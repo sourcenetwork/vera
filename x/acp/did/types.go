@@ -38,13 +38,13 @@ func IsValidDID(did string) error {
 // IssueDID produces a DID for a SourceHub account
 func IssueDID(acc sdk.AccountI) (string, error) {
 	var keyType crypto.KeyType
-	switch acc.GetPubKey().(type) {
+	switch t := acc.GetPubKey().(type) {
 	case *secp256k1.PubKey:
 		keyType = crypto.SECP256k1
 	case *ed25519.PubKey:
 		keyType = crypto.Ed25519
 	default:
-		return "", fmt.Errorf("failed to issue did for %v: account key type must be secp256k1 or ed25519", acc.GetAddress().String())
+		return "", fmt.Errorf("failed to issue did for %v: account key type must be secp256k1 or ed25519, got %v", acc.GetAddress().String(), t)
 	}
 
 	did, err := key.CreateDIDKey(keyType, acc.GetPubKey().Bytes())
