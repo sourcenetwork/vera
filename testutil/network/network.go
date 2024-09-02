@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	"github.com/sourcenetwork/sourcehub/app/params"
 )
 
 type (
@@ -28,6 +29,7 @@ func New(t *testing.T, configs ...Config) *Network {
 	} else {
 		cfg = configs[0]
 	}
+	cfg.BondDenom = params.DefaultBondDenom
 	net, err := network.New(t, t.TempDir(), cfg)
 	require.NoError(t, err)
 	_, err = net.WaitForHeight(1)

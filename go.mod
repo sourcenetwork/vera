@@ -4,8 +4,6 @@ go 1.22
 
 toolchain go1.22.4
 
-replace github.com/sourcenetwork/acp_core => ./submodules/acp_core
-
 replace (
 	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
@@ -47,7 +45,7 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.4.0
 	github.com/lestrrat-go/jwx/v2 v2.1.0
-	github.com/sourcenetwork/acp_core v0.0.0-00010101000000-000000000000
+	github.com/sourcenetwork/acp_core v0.2.0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
@@ -88,6 +86,8 @@ require (
 	github.com/bits-and-blooms/bitset v1.11.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
+	github.com/btcsuite/btcd/btcutil v1.1.5 // indirect
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
 	github.com/bufbuild/protocompile v0.9.0 // indirect
 	github.com/bufbuild/protovalidate-go v0.6.0 // indirect
 	github.com/bufbuild/protoyaml-go v0.1.8 // indirect
@@ -249,7 +249,7 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/sourcenetwork/zanzi v0.3.1-0.20240722161512-1aa0a9977af7 // indirect
+	github.com/sourcenetwork/zanzi v0.3.1-0.20240814180502-4f29069b6164 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
