@@ -184,3 +184,18 @@ func (a *PolicySetupAction) Run(ctx *TestCtx) {
 		action.Run(ctx)
 	}
 }
+
+type GetPolicyAction struct {
+	Id          string
+	Expected    *types.QueryPolicyResponse
+	ExpectedErr error
+}
+
+func (a *GetPolicyAction) Run(ctx *TestCtx) {
+	msg := &types.QueryPolicyRequest{
+		Id: a.Id,
+	}
+	result, err := ctx.Executor.Policy(ctx, msg)
+
+	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
+}

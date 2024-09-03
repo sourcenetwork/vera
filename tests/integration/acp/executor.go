@@ -32,6 +32,7 @@ import (
 
 type KeeperExecutor struct {
 	k              types.MsgServer
+	keeper         types.QueryServer
 	accountCreator *testutil.AccountKeeperStub
 }
 
@@ -55,6 +56,10 @@ func (e *KeeperExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) 
 
 func (e *KeeperExecutor) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
 	return e.accountCreator.NewAccount(actor.PubKey), nil
+}
+
+func (e *KeeperExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
+	return e.keeper.Policy(ctx, msg)
 }
 
 func NewExecutor(t *testing.T, strategy ExecutorStrategy) (context.Context, MsgExecutor) {
@@ -114,6 +119,7 @@ func newKeeperExecutor() (context.Context, MsgExecutor, error) {
 	msgServer := keeper.NewMsgServerImpl(k)
 	executor := &KeeperExecutor{
 		k:              msgServer,
+		keeper:         k,
 		accountCreator: accKeeper,
 	}
 	return ctx, executor, nil
@@ -248,6 +254,10 @@ func (e *SDKClientExecutor) broadcastTx(ctx *TestCtx, msgSet *hubsdk.MsgSet) *hu
 	require.NoError(ctx.T, err)
 
 	return result
+}
+
+func (e *SDKClientExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
+	panic("todo")
 }
 
 func (e *SDKClientExecutor) Cleanup() {
