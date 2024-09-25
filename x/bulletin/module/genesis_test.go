@@ -5,7 +5,7 @@ import (
 
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/testutil/nullify"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/module"
+	bulletin "github.com/sourcenetwork/sourcehub/x/bulletin/module"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	"github.com/stretchr/testify/require"
 )

@@ -5,12 +5,13 @@ package types
 
 import (
 	fmt "fmt"
-	proto "github.com/cosmos/gogoproto/proto"
-	types1 "github.com/cosmos/gogoproto/types"
-	types "github.com/sourcenetwork/acp_core/pkg/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	proto "github.com/cosmos/gogoproto/proto"
+	types1 "github.com/cosmos/gogoproto/types"
+	types "github.com/sourcenetwork/acp_core/pkg/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

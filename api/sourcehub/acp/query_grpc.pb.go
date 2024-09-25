@@ -8,6 +8,7 @@ package acp
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,14 +20,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName              = "/sourcehub.acp.Query/Params"
-	Query_Policy_FullMethodName              = "/sourcehub.acp.Query/Policy"
-	Query_PolicyIds_FullMethodName           = "/sourcehub.acp.Query/PolicyIds"
-	Query_FilterRelationships_FullMethodName = "/sourcehub.acp.Query/FilterRelationships"
-	Query_VerifyAccessRequest_FullMethodName = "/sourcehub.acp.Query/VerifyAccessRequest"
-	Query_ValidatePolicy_FullMethodName      = "/sourcehub.acp.Query/ValidatePolicy"
-	Query_AccessDecision_FullMethodName      = "/sourcehub.acp.Query/AccessDecision"
-	Query_ObjectOwner_FullMethodName         = "/sourcehub.acp.Query/ObjectOwner"
+	Query_Params_FullMethodName                  = "/sourcehub.acp.Query/Params"
+	Query_Policy_FullMethodName                  = "/sourcehub.acp.Query/Policy"
+	Query_PolicyIds_FullMethodName               = "/sourcehub.acp.Query/PolicyIds"
+	Query_FilterRelationships_FullMethodName     = "/sourcehub.acp.Query/FilterRelationships"
+	Query_VerifyAccessRequest_FullMethodName     = "/sourcehub.acp.Query/VerifyAccessRequest"
+	Query_ValidatePolicy_FullMethodName          = "/sourcehub.acp.Query/ValidatePolicy"
+	Query_AccessDecision_FullMethodName          = "/sourcehub.acp.Query/AccessDecision"
+	Query_ObjectOwner_FullMethodName             = "/sourcehub.acp.Query/ObjectOwner"
+	Query_RegistrationsCommitment_FullMethodName = "/sourcehub.acp.Query/RegistrationsCommitment"
 )
 
 // QueryClient is the client API for Query service.
@@ -49,6 +51,8 @@ type QueryClient interface {
 	AccessDecision(ctx context.Context, in *QueryAccessDecisionRequest, opts ...grpc.CallOption) (*QueryAccessDecisionResponse, error)
 	// ObjectOwner returns the Actor ID of the the given Object's owner
 	ObjectOwner(ctx context.Context, in *QueryObjectOwnerRequest, opts ...grpc.CallOption) (*QueryObjectOwnerResponse, error)
+	// Queries a list of RegistrationsCommitment items.
+	RegistrationsCommitment(ctx context.Context, in *QueryRegistrationsCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentResponse, error)
 }
 
 type queryClient struct {
@@ -131,6 +135,15 @@ func (c *queryClient) ObjectOwner(ctx context.Context, in *QueryObjectOwnerReque
 	return out, nil
 }
 
+func (c *queryClient) RegistrationsCommitment(ctx context.Context, in *QueryRegistrationsCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentResponse, error) {
+	out := new(QueryRegistrationsCommitmentResponse)
+	err := c.cc.Invoke(ctx, Query_RegistrationsCommitment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -151,6 +164,8 @@ type QueryServer interface {
 	AccessDecision(context.Context, *QueryAccessDecisionRequest) (*QueryAccessDecisionResponse, error)
 	// ObjectOwner returns the Actor ID of the the given Object's owner
 	ObjectOwner(context.Context, *QueryObjectOwnerRequest) (*QueryObjectOwnerResponse, error)
+	// Queries a list of RegistrationsCommitment items.
+	RegistrationsCommitment(context.Context, *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -181,6 +196,9 @@ func (UnimplementedQueryServer) AccessDecision(context.Context, *QueryAccessDeci
 }
 func (UnimplementedQueryServer) ObjectOwner(context.Context, *QueryObjectOwnerRequest) (*QueryObjectOwnerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ObjectOwner not implemented")
+}
+func (UnimplementedQueryServer) RegistrationsCommitment(context.Context, *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegistrationsCommitment not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -339,6 +357,24 @@ func _Query_ObjectOwner_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_RegistrationsCommitment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRegistrationsCommitmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).RegistrationsCommitment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_RegistrationsCommitment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).RegistrationsCommitment(ctx, req.(*QueryRegistrationsCommitmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -377,6 +413,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ObjectOwner",
 			Handler:    _Query_ObjectOwner_Handler,
+		},
+		{
+			MethodName: "RegistrationsCommitment",
+			Handler:    _Query_RegistrationsCommitment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
