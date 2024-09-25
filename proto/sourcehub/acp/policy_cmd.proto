@@ -4,7 +4,7 @@ package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
-import "sourcenetwork/sourcehub/acp/commitment.proto";
+import "sourcehub/acp/commitment.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -92,7 +92,7 @@ message CommitRegistrationsCmdResult {
 message RevealRegistrationCmd {
   string policy_id = 1;
   string registrations_commitment_id = 2;
-  Object object = 3;
+  sourcenetwork.acp_core.Object object = 3;
   RegistrationProof proof = 4;
 }
 

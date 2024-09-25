@@ -45,12 +45,12 @@ message RegistrationsCommitment {
 // RegistrationAmendmentEvent models an instance of the Registration Amendment rule
 message RegistrationAmendmentEvent {
     string policy_id = 1;
-    Object object = 2;
-    Actor owner = 3;
+    sourcenetwork.acp_core.Object object = 2;
+    sourcenetwork.acp_core.Actor owner = 3;
     string commitment_id = 4;
 
-    Actor offending_actor = 4;
-    bytes offending_tx = 5;
+    sourcenetwork.acp_core.Actor offending_actor = 5;
+    bytes offending_tx_hash = 6;
 
-    bool hijack_flag = 6;
+    bool hijack_flag = 7;
 }
