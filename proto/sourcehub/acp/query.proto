@@ -59,15 +59,6 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/object_owner/{policy_id}/{object.resource}/{object.id}";
   }
 
-  // RegistrationsCommitment returns a RegistrationsCommitment with the given ID
-  rpc RegistrationsCommitment(QueryRegistrationsCommitment) returns (QueryRegistrationsCommitmentResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registration_commitments/{id}";
-  }
-
-  // RegistrationsCommitment filters RegistrationsCommitments for objects with the matching commitment value
-  rpc RegistrationsCommitmentByCommitment(QueryRegistrationsCommitmentByCommitment) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registration_commitments/commitment/{commitment}";
-  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -150,20 +141,4 @@ message QueryObjectOwnerRequest {
 message QueryObjectOwnerResponse {
   bool is_registered = 1;
   string owner_id = 2;
-}
-
-message QueryRegistrationsCommitment{
-  string id = 1;
-}
-
-message QueryRegistrationsCommitmentResponse{
-  RegistrationsCommitment registrations_commitment = 1;
-}
-
-message QueryRegistrationsCommitmentByCommitment {
-  bytes commitment = 1;
-}
-
-message QueryRegistrationsCommitmentByCommitmentResponse {
-  repeated RegistrationsCommitment registrations_commitments = 1;
 }
