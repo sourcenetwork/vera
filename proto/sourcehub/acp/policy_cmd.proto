@@ -4,6 +4,7 @@ package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcenetwork/sourcehub/acp/commitment.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -48,6 +49,9 @@ message PolicyCmd {
     DeleteRelationshipCmd delete_relationship_cmd = 2;
     RegisterObjectCmd register_object_cmd = 3;
     UnregisterObjectCmd unregister_object_cmd = 4;
+    CommitRegistrationsCmd commit_registrations_cmd = 5;
+    RevealRegistrationCmd reveal_registration_cmd = 6;
+    FlagHijackAttemptCmd flag_hijack_attempt_cmd = 7;
   }
 }
 
@@ -76,6 +80,42 @@ message RegisterObjectCmd {
   sourcenetwork.acp_core.Object object = 1;
 }
 
+message CommitRegistrationsCmd {
+  string policy_id = 1;
+  bytes commitment = 2;
+}
+
+message CommitRegistrationsCmdResult {
+  RegistrationsCommitment registrations_commitment = 1;
+}
+
+message RevealRegistrationCmd {
+  string policy_id = 1;
+  string registrations_commitment_id = 2;
+  Object object = 3;
+  RegistrationProof proof = 4;
+}
+
+enum RegistrationResultStatus {
+  NO_OP = 0;
+  OK = 1;
+  AMENDED = 2;
+  UNARCHIVED = 3;
+}
+
+message RevealRegistrationCmdResult {
+  RegistrationResultStatus result = 1;
+  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  RegistrationAmendmentEvent amendment_event = 3;
+}
+
+message FlagHijackAttemptCmd {
+  string amendment_event_id = 1;
+}
+
+message FlagHijackAttemptCmdResult {
+  RegistrationAmendmentEvent amendment_event = 1;
+}
 
 // UnregisterObject let's an Object's Owner effectively "unshare" their Object.
 // This method wipes all Relationships referencing the given Object.

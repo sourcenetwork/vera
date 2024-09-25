@@ -1,8 +1,8 @@
 module github.com/sourcenetwork/sourcehub
 
-go 1.22
+go 1.21.3
 
-toolchain go1.22.4
+toolchain go1.23.1
 
 replace (
 	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.

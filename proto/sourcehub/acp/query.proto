@@ -8,6 +8,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/access_decision.proto";
+import "sourcehub/acp/commitment.proto";
 import "sourcenetwork/acp_core/policy.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/relationship.proto";
@@ -56,6 +57,16 @@ service Query {
   // ObjectOwner returns the Actor ID of the the given Object's owner
   rpc ObjectOwner(QueryObjectOwnerRequest) returns (QueryObjectOwnerResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/object_owner/{policy_id}/{object.resource}/{object.id}";
+  }
+
+  // RegistrationsCommitment returns a RegistrationsCommitment with the given ID
+  rpc RegistrationsCommitment(QueryRegistrationsCommitment) returns (QueryRegistrationsCommitmentResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registration_commitments/{id}";
+  }
+
+  // RegistrationsCommitment filters RegistrationsCommitments for objects with the matching commitment value
+  rpc RegistrationsCommitmentByCommitment(QueryRegistrationsCommitmentByCommitment) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registration_commitments/commitment/{id}";
   }
 }
 
@@ -139,4 +150,20 @@ message QueryObjectOwnerRequest {
 message QueryObjectOwnerResponse {
   bool is_registered = 1;
   string owner_id = 2;
+}
+
+message QueryRegistrationsCommitment{
+  string id = 1;
+}
+
+message QueryRegistrationsCommitmentResponse{
+  RegistartionsCommitment registrations_commitment = 1;
+}
+
+message QueryRegistrationsCommitmentByCommitment {
+  bytes commitment = 1;
+}
+
+message QueryRegistrationsCommitmentByCommitmentResponse {
+  repeated RegistartionsCommitment registrations_commitments = 1;
 }

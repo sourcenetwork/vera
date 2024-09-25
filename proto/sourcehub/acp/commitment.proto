@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package sourcehub.acp;
+
+import "google/protobuf/timestamp.proto";
+import "sourcenetwork/acp_core/relationship.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
+
+
+// RegistrationProof models an opening proof for a RegistrationCommitment
+message RegistrationProof {
+    // Hash of neighbors required to validate proof.
+    // Hashes must be ordered by neighbors / levels in the tree,
+    // such that a foldl like recursion over the hashes produces the
+    // stored commitment
+    repeated bytes merkle_proof = 1;
+}
+
+// RegistrationsCommitment models a batched cryptographic commitment
+// of a set of Object registrations issued by an Actor
+message RegistrationsCommitment {
+    string id = 1;
+    string policy_id = 2;
+    sourcenetwork.acp_core.Actor actor = 3;
+
+    // commitment is a merkle root of registrations 
+    // TODO reference to doc containing commitment format
+    bytes commitment = 4;
+    bool expired = 5;
+
+    // hash of tx which created the commitment
+    bytes tx_hash = 6;
+
+    // block number at creation
+    uint64 creation_height = 7;
+
+    // tendermint timestamp of the block which processed the tx
+    google.protobuf.Timestamp creation_time = 8;
+
+    // time after which the registration should no longer be accepted
+    google.protobuf.Timestamp expiration_time = 9;
+}
+
+// RegistrationAmendmentEvent models an instance of the Registration Amendment rule
+message RegistrationAmendmentEvent {
+    string policy_id = 1;
+    Object object = 2;
+    Actor owner = 3;
+    string commitment_id = 4;
+
+    Actor offending_actor = 4;
+    bytes offending_tx = 5;
+
+    bool hijack_flag = 6;
+}
