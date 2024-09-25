@@ -56,6 +56,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
 
+				{
+					RpcMethod:      "RegistrationsCommitmentByCommitment",
+					Use:            "registrations-commitment-by-commitment",
+					Short:          "Query RegistrationsCommitmentByCommitment",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
+				},
+
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},

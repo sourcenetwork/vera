@@ -73,6 +73,12 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment";
   
   }
+  
+  // Queries a list of RegistrationsCommitmentByCommitment items.
+  rpc RegistrationsCommitmentByCommitment (QueryRegistrationsCommitmentByCommitmentRequest) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment_by_commitment";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -159,4 +165,8 @@ message QueryObjectOwnerResponse {
 message QueryRegistrationsCommitmentRequest {}
 
 message QueryRegistrationsCommitmentResponse {}
+
+message QueryRegistrationsCommitmentByCommitmentRequest {}
+
+message QueryRegistrationsCommitmentByCommitmentResponse {}
 

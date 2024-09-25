@@ -20,15 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_Params_FullMethodName                  = "/sourcehub.acp.Query/Params"
-	Query_Policy_FullMethodName                  = "/sourcehub.acp.Query/Policy"
-	Query_PolicyIds_FullMethodName               = "/sourcehub.acp.Query/PolicyIds"
-	Query_FilterRelationships_FullMethodName     = "/sourcehub.acp.Query/FilterRelationships"
-	Query_VerifyAccessRequest_FullMethodName     = "/sourcehub.acp.Query/VerifyAccessRequest"
-	Query_ValidatePolicy_FullMethodName          = "/sourcehub.acp.Query/ValidatePolicy"
-	Query_AccessDecision_FullMethodName          = "/sourcehub.acp.Query/AccessDecision"
-	Query_ObjectOwner_FullMethodName             = "/sourcehub.acp.Query/ObjectOwner"
-	Query_RegistrationsCommitment_FullMethodName = "/sourcehub.acp.Query/RegistrationsCommitment"
+	Query_Params_FullMethodName                              = "/sourcehub.acp.Query/Params"
+	Query_Policy_FullMethodName                              = "/sourcehub.acp.Query/Policy"
+	Query_PolicyIds_FullMethodName                           = "/sourcehub.acp.Query/PolicyIds"
+	Query_FilterRelationships_FullMethodName                 = "/sourcehub.acp.Query/FilterRelationships"
+	Query_VerifyAccessRequest_FullMethodName                 = "/sourcehub.acp.Query/VerifyAccessRequest"
+	Query_ValidatePolicy_FullMethodName                      = "/sourcehub.acp.Query/ValidatePolicy"
+	Query_AccessDecision_FullMethodName                      = "/sourcehub.acp.Query/AccessDecision"
+	Query_ObjectOwner_FullMethodName                         = "/sourcehub.acp.Query/ObjectOwner"
+	Query_RegistrationsCommitment_FullMethodName             = "/sourcehub.acp.Query/RegistrationsCommitment"
+	Query_RegistrationsCommitmentByCommitment_FullMethodName = "/sourcehub.acp.Query/RegistrationsCommitmentByCommitment"
 )
 
 // QueryClient is the client API for Query service.
@@ -53,6 +54,8 @@ type QueryClient interface {
 	ObjectOwner(ctx context.Context, in *QueryObjectOwnerRequest, opts ...grpc.CallOption) (*QueryObjectOwnerResponse, error)
 	// Queries a list of RegistrationsCommitment items.
 	RegistrationsCommitment(ctx context.Context, in *QueryRegistrationsCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentResponse, error)
+	// Queries a list of RegistrationsCommitmentByCommitment items.
+	RegistrationsCommitmentByCommitment(ctx context.Context, in *QueryRegistrationsCommitmentByCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentByCommitmentResponse, error)
 }
 
 type queryClient struct {
@@ -144,6 +147,15 @@ func (c *queryClient) RegistrationsCommitment(ctx context.Context, in *QueryRegi
 	return out, nil
 }
 
+func (c *queryClient) RegistrationsCommitmentByCommitment(ctx context.Context, in *QueryRegistrationsCommitmentByCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	out := new(QueryRegistrationsCommitmentByCommitmentResponse)
+	err := c.cc.Invoke(ctx, Query_RegistrationsCommitmentByCommitment_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
@@ -166,6 +178,8 @@ type QueryServer interface {
 	ObjectOwner(context.Context, *QueryObjectOwnerRequest) (*QueryObjectOwnerResponse, error)
 	// Queries a list of RegistrationsCommitment items.
 	RegistrationsCommitment(context.Context, *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error)
+	// Queries a list of RegistrationsCommitmentByCommitment items.
+	RegistrationsCommitmentByCommitment(context.Context, *QueryRegistrationsCommitmentByCommitmentRequest) (*QueryRegistrationsCommitmentByCommitmentResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -199,6 +213,9 @@ func (UnimplementedQueryServer) ObjectOwner(context.Context, *QueryObjectOwnerRe
 }
 func (UnimplementedQueryServer) RegistrationsCommitment(context.Context, *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegistrationsCommitment not implemented")
+}
+func (UnimplementedQueryServer) RegistrationsCommitmentByCommitment(context.Context, *QueryRegistrationsCommitmentByCommitmentRequest) (*QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegistrationsCommitmentByCommitment not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -375,6 +392,24 @@ func _Query_RegistrationsCommitment_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_RegistrationsCommitmentByCommitment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRegistrationsCommitmentByCommitmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).RegistrationsCommitmentByCommitment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_RegistrationsCommitmentByCommitment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).RegistrationsCommitmentByCommitment(ctx, req.(*QueryRegistrationsCommitmentByCommitmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -417,6 +452,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegistrationsCommitment",
 			Handler:    _Query_RegistrationsCommitment_Handler,
+		},
+		{
+			MethodName: "RegistrationsCommitmentByCommitment",
+			Handler:    _Query_RegistrationsCommitmentByCommitment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
