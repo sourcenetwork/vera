@@ -3,6 +3,7 @@ syntax = "proto3";
 package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
+import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -23,8 +24,8 @@ message ObjectRegistrationEvent {
     uint64 height = 4;
     google.protobuf.Timestamp ts = 5;
     string policy_id = 6;
-    Object object = 7;
-    Actor actor = 8;
+    sourcenetwork.acp_core.Object object = 7;
+    sourcenetwork.acp_core.Actor actor = 8;
 }
 
 message EventDetail {
@@ -37,7 +38,7 @@ message EventDetail {
 
 message AmendmentEventDetail {
     bool hijack_flag = 1;
-    Actor previous_owner = 2;
+    sourcenetwork.acp_core.Actor previous_owner = 2;
     string reveal_registration_event_id = 3;
 }
 

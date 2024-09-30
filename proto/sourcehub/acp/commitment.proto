@@ -41,16 +41,3 @@ message RegistrationsCommitment {
     // time after which the registration should no longer be accepted
     google.protobuf.Timestamp expiration_time = 9;
 }
-
-// RegistrationAmendmentEvent models an instance of the Registration Amendment rule
-message RegistrationAmendmentEvent {
-    string policy_id = 1;
-    sourcenetwork.acp_core.Object object = 2;
-    sourcenetwork.acp_core.Actor owner = 3;
-    string commitment_id = 4;
-
-    sourcenetwork.acp_core.Actor offending_actor = 5;
-    bytes offending_tx_hash = 6;
-
-    bool hijack_flag = 7;
-}

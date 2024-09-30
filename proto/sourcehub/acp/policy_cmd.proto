@@ -5,7 +5,7 @@ package sourcehub.acp;
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/commitment.proto";
-import "sourcehub/acp/metadata.proto";
+import "sourcehub/acp/registration.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -106,8 +106,7 @@ enum RegistrationResultStatus {
 message RevealRegistrationCmdResult {
   RegistrationResultStatus result = 1;
   sourcenetwork.acp_core.RelationshipRecord record = 2;
-  RegistrationAmendmentEvent amendment_event = 3;
-  RegistrationMetadata metadata = 4;
+  ObjectRegistrationEvent event = 3;
 }
 
 message FlagHijackAttemptCmd {
@@ -115,7 +114,7 @@ message FlagHijackAttemptCmd {
 }
 
 message FlagHijackAttemptCmdResult {
-  RegistrationAmendmentEvent amendment_event = 1;
+  ObjectRegistrationEvent event = 1;
 }
 
 // UnregisterObject let's an Object's Owner effectively "unshare" their Object.
