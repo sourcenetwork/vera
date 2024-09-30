@@ -5,6 +5,7 @@ package sourcehub.acp;
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/commitment.proto";
+import "sourcehub/acp/metadata.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -90,10 +91,9 @@ message CommitRegistrationsCmdResult {
 }
 
 message RevealRegistrationCmd {
-  string policy_id = 1;
-  string registrations_commitment_id = 2;
-  sourcenetwork.acp_core.Object object = 3;
-  RegistrationProof proof = 4;
+  string registrations_commitment_id = 1;
+  sourcenetwork.acp_core.Object object = 2;
+  RegistrationProof proof = 3;
 }
 
 enum RegistrationResultStatus {
@@ -107,6 +107,7 @@ message RevealRegistrationCmdResult {
   RegistrationResultStatus result = 1;
   sourcenetwork.acp_core.RelationshipRecord record = 2;
   RegistrationAmendmentEvent amendment_event = 3;
+  RegistrationMetadata metadata = 4;
 }
 
 message FlagHijackAttemptCmd {

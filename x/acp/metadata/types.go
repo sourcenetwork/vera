@@ -3,11 +3,11 @@ package metadata
 import (
 	"context"
 
-	"github.com/sourcenetwork/sourcehub/api/sourcenetwork/acp_core"
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
 type MetadataRepository interface {
-	SetRelationshipMetadata(context.Context, *acp_core.Relationship, *types.RelationshipMetadata) error
-	GetRelationshipMetadata(context.Context, *acp_core.Relationship) (*types.RelationshipMetadata, error)
+	SetRegistrationMetadata(context.Context, string, *coretypes.Object, *types.RegistrationMetadata) error
+	GetRegistrationMetadata(context.Context, string, *coretypes.Object) (*types.RegistrationMetadata, error)
 }

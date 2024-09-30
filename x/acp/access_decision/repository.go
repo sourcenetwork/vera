@@ -4,7 +4,6 @@ import (
 	"context"
 
 	storetypes "cosmossdk.io/store/types"
-	gogoproto "github.com/cosmos/gogoproto/proto"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	raccoon "github.com/sourcenetwork/raccoondb"
 
@@ -12,30 +11,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
-
-func NewGogoProtoMarshaler[T gogoproto.Message](factory func() T) *GogoProtoMarshaler[T] {
-	return &GogoProtoMarshaler[T]{
-		factory: factory,
-	}
-}
-
-type GogoProtoMarshaler[T gogoproto.Message] struct {
-	factory func() T
-}
-
-func (m *GogoProtoMarshaler[T]) Marshal(t *T) ([]byte, error) {
-	return gogoproto.Marshal(*t)
-}
-
-func (m *GogoProtoMarshaler[T]) Unmarshal(bytes []byte) (T, error) {
-	t := m.factory()
-	err := gogoproto.Unmarshal(bytes, t)
-	if err != nil {
-		return t, err
-	}
-
-	return t, nil
-}
 
 type AccessDecisionRepository struct {
 	kv storetypes.KVStore
@@ -49,7 +24,7 @@ func NewAccessDecisionRepository(store storetypes.KVStore) *AccessDecisionReposi
 
 func (r *AccessDecisionRepository) getStore(ctx context.Context) raccoon.ObjectStore[*types.AccessDecision] {
 	rcKV := stores.RaccoonKVFromCosmos(r.kv)
-	marshaler := NewGogoProtoMarshaler[*types.AccessDecision](func() *types.AccessDecision { return &types.AccessDecision{} })
+	marshaler := stores.NewGogoProtoMarshaler[*types.AccessDecision](func() *types.AccessDecision { return &types.AccessDecision{} })
 	ider := &decisionIder{}
 	return raccoon.NewObjStore[*types.AccessDecision](rcKV, marshaler, ider)
 }

@@ -46,7 +46,7 @@ require (
 	github.com/ignite/cli/v28 v28.4.0
 	github.com/lestrrat-go/jwx/v2 v2.1.0
 	github.com/sourcenetwork/acp_core v0.2.0
-	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
+	github.com/sourcenetwork/raccoondb v0.2.1-0.20240926172518-43cb8aeda222
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2

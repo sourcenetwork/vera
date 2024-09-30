@@ -14,7 +14,3 @@ type RegistrationsRepository interface {
 
 	FilterByCommitment(ctx context.Context, commitment []byte) ([]*types.RegistrationsCommitment, error)
 }
-
-type RegistrationCounter interface {
-	GetNextId(context.Context) (uint64, error)
-}

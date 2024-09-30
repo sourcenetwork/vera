@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package sourcehub.acp;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
+
+enum ObjectRegistrationEventType {
+    UNKNOWN = 0;
+    REGISTRATION = 1;
+    REVEAL_REGISTRATION = 2;
+    ARCHIVAL = 3;
+    UNARCHIVAL = 4;
+    AMENDMENT = 5;
+    TRANSFER = 6;
+}
+
+message ObjectRegistrationEvent {
+    string id = 1;
+    ObjectRegistrationEventType type = 2;
+    bytes tx_hash = 3;
+    uint64 height = 4;
+    google.protobuf.Timestamp ts = 5;
+    string policy_id = 6;
+    Object object = 7;
+    Actor actor = 8;
+}
+
+message EventDetail {
+    oneof detail {
+        RegistrationEvent registration_event = 1;
+        RevealRegistrationDetail reveal_event = 2;
+        AmendmentEventDetail amendment_event = 3;
+    }
+}
+
+message AmendmentEventDetail {
+    bool hijack_flag = 1;
+    Actor previous_owner = 2;
+    string reveal_registration_event_id = 3;
+}
+
+message RevealRegistrationDetail {
+    // height at which the relationship was created
+    uint64 commitment_creation_height = 2;
+
+    // id of the registration commitment which originally registered the relationship
+    string registration_commitment_id = 3;
+}
+
+
+// RegistrationMetadata stores historical data for an Object Registration
+message RegistrationEvent {
+    //tx_hash is the hash of the Tx that created the Relatinoship
+  bytes tx_hash = 1;
+
+  // height at which the relationship was created
+  uint64 creation_height = 2;
+
+  // id of the registration commitment which originally registered the relationship
+  string registration_commitment_id = 3;
+
+  // tendermint timestamp for the block which created the Relationship
+  google.protobuf.Timestamp creation_height_ts = 4;
+}

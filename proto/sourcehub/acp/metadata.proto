@@ -6,8 +6,8 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
-// RelationshipMetadata stores historical data for a Relationship
-message RelationshipMetadata {
+// RegistrationMetadata stores historical data for an Object Registration
+message RegistrationMetadata {
     //tx_hash is the hash of the Tx that created the Relatinoship
   bytes tx_hash = 1;
 
