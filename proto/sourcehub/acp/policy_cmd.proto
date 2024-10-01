@@ -110,7 +110,7 @@ message RevealRegistrationCmdResult {
 }
 
 message FlagHijackAttemptCmd {
-  string amendment_event_id = 1;
+  string event_id = 1;
 }
 
 message FlagHijackAttemptCmdResult {

@@ -7,6 +7,7 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	acputils "github.com/sourcenetwork/acp_core/pkg/utils"
 	raccoon "github.com/sourcenetwork/raccoondb"
@@ -72,6 +73,35 @@ func (s *eventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string,
 	sortable.SortInPlace()
 
 	return evs[0], nil
+}
+
+func (s *eventService) FlagHijackEvent(ctx sdk.Context, eventId string, actor *coretypes.Actor) (*types.ObjectRegistrationEvent, error) {
+	event, err := s.repo.GetById(ctx, eventId)
+	if err != nil {
+		return nil, err
+	}
+	if event.Type != types.ObjectRegistrationEventType_AMENDMENT {
+		return nil, errors.Wrap("event must be of type AMENDMENT", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("event", eventId),
+		)
+	}
+
+	if event.Actor != actor {
+		return nil, errors.Wrap("event actor missmatch: principal must be event subject",
+			errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("event", eventId),
+			errors.Pair("expected_actor", actor.Id),
+		)
+	}
+
+	event.Detail.GetAmendmentEvent().HijackFlag = true
+
+	err = s.repo.Set(ctx, event)
+	if err != nil {
+		return nil, err
+	}
+
+	return event, nil
 }
 
 type registrationService struct {

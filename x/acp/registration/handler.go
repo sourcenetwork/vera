@@ -239,3 +239,20 @@ func (h *RevealRegistrationHandler) unregisteredStrategy(
 		Event:  event,
 	}, nil
 }
+
+type FlagHijackAttemptHandler struct{}
+
+func (h *FlagHijackAttemptHandler) Handle(
+	ctx sdk.Context,
+	service *eventService,
+	actor *coretypes.Actor,
+	cmd *types.FlagHijackAttemptCmd) (*types.FlagHijackAttemptCmdResult, error) {
+	event, err := service.FlagHijackEvent(ctx, cmd.EventId, actor)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.FlagHijackAttemptCmdResult{
+		Event: event,
+	}, nil
+}
