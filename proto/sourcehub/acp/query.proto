@@ -80,6 +80,12 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment_by_commitment";
   
   }
+  
+  // Queries a list of ListObjectEvents items.
+  rpc ListObjectEvents (QueryListObjectEventsRequest) returns (QueryListObjectEventsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/list_object_events";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -178,4 +184,8 @@ message QueryRegistrationsCommitmentByCommitmentRequest {
 message QueryRegistrationsCommitmentByCommitmentResponse {
   repeated RegistrationsCommitment registrations_commitments = 1;
 }
+
+message QueryListObjectEventsRequest {}
+
+message QueryListObjectEventsResponse {}
 
