@@ -50,7 +50,7 @@ func (r *KVEventRepository) GetById(ctx context.Context, id string) (*types.Obje
 	return opt.Value(), nil
 }
 
-func (r *KVEventRepository) GetObjectEvents(ctx context.Context, policyId string, object coretypes.Object) ([]*types.ObjectRegistrationEvent, error) {
+func (r *KVEventRepository) GetObjectEvents(ctx context.Context, policyId string, object *coretypes.Object) ([]*types.ObjectRegistrationEvent, error) {
 	recs, err := r.store.Filter(func(ev *types.ObjectRegistrationEvent) bool {
 		return ev.PolicyId == policyId && ev.Object.Resource == object.Resource && ev.Object.Id == ev.Object.Id
 	})

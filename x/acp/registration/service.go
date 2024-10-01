@@ -52,7 +52,7 @@ func (s *eventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 }
 
 func (s *eventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string, object *coretypes.Object) (*types.ObjectRegistrationEvent, error) {
-	evs, err := s.repo.GetObjectEvents(ctx, polId, *object)
+	evs, err := s.repo.GetObjectEvents(ctx, polId, object)
 	if err != nil {
 		return nil, err
 	}

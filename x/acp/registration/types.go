@@ -20,5 +20,5 @@ type CommitmentRepository interface {
 type RegistrationEventRepository interface {
 	Set(ctx context.Context, event *types.ObjectRegistrationEvent) error
 	GetById(ctx context.Context, id string) (*types.ObjectRegistrationEvent, error)
-	GetObjectEvents(ctx context.Context, policyId string, object coretypes.Object) ([]*types.ObjectRegistrationEvent, error)
+	GetObjectEvents(ctx context.Context, policyId string, object *coretypes.Object) ([]*types.ObjectRegistrationEvent, error)
 }

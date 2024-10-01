@@ -185,7 +185,12 @@ message QueryRegistrationsCommitmentByCommitmentResponse {
   repeated RegistrationsCommitment registrations_commitments = 1;
 }
 
-message QueryListObjectEventsRequest {}
+message QueryListObjectEventsRequest {
+  string policy_id = 1;
+  sourcenetwork.acp_core.Object object = 2;
+}
 
-message QueryListObjectEventsResponse {}
+message QueryListObjectEventsResponse {
+  repeated ObjectRegistrationEvent events = 1;
+}
 
