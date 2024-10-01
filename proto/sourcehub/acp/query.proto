@@ -8,6 +8,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/access_decision.proto";
+import "sourcehub/acp/registration.proto";
 import "sourcehub/acp/commitment.proto";
 import "sourcenetwork/acp_core/policy.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
@@ -162,11 +163,19 @@ message QueryObjectOwnerResponse {
   string owner_id      = 2;
 }
 
-message QueryRegistrationsCommitmentRequest {}
+message QueryRegistrationsCommitmentRequest {
+  string id = 1;
+}
 
-message QueryRegistrationsCommitmentResponse {}
+message QueryRegistrationsCommitmentResponse {
+  RegistrationsCommitment registrations_commitment = 1;
+}
 
-message QueryRegistrationsCommitmentByCommitmentRequest {}
+message QueryRegistrationsCommitmentByCommitmentRequest {
+  bytes commitment = 1;
+}
 
-message QueryRegistrationsCommitmentByCommitmentResponse {}
+message QueryRegistrationsCommitmentByCommitmentResponse {
+  repeated RegistrationsCommitment registrations_commitments = 1;
+}
 

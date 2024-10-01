@@ -73,6 +73,7 @@ type ObjectRegistrationEvent struct {
 	PolicyId string                      `protobuf:"bytes,6,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	Object   *types1.Object              `protobuf:"bytes,7,opt,name=object,proto3" json:"object,omitempty"`
 	Actor    *types1.Actor               `protobuf:"bytes,8,opt,name=actor,proto3" json:"actor,omitempty"`
+	Detail   *EventDetail                `protobuf:"bytes,9,opt,name=detail,proto3" json:"detail,omitempty"`
 }
 
 func (m *ObjectRegistrationEvent) Reset()         { *m = ObjectRegistrationEvent{} }
@@ -164,10 +165,16 @@ func (m *ObjectRegistrationEvent) GetActor() *types1.Actor {
 	return nil
 }
 
+func (m *ObjectRegistrationEvent) GetDetail() *EventDetail {
+	if m != nil {
+		return m.Detail
+	}
+	return nil
+}
+
 type EventDetail struct {
 	// Types that are valid to be assigned to Detail:
 	//
-	//	*EventDetail_RegistrationEvent
 	//	*EventDetail_RevealEvent
 	//	*EventDetail_AmendmentEvent
 	Detail isEventDetail_Detail `protobuf_oneof:"detail"`
@@ -212,9 +219,6 @@ type isEventDetail_Detail interface {
 	Size() int
 }
 
-type EventDetail_RegistrationEvent struct {
-	RegistrationEvent *RegistrationEvent `protobuf:"bytes,1,opt,name=registration_event,json=registrationEvent,proto3,oneof" json:"registration_event,omitempty"`
-}
 type EventDetail_RevealEvent struct {
 	RevealEvent *RevealRegistrationDetail `protobuf:"bytes,2,opt,name=reveal_event,json=revealEvent,proto3,oneof" json:"reveal_event,omitempty"`
 }
@@ -222,20 +226,12 @@ type EventDetail_AmendmentEvent struct {
 	AmendmentEvent *AmendmentEventDetail `protobuf:"bytes,3,opt,name=amendment_event,json=amendmentEvent,proto3,oneof" json:"amendment_event,omitempty"`
 }
 
-func (*EventDetail_RegistrationEvent) isEventDetail_Detail() {}
-func (*EventDetail_RevealEvent) isEventDetail_Detail()       {}
-func (*EventDetail_AmendmentEvent) isEventDetail_Detail()    {}
+func (*EventDetail_RevealEvent) isEventDetail_Detail()    {}
+func (*EventDetail_AmendmentEvent) isEventDetail_Detail() {}
 
 func (m *EventDetail) GetDetail() isEventDetail_Detail {
 	if m != nil {
 		return m.Detail
-	}
-	return nil
-}
-
-func (m *EventDetail) GetRegistrationEvent() *RegistrationEvent {
-	if x, ok := m.GetDetail().(*EventDetail_RegistrationEvent); ok {
-		return x.RegistrationEvent
 	}
 	return nil
 }
@@ -257,7 +253,6 @@ func (m *EventDetail) GetAmendmentEvent() *AmendmentEventDetail {
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*EventDetail) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*EventDetail_RegistrationEvent)(nil),
 		(*EventDetail_RevealEvent)(nil),
 		(*EventDetail_AmendmentEvent)(nil),
 	}
@@ -267,6 +262,7 @@ type AmendmentEventDetail struct {
 	HijackFlag                bool          `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
 	PreviousOwner             *types1.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
 	RevealRegistrationEventId string        `protobuf:"bytes,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
+	CommitmentCreationHeight  uint64        `protobuf:"varint,4,opt,name=commitment_creation_height,json=commitmentCreationHeight,proto3" json:"commitment_creation_height,omitempty"`
 }
 
 func (m *AmendmentEventDetail) Reset()         { *m = AmendmentEventDetail{} }
@@ -323,11 +319,17 @@ func (m *AmendmentEventDetail) GetRevealRegistrationEventId() string {
 	return ""
 }
 
+func (m *AmendmentEventDetail) GetCommitmentCreationHeight() uint64 {
+	if m != nil {
+		return m.CommitmentCreationHeight
+	}
+	return 0
+}
+
 type RevealRegistrationDetail struct {
-	// height at which the relationship was created
-	CommitmentCreationHeight uint64 `protobuf:"varint,2,opt,name=commitment_creation_height,json=commitmentCreationHeight,proto3" json:"commitment_creation_height,omitempty"`
+	CommitmentCreationHeight uint64 `protobuf:"varint,1,opt,name=commitment_creation_height,json=commitmentCreationHeight,proto3" json:"commitment_creation_height,omitempty"`
 	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId string `protobuf:"bytes,3,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
+	RegistrationCommitmentId string `protobuf:"bytes,2,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
 }
 
 func (m *RevealRegistrationDetail) Reset()         { *m = RevealRegistrationDetail{} }
@@ -377,138 +379,62 @@ func (m *RevealRegistrationDetail) GetRegistrationCommitmentId() string {
 	return ""
 }
 
-// RegistrationMetadata stores historical data for an Object Registration
-type RegistrationEvent struct {
-	// tx_hash is the hash of the Tx that created the Relatinoship
-	TxHash []byte `protobuf:"bytes,1,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	// height at which the relationship was created
-	CreationHeight uint64 `protobuf:"varint,2,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
-	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId string `protobuf:"bytes,3,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
-	// tendermint timestamp for the block which created the Relationship
-	CreationHeightTs *types.Timestamp `protobuf:"bytes,4,opt,name=creation_height_ts,json=creationHeightTs,proto3" json:"creation_height_ts,omitempty"`
-}
-
-func (m *RegistrationEvent) Reset()         { *m = RegistrationEvent{} }
-func (m *RegistrationEvent) String() string { return proto.CompactTextString(m) }
-func (*RegistrationEvent) ProtoMessage()    {}
-func (*RegistrationEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1356cd7eda5c526d, []int{4}
-}
-func (m *RegistrationEvent) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RegistrationEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RegistrationEvent.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RegistrationEvent) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RegistrationEvent.Merge(m, src)
-}
-func (m *RegistrationEvent) XXX_Size() int {
-	return m.Size()
-}
-func (m *RegistrationEvent) XXX_DiscardUnknown() {
-	xxx_messageInfo_RegistrationEvent.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RegistrationEvent proto.InternalMessageInfo
-
-func (m *RegistrationEvent) GetTxHash() []byte {
-	if m != nil {
-		return m.TxHash
-	}
-	return nil
-}
-
-func (m *RegistrationEvent) GetCreationHeight() uint64 {
-	if m != nil {
-		return m.CreationHeight
-	}
-	return 0
-}
-
-func (m *RegistrationEvent) GetRegistrationCommitmentId() string {
-	if m != nil {
-		return m.RegistrationCommitmentId
-	}
-	return ""
-}
-
-func (m *RegistrationEvent) GetCreationHeightTs() *types.Timestamp {
-	if m != nil {
-		return m.CreationHeightTs
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterEnum("sourcehub.acp.ObjectRegistrationEventType", ObjectRegistrationEventType_name, ObjectRegistrationEventType_value)
 	proto.RegisterType((*ObjectRegistrationEvent)(nil), "sourcehub.acp.ObjectRegistrationEvent")
 	proto.RegisterType((*EventDetail)(nil), "sourcehub.acp.EventDetail")
 	proto.RegisterType((*AmendmentEventDetail)(nil), "sourcehub.acp.AmendmentEventDetail")
 	proto.RegisterType((*RevealRegistrationDetail)(nil), "sourcehub.acp.RevealRegistrationDetail")
-	proto.RegisterType((*RegistrationEvent)(nil), "sourcehub.acp.RegistrationEvent")
 }
 
 func init() { proto.RegisterFile("sourcehub/acp/registration.proto", fileDescriptor_1356cd7eda5c526d) }
 
 var fileDescriptor_1356cd7eda5c526d = []byte{
-	// 732 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0x4d, 0x4f, 0xdb, 0x58,
-	0x14, 0xcd, 0x73, 0x42, 0x08, 0x37, 0x21, 0x84, 0x37, 0xa3, 0xc1, 0x13, 0x66, 0x42, 0x94, 0x59,
-	0x90, 0x61, 0xe1, 0x48, 0x20, 0x75, 0x85, 0x5a, 0x19, 0x08, 0x75, 0x54, 0x70, 0xd4, 0x47, 0xa0,
-	0x52, 0x37, 0x96, 0x63, 0x3f, 0x62, 0x43, 0x92, 0x67, 0xd9, 0x2f, 0x7c, 0xfc, 0x83, 0x2e, 0x59,
-	0xf5, 0xe7, 0x74, 0xdd, 0x25, 0xcb, 0x6e, 0x2a, 0x55, 0xf0, 0x47, 0x2a, 0x3f, 0x3b, 0x21, 0x26,
-	0x40, 0x37, 0x5d, 0xfa, 0xdd, 0x73, 0x8f, 0xcf, 0x3d, 0xf7, 0x03, 0xaa, 0x01, 0x1b, 0xf9, 0x16,
-	0x75, 0x46, 0xdd, 0x86, 0x69, 0x79, 0x0d, 0x9f, 0xf6, 0xdc, 0x80, 0xfb, 0x26, 0x77, 0xd9, 0x50,
-	0xf1, 0x7c, 0xc6, 0x19, 0x5e, 0x9c, 0x20, 0x14, 0xd3, 0xf2, 0xca, 0x6b, 0x3d, 0xc6, 0x7a, 0x7d,
-	0xda, 0x10, 0xc1, 0xee, 0xe8, 0xb4, 0xc1, 0xdd, 0x01, 0x0d, 0xb8, 0x39, 0xf0, 0x22, 0x7c, 0xf9,
-	0xff, 0x08, 0x3f, 0xa4, 0xfc, 0x92, 0xf9, 0xe7, 0x21, 0xab, 0x61, 0x31, 0x9f, 0x36, 0x7c, 0xda,
-	0x17, 0xb4, 0x81, 0xe3, 0xc6, 0xd0, 0xda, 0xad, 0x04, 0x2b, 0xed, 0xee, 0x19, 0xb5, 0x38, 0x99,
-	0xfa, 0x6f, 0xf3, 0x82, 0x0e, 0x39, 0x2e, 0x82, 0xe4, 0xda, 0x32, 0xaa, 0xa2, 0xfa, 0x02, 0x91,
-	0x5c, 0x1b, 0xbf, 0x86, 0x0c, 0xbf, 0xf6, 0xa8, 0x2c, 0x55, 0x51, 0xbd, 0xb8, 0xb9, 0xa1, 0x24,
-	0x54, 0x29, 0xcf, 0xb0, 0x74, 0xae, 0x3d, 0x4a, 0x44, 0x1e, 0x5e, 0x81, 0x79, 0x7e, 0x65, 0x38,
-	0x66, 0xe0, 0xc8, 0xe9, 0x2a, 0xaa, 0x17, 0x48, 0x96, 0x5f, 0x69, 0x66, 0xe0, 0xe0, 0xbf, 0x20,
-	0xeb, 0x50, 0xb7, 0xe7, 0x70, 0x39, 0x53, 0x45, 0xf5, 0x0c, 0x89, 0xbf, 0xf0, 0x06, 0x48, 0x3c,
-	0x90, 0xe7, 0xaa, 0xa8, 0x9e, 0xdf, 0x2c, 0x2b, 0x51, 0xd5, 0xca, 0xb8, 0x6a, 0xa5, 0x33, 0xae,
-	0x9a, 0x48, 0x3c, 0xc0, 0xab, 0xb0, 0xe0, 0xb1, 0xbe, 0x6b, 0x5d, 0x1b, 0xae, 0x2d, 0x67, 0x85,
-	0xe6, 0x5c, 0xf4, 0xd0, 0xb2, 0xf1, 0x2b, 0xc8, 0x32, 0x21, 0x4f, 0x9e, 0x17, 0x64, 0x15, 0x25,
-	0xe1, 0x90, 0x32, 0x76, 0x68, 0x5c, 0x44, 0x8c, 0xc6, 0x5b, 0x30, 0x67, 0x5a, 0x9c, 0xf9, 0x72,
-	0x4e, 0xa4, 0xfd, 0xfb, 0x5c, 0x9a, 0x1a, 0x82, 0x48, 0x84, 0xad, 0x7d, 0x92, 0x20, 0x2f, 0x4a,
-	0xdf, 0xa3, 0xdc, 0x74, 0xfb, 0xf8, 0x3d, 0xe0, 0xe9, 0x9e, 0x1a, 0x34, 0x8c, 0x09, 0x5b, 0xf3,
-	0x9b, 0xd5, 0x47, 0x26, 0xce, 0xd8, 0xa7, 0xa5, 0xc8, 0xb2, 0x3f, 0xd3, 0x99, 0x03, 0x28, 0xf8,
-	0xf4, 0x82, 0x9a, 0xfd, 0x98, 0x4c, 0x12, 0x64, 0xeb, 0x33, 0x64, 0x21, 0x64, 0x9a, 0x32, 0x52,
-	0xa4, 0xa5, 0x48, 0x3e, 0x4a, 0x8f, 0xd8, 0x74, 0x58, 0x32, 0x07, 0x74, 0x68, 0x0f, 0xe8, 0x90,
-	0xc7, 0x84, 0x69, 0x41, 0xf8, 0xdf, 0x23, 0x42, 0x75, 0x8c, 0x9a, 0x2a, 0x4f, 0x4b, 0x91, 0xa2,
-	0x99, 0x78, 0xdf, 0xc9, 0x41, 0xd6, 0x16, 0xb1, 0xda, 0x17, 0x04, 0x7f, 0x3e, 0x95, 0x84, 0xd7,
-	0x20, 0xef, 0xb8, 0x67, 0xa6, 0x75, 0x6e, 0x9c, 0xf6, 0xcd, 0x9e, 0x30, 0x23, 0x47, 0x20, 0x7a,
-	0xda, 0xef, 0x9b, 0x3d, 0xbc, 0x07, 0x45, 0xcf, 0xa7, 0x17, 0x2e, 0x1b, 0x05, 0x06, 0xbb, 0x1c,
-	0x52, 0x3f, 0xae, 0xf1, 0x17, 0x2d, 0x58, 0x1c, 0x27, 0xb5, 0xc3, 0x1c, 0xfc, 0x06, 0xfe, 0x89,
-	0x7d, 0x9a, 0xed, 0x40, 0x38, 0x27, 0x69, 0x31, 0x27, 0x7f, 0xfb, 0x33, 0x46, 0x09, 0xad, 0x2d,
-	0xbb, 0xf6, 0x19, 0x81, 0xfc, 0x9c, 0x8d, 0x78, 0x1b, 0xca, 0x16, 0x1b, 0x0c, 0x5c, 0x2e, 0x8c,
-	0xb3, 0x7c, 0x1a, 0xb1, 0xc7, 0xa3, 0x2c, 0x89, 0x51, 0x96, 0x1f, 0x10, 0xbb, 0x31, 0x40, 0x8b,
-	0x86, 0x7b, 0x1b, 0xca, 0x09, 0x51, 0x53, 0x54, 0x13, 0x65, 0xf2, 0x34, 0x62, 0x77, 0x02, 0x68,
-	0xd9, 0xb5, 0xef, 0x08, 0x96, 0x67, 0x37, 0x76, 0x6a, 0xc3, 0x50, 0x62, 0xc3, 0xd6, 0x61, 0xe9,
-	0x69, 0x7d, 0x45, 0xeb, 0x37, 0xaa, 0xc2, 0x1a, 0xe0, 0x47, 0xbf, 0x31, 0x78, 0x20, 0x96, 0xfa,
-	0xe5, 0x05, 0x2e, 0x25, 0x55, 0x74, 0x82, 0x8d, 0x1b, 0x04, 0xab, 0x2f, 0x5c, 0x14, 0x9c, 0x87,
-	0xf9, 0x63, 0xfd, 0x9d, 0xde, 0xfe, 0xa0, 0x97, 0x52, 0xb8, 0x04, 0x05, 0xd2, 0x7c, 0xdb, 0x3a,
-	0xea, 0x10, 0xb5, 0xd3, 0x6a, 0xeb, 0x25, 0x84, 0x57, 0xe0, 0x0f, 0xd2, 0x3c, 0x69, 0xaa, 0x07,
-	0x46, 0x22, 0x20, 0xe1, 0x02, 0xe4, 0x54, 0xb2, 0xab, 0xb5, 0x4e, 0xd4, 0x83, 0x52, 0x1a, 0x17,
-	0x01, 0x8e, 0xf5, 0xc9, 0x77, 0x06, 0x2f, 0xc2, 0x82, 0x7a, 0xd8, 0xd4, 0xf7, 0x0e, 0x9b, 0x7a,
-	0xa7, 0x34, 0x17, 0x82, 0x3b, 0x44, 0xd5, 0x8f, 0xf6, 0x9b, 0xa4, 0x94, 0xdd, 0xd1, 0xbe, 0xde,
-	0x55, 0xd0, 0xed, 0x5d, 0x05, 0xfd, 0xb8, 0xab, 0xa0, 0x9b, 0xfb, 0x4a, 0xea, 0xf6, 0xbe, 0x92,
-	0xfa, 0x76, 0x5f, 0x49, 0x7d, 0x54, 0x7a, 0x2e, 0x0f, 0x77, 0xc4, 0x62, 0x83, 0x46, 0xf2, 0xf4,
-	0x3e, 0x9c, 0xf6, 0x2b, 0x71, 0xdc, 0xc3, 0x3b, 0x18, 0x74, 0xb3, 0xc2, 0x82, 0xad, 0x9f, 0x01,
-	0x00, 0x00, 0xff, 0xff, 0x30, 0xff, 0xef, 0x06, 0xfa, 0x05, 0x00, 0x00,
+	// 690 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x54, 0xcf, 0x4f, 0x1a, 0x41,
+	0x14, 0x66, 0x00, 0x11, 0x1e, 0x48, 0xc9, 0xb4, 0xa9, 0x5b, 0x6c, 0x91, 0xd0, 0x43, 0xa9, 0x87,
+	0x25, 0xc1, 0xa4, 0xa7, 0xa6, 0xcd, 0xaa, 0x58, 0x48, 0x75, 0x49, 0x46, 0xb4, 0x49, 0x2f, 0x64,
+	0xd8, 0x1d, 0xd9, 0x51, 0x60, 0x36, 0xbb, 0x83, 0x3f, 0xee, 0xfd, 0x03, 0x3c, 0xf5, 0x3f, 0xe9,
+	0xff, 0xd0, 0xa3, 0xc7, 0x1e, 0x1b, 0xfd, 0x37, 0x7a, 0x68, 0x76, 0x76, 0x51, 0xd6, 0x56, 0x3d,
+	0xee, 0x9b, 0xef, 0xfb, 0xf6, 0x7d, 0xdf, 0xbc, 0x79, 0x50, 0xf5, 0xc5, 0xd4, 0xb3, 0x98, 0x33,
+	0x1d, 0x34, 0xa8, 0xe5, 0x36, 0x3c, 0x36, 0xe4, 0xbe, 0xf4, 0xa8, 0xe4, 0x62, 0xa2, 0xbb, 0x9e,
+	0x90, 0x02, 0x2f, 0xdd, 0x20, 0x74, 0x6a, 0xb9, 0xe5, 0xd5, 0xa1, 0x10, 0xc3, 0x11, 0x6b, 0xa8,
+	0xc3, 0xc1, 0xf4, 0xb0, 0x21, 0xf9, 0x98, 0xf9, 0x92, 0x8e, 0xdd, 0x10, 0x5f, 0x7e, 0x1b, 0xe2,
+	0x27, 0x4c, 0x9e, 0x0a, 0xef, 0x38, 0x50, 0xed, 0x5b, 0xc2, 0x63, 0x0d, 0x8f, 0x8d, 0x94, 0xac,
+	0xef, 0xf0, 0x08, 0x5a, 0xfb, 0x96, 0x82, 0xe5, 0xee, 0xe0, 0x88, 0x59, 0x92, 0xcc, 0xfd, 0xb7,
+	0x75, 0xc2, 0x26, 0x12, 0x17, 0x21, 0xc9, 0x6d, 0x0d, 0x55, 0x51, 0x3d, 0x47, 0x92, 0xdc, 0xc6,
+	0x1f, 0x20, 0x2d, 0xcf, 0x5d, 0xa6, 0x25, 0xab, 0xa8, 0x5e, 0x6c, 0xae, 0xe9, 0xb1, 0xae, 0xf4,
+	0x7b, 0x54, 0x7a, 0xe7, 0x2e, 0x23, 0x8a, 0x87, 0x97, 0x61, 0x51, 0x9e, 0xf5, 0x1d, 0xea, 0x3b,
+	0x5a, 0xaa, 0x8a, 0xea, 0x05, 0x92, 0x91, 0x67, 0x6d, 0xea, 0x3b, 0xf8, 0x39, 0x64, 0x1c, 0xc6,
+	0x87, 0x8e, 0xd4, 0xd2, 0x55, 0x54, 0x4f, 0x93, 0xe8, 0x0b, 0xaf, 0x41, 0x52, 0xfa, 0xda, 0x42,
+	0x15, 0xd5, 0xf3, 0xcd, 0xb2, 0x1e, 0xba, 0xd6, 0x67, 0xae, 0xf5, 0xde, 0xcc, 0x35, 0x49, 0x4a,
+	0x1f, 0xaf, 0x40, 0xce, 0x15, 0x23, 0x6e, 0x9d, 0xf7, 0xb9, 0xad, 0x65, 0x54, 0xcf, 0xd9, 0xb0,
+	0xd0, 0xb1, 0xf1, 0x3b, 0xc8, 0x08, 0xd5, 0x9e, 0xb6, 0xa8, 0xc4, 0x2a, 0x7a, 0x2c, 0x21, 0x7d,
+	0x96, 0xd0, 0xcc, 0x44, 0x84, 0xc6, 0xeb, 0xb0, 0x40, 0x2d, 0x29, 0x3c, 0x2d, 0xab, 0x68, 0xaf,
+	0xee, 0xa3, 0x19, 0x01, 0x88, 0x84, 0x58, 0xdc, 0x84, 0x8c, 0xcd, 0x24, 0xe5, 0x23, 0x2d, 0x17,
+	0x75, 0x1e, 0x0f, 0x4a, 0xc5, 0xb2, 0xa5, 0x10, 0x24, 0x42, 0xd6, 0x7e, 0x20, 0xc8, 0xcf, 0xd5,
+	0xf1, 0x0e, 0x14, 0x3c, 0x76, 0xc2, 0xe8, 0xa8, 0xcf, 0x82, 0xaa, 0x8a, 0x3c, 0xdf, 0x7c, 0x73,
+	0x47, 0x89, 0x28, 0xc8, 0x7c, 0xe4, 0x21, 0xbd, 0x9d, 0x20, 0xf9, 0x90, 0x1e, 0x5e, 0xa4, 0x09,
+	0x4f, 0xe8, 0x98, 0x4d, 0xec, 0x31, 0x9b, 0xc8, 0x48, 0x30, 0xa5, 0x04, 0x5f, 0xdf, 0x11, 0x34,
+	0x66, 0xa8, 0xb9, 0x5e, 0xda, 0x09, 0x52, 0xa4, 0xb1, 0xfa, 0x46, 0x76, 0xe6, 0xb0, 0xf6, 0x07,
+	0xc1, 0xb3, 0xff, 0x91, 0xf0, 0x2a, 0xe4, 0x1d, 0x7e, 0x44, 0xad, 0xe3, 0xfe, 0xe1, 0x88, 0x0e,
+	0xd5, 0x10, 0x65, 0x09, 0x84, 0xa5, 0xed, 0x11, 0x1d, 0xe2, 0x2d, 0x28, 0xba, 0x1e, 0x3b, 0xe1,
+	0x62, 0xea, 0xf7, 0xc5, 0xe9, 0x84, 0x79, 0x91, 0xc7, 0x47, 0x32, 0x5e, 0x9a, 0x91, 0xba, 0x01,
+	0x07, 0x7f, 0x84, 0x97, 0x51, 0x4e, 0xf3, 0xcf, 0x26, 0xf4, 0x18, 0x0c, 0x42, 0x4a, 0x0d, 0xc2,
+	0x0b, 0xef, 0x9f, 0xa0, 0x54, 0xaf, 0x1d, 0x1b, 0xbf, 0x87, 0xb2, 0x25, 0xc6, 0x63, 0x2e, 0x55,
+	0x36, 0x96, 0xc7, 0x42, 0x81, 0xd8, 0x38, 0x6a, 0xb7, 0x88, 0xcd, 0x08, 0xd0, 0x56, 0xe7, 0xb5,
+	0xef, 0x08, 0xb4, 0xfb, 0x2e, 0xe1, 0x11, 0x69, 0xf4, 0xb0, 0x74, 0xc0, 0x8e, 0x59, 0x9a, 0x93,
+	0xe2, 0xb6, 0xca, 0x2a, 0x47, 0xb4, 0x79, 0xc4, 0xe6, 0x0d, 0xa0, 0x63, 0xaf, 0x5d, 0x20, 0x58,
+	0x79, 0xe0, 0x41, 0xe2, 0x3c, 0x2c, 0xee, 0x9b, 0x9f, 0xcd, 0xee, 0x17, 0xb3, 0x94, 0xc0, 0x25,
+	0x28, 0x90, 0xd6, 0xa7, 0xce, 0x5e, 0x8f, 0x18, 0xbd, 0x4e, 0xd7, 0x2c, 0x21, 0xbc, 0x0c, 0x4f,
+	0x49, 0xeb, 0xa0, 0x65, 0xec, 0xf4, 0x63, 0x07, 0x49, 0x5c, 0x80, 0xac, 0x41, 0x36, 0xdb, 0x9d,
+	0x03, 0x63, 0xa7, 0x94, 0xc2, 0x45, 0x80, 0x7d, 0xf3, 0xe6, 0x3b, 0x8d, 0x97, 0x20, 0x67, 0xec,
+	0xb6, 0xcc, 0xad, 0xdd, 0x96, 0xd9, 0x2b, 0x2d, 0x04, 0xe0, 0x1e, 0x31, 0xcc, 0xbd, 0xed, 0x16,
+	0x29, 0x65, 0x36, 0xda, 0x3f, 0xaf, 0x2a, 0xe8, 0xf2, 0xaa, 0x82, 0x7e, 0x5f, 0x55, 0xd0, 0xc5,
+	0x75, 0x25, 0x71, 0x79, 0x5d, 0x49, 0xfc, 0xba, 0xae, 0x24, 0xbe, 0xea, 0x43, 0x2e, 0x83, 0x09,
+	0xb4, 0xc4, 0xb8, 0x11, 0xdf, 0x5c, 0xb7, 0x9b, 0xf1, 0x4c, 0xed, 0xc6, 0x60, 0x8d, 0xf8, 0x83,
+	0x8c, 0x5a, 0x01, 0xeb, 0x7f, 0x03, 0x00, 0x00, 0xff, 0xff, 0xc2, 0xd4, 0x4a, 0xc1, 0x39, 0x05,
+	0x00, 0x00,
 }
 
 func (m *ObjectRegistrationEvent) Marshal() (dAtA []byte, err error) {
@@ -531,6 +457,18 @@ func (m *ObjectRegistrationEvent) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
+	if m.Detail != nil {
+		{
+			size, err := m.Detail.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintRegistration(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x4a
+	}
 	if m.Actor != nil {
 		{
 			size, err := m.Actor.MarshalToSizedBuffer(dAtA[:i])
@@ -633,27 +571,6 @@ func (m *EventDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *EventDetail_RegistrationEvent) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *EventDetail_RegistrationEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.RegistrationEvent != nil {
-		{
-			size, err := m.RegistrationEvent.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
 func (m *EventDetail_RevealEvent) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
@@ -716,6 +633,11 @@ func (m *AmendmentEventDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.CommitmentCreationHeight != 0 {
+		i = encodeVarintRegistration(dAtA, i, uint64(m.CommitmentCreationHeight))
+		i--
+		dAtA[i] = 0x20
+	}
 	if len(m.RevealRegistrationEventId) > 0 {
 		i -= len(m.RevealRegistrationEventId)
 		copy(dAtA[i:], m.RevealRegistrationEventId)
@@ -773,66 +695,12 @@ func (m *RevealRegistrationDetail) MarshalToSizedBuffer(dAtA []byte) (int, error
 		copy(dAtA[i:], m.RegistrationCommitmentId)
 		i = encodeVarintRegistration(dAtA, i, uint64(len(m.RegistrationCommitmentId)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if m.CommitmentCreationHeight != 0 {
 		i = encodeVarintRegistration(dAtA, i, uint64(m.CommitmentCreationHeight))
 		i--
-		dAtA[i] = 0x10
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *RegistrationEvent) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *RegistrationEvent) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *RegistrationEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.CreationHeightTs != nil {
-		{
-			size, err := m.CreationHeightTs.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.RegistrationCommitmentId) > 0 {
-		i -= len(m.RegistrationCommitmentId)
-		copy(dAtA[i:], m.RegistrationCommitmentId)
-		i = encodeVarintRegistration(dAtA, i, uint64(len(m.RegistrationCommitmentId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.CreationHeight != 0 {
-		i = encodeVarintRegistration(dAtA, i, uint64(m.CreationHeight))
-		i--
-		dAtA[i] = 0x10
-	}
-	if len(m.TxHash) > 0 {
-		i -= len(m.TxHash)
-		copy(dAtA[i:], m.TxHash)
-		i = encodeVarintRegistration(dAtA, i, uint64(len(m.TxHash)))
-		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x8
 	}
 	return len(dAtA) - i, nil
 }
@@ -884,6 +752,10 @@ func (m *ObjectRegistrationEvent) Size() (n int) {
 		l = m.Actor.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
+	if m.Detail != nil {
+		l = m.Detail.Size()
+		n += 1 + l + sovRegistration(uint64(l))
+	}
 	return n
 }
 
@@ -899,18 +771,6 @@ func (m *EventDetail) Size() (n int) {
 	return n
 }
 
-func (m *EventDetail_RegistrationEvent) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.RegistrationEvent != nil {
-		l = m.RegistrationEvent.Size()
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	return n
-}
 func (m *EventDetail_RevealEvent) Size() (n int) {
 	if m == nil {
 		return 0
@@ -952,6 +812,9 @@ func (m *AmendmentEventDetail) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovRegistration(uint64(l))
 	}
+	if m.CommitmentCreationHeight != 0 {
+		n += 1 + sovRegistration(uint64(m.CommitmentCreationHeight))
+	}
 	return n
 }
 
@@ -966,30 +829,6 @@ func (m *RevealRegistrationDetail) Size() (n int) {
 	}
 	l = len(m.RegistrationCommitmentId)
 	if l > 0 {
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	return n
-}
-
-func (m *RegistrationEvent) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.TxHash)
-	if l > 0 {
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	if m.CreationHeight != 0 {
-		n += 1 + sovRegistration(uint64(m.CreationHeight))
-	}
-	l = len(m.RegistrationCommitmentId)
-	if l > 0 {
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	if m.CreationHeightTs != nil {
-		l = m.CreationHeightTs.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
 	return n
@@ -1274,6 +1113,42 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Detail", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegistration
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRegistration
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRegistration
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Detail == nil {
+				m.Detail = &EventDetail{}
+			}
+			if err := m.Detail.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegistration(dAtA[iNdEx:])
@@ -1324,41 +1199,6 @@ func (m *EventDetail) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: EventDetail: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationEvent", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &RegistrationEvent{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Detail = &EventDetail_RegistrationEvent{v}
-			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RevealEvent", wireType)
@@ -1567,6 +1407,25 @@ func (m *AmendmentEventDetail) Unmarshal(dAtA []byte) error {
 			}
 			m.RevealRegistrationEventId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CommitmentCreationHeight", wireType)
+			}
+			m.CommitmentCreationHeight = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegistration
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CommitmentCreationHeight |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipRegistration(dAtA[iNdEx:])
@@ -1617,7 +1476,7 @@ func (m *RevealRegistrationDetail) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: RevealRegistrationDetail: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 2:
+		case 1:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CommitmentCreationHeight", wireType)
 			}
@@ -1636,142 +1495,7 @@ func (m *RevealRegistrationDetail) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RegistrationCommitmentId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegistration(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RegistrationEvent) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegistration
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RegistrationEvent: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RegistrationEvent: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TxHash = append(m.TxHash[:0], dAtA[iNdEx:postIndex]...)
-			if m.TxHash == nil {
-				m.TxHash = []byte{}
-			}
-			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreationHeight", wireType)
-			}
-			m.CreationHeight = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.CreationHeight |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
 			}
@@ -1802,42 +1526,6 @@ func (m *RegistrationEvent) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.RegistrationCommitmentId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CreationHeightTs", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CreationHeightTs == nil {
-				m.CreationHeightTs = &types.Timestamp{}
-			}
-			if err := m.CreationHeightTs.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

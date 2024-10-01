@@ -18,7 +18,7 @@ func (i *registrationIder) Id(obj *types.RegistrationsCommitment) []byte {
 	return []byte(obj.Id)
 }
 
-var _ RegistrationsRepository = (*KVRegistrationRepository)(nil)
+var _ CommitmentRepository = (*KVRegistrationRepository)(nil)
 
 type KVRegistrationRepository struct {
 	kv    storetypes.KVStore

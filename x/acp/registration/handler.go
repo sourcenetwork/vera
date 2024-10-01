@@ -10,7 +10,6 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	raccoon "github.com/sourcenetwork/raccoondb"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/metadata"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
@@ -23,7 +22,7 @@ type CommitRegistrationsHandler struct{}
 func (h *CommitRegistrationsHandler) Handle(
 	ctx sdk.Context,
 	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
+	repository CommitmentRepository,
 	registrationIdCounter *raccoon.CounterStore,
 	params *types.Params,
 	actor *coretypes.Actor,
@@ -89,13 +88,16 @@ func (h *CommitRegistrationsHandler) calculationExpirationTime(now time.Time, of
 	return prototypes.TimestampProto(now.Add(delta))
 }
 
+// TODO finish registration handler
+
 type RevealRegistrationHandler struct{}
 
 func (h *RevealRegistrationHandler) Handle(
 	ctx sdk.Context,
+	registrationService *registrationService,
+	eventService *eventService,
 	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
-	registrationIdCounter *raccoon.CounterStore,
+	repository CommitmentRepository,
 	actor *coretypes.Actor,
 	cmd *types.RevealRegistrationCmd) (*types.RevealRegistrationCmdResult, error) {
 	commitment, err := repository.GetById(ctx, cmd.RegistrationsCommitmentId)
@@ -112,129 +114,128 @@ func (h *RevealRegistrationHandler) Handle(
 		return nil, errors.Wrap("invalid proof", errors.ErrorType_BAD_INPUT)
 	}
 
-	registraionRecord, err := engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
+	registrationRecord, err := engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: commitment.PolicyId,
 		Object:   cmd.Object,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if registraionRecord.IsRegistered {
-		return nil, errors.Wrap("object already registered", errors.ErrorType_UNAUTHORIZED,
-			errors.Pair("policy", commitment.PolicyId),
-			errors.Pair("resource", cmd.Object.Resource),
-			errors.Pair("object", cmd.Object.Id),
+
+	if registrationRecord.IsRegistered {
+		return h.registeredStrategy(
+			ctx,
+			registrationService,
+			eventService,
+			engine,
+			repository,
+			actor,
+			commitment,
+			registrationRecord,
+			cmd,
+		)
+	} else {
+		return h.unregisteredStrategy(
+			ctx,
+			registrationService,
+			engine,
+			repository,
+			actor,
+			commitment,
+			registrationRecord,
+			cmd,
 		)
 	}
-	// TODO object registration should return object status / archived status
-
-	// TODO verify object is archived by the owner then unarchive.
-
-	// either amendment strategy
-	// register strategy
-
-	return nil, nil
-
 }
 
 func (h *RevealRegistrationHandler) registeredStrategy(
 	ctx sdk.Context,
+	registrationService *registrationService,
+	eventService *eventService,
 	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
-	registrationIdCounter *raccoon.CounterStore,
+	repository CommitmentRepository,
 	actor *coretypes.Actor,
 	commitment *types.RegistrationsCommitment,
+	registrationStatus *coretypes.GetObjectRegistrationResponse,
 	cmd *types.RevealRegistrationCmd) (*types.RevealRegistrationCmdResult, error) {
-	// if owned by user
-	//    if archived: unarchive, return
-	//    if active: return
-	// if owned by someone else
-	//    if commitment older than registration, return
-	//    else return unauthorized
-	return nil, nil
-}
+	if registrationStatus.OwnerId == actor.Id {
+		isArchived := false // FIXME use data in registration status instead
+		if !isArchived {
+			// NOOP
+			return &types.RevealRegistrationCmdResult{
+				Result: types.RegistrationResultStatus_NO_OP,
+				Record: nil, // FIXME registrationStatus.Record
+				Event:  nil,
+			}, nil
+		}
 
-func (h *RevealRegistrationHandler) amendmentStrategy(
-	ctx sdk.Context,
-	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
-	registrationIdCounter *raccoon.CounterStore,
-	actor *coretypes.Actor,
-	commitment *types.RegistrationsCommitment,
-	cmd *types.RevealRegistrationCmd) (*types.RevealRegistrationCmdResult, error) {
-	// transfer object ownership
-	// create amendment event
-	return nil, nil
+		record, event, err := registrationService.UnarchiveObject(ctx, commitment.PolicyId, cmd.Object, actor)
+		if err != nil {
+			return nil, err
+		}
+		return &types.RevealRegistrationCmdResult{
+			Result: types.RegistrationResultStatus_UNARCHIVED,
+			Record: record,
+			Event:  event,
+		}, nil
+	}
+
+	// FIXME this name is bad because due to how i called all events are registration events.
+	// refactor event to simply ObjectEvent
+	event, err := eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, cmd.Object)
+	if err != nil {
+		return nil, err
+	}
+	// this shouldn't happen because the object was verified
+	// to be registered beforehand.
+	// return an internal error if it ever does
+	if event == nil {
+		return nil, errors.ErrorType_INTERNAL
+	}
+
+	claimHeight := event.Height
+	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
+		claimHeight = event.Detail.GetRevealEvent().CommitmentCreationHeight
+	} else if event.Type == types.ObjectRegistrationEventType_AMENDMENT {
+		claimHeight = event.Detail.GetAmendmentEvent().CommitmentCreationHeight
+	}
+
+	if commitment.CreationHeight < claimHeight {
+		rec, ev, err := registrationService.AmendRegistration(ctx, commitment.Id, commitment.PolicyId, cmd.Object, actor)
+		if err != nil {
+			return nil, err
+		}
+		return &types.RevealRegistrationCmdResult{
+			Record: rec,
+			Event:  ev,
+			Result: types.RegistrationResultStatus_AMENDED,
+		}, nil
+	}
+
+	return nil, errors.Wrap("object already registered", errors.ErrorType_UNAUTHORIZED,
+		errors.Pair("policy", commitment.PolicyId),
+		errors.Pair("resource", cmd.Object.Resource),
+		errors.Pair("object", cmd.Object.Id),
+	)
 }
 
 func (h *RevealRegistrationHandler) unregisteredStrategy(
 	ctx sdk.Context,
+	registrationService *registrationService,
 	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
-	metadataRepository metadata.MetadataRepository,
-	registrationIdCounter *raccoon.CounterStore,
+	repository CommitmentRepository,
 	actor *coretypes.Actor,
 	commitment *types.RegistrationsCommitment,
+	registrationStatus *coretypes.GetObjectRegistrationResponse,
 	cmd *types.RevealRegistrationCmd) (*types.RevealRegistrationCmdResult, error) {
-	record, metadata, err := registerObjectAndMetadata(
-		ctx,
-		engine,
-		repository,
-		metadataRepository,
-		commitment.PolicyId,
-		commitment.Id,
-		cmd.Object,
-		actor,
-	)
+	record, event, err := registrationService.RegisterObject(ctx, commitment.PolicyId, cmd.Object, actor)
 	if err != nil {
 		return nil, err
 	}
+
 	return &types.RevealRegistrationCmdResult{
-		Result:         types.RegistrationResultStatus_OK,
-		Record:         record,
-		Metadata:       metadata,
-		AmendmentEvent: nil,
+		Result: types.RegistrationResultStatus_OK,
+		Record: record,
+		Event:  event,
 	}, nil
-}
-
-// registerObjectAndMetadata is an internal handler which registers an object
-// on the ACP Core store and creates and stores registration metadata
-func registerObjectAndMetadata(
-	ctx sdk.Context,
-	engine coretypes.ACPEngineServer,
-	repository RegistrationsRepository,
-	metadataRepository metadata.MetadataRepository,
-	policyId string,
-	commitmentId string,
-	object *coretypes.Object,
-	owner *coretypes.Actor,
-) (*coretypes.RelationshipRecord, *types.RegistrationMetadata, error) {
-	result, err := engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
-		PolicyId:     policyId,
-		Object:       object,
-		CreationTime: nil,
-		Metadata:     nil, // TODO change
-	})
-	if err != nil {
-		return nil, nil, err
-	}
-	ts, err := prototypes.TimestampProto(ctx.BlockTime())
-	if err != nil {
-		return nil, nil, err
-	}
-
-	metadata := &types.RegistrationMetadata{
-		TxHash:                   utils.HashTx(ctx.TxBytes()),
-		CreationHeight:           uint64(ctx.BlockHeight()),
-		RegistrationCommitmentId: commitmentId,
-		CreationHeightTs:         ts,
-	}
-
-	err = metadataRepository.SetRegistrationMetadata(ctx, policyId, object, metadata)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return result.Record, metadata, nil
-	// TODO this needs to be atomic, are msgs atomic? i can't remmeber, i think so.
 }

@@ -26,11 +26,11 @@ message ObjectRegistrationEvent {
     string policy_id = 6;
     sourcenetwork.acp_core.Object object = 7;
     sourcenetwork.acp_core.Actor actor = 8;
+    EventDetail detail = 9;
 }
 
 message EventDetail {
     oneof detail {
-        RegistrationEvent registration_event = 1;
         RevealRegistrationDetail reveal_event = 2;
         AmendmentEventDetail amendment_event = 3;
     }
@@ -40,28 +40,13 @@ message AmendmentEventDetail {
     bool hijack_flag = 1;
     sourcenetwork.acp_core.Actor previous_owner = 2;
     string reveal_registration_event_id = 3;
+
+    uint64 commitment_creation_height = 4;
 }
 
 message RevealRegistrationDetail {
-    // height at which the relationship was created
-    uint64 commitment_creation_height = 2;
+    uint64 commitment_creation_height = 1;
 
     // id of the registration commitment which originally registered the relationship
-    string registration_commitment_id = 3;
-}
-
-
-// RegistrationMetadata stores historical data for an Object Registration
-message RegistrationEvent {
-    //tx_hash is the hash of the Tx that created the Relatinoship
-  bytes tx_hash = 1;
-
-  // height at which the relationship was created
-  uint64 creation_height = 2;
-
-  // id of the registration commitment which originally registered the relationship
-  string registration_commitment_id = 3;
-
-  // tendermint timestamp for the block which created the Relationship
-  google.protobuf.Timestamp creation_height_ts = 4;
+    string registration_commitment_id = 2;
 }
