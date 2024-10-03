@@ -183,10 +183,10 @@ func (s *registrationService) AmendRegistration(ctx sdk.Context, commitmentId st
 		return nil, nil, err
 	}
 	if !status.IsRegistered {
-		return nil, nil, nil //TODO return protocol exception
+		return nil, nil, errors.ErrorType_BAD_INPUT //TODO return protocol exception
 	}
 	if status.OwnerId == actor.Id {
-		return nil, nil, nil // TODO wrap
+		return nil, nil, nil // TODO wrap // this should be a noop right?
 	}
 
 	commitment, err := s.repository.GetById(ctx, commitmentId)

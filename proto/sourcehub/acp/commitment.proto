@@ -10,11 +10,13 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
 // RegistrationProof models an opening proof for a RegistrationCommitment
 message RegistrationProof {
+    sourcenetwork.acp_core.Object object = 1;
+
     // Hash of neighbors required to validate proof.
     // Hashes must be ordered by neighbors / levels in the tree,
     // such that a foldl like recursion over the hashes produces the
     // stored commitment
-    repeated bytes merkle_proof = 1;
+    repeated bytes merkle_proof = 2;
 }
 
 // RegistrationsCommitment models a batched cryptographic commitment

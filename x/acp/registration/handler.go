@@ -109,7 +109,7 @@ func (h *RevealRegistrationHandler) Handle(
 			errors.Pair("id", cmd.RegistrationsCommitmentId))
 	}
 
-	ok := VerifyProof(commitment.Commitment, cmd.Proof)
+	ok := VerifyProof(commitment.Commitment, commitment.PolicyId, commitment.Actor, cmd.Proof)
 	if !ok {
 		return nil, errors.Wrap("invalid proof", errors.ErrorType_BAD_INPUT)
 	}
@@ -255,4 +255,28 @@ func (h *FlagHijackAttemptHandler) Handle(
 	return &types.FlagHijackAttemptCmdResult{
 		Event: event,
 	}, nil
+}
+
+// FlagExpiredCommitments iterates over stored commitments,
+// filters for expired commitments wrt the current block time,
+// flags them as expired and returns the expired commitments
+func FlagExpiredCommitments(ctx sdk.Context, repository CommitmentRepository) ([]*types.RegistrationsCommitment, error) {
+	commitments, err := repository.GetExpiredCommitments(ctx, ctx.BlockTime())
+	if err != nil {
+		return nil, err
+	}
+	processed := make([]*types.RegistrationsCommitment, 0, len(commitments))
+	for _, c := range commitments {
+		if c.Expired {
+			continue
+		}
+		c.Expired = true
+		err := repository.Set(ctx, c)
+		if err != nil {
+			return nil, err
+		}
+		processed = append(processed, c)
+
+	}
+	return commitments, nil
 }

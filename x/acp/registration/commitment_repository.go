@@ -3,8 +3,10 @@ package registration
 import (
 	"bytes"
 	"context"
+	"time"
 
 	storetypes "cosmossdk.io/store/types"
+	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	raccoon "github.com/sourcenetwork/raccoondb"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -58,4 +60,22 @@ func (r *KVRegistrationRepository) FilterByCommitment(ctx context.Context, commi
 		return nil, r.wrapErr(err)
 	}
 	return recs, nil
+}
+
+func (r *KVRegistrationRepository) GetExpiredCommitments(ctx context.Context, currentTime time.Time) ([]*types.RegistrationsCommitment, error) {
+	var filterErr error = nil
+	records, err := r.store.Filter(func(c *types.RegistrationsCommitment) bool {
+		expiration, err := prototypes.TimestampFromProto(c.ExpirationTime)
+		if err != nil {
+			filterErr = err
+		}
+		return currentTime.Compare(expiration) == 1
+	})
+	if filterErr != nil {
+		return nil, filterErr
+	}
+	if err != nil {
+		return nil, err
+	}
+	return records, nil
 }
