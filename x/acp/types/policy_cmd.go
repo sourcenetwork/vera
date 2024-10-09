@@ -41,3 +41,35 @@ func NewUnregisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
 		},
 	}
 }
+
+func NewCommitRegistrationCmd(commitment []byte) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_CommitRegistrationsCmd{
+			CommitRegistrationsCmd: &CommitRegistrationsCmd{
+				Commitment: commitment,
+			},
+		},
+	}
+}
+
+func NewRevealRegistrationCmd(commitmentId string, proof *RegistrationProof, obj *acptypes.Object) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_RevealRegistrationCmd{
+			RevealRegistrationCmd: &RevealRegistrationCmd{
+				Object:                    obj,
+				Proof:                     proof,
+				RegistrationsCommitmentId: commitmentId,
+			},
+		},
+	}
+}
+
+func NewFlagHijackAttemptCmd(eventId string) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_FlagHijackAttemptCmd{
+			FlagHijackAttemptCmd: &FlagHijackAttemptCmd{
+				EventId: eventId,
+			},
+		},
+	}
+}

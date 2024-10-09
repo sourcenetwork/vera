@@ -14,10 +14,7 @@ import (
 
 func (k msgServer) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+
 	addr, err := hubtypes.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("DirectPolicyCmd: %v: %w", err, types.NewErrInvalidAccAddrErr(err, msg.Creator))
@@ -34,7 +31,7 @@ func (k msgServer) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPo
 			errors.ErrorType_BAD_INPUT, errors.Pair("address", msg.Creator))
 	}
 
-	result, err := dispatchPolicyCmd(ctx, engine, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
+	result, err := dispatchPolicyCmd(ctx, &k.Keeper, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,9 @@ package test
 
 import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/stretchr/testify/require"
 
+	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -46,10 +48,15 @@ type SetRelationshipAction struct {
 }
 
 func (a *SetRelationshipAction) Run(ctx *TestCtx) *coretypes.RelationshipRecord {
-	result, err := setRelationshipDispatcher(ctx, a)
-	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
+	cmd := types.NewSetRelationshipCmd(a.Relationship)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.SetRelationshipCmdResult)(nil)
 	if result != nil {
-		return result.Record
+		got = result.GetSetRelationshipResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	if got != nil {
+		return got.Record
 	}
 	return nil
 }
@@ -63,10 +70,15 @@ type RegisterObjectAction struct {
 }
 
 func (a *RegisterObjectAction) Run(ctx *TestCtx) *coretypes.RelationshipRecord {
-	result, err := registerObjectDispatcher(ctx, a)
-	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
+	cmd := types.NewRegisterObjectCmd(a.Object)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.RegisterObjectCmdResult)(nil)
 	if result != nil {
-		return result.Record
+		got = result.GetRegisterObjectResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	if result != nil {
+		return got.Record
 	}
 	return nil
 }
@@ -131,9 +143,14 @@ type DeleteRelationshipAction struct {
 }
 
 func (a *DeleteRelationshipAction) Run(ctx *TestCtx) *types.DeleteRelationshipCmdResult {
-	result, err := deleteRelationshipDispatcher(ctx, a)
-	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
-	return result
+	cmd := types.NewDeleteRelationshipCmd(a.Relationship)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.DeleteRelationshipCmdResult)(nil)
+	if result != nil {
+		got = result.GetDeleteRelationshipResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	return got
 }
 
 type UnregisterObjectAction struct {
@@ -145,9 +162,14 @@ type UnregisterObjectAction struct {
 }
 
 func (a *UnregisterObjectAction) Run(ctx *TestCtx) *types.UnregisterObjectCmdResult {
-	result, err := unregisterObjectDispatcher(ctx, a)
-	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
-	return result
+	cmd := types.NewUnregisterObjectCmd(a.Object)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.UnregisterObjectCmdResult)(nil)
+	if result != nil {
+		got = result.GetUnregisterObjectResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	return got
 }
 
 type PolicySetupAction struct {
@@ -198,4 +220,54 @@ func (a *GetPolicyAction) Run(ctx *TestCtx) {
 	result, err := ctx.Executor.Policy(ctx, msg)
 
 	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
+}
+
+type CommitRegistrationsAction struct {
+	PolicyId    string
+	Objects     []*coretypes.Object
+	Actor       *TestActor
+	Expected    *types.RevealRegistrationCmdResult
+	commitment  []byte
+	ExpectedErr error
+}
+
+func (a *CommitRegistrationsAction) Run(ctx *TestCtx) string {
+	actor := coretypes.NewActor(a.Actor.DID)
+	commitment, err := registration.GenerateCommitment(a.PolicyId, actor, a.Objects)
+	require.NoError(ctx.T, err)
+	cmd := types.NewCommitRegistrationCmd(commitment)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.CommitRegistrationsCmdResult)(nil)
+	if result != nil {
+		got = result.GetCommitRegistrationsResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	if result != nil {
+		return got.RegistrationsCommitment.Id
+	}
+	return ""
+}
+
+type RevealRegistrationAction struct {
+	PolicyId     string
+	CommitmentId string
+	Objects      []*coretypes.Object
+	Index        uint
+	Actor        *TestActor
+	Expected     *types.RegisterObjectCmdResult
+	ExpectedErr  error
+}
+
+func (a *RevealRegistrationAction) Run(ctx *TestCtx) *types.RevealRegistrationCmdResult {
+	actor := coretypes.NewActor(a.Actor.DID)
+	proof, err := registration.ProofForObject(a.PolicyId, actor, uint64(a.Index), a.Objects)
+	require.NoError(ctx.T, err)
+	cmd := types.NewRevealRegistrationCmd(a.CommitmentId, proof, a.Objects[a.Index])
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	got := (*types.RevealRegistrationCmdResult)(nil)
+	if result != nil {
+		got = result.GetRevealRegistrationResult()
+	}
+	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
+	return got
 }

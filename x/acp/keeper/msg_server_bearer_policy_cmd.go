@@ -13,10 +13,6 @@ import (
 
 func (k msgServer) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	resolver := &did.KeyResolver{}
 	actorID, err := bearer_token.AuthorizeMsg(ctx, resolver, msg, ctx.BlockTime())
@@ -24,7 +20,7 @@ func (k msgServer) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPo
 		return nil, err
 	}
 
-	result, err := dispatchPolicyCmd(ctx, engine, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
+	result, err := dispatchPolicyCmd(ctx, &k.Keeper, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
 
 	if err != nil {
 		return nil, fmt.Errorf("PolicyCmd failed: %w", err)

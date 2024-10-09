@@ -1,0 +1,45 @@
+package registration
+
+import (
+	"testing"
+
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/stretchr/testify/require"
+)
+
+const testPolicyID = "095d86e559a22cef11c7aa7240560b9fd3acf8657fc3743fb16c271a854171e3"
+
+// testCorrectness is a minimal test case which given setup data,
+// asserts that generating a commitment, a proof for an object within it
+// and finally verifying the proof is a valid operation.
+func testCorrectness(t *testing.T, policyId string, idx uint64, objs []*coretypes.Object, actor *coretypes.Actor) {
+	commitment := GenerateCommitment(policyId, actor, objs)
+
+	proof, err := ProofForObject(policyId, actor, idx, objs)
+	require.NoError(t, err)
+
+	ok, err := VerifyProof(commitment, policyId, actor, proof)
+	require.NoError(t, err)
+	require.True(t, ok)
+}
+
+func TestCommitmentMultiObject(t *testing.T) {
+	actor := coretypes.NewActor("did:example:bob")
+	objs := []*coretypes.Object{
+		coretypes.NewObject("file", "foo"),
+		coretypes.NewObject("file", "bar"),
+	}
+	for idx, obj := range objs {
+		t.Run(obj.String(), func(t *testing.T) {
+			testCorrectness(t, testPolicyID, uint64(idx), objs, actor)
+		})
+	}
+}
+
+func TestCommitmentSingleObject(t *testing.T) {
+	actor := coretypes.NewActor("did:example:bob")
+	objs := []*coretypes.Object{
+		coretypes.NewObject("file", "foo"),
+	}
+	testCorrectness(t, testPolicyID, 0, objs, actor)
+}

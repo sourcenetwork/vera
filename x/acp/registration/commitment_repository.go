@@ -5,12 +5,18 @@ import (
 	"context"
 	"time"
 
+	"cosmossdk.io/store/prefix"
+
 	storetypes "cosmossdk.io/store/types"
 	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	raccoon "github.com/sourcenetwork/raccoondb"
+	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
+
+const commitmentObjsPrefix = "/objs"
+const commitmentCounterPrefix = "/counter"
 
 var _ raccoon.Ider[*types.RegistrationsCommitment] = (*registrationIder)(nil)
 
@@ -22,9 +28,24 @@ func (i *registrationIder) Id(obj *types.RegistrationsCommitment) []byte {
 
 var _ CommitmentRepository = (*KVRegistrationRepository)(nil)
 
+func NewKVRegistrationRepository(kv storetypes.KVStore) CommitmentRepository {
+	objsKv := prefix.NewStore(kv, []byte(commitmentObjsPrefix))
+	counterKv := prefix.NewStore(kv, []byte(eventsPrefix))
+
+	objsRCKV := stores.RaccoonKVFromCosmos(objsKv)
+	counterRCKV := stores.RaccoonKVFromCosmos(counterKv)
+
+	factory := func() *types.RegistrationsCommitment { return &types.RegistrationsCommitment{} }
+	objs := raccoon.NewObjStore(objsRCKV, stores.NewGogoProtoMarshaler(factory), &registrationIder{})
+	return &KVRegistrationRepository{
+		store:   objs,
+		counter: raccoon.NewCounterStore("", counterRCKV, raccoon.NoopLogger()),
+	}
+}
+
 type KVRegistrationRepository struct {
-	kv    storetypes.KVStore
-	store raccoon.ObjectStore[*types.RegistrationsCommitment]
+	store   raccoon.ObjectStore[*types.RegistrationsCommitment]
+	counter raccoon.CounterStore
 }
 
 func (r *KVRegistrationRepository) wrapErr(err error) error {
@@ -33,6 +54,10 @@ func (r *KVRegistrationRepository) wrapErr(err error) error {
 	}
 
 	return errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "registration repository")
+}
+
+func (r *KVRegistrationRepository) IncrementId(ctx context.Context) (uint64, error) {
+	return r.counter.GetNextAndIncrement(ctx)
 }
 
 func (r *KVRegistrationRepository) Set(ctx context.Context, reg *types.RegistrationsCommitment) error {

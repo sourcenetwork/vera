@@ -15,6 +15,7 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
+	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -84,4 +85,20 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error
 	}
 
 	return services.NewACPEngine(runtime), nil
+}
+
+func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) registration.CommitmentRepository {
+	kv := k.storeService.OpenKVStore(ctx)
+	prefixKey := []byte(types.RegistrationsCommitmentPrefix)
+	adapted := runtime.KVStoreAdapter(kv)
+	adapted = prefix.NewStore(adapted, prefixKey)
+	return registration.NewKVRegistrationRepository(adapted)
+}
+
+func (k *Keeper) GetObjectEventRepository(ctx sdk.Context) registration.RegistrationEventRepository {
+	kv := k.storeService.OpenKVStore(ctx)
+	prefixKey := []byte(types.ObjectEventsPreix)
+	adapted := runtime.KVStoreAdapter(kv)
+	adapted = prefix.NewStore(adapted, prefixKey)
+	return registration.NewObjectEventRepository(adapted)
 }

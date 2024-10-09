@@ -15,23 +15,37 @@ import (
 const leafPrefix byte = 0x00
 const nodePrefix byte = 0x01
 
-func VerifyProof(root []byte, policyId string, actor *coretypes.Actor, opening *types.RegistrationProof) bool {
+func VerifyProof(root []byte, policyId string, actor *coretypes.Actor, opening *types.RegistrationProof) (bool, error) {
+	if actor == nil || actor.Id == "" {
+		return false, errors.Wrap("invalid actor", errors.ErrorType_BAD_INPUT)
+	}
+	if len(root) != sha256.Size {
+		return false, errors.Wrap("invalid root commitment", errors.ErrorType_BAD_INPUT)
+	}
+	if opening == nil || opening.Object == nil || opening.Object.Id == "" ||
+		opening.MerkleProof == nil || opening.Object.Resource == "" {
+		return false, errors.Wrap("invalid opening", errors.ErrorType_BAD_INPUT)
+	}
+
 	leafHash := produceLeafHash(policyId, actor, opening.Object)
 	computedRoot := foldl(opening.MerkleProof, leafHash, func(proofHash, acc []byte) []byte {
 		return produceNodeHash(acc, proofHash)
 	})
 	if !slices.Equal(computedRoot, root) {
-		return false
+		return false, nil
 	}
-	return true
+	return true, nil
 }
 
-func GenerateCommitment(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) []byte {
-	keys := generateByteSlice(policyId, actor, objs)
-	return merkle.HashFromByteSlices(keys)
+func GenerateCommitment(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) ([]byte, error) {
+	if len(objs) == 0 {
+		return nil, errors.Wrap("cannot generate commitment to empty object set", errors.ErrorType_BAD_INPUT)
+	}
+	keys := generateByteSlices(policyId, actor, objs)
+	return merkle.HashFromByteSlices(keys), nil
 }
 
-func generateByteSlice(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) [][]byte {
+func generateByteSlices(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) [][]byte {
 	sortable := utils.FromExtractor(objs, func(o *coretypes.Object) string {
 		return o.Resource + ":" + o.Id
 	})
@@ -42,67 +56,16 @@ func generateByteSlice(policyId string, actor *coretypes.Actor, objs []*coretype
 	return keys
 }
 
-func ProofForObject(policyId string, actor *coretypes.Actor, idx uint64, objs []*coretypes.Object) *types.RegistrationProof {
-	keys := generateByteSlice(policyId, actor, objs)
+func ProofForObject(policyId string, actor *coretypes.Actor, idx uint64, objs []*coretypes.Object) (*types.RegistrationProof, error) {
+	if idx >= uint64(len(objs)) {
+		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
+	}
+	keys := generateByteSlices(policyId, actor, objs)
 	_, proofs := merkle.ProofsFromByteSlices(keys)
 	return &types.RegistrationProof{
 		MerkleProof: proofs[idx].Aunts,
-	}
-}
-
-type objectTree struct {
-	polId      string
-	actor      *coretypes.Actor
-	objs       []*coretypes.Object
-	merkleVals [][]byte
-}
-
-func (t *objectTree) ProofForObject(obj *coretypes.Object) (*types.RegistrationProof, error) {
-	idx, err := t.findObj(obj)
-	if err != nil {
-		return nil, err
-	}
-	return t.Proof(idx)
-}
-
-func (t *objectTree) Proof(idx uint) (*types.RegistrationProof, error) {
-	if idx >= uint(len(t.objs)) {
-		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
-	}
-
-	_, proofs := merkle.ProofsFromByteSlices(t.merkleVals)
-	return &types.RegistrationProof{
-		MerkleProof: proofs[idx].Aunts,
-		Object:      t.objs[idx],
+		Object:      objs[idx],
 	}, nil
-}
-
-func (t *objectTree) findObj(obj *coretypes.Object) (uint, error) {
-	idx := slices.IndexFunc(t.objs, func(o *coretypes.Object) bool {
-		return o.Resource == obj.Resource && o.Id == obj.Id
-	})
-	if idx == -1 {
-		return 0, errors.Wrap("proof does not contain object", errors.ErrorType_BAD_INPUT,
-			errors.Pair("resource", obj.Resource),
-			errors.Pair("obj", obj.Id))
-	}
-	return uint(idx), nil
-}
-
-func newObjectTree(policyId string, actor *coretypes.Actor, obj *coretypes.Object, objs []*coretypes.Object) objectTree {
-	sortable := objsToSortable(objs)
-	sorted := sortable.Sort()
-
-	merkleVals := utils.MapSlice(sorted, func(o *coretypes.Object) []byte {
-		return generateCommitmentValue(policyId, actor, o)
-	})
-
-	return objectTree{
-		polId:      policyId,
-		actor:      actor,
-		objs:       sorted,
-		merkleVals: merkleVals,
-	}
 }
 
 // objsToStorable returns a Sortable which alphabetically sorts objects by resource:obj_id

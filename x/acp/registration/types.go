@@ -11,6 +11,8 @@ import (
 )
 
 type CommitmentRepository interface {
+	IncrementId(ctx context.Context) (uint64, error)
+
 	Set(ctx context.Context, reg *types.RegistrationsCommitment) error
 
 	GetById(ctx context.Context, id string) (*types.RegistrationsCommitment, error)
@@ -21,6 +23,7 @@ type CommitmentRepository interface {
 }
 
 type RegistrationEventRepository interface {
+	IncrementId(ctx context.Context) (uint64, error)
 	Set(ctx context.Context, event *types.ObjectRegistrationEvent) error
 	GetById(ctx context.Context, id string) (*types.ObjectRegistrationEvent, error)
 	GetObjectEvents(ctx context.Context, policyId string, object *coretypes.Object) ([]*types.ObjectRegistrationEvent, error)

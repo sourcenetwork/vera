@@ -13,10 +13,6 @@ import (
 
 func (k msgServer) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
 
 	resolver := &did.KeyResolver{}
 	params := k.GetParams(ctx)
@@ -26,7 +22,7 @@ func (k msgServer) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPo
 		return nil, fmt.Errorf("PolicyCmd: %w", err)
 	}
 
-	result, err := dispatchPolicyCmd(ctx, engine, payload.PolicyId, payload.Actor, payload.CreationTime, payload.Cmd)
+	result, err := dispatchPolicyCmd(ctx, &k.Keeper, payload.PolicyId, payload.Actor, payload.CreationTime, payload.Cmd)
 
 	if err != nil {
 		return nil, err
