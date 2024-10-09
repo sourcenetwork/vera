@@ -95,7 +95,7 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 	case *types.PolicyCmd_CommitRegistrationsCmd:
 		regCmd := c.CommitRegistrationsCmd
 		params := k.GetParams(ctx)
-		commitment, respErr := registrationService.CommitRegistration(ctx, regCmd.PolicyId, regCmd.Commitment, actor, &params)
+		commitment, respErr := registrationService.CommitRegistration(ctx, policyId, regCmd.Commitment, actor, &params)
 		if respErr != nil {
 			err = respErr
 			break

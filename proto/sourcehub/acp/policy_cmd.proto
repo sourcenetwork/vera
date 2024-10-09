@@ -82,7 +82,7 @@ message RegisterObjectCmd {
 }
 
 message CommitRegistrationsCmd {
-  bytes commitment = 2;
+  bytes commitment = 1;
 }
 
 message CommitRegistrationsCmdResult {

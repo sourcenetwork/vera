@@ -91,7 +91,7 @@ resources:
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmdBuilder.RegisterObject(coretypes.NewObject("resource", "readme.txt"))
+	cmdBuilder.PolicyCmd(acptypes.NewRegisterObjectCmd(coretypes.NewObject("resource", "readme.txt")))
 	cmdBuilder.PolicyID(policyResponse.Policy.Id)
 	cmdBuilder.Actor(aliceDid)
 	cmdBuilder.SetSigner(aliceSigner)
