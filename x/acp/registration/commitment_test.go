@@ -12,7 +12,7 @@ const testPolicyID = "095d86e559a22cef11c7aa7240560b9fd3acf8657fc3743fb16c271a85
 // testCorrectness is a minimal test case which given setup data,
 // asserts that generating a commitment, a proof for an object within it
 // and finally verifying the proof is a valid operation.
-func testCorrectness(t *testing.T, policyId string, idx uint64, objs []*coretypes.Object, actor *coretypes.Actor) {
+func testCorrectness(t *testing.T, policyId string, idx int, objs []*coretypes.Object, actor *coretypes.Actor) {
 	commitment, err := GenerateCommitment(policyId, actor, objs)
 	require.NoError(t, err)
 
@@ -24,15 +24,29 @@ func testCorrectness(t *testing.T, policyId string, idx uint64, objs []*coretype
 	require.True(t, ok)
 }
 
-func TestCommitmentMultiObject(t *testing.T) {
+func TestCommitmentEvenObjects(t *testing.T) {
 	actor := coretypes.NewActor("did:example:bob")
 	objs := []*coretypes.Object{
 		coretypes.NewObject("file", "foo"),
-		coretypes.NewObject("file", "bar"),
+		coretypes.NewObject("file", "tester"),
 	}
 	for idx, obj := range objs {
 		t.Run(obj.String(), func(t *testing.T) {
-			testCorrectness(t, testPolicyID, uint64(idx), objs, actor)
+			testCorrectness(t, testPolicyID, idx, objs, actor)
+		})
+	}
+}
+
+func TestCommitmentOddObjects(t *testing.T) {
+	actor := coretypes.NewActor("did:example:bob")
+	objs := []*coretypes.Object{
+		coretypes.NewObject("file", "bar"),
+		coretypes.NewObject("file", "deez"),
+		coretypes.NewObject("file", "zaz"),
+	}
+	for idx, obj := range objs {
+		t.Run(obj.String(), func(t *testing.T) {
+			testCorrectness(t, testPolicyID, idx, objs, actor)
 		})
 	}
 }

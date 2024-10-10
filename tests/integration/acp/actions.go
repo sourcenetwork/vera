@@ -252,7 +252,7 @@ type RevealRegistrationAction struct {
 	PolicyId     string
 	CommitmentId string
 	Objects      []*coretypes.Object
-	Index        uint
+	Index        int
 	Actor        *TestActor
 	Expected     *types.RegisterObjectCmdResult
 	ExpectedErr  error
@@ -260,7 +260,7 @@ type RevealRegistrationAction struct {
 
 func (a *RevealRegistrationAction) Run(ctx *TestCtx) *types.RevealRegistrationCmdResult {
 	actor := coretypes.NewActor(a.Actor.DID)
-	proof, err := registration.ProofForObject(a.PolicyId, actor, uint64(a.Index), a.Objects)
+	proof, err := registration.ProofForObject(a.PolicyId, actor, a.Index, a.Objects)
 	require.NoError(ctx.T, err)
 	cmd := types.NewRevealRegistrationCmd(a.CommitmentId, proof, a.Objects[a.Index])
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)

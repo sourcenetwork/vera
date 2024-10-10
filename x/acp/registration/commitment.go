@@ -27,45 +27,33 @@ func VerifyProof(root []byte, policyId string, actor *coretypes.Actor, opening *
 		return false, errors.Wrap("invalid opening", errors.ErrorType_BAD_INPUT)
 	}
 
-	leafHash := produceLeafHash(policyId, actor, opening.Object)
-	computedRoot := foldl(opening.MerkleProof, leafHash, func(proofHash, acc []byte) []byte {
-		return produceNodeHash(acc, proofHash)
-	})
-	if !slices.Equal(computedRoot, root) {
+	proof := merkle.Proof{
+		Total:    int64(opening.LeafCount),
+		Index:    int64(opening.LeafIndex),
+		LeafHash: produceLeafHash(policyId, actor, opening.Object),
+		Aunts:    opening.MerkleProof,
+	}
+	err := proof.Verify(root, generateLeafValue(policyId, actor, opening.Object))
+	if err != nil {
 		return false, nil
 	}
 	return true, nil
 }
 
 func GenerateCommitment(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) ([]byte, error) {
-	if len(objs) == 0 {
-		return nil, errors.Wrap("cannot generate commitment to empty object set", errors.ErrorType_BAD_INPUT)
+	t, err := NewObjectCommitmentTree(policyId, actor, objs)
+	if err != nil {
+		return nil, err
 	}
-	keys := generateByteSlices(policyId, actor, objs)
-	return merkle.HashFromByteSlices(keys), nil
+	return t.GetCommitment(), nil
 }
 
-func generateByteSlices(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) [][]byte {
-	sortable := utils.FromExtractor(objs, func(o *coretypes.Object) string {
-		return o.Resource + ":" + o.Id
-	})
-	objs = sortable.Sort()
-	keys := utils.MapSlice(objs, func(o *coretypes.Object) []byte {
-		return []byte(policyId + ":" + o.Resource + ":" + o.Id + ":" + actor.Id)
-	})
-	return keys
-}
-
-func ProofForObject(policyId string, actor *coretypes.Actor, idx uint64, objs []*coretypes.Object) (*types.RegistrationProof, error) {
-	if idx >= uint64(len(objs)) {
-		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
+func ProofForObject(policyId string, actor *coretypes.Actor, idx int, objs []*coretypes.Object) (*types.RegistrationProof, error) {
+	t, err := NewObjectCommitmentTree(policyId, actor, objs)
+	if err != nil {
+		return nil, err
 	}
-	keys := generateByteSlices(policyId, actor, objs)
-	_, proofs := merkle.ProofsFromByteSlices(keys)
-	return &types.RegistrationProof{
-		MerkleProof: proofs[idx].Aunts,
-		Object:      objs[idx],
-	}, nil
+	return t.GetProofForIdx(idx)
 }
 
 // objsToStorable returns a Sortable which alphabetically sorts objects by resource:obj_id
@@ -76,36 +64,104 @@ func objsToSortable(objs []*coretypes.Object) utils.Sortable[*coretypes.Object] 
 	})
 }
 
-// generateCommitmentValue produces a byte slice representing an individual object registration
+// generateLeafValue produces a byte slice representing an individual object registration
 // which will be commited to.
-func generateCommitmentValue(policyId string, actor *coretypes.Actor, o *coretypes.Object) []byte {
+func generateLeafValue(policyId string, actor *coretypes.Actor, o *coretypes.Object) []byte {
 	return []byte(policyId + ":" + o.Resource + ":" + o.Id + ":" + actor.Id)
-}
-
-// foldl folds / reduces a slice starting from index 0
-func foldl[T, U any](ts []T, acc U, ff func(T, U) U) U {
-	for _, t := range ts {
-		acc = ff(t, acc)
-	}
-	return acc
 }
 
 // produceNodeHash hashes a Mertle Tree leaf as per RFC 6962
 // https://www.rfc-editor.org/rfc/rfc6962#section-2.1
 func produceLeafHash(policyId string, actor *coretypes.Actor, o *coretypes.Object) []byte {
-	merkleVal := generateCommitmentValue(policyId, actor, o)
+	merkleVal := generateLeafValue(policyId, actor, o)
 	hasher := sha256.New()
 	hasher.Write([]byte{leafPrefix})
 	hasher.Write(merkleVal)
 	return hasher.Sum(nil)
 }
 
-// produceNodeHash hashes an inner node of a binary Merkle Tree as per RFC 6962
-// https://www.rfc-editor.org/rfc/rfc6962#section-2.1
-func produceNodeHash(h1, h2 []byte) []byte {
-	hasher := sha256.New()
-	hasher.Write([]byte{nodePrefix})
-	hasher.Write(h1)
-	hasher.Write(h2)
-	return hasher.Sum(nil)
+func NewObjectCommitmentTree(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) (*RegistrationCommitmentTree, error) {
+	if len(objs) == 0 {
+		return nil, errors.Wrap("cannot generate commitment to empty object set", errors.ErrorType_BAD_INPUT)
+	}
+	tree := &RegistrationCommitmentTree{
+		policyId: policyId,
+		actor:    actor,
+		objs:     objs,
+	}
+	tree.genCommitment()
+	return tree, nil
+}
+
+type RegistrationCommitmentTree struct {
+	policyId   string
+	actor      *coretypes.Actor
+	objs       []*coretypes.Object
+	sorted     []*coretypes.Object
+	commitment []byte
+	leaves     [][]byte
+}
+
+func (t *RegistrationCommitmentTree) genCommitment() {
+	sortable := objsToSortable(t.objs)
+	t.sorted = sortable.Sort()
+
+	t.leaves = utils.MapSlice(t.sorted, func(o *coretypes.Object) []byte {
+		return generateLeafValue(t.policyId, t.actor, o)
+	})
+
+	t.commitment = merkle.HashFromByteSlices(t.leaves)
+}
+
+func (t *RegistrationCommitmentTree) GetCommitment() []byte {
+	return t.commitment
+}
+
+func (t *RegistrationCommitmentTree) GetProofForObj(obj *coretypes.Object) (*types.RegistrationProof, error) {
+	idx, err := t.findSortedIdx(obj)
+	if err != nil {
+		return nil, err
+	}
+	return t.proofForSortedIdx(idx)
+}
+
+func (t *RegistrationCommitmentTree) GetProofForIdx(idx int) (*types.RegistrationProof, error) {
+	if idx >= len(t.objs) || idx < 0 {
+		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
+	}
+	obj := t.objs[idx]
+	sortedIdx, err := t.findSortedIdx(obj)
+	if err != nil {
+		return nil, err
+	}
+	return t.proofForSortedIdx(sortedIdx)
+}
+
+func (t *RegistrationCommitmentTree) proofForSortedIdx(idx int) (*types.RegistrationProof, error) {
+	if idx >= len(t.objs) {
+		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
+	}
+
+	_, proofs := merkle.ProofsFromByteSlices(t.leaves)
+	return &types.RegistrationProof{
+		MerkleProof: proofs[idx].Aunts,
+		Object:      t.sorted[idx],
+		LeafCount:   uint64(len(t.objs)),
+		LeafIndex:   uint64(idx),
+	}, nil
+}
+
+func (t *RegistrationCommitmentTree) findSortedIdx(obj *coretypes.Object) (int, error) {
+	i := slices.IndexFunc(t.objs, func(o *coretypes.Object) bool {
+		return objEq(obj, o)
+	})
+	if i == -1 {
+		return 0, errors.Wrap("proof does not contain object", errors.ErrorType_BAD_INPUT)
+	}
+
+	return i, nil
+}
+
+func objEq(a, b *coretypes.Object) bool {
+	return a.Id == b.Id && a.Resource == b.Resource
 }
