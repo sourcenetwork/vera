@@ -226,12 +226,12 @@ type CommitRegistrationsAction struct {
 	PolicyId    string
 	Objects     []*coretypes.Object
 	Actor       *TestActor
-	Expected    *types.RevealRegistrationCmdResult
+	Expected    *types.RegistrationsCommitment
 	commitment  []byte
 	ExpectedErr error
 }
 
-func (a *CommitRegistrationsAction) Run(ctx *TestCtx) string {
+func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommitment {
 	actor := coretypes.NewActor(a.Actor.DID)
 	commitment, err := registration.GenerateCommitment(a.PolicyId, actor, a.Objects)
 	require.NoError(ctx.T, err)
@@ -243,9 +243,9 @@ func (a *CommitRegistrationsAction) Run(ctx *TestCtx) string {
 	}
 	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
 	if result != nil {
-		return got.RegistrationsCommitment.Id
+		return got.RegistrationsCommitment
 	}
-	return ""
+	return nil
 }
 
 type RevealRegistrationAction struct {

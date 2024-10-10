@@ -62,6 +62,18 @@ func (e *KeeperExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*t
 	return e.keeper.Policy(ctx, msg)
 }
 
+func (e *KeeperExecutor) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
+	return e.keeper.RegistrationsCommitment(ctx, msg)
+}
+
+func (e *KeeperExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	return e.keeper.RegistrationsCommitmentByCommitment(ctx, msg)
+}
+
+func (e *KeeperExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
+	return e.keeper.ListObjectEvents(ctx, msg)
+}
+
 func NewExecutor(t *testing.T, strategy ExecutorStrategy) (context.Context, MsgExecutor) {
 	switch strategy {
 	case Keeper:
@@ -257,7 +269,19 @@ func (e *SDKClientExecutor) broadcastTx(ctx *TestCtx, msgSet *hubsdk.MsgSet) *hu
 }
 
 func (e *SDKClientExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
-	panic("todo")
+	return e.Network.Client.ACPQueryClient().Policy(ctx, msg)
+}
+
+func (e *SDKClientExecutor) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
+	return e.Network.Client.ACPQueryClient().RegistrationsCommitment(ctx, msg)
+}
+
+func (e *SDKClientExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	return e.Network.Client.ACPQueryClient().RegistrationsCommitmentByCommitment(ctx, msg)
+}
+
+func (e *SDKClientExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
+	return e.Network.Client.ACPQueryClient().ListObjectEvents(ctx, msg)
 }
 
 func (e *SDKClientExecutor) Cleanup() {

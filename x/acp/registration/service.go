@@ -137,10 +137,16 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 		return nil, nil, err
 	}
 	if !status.IsRegistered {
-		return nil, nil, nil //TODO return protocol exception
+		return nil, nil, errors.Wrap("object not registered", errors.ErrorType_BAD_INPUT,
+			errors.Pair("policy", polId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("id", object.Id))
 	}
 	if !status.Record.Archived {
-		return nil, nil, nil //TODO return protocol exception
+		return nil, nil, errors.Wrap("object not archived", errors.ErrorType_BAD_INPUT,
+			errors.Pair("policy", polId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("id", object.Id))
 	}
 
 	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_UNARCHIVAL, polId, object, actor, nil)
@@ -161,6 +167,10 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 }
 
 func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	return s.registerWithEvent(ctx, polId, object, actor, types.ObjectRegistrationEventType_REGISTRATION)
+}
+
+func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, eventType types.ObjectRegistrationEventType) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: polId,
 		Object:   object,
@@ -169,13 +179,19 @@ func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, obje
 		return nil, nil, err
 	}
 	if status.IsRegistered {
-		return nil, nil, nil //TODO return protocol exception
+		return nil, nil, errors.Wrap("object already registered", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("policy", polId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("id", object.Id))
 	}
 	if status.Record.Archived {
-		return nil, nil, nil //TODO return protocol exception
+		return nil, nil, errors.Wrap("object archived", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("policy", polId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("id", object.Id))
 	}
 
-	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_REGISTRATION, polId, object, actor, nil)
+	ev, err := s.eventService.NewEvent(ctx, eventType, polId, object, actor, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -192,22 +208,42 @@ func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, obje
 	return result.Record, ev, nil
 }
 
-func (s *RegistrationService) AmendRegistration(ctx sdk.Context, commitmentId string, polId string, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
-	status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
-		PolicyId: polId,
-		Object:   object,
-	})
+func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *types.RegistrationsCommitment, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	// FIXME this name is bad because due to how i called all events are registration events.
+	// refactor event to simply ObjectEvent
+	event, err := s.eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, object)
 	if err != nil {
 		return nil, nil, err
 	}
-	if !status.IsRegistered {
-		return nil, nil, errors.ErrorType_BAD_INPUT //TODO return protocol exception
-	}
-	if status.OwnerId == actor.Id {
-		return nil, nil, nil // TODO wrap // this should be a noop right?
+	// this shouldn't happen because the object was verified
+	// to be registered beforehand.
+	// return an internal error if it ever does
+	if event == nil {
+		return nil, nil, errors.Wrap("no registration event for object", errors.ErrorType_INTERNAL,
+			errors.Pair("policy", commitment.PolicyId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("id", object.Id))
 	}
 
-	commitment, err := s.repository.GetById(ctx, commitmentId)
+	claimHeight := event.Height
+	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
+		claimHeight = event.Detail.GetRevealEvent().CommitmentCreationHeight
+	} else if event.Type == types.ObjectRegistrationEventType_AMENDMENT {
+		claimHeight = event.Detail.GetAmendmentEvent().CommitmentCreationHeight
+	}
+
+	if commitment.CreationHeight > claimHeight {
+		return nil, nil, errors.Wrap("object already registered", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("policy", commitment.PolicyId),
+			errors.Pair("resource", object.Resource),
+			errors.Pair("object", object.Id),
+		)
+	}
+
+	registrationRecord, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
+		PolicyId: commitment.PolicyId,
+		Object:   object,
+	})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -219,18 +255,18 @@ func (s *RegistrationService) AmendRegistration(ctx sdk.Context, commitmentId st
 				CommitmentCreationHeight:  commitment.CreationHeight,
 				HijackFlag:                false,
 				PreviousOwner: &coretypes.Actor{
-					Id: status.OwnerId,
+					Id: registrationRecord.OwnerId,
 				},
 			},
 		},
 	}
-	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_AMENDMENT, polId, object, actor, metadata)
+	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_AMENDMENT, commitment.PolicyId, object, actor, metadata)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	result, err := s.engine.TransferObject(ctx, &coretypes.TransferObjectRequest{
-		PolicyId: polId,
+		PolicyId: commitment.PolicyId,
 		Object:   object,
 		NewOwner: actor,
 	})
@@ -338,46 +374,10 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 	}
 
 	if !registrationRecord.IsRegistered {
-		return s.RegisterObject(ctx, commitment.PolicyId, object, actor)
+		return s.registerWithEvent(ctx, commitment.PolicyId, object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION)
 	}
 
-	if registrationRecord.OwnerId == actor.Id {
-		if !registrationRecord.Record.Archived {
-			// NOOP
-			return registrationRecord.Record, nil, nil
-		}
-		return s.UnarchiveObject(ctx, commitment.PolicyId, object, actor)
-	}
-
-	// FIXME this name is bad because due to how i called all events are registration events.
-	// refactor event to simply ObjectEvent
-	event, err := s.eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, object)
-	if err != nil {
-		return nil, nil, err
-	}
-	// this shouldn't happen because the object was verified
-	// to be registered beforehand.
-	// return an internal error if it ever does
-	if event == nil {
-		return nil, nil, errors.ErrorType_INTERNAL
-	}
-
-	claimHeight := event.Height
-	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
-		claimHeight = event.Detail.GetRevealEvent().CommitmentCreationHeight
-	} else if event.Type == types.ObjectRegistrationEventType_AMENDMENT {
-		claimHeight = event.Detail.GetAmendmentEvent().CommitmentCreationHeight
-	}
-
-	if commitment.CreationHeight < claimHeight {
-		return s.AmendRegistration(ctx, commitment.Id, commitment.PolicyId, object, actor)
-	}
-
-	return nil, nil, errors.Wrap("object already registered", errors.ErrorType_UNAUTHORIZED,
-		errors.Pair("policy", commitment.PolicyId),
-		errors.Pair("resource", object.Resource),
-		errors.Pair("object", object.Id),
-	)
+	return s.amendRegistration(ctx, commitment, object, actor)
 }
 
 func calculationExpirationTime(now time.Time, offsetSecs uint64) (*prototypes.Timestamp, error) {
