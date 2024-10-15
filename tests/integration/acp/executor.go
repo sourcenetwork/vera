@@ -92,10 +92,10 @@ func (e *KeeperExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObje
 	return e.keeper.ListObjectEvents(sdkCtx, msg)
 }
 
-func NewExecutor(t *testing.T, strategy ExecutorStrategy) MsgExecutor {
+func NewExecutor(t *testing.T, strategy ExecutorStrategy, params types.Params) MsgExecutor {
 	switch strategy {
 	case Keeper:
-		exec, err := newKeeperExecutor()
+		exec, err := newKeeperExecutor(params)
 		require.NoError(t, err)
 		return exec
 	case SDK:
@@ -111,7 +111,7 @@ func NewExecutor(t *testing.T, strategy ExecutorStrategy) MsgExecutor {
 	}
 }
 
-func newKeeperExecutor() (MsgExecutor, error) {
+func newKeeperExecutor(params types.Params) (MsgExecutor, error) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()
@@ -145,7 +145,7 @@ func newKeeperExecutor() (MsgExecutor, error) {
 	ctx = ctx.WithBlockHeight(1)
 
 	// Initialize params
-	k.SetParams(ctx, types.DefaultParams())
+	k.SetParams(ctx, params)
 
 	msgServer := keeper.NewMsgServerImpl(k)
 	executor := &KeeperExecutor{

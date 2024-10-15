@@ -53,7 +53,7 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 	a.Run(ctx)
 }
 
-func TestRevealRegistration_ObjectRegistereToActor_ReturnOldRecord(t *testing.T) {
+func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
@@ -195,7 +195,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 func TestRevealRegistration_ObjectOwnedByUserAfterCommitment_NoOp(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
-	t.FailNow()
+	//TODOt.FailNow()
 }
 
 func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsUnauthorized(t *testing.T) {
@@ -303,9 +303,8 @@ func TestRevealRegistration_ValidProofToExpiredCommitment_ReturnsProtocolError(t
 		},
 	}
 	commitment := a2.Run(ctx)
-	ctx.WaitBlock()
+	ctx.WaitBlocks(ctx.Params.RegistrationsCommitmentValidity.GetBlockCount() + 1)
 
-	// TODO expire stuff
 	// When Bob reveals foo.txt Bob is forbidden from doing so
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),

@@ -95,7 +95,7 @@ func (s *EventService) FlagHijackEvent(ctx sdk.Context, eventId string, actor *c
 
 	if event.Actor != actor {
 		return nil, errors.Wrap("event actor missmatch: principal must be event subject",
-			errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.ErrorType_UNAUTHORIZED,
 			errors.Pair("event", eventId),
 			errors.Pair("expected_actor", actor.Id),
 		)
@@ -230,7 +230,7 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 	}
 
 	if commitment.CreationTs.BlockHeight > claimTs.BlockHeight {
-		return nil, nil, errors.Wrap("object already registered", errors.ErrorType_OPERATION_FORBIDDEN,
+		return nil, nil, errors.Wrap("amendment failed: current registration older than commitment", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("policy", commitment.PolicyId),
 			errors.Pair("resource", object.Resource),
 			errors.Pair("object", object.Id),
@@ -352,6 +352,19 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 	if commitment == nil {
 		return nil, nil, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
 			errors.Pair("id", commitmentId))
+	}
+
+	now, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return nil, nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
+	}
+	after, err := types.IsAfter(commitment.CreationTs, commitment.Validity, now)
+	if err != nil {
+		return nil, nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
+	}
+	if after {
+		return nil, nil, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("commitment", commitmentId))
 	}
 
 	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, commitment.Actor, proof)

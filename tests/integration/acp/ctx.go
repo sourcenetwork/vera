@@ -23,7 +23,11 @@ type TestState struct {
 }
 
 func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
-	executor := NewExecutor(t, config.ExecutorStrategy)
+	params := types.Params{
+		PolicyCommandMaxExpirationDelta: 1,
+		RegistrationsCommitmentValidity: types.NewBlockCountDuration(7),
+	}
+	executor := NewExecutor(t, config.ExecutorStrategy, params)
 
 	root := MustNewSourceHubActorFromName("root")
 	ctx := &TestCtx{
@@ -36,6 +40,7 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 		Strategy:     config.AuthStrategy,
 		ActorType:    config.ActorType,
 		LogicalClock: &logicalClockImpl{},
+		Params:       params,
 	}
 
 	_, err := executor.GetOrCreateAccountFromActor(ctx, root)
@@ -59,6 +64,7 @@ type TestCtx struct {
 	ActorType     ActorKeyType
 	LogicalClock  signed_policy_cmd.LogicalClock
 	TxHash        string
+	Params        types.Params
 }
 
 func NewTestCtx(t *testing.T) *TestCtx {
@@ -105,4 +111,11 @@ func (c *TestCtx) Cleanup() {
 // WaitBlock waits until the underlying SourceHub node advances to the next block
 func (c *TestCtx) WaitBlock() {
 	c.Executor.WaitBlock()
+}
+
+// WaitBlock waits until the underlying SourceHub node advances to the next block
+func (c *TestCtx) WaitBlocks(n uint64) {
+	for i := uint64(0); i < n; i += 1 {
+		c.Executor.WaitBlock()
+	}
 }

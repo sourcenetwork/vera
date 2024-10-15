@@ -1,6 +1,8 @@
 package types
 
 import (
+	"time"
+
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -15,6 +17,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 func NewParams() Params {
 	return Params{
 		PolicyCommandMaxExpirationDelta: DefaultPolicyCommandMaxExpirationDelta,
+		RegistrationsCommitmentValidity: NewDurationFromTimeDuration(time.Minute * 10),
 	}
 }
 
