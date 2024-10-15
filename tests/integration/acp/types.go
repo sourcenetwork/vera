@@ -47,6 +47,8 @@ type MsgExecutor interface {
 	RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error)
 
 	Cleanup()
+	// WaitBlock waits until the Executor has advanced to the next block
+	WaitBlock()
 }
 
 // AuthenticationStrategy is an enum representing the Authentication format

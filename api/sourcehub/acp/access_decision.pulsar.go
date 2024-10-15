@@ -2,18 +2,17 @@
 package acp
 
 import (
+	acp_core "github.com/sourcenetwork/acp_core/pulsar"
 	fmt "fmt"
-	io "io"
-	reflect "reflect"
-	sync "sync"
-
-	acp_core "github.com/sourcenetwork/acp_core/pkg/types"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	io "io"
+	reflect "reflect"
+	sync "sync"
 )
 
 var _ protoreflect.List = (*_AccessDecision_5_list)(nil)

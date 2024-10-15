@@ -28,7 +28,8 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 	if err != nil {
 		return nil, err
 	}
-	goCtx := auth.InjectPrincipal(ctx.Context(), principal)
+	goCtx := auth.InjectPrincipal(ctx, principal)
+	ctx = ctx.WithContext(goCtx)
 
 	switch c := cmd.Cmd.(type) {
 	case *types.PolicyCmd_SetRelationshipCmd:
@@ -62,19 +63,15 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 			},
 		}
 	case *types.PolicyCmd_RegisterObjectCmd:
-		resp, respErr := engine.RegisterObject(goCtx, &coretypes.RegisterObjectRequest{
-			PolicyId:     policyId,
-			CreationTime: ts,
-			Object:       c.RegisterObjectCmd.Object,
-		})
+		rec, _, respErr := registrationService.RegisterObject(ctx, policyId, c.RegisterObjectCmd.Object, actor)
 		if respErr != nil {
 			err = respErr
 			break
 		}
 		result.Result = &types.PolicyCmdResult_RegisterObjectResult{
 			RegisterObjectResult: &types.RegisterObjectCmdResult{
-				Result: resp.Result,
-				Record: resp.Record,
+				Result: coretypes.RegistrationResult_Registered,
+				Record: rec,
 			},
 		}
 	case *types.PolicyCmd_UnregisterObjectCmd:

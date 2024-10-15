@@ -4,7 +4,6 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +16,7 @@ func (k Keeper) RegistrationsCommitment(goCtx context.Context, req *types.QueryR
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var repo registration.CommitmentRepository = nil
+	repo := k.GetRegistrationsCommitmentRepository(ctx)
 
 	commitment, err := repo.GetById(ctx, req.Id)
 	if err != nil {

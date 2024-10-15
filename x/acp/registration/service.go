@@ -3,11 +3,9 @@ package registration
 import (
 	"fmt"
 	"slices"
-	"time"
-
-	prototypes "github.com/cosmos/gogoproto/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	acputils "github.com/sourcenetwork/acp_core/pkg/utils"
@@ -36,7 +34,7 @@ func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 		return nil, err
 	}
 
-	ts, err := prototypes.TimestampProto(ctx.BlockTime())
+	ts, err := types.TimestampFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +43,6 @@ func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 		Id:       fmt.Sprintf("%v", id),
 		Type:     t,
 		TxHash:   utils.HashTx(ctx.TxBytes()),
-		Height:   uint64(ctx.BlockHeight()),
 		Ts:       ts,
 		PolicyId: polId,
 		Object:   object,
@@ -78,7 +75,7 @@ func (s *EventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string,
 	// any further object amendment can only reference an ealier commitment.
 	// this means that the lastest event is the one that corresponds to the earliest registration"
 	sortable := acputils.FromExtractor(evs, func(ev *types.ObjectRegistrationEvent) uint64 {
-		return ev.Height
+		return ev.Ts.BlockHeight
 	})
 	sortable.SortInPlace()
 
@@ -157,7 +154,7 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
 		PolicyId:     polId,
 		Object:       object,
-		CreationTime: ev.Ts,
+		CreationTime: ev.Ts.ProtoTs,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -167,10 +164,10 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 }
 
 func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
-	return s.registerWithEvent(ctx, polId, object, actor, types.ObjectRegistrationEventType_REGISTRATION)
+	return s.registerWithEvent(ctx, polId, object, actor, types.ObjectRegistrationEventType_REGISTRATION, nil)
 }
 
-func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, eventType types.ObjectRegistrationEventType) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, eventType types.ObjectRegistrationEventType, detail *types.EventDetail) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: polId,
 		Object:   object,
@@ -184,14 +181,14 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 			errors.Pair("resource", object.Resource),
 			errors.Pair("id", object.Id))
 	}
-	if status.Record.Archived {
+	if status.Record != nil && status.Record.Archived {
 		return nil, nil, errors.Wrap("object archived", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("policy", polId),
 			errors.Pair("resource", object.Resource),
 			errors.Pair("id", object.Id))
 	}
 
-	ev, err := s.eventService.NewEvent(ctx, eventType, polId, object, actor, nil)
+	ev, err := s.eventService.NewEvent(ctx, eventType, polId, object, actor, detail)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -199,7 +196,7 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
 		PolicyId:     polId,
 		Object:       object,
-		CreationTime: ev.Ts,
+		CreationTime: ev.Ts.ProtoTs,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -225,14 +222,14 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 			errors.Pair("id", object.Id))
 	}
 
-	claimHeight := event.Height
+	claimTs := event.Ts
 	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
-		claimHeight = event.Detail.GetRevealEvent().CommitmentCreationHeight
+		claimTs = event.Detail.GetRevealEvent().CommitmentTimestamp
 	} else if event.Type == types.ObjectRegistrationEventType_AMENDMENT {
-		claimHeight = event.Detail.GetAmendmentEvent().CommitmentCreationHeight
+		claimTs = event.Detail.GetAmendmentEvent().CommitmentTimestamp
 	}
 
-	if commitment.CreationHeight > claimHeight {
+	if commitment.CreationTs.BlockHeight > claimTs.BlockHeight {
 		return nil, nil, errors.Wrap("object already registered", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("policy", commitment.PolicyId),
 			errors.Pair("resource", object.Resource),
@@ -252,7 +249,7 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 		Detail: &types.EventDetail_AmendmentEvent{
 			AmendmentEvent: &types.AmendmentEventDetail{
 				RevealRegistrationEventId: commitment.Id,
-				CommitmentCreationHeight:  commitment.CreationHeight,
+				CommitmentTimestamp:       commitment.CreationTs,
 				HijackFlag:                false,
 				PreviousOwner: &coretypes.Actor{
 					Id: registrationRecord.OwnerId,
@@ -265,7 +262,9 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 		return nil, nil, err
 	}
 
-	result, err := s.engine.TransferObject(ctx, &coretypes.TransferObjectRequest{
+	goCtx := auth.InjectPrincipal(ctx, auth.RootPrincipal())
+	ctx = ctx.WithContext(goCtx)
+	result, err := s.engine.AmendRegistration(ctx, &coretypes.AmendRegistrationRequest{
 		PolicyId: commitment.PolicyId,
 		Object:   object,
 		NewOwner: actor,
@@ -294,27 +293,20 @@ func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId strin
 		return nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "fail generating commitment id")
 	}
 
-	creationTime, err := prototypes.TimestampProto(ctx.BlockTime())
-	if err != nil {
-		return nil, err
-	}
-
-	expiration, err := calculationExpirationTime(ctx.BlockTime(),
-		params.RegistrationsCommitmentValiditySecs)
+	now, err := types.TimestampFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	registration := &types.RegistrationsCommitment{
-		Id:             fmt.Sprintf("%v", id),
-		PolicyId:       policyId,
-		Actor:          actor,
-		Commitment:     commitment,
-		Expired:        false,
-		TxHash:         utils.HashTx(ctx.TxBytes()),
-		CreationHeight: uint64(ctx.BlockHeight()),
-		CreationTime:   creationTime,
-		ExpirationTime: expiration,
+		Id:         fmt.Sprintf("%v", id),
+		PolicyId:   policyId,
+		Actor:      actor,
+		Commitment: commitment,
+		Expired:    false,
+		TxHash:     utils.HashTx(ctx.TxBytes()),
+		CreationTs: now,
+		Validity:   params.RegistrationsCommitmentValidity,
 	}
 
 	err = s.repository.Set(ctx, registration)
@@ -329,7 +321,11 @@ func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId strin
 // filters for expired commitments wrt the current block time,
 // flags them as expired and returns the expired commitments
 func (s *RegistrationService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.RegistrationsCommitment, error) {
-	commitments, err := s.repository.GetExpiredCommitments(ctx, ctx.BlockTime())
+	now, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	commitments, err := s.repository.GetExpiredCommitments(ctx, now)
 	if err != nil {
 		return nil, err
 	}
@@ -374,13 +370,16 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 	}
 
 	if !registrationRecord.IsRegistered {
-		return s.registerWithEvent(ctx, commitment.PolicyId, object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION)
+		detail := &types.EventDetail{
+			Detail: &types.EventDetail_RevealEvent{
+				RevealEvent: &types.RevealRegistrationDetail{
+					CommitmentTimestamp:      commitment.CreationTs,
+					RegistrationCommitmentId: commitment.Id,
+				},
+			},
+		}
+		return s.registerWithEvent(ctx, commitment.PolicyId, object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
 	}
 
 	return s.amendRegistration(ctx, commitment, object, actor)
-}
-
-func calculationExpirationTime(now time.Time, offsetSecs uint64) (*prototypes.Timestamp, error) {
-	delta := time.Second * time.Duration(offsetSecs)
-	return prototypes.TimestampProto(now.Add(delta))
 }

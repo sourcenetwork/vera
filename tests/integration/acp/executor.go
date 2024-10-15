@@ -31,6 +31,7 @@ import (
 )
 
 type KeeperExecutor struct {
+	baseCtx        sdk.Context
 	k              types.MsgServer
 	keeper         types.QueryServer
 	accountCreator *testutil.AccountKeeperStub
@@ -38,20 +39,33 @@ type KeeperExecutor struct {
 
 func (e *KeeperExecutor) Cleanup() {}
 
+func (e *KeeperExecutor) WaitBlock() {
+	newHeight := e.baseCtx.BlockHeight() + 1
+	e.baseCtx = e.baseCtx.WithBlockHeight(newHeight)
+}
+
+func (e *KeeperExecutor) getSDKCtx(ctx context.Context) context.Context {
+	return e.baseCtx.WithContext(ctx)
+}
+
 func (e *KeeperExecutor) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
-	return e.k.BearerPolicyCmd(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.k.BearerPolicyCmd(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
-	return e.k.SignedPolicyCmd(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.k.SignedPolicyCmd(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
-	return e.k.DirectPolicyCmd(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.k.DirectPolicyCmd(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
-	return e.k.CreatePolicy(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.k.CreatePolicy(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
@@ -59,33 +73,37 @@ func (e *KeeperExecutor) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActo
 }
 
 func (e *KeeperExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
-	return e.keeper.Policy(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.keeper.Policy(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
-	return e.keeper.RegistrationsCommitment(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.keeper.RegistrationsCommitment(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
-	return e.keeper.RegistrationsCommitmentByCommitment(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.keeper.RegistrationsCommitmentByCommitment(sdkCtx, msg)
 }
 
 func (e *KeeperExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
-	return e.keeper.ListObjectEvents(ctx, msg)
+	sdkCtx := e.getSDKCtx(ctx)
+	return e.keeper.ListObjectEvents(sdkCtx, msg)
 }
 
-func NewExecutor(t *testing.T, strategy ExecutorStrategy) (context.Context, MsgExecutor) {
+func NewExecutor(t *testing.T, strategy ExecutorStrategy) MsgExecutor {
 	switch strategy {
 	case Keeper:
-		ctx, exec, err := newKeeperExecutor()
+		exec, err := newKeeperExecutor()
 		require.NoError(t, err)
-		return ctx, exec
+		return exec
 	case SDK:
 		network := &e2e.TestNetwork{}
 		network.Setup(t)
 		executor, err := newSDKExecutor(network)
 		require.NoError(t, err)
-		return context.Background(), executor
+		return executor
 	case CLI:
 		panic("sdk executor not implemented")
 	default:
@@ -93,7 +111,7 @@ func NewExecutor(t *testing.T, strategy ExecutorStrategy) (context.Context, MsgE
 	}
 }
 
-func newKeeperExecutor() (context.Context, MsgExecutor, error) {
+func newKeeperExecutor() (MsgExecutor, error) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()
@@ -101,7 +119,7 @@ func newKeeperExecutor() (context.Context, MsgExecutor, error) {
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	err := stateStore.LoadLatestVersion()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create keeper executor: %v", err)
+		return nil, fmt.Errorf("failed to create keeper executor: %v", err)
 	}
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -124,17 +142,19 @@ func newKeeperExecutor() (context.Context, MsgExecutor, error) {
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
 	ctx = ctx.WithEventManager(sdk.NewEventManager())
 	ctx = ctx.WithMultiStore(stateStore)
+	ctx = ctx.WithBlockHeight(1)
 
 	// Initialize params
 	k.SetParams(ctx, types.DefaultParams())
 
 	msgServer := keeper.NewMsgServerImpl(k)
 	executor := &KeeperExecutor{
+		baseCtx:        ctx,
 		k:              msgServer,
 		keeper:         k,
 		accountCreator: accKeeper,
 	}
-	return ctx, executor, nil
+	return executor, nil
 }
 
 func newSDKExecutor(network *e2e.TestNetwork) (*SDKClientExecutor, error) {
@@ -286,4 +306,8 @@ func (e *SDKClientExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListO
 
 func (e *SDKClientExecutor) Cleanup() {
 	e.Network.TearDown()
+}
+
+func (e *SDKClientExecutor) WaitBlock() {
+	panic("not implemented")
 }

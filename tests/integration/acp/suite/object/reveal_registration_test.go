@@ -11,6 +11,7 @@ import (
 )
 
 const revealPolicy string = `
+name: pol
 resources:
   file:
     relations:
@@ -37,6 +38,7 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 		},
 	}
 	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
 
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
@@ -69,6 +71,7 @@ func TestRevealRegistration_ObjectRegistereToActor_ReturnOldRecord(t *testing.T)
 		},
 	}
 	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
 
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
@@ -102,6 +105,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 		},
 	}
 	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
 
 	a3 := test.RegisterObjectAction{
 		Actor:    ctx.GetActor("alice"),
@@ -109,6 +113,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 		Object:   coretypes.NewObject("file", "foo.txt"),
 	}
 	a3.Run(ctx)
+	ctx.WaitBlock()
 
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
@@ -146,6 +151,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 		},
 	}
 	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
 	// Given alice registers foo.txt through a commitment made after bob's
 	a3 := test.CommitRegistrationsAction{
 		Actor:    ctx.GetActor("alice"),
@@ -155,6 +161,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 		},
 	}
 	aliceComm := a3.Run(ctx)
+	ctx.WaitBlock()
 	a4 := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("alice"),
 		PolicyId:     pol.Id,
@@ -165,6 +172,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 		Index: 0,
 	}
 	a4.Run(ctx)
+	ctx.WaitBlock()
 
 	// When Bob reveals foo.txt
 	a := test.RevealRegistrationAction{
@@ -207,6 +215,7 @@ func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsU
 		Object:   coretypes.NewObject("file", "foo.txt"),
 	}
 	a2.Run(ctx)
+	ctx.WaitBlock()
 	// Given a commitment made by bob to foo.txt
 	a3 := test.CommitRegistrationsAction{
 		PolicyId: pol.Id,
@@ -216,6 +225,7 @@ func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsU
 		},
 	}
 	commitment := a3.Run(ctx)
+	ctx.WaitBlock()
 
 	// When Bob reveals foo.txt then bob is forbidden from doing so
 	a := test.RevealRegistrationAction{
@@ -248,6 +258,7 @@ func TestRevealRegistration_InvalidProof_ReturnsError(t *testing.T) {
 		Object:   coretypes.NewObject("file", "foo.txt"),
 	}
 	a2.Run(ctx)
+	ctx.WaitBlock()
 	// Given a commitment made by bob to foo.txt
 	a3 := test.CommitRegistrationsAction{
 		PolicyId: pol.Id,
@@ -257,6 +268,7 @@ func TestRevealRegistration_InvalidProof_ReturnsError(t *testing.T) {
 		},
 	}
 	commitment := a3.Run(ctx)
+	ctx.WaitBlock()
 
 	// When Bob reveals foo.txt then bob is forbidden from doing so
 	a := test.RevealRegistrationAction{
@@ -291,6 +303,7 @@ func TestRevealRegistration_ValidProofToExpiredCommitment_ReturnsProtocolError(t
 		},
 	}
 	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
 
 	// TODO expire stuff
 	// When Bob reveals foo.txt Bob is forbidden from doing so

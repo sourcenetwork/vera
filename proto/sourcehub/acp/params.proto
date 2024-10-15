@@ -4,19 +4,19 @@ package sourcehub.acp;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
+import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
 // Params defines the parameters for the module.
 message Params {
   option (amino.name) = "sourcehub/x/acp/Params";
-  option (gogoproto.equal) = true;
+  //option (gogoproto.equal) = true;
 
   // policy_command_max_expiration_delta specifies a global thershold for how old a Command will be accepted for.
   uint64 policy_command_max_expiration_delta = 1;
 
-    // registrations_commitment_validity_secs specifies a duration (in seconds)
-    // for the lifetime of a commitment.
+    // registrations_commitment_validity specifies a duration for the lifetime of a commitment.
     // Performing a RevealRegistration against an expired commitment causes a protocol error.
-    uint64 registrations_commitment_validity_secs = 2;
+    Duration registrations_commitment_validity = 2;
 }

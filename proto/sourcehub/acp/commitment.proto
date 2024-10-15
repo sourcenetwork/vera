@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package sourcehub.acp;
 
-import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -35,12 +35,9 @@ message RegistrationsCommitment {
     // hash of tx which created the commitment
     bytes tx_hash = 6;
 
-    // block number at creation
-    uint64 creation_height = 7;
+    // timestamp of the block which processed the tx
+    Timestamp creation_ts = 7;
 
-    // tendermint timestamp of the block which processed the tx
-    google.protobuf.Timestamp creation_time = 8;
-
-    // time after which the registration should no longer be accepted
-    google.protobuf.Timestamp expiration_time = 9;
+    // validity models the duration for which the commitment is valid for 
+    Duration validity = 8;
 }

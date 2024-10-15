@@ -4,6 +4,7 @@ package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -21,12 +22,11 @@ message ObjectRegistrationEvent {
     string id = 1;
     ObjectRegistrationEventType type = 2;
     bytes tx_hash = 3;
-    uint64 height = 4;
-    google.protobuf.Timestamp ts = 5;
-    string policy_id = 6;
-    sourcenetwork.acp_core.Object object = 7;
-    sourcenetwork.acp_core.Actor actor = 8;
-    EventDetail detail = 9;
+    string policy_id = 4;
+    Timestamp ts = 5;
+    sourcenetwork.acp_core.Object object = 6;
+    sourcenetwork.acp_core.Actor actor = 7;
+    EventDetail detail = 8;
 }
 
 message EventDetail {
@@ -40,13 +40,11 @@ message AmendmentEventDetail {
     bool hijack_flag = 1;
     sourcenetwork.acp_core.Actor previous_owner = 2;
     string reveal_registration_event_id = 3;
-
-    uint64 commitment_creation_height = 4;
+    Timestamp commitment_timestamp = 4;
 }
 
 message RevealRegistrationDetail {
-    uint64 commitment_creation_height = 1;
-
     // id of the registration commitment which originally registered the relationship
-    string registration_commitment_id = 2;
+    string registration_commitment_id = 1;
+    Timestamp commitment_timestamp = 2;
 }

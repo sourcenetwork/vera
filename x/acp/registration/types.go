@@ -3,7 +3,6 @@ package registration
 
 import (
 	"context"
-	"time"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -19,7 +18,7 @@ type CommitmentRepository interface {
 
 	FilterByCommitment(ctx context.Context, commitment []byte) ([]*types.RegistrationsCommitment, error)
 
-	GetExpiredCommitments(ctx context.Context, currentTime time.Time) ([]*types.RegistrationsCommitment, error)
+	GetExpiredCommitments(ctx context.Context, currentTime *types.Timestamp) ([]*types.RegistrationsCommitment, error)
 }
 
 type RegistrationEventRepository interface {

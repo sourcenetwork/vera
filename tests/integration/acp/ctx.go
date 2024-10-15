@@ -23,11 +23,11 @@ type TestState struct {
 }
 
 func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
-	baseCtx, executor := NewExecutor(t, config.ExecutorStrategy)
+	executor := NewExecutor(t, config.ExecutorStrategy)
 
 	root := MustNewSourceHubActorFromName("root")
 	ctx := &TestCtx{
-		Ctx:          baseCtx,
+		Ctx:          context.TODO(),
 		T:            t,
 		TxSigner:     root,
 		Timestamp:    time.Now(),
@@ -100,4 +100,9 @@ func (c *TestCtx) GetParams() types.Params {
 
 func (c *TestCtx) Cleanup() {
 	c.Executor.Cleanup()
+}
+
+// WaitBlock waits until the underlying SourceHub node advances to the next block
+func (c *TestCtx) WaitBlock() {
+	c.Executor.WaitBlock()
 }

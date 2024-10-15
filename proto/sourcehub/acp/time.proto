@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package sourcehub.acp;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
+
+// Duration models a time interval expressed either as a protobuf
+// Duration interval or a number of blocks
+message Duration {
+    oneof duration {
+        google.protobuf.Duration proto_duration = 1;
+        uint64 block_count = 2;
+    }
+}
+
+// Timestamp models an instant in time expressed as a protobuf
+// Timestamp and a block height
+message Timestamp {
+    google.protobuf.Timestamp proto_ts = 1;
+    uint64 block_height = 2;
+}

@@ -1,0 +1,66 @@
+package types
+
+import (
+	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	prototypes "github.com/cosmos/gogoproto/types"
+)
+
+func NewBlockCountDuration(blocks uint64) *Duration {
+	return &Duration{
+		Duration: &Duration_BlockCount{
+			BlockCount: blocks,
+		},
+	}
+}
+
+func NewDurationFromTimeDuration(duration time.Duration) *Duration {
+	return &Duration{
+		Duration: &Duration_ProtoDuration{
+			ProtoDuration: prototypes.DurationProto(duration),
+		},
+	}
+}
+
+// IsAfter returns whether now is after ts + duration
+func IsAfter(ts *Timestamp, duration *Duration, now *Timestamp) (bool, error) {
+	switch d := duration.Duration.(type) {
+	case *Duration_BlockCount:
+		return ts.BlockHeight+d.BlockCount < now.BlockHeight, nil
+	case *Duration_ProtoDuration:
+		goTs, err := prototypes.TimestampFromProto(ts.ProtoTs)
+		if err != nil {
+			return false, err
+		}
+
+		goNow, err := prototypes.TimestampFromProto(now.ProtoTs)
+		if err != nil {
+			return false, err
+		}
+
+		goDuration, err := prototypes.DurationFromProto(d.ProtoDuration)
+		if err != nil {
+			return false, err
+		}
+
+		return goNow.After(goTs.Add(goDuration)), nil
+	default:
+		panic("invalid duration")
+	}
+}
+
+func TimestampFromCtx(ctx sdk.Context) (*Timestamp, error) {
+	ts, err := prototypes.TimestampProto(ctx.BlockTime())
+	if err != nil {
+		return nil, err
+	}
+	return NewTimestamp(ts, uint64(ctx.BlockHeight())), nil
+}
+
+func NewTimestamp(time *prototypes.Timestamp, height uint64) *Timestamp {
+	return &Timestamp{
+		BlockHeight: height,
+		ProtoTs:     time,
+	}
+}
