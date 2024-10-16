@@ -5,12 +5,13 @@ package types
 
 import (
 	fmt "fmt"
-	proto "github.com/cosmos/gogoproto/proto"
-	_ "github.com/cosmos/gogoproto/types"
-	types "github.com/sourcenetwork/acp_core/pkg/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	proto "github.com/cosmos/gogoproto/proto"
+	_ "github.com/cosmos/gogoproto/types"
+	types "github.com/sourcenetwork/acp_core/pkg/types"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -166,7 +167,6 @@ func (m *ObjectRegistrationEvent) GetDetail() *EventDetail {
 
 type EventDetail struct {
 	// Types that are valid to be assigned to Detail:
-	//
 	//	*EventDetail_RevealEvent
 	//	*EventDetail_AmendmentEvent
 	Detail isEventDetail_Detail `protobuf_oneof:"detail"`

@@ -86,6 +86,12 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/list_object_events";
   
   }
+  
+  // Queries a list of GenerateCommitment items.
+  rpc GenerateCommitment (QueryGenerateCommitmentRequest) returns (QueryGenerateCommitmentResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/generate_commitment";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -186,11 +192,21 @@ message QueryRegistrationsCommitmentByCommitmentResponse {
 }
 
 message QueryListObjectEventsRequest {
-  string policy_id = 1;
-  sourcenetwork.acp_core.Object object = 2;
+  string                        policy_id = 1;
+  sourcenetwork.acp_core.Object object    = 2;
 }
 
 message QueryListObjectEventsResponse {
   repeated ObjectRegistrationEvent events = 1;
+}
+
+message QueryGenerateCommitmentRequest {
+  string policy_id = 1;
+  repeated sourcenetwork.acp_core.Object objects = 2;
+  sourcenetwork.acp_core.Actor actor = 3;
+}
+
+message QueryGenerateCommitmentResponse {
+  bytes commitment = 1;
 }
 

@@ -2,16 +2,17 @@
 package acp
 
 import (
-	acp_core "github.com/sourcenetwork/acp_core/pulsar"
 	fmt "fmt"
+	io "io"
+	reflect "reflect"
+	sync "sync"
+
+	acp_core "cosmossdk.io/api/sourcenetwork/acp_core"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	io "io"
-	reflect "reflect"
-	sync "sync"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var (
@@ -19,9 +20,8 @@ var (
 	fd_ObjectRegistrationEvent_id        protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_type      protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_tx_hash   protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_height    protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_ts        protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_policy_id protoreflect.FieldDescriptor
+	fd_ObjectRegistrationEvent_ts        protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_object    protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_actor     protoreflect.FieldDescriptor
 	fd_ObjectRegistrationEvent_detail    protoreflect.FieldDescriptor
@@ -33,9 +33,8 @@ func init() {
 	fd_ObjectRegistrationEvent_id = md_ObjectRegistrationEvent.Fields().ByName("id")
 	fd_ObjectRegistrationEvent_type = md_ObjectRegistrationEvent.Fields().ByName("type")
 	fd_ObjectRegistrationEvent_tx_hash = md_ObjectRegistrationEvent.Fields().ByName("tx_hash")
-	fd_ObjectRegistrationEvent_height = md_ObjectRegistrationEvent.Fields().ByName("height")
-	fd_ObjectRegistrationEvent_ts = md_ObjectRegistrationEvent.Fields().ByName("ts")
 	fd_ObjectRegistrationEvent_policy_id = md_ObjectRegistrationEvent.Fields().ByName("policy_id")
+	fd_ObjectRegistrationEvent_ts = md_ObjectRegistrationEvent.Fields().ByName("ts")
 	fd_ObjectRegistrationEvent_object = md_ObjectRegistrationEvent.Fields().ByName("object")
 	fd_ObjectRegistrationEvent_actor = md_ObjectRegistrationEvent.Fields().ByName("actor")
 	fd_ObjectRegistrationEvent_detail = md_ObjectRegistrationEvent.Fields().ByName("detail")
@@ -124,21 +123,15 @@ func (x *fastReflection_ObjectRegistrationEvent) Range(f func(protoreflect.Field
 			return
 		}
 	}
-	if x.Height != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.Height)
-		if !f(fd_ObjectRegistrationEvent_height, value) {
+	if x.PolicyId != "" {
+		value := protoreflect.ValueOfString(x.PolicyId)
+		if !f(fd_ObjectRegistrationEvent_policy_id, value) {
 			return
 		}
 	}
 	if x.Ts != nil {
 		value := protoreflect.ValueOfMessage(x.Ts.ProtoReflect())
 		if !f(fd_ObjectRegistrationEvent_ts, value) {
-			return
-		}
-	}
-	if x.PolicyId != "" {
-		value := protoreflect.ValueOfString(x.PolicyId)
-		if !f(fd_ObjectRegistrationEvent_policy_id, value) {
 			return
 		}
 	}
@@ -181,12 +174,10 @@ func (x *fastReflection_ObjectRegistrationEvent) Has(fd protoreflect.FieldDescri
 		return x.Type_ != 0
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		return len(x.TxHash) != 0
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		return x.Height != uint64(0)
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		return x.Ts != nil
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		return x.PolicyId != ""
+	case "sourcehub.acp.ObjectRegistrationEvent.ts":
+		return x.Ts != nil
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		return x.Object != nil
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
@@ -215,12 +206,10 @@ func (x *fastReflection_ObjectRegistrationEvent) Clear(fd protoreflect.FieldDesc
 		x.Type_ = 0
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		x.TxHash = nil
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		x.Height = uint64(0)
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		x.Ts = nil
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		x.PolicyId = ""
+	case "sourcehub.acp.ObjectRegistrationEvent.ts":
+		x.Ts = nil
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		x.Object = nil
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
@@ -252,15 +241,12 @@ func (x *fastReflection_ObjectRegistrationEvent) Get(descriptor protoreflect.Fie
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		value := x.TxHash
 		return protoreflect.ValueOfBytes(value)
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		value := x.Height
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		value := x.Ts
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		value := x.PolicyId
 		return protoreflect.ValueOfString(value)
+	case "sourcehub.acp.ObjectRegistrationEvent.ts":
+		value := x.Ts
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		value := x.Object
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
@@ -296,12 +282,10 @@ func (x *fastReflection_ObjectRegistrationEvent) Set(fd protoreflect.FieldDescri
 		x.Type_ = (ObjectRegistrationEventType)(value.Enum())
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		x.TxHash = value.Bytes()
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		x.Height = value.Uint()
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		x.Ts = value.Message().Interface().(*timestamppb.Timestamp)
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		x.PolicyId = value.Interface().(string)
+	case "sourcehub.acp.ObjectRegistrationEvent.ts":
+		x.Ts = value.Message().Interface().(*Timestamp)
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		x.Object = value.Message().Interface().(*acp_core.Object)
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
@@ -330,7 +314,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Mutable(fd protoreflect.FieldDe
 	switch fd.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.ts":
 		if x.Ts == nil {
-			x.Ts = new(timestamppb.Timestamp)
+			x.Ts = new(Timestamp)
 		}
 		return protoreflect.ValueOfMessage(x.Ts.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
@@ -354,8 +338,6 @@ func (x *fastReflection_ObjectRegistrationEvent) Mutable(fd protoreflect.FieldDe
 		panic(fmt.Errorf("field type of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		panic(fmt.Errorf("field tx_hash of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		panic(fmt.Errorf("field height of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		panic(fmt.Errorf("field policy_id of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
 	default:
@@ -377,13 +359,11 @@ func (x *fastReflection_ObjectRegistrationEvent) NewField(fd protoreflect.FieldD
 		return protoreflect.ValueOfEnum(0)
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
 		return protoreflect.ValueOfBytes(nil)
-	case "sourcehub.acp.ObjectRegistrationEvent.height":
-		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		m := new(timestamppb.Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
 		return protoreflect.ValueOfString("")
+	case "sourcehub.acp.ObjectRegistrationEvent.ts":
+		m := new(Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		m := new(acp_core.Object)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
@@ -473,15 +453,12 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Height != 0 {
-			n += 1 + runtime.Sov(uint64(x.Height))
+		l = len(x.PolicyId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.Ts != nil {
 			l = options.Size(x.Ts)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.PolicyId)
-		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.Object != nil {
@@ -537,7 +514,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x4a
+			dAtA[i] = 0x42
 		}
 		if x.Actor != nil {
 			encoded, err := options.Marshal(x.Actor)
@@ -551,7 +528,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x42
+			dAtA[i] = 0x3a
 		}
 		if x.Object != nil {
 			encoded, err := options.Marshal(x.Object)
@@ -564,13 +541,6 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			i -= len(encoded)
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x3a
-		}
-		if len(x.PolicyId) > 0 {
-			i -= len(x.PolicyId)
-			copy(dAtA[i:], x.PolicyId)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
 			i--
 			dAtA[i] = 0x32
 		}
@@ -588,10 +558,12 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			i--
 			dAtA[i] = 0x2a
 		}
-		if x.Height != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.Height))
+		if len(x.PolicyId) > 0 {
+			i -= len(x.PolicyId)
+			copy(dAtA[i:], x.PolicyId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
 			i--
-			dAtA[i] = 0x20
+			dAtA[i] = 0x22
 		}
 		if len(x.TxHash) > 0 {
 			i -= len(x.TxHash)
@@ -747,61 +719,6 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 				}
 				iNdEx = postIndex
 			case 4:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
-				}
-				x.Height = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.Height |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 5:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Ts", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Ts == nil {
-					x.Ts = &timestamppb.Timestamp{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Ts); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 6:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 				}
@@ -833,7 +750,43 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 				}
 				x.PolicyId = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 7:
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Ts", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Ts == nil {
+					x.Ts = &Timestamp{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Ts); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 6:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
 				}
@@ -869,7 +822,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 8:
+			case 7:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
 				}
@@ -905,7 +858,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 9:
+			case 8:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Detail", wireType)
 				}
@@ -1559,7 +1512,7 @@ var (
 	fd_AmendmentEventDetail_hijack_flag                  protoreflect.FieldDescriptor
 	fd_AmendmentEventDetail_previous_owner               protoreflect.FieldDescriptor
 	fd_AmendmentEventDetail_reveal_registration_event_id protoreflect.FieldDescriptor
-	fd_AmendmentEventDetail_commitment_creation_height   protoreflect.FieldDescriptor
+	fd_AmendmentEventDetail_commitment_timestamp         protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -1568,7 +1521,7 @@ func init() {
 	fd_AmendmentEventDetail_hijack_flag = md_AmendmentEventDetail.Fields().ByName("hijack_flag")
 	fd_AmendmentEventDetail_previous_owner = md_AmendmentEventDetail.Fields().ByName("previous_owner")
 	fd_AmendmentEventDetail_reveal_registration_event_id = md_AmendmentEventDetail.Fields().ByName("reveal_registration_event_id")
-	fd_AmendmentEventDetail_commitment_creation_height = md_AmendmentEventDetail.Fields().ByName("commitment_creation_height")
+	fd_AmendmentEventDetail_commitment_timestamp = md_AmendmentEventDetail.Fields().ByName("commitment_timestamp")
 }
 
 var _ protoreflect.Message = (*fastReflection_AmendmentEventDetail)(nil)
@@ -1654,9 +1607,9 @@ func (x *fastReflection_AmendmentEventDetail) Range(f func(protoreflect.FieldDes
 			return
 		}
 	}
-	if x.CommitmentCreationHeight != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.CommitmentCreationHeight)
-		if !f(fd_AmendmentEventDetail_commitment_creation_height, value) {
+	if x.CommitmentTimestamp != nil {
+		value := protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
+		if !f(fd_AmendmentEventDetail_commitment_timestamp, value) {
 			return
 		}
 	}
@@ -1681,8 +1634,8 @@ func (x *fastReflection_AmendmentEventDetail) Has(fd protoreflect.FieldDescripto
 		return x.PreviousOwner != nil
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		return x.RevealRegistrationEventId != ""
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		return x.CommitmentCreationHeight != uint64(0)
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		return x.CommitmentTimestamp != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1705,8 +1658,8 @@ func (x *fastReflection_AmendmentEventDetail) Clear(fd protoreflect.FieldDescrip
 		x.PreviousOwner = nil
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		x.RevealRegistrationEventId = ""
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		x.CommitmentCreationHeight = uint64(0)
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		x.CommitmentTimestamp = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1732,9 +1685,9 @@ func (x *fastReflection_AmendmentEventDetail) Get(descriptor protoreflect.FieldD
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		value := x.RevealRegistrationEventId
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		value := x.CommitmentCreationHeight
-		return protoreflect.ValueOfUint64(value)
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		value := x.CommitmentTimestamp
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1761,8 +1714,8 @@ func (x *fastReflection_AmendmentEventDetail) Set(fd protoreflect.FieldDescripto
 		x.PreviousOwner = value.Message().Interface().(*acp_core.Actor)
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		x.RevealRegistrationEventId = value.Interface().(string)
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		x.CommitmentCreationHeight = value.Uint()
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1788,12 +1741,15 @@ func (x *fastReflection_AmendmentEventDetail) Mutable(fd protoreflect.FieldDescr
 			x.PreviousOwner = new(acp_core.Actor)
 		}
 		return protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		if x.CommitmentTimestamp == nil {
+			x.CommitmentTimestamp = new(Timestamp)
+		}
+		return protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
 	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
 		panic(fmt.Errorf("field hijack_flag of message sourcehub.acp.AmendmentEventDetail is not mutable"))
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		panic(fmt.Errorf("field reveal_registration_event_id of message sourcehub.acp.AmendmentEventDetail is not mutable"))
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		panic(fmt.Errorf("field commitment_creation_height of message sourcehub.acp.AmendmentEventDetail is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1814,8 +1770,9 @@ func (x *fastReflection_AmendmentEventDetail) NewField(fd protoreflect.FieldDesc
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.acp.AmendmentEventDetail.commitment_creation_height":
-		return protoreflect.ValueOfUint64(uint64(0))
+	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
+		m := new(Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
@@ -1896,8 +1853,9 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.CommitmentCreationHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.CommitmentCreationHeight))
+		if x.CommitmentTimestamp != nil {
+			l = options.Size(x.CommitmentTimestamp)
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -1928,10 +1886,19 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.CommitmentCreationHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.CommitmentCreationHeight))
+		if x.CommitmentTimestamp != nil {
+			encoded, err := options.Marshal(x.CommitmentTimestamp)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x20
+			dAtA[i] = 0x22
 		}
 		if len(x.RevealRegistrationEventId) > 0 {
 			i -= len(x.RevealRegistrationEventId)
@@ -2102,10 +2069,10 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 				x.RevealRegistrationEventId = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 4:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentCreationHeight", wireType)
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
 				}
-				x.CommitmentCreationHeight = 0
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2115,11 +2082,28 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.CommitmentCreationHeight |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.CommitmentTimestamp == nil {
+					x.CommitmentTimestamp = &Timestamp{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CommitmentTimestamp); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -2157,15 +2141,15 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 
 var (
 	md_RevealRegistrationDetail                            protoreflect.MessageDescriptor
-	fd_RevealRegistrationDetail_commitment_creation_height protoreflect.FieldDescriptor
 	fd_RevealRegistrationDetail_registration_commitment_id protoreflect.FieldDescriptor
+	fd_RevealRegistrationDetail_commitment_timestamp       protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_acp_registration_proto_init()
 	md_RevealRegistrationDetail = File_sourcehub_acp_registration_proto.Messages().ByName("RevealRegistrationDetail")
-	fd_RevealRegistrationDetail_commitment_creation_height = md_RevealRegistrationDetail.Fields().ByName("commitment_creation_height")
 	fd_RevealRegistrationDetail_registration_commitment_id = md_RevealRegistrationDetail.Fields().ByName("registration_commitment_id")
+	fd_RevealRegistrationDetail_commitment_timestamp = md_RevealRegistrationDetail.Fields().ByName("commitment_timestamp")
 }
 
 var _ protoreflect.Message = (*fastReflection_RevealRegistrationDetail)(nil)
@@ -2233,15 +2217,15 @@ func (x *fastReflection_RevealRegistrationDetail) Interface() protoreflect.Proto
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_RevealRegistrationDetail) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.CommitmentCreationHeight != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.CommitmentCreationHeight)
-		if !f(fd_RevealRegistrationDetail_commitment_creation_height, value) {
-			return
-		}
-	}
 	if x.RegistrationCommitmentId != "" {
 		value := protoreflect.ValueOfString(x.RegistrationCommitmentId)
 		if !f(fd_RevealRegistrationDetail_registration_commitment_id, value) {
+			return
+		}
+	}
+	if x.CommitmentTimestamp != nil {
+		value := protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
+		if !f(fd_RevealRegistrationDetail_commitment_timestamp, value) {
 			return
 		}
 	}
@@ -2260,10 +2244,10 @@ func (x *fastReflection_RevealRegistrationDetail) Range(f func(protoreflect.Fiel
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_RevealRegistrationDetail) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		return x.CommitmentCreationHeight != uint64(0)
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		return x.RegistrationCommitmentId != ""
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		return x.CommitmentTimestamp != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
@@ -2280,10 +2264,10 @@ func (x *fastReflection_RevealRegistrationDetail) Has(fd protoreflect.FieldDescr
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_RevealRegistrationDetail) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		x.CommitmentCreationHeight = uint64(0)
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		x.RegistrationCommitmentId = ""
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		x.CommitmentTimestamp = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
@@ -2300,12 +2284,12 @@ func (x *fastReflection_RevealRegistrationDetail) Clear(fd protoreflect.FieldDes
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_RevealRegistrationDetail) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		value := x.CommitmentCreationHeight
-		return protoreflect.ValueOfUint64(value)
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		value := x.RegistrationCommitmentId
 		return protoreflect.ValueOfString(value)
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		value := x.CommitmentTimestamp
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
@@ -2326,10 +2310,10 @@ func (x *fastReflection_RevealRegistrationDetail) Get(descriptor protoreflect.Fi
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_RevealRegistrationDetail) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		x.CommitmentCreationHeight = value.Uint()
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		x.RegistrationCommitmentId = value.Interface().(string)
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
@@ -2350,8 +2334,11 @@ func (x *fastReflection_RevealRegistrationDetail) Set(fd protoreflect.FieldDescr
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_RevealRegistrationDetail) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		panic(fmt.Errorf("field commitment_creation_height of message sourcehub.acp.RevealRegistrationDetail is not mutable"))
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		if x.CommitmentTimestamp == nil {
+			x.CommitmentTimestamp = new(Timestamp)
+		}
+		return protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		panic(fmt.Errorf("field registration_commitment_id of message sourcehub.acp.RevealRegistrationDetail is not mutable"))
 	default:
@@ -2367,10 +2354,11 @@ func (x *fastReflection_RevealRegistrationDetail) Mutable(fd protoreflect.FieldD
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_RevealRegistrationDetail) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_creation_height":
-		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		return protoreflect.ValueOfString("")
+	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
+		m := new(Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
@@ -2440,11 +2428,12 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 		var n int
 		var l int
 		_ = l
-		if x.CommitmentCreationHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.CommitmentCreationHeight))
-		}
 		l = len(x.RegistrationCommitmentId)
 		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.CommitmentTimestamp != nil {
+			l = options.Size(x.CommitmentTimestamp)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -2476,17 +2465,26 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		if x.CommitmentTimestamp != nil {
+			encoded, err := options.Marshal(x.CommitmentTimestamp)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
 		if len(x.RegistrationCommitmentId) > 0 {
 			i -= len(x.RegistrationCommitmentId)
 			copy(dAtA[i:], x.RegistrationCommitmentId)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RegistrationCommitmentId)))
 			i--
-			dAtA[i] = 0x12
-		}
-		if x.CommitmentCreationHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.CommitmentCreationHeight))
-			i--
-			dAtA[i] = 0x8
+			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -2538,25 +2536,6 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 			}
 			switch fieldNum {
 			case 1:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentCreationHeight", wireType)
-				}
-				x.CommitmentCreationHeight = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.CommitmentCreationHeight |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 2:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
 				}
@@ -2587,6 +2566,42 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				x.RegistrationCommitmentId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.CommitmentTimestamp == nil {
+					x.CommitmentTimestamp = &Timestamp{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CommitmentTimestamp); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -2705,12 +2720,11 @@ type ObjectRegistrationEvent struct {
 	Id       string                      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type_    ObjectRegistrationEventType `protobuf:"varint,2,opt,name=type,proto3,enum=sourcehub.acp.ObjectRegistrationEventType" json:"type,omitempty"`
 	TxHash   []byte                      `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	Height   uint64                      `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
-	Ts       *timestamppb.Timestamp      `protobuf:"bytes,5,opt,name=ts,proto3" json:"ts,omitempty"`
-	PolicyId string                      `protobuf:"bytes,6,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Object   *acp_core.Object            `protobuf:"bytes,7,opt,name=object,proto3" json:"object,omitempty"`
-	Actor    *acp_core.Actor             `protobuf:"bytes,8,opt,name=actor,proto3" json:"actor,omitempty"`
-	Detail   *EventDetail                `protobuf:"bytes,9,opt,name=detail,proto3" json:"detail,omitempty"`
+	PolicyId string                      `protobuf:"bytes,4,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Ts       *Timestamp                  `protobuf:"bytes,5,opt,name=ts,proto3" json:"ts,omitempty"`
+	Object   *acp_core.Object            `protobuf:"bytes,6,opt,name=object,proto3" json:"object,omitempty"`
+	Actor    *acp_core.Actor             `protobuf:"bytes,7,opt,name=actor,proto3" json:"actor,omitempty"`
+	Detail   *EventDetail                `protobuf:"bytes,8,opt,name=detail,proto3" json:"detail,omitempty"`
 }
 
 func (x *ObjectRegistrationEvent) Reset() {
@@ -2754,25 +2768,18 @@ func (x *ObjectRegistrationEvent) GetTxHash() []byte {
 	return nil
 }
 
-func (x *ObjectRegistrationEvent) GetHeight() uint64 {
-	if x != nil {
-		return x.Height
-	}
-	return 0
-}
-
-func (x *ObjectRegistrationEvent) GetTs() *timestamppb.Timestamp {
-	if x != nil {
-		return x.Ts
-	}
-	return nil
-}
-
 func (x *ObjectRegistrationEvent) GetPolicyId() string {
 	if x != nil {
 		return x.PolicyId
 	}
 	return ""
+}
+
+func (x *ObjectRegistrationEvent) GetTs() *Timestamp {
+	if x != nil {
+		return x.Ts
+	}
+	return nil
 }
 
 func (x *ObjectRegistrationEvent) GetObject() *acp_core.Object {
@@ -2873,7 +2880,7 @@ type AmendmentEventDetail struct {
 	HijackFlag                bool            `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
 	PreviousOwner             *acp_core.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
 	RevealRegistrationEventId string          `protobuf:"bytes,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
-	CommitmentCreationHeight  uint64          `protobuf:"varint,4,opt,name=commitment_creation_height,json=commitmentCreationHeight,proto3" json:"commitment_creation_height,omitempty"`
+	CommitmentTimestamp       *Timestamp      `protobuf:"bytes,4,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
 }
 
 func (x *AmendmentEventDetail) Reset() {
@@ -2917,11 +2924,11 @@ func (x *AmendmentEventDetail) GetRevealRegistrationEventId() string {
 	return ""
 }
 
-func (x *AmendmentEventDetail) GetCommitmentCreationHeight() uint64 {
+func (x *AmendmentEventDetail) GetCommitmentTimestamp() *Timestamp {
 	if x != nil {
-		return x.CommitmentCreationHeight
+		return x.CommitmentTimestamp
 	}
-	return 0
+	return nil
 }
 
 type RevealRegistrationDetail struct {
@@ -2929,9 +2936,9 @@ type RevealRegistrationDetail struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	CommitmentCreationHeight uint64 `protobuf:"varint,1,opt,name=commitment_creation_height,json=commitmentCreationHeight,proto3" json:"commitment_creation_height,omitempty"`
 	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId string `protobuf:"bytes,2,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
+	RegistrationCommitmentId string     `protobuf:"bytes,1,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
+	CommitmentTimestamp      *Timestamp `protobuf:"bytes,2,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
 }
 
 func (x *RevealRegistrationDetail) Reset() {
@@ -2954,18 +2961,18 @@ func (*RevealRegistrationDetail) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *RevealRegistrationDetail) GetCommitmentCreationHeight() uint64 {
-	if x != nil {
-		return x.CommitmentCreationHeight
-	}
-	return 0
-}
-
 func (x *RevealRegistrationDetail) GetRegistrationCommitmentId() string {
 	if x != nil {
 		return x.RegistrationCommitmentId
 	}
 	return ""
+}
+
+func (x *RevealRegistrationDetail) GetCommitmentTimestamp() *Timestamp {
+	if x != nil {
+		return x.CommitmentTimestamp
+	}
+	return nil
 }
 
 var File_sourcehub_acp_registration_proto protoreflect.FileDescriptor
@@ -2978,29 +2985,29 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f,
 	0x74, 0x6f, 0x1a, 0x29, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
 	0x6b, 0x2f, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x72, 0x65, 0x6c, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x84, 0x03,
-	0x0a, 0x17, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x3e, 0x0a, 0x04, 0x74, 0x79, 0x70,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x54,
-	0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x78, 0x5f,
-	0x68, 0x61, 0x73, 0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x74, 0x78, 0x48, 0x61,
-	0x73, 0x68, 0x12, 0x16, 0x0a, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x04, 0x52, 0x06, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x2a, 0x0a, 0x02, 0x74, 0x73,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x52, 0x02, 0x74, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
-	0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63,
-	0x79, 0x49, 0x64, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x07, 0x20,
+	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x18, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x74, 0x69, 0x6d,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xea, 0x02, 0x0a, 0x17, 0x4f, 0x62, 0x6a, 0x65,
+	0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76,
+	0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x02, 0x69, 0x64, 0x12, 0x3e, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0e, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
+	0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x78, 0x5f, 0x68, 0x61, 0x73, 0x68, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x74, 0x78, 0x48, 0x61, 0x73, 0x68, 0x12, 0x1b, 0x0a, 0x09,
+	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x49, 0x64, 0x12, 0x28, 0x0a, 0x02, 0x74, 0x73, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x02, 0x74, 0x73, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x06, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77,
 	0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a,
 	0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x33, 0x0a, 0x05, 0x61,
-	0x63, 0x74, 0x6f, 0x72, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75,
+	0x63, 0x74, 0x6f, 0x72, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75,
 	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63,
 	0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x05, 0x61, 0x63, 0x74, 0x6f, 0x72,
-	0x12, 0x32, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x18, 0x09, 0x20, 0x01, 0x28, 0x0b,
+	0x12, 0x32, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b,
 	0x32, 0x1a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
 	0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x06, 0x64, 0x65,
 	0x74, 0x61, 0x69, 0x6c, 0x22, 0xb5, 0x01, 0x0a, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65,
@@ -3014,7 +3021,7 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x41, 0x6d, 0x65, 0x6e,
 	0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c,
 	0x48, 0x00, 0x52, 0x0e, 0x61, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x22, 0xfc, 0x01, 0x0a,
+	0x6e, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x22, 0x8b, 0x02, 0x0a,
 	0x14, 0x41, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44,
 	0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x1f, 0x0a, 0x0b, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f,
 	0x66, 0x6c, 0x61, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x68, 0x69, 0x6a, 0x61,
@@ -3026,40 +3033,42 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x5f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x19, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x3c, 0x0a,
-	0x1a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x63, 0x72, 0x65, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
-	0x04, 0x52, 0x18, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x72, 0x65,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x22, 0x96, 0x01, 0x0a, 0x18,
-	0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x3c, 0x0a, 0x1a, 0x63, 0x6f, 0x6d, 0x6d,
-	0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
-	0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x18, 0x63, 0x6f,
-	0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x43, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x3c, 0x0a, 0x1a, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e,
-	0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x18, 0x72, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65,
-	0x6e, 0x74, 0x49, 0x64, 0x2a, 0x90, 0x01, 0x0a, 0x1b, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52,
-	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74,
-	0x54, 0x79, 0x70, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10,
-	0x00, 0x12, 0x10, 0x0a, 0x0c, 0x52, 0x45, 0x47, 0x49, 0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f,
-	0x4e, 0x10, 0x01, 0x12, 0x17, 0x0a, 0x13, 0x52, 0x45, 0x56, 0x45, 0x41, 0x4c, 0x5f, 0x52, 0x45,
-	0x47, 0x49, 0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x02, 0x12, 0x0c, 0x0a, 0x08,
-	0x41, 0x52, 0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x03, 0x12, 0x0e, 0x0a, 0x0a, 0x55, 0x4e,
-	0x41, 0x52, 0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x04, 0x12, 0x0d, 0x0a, 0x09, 0x41, 0x4d,
-	0x45, 0x4e, 0x44, 0x4d, 0x45, 0x4e, 0x54, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x52, 0x41,
-	0x4e, 0x53, 0x46, 0x45, 0x52, 0x10, 0x06, 0x42, 0x9b, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e,
-	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42, 0x11, 0x52,
-	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61,
-	0x63, 0x70, 0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x3a, 0x3a, 0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a,
+	0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65,
+	0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x13, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e,
+	0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0xa5, 0x01, 0x0a, 0x18, 0x52,
+	0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x3c, 0x0a, 0x1a, 0x72, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65,
+	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x18, 0x72, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
+	0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
+	0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x13, 0x63,
+	0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
+	0x6d, 0x70, 0x2a, 0x90, 0x01, 0x0a, 0x1b, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x54, 0x79,
+	0x70, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12,
+	0x10, 0x0a, 0x0c, 0x52, 0x45, 0x47, 0x49, 0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x10,
+	0x01, 0x12, 0x17, 0x0a, 0x13, 0x52, 0x45, 0x56, 0x45, 0x41, 0x4c, 0x5f, 0x52, 0x45, 0x47, 0x49,
+	0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x02, 0x12, 0x0c, 0x0a, 0x08, 0x41, 0x52,
+	0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x03, 0x12, 0x0e, 0x0a, 0x0a, 0x55, 0x4e, 0x41, 0x52,
+	0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x04, 0x12, 0x0d, 0x0a, 0x09, 0x41, 0x4d, 0x45, 0x4e,
+	0x44, 0x4d, 0x45, 0x4e, 0x54, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x52, 0x41, 0x4e, 0x53,
+	0x46, 0x45, 0x52, 0x10, 0x06, 0x42, 0x9b, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42, 0x11, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70,
+	0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a,
+	0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3082,24 +3091,26 @@ var file_sourcehub_acp_registration_proto_goTypes = []interface{}{
 	(*EventDetail)(nil),              // 2: sourcehub.acp.EventDetail
 	(*AmendmentEventDetail)(nil),     // 3: sourcehub.acp.AmendmentEventDetail
 	(*RevealRegistrationDetail)(nil), // 4: sourcehub.acp.RevealRegistrationDetail
-	(*timestamppb.Timestamp)(nil),    // 5: google.protobuf.Timestamp
+	(*Timestamp)(nil),                // 5: sourcehub.acp.Timestamp
 	(*acp_core.Object)(nil),          // 6: sourcenetwork.acp_core.Object
 	(*acp_core.Actor)(nil),           // 7: sourcenetwork.acp_core.Actor
 }
 var file_sourcehub_acp_registration_proto_depIdxs = []int32{
-	0, // 0: sourcehub.acp.ObjectRegistrationEvent.type:type_name -> sourcehub.acp.ObjectRegistrationEventType
-	5, // 1: sourcehub.acp.ObjectRegistrationEvent.ts:type_name -> google.protobuf.Timestamp
-	6, // 2: sourcehub.acp.ObjectRegistrationEvent.object:type_name -> sourcenetwork.acp_core.Object
-	7, // 3: sourcehub.acp.ObjectRegistrationEvent.actor:type_name -> sourcenetwork.acp_core.Actor
-	2, // 4: sourcehub.acp.ObjectRegistrationEvent.detail:type_name -> sourcehub.acp.EventDetail
-	4, // 5: sourcehub.acp.EventDetail.reveal_event:type_name -> sourcehub.acp.RevealRegistrationDetail
-	3, // 6: sourcehub.acp.EventDetail.amendment_event:type_name -> sourcehub.acp.AmendmentEventDetail
-	7, // 7: sourcehub.acp.AmendmentEventDetail.previous_owner:type_name -> sourcenetwork.acp_core.Actor
-	8, // [8:8] is the sub-list for method output_type
-	8, // [8:8] is the sub-list for method input_type
-	8, // [8:8] is the sub-list for extension type_name
-	8, // [8:8] is the sub-list for extension extendee
-	0, // [0:8] is the sub-list for field type_name
+	0,  // 0: sourcehub.acp.ObjectRegistrationEvent.type:type_name -> sourcehub.acp.ObjectRegistrationEventType
+	5,  // 1: sourcehub.acp.ObjectRegistrationEvent.ts:type_name -> sourcehub.acp.Timestamp
+	6,  // 2: sourcehub.acp.ObjectRegistrationEvent.object:type_name -> sourcenetwork.acp_core.Object
+	7,  // 3: sourcehub.acp.ObjectRegistrationEvent.actor:type_name -> sourcenetwork.acp_core.Actor
+	2,  // 4: sourcehub.acp.ObjectRegistrationEvent.detail:type_name -> sourcehub.acp.EventDetail
+	4,  // 5: sourcehub.acp.EventDetail.reveal_event:type_name -> sourcehub.acp.RevealRegistrationDetail
+	3,  // 6: sourcehub.acp.EventDetail.amendment_event:type_name -> sourcehub.acp.AmendmentEventDetail
+	7,  // 7: sourcehub.acp.AmendmentEventDetail.previous_owner:type_name -> sourcenetwork.acp_core.Actor
+	5,  // 8: sourcehub.acp.AmendmentEventDetail.commitment_timestamp:type_name -> sourcehub.acp.Timestamp
+	5,  // 9: sourcehub.acp.RevealRegistrationDetail.commitment_timestamp:type_name -> sourcehub.acp.Timestamp
+	10, // [10:10] is the sub-list for method output_type
+	10, // [10:10] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_acp_registration_proto_init() }
@@ -3107,6 +3118,7 @@ func file_sourcehub_acp_registration_proto_init() {
 	if File_sourcehub_acp_registration_proto != nil {
 		return
 	}
+	file_sourcehub_acp_time_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_sourcehub_acp_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ObjectRegistrationEvent); i {

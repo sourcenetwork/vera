@@ -2,29 +2,30 @@
 package acp
 
 import (
-	_ "cosmossdk.io/api/amino"
 	fmt "fmt"
+	io "io"
+	reflect "reflect"
+	sync "sync"
+
+	_ "cosmossdk.io/api/amino"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	io "io"
-	reflect "reflect"
-	sync "sync"
 )
 
 var (
-	md_Params                                        protoreflect.MessageDescriptor
-	fd_Params_policy_command_max_expiration_delta    protoreflect.FieldDescriptor
-	fd_Params_registrations_commitment_validity_secs protoreflect.FieldDescriptor
+	md_Params                                     protoreflect.MessageDescriptor
+	fd_Params_policy_command_max_expiration_delta protoreflect.FieldDescriptor
+	fd_Params_registrations_commitment_validity   protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_acp_params_proto_init()
 	md_Params = File_sourcehub_acp_params_proto.Messages().ByName("Params")
 	fd_Params_policy_command_max_expiration_delta = md_Params.Fields().ByName("policy_command_max_expiration_delta")
-	fd_Params_registrations_commitment_validity_secs = md_Params.Fields().ByName("registrations_commitment_validity_secs")
+	fd_Params_registrations_commitment_validity = md_Params.Fields().ByName("registrations_commitment_validity")
 }
 
 var _ protoreflect.Message = (*fastReflection_Params)(nil)
@@ -98,9 +99,9 @@ func (x *fastReflection_Params) Range(f func(protoreflect.FieldDescriptor, proto
 			return
 		}
 	}
-	if x.RegistrationsCommitmentValiditySecs != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.RegistrationsCommitmentValiditySecs)
-		if !f(fd_Params_registrations_commitment_validity_secs, value) {
+	if x.RegistrationsCommitmentValidity != nil {
+		value := protoreflect.ValueOfMessage(x.RegistrationsCommitmentValidity.ProtoReflect())
+		if !f(fd_Params_registrations_commitment_validity, value) {
 			return
 		}
 	}
@@ -121,8 +122,8 @@ func (x *fastReflection_Params) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		return x.PolicyCommandMaxExpirationDelta != uint64(0)
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		return x.RegistrationsCommitmentValiditySecs != uint64(0)
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		return x.RegistrationsCommitmentValidity != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -141,8 +142,8 @@ func (x *fastReflection_Params) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		x.PolicyCommandMaxExpirationDelta = uint64(0)
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		x.RegistrationsCommitmentValiditySecs = uint64(0)
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		x.RegistrationsCommitmentValidity = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -162,9 +163,9 @@ func (x *fastReflection_Params) Get(descriptor protoreflect.FieldDescriptor) pro
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		value := x.PolicyCommandMaxExpirationDelta
 		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		value := x.RegistrationsCommitmentValiditySecs
-		return protoreflect.ValueOfUint64(value)
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		value := x.RegistrationsCommitmentValidity
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -187,8 +188,8 @@ func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value proto
 	switch fd.FullName() {
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		x.PolicyCommandMaxExpirationDelta = value.Uint()
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		x.RegistrationsCommitmentValiditySecs = value.Uint()
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		x.RegistrationsCommitmentValidity = value.Message().Interface().(*Duration)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -209,10 +210,13 @@ func (x *fastReflection_Params) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Params) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		if x.RegistrationsCommitmentValidity == nil {
+			x.RegistrationsCommitmentValidity = new(Duration)
+		}
+		return protoreflect.ValueOfMessage(x.RegistrationsCommitmentValidity.ProtoReflect())
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		panic(fmt.Errorf("field policy_command_max_expiration_delta of message sourcehub.acp.Params is not mutable"))
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		panic(fmt.Errorf("field registrations_commitment_validity_secs of message sourcehub.acp.Params is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -228,8 +232,9 @@ func (x *fastReflection_Params) NewField(fd protoreflect.FieldDescriptor) protor
 	switch fd.FullName() {
 	case "sourcehub.acp.Params.policy_command_max_expiration_delta":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.Params.registrations_commitment_validity_secs":
-		return protoreflect.ValueOfUint64(uint64(0))
+	case "sourcehub.acp.Params.registrations_commitment_validity":
+		m := new(Duration)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.Params"))
@@ -302,8 +307,9 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 		if x.PolicyCommandMaxExpirationDelta != 0 {
 			n += 1 + runtime.Sov(uint64(x.PolicyCommandMaxExpirationDelta))
 		}
-		if x.RegistrationsCommitmentValiditySecs != 0 {
-			n += 1 + runtime.Sov(uint64(x.RegistrationsCommitmentValiditySecs))
+		if x.RegistrationsCommitmentValidity != nil {
+			l = options.Size(x.RegistrationsCommitmentValidity)
+			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -334,10 +340,19 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.RegistrationsCommitmentValiditySecs != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.RegistrationsCommitmentValiditySecs))
+		if x.RegistrationsCommitmentValidity != nil {
+			encoded, err := options.Marshal(x.RegistrationsCommitmentValidity)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x10
+			dAtA[i] = 0x12
 		}
 		if x.PolicyCommandMaxExpirationDelta != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.PolicyCommandMaxExpirationDelta))
@@ -413,10 +428,10 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 					}
 				}
 			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RegistrationsCommitmentValiditySecs", wireType)
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RegistrationsCommitmentValidity", wireType)
 				}
-				x.RegistrationsCommitmentValiditySecs = 0
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -426,11 +441,28 @@ func (x *fastReflection_Params) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.RegistrationsCommitmentValiditySecs |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.RegistrationsCommitmentValidity == nil {
+					x.RegistrationsCommitmentValidity = &Duration{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.RegistrationsCommitmentValidity); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -487,10 +519,9 @@ type Params struct {
 
 	// policy_command_max_expiration_delta specifies a global thershold for how old a Command will be accepted for.
 	PolicyCommandMaxExpirationDelta uint64 `protobuf:"varint,1,opt,name=policy_command_max_expiration_delta,json=policyCommandMaxExpirationDelta,proto3" json:"policy_command_max_expiration_delta,omitempty"`
-	// registrations_commitment_validity_secs specifies a duration (in seconds)
-	// for the lifetime of a commitment.
+	// registrations_commitment_validity specifies a duration for the lifetime of a commitment.
 	// Performing a RevealRegistration against an expired commitment causes a protocol error.
-	RegistrationsCommitmentValiditySecs uint64 `protobuf:"varint,2,opt,name=registrations_commitment_validity_secs,json=registrationsCommitmentValiditySecs,proto3" json:"registrations_commitment_validity_secs,omitempty"`
+	RegistrationsCommitmentValidity *Duration `protobuf:"bytes,2,opt,name=registrations_commitment_validity,json=registrationsCommitmentValidity,proto3" json:"registrations_commitment_validity,omitempty"`
 }
 
 func (x *Params) Reset() {
@@ -520,11 +551,11 @@ func (x *Params) GetPolicyCommandMaxExpirationDelta() uint64 {
 	return 0
 }
 
-func (x *Params) GetRegistrationsCommitmentValiditySecs() uint64 {
+func (x *Params) GetRegistrationsCommitmentValidity() *Duration {
 	if x != nil {
-		return x.RegistrationsCommitmentValiditySecs
+		return x.RegistrationsCommitmentValidity
 	}
-	return 0
+	return nil
 }
 
 var File_sourcehub_acp_params_proto protoreflect.FileDescriptor
@@ -535,30 +566,32 @@ var file_sourcehub_acp_params_proto_rawDesc = []byte{
 	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x1a, 0x11, 0x61, 0x6d, 0x69,
 	0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14,
 	0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x22, 0xcc, 0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
-	0x4c, 0x0a, 0x23, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e,
-	0x64, 0x5f, 0x6d, 0x61, 0x78, 0x5f, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x5f, 0x64, 0x65, 0x6c, 0x74, 0x61, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x1f, 0x70, 0x6f,
-	0x6c, 0x69, 0x63, 0x79, 0x43, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x4d, 0x61, 0x78, 0x45, 0x78,
-	0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x65, 0x6c, 0x74, 0x61, 0x12, 0x53, 0x0a,
-	0x26, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x63,
-	0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x69,
-	0x74, 0x79, 0x5f, 0x73, 0x65, 0x63, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x23, 0x72,
-	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d,
-	0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x69, 0x74, 0x79, 0x53, 0x65,
-	0x63, 0x73, 0x3a, 0x1f, 0xe8, 0xa0, 0x1f, 0x01, 0x8a, 0xe7, 0xb0, 0x2a, 0x16, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x78, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x50, 0x61, 0x72,
-	0x61, 0x6d, 0x73, 0x42, 0x95, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42, 0x0b, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
-	0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa, 0x02,
-	0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca, 0x02,
-	0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02,
-	0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x18, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f,
+	0x61, 0x63, 0x70, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xd8,
+	0x01, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x4c, 0x0a, 0x23, 0x70, 0x6f, 0x6c,
+	0x69, 0x63, 0x79, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x5f, 0x6d, 0x61, 0x78, 0x5f,
+	0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x74, 0x61,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x1f, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6f,
+	0x6d, 0x6d, 0x61, 0x6e, 0x64, 0x4d, 0x61, 0x78, 0x45, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x44, 0x65, 0x6c, 0x74, 0x61, 0x12, 0x63, 0x0a, 0x21, 0x72, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
+	0x65, 0x6e, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x69, 0x74, 0x79, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x17, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x2e, 0x44, 0x75, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x1f, 0x72, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74,
+	0x6d, 0x65, 0x6e, 0x74, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x69, 0x74, 0x79, 0x3a, 0x1b, 0x8a, 0xe7,
+	0xb0, 0x2a, 0x16, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x78, 0x2f, 0x61,
+	0x63, 0x70, 0x2f, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42, 0x95, 0x01, 0x0a, 0x11, 0x63, 0x6f,
+	0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42,
+	0x0b, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1e,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0xa2, 0x02,
+	0x03, 0x53, 0x41, 0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x41, 0x63, 0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x41, 0x63,
+	0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -575,14 +608,16 @@ func file_sourcehub_acp_params_proto_rawDescGZIP() []byte {
 
 var file_sourcehub_acp_params_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_sourcehub_acp_params_proto_goTypes = []interface{}{
-	(*Params)(nil), // 0: sourcehub.acp.Params
+	(*Params)(nil),   // 0: sourcehub.acp.Params
+	(*Duration)(nil), // 1: sourcehub.acp.Duration
 }
 var file_sourcehub_acp_params_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: sourcehub.acp.Params.registrations_commitment_validity:type_name -> sourcehub.acp.Duration
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_acp_params_proto_init() }
@@ -590,6 +625,7 @@ func file_sourcehub_acp_params_proto_init() {
 	if File_sourcehub_acp_params_proto != nil {
 		return
 	}
+	file_sourcehub_acp_time_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_sourcehub_acp_params_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Params); i {
