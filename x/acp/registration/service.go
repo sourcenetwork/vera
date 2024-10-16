@@ -277,11 +277,14 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 }
 
 func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId string, commitment []byte, actor *coretypes.Actor, params *types.Params) (*types.RegistrationsCommitment, error) {
-	_, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
+	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
 		Id: policyId,
 	})
 	if err != nil {
 		return nil, err
+	}
+	if rec == nil {
+		return nil, errors.NewPolicyNotFound(policyId)
 	}
 
 	if len(commitment) != commitmentLen {
@@ -395,4 +398,29 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 	}
 
 	return s.amendRegistration(ctx, commitment, object, actor)
+}
+
+func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId string, actor *coretypes.Actor, objects []*coretypes.Object) ([]byte, error) {
+	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
+		Id: policyId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if rec == nil {
+		return nil, errors.NewPolicyNotFound(policyId)
+	}
+
+	for _, obj := range objects {
+		resource := rec.Policy.GetResourceByName(obj.Resource)
+		if resource == nil {
+			return nil, errors.Wrap("resource not found", errors.ErrorType_BAD_INPUT,
+				errors.Pair("policy", policyId),
+				errors.Pair("resource", obj.Resource),
+			)
+		}
+	}
+
+	return GenerateCommitmentWithoutValidation(policyId, actor, objects)
+
 }

@@ -233,7 +233,7 @@ type CommitRegistrationsAction struct {
 
 func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommitment {
 	actor := coretypes.NewActor(a.Actor.DID)
-	commitment, err := registration.GenerateCommitment(a.PolicyId, actor, a.Objects)
+	commitment, err := registration.GenerateCommitmentWithoutValidation(a.PolicyId, actor, a.Objects)
 	require.NoError(ctx.T, err)
 	cmd := types.NewCommitRegistrationCmd(commitment)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)

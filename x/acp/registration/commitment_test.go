@@ -13,7 +13,7 @@ const testPolicyID = "095d86e559a22cef11c7aa7240560b9fd3acf8657fc3743fb16c271a85
 // asserts that generating a commitment, a proof for an object within it
 // and finally verifying the proof is a valid operation.
 func testCorrectness(t *testing.T, policyId string, idx int, objs []*coretypes.Object, actor *coretypes.Actor) {
-	commitment, err := GenerateCommitment(policyId, actor, objs)
+	commitment, err := GenerateCommitmentWithoutValidation(policyId, actor, objs)
 	require.NoError(t, err)
 
 	proof, err := ProofForObject(policyId, actor, idx, objs)

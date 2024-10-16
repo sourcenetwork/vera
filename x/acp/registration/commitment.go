@@ -40,7 +40,7 @@ func VerifyProof(root []byte, policyId string, actor *coretypes.Actor, opening *
 	return true, nil
 }
 
-func GenerateCommitment(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) ([]byte, error) {
+func GenerateCommitmentWithoutValidation(policyId string, actor *coretypes.Actor, objs []*coretypes.Object) ([]byte, error) {
 	t, err := NewObjectCommitmentTree(policyId, actor, objs)
 	if err != nil {
 		return nil, err
@@ -54,14 +54,6 @@ func ProofForObject(policyId string, actor *coretypes.Actor, idx int, objs []*co
 		return nil, err
 	}
 	return t.GetProofForIdx(idx)
-}
-
-// objsToStorable returns a Sortable which alphabetically sorts objects by resource:obj_id
-// this ensures the determinism of generating commitments.
-func objsToSortable(objs []*coretypes.Object) utils.Sortable[*coretypes.Object] {
-	return utils.FromExtractor(objs, func(o *coretypes.Object) string {
-		return o.Resource + ":" + o.Id
-	})
 }
 
 // generateLeafValue produces a byte slice representing an individual object registration
@@ -97,19 +89,14 @@ type RegistrationCommitmentTree struct {
 	policyId   string
 	actor      *coretypes.Actor
 	objs       []*coretypes.Object
-	sorted     []*coretypes.Object
 	commitment []byte
 	leaves     [][]byte
 }
 
 func (t *RegistrationCommitmentTree) genCommitment() {
-	sortable := objsToSortable(t.objs)
-	t.sorted = sortable.Sort()
-
-	t.leaves = utils.MapSlice(t.sorted, func(o *coretypes.Object) []byte {
+	t.leaves = utils.MapSlice(t.objs, func(o *coretypes.Object) []byte {
 		return generateLeafValue(t.policyId, t.actor, o)
 	})
-
 	t.commitment = merkle.HashFromByteSlices(t.leaves)
 }
 
@@ -118,40 +105,32 @@ func (t *RegistrationCommitmentTree) GetCommitment() []byte {
 }
 
 func (t *RegistrationCommitmentTree) GetProofForObj(obj *coretypes.Object) (*types.RegistrationProof, error) {
-	idx, err := t.findSortedIdx(obj)
+	idx, err := t.findIdx(obj)
 	if err != nil {
 		return nil, err
 	}
-	return t.proofForSortedIdx(idx)
+	return t.proofForIdx(idx)
 }
 
 func (t *RegistrationCommitmentTree) GetProofForIdx(idx int) (*types.RegistrationProof, error) {
-	if idx >= len(t.objs) || idx < 0 {
-		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
-	}
-	obj := t.objs[idx]
-	sortedIdx, err := t.findSortedIdx(obj)
-	if err != nil {
-		return nil, err
-	}
-	return t.proofForSortedIdx(sortedIdx)
+	return t.proofForIdx(idx)
 }
 
-func (t *RegistrationCommitmentTree) proofForSortedIdx(idx int) (*types.RegistrationProof, error) {
-	if idx >= len(t.objs) {
+func (t *RegistrationCommitmentTree) proofForIdx(idx int) (*types.RegistrationProof, error) {
+	if idx >= len(t.objs) || idx < 0 {
 		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
 	}
 
 	_, proofs := merkle.ProofsFromByteSlices(t.leaves)
 	return &types.RegistrationProof{
 		MerkleProof: proofs[idx].Aunts,
-		Object:      t.sorted[idx],
+		Object:      t.objs[idx],
 		LeafCount:   uint64(len(t.objs)),
 		LeafIndex:   uint64(idx),
 	}, nil
 }
 
-func (t *RegistrationCommitmentTree) findSortedIdx(obj *coretypes.Object) (int, error) {
+func (t *RegistrationCommitmentTree) findIdx(obj *coretypes.Object) (int, error) {
 	i := slices.IndexFunc(t.objs, func(o *coretypes.Object) bool {
 		return objEq(obj, o)
 	})
