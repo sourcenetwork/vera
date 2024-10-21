@@ -2,14 +2,9 @@
 package tierv1beta1
 
 import (
+	_ "cosmossdk.io/api/amino"
 	binary "encoding/binary"
 	fmt "fmt"
-	io "io"
-	math "math"
-	reflect "reflect"
-	sync "sync"
-
-	_ "cosmossdk.io/api/amino"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
@@ -17,6 +12,10 @@ import (
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
+	io "io"
+	math "math"
+	reflect "reflect"
+	sync "sync"
 )
 
 var _ protoreflect.List = (*_Params_3_list)(nil)

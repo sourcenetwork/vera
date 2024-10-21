@@ -2,20 +2,19 @@
 package acp
 
 import (
-	fmt "fmt"
-	io "io"
-	reflect "reflect"
-	sync "sync"
-
 	_ "cosmossdk.io/api/amino"
 	_ "cosmossdk.io/api/cosmos/base/query/v1beta1"
 	acp_core "github.com/sourcenetwork/acp_core/pulsar"
+	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	io "io"
+	reflect "reflect"
+	sync "sync"
 )
 
 var (
@@ -10048,13 +10047,70 @@ func (x *fastReflection_QueryListObjectEventsResponse) ProtoMethods() *protoifac
 	}
 }
 
+var _ protoreflect.List = (*_QueryGenerateCommitmentRequest_2_list)(nil)
+
+type _QueryGenerateCommitmentRequest_2_list struct {
+	list *[]*acp_core.Object
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*acp_core.Object)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*acp_core.Object)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) AppendMutable() protoreflect.Value {
+	v := new(acp_core.Object)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) NewElement() protoreflect.Value {
+	v := new(acp_core.Object)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentRequest_2_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_QueryGenerateCommitmentRequest protoreflect.MessageDescriptor
+	md_QueryGenerateCommitmentRequest           protoreflect.MessageDescriptor
+	fd_QueryGenerateCommitmentRequest_policy_id protoreflect.FieldDescriptor
+	fd_QueryGenerateCommitmentRequest_objects   protoreflect.FieldDescriptor
+	fd_QueryGenerateCommitmentRequest_actor     protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_acp_query_proto_init()
 	md_QueryGenerateCommitmentRequest = File_sourcehub_acp_query_proto.Messages().ByName("QueryGenerateCommitmentRequest")
+	fd_QueryGenerateCommitmentRequest_policy_id = md_QueryGenerateCommitmentRequest.Fields().ByName("policy_id")
+	fd_QueryGenerateCommitmentRequest_objects = md_QueryGenerateCommitmentRequest.Fields().ByName("objects")
+	fd_QueryGenerateCommitmentRequest_actor = md_QueryGenerateCommitmentRequest.Fields().ByName("actor")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryGenerateCommitmentRequest)(nil)
@@ -10122,6 +10178,24 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Interface() protoreflect
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.PolicyId != "" {
+		value := protoreflect.ValueOfString(x.PolicyId)
+		if !f(fd_QueryGenerateCommitmentRequest_policy_id, value) {
+			return
+		}
+	}
+	if len(x.Objects) != 0 {
+		value := protoreflect.ValueOfList(&_QueryGenerateCommitmentRequest_2_list{list: &x.Objects})
+		if !f(fd_QueryGenerateCommitmentRequest_objects, value) {
+			return
+		}
+	}
+	if x.Actor != nil {
+		value := protoreflect.ValueOfMessage(x.Actor.ProtoReflect())
+		if !f(fd_QueryGenerateCommitmentRequest_actor, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -10137,6 +10211,12 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Range(f func(protoreflec
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		return x.PolicyId != ""
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		return len(x.Objects) != 0
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		return x.Actor != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10153,6 +10233,12 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Has(fd protoreflect.Fiel
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		x.PolicyId = ""
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		x.Objects = nil
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		x.Actor = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10169,6 +10255,18 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Clear(fd protoreflect.Fi
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		value := x.PolicyId
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		if len(x.Objects) == 0 {
+			return protoreflect.ValueOfList(&_QueryGenerateCommitmentRequest_2_list{})
+		}
+		listValue := &_QueryGenerateCommitmentRequest_2_list{list: &x.Objects}
+		return protoreflect.ValueOfList(listValue)
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		value := x.Actor
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10189,6 +10287,14 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Get(descriptor protorefl
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		x.PolicyId = value.Interface().(string)
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		lv := value.List()
+		clv := lv.(*_QueryGenerateCommitmentRequest_2_list)
+		x.Objects = *clv.list
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		x.Actor = value.Message().Interface().(*acp_core.Actor)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10209,6 +10315,19 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Set(fd protoreflect.Fiel
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		if x.Objects == nil {
+			x.Objects = []*acp_core.Object{}
+		}
+		value := &_QueryGenerateCommitmentRequest_2_list{list: &x.Objects}
+		return protoreflect.ValueOfList(value)
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		if x.Actor == nil {
+			x.Actor = new(acp_core.Actor)
+		}
+		return protoreflect.ValueOfMessage(x.Actor.ProtoReflect())
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		panic(fmt.Errorf("field policy_id of message sourcehub.acp.QueryGenerateCommitmentRequest is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10222,6 +10341,14 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) Mutable(fd protoreflect.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryGenerateCommitmentRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.policy_id":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.objects":
+		list := []*acp_core.Object{}
+		return protoreflect.ValueOfList(&_QueryGenerateCommitmentRequest_2_list{list: &list})
+	case "sourcehub.acp.QueryGenerateCommitmentRequest.actor":
+		m := new(acp_core.Actor)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentRequest"))
@@ -10291,6 +10418,20 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) ProtoMethods() *protoifa
 		var n int
 		var l int
 		_ = l
+		l = len(x.PolicyId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if len(x.Objects) > 0 {
+			for _, e := range x.Objects {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		if x.Actor != nil {
+			l = options.Size(x.Actor)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -10319,6 +10460,43 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) ProtoMethods() *protoifa
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Actor != nil {
+			encoded, err := options.Marshal(x.Actor)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.Objects) > 0 {
+			for iNdEx := len(x.Objects) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Objects[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x12
+			}
+		}
+		if len(x.PolicyId) > 0 {
+			i -= len(x.PolicyId)
+			copy(dAtA[i:], x.PolicyId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
+			i--
+			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -10369,6 +10547,108 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) ProtoMethods() *protoifa
 				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGenerateCommitmentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PolicyId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Objects", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Objects = append(x.Objects, &acp_core.Object{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Objects[len(x.Objects)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Actor == nil {
+					x.Actor = &acp_core.Actor{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Actor); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -10404,13 +10684,118 @@ func (x *fastReflection_QueryGenerateCommitmentRequest) ProtoMethods() *protoifa
 	}
 }
 
+var _ protoreflect.List = (*_QueryGenerateCommitmentResponse_3_list)(nil)
+
+type _QueryGenerateCommitmentResponse_3_list struct {
+	list *[]*RegistrationProof
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfMessage((*x.list)[i].ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*RegistrationProof)
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.Message()
+	concreteValue := valueUnwrapped.Interface().(*RegistrationProof)
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) AppendMutable() protoreflect.Value {
+	v := new(RegistrationProof)
+	*x.list = append(*x.list, v)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) Truncate(n int) {
+	for i := n; i < len(*x.list); i++ {
+		(*x.list)[i] = nil
+	}
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) NewElement() protoreflect.Value {
+	v := new(RegistrationProof)
+	return protoreflect.ValueOfMessage(v.ProtoReflect())
+}
+
+func (x *_QueryGenerateCommitmentResponse_3_list) IsValid() bool {
+	return x.list != nil
+}
+
+var _ protoreflect.List = (*_QueryGenerateCommitmentResponse_4_list)(nil)
+
+type _QueryGenerateCommitmentResponse_4_list struct {
+	list *[]string
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message QueryGenerateCommitmentResponse at list field ProofsJson as it is not of Message kind"))
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_QueryGenerateCommitmentResponse_4_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
-	md_QueryGenerateCommitmentResponse protoreflect.MessageDescriptor
+	md_QueryGenerateCommitmentResponse                protoreflect.MessageDescriptor
+	fd_QueryGenerateCommitmentResponse_commitment     protoreflect.FieldDescriptor
+	fd_QueryGenerateCommitmentResponse_hex_commitment protoreflect.FieldDescriptor
+	fd_QueryGenerateCommitmentResponse_proofs         protoreflect.FieldDescriptor
+	fd_QueryGenerateCommitmentResponse_proofs_json    protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_acp_query_proto_init()
 	md_QueryGenerateCommitmentResponse = File_sourcehub_acp_query_proto.Messages().ByName("QueryGenerateCommitmentResponse")
+	fd_QueryGenerateCommitmentResponse_commitment = md_QueryGenerateCommitmentResponse.Fields().ByName("commitment")
+	fd_QueryGenerateCommitmentResponse_hex_commitment = md_QueryGenerateCommitmentResponse.Fields().ByName("hex_commitment")
+	fd_QueryGenerateCommitmentResponse_proofs = md_QueryGenerateCommitmentResponse.Fields().ByName("proofs")
+	fd_QueryGenerateCommitmentResponse_proofs_json = md_QueryGenerateCommitmentResponse.Fields().ByName("proofs_json")
 }
 
 var _ protoreflect.Message = (*fastReflection_QueryGenerateCommitmentResponse)(nil)
@@ -10478,6 +10863,30 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Interface() protoreflec
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if len(x.Commitment) != 0 {
+		value := protoreflect.ValueOfBytes(x.Commitment)
+		if !f(fd_QueryGenerateCommitmentResponse_commitment, value) {
+			return
+		}
+	}
+	if x.HexCommitment != "" {
+		value := protoreflect.ValueOfString(x.HexCommitment)
+		if !f(fd_QueryGenerateCommitmentResponse_hex_commitment, value) {
+			return
+		}
+	}
+	if len(x.Proofs) != 0 {
+		value := protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_3_list{list: &x.Proofs})
+		if !f(fd_QueryGenerateCommitmentResponse_proofs, value) {
+			return
+		}
+	}
+	if len(x.ProofsJson) != 0 {
+		value := protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_4_list{list: &x.ProofsJson})
+		if !f(fd_QueryGenerateCommitmentResponse_proofs_json, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -10493,6 +10902,14 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Range(f func(protorefle
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		return len(x.Commitment) != 0
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		return x.HexCommitment != ""
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		return len(x.Proofs) != 0
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		return len(x.ProofsJson) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10509,6 +10926,14 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Has(fd protoreflect.Fie
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		x.Commitment = nil
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		x.HexCommitment = ""
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		x.Proofs = nil
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		x.ProofsJson = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10525,6 +10950,24 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Clear(fd protoreflect.F
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		value := x.Commitment
+		return protoreflect.ValueOfBytes(value)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		value := x.HexCommitment
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		if len(x.Proofs) == 0 {
+			return protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_3_list{})
+		}
+		listValue := &_QueryGenerateCommitmentResponse_3_list{list: &x.Proofs}
+		return protoreflect.ValueOfList(listValue)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		if len(x.ProofsJson) == 0 {
+			return protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_4_list{})
+		}
+		listValue := &_QueryGenerateCommitmentResponse_4_list{list: &x.ProofsJson}
+		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10545,6 +10988,18 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Get(descriptor protoref
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		x.Commitment = value.Bytes()
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		x.HexCommitment = value.Interface().(string)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		lv := value.List()
+		clv := lv.(*_QueryGenerateCommitmentResponse_3_list)
+		x.Proofs = *clv.list
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		lv := value.List()
+		clv := lv.(*_QueryGenerateCommitmentResponse_4_list)
+		x.ProofsJson = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10565,6 +11020,22 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Set(fd protoreflect.Fie
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_QueryGenerateCommitmentResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		if x.Proofs == nil {
+			x.Proofs = []*RegistrationProof{}
+		}
+		value := &_QueryGenerateCommitmentResponse_3_list{list: &x.Proofs}
+		return protoreflect.ValueOfList(value)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		if x.ProofsJson == nil {
+			x.ProofsJson = []string{}
+		}
+		value := &_QueryGenerateCommitmentResponse_4_list{list: &x.ProofsJson}
+		return protoreflect.ValueOfList(value)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		panic(fmt.Errorf("field commitment of message sourcehub.acp.QueryGenerateCommitmentResponse is not mutable"))
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		panic(fmt.Errorf("field hex_commitment of message sourcehub.acp.QueryGenerateCommitmentResponse is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10578,6 +11049,16 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) Mutable(fd protoreflect
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_QueryGenerateCommitmentResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.commitment":
+		return protoreflect.ValueOfBytes(nil)
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.hex_commitment":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs":
+		list := []*RegistrationProof{}
+		return protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_3_list{list: &list})
+	case "sourcehub.acp.QueryGenerateCommitmentResponse.proofs_json":
+		list := []string{}
+		return protoreflect.ValueOfList(&_QueryGenerateCommitmentResponse_4_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.QueryGenerateCommitmentResponse"))
@@ -10647,6 +11128,26 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) ProtoMethods() *protoif
 		var n int
 		var l int
 		_ = l
+		l = len(x.Commitment)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.HexCommitment)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if len(x.Proofs) > 0 {
+			for _, e := range x.Proofs {
+				l = options.Size(e)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
+		if len(x.ProofsJson) > 0 {
+			for _, s := range x.ProofsJson {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -10675,6 +11176,45 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) ProtoMethods() *protoif
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.ProofsJson) > 0 {
+			for iNdEx := len(x.ProofsJson) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.ProofsJson[iNdEx])
+				copy(dAtA[i:], x.ProofsJson[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ProofsJson[iNdEx])))
+				i--
+				dAtA[i] = 0x22
+			}
+		}
+		if len(x.Proofs) > 0 {
+			for iNdEx := len(x.Proofs) - 1; iNdEx >= 0; iNdEx-- {
+				encoded, err := options.Marshal(x.Proofs[iNdEx])
+				if err != nil {
+					return protoiface.MarshalOutput{
+						NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+						Buf:               input.Buf,
+					}, err
+				}
+				i -= len(encoded)
+				copy(dAtA[i:], encoded)
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+				i--
+				dAtA[i] = 0x1a
+			}
+		}
+		if len(x.HexCommitment) > 0 {
+			i -= len(x.HexCommitment)
+			copy(dAtA[i:], x.HexCommitment)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.HexCommitment)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Commitment) > 0 {
+			i -= len(x.Commitment)
+			copy(dAtA[i:], x.Commitment)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Commitment)))
+			i--
+			dAtA[i] = 0xa
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -10725,6 +11265,138 @@ func (x *fastReflection_QueryGenerateCommitmentResponse) ProtoMethods() *protoif
 				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryGenerateCommitmentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Commitment", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Commitment = append(x.Commitment[:0], dAtA[iNdEx:postIndex]...)
+				if x.Commitment == nil {
+					x.Commitment = []byte{}
+				}
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HexCommitment", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.HexCommitment = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Proofs", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Proofs = append(x.Proofs, &RegistrationProof{})
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Proofs[len(x.Proofs)-1]); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ProofsJson", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ProofsJson = append(x.ProofsJson, string(dAtA[iNdEx:postIndex]))
+				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -11608,6 +12280,10 @@ type QueryGenerateCommitmentRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	PolicyId string             `protobuf:"bytes,1,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Objects  []*acp_core.Object `protobuf:"bytes,2,rep,name=objects,proto3" json:"objects,omitempty"`
+	Actor    *acp_core.Actor    `protobuf:"bytes,3,opt,name=actor,proto3" json:"actor,omitempty"`
 }
 
 func (x *QueryGenerateCommitmentRequest) Reset() {
@@ -11630,10 +12306,36 @@ func (*QueryGenerateCommitmentRequest) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_query_proto_rawDescGZIP(), []int{22}
 }
 
+func (x *QueryGenerateCommitmentRequest) GetPolicyId() string {
+	if x != nil {
+		return x.PolicyId
+	}
+	return ""
+}
+
+func (x *QueryGenerateCommitmentRequest) GetObjects() []*acp_core.Object {
+	if x != nil {
+		return x.Objects
+	}
+	return nil
+}
+
+func (x *QueryGenerateCommitmentRequest) GetActor() *acp_core.Actor {
+	if x != nil {
+		return x.Actor
+	}
+	return nil
+}
+
 type QueryGenerateCommitmentResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Commitment    []byte               `protobuf:"bytes,1,opt,name=commitment,proto3" json:"commitment,omitempty"`
+	HexCommitment string               `protobuf:"bytes,2,opt,name=hex_commitment,json=hexCommitment,proto3" json:"hex_commitment,omitempty"`
+	Proofs        []*RegistrationProof `protobuf:"bytes,3,rep,name=proofs,proto3" json:"proofs,omitempty"`
+	ProofsJson    []string             `protobuf:"bytes,4,rep,name=proofs_json,json=proofsJson,proto3" json:"proofs_json,omitempty"`
 }
 
 func (x *QueryGenerateCommitmentResponse) Reset() {
@@ -11654,6 +12356,34 @@ func (*QueryGenerateCommitmentResponse) ProtoMessage() {}
 // Deprecated: Use QueryGenerateCommitmentResponse.ProtoReflect.Descriptor instead.
 func (*QueryGenerateCommitmentResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_query_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *QueryGenerateCommitmentResponse) GetCommitment() []byte {
+	if x != nil {
+		return x.Commitment
+	}
+	return nil
+}
+
+func (x *QueryGenerateCommitmentResponse) GetHexCommitment() string {
+	if x != nil {
+		return x.HexCommitment
+	}
+	return ""
+}
+
+func (x *QueryGenerateCommitmentResponse) GetProofs() []*RegistrationProof {
+	if x != nil {
+		return x.Proofs
+	}
+	return nil
+}
+
+func (x *QueryGenerateCommitmentResponse) GetProofsJson() []string {
+	if x != nil {
+		return x.ProofsJson
+	}
+	return nil
 }
 
 var File_sourcehub_acp_query_proto protoreflect.FileDescriptor
@@ -11819,11 +12549,30 @@ var file_sourcehub_acp_query_proto_rawDesc = []byte{
 	0x0b, 0x32, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
 	0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
 	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x06, 0x65, 0x76, 0x65, 0x6e, 0x74,
-	0x73, 0x22, 0x20, 0x0a, 0x1e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61,
-	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x22, 0x21, 0x0a, 0x1f, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x6e, 0x65,
-	0x72, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb5, 0x10, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x73, 0x22, 0xac, 0x01, 0x0a, 0x1e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x6e, 0x65, 0x72,
+	0x61, 0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x49,
+	0x64, 0x12, 0x38, 0x0a, 0x07, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x18, 0x02, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f,
+	0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a, 0x65,
+	0x63, 0x74, 0x52, 0x07, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x12, 0x33, 0x0a, 0x05, 0x61,
+	0x63, 0x74, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63,
+	0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x05, 0x61, 0x63, 0x74, 0x6f, 0x72,
+	0x22, 0xc3, 0x01, 0x0a, 0x1f, 0x51, 0x75, 0x65, 0x72, 0x79, 0x47, 0x65, 0x6e, 0x65, 0x72, 0x61,
+	0x74, 0x65, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65,
+	0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74,
+	0x6d, 0x65, 0x6e, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x68, 0x65, 0x78, 0x5f, 0x63, 0x6f, 0x6d, 0x6d,
+	0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x68, 0x65,
+	0x78, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x38, 0x0a, 0x06, 0x70,
+	0x72, 0x6f, 0x6f, 0x66, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x6f, 0x66, 0x52, 0x06, 0x70,
+	0x72, 0x6f, 0x6f, 0x66, 0x73, 0x12, 0x1f, 0x0a, 0x0b, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x73, 0x5f,
+	0x6a, 0x73, 0x6f, 0x6e, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x72, 0x6f, 0x6f,
+	0x66, 0x73, 0x4a, 0x73, 0x6f, 0x6e, 0x32, 0xb5, 0x10, 0x0a, 0x05, 0x51, 0x75, 0x65, 0x72, 0x79,
 	0x12, 0x7c, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75,
 	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
 	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e,
@@ -12015,6 +12764,8 @@ var file_sourcehub_acp_query_proto_goTypes = []interface{}{
 	(*acp_core.Object)(nil),                                  // 31: sourcenetwork.acp_core.Object
 	(*RegistrationsCommitment)(nil),                          // 32: sourcehub.acp.RegistrationsCommitment
 	(*ObjectRegistrationEvent)(nil),                          // 33: sourcehub.acp.ObjectRegistrationEvent
+	(*acp_core.Actor)(nil),                                   // 34: sourcenetwork.acp_core.Actor
+	(*RegistrationProof)(nil),                                // 35: sourcehub.acp.RegistrationProof
 }
 var file_sourcehub_acp_query_proto_depIdxs = []int32{
 	24, // 0: sourcehub.acp.QueryParamsResponse.params:type_name -> sourcehub.acp.Params
@@ -12030,35 +12781,38 @@ var file_sourcehub_acp_query_proto_depIdxs = []int32{
 	32, // 10: sourcehub.acp.QueryRegistrationsCommitmentByCommitmentResponse.registrations_commitments:type_name -> sourcehub.acp.RegistrationsCommitment
 	31, // 11: sourcehub.acp.QueryListObjectEventsRequest.object:type_name -> sourcenetwork.acp_core.Object
 	33, // 12: sourcehub.acp.QueryListObjectEventsResponse.events:type_name -> sourcehub.acp.ObjectRegistrationEvent
-	0,  // 13: sourcehub.acp.Query.Params:input_type -> sourcehub.acp.QueryParamsRequest
-	2,  // 14: sourcehub.acp.Query.Policy:input_type -> sourcehub.acp.QueryPolicyRequest
-	4,  // 15: sourcehub.acp.Query.PolicyIds:input_type -> sourcehub.acp.QueryPolicyIdsRequest
-	6,  // 16: sourcehub.acp.Query.FilterRelationships:input_type -> sourcehub.acp.QueryFilterRelationshipsRequest
-	8,  // 17: sourcehub.acp.Query.VerifyAccessRequest:input_type -> sourcehub.acp.QueryVerifyAccessRequestRequest
-	10, // 18: sourcehub.acp.Query.ValidatePolicy:input_type -> sourcehub.acp.QueryValidatePolicyRequest
-	12, // 19: sourcehub.acp.Query.AccessDecision:input_type -> sourcehub.acp.QueryAccessDecisionRequest
-	14, // 20: sourcehub.acp.Query.ObjectOwner:input_type -> sourcehub.acp.QueryObjectOwnerRequest
-	16, // 21: sourcehub.acp.Query.RegistrationsCommitment:input_type -> sourcehub.acp.QueryRegistrationsCommitmentRequest
-	18, // 22: sourcehub.acp.Query.RegistrationsCommitmentByCommitment:input_type -> sourcehub.acp.QueryRegistrationsCommitmentByCommitmentRequest
-	20, // 23: sourcehub.acp.Query.ListObjectEvents:input_type -> sourcehub.acp.QueryListObjectEventsRequest
-	22, // 24: sourcehub.acp.Query.GenerateCommitment:input_type -> sourcehub.acp.QueryGenerateCommitmentRequest
-	1,  // 25: sourcehub.acp.Query.Params:output_type -> sourcehub.acp.QueryParamsResponse
-	3,  // 26: sourcehub.acp.Query.Policy:output_type -> sourcehub.acp.QueryPolicyResponse
-	5,  // 27: sourcehub.acp.Query.PolicyIds:output_type -> sourcehub.acp.QueryPolicyIdsResponse
-	7,  // 28: sourcehub.acp.Query.FilterRelationships:output_type -> sourcehub.acp.QueryFilterRelationshipsResponse
-	9,  // 29: sourcehub.acp.Query.VerifyAccessRequest:output_type -> sourcehub.acp.QueryVerifyAccessRequestResponse
-	11, // 30: sourcehub.acp.Query.ValidatePolicy:output_type -> sourcehub.acp.QueryValidatePolicyResponse
-	13, // 31: sourcehub.acp.Query.AccessDecision:output_type -> sourcehub.acp.QueryAccessDecisionResponse
-	15, // 32: sourcehub.acp.Query.ObjectOwner:output_type -> sourcehub.acp.QueryObjectOwnerResponse
-	17, // 33: sourcehub.acp.Query.RegistrationsCommitment:output_type -> sourcehub.acp.QueryRegistrationsCommitmentResponse
-	19, // 34: sourcehub.acp.Query.RegistrationsCommitmentByCommitment:output_type -> sourcehub.acp.QueryRegistrationsCommitmentByCommitmentResponse
-	21, // 35: sourcehub.acp.Query.ListObjectEvents:output_type -> sourcehub.acp.QueryListObjectEventsResponse
-	23, // 36: sourcehub.acp.Query.GenerateCommitment:output_type -> sourcehub.acp.QueryGenerateCommitmentResponse
-	25, // [25:37] is the sub-list for method output_type
-	13, // [13:25] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	31, // 13: sourcehub.acp.QueryGenerateCommitmentRequest.objects:type_name -> sourcenetwork.acp_core.Object
+	34, // 14: sourcehub.acp.QueryGenerateCommitmentRequest.actor:type_name -> sourcenetwork.acp_core.Actor
+	35, // 15: sourcehub.acp.QueryGenerateCommitmentResponse.proofs:type_name -> sourcehub.acp.RegistrationProof
+	0,  // 16: sourcehub.acp.Query.Params:input_type -> sourcehub.acp.QueryParamsRequest
+	2,  // 17: sourcehub.acp.Query.Policy:input_type -> sourcehub.acp.QueryPolicyRequest
+	4,  // 18: sourcehub.acp.Query.PolicyIds:input_type -> sourcehub.acp.QueryPolicyIdsRequest
+	6,  // 19: sourcehub.acp.Query.FilterRelationships:input_type -> sourcehub.acp.QueryFilterRelationshipsRequest
+	8,  // 20: sourcehub.acp.Query.VerifyAccessRequest:input_type -> sourcehub.acp.QueryVerifyAccessRequestRequest
+	10, // 21: sourcehub.acp.Query.ValidatePolicy:input_type -> sourcehub.acp.QueryValidatePolicyRequest
+	12, // 22: sourcehub.acp.Query.AccessDecision:input_type -> sourcehub.acp.QueryAccessDecisionRequest
+	14, // 23: sourcehub.acp.Query.ObjectOwner:input_type -> sourcehub.acp.QueryObjectOwnerRequest
+	16, // 24: sourcehub.acp.Query.RegistrationsCommitment:input_type -> sourcehub.acp.QueryRegistrationsCommitmentRequest
+	18, // 25: sourcehub.acp.Query.RegistrationsCommitmentByCommitment:input_type -> sourcehub.acp.QueryRegistrationsCommitmentByCommitmentRequest
+	20, // 26: sourcehub.acp.Query.ListObjectEvents:input_type -> sourcehub.acp.QueryListObjectEventsRequest
+	22, // 27: sourcehub.acp.Query.GenerateCommitment:input_type -> sourcehub.acp.QueryGenerateCommitmentRequest
+	1,  // 28: sourcehub.acp.Query.Params:output_type -> sourcehub.acp.QueryParamsResponse
+	3,  // 29: sourcehub.acp.Query.Policy:output_type -> sourcehub.acp.QueryPolicyResponse
+	5,  // 30: sourcehub.acp.Query.PolicyIds:output_type -> sourcehub.acp.QueryPolicyIdsResponse
+	7,  // 31: sourcehub.acp.Query.FilterRelationships:output_type -> sourcehub.acp.QueryFilterRelationshipsResponse
+	9,  // 32: sourcehub.acp.Query.VerifyAccessRequest:output_type -> sourcehub.acp.QueryVerifyAccessRequestResponse
+	11, // 33: sourcehub.acp.Query.ValidatePolicy:output_type -> sourcehub.acp.QueryValidatePolicyResponse
+	13, // 34: sourcehub.acp.Query.AccessDecision:output_type -> sourcehub.acp.QueryAccessDecisionResponse
+	15, // 35: sourcehub.acp.Query.ObjectOwner:output_type -> sourcehub.acp.QueryObjectOwnerResponse
+	17, // 36: sourcehub.acp.Query.RegistrationsCommitment:output_type -> sourcehub.acp.QueryRegistrationsCommitmentResponse
+	19, // 37: sourcehub.acp.Query.RegistrationsCommitmentByCommitment:output_type -> sourcehub.acp.QueryRegistrationsCommitmentByCommitmentResponse
+	21, // 38: sourcehub.acp.Query.ListObjectEvents:output_type -> sourcehub.acp.QueryListObjectEventsResponse
+	23, // 39: sourcehub.acp.Query.GenerateCommitment:output_type -> sourcehub.acp.QueryGenerateCommitmentResponse
+	28, // [28:40] is the sub-list for method output_type
+	16, // [16:28] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_acp_query_proto_init() }
