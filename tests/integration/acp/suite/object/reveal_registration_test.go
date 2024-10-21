@@ -38,8 +38,11 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 		},
 	}
 	commitment := a2.Run(ctx)
+	t.Logf("commitment generated: %v", commitment.Commitment)
+	t.Logf("registrations commitment id: %v", commitment.Id)
 	ctx.WaitBlock()
 
+	t.Logf("reveal registration for file:foo.txt")
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
 		PolicyId:     pol.Id,
@@ -50,7 +53,9 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 		},
 		Index: 0,
 	}
-	a.Run(ctx)
+	result := a.Run(ctx)
+	t.Logf("created relationship: %v", result.Record)
+	t.Fail()
 }
 
 func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T) {

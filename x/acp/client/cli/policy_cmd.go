@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/gogoproto/jsonpb"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/spf13/cobra"
@@ -91,6 +93,86 @@ func CmdUnregisterObject(dispatcher dispatcher) *cobra.Command {
 			if err != nil {
 				return err
 			}
+			err = dispatcher(cmd, polId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "reveal-registration policy-id commitment-id resource object-id json-proof",
+		Short: "Reveal an Object Registration for a Commitment",
+		Long:  ``,
+		Args:  cobra.ExactArgs(5),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			policyId := args[0]
+			commitId := args[1]
+			resource := args[2]
+			objectId := args[3]
+			proofJson := args[4]
+
+			proof := &types.RegistrationProof{}
+			err = jsonpb.UnmarshalString(proofJson, proof)
+			if err != nil {
+				return fmt.Errorf("unmarshaling proof: %v", err)
+			}
+
+			polCmd := types.NewRevealRegistrationCmd(commitId, proof, coretypes.NewObject(resource, objectId))
+
+			err = dispatcher(cmd, policyId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdCreateCommitment(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-commitment policy-id hex-commitment",
+		Short: "Create a new Registration Commitment on SourceHub",
+		Long:  ``,
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId := args[0]
+			commitment, err := hex.DecodeString(args[1])
+			if err != nil {
+				return fmt.Errorf("decoding commitment: %v", err)
+			}
+			polCmd := types.NewCommitRegistrationCmd(commitment)
+
+			err = dispatcher(cmd, polId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdFlagHijack(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "flag-hijack policy-id event-id",
+		Short: "Issue UnregisterObject PolicyCmd",
+		Long:  ``,
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId := args[0]
+			eventId := args[1]
+
+			polCmd := types.NewFlagHijackAttemptCmd(eventId)
+
 			err = dispatcher(cmd, polId, polCmd)
 			if err != nil {
 				return err

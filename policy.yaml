@@ -1,0 +1,7 @@
+name: test
+resources:
+  file:
+    relations:
+      owner:
+        types:
+          - actor

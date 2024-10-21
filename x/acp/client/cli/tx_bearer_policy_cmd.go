@@ -41,5 +41,8 @@ func CmdBearerPolicyCmd() *cobra.Command {
 	cmd.AddCommand(CmdUnregisterObject(bearerDispatcher))
 	cmd.AddCommand(CmdSetRelationship(bearerDispatcher))
 	cmd.AddCommand(CmdDeleteRelationship(bearerDispatcher))
+	cmd.AddCommand(CmdCreateCommitment(bearerDispatcher))
+	cmd.AddCommand(CmdRevealRegistration(bearerDispatcher))
+	cmd.AddCommand(CmdFlagHijack(bearerDispatcher))
 	return cmd
 }

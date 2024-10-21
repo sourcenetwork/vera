@@ -7,7 +7,7 @@ import (
 	reflect "reflect"
 	sync "sync"
 
-	acp_core "cosmossdk.io/api/sourcenetwork/acp_core"
+	acp_core "github.com/sourcenetwork/acp_core/pulsar"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"

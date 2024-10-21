@@ -208,5 +208,8 @@ message QueryGenerateCommitmentRequest {
 
 message QueryGenerateCommitmentResponse {
   bytes commitment = 1;
+  string hex_commitment = 2;
+  repeated RegistrationProof proofs = 3;
+  repeated string proofs_json = 4;
 }
 

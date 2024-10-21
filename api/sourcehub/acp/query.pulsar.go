@@ -9,7 +9,7 @@ import (
 
 	_ "cosmossdk.io/api/amino"
 	_ "cosmossdk.io/api/cosmos/base/query/v1beta1"
-	acp_core "cosmossdk.io/api/sourcenetwork/acp_core"
+	acp_core "github.com/sourcenetwork/acp_core/pulsar"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	_ "google.golang.org/genproto/googleapis/api/annotations"

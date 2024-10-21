@@ -9,7 +9,7 @@ import (
 
 	_ "cosmossdk.io/api/amino"
 	_ "cosmossdk.io/api/cosmos/msg/v1"
-	acp_core "cosmossdk.io/api/sourcenetwork/acp_core"
+	acp_core "github.com/sourcenetwork/acp_core/pulsar"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
