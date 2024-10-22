@@ -153,7 +153,7 @@ func (a *DeleteRelationshipAction) Run(ctx *TestCtx) *types.DeleteRelationshipCm
 	return got
 }
 
-type UnregisterObjectAction struct {
+type ArchiveObjectAction struct {
 	PolicyId    string
 	Object      *coretypes.Object
 	Actor       *TestActor
@@ -161,12 +161,12 @@ type UnregisterObjectAction struct {
 	ExpectedErr error
 }
 
-func (a *UnregisterObjectAction) Run(ctx *TestCtx) *types.ArchiveObjectCmdResult {
+func (a *ArchiveObjectAction) Run(ctx *TestCtx) *types.ArchiveObjectCmdResult {
 	cmd := types.NewUnregisterObjectCmd(a.Object)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
 	got := (*types.ArchiveObjectCmdResult)(nil)
 	if result != nil {
-		got = result.GetUnregisterObjectResult()
+		got = result.GetArchiveObjectResult()
 	}
 	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
 	return got

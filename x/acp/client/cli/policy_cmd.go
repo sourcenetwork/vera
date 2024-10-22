@@ -82,14 +82,14 @@ func CmdRegisterObject(dispatcher dispatcher) *cobra.Command {
 	return cmd
 }
 
-func CmdUnregisterObject(dispatcher dispatcher) *cobra.Command {
+func CmdArchiveObject(dispatcher dispatcher) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unregister-object policy-id resource objectId",
-		Short: "Issue UnregisterObject PolicyCmd",
+		Use:   "archive-object policy-id resource objectId",
+		Short: "Issue ArchiveObject PolicyCmd",
 		Long:  ``,
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			polId, polCmd, err := parseUnregisterObjectArgs(args)
+			polId, polCmd, err := parseArhchiveObjectArgs(args)
 			if err != nil {
 				return err
 			}
@@ -250,9 +250,9 @@ func parseRegisterObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	return polId, types.NewRegisterObjectCmd(coretypes.NewObject(resource, objId)), nil
 }
 
-func parseUnregisterObjectArgs(args []string) (string, *types.PolicyCmd, error) {
+func parseArhchiveObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	if len(args) != 3 {
-		return "", nil, fmt.Errorf("UnregisterObject: invalid number of arguments: policy-id resource objectId")
+		return "", nil, fmt.Errorf("ArchiveObject: invalid number of arguments: policy-id resource objectId")
 	}
 	polId := args[0]
 	resource := args[1]

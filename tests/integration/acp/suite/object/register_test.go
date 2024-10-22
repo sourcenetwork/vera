@@ -140,7 +140,7 @@ func TestRegisterObject_RegisteringAnotherUsersArchivedObject_Errors(t *testing.
 	}
 	a2.Run(ctx)
 
-	a3 := test.UnregisterObjectAction{
+	a3 := test.ArchiveObjectAction{
 		PolicyId: pol.Id,
 		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
@@ -173,7 +173,7 @@ func TestRegisterObject_RegisteringArchivedUserObject_ReturnsOperationForbidden(
 		Object:   coretypes.NewObject("resource", "foo"),
 	}
 	a2.Run(ctx)
-	a3 := test.UnregisterObjectAction{
+	a3 := test.ArchiveObjectAction{
 		PolicyId: pol.Id,
 		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),

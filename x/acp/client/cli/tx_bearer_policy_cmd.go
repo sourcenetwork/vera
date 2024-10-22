@@ -38,7 +38,7 @@ func CmdBearerPolicyCmd() *cobra.Command {
 	flags.String(BearerFlag, "", "specifies the bearer token to be broadcast with the command")
 
 	cmd.AddCommand(CmdRegisterObject(bearerDispatcher))
-	cmd.AddCommand(CmdUnregisterObject(bearerDispatcher))
+	cmd.AddCommand(CmdArchiveObject(bearerDispatcher))
 	cmd.AddCommand(CmdSetRelationship(bearerDispatcher))
 	cmd.AddCommand(CmdDeleteRelationship(bearerDispatcher))
 	cmd.AddCommand(CmdCreateCommitment(bearerDispatcher))

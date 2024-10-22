@@ -49,7 +49,7 @@ func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T
 	ctx := setupUnregister(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
@@ -65,7 +65,7 @@ func TestUnregisterObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) 
 	ctx := setupUnregister(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId:    ctx.State.PolicyId,
 		Object:      coretypes.NewObject("file", "foo"),
 		Actor:       ctx.GetActor("bob"),
@@ -78,7 +78,7 @@ func TestUnregisterObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse
 	ctx := setupUnregister(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId:    ctx.State.PolicyId,
 		Object:      coretypes.NewObject("file", "file-isnt-registerd"),
 		Actor:       ctx.GetActor("bob"),
@@ -91,14 +91,14 @@ func TestUnregisterObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing
 	ctx := setupUnregister(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
 	}
 	action.Run(ctx)
 
-	action = test.UnregisterObjectAction{
+	action = test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
@@ -113,7 +113,7 @@ func TestUnregisterObject_SendingInvalidPolicyIdErrors(t *testing.T) {
 	ctx := setupUnregister(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId:    "abc1234",
 		Object:      coretypes.NewObject("file", "foo"),
 		Actor:       ctx.GetActor("alice"),

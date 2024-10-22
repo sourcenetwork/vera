@@ -35,7 +35,7 @@ func NewRegisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
 func NewUnregisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_UnregisterObjectCmd{
-			UnregisterObjectCmd: &UnregisterObjectCmd{
+			UnregisterObjectCmd: &ArchiveObjectCmd{
 				Object: obj,
 			},
 		},

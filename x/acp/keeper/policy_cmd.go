@@ -70,12 +70,11 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 		}
 		result.Result = &types.PolicyCmdResult_RegisterObjectResult{
 			RegisterObjectResult: &types.RegisterObjectCmdResult{
-				Result: coretypes.RegistrationResult_Registered,
 				Record: rec,
 			},
 		}
 	case *types.PolicyCmd_UnregisterObjectCmd:
-		resp, respErr := engine.UnregisterObject(goCtx, &coretypes.UnregisterObjectRequest{
+		resp, respErr := engine.ArchiveObject(goCtx, &coretypes.ArchiveObjectRequest{
 			PolicyId: policyId,
 			Object:   c.UnregisterObjectCmd.Object,
 		})
@@ -83,9 +82,9 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 			err = respErr
 			break
 		}
-		result.Result = &types.PolicyCmdResult_UnregisterObjectResult{
-			UnregisterObjectResult: &types.UnregisterObjectCmdResult{
-				Found:                resp.Found,
+		result.Result = &types.PolicyCmdResult_ArchiveObjectResult{
+			ArchiveObjectResult: &types.ArchiveObjectCmdResult{
+				Found:                true,
 				RelationshipsRemoved: resp.RelationshipsRemoved,
 			},
 		}
