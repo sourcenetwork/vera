@@ -71,9 +71,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 
 				{
-					RpcMethod:      "GenerateCommitment",
-					Use:            "generate-commitment",
-					Short:          "Query GenerateCommitment",
+					RpcMethod:      "HijackAttemptsByPolicy",
+					Use:            "hijack-attempts-by-policy",
+					Short:          "Query HijackAttemptsByPolicy",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
 

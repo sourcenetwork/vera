@@ -92,6 +92,12 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/generate_commitment";
   
   }
+  
+  // Queries a list of HijackAttemptsByPolicy items.
+  rpc HijackAttemptsByPolicy (QueryHijackAttemptsByPolicyRequest) returns (QueryHijackAttemptsByPolicyResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/hijack_attempts_by_policy";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -201,15 +207,23 @@ message QueryListObjectEventsResponse {
 }
 
 message QueryGenerateCommitmentRequest {
-  string policy_id = 1;
-  repeated sourcenetwork.acp_core.Object objects = 2;
-  sourcenetwork.acp_core.Actor actor = 3;
+           string                        policy_id = 1;
+  repeated sourcenetwork.acp_core.Object objects   = 2;
+           sourcenetwork.acp_core.Actor  actor     = 3;
 }
 
 message QueryGenerateCommitmentResponse {
-  bytes commitment = 1;
-  string hex_commitment = 2;
-  repeated RegistrationProof proofs = 3;
-  repeated string proofs_json = 4;
+           bytes             commitment     = 1;
+           string            hex_commitment = 2;
+  repeated RegistrationProof proofs         = 3;
+  repeated string            proofs_json    = 4;
+}
+
+message QueryHijackAttemptsByPolicyRequest {
+  string policy_id = 1;
+}
+
+message QueryHijackAttemptsByPolicyResponse {
+  repeated ObjectRegistrationEvent events = 1;
 }
 

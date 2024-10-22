@@ -83,3 +83,13 @@ func (r *KVEventRepository) GetObjectEvents(ctx context.Context, policyId string
 	}
 	return recs, nil
 }
+
+func (r *KVEventRepository) ListHijackEventsByPolicy(ctx context.Context, policyId string) ([]*types.ObjectRegistrationEvent, error) {
+	recs, err := r.store.Filter(func(ev *types.ObjectRegistrationEvent) bool {
+		return ev.PolicyId == policyId && ev.Type == types.ObjectRegistrationEventType_AMENDMENT && ev.Detail.GetAmendmentEvent().HijackFlag
+	})
+	if err != nil {
+		return nil, r.wrapErr(err)
+	}
+	return recs, nil
+}
