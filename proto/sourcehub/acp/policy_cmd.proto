@@ -146,8 +146,7 @@ message DeleteRelationshipCmdResult {
 
 // RegisterObjectCmdResult registers an Object in a Policy
 message RegisterObjectCmdResult {
-  sourcenetwork.acp_core.RegistrationResult result = 1;
-  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  sourcenetwork.acp_core.RelationshipRecord record = 1;
 }
 
 // UnregisterObjectCmdResult unregisters an Object in a Policy

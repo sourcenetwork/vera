@@ -19,13 +19,13 @@ deps:
   - remote: buf.build
     owner: cosmos
     repository: ibc
-    commit: c159402ffeef4c21a7f9f0643817ae0d
-    digest: shake256:694e3f5a1d469798bb6cb3510f6f489e10d9309d1f2e8f7a369a776947602195f13ab65972d2d586a1134978b6a6fa28a43e5d7710ef5032ba0c7fbbe6038f08
+    commit: 41fbc441e4d645119d275150719c5441
+    digest: shake256:a61d3e152909abddc91dcc1aec8ac997007bebd48a7921bc243681c708e6c9068f6484aa7ed4e6ff60101d3422c98744a4a5294bbda6aacdba07f1dfa4291020
   - remote: buf.build
     owner: cosmos
     repository: ics23
-    commit: d2ad30d1af0e4e978fa1f5c143acf63b
-    digest: shake256:000ea62514f7d507c96905d70ef11d16b8f8f32fda5a75def40d4130058af0174142ed3cd6c4a89c5fdb3cbf138277d771d86eeb6992f054d13a82556a2ff079
+    commit: dc427cb4519143d8996361c045a29ad7
+    digest: shake256:f6611c56170e2cb6354fa6e367a225fed7b8b0defca3252f05e842fe311be46997680ebf57d8644b52c1f2cca49b366ffe89ce5e8db5fd055a15259c88e4e41e
   - remote: buf.build
     owner: googleapis
     repository: googleapis
@@ -39,8 +39,8 @@ deps:
   - remote: buf.build
     owner: sourcenetwork
     repository: acp-core
-    commit: f4b0adefe71248fb85850ef260e8cd74
-    digest: shake256:eb8473738a3eaf0b9c84965da6b5e8fcbd0ba20c6d031f14fb1e35df755b4ff524885da6fabb54cf5b9627e9db7ebdc9c61b6c08fe516ac3e02cfa4748e4efc1
+    commit: b6f94fa155414e3cb1c771d9b4665c61
+    digest: shake256:1bcba7dd668ad7bc197c7bd6235eff8a5e433c691844730de6108692d77987768cc28ed23dd0a74af1582a5582792a9c7890cf3669fdc43d8dd20183b593d253
   - remote: buf.build
     owner: tendermint
     repository: tendermint
