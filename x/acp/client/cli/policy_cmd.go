@@ -89,7 +89,7 @@ func CmdArchiveObject(dispatcher dispatcher) *cobra.Command {
 		Long:  ``,
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			polId, polCmd, err := parseArhchiveObjectArgs(args)
+			polId, polCmd, err := parseArchiveObjectArgs(args)
 			if err != nil {
 				return err
 			}
@@ -184,6 +184,27 @@ func CmdFlagHijack(dispatcher dispatcher) *cobra.Command {
 	return cmd
 }
 
+func CmdUnarchiveObject(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unarchive-object policy-id resource objectId",
+		Short: "Issue UnarchiveObject PolicyCmd",
+		Long:  ``,
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId := args[0]
+			obj := coretypes.NewObject(args[1], args[2])
+			polCmd := types.NewArchiveObjectCmd(obj)
+			err = dispatcher(cmd, polId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
 // parseSetRelationshipArgs parses a SetRelationship from cli args
 // format: policy-id resource objectId relation [subject resource] subjectId [subjRel]
 func parseSetRelationshipArgs(args []string) (string, *types.PolicyCmd, error) {
@@ -250,12 +271,12 @@ func parseRegisterObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	return polId, types.NewRegisterObjectCmd(coretypes.NewObject(resource, objId)), nil
 }
 
-func parseArhchiveObjectArgs(args []string) (string, *types.PolicyCmd, error) {
+func parseArchiveObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	if len(args) != 3 {
 		return "", nil, fmt.Errorf("ArchiveObject: invalid number of arguments: policy-id resource objectId")
 	}
 	polId := args[0]
 	resource := args[1]
 	objId := args[2]
-	return polId, types.NewUnregisterObjectCmd(coretypes.NewObject(resource, objId)), nil
+	return polId, types.NewArchiveObjectCmd(coretypes.NewObject(resource, objId)), nil
 }

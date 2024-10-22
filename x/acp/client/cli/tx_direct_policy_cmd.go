@@ -36,5 +36,6 @@ func CmdDirectPolicyCmd() *cobra.Command {
 	cmd.AddCommand(CmdCreateCommitment(directDispatcher))
 	cmd.AddCommand(CmdRevealRegistration(directDispatcher))
 	cmd.AddCommand(CmdFlagHijack(directDispatcher))
+	cmd.AddCommand(CmdUnarchiveObject(directDispatcher))
 	return cmd
 }

@@ -162,7 +162,7 @@ type ArchiveObjectAction struct {
 }
 
 func (a *ArchiveObjectAction) Run(ctx *TestCtx) *types.ArchiveObjectCmdResult {
-	cmd := types.NewUnregisterObjectCmd(a.Object)
+	cmd := types.NewArchiveObjectCmd(a.Object)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
 	got := (*types.ArchiveObjectCmdResult)(nil)
 	if result != nil {

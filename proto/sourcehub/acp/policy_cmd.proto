@@ -49,10 +49,11 @@ message PolicyCmd {
     SetRelationshipCmd set_relationship_cmd = 1;
     DeleteRelationshipCmd delete_relationship_cmd = 2;
     RegisterObjectCmd register_object_cmd = 3;
-    ArchiveObjectCmd unregister_object_cmd = 4;
+    ArchiveObjectCmd archive_object_cmd = 4;
     CommitRegistrationsCmd commit_registrations_cmd = 5;
     RevealRegistrationCmd reveal_registration_cmd = 6;
     FlagHijackAttemptCmd flag_hijack_attempt_cmd = 7;
+    UnarchiveObjectCmd unarchive_object_cmd = 8;
   }
 }
 
@@ -116,14 +117,23 @@ message FlagHijackAttemptCmdResult {
   ObjectRegistrationEvent event = 1;
 }
 
-// UnregisterObject let's an Object's Owner effectively "unshare" their Object.
+message UnarchiveObjectCmd{
+  sourcenetwork.acp_core.Object object = 1;
+}
+
+message UnarchiveObjectCmdResult{
+  sourcenetwork.acp_core.RelationshipRecord record = 1;
+  bool relationship_modified = 2;
+}
+
+// ArchiveObject let's an Object's Owner effectively "unshare" their Object.
 // This method wipes all Relationships referencing the given Object.
 //
 // A caveat is that after removing the Relationships, a record of the original Object owner
 // is maintained to prevent an "ownership hijack" attack.
 // 
 // Suppose Bob owns object Foo, which is shared with Bob but not Eve.
-// Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Unregister Foo,
+// Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Archive Foo,
 // then submitting a RegisterObject Msg, effectively becoming Foo's new owner.
 // If Charlie has a copy of the object, Eve could convince Charlie to share his copy, granting Eve access to Foo.
 // The previous scenario where an unauthorized user is able to claim ownership to data previously unaccessible to them
@@ -164,5 +174,6 @@ message PolicyCmdResult {
     CommitRegistrationsCmdResult commit_registrations_result = 5;
     RevealRegistrationCmdResult reveal_registration_result = 6;
     FlagHijackAttemptCmdResult flag_hijack_attempt_result = 7;
+    UnarchiveObjectCmdResult unarchive_object_result = 8;
   }
 }

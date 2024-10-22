@@ -44,5 +44,6 @@ func CmdBearerPolicyCmd() *cobra.Command {
 	cmd.AddCommand(CmdCreateCommitment(bearerDispatcher))
 	cmd.AddCommand(CmdRevealRegistration(bearerDispatcher))
 	cmd.AddCommand(CmdFlagHijack(bearerDispatcher))
+	cmd.AddCommand(CmdUnarchiveObject(bearerDispatcher))
 	return cmd
 }

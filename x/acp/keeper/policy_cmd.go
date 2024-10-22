@@ -73,10 +73,10 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 				Record: rec,
 			},
 		}
-	case *types.PolicyCmd_UnregisterObjectCmd:
+	case *types.PolicyCmd_ArchiveObjectCmd:
 		resp, respErr := engine.ArchiveObject(goCtx, &coretypes.ArchiveObjectRequest{
 			PolicyId: policyId,
-			Object:   c.UnregisterObjectCmd.Object,
+			Object:   c.ArchiveObjectCmd.Object,
 		})
 		if respErr != nil {
 			err = respErr
@@ -126,6 +126,20 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 				Result: types.RegistrationResultStatus_UNARCHIVED, // TODO
 			},
 		}
+	case *types.PolicyCmd_UnarchiveObjectCmd:
+		unarchCmd := c.UnarchiveObjectCmd
+		rec, _, respErr := registrationService.UnarchiveObject(ctx, policyId, unarchCmd.Object, actor)
+		if respErr != nil {
+			err = respErr
+			break
+		}
+		result.Result = &types.PolicyCmdResult_UnarchiveObjectResult{
+			UnarchiveObjectResult: &types.UnarchiveObjectCmdResult{
+				Record:               rec,
+				RelationshipModified: true, // TODO
+			},
+		}
+
 	default:
 		err = errors.Wrap("unsuported command", errors.ErrUnknownVariant, errors.Pair("command", c))
 	}
