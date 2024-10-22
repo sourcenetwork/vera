@@ -55,7 +55,6 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 	}
 	result := a.Run(ctx)
 	t.Logf("created relationship: %v", result.Record)
-	t.Fail()
 }
 
 func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T) {

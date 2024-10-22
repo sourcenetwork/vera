@@ -53,7 +53,7 @@ func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
-		Expected: &types.UnregisterObjectCmdResult{
+		Expected: &types.ArchiveObjectCmdResult{
 			Found:                true,
 			RelationshipsRemoved: 2,
 		},
@@ -79,13 +79,10 @@ func TestUnregisterObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse
 	defer ctx.Cleanup()
 
 	action := test.UnregisterObjectAction{
-		PolicyId: ctx.State.PolicyId,
-		Object:   coretypes.NewObject("file", "file-isnt-registerd"),
-		Actor:    ctx.GetActor("bob"),
-		Expected: &types.UnregisterObjectCmdResult{
-			Found:                false,
-			RelationshipsRemoved: 0,
-		},
+		PolicyId:    ctx.State.PolicyId,
+		Object:      coretypes.NewObject("file", "file-isnt-registerd"),
+		Actor:       ctx.GetActor("bob"),
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	action.Run(ctx)
 }
@@ -105,7 +102,7 @@ func TestUnregisterObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
-		Expected: &types.UnregisterObjectCmdResult{
+		Expected: &types.ArchiveObjectCmdResult{
 			Found: true,
 		},
 	}

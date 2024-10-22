@@ -157,14 +157,14 @@ type UnregisterObjectAction struct {
 	PolicyId    string
 	Object      *coretypes.Object
 	Actor       *TestActor
-	Expected    *types.UnregisterObjectCmdResult
+	Expected    *types.ArchiveObjectCmdResult
 	ExpectedErr error
 }
 
-func (a *UnregisterObjectAction) Run(ctx *TestCtx) *types.UnregisterObjectCmdResult {
+func (a *UnregisterObjectAction) Run(ctx *TestCtx) *types.ArchiveObjectCmdResult {
 	cmd := types.NewUnregisterObjectCmd(a.Object)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
-	got := (*types.UnregisterObjectCmdResult)(nil)
+	got := (*types.ArchiveObjectCmdResult)(nil)
 	if result != nil {
 		got = result.GetUnregisterObjectResult()
 	}
