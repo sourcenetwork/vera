@@ -316,18 +316,7 @@ func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId strin
 	if err != nil {
 		return nil, err
 	}
-	ctx.Logger().Error("registration commitment", "thingy", registration)
-
-	return &types.RegistrationsCommitment{
-		Id:         fmt.Sprintf("%v", id),
-		PolicyId:   policyId,
-		Actor:      actor,
-		Commitment: commitment,
-		Expired:    false,
-		TxHash:     utils.HashTx(ctx.TxBytes()),
-		CreationTs: now,
-		Validity:   params.RegistrationsCommitmentValidity,
-	}, nil
+	return registration, nil
 }
 
 // FlagExpiredCommitments iterates over stored commitments,
