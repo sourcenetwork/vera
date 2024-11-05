@@ -28,5 +28,16 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateParams{},
 	)
+
+	registerResponses(registry)
+
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+}
+
+func registerResponses(registry cdctypes.InterfaceRegistry) {
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCreatePolicyResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCheckAccessResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSignedPolicyCmdResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgDirectPolicyCmdResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgUpdateParamsResponse{})
 }

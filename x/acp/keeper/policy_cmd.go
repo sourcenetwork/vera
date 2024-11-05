@@ -144,7 +144,7 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 		}
 	case *types.PolicyCmd_RevealRegistrationCmd:
 		regCmd := c.RevealRegistrationCmd
-		rec, ev, respErr := registrationService.RevealRegistration(ctx, regCmd.RegistrationsCommitmentId, regCmd.Proof, regCmd.Object, actor)
+		rec, ev, respErr := registrationService.RevealRegistration(ctx, regCmd.RegistrationsCommitmentId, regCmd.Proof, actor)
 		if respErr != nil {
 			err = respErr
 			break

@@ -106,16 +106,14 @@ func CmdArchiveObject(dispatcher dispatcher) *cobra.Command {
 
 func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "reveal-registration policy-id commitment-id resource object-id json-proof",
+		Use:   "reveal-registration policy-id commitment-id json-proof",
 		Short: "Reveal an Object Registration for a Commitment",
 		Long:  ``,
-		Args:  cobra.ExactArgs(5),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			policyId := args[0]
 			commitId := args[1]
-			resource := args[2]
-			objectId := args[3]
-			proofJson := args[4]
+			proofJson := args[2]
 
 			proof := &types.RegistrationProof{}
 			err = jsonpb.UnmarshalString(proofJson, proof)
@@ -123,7 +121,7 @@ func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 				return fmt.Errorf("unmarshaling proof: %v", err)
 			}
 
-			polCmd := types.NewRevealRegistrationCmd(commitId, proof, coretypes.NewObject(resource, objectId))
+			polCmd := types.NewRevealRegistrationCmd(commitId, proof)
 
 			err = dispatcher(cmd, policyId, polCmd)
 			if err != nil {

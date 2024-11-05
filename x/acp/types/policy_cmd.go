@@ -52,11 +52,10 @@ func NewCommitRegistrationCmd(commitment []byte) *PolicyCmd {
 	}
 }
 
-func NewRevealRegistrationCmd(commitmentId string, proof *RegistrationProof, obj *acptypes.Object) *PolicyCmd {
+func NewRevealRegistrationCmd(commitmentId string, proof *RegistrationProof) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_RevealRegistrationCmd{
 			RevealRegistrationCmd: &RevealRegistrationCmd{
-				Object:                    obj,
 				Proof:                     proof,
 				RegistrationsCommitmentId: commitmentId,
 			},

@@ -30,14 +30,14 @@ message RegistrationsCommitment {
     // commitment is a merkle root of registrations 
     // TODO reference to doc containing commitment format
     bytes commitment = 4;
-    bool expired = 5;
-
-    // hash of tx which created the commitment
-    bytes tx_hash = 6;
 
     // timestamp of the block which processed the tx
-    Timestamp creation_ts = 7;
+    Timestamp creation_ts = 5;
 
+    bool expired = 6;
     // validity models the duration for which the commitment is valid for 
-    Duration validity = 8;
+    Duration validity = 7;
+
+    // hash of tx which created the commitment
+    bytes tx_hash = 8;
 }

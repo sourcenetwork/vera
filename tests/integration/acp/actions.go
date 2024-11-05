@@ -262,7 +262,7 @@ func (a *RevealRegistrationAction) Run(ctx *TestCtx) *types.RevealRegistrationCm
 	actor := coretypes.NewActor(a.Actor.DID)
 	proof, err := registration.ProofForObject(a.PolicyId, actor, a.Index, a.Objects)
 	require.NoError(ctx.T, err)
-	cmd := types.NewRevealRegistrationCmd(a.CommitmentId, proof, a.Objects[a.Index])
+	cmd := types.NewRevealRegistrationCmd(a.CommitmentId, proof)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
 	got := (*types.RevealRegistrationCmdResult)(nil)
 	if result != nil {

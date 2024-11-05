@@ -92,8 +92,7 @@ message CommitRegistrationsCmdResult {
 
 message RevealRegistrationCmd {
   string registrations_commitment_id = 1;
-  sourcenetwork.acp_core.Object object = 2;
-  RegistrationProof proof = 3;
+  RegistrationProof proof = 2;
 }
 
 enum RegistrationResultStatus {

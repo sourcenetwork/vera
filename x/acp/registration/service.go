@@ -339,14 +339,14 @@ func (s *RegistrationService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.
 		c.Expired = true
 		err := s.repository.Set(ctx, c)
 		if err != nil {
-			return nil, err
+			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", c.Id))
 		}
 		processed = append(processed, c)
 	}
 	return commitments, nil
 }
 
-func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId string, proof *types.RegistrationProof, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId string, proof *types.RegistrationProof, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	commitment, err := s.repository.GetById(ctx, commitmentId)
 	if err != nil {
 		return nil, nil, err
@@ -378,7 +378,7 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 
 	registrationRecord, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: commitment.PolicyId,
-		Object:   object,
+		Object:   proof.Object,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -393,10 +393,10 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId s
 				},
 			},
 		}
-		return s.registerWithEvent(ctx, commitment.PolicyId, object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
+		return s.registerWithEvent(ctx, commitment.PolicyId, proof.Object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
 	}
 
-	return s.amendRegistration(ctx, commitment, object, actor)
+	return s.amendRegistration(ctx, commitment, proof.Object, actor)
 }
 
 func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId string, actor *coretypes.Actor, objects []*coretypes.Object) ([]byte, error) {

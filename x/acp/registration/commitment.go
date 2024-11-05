@@ -23,7 +23,7 @@ func VerifyProof(root []byte, policyId string, actor *coretypes.Actor, opening *
 		return false, errors.Wrap("invalid root commitment", errors.ErrorType_BAD_INPUT)
 	}
 	if opening == nil || opening.Object == nil || opening.Object.Id == "" ||
-		opening.MerkleProof == nil || opening.Object.Resource == "" {
+		opening.Object.Resource == "" {
 		return false, errors.Wrap("invalid opening", errors.ErrorType_BAD_INPUT)
 	}
 

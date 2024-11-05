@@ -4,12 +4,13 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/acp_core/pkg/errors"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-// EndBlocker called at every block, update validator set
 func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommitment, error) {
+	return nil, nil
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	objRepo := k.GetObjectEventRepository(ctx)
@@ -23,7 +24,7 @@ func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommit
 
 	commitments, err := service.FlagExpiredCommitments(ctx)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap("end blocker failed", err)
 	}
 
 	return commitments, nil

@@ -98,10 +98,10 @@ func (r *KVRegistrationRepository) GetExpiredCommitments(ctx context.Context, no
 		return expired
 	})
 	if filterErr != nil {
-		return nil, filterErr
+		return nil, errors.Wrap("filtering expired commitments", filterErr)
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap("filtering expired commitments", err)
 	}
 	return records, nil
 }
