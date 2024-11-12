@@ -22,6 +22,8 @@ service Query {
   rpc ReadPost(QueryReadPostRequest) returns (QueryReadPostResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/read_post/{namespace}";
   }
+
+  rpc IterateGlob(QueryIterateGlobRequest) returns (QueryIterateGlobResponse)
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -42,4 +44,16 @@ message QueryReadPostRequest {
 
 message QueryReadPostResponse {
   Post post = 1;
+}
+
+message QueryIterateGlobRequest {
+  string glob = 1;
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryIterateGlobResponse {
+  repeated Post posts = 1;
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
