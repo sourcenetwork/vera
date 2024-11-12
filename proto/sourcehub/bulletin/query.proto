@@ -23,7 +23,10 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/read_post/{namespace}";
   }
 
-  rpc IterateGlob(QueryIterateGlobRequest) returns (QueryIterateGlobResponse)
+  // Glob iteration over a namespace
+  rpc IterateGlob(QueryIterateGlobRequest) returns (QueryIterateGlobResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/iterate_glob";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -38,20 +41,25 @@ message QueryParamsResponse {
   ];
 }
 
+// QueryReadPostRequest
 message QueryReadPostRequest {
   string namespace = 1;
 }
 
+// QueryReadPostResponse
 message QueryReadPostResponse {
   Post post = 1;
 }
 
+// QueryIterateGlobRequest
 message QueryIterateGlobRequest {
-  string glob = 1;
+  string namespace = 1;
+  string glob = 2;
   // pagination defines an optional pagination for the request.
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 3;
 }
 
+// QueryIterateGlobResponse
 message QueryIterateGlobResponse {
   repeated Post posts = 1;
   // pagination defines an optional pagination for the request.
