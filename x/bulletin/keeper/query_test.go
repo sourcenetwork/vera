@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
@@ -110,4 +111,26 @@ func TestParamsQueryIterateGlob(t *testing.T) {
 				Payload:   []byte("val3"),
 			},
 		}, resp5.Posts)
+
+	// pagination
+	resp6, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "test1",
+		Glob:      "*",
+		Pagination: &query.PageRequest{
+			Limit: 3,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, posts[:3], resp6.Posts)
+
+	// continuation pagination
+	resp7, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "test1",
+		Glob:      "*",
+		Pagination: &query.PageRequest{
+			Key: resp6.Pagination.NextKey,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, posts[3:], resp7.Posts)
 }
