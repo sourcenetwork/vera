@@ -77,6 +77,7 @@ message LockupsResponse {
 message UnlockingLockupRequest {
   string delegator_address = 1;
   string validator_address = 2;
+  int64 creation_height = 3;
 }
 
 // UnlockingLockupResponse is the response type for the Query/UnlockingLockup RPC method.
