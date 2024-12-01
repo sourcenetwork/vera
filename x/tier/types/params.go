@@ -29,7 +29,9 @@ func NewParams(epochDuration *time.Duration, unlockingEpochs int64, creditReward
 	}
 }
 
-// DefaultParams returns default parameters
+// DefaultParams returns default parameters.
+// Rates in RewardRates are integers representing percentages with 2 decimal precision.
+// For example, a rate of 150 represents 1.50 (150 / 100).
 func DefaultParams() Params {
 	du := 5 * time.Minute
 	return Params{

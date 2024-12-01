@@ -137,6 +137,7 @@ func calculateCredit(rateList []types.Rate, lockedAmt, lockingAmt math.Int) math
 		diffDec := math.LegacyNewDecFromInt(diff)
 		rateDec := math.LegacyNewDec(r.Rate)
 
+		// rateDec MUST have 2 decimals of precision for the calculation to be correct.
 		amt := diffDec.Mul(rateDec).Quo(math.LegacyNewDec(100))
 		credit = credit.Add(amt.TruncateInt())
 
