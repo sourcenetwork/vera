@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -40,9 +41,8 @@ func KeyPrefix(unlocking bool) []byte {
 	return []byte(LockupKeyPrefix)
 }
 
-// LockupKey returns the store key to retrieve a Lockup from the index fields
+// LockupKey returns the store key to retrieve a Lockup from the index fields.
 func LockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress) []byte {
-
 	// Calculate the size of the buffer in advance
 	size := len(delAddr.Bytes()) + 1 + len(valAddr.Bytes()) + 1
 	buf := make([]byte, 0, size)
@@ -56,12 +56,30 @@ func LockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress) []byte {
 	return buf
 }
 
-func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
+// UnlockingLockupKey returns the store key to retrieve an unlocking Lockup from the index fields.
+func UnlockingLockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) []byte {
+	// Calculate the size of the buffer in advance, allocating 20 more bytes for creationHeight.
+	creationHeightLength := 20
+	size := len(delAddr.Bytes()) + 1 + len(valAddr.Bytes()) + 1 + creationHeightLength + 1
+	buf := make([]byte, 0, size)
 
+	// Append bytes to the buffer
+	buf = append(buf, delAddr.Bytes()...)
+	buf = append(buf, '/')
+	buf = append(buf, valAddr.Bytes()...)
+	buf = append(buf, '/')
+	buf = strconv.AppendInt(buf, creationHeight, 10)
+	buf = append(buf, '/')
+
+	return buf
+}
+
+// LockupKeyToAddresses retreives delAddr and valAddr from provided Lockup key.
+func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
 	// Find the positions of the delimiters
 	parts := bytes.Split(key, []byte{'/'})
 	if len(parts) != 3 {
-		panic("expected format in delAddr/valAddr/")
+		panic("invalid key format: expected format delAddr/valAddr/")
 	}
 
 	// Reconstruct the addresses
@@ -69,4 +87,23 @@ func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
 	valAddr := sdk.ValAddress(parts[1])
 
 	return delAddr, valAddr
+}
+
+// LockupKeyToAddressesAtHeight retreives delAddr, valAddr, and creationHeight from provided unlocking Lockup key.
+func LockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValAddress, int64) {
+	// Find the positions of the delimiters
+	parts := bytes.Split(key, []byte{'/'})
+	if len(parts) != 4 {
+		panic("invalid key format: expected format delAddr/valAddr/creationHeight/")
+	}
+
+	// Reconstruct the addresses and creation height
+	delAddr := sdk.AccAddress(parts[0])
+	valAddr := sdk.ValAddress(parts[1])
+	creationHeight, err := strconv.ParseInt(string(parts[2]), 10, 64)
+	if err != nil {
+		panic("unexpected creation height")
+	}
+
+	return delAddr, valAddr, creationHeight
 }
