@@ -5,7 +5,9 @@ import (
 	time "time"
 
 	"cosmossdk.io/math"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 )
@@ -48,6 +50,13 @@ type BankKeeper interface {
 	// ViewKeeper interface
 	IterateAllBalances(ctx context.Context, cb func(addr sdk.AccAddress, coin sdk.Coin) bool)
 	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
+}
+
+// DistributionKeeper defines the expected interface for the Distriution module.
+type DistributionKeeper interface {
+	AllocateTokensToValidator(ctx context.Context, val stakingtypes.ValidatorI, tokens sdk.DecCoins) error
+	AllocateTokens(ctx context.Context, totalReward int64, bondedValidators []abcitypes.VoteInfo) error
+	GetValidatorOutstandingRewards(ctx context.Context, valAddr sdk.ValAddress) (distrtypes.ValidatorOutstandingRewards, error)
 }
 
 // ParamSubspace defines the expected Subspace interface for parameters.
