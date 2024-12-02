@@ -102,7 +102,9 @@ func TestRedelegate(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
 	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	srcValAddr := sample.RandomValAddress()
+	srcValAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	dstValAddr := sample.RandomValAddress()
 
 	initialDelegatorBalance := math.NewInt(2000)
@@ -142,10 +144,10 @@ func TestCompleteUnlocking(t *testing.T) {
 	initialDelegatorBalance := math.NewInt(200_000)
 	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
 
-	initialValidatorBalance := math.NewInt(1000_000)
+	initialValidatorBalance := math.NewInt(1_000_000)
 	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
-	lockAmount := math.NewInt(12_3456)
+	lockAmount := math.NewInt(123_456)
 	err = k.Lock(ctx, delAddr, valAddr, lockAmount)
 	require.NoError(t, err)
 
@@ -156,7 +158,8 @@ func TestCompleteUnlocking(t *testing.T) {
 	require.Equal(t, initialDelegatorBalance.Sub(lockAmount), balance.Amount)
 
 	// unlocking tokens
-	unlockAmount := math.NewInt(12_3456)
+	unlockAmount := math.NewInt(123_456)
+	adjustedUnlockAmount := unlockAmount.Sub(math.NewInt(1))
 	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
@@ -165,7 +168,7 @@ func TestCompleteUnlocking(t *testing.T) {
 
 	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found)
-	require.Equal(t, unlockAmount, amt)
+	require.Equal(t, adjustedUnlockAmount, amt)
 	require.Equal(t, unbondTime, unbTime)
 	require.Equal(t, unlockTime, unlTime)
 
@@ -180,7 +183,7 @@ func TestCompleteUnlocking(t *testing.T) {
 
 	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found)
-	require.Equal(t, unlockAmount, amt)
+	require.Equal(t, adjustedUnlockAmount, amt)
 	require.Equal(t, unbondTime, unbTime)
 	require.Equal(t, unlockTime, unlTime)
 
@@ -190,4 +193,60 @@ func TestCompleteUnlocking(t *testing.T) {
 	// verify that the balance is returned
 	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
 	require.Equal(t, initialDelegatorBalance.Sub(math.NewInt(1)), balance.Amount)
+}
+
+func TestCancelUnlocking(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	initialDelegatorBalance := math.NewInt(200_000)
+	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+
+	initialValidatorBalance := math.NewInt(10_000_000)
+	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
+
+	initialAmount := math.NewInt(1000)
+	unlockAmount := math.NewInt(500)
+	adjustedUnlockAmount := unlockAmount.Sub(math.NewInt(1))
+
+	// lock the initialAmount
+	err = k.Lock(ctx, delAddr, valAddr, initialAmount)
+	require.NoError(t, err)
+
+	// verify that lockup was added
+	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, initialAmount, lockedAmt)
+
+	// unlock the unlockAmount
+	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
+	require.NoError(t, err)
+
+	// verify that lockup was updated
+	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, math.ZeroInt(), lockedAmt)
+
+	// check the unlocking entry based on adjusted unlock amount
+	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.True(t, found)
+	require.Equal(t, adjustedUnlockAmount, amt)
+	require.Equal(t, unbondTime, unbTime)
+	require.Equal(t, unlockTime, unlTime)
+
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, adjustedUnlockAmount)
+	require.NoError(t, err)
+
+	// verify that lockup was updated
+	lockupAmount := k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, math.NewInt(499), lockupAmount)
+
+	// check the unlocking entry
+	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.Equal(t, true, found)
+	require.Equal(t, math.NewInt(499), amt)
+	require.Equal(t, unbondTime, unbTime)
+	require.Equal(t, unlockTime, unlTime)
 }
