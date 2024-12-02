@@ -50,7 +50,7 @@ func (q Querier) Lockup(ctx context.Context, req *types.LockupRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	amt := q.GetLockup(ctx, delAddr, valAddr)
+	amt := q.GetLockupAmount(ctx, delAddr, valAddr)
 
 	lockup := &types.Lockup{
 		DelegatorAddress: req.DelegatorAddress,
@@ -98,9 +98,9 @@ func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockup
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	found, amt, unbondTime, unlockTime := q.getUnlockingLockup(ctx, delAddr, valAddr)
+	found, amt, unbondTime, unlockTime := q.GetUnlockingLockup(ctx, delAddr, valAddr, req.CreationHeight)
 	if !found {
-		return &types.UnlockingLockupResponse{Lockup: types.Lockup{ValidatorAddress: req.ValidatorAddress, Amount: amt}}, nil
+		return &types.UnlockingLockupResponse{Lockup: types.Lockup{DelegatorAddress: req.DelegatorAddress, ValidatorAddress: req.ValidatorAddress, Amount: amt}}, nil
 	}
 
 	lockup := &types.Lockup{
