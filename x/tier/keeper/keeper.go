@@ -71,12 +71,12 @@ func (k Keeper) GetAuthority() string {
 	return k.authority
 }
 
-// GetAuthority returns the module's StakingKeeper.
+// GetStakingKeeper returns the module's StakingKeeper.
 func (k Keeper) GetStakingKeeper() types.StakingKeeper {
 	return k.stakingKeeper
 }
 
-// GetAuthority returns the module's BankKeeper.
+// GetBankKeeper returns the module's BankKeeper.
 func (k Keeper) GetBankKeeper() types.BankKeeper {
 	return k.bankKeeper
 }
