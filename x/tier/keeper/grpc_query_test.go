@@ -75,8 +75,9 @@ func TestUnlockingLockupQuery(t *testing.T) {
 	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	amount := math.NewInt(1000)
 
-	unbondTime := time.Now().Add(24 * time.Hour).UTC()
-	unlockTime := time.Now().Add(48 * time.Hour).UTC()
+	// normalize time to UTC within SetLockup() so unbondTime/unlockTime can be local
+	unbondTime := time.Now().Add(24 * time.Hour)
+	unlockTime := time.Now().Add(48 * time.Hour)
 
 	keeper.SetLockup(ctx, true, delAddr, valAddr, amount, 1, &unbondTime, &unlockTime)
 
@@ -84,7 +85,12 @@ func TestUnlockingLockupQuery(t *testing.T) {
 	response, err := querier.UnlockingLockup(ctx, &types.UnlockingLockupRequest{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
+		CreationHeight:   1,
 	})
+
+	// use normalized time to confirm SetLockup() logic
+	unbondTimeUTC := unbondTime.UTC()
+	unlockTimeUTC := unlockTime.UTC()
 
 	require.NoError(t, err)
 	require.Equal(t, &types.UnlockingLockupResponse{
@@ -92,8 +98,8 @@ func TestUnlockingLockupQuery(t *testing.T) {
 			DelegatorAddress: delAddr.String(),
 			ValidatorAddress: valAddr.String(),
 			Amount:           amount,
-			UnbondTime:       &unbondTime,
-			UnlockTime:       &unlockTime,
+			UnbondTime:       &unbondTimeUTC,
+			UnlockTime:       &unlockTimeUTC,
 		},
 	}, response)
 }
@@ -119,9 +125,15 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Len(t, response.Lockup, 1)
-	// TODO: at the moment, SetLockup() overrides existing lockup.
-	// This needs to be changed in favor of storing unlocking lockups separately.
-	// After the change, this test should be updated to use new SetLockup logic
-	// and the response.Lockup length check above should return 2 as expected.
+	require.Len(t, response.Lockup, 2)
+
+	require.Equal(t, amount1, response.Lockup[0].Amount)
+	require.Equal(t, int64(1), response.Lockup[0].CreationHeight)
+	require.Equal(t, &unbondTime1, response.Lockup[0].UnbondTime)
+	require.Equal(t, &unlockTime1, response.Lockup[0].UnlockTime)
+
+	require.Equal(t, amount2, response.Lockup[1].Amount)
+	require.Equal(t, int64(2), response.Lockup[1].CreationHeight)
+	require.Equal(t, &unbondTime2, response.Lockup[1].UnbondTime)
+	require.Equal(t, &unlockTime2, response.Lockup[1].UnlockTime)
 }
