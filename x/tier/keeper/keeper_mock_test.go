@@ -139,6 +139,17 @@ func (suite *KeeperTestSuite) TestUnlock() {
 		EpochDuration:   &epochDuration,
 	}
 
+	validator := stakingtypes.Validator{
+		OperatorAddress: valAddr.String(),
+		Status:          stakingtypes.Bonded,
+		DelegatorShares: math.LegacyNewDec(1_000_000),
+		Tokens:          math.NewInt(2_000_000),
+	}
+
+	suite.stakingKeeper.EXPECT().
+		GetValidator(gomock.Any(), valAddr).
+		Return(validator, nil).Times(1)
+
 	suite.bankKeeper.EXPECT().
 		GetBalance(
 			gomock.Any(),
