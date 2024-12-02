@@ -101,7 +101,7 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount)
 	}
 
-	k.MustIterateLockups(ctx, false, cb)
+	k.MustIterateLockups(ctx, cb)
 
 	rates := k.GetParams(ctx).RewardRates
 
