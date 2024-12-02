@@ -96,15 +96,11 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 		}
 
 		// Redeem the unlocked lockup for stake.
-		// Adjust calculation forthe given tolerance, because the undelegated amount
-		// could be less than the expected amount due to validator share calculations.
-		// TODO: handle tolerance more gracefully.
-		tolerance := math.NewInt(1)
-		stake := sdk.NewCoin(appparams.DefaultBondDenom, lockup.Amount.Sub(tolerance))
+		stake := sdk.NewCoin(appparams.DefaultBondDenom, lockup.Amount)
 		coins := sdk.NewCoins(stake)
 
 		moduleBalance := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(types.ModuleName), appparams.DefaultBondDenom)
-		if moduleBalance.Amount.Add(tolerance).LT(lockup.Amount) {
+		if moduleBalance.Amount.LT(lockup.Amount) {
 			fmt.Printf("Module account balance %s is smaller than required amount %s\n", delAddr, valAddr)
 			return nil
 		}
@@ -167,6 +163,11 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
 	unbondTime time.Time, unlockTime time.Time, creationHeight int64, err error) {
 
+	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
+	if err != nil {
+		return time.Time{}, time.Time{}, 0, types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
+	}
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	creationHeight = sdkCtx.BlockHeight()
 
@@ -184,6 +185,16 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, valAddr, amt)
 	if err != nil {
 		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "validate unbond amount")
+	}
+
+	if shares.IsZero() {
+		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(stakingtypes.ErrInsufficientShares, "calculated shares are zero")
+	}
+
+	// adjust token amount to match the actual undelegated tokens
+	tokenAmount := validator.TokensFromSharesTruncated(shares).TruncateInt()
+	if tokenAmount.LT(amt) {
+		amt = tokenAmount
 	}
 
 	unbondTime, _, err = k.stakingKeeper.Undelegate(ctx, modAddr, valAddr, shares)
@@ -223,4 +234,78 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	}
 
 	return completionTime, nil
+}
+
+// CancelUnlocking effectively cancels the pending unlocking lockup.
+func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	// use the module account address when interacting with unbonding delegations
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
+
+	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
+	if err != nil {
+		return types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
+	}
+
+	ubd, err := k.stakingKeeper.GetUnbondingDelegation(ctx, modAddr, valAddr)
+	if err != nil {
+		return errorsmod.Wrapf(err, "unbonding delegation not found for delegator %s and validator %s", modAddr, valAddr)
+	}
+
+	// search for the unbonding delegation entry that matches the amount and ensure it's valid
+	var (
+		unbondEntryIndex int64 = -1
+		unbondEntry      stakingtypes.UnbondingDelegationEntry
+	)
+
+	for i, entry := range ubd.Entries {
+		if entry.Balance.GTE(amt) && entry.CompletionTime.After(sdkCtx.BlockTime()) {
+			unbondEntryIndex = int64(i)
+			unbondEntry = entry
+			break
+		}
+	}
+
+	if unbondEntryIndex == -1 {
+		return errorsmod.Wrapf(stakingtypes.ErrNoUnbondingDelegation, "no valid unbonding entry found for amount %s", amt)
+	}
+
+	_, err = k.stakingKeeper.Delegate(ctx, modAddr, amt, stakingtypes.Unbonding, validator, false)
+	if err != nil {
+		return errorsmod.Wrap(err, "failed to delegate tokens back to validator")
+	}
+
+	// update or remove the unbonding delegation entry
+	remainingBalance := unbondEntry.Balance.Sub(amt)
+	if remainingBalance.IsZero() {
+		ubd.RemoveEntry(unbondEntryIndex)
+	} else {
+		unbondEntry.Balance = remainingBalance
+		unbondEntry.InitialBalance = unbondEntry.InitialBalance.Sub(amt)
+		ubd.Entries[unbondEntryIndex] = unbondEntry
+	}
+
+	// update or remove the unbonding delegation in the store
+	if len(ubd.Entries) == 0 {
+		err = k.stakingKeeper.RemoveUnbondingDelegation(ctx, ubd)
+	} else {
+		err = k.stakingKeeper.SetUnbondingDelegation(ctx, ubd)
+	}
+	if err != nil {
+		return errorsmod.Wrap(err, "failed to update unbonding delegation")
+	}
+
+	k.AddLockup(ctx, delAddr, valAddr, amt)
+
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeCancelUnlocking,
+			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
+			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+		),
+	)
+
+	return nil
 }
