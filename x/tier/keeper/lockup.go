@@ -125,7 +125,7 @@ func (k Keeper) GetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, 
 	return true, lockup.Amount, *lockup.UnbondTime, *lockup.UnlockTime
 }
 
-// removeUnlockingLockup removes existing lockup (delAddr/valAddr/).
+// removeLockup removes existing lockup (delAddr/valAddr/).
 func (k Keeper) removeLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) {
 	key := types.LockupKey(delAddr, valAddr)
 	store := k.lockupStore(ctx, false)
