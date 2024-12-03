@@ -52,7 +52,7 @@ type BankKeeper interface {
 	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
 }
 
-// DistributionKeeper defines the expected interface for the Distriution module.
+// DistributionKeeper defines the expected interface for the distribution module.
 type DistributionKeeper interface {
 	AllocateTokensToValidator(ctx context.Context, val stakingtypes.ValidatorI, tokens sdk.DecCoins) error
 	AllocateTokens(ctx context.Context, totalReward int64, bondedValidators []abcitypes.VoteInfo) error
