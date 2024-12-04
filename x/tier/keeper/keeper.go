@@ -150,7 +150,7 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 
 	// Mint credits
 	creditAmt := k.proratedCredit(ctx, delAddr, amt)
-	err = k.mintCredit(ctx, delAddr, creditAmt)
+	err = k.MintCredit(ctx, delAddr, creditAmt)
 	if err != nil {
 		return errorsmod.Wrap(err, "mint credit")
 	}

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
@@ -12,8 +13,16 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// mintCredit mints a coin and sends it to the specified address.
-func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
+// MintCredit mints a coin and sends it to the specified address.
+func (k Keeper) MintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
+	if _, err := sdk.AccAddressFromBech32(addr.String()); err != nil {
+		return errorsmod.Wrap(err, "invalid address")
+	}
+
+	if amt.LTE(math.ZeroInt()) {
+		return errors.New("invalid amount")
+	}
+
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.CreditDenom, amt))
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, coins)
 	if err != nil {
@@ -33,7 +42,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 	// Calculate the reward credits earned on the new lock.
 	rates := k.GetParams(ctx).RewardRates
 	lockedAmt := k.TotalAmountByAddr(ctx, delAddr)
-	credit := calculateCredit(rates, lockedAmt, lockingAmt)
+	credit := CalculateCredit(rates, lockedAmt, lockingAmt)
 
 	// Pro-rate the credit based on the time elapsed in the current epoch.
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
@@ -107,8 +116,8 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 
 	for delStrAddr, amt := range lockedAmts {
 		delAddr := sdk.MustAccAddressFromBech32(delStrAddr)
-		credit := calculateCredit(rates, math.ZeroInt(), amt)
-		err := k.mintCredit(ctx, delAddr, credit)
+		credit := CalculateCredit(rates, math.ZeroInt(), amt)
+		err := k.MintCredit(ctx, delAddr, credit)
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s to %s", credit, delAddr)
 		}
@@ -117,10 +126,10 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 	return nil
 }
 
-// calculateCredit calculates the reward earned on the lockingAmt.
+// CalculateCredit calculates the reward earned on the lockingAmt.
 // lockingAmt is stacked up on top of the lockedAmt to earn at the
 // highest eligible reward.
-func calculateCredit(rateList []types.Rate, lockedAmt, lockingAmt math.Int) math.Int {
+func CalculateCredit(rateList []types.Rate, lockedAmt, lockingAmt math.Int) math.Int {
 	credit := math.ZeroInt()
 	stakedAmt := lockedAmt.Add(lockingAmt)
 
