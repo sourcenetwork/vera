@@ -7,8 +7,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/app"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
@@ -17,13 +16,8 @@ func init() {
 	app.SetConfig(true)
 }
 
-func setupKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
-	k, ctx := keepertest.TierKeeper(t)
-	return &k, ctx
-}
-
 func TestSetAndGetLockup(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount := math.NewInt(1000)
 	creationHeight := int64(10)
@@ -50,7 +44,7 @@ func TestSetAndGetLockup(t *testing.T) {
 }
 
 func TestAddLockup(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount := math.NewInt(500)
 
@@ -66,7 +60,7 @@ func TestAddLockup(t *testing.T) {
 }
 
 func TestSubtractLockup(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount := math.NewInt(1000)
 
@@ -85,7 +79,7 @@ func TestSubtractLockup(t *testing.T) {
 }
 
 func TestGetAllLockups(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
@@ -113,7 +107,7 @@ func TestGetAllLockups(t *testing.T) {
 }
 
 func TestMustIterateLockups(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount := math.NewInt(1000)
 
@@ -136,7 +130,7 @@ func TestMustIterateLockups(t *testing.T) {
 }
 
 func TestMustIterateUnlockingLockups(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	amount := math.NewInt(1000)
 
@@ -163,7 +157,7 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 }
 
 func TestIterateLockups(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.Nil(t, err)

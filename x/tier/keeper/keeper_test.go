@@ -41,7 +41,7 @@ func initializeDelegator(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context, de
 
 // TestLock verifies that a valid lockup is created on keeper.Lock().
 func TestLock(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -66,7 +66,7 @@ func TestLock(t *testing.T) {
 
 // TestUnlock verifies that a valid unlocking lockup is created on keeper.Unock().
 func TestUnlock(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -105,7 +105,7 @@ func TestUnlock(t *testing.T) {
 
 // TestRedelegate verifies that a locked amount is correctly redelegated on keeper.Redelegate().
 func TestRedelegate(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -145,7 +145,7 @@ func TestRedelegate(t *testing.T) {
 // TestCompleteUnlocking verifies that 'fully unlocked' unlocking lockups are removed on keeper.CompleteUnlocking().
 // Block time is advanced by 60 days from when keeper.Unlock() is called to make sure that the unlock time is in the past.
 func TestCompleteUnlocking(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
@@ -213,7 +213,7 @@ func TestCompleteUnlocking(t *testing.T) {
 
 // TestCancelUnlocking verifies that the unlocking lockup is removed on keeper.CancelUnlocking().
 func TestCancelUnlocking(t *testing.T) {
-	k, ctx := setupKeeper(t)
+	k, ctx := testutil.SetupKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
