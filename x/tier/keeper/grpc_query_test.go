@@ -27,8 +27,13 @@ func TestParamsQuery(t *testing.T) {
 
 func TestLockupQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	amount := math.NewInt(1000)
 
 	keeper.AddLockup(ctx, delAddr, valAddr, amount)
@@ -51,8 +56,13 @@ func TestLockupQuery(t *testing.T) {
 
 func TestLockupsQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 
@@ -71,8 +81,13 @@ func TestLockupsQuery(t *testing.T) {
 
 func TestUnlockingLockupQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	amount := math.NewInt(1000)
 
 	// normalize time to UTC within SetLockup() so unbondTime/unlockTime can be local
@@ -106,8 +121,13 @@ func TestUnlockingLockupQuery(t *testing.T) {
 
 func TestUnlockingLockupsQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 

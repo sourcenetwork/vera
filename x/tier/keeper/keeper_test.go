@@ -13,7 +13,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/app"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	"github.com/sourcenetwork/sourcehub/testutil/sample"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
@@ -44,7 +43,9 @@ func initializeDelegator(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context, de
 func TestLock(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
@@ -67,7 +68,9 @@ func TestLock(t *testing.T) {
 func TestUnlock(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
@@ -104,11 +107,14 @@ func TestUnlock(t *testing.T) {
 func TestRedelegate(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr := sdk.AccAddress("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+
 	srcValAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
-	dstValAddr := sample.RandomValAddress()
+	dstValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
 	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
@@ -143,6 +149,7 @@ func TestCompleteUnlocking(t *testing.T) {
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
+
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
@@ -163,14 +170,14 @@ func TestCompleteUnlocking(t *testing.T) {
 	require.Equal(t, initialDelegatorBalance.Sub(lockAmount), balance.Amount)
 
 	unlockAmount := math.NewInt(123_456)
-	adjustedUnlockAmount := unlockAmount.Sub(math.NewInt(1))
+	adjustedUnlockAmount := unlockAmount.Sub(math.OneInt())
 
 	// unlock tokens
 	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
 	lockup = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, math.NewInt(0), lockup)
+	require.Equal(t, math.ZeroInt(), lockup)
 
 	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found)
@@ -201,7 +208,7 @@ func TestCompleteUnlocking(t *testing.T) {
 
 	// verify that the balance is correct
 	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
-	require.Equal(t, initialDelegatorBalance.Sub(math.NewInt(1)), balance.Amount)
+	require.Equal(t, initialDelegatorBalance.Sub(math.OneInt()), balance.Amount)
 }
 
 // TestCancelUnlocking verifies that the unlocking lockup is removed on keeper.CancelUnlocking().
@@ -210,6 +217,7 @@ func TestCancelUnlocking(t *testing.T) {
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
+
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
@@ -221,7 +229,7 @@ func TestCancelUnlocking(t *testing.T) {
 
 	initialAmount := math.NewInt(1000)
 	unlockAmount := math.NewInt(500)
-	adjustedUnlockAmount := unlockAmount.Sub(math.NewInt(1))
+	adjustedUnlockAmount := unlockAmount.Sub(math.OneInt())
 
 	// lock the initialAmount
 	err = k.Lock(ctx, delAddr, valAddr, initialAmount)
