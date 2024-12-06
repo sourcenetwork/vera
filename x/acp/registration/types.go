@@ -14,11 +14,11 @@ type CommitmentRepository interface {
 
 	Set(ctx context.Context, reg *types.RegistrationsCommitment) error
 
-	GetById(ctx context.Context, id string) (*types.RegistrationsCommitment, error)
+	GetById(ctx context.Context, id string) (types.RegistrationsCommitment, error)
 
-	FilterByCommitment(ctx context.Context, commitment []byte) ([]*types.RegistrationsCommitment, error)
+	FilterByCommitment(ctx context.Context, commitment []byte) ([]types.RegistrationsCommitment, error)
 
-	GetExpiredCommitments(ctx context.Context, currentTime *types.Timestamp) ([]*types.RegistrationsCommitment, error)
+	GetExpiredCommitments(ctx context.Context, currentTime *types.Timestamp) ([]types.RegistrationsCommitment, error)
 }
 
 type RegistrationEventRepository interface {

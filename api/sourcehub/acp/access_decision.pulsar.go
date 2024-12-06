@@ -2,7 +2,7 @@
 package acp
 
 import (
-	acp_core "github.com/sourcenetwork/acp_core/pulsar"
+	acp_core "github.com/sourcenetwork/acp_core/pkg/pulsar/types"
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"

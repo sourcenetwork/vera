@@ -1,7 +1,6 @@
 package registration
 
 import (
-	"bytes"
 	"context"
 
 	"cosmossdk.io/store/prefix"
@@ -9,6 +8,10 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	raccoon "github.com/sourcenetwork/raccoondb"
+	"github.com/sourcenetwork/raccoondb/v2/iterator"
+	"github.com/sourcenetwork/raccoondb/v2/store"
+	"github.com/sourcenetwork/raccoondb/v2/stores"
+	"github.com/sourcenetwork/raccoondb/v2/table"
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -27,6 +30,7 @@ func (i *registrationIder) Id(obj *types.RegistrationsCommitment) []byte {
 var _ CommitmentRepository = (*KVRegistrationRepository)(nil)
 
 func NewKVRegistrationRepository(kv storetypes.KVStore) CommitmentRepository {
+	table.New
 	objsKv := prefix.NewStore(kv, []byte(commitmentObjsPrefix))
 	counterKv := prefix.NewStore(kv, []byte(eventsPrefix))
 
@@ -42,8 +46,11 @@ func NewKVRegistrationRepository(kv storetypes.KVStore) CommitmentRepository {
 }
 
 type KVRegistrationRepository struct {
-	store   raccoon.ObjectStore[*types.RegistrationsCommitment]
-	counter raccoon.CounterStore
+	store     raccoon.ObjectStore[*types.RegistrationsCommitment]
+	counter   raccoon.CounterStore
+	table     table.Table[types.RegistrationsCommitment]
+	commIndex table.IndexReader[types.RegistrationsCommitment, []byte]
+	timeIdx   table.IndexReader[types.RegistrationsCommitment, string]
 }
 
 func (r *KVRegistrationRepository) wrapErr(err error) error {
@@ -59,49 +66,45 @@ func (r *KVRegistrationRepository) IncrementId(ctx context.Context) (uint64, err
 }
 
 func (r *KVRegistrationRepository) Set(ctx context.Context, reg *types.RegistrationsCommitment) error {
+	r.table.Set(ctx, []byte(reg.Id), *reg)
 	err := r.store.SetObject(reg)
 	return r.wrapErr(err)
 }
 
 func (r *KVRegistrationRepository) GetById(ctx context.Context, id string) (*types.RegistrationsCommitment, error) {
-	opt, err := r.store.GetObject([]byte(id))
+	opt, err := r.table.Get(ctx, []byte(id))
 	if err != nil {
 		return nil, r.wrapErr(err)
 	}
-	if opt.IsEmpty() {
+	if opt.Empty() {
 		return nil, nil
 	}
-	return opt.Value(), nil
+	reg := opt.GetValue()
+	return &reg, nil
 }
 
-func (r *KVRegistrationRepository) FilterByCommitment(ctx context.Context, commitment []byte) ([]*types.RegistrationsCommitment, error) {
-	// FIXME update raccoon store schema
-	recs, err := r.store.Filter(func(rc *types.RegistrationsCommitment) bool {
-		return bytes.Equal(rc.Commitment, commitment)
-	})
+func (r *KVRegistrationRepository) FilterByCommitment(ctx context.Context, commitment []byte) ([]types.RegistrationsCommitment, error) {
+	keyIter, err := r.commIndex.IterateKeys(ctx, &commitment, stores.NewOpenIterator())
 	if err != nil {
-		return nil, r.wrapErr(err)
+		return nil, err
 	}
-	return recs, nil
+	iter := table.MaterializeObjects(ctx, &r.table, keyIter)
+	vals, errs := iterator.Consume(ctx, iter)
+	if err != nil {
+		return nil, errs[0]
+	}
+	return vals, nil
 }
 
-func (r *KVRegistrationRepository) GetExpiredCommitments(ctx context.Context, now *types.Timestamp) ([]*types.RegistrationsCommitment, error) {
-	var filterErr error = nil
-	records, err := r.store.Filter(func(c *types.RegistrationsCommitment) bool {
-		expired, err := types.IsAfter(c.CreationTs, c.Validity, now)
-		if err != nil {
-			filterErr = errors.NewFromBaseError(err, errors.ErrorType_INTERNAL,
-				"comparing timestamp for commitment failed",
-				errors.Pair("commitment", c.Id),
-			)
-		}
-		return expired
-	})
-	if filterErr != nil {
-		return nil, errors.Wrap("filtering expired commitments", filterErr)
-	}
+func (r *KVRegistrationRepository) GetExpiredCommitments(ctx context.Context, now *types.Timestamp) ([]types.RegistrationsCommitment, error) {
+	var end []byte // todo marshal now
+	param := store.NewBoundIterator(nil, end)
+	keysIter, err := r.timeIdx.Iterate(ctx, param)
+
+	iter := table.MaterializeObjects(ctx, &r.table, keysIter)
+	vals, errs := iterator.Consume(ctx, iter)
 	if err != nil {
-		return nil, errors.Wrap("filtering expired commitments", err)
+		return nil, errs[0]
 	}
-	return records, nil
+	return vals, nil
 }

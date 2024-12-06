@@ -4,7 +4,7 @@ package acp
 import (
 	_ "cosmossdk.io/api/amino"
 	_ "cosmossdk.io/api/cosmos/base/query/v1beta1"
-	acp_core "github.com/sourcenetwork/acp_core/pulsar"
+	acp_core "github.com/sourcenetwork/acp_core/pkg/pulsar/types"
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
 	_ "github.com/cosmos/gogoproto/gogoproto"
