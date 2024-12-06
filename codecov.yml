@@ -1,0 +1,13 @@
+coverage:
+  ignore:
+    - "api/*"
+    - "data/*"
+    - "devnet/*"
+    - "docs/*"
+    - "example/*"
+    - "manual/*"
+    - "proto/*"
+    - "scripts/*"
+    - "testutil/*"
+    - "**/*.pb.go"
+    - "**/*_test.go"
