@@ -9,3 +9,5 @@ coverage:
     - "proto/*"
     - "scripts/*"
     - "testutil/*"
+    - "**/*.pb.go"
+    - "**/*_test.go"
