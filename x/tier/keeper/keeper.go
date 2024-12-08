@@ -89,6 +89,8 @@ func (k Keeper) Logger() log.Logger {
 // CompleteUnlocking completes the unlocking process for all lockups that have reached their unlock time.
 // It is called at the end of each Epoch.
 func (k Keeper) CompleteUnlocking(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
 		if sdk.UnwrapSDKContext(ctx).BlockTime().Before(*lockup.UnlockTime) {
 			fmt.Printf("Unlock time not reached for %s/%s\n", delAddr, valAddr)
@@ -112,6 +114,16 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 
 		k.removeUnlockingLockup(ctx, delAddr, valAddr)
 
+		sdkCtx.EventManager().EmitEvent(
+			sdk.NewEvent(
+				types.EventTypeCompleteUnlocking,
+				sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
+				sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
+				sdk.NewAttribute(sdk.AttributeKeyAmount, lockup.Amount.String()),
+				sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
+			),
+		)
+
 		return nil
 	}
 
@@ -125,6 +137,8 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 
 // Lock locks the stake of a delegator to a validator.
 func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
 		return types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
@@ -155,6 +169,15 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 		return errorsmod.Wrap(err, "mint credit")
 	}
 
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeLock,
+			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
+			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+		),
+	)
+
 	return nil
 }
 
@@ -163,13 +186,13 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
 	unbondTime time.Time, unlockTime time.Time, creationHeight int64, err error) {
 
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	creationHeight = sdkCtx.BlockHeight()
+
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
 		return time.Time{}, time.Time{}, 0, types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
 	}
-
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	creationHeight = sdkCtx.BlockHeight()
 
 	err = k.SubtractLockup(ctx, delAddr, valAddr, amt)
 	if err != nil {
@@ -206,6 +229,18 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 
 	k.SetLockup(ctx, true, delAddr, valAddr, amt, creationHeight, &unbondTime, &unlockTime)
 
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUnlock,
+			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
+			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+			sdk.NewAttribute(types.AttributeKeyUnbondTime, unbondTime.String()),
+			sdk.NewAttribute(types.AttributeKeyUnlockTime, unlockTime.String()),
+			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
+		),
+	)
+
 	return unbondTime, unlockTime, creationHeight, nil
 }
 
@@ -213,6 +248,8 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 // The redelegation will be completed after the unbonding period has passed.
 func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress, amt math.Int) (
 	completionTime time.Time, err error) {
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	err = k.SubtractLockup(ctx, delAddr, srcValAddr, amt)
 	if err != nil {
@@ -232,6 +269,17 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "begin redelegation")
 	}
+
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeRedelegate,
+			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
+			sdk.NewAttribute(types.AttributeKeySourceValidator, srcValAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyDestinationValidator, dstValAddr.String()),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.String()),
+		),
+	)
 
 	return completionTime, nil
 }
