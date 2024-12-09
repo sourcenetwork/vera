@@ -285,7 +285,7 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 }
 
 // CancelUnlocking effectively cancels the pending unlocking lockup.
-func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt math.Int) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	// use the module account address when interacting with unbonding delegations
@@ -301,14 +301,14 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 		return errorsmod.Wrapf(err, "unbonding delegation not found for delegator %s and validator %s", modAddr, valAddr)
 	}
 
-	// search for the unbonding delegation entry that matches the amount and ensure it's valid
+	// find unbonding delegation entry by CreationHeight
 	var (
 		unbondEntryIndex int64 = -1
 		unbondEntry      stakingtypes.UnbondingDelegationEntry
 	)
 
 	for i, entry := range ubd.Entries {
-		if entry.Balance.GTE(amt) && entry.CompletionTime.After(sdkCtx.BlockTime()) {
+		if entry.CreationHeight == creationHeight && entry.CompletionTime.After(sdkCtx.BlockTime()) {
 			unbondEntryIndex = int64(i)
 			unbondEntry = entry
 			break
@@ -316,21 +316,31 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	}
 
 	if unbondEntryIndex == -1 {
-		return errorsmod.Wrapf(stakingtypes.ErrNoUnbondingDelegation, "no valid unbonding entry found for amount %s", amt)
+		return errorsmod.Wrapf(
+			stakingtypes.ErrNoUnbondingDelegation,
+			"no valid unbonding entry found for creation height %d",
+			creationHeight,
+		)
 	}
 
-	_, err = k.stakingKeeper.Delegate(ctx, modAddr, amt, stakingtypes.Unbonding, validator, false)
+	// if amt is zero, revert entire UnbondingDelegationEntry. Otherwise, revert the specified amt.
+	restoreAmount := amt
+	if restoreAmount.IsZero() {
+		restoreAmount = unbondEntry.Balance
+	}
+
+	_, err = k.stakingKeeper.Delegate(ctx, modAddr, restoreAmount, stakingtypes.Unbonding, validator, false)
 	if err != nil {
 		return errorsmod.Wrap(err, "failed to delegate tokens back to validator")
 	}
 
 	// update or remove the unbonding delegation entry
-	remainingBalance := unbondEntry.Balance.Sub(amt)
+	remainingBalance := unbondEntry.Balance.Sub(restoreAmount)
 	if remainingBalance.IsZero() {
 		ubd.RemoveEntry(unbondEntryIndex)
 	} else {
 		unbondEntry.Balance = remainingBalance
-		unbondEntry.InitialBalance = unbondEntry.InitialBalance.Sub(amt)
+		unbondEntry.InitialBalance = unbondEntry.InitialBalance.Sub(restoreAmount)
 		ubd.Entries[unbondEntryIndex] = unbondEntry
 	}
 
@@ -344,14 +354,15 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 		return errorsmod.Wrap(err, "failed to update unbonding delegation")
 	}
 
-	k.AddLockup(ctx, delAddr, valAddr, amt)
+	k.AddLockup(ctx, delAddr, valAddr, restoreAmount)
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeCancelUnlocking,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, restoreAmount.String()),
+			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
 		),
 	)
 

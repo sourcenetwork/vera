@@ -68,7 +68,7 @@ func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlo
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.Stake.Amount)
+	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.CreationHeight, msg.Stake.Amount)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "cancel unlocking")
 	}

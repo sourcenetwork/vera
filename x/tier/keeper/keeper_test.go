@@ -255,7 +255,7 @@ func TestCancelUnlocking(t *testing.T) {
 	require.Equal(t, unlockTime, unlTime)
 
 	// cancel (remove) the unlocking lockup
-	err = k.CancelUnlocking(ctx, delAddr, valAddr, adjustedUnlockAmount)
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, adjustedUnlockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was updated
