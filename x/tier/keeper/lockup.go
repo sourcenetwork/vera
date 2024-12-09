@@ -150,12 +150,19 @@ func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr s
 func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
 
-	lockedAmt, err := lockedAmt.SafeSub(amt)
+	// remove lockup record completely if subtracted amt is equal to lockedAmt
+	if amt.Equal(lockedAmt) {
+		k.removeLockup(ctx, delAddr, valAddr)
+		return nil
+	}
+
+	// subtract amt from the lockedAmt othwerwise
+	newAmt, err := lockedAmt.SafeSub(amt)
 	if err != nil {
 		return errorsmod.Wrapf(err, "subtract %s from locked amount %s", amt, lockedAmt)
 	}
 
-	k.SetLockup(ctx, false, delAddr, valAddr, lockedAmt, sdk.UnwrapSDKContext(ctx).BlockHeight(), nil, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr, newAmt, sdk.UnwrapSDKContext(ctx).BlockHeight(), nil, nil)
 
 	return nil
 }
