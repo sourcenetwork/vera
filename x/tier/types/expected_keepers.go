@@ -26,6 +26,8 @@ type StakingKeeper interface {
 		sharesAmount math.LegacyDec) (completionTime time.Time, err error)
 	BondDenom(ctx context.Context) (string, error)
 	GetValidator(ctx context.Context, addr sdk.ValAddress) (validator stakingtypes.Validator, err error)
+	IterateValidators(context.Context, func(index int64, validator stakingtypes.ValidatorI) (stop bool)) error
+	TotalBondedTokens(context.Context) (math.Int, error)
 	ValidateUnbondAmount(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
 		shares math.LegacyDec, err error)
 	GetUnbondingDelegation(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (
