@@ -202,3 +202,32 @@ func TestIterateLockups(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 3, unlockingLockupsCount)
 }
+
+func TestTotalAmountByAddr(t *testing.T) {
+	k, ctx := testutil.SetupKeeper(t)
+
+	delAddr1, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	delAddr2, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(1000))
+	k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(500))
+	k.AddLockup(ctx, delAddr2, valAddr2, math.NewInt(700))
+
+	totalDel1 := k.TotalAmountByAddr(ctx, delAddr1)
+	require.Equal(t, math.NewInt(1500), totalDel1, "delAddr1 should have a total of 1500")
+
+	totalDel2 := k.TotalAmountByAddr(ctx, delAddr2)
+	require.Equal(t, math.NewInt(700), totalDel2, "delAddr2 should have a total of 700")
+
+	delAddr3, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
+	require.NoError(t, err)
+	totalDel3 := k.TotalAmountByAddr(ctx, delAddr3)
+	require.True(t, totalDel3.IsZero(), "delAddr3 should have no lockups")
+}

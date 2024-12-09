@@ -164,8 +164,8 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 func (k Keeper) TotalAmountByAddr(ctx context.Context, delAddr sdk.AccAddress) math.Int {
 	amt := math.ZeroInt()
 
-	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
-		if delAddr.Equals(delAddr) {
+	cb := func(d sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
+		if d.Equals(delAddr) {
 			amt = amt.Add(lockup.Amount)
 		}
 	}
