@@ -16,7 +16,7 @@ func TestEndBlocker(t *testing.T) {
 
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
 	err := repo.Set(ctx, &types.RegistrationsCommitment{
-		Id:         "1",
+		Id:         1,
 		PolicyId:   "abc",
 		Actor:      coretypes.NewActor("abc"),
 		Commitment: []byte("0"),

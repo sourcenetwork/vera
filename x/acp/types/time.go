@@ -23,6 +23,14 @@ func NewDurationFromTimeDuration(duration time.Duration) *Duration {
 	}
 }
 
+func (ts *Timestamp) ToISOString() (string, error) {
+	t, err := prototypes.TimestampFromProto(ts.ProtoTs)
+	if err != nil {
+		return "", err
+	}
+	return t.Format(time.RFC3339), nil
+}
+
 // IsAfter returns whether now is after ts + duration
 func IsAfter(ts *Timestamp, duration *Duration, now *Timestamp) (bool, error) {
 	switch d := duration.Duration.(type) {

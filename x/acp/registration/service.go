@@ -1,7 +1,6 @@
 package registration
 
 import (
-	"fmt"
 	"slices"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,6 +8,8 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	acputils "github.com/sourcenetwork/acp_core/pkg/utils"
+	"github.com/sourcenetwork/raccoondb/v2/iterator"
+	rctypes "github.com/sourcenetwork/raccoondb/v2/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
@@ -29,18 +30,13 @@ type EventService struct {
 
 // NewEvent creates and stores a new ObjectStatusEvents with the given information
 func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEventType, polId string, object *coretypes.Object, actor *coretypes.Actor, detail *types.EventDetail) (*types.ObjectRegistrationEvent, error) {
-	id, err := s.repo.IncrementId(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	ts, err := types.TimestampFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	event := &types.ObjectRegistrationEvent{
-		Id:       fmt.Sprintf("%v", id),
+		Id:       0,
 		Type:     t,
 		TxHash:   utils.HashTx(ctx.TxBytes()),
 		Ts:       ts,
@@ -50,7 +46,7 @@ func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 		Detail:   detail,
 	}
 
-	err = s.repo.Set(ctx, event)
+	err = s.repo.Create(ctx, event)
 	if err != nil {
 		return nil, err
 	}
@@ -58,17 +54,21 @@ func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 	return event, nil
 }
 
-func (s *EventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string, object *coretypes.Object) (*types.ObjectRegistrationEvent, error) {
-	evs, err := s.repo.GetObjectEvents(ctx, polId, object)
+func (s *EventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string, object *coretypes.Object) (rctypes.Option[*types.ObjectRegistrationEvent], error) {
+	iter, err := s.repo.GetObjectEvents(ctx, polId, object)
 	if err != nil {
-		return nil, err
+		return rctypes.None[*types.ObjectRegistrationEvent](), err
 	}
-	evs = acputils.FilterSlice(evs, func(ev *types.ObjectRegistrationEvent) bool {
+	iter = iterator.Filter(iter, func(ev *types.ObjectRegistrationEvent) bool {
 		return slices.Contains(types.ObjectClaimEvents, ev.Type)
 	})
 
+	evs, err := iterator.Consume(ctx, iter)
+	if err != nil {
+		return rctypes.None[*types.ObjectRegistrationEvent](), err
+	}
 	if len(evs) == 0 {
-		return nil, nil
+		return rctypes.None[*types.ObjectRegistrationEvent](), nil
 	}
 
 	// ACP should maintain an invariant where, after the first claim event,
@@ -79,14 +79,19 @@ func (s *EventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string,
 	})
 	sortable.SortInPlace()
 
-	return evs[0], nil
+	return rctypes.Some(evs[0]), nil
 }
 
-func (s *EventService) FlagHijackEvent(ctx sdk.Context, eventId string, actor *coretypes.Actor) (*types.ObjectRegistrationEvent, error) {
-	event, err := s.repo.GetById(ctx, eventId)
+func (s *EventService) FlagHijackEvent(ctx sdk.Context, eventId uint64, actor *coretypes.Actor) (*types.ObjectRegistrationEvent, error) {
+	opt, err := s.repo.GetById(ctx, eventId)
 	if err != nil {
 		return nil, err
 	}
+	if opt.Empty() {
+		return nil, errors.Wrap("event not found", errors.ErrorType_NOT_FOUND, errors.Pair("event", eventId))
+	}
+
+	event := opt.GetValue()
 	if event.Type != types.ObjectRegistrationEventType_AMENDMENT {
 		return nil, errors.Wrap("event must be of type AMENDMENT", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("event", eventId),
@@ -152,9 +157,8 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 	}
 
 	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
-		PolicyId:     polId,
-		Object:       object,
-		CreationTime: ev.Ts.ProtoTs,
+		PolicyId: polId,
+		Object:   object,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -194,9 +198,8 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 	}
 
 	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
-		PolicyId:     polId,
-		Object:       object,
-		CreationTime: ev.Ts.ProtoTs,
+		PolicyId: polId,
+		Object:   object,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -208,20 +211,21 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *types.RegistrationsCommitment, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	// FIXME this name is bad because due to how i called all events are registration events.
 	// refactor event to simply ObjectEvent
-	event, err := s.eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, object)
+	opt, err := s.eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, object)
 	if err != nil {
 		return nil, nil, err
 	}
 	// this shouldn't happen because the object was verified
 	// to be registered beforehand.
 	// return an internal error if it ever does
-	if event == nil {
+	if opt.Empty() {
 		return nil, nil, errors.Wrap("no registration event for object", errors.ErrorType_INTERNAL,
 			errors.Pair("policy", commitment.PolicyId),
 			errors.Pair("resource", object.Resource),
 			errors.Pair("id", object.Id))
 	}
 
+	event := opt.GetValue()
 	claimTs := event.Ts
 	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
 		claimTs = event.Detail.GetRevealEvent().CommitmentTimestamp
@@ -291,18 +295,13 @@ func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId strin
 		return nil, newErrInvalidCommitment(policyId, commitment)
 	}
 
-	id, err := s.repository.IncrementId(ctx)
-	if err != nil {
-		return nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "fail generating commitment id")
-	}
-
 	now, err := types.TimestampFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	registration := &types.RegistrationsCommitment{
-		Id:         fmt.Sprintf("%v", id),
+		Id:         0,
 		PolicyId:   policyId,
 		Actor:      actor,
 		Commitment: commitment,
@@ -312,7 +311,7 @@ func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId strin
 		Validity:   params.RegistrationsCommitmentValidity,
 	}
 
-	err = s.repository.Set(ctx, registration)
+	err = s.repository.Create(ctx, registration)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +326,11 @@ func (s *RegistrationService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.
 	if err != nil {
 		return nil, err
 	}
-	commitments, err := s.repository.GetExpiredCommitments(ctx, now)
+	iter, err := s.repository.GetExpiredCommitments(ctx, now)
+	if err != nil {
+		return nil, err
+	}
+	commitments, err := iterator.Consume(ctx, iter)
 	if err != nil {
 		return nil, err
 	}
@@ -346,16 +349,17 @@ func (s *RegistrationService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.
 	return commitments, nil
 }
 
-func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId string, proof *types.RegistrationProof, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
-	commitment, err := s.repository.GetById(ctx, commitmentId)
+func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	opt, err := s.repository.GetById(ctx, commitmentId)
 	if err != nil {
 		return nil, nil, err
 	}
-	if commitment == nil {
+	if opt.Empty() {
 		return nil, nil, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
 			errors.Pair("id", commitmentId))
 	}
 
+	commitment := opt.GetValue()
 	now, err := types.TimestampFromCtx(ctx)
 	if err != nil {
 		return nil, nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
@@ -421,5 +425,4 @@ func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId strin
 	}
 
 	return GenerateCommitmentWithoutValidation(policyId, actor, objects)
-
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
+	"github.com/sourcenetwork/raccoondb/v2/iterator"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,11 +14,15 @@ func (k Keeper) ListObjectEvents(goCtx context.Context, req *types.QueryListObje
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var repo registration.RegistrationEventRepository
-	events, err := repo.GetObjectEvents(ctx, req.PolicyId, req.Object)
+	repo := k.GetObjectEventRepository(ctx)
+	iter, err := repo.GetObjectEvents(ctx, req.PolicyId, req.Object)
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := iterator.Consume(ctx, iter)
 	if err != nil {
 		return nil, err
 	}

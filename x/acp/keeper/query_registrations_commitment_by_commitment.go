@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
+	"github.com/sourcenetwork/raccoondb/v2/iterator"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -14,12 +14,16 @@ func (k Keeper) RegistrationsCommitmentByCommitment(goCtx context.Context, req *
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-
-	var repo registration.CommitmentRepository = nil
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	commitments, err := repo.FilterByCommitment(ctx, req.Commitment)
+	repo := k.GetRegistrationsCommitmentRepository(ctx)
+
+	iter, err := repo.FilterByCommitment(ctx, req.Commitment)
+	if err != nil {
+		return nil, err
+	}
+
+	commitments, err := iterator.Consume(ctx, iter)
 	if err != nil {
 		return nil, err
 	}

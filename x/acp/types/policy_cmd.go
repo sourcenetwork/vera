@@ -52,7 +52,7 @@ func NewCommitRegistrationCmd(commitment []byte) *PolicyCmd {
 	}
 }
 
-func NewRevealRegistrationCmd(commitmentId string, proof *RegistrationProof) *PolicyCmd {
+func NewRevealRegistrationCmd(commitmentId uint64, proof *RegistrationProof) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_RevealRegistrationCmd{
 			RevealRegistrationCmd: &RevealRegistrationCmd{
@@ -63,7 +63,7 @@ func NewRevealRegistrationCmd(commitmentId string, proof *RegistrationProof) *Po
 	}
 }
 
-func NewFlagHijackAttemptCmd(eventId string) *PolicyCmd {
+func NewFlagHijackAttemptCmd(eventId uint64) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_FlagHijackAttemptCmd{
 			FlagHijackAttemptCmd: &FlagHijackAttemptCmd{

@@ -33,10 +33,9 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 	txHash := hex.EncodeToString(tx.Hash())
 
 	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
-		Policy:       msg.Policy,
-		MarshalType:  msg.MarshalType,
-		CreationTime: msg.CreationTime,
-		Metadata: map[string]string{
+		Policy:      msg.Policy,
+		MarshalType: msg.MarshalType,
+		Attributes: map[string]string{
 			txHashMapKey:  txHash,
 			creatorMapKey: msg.Creator,
 		},

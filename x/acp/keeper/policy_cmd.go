@@ -35,7 +35,6 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 	case *types.PolicyCmd_SetRelationshipCmd:
 		resp, respErr := engine.SetRelationship(goCtx, &coretypes.SetRelationshipRequest{
 			PolicyId:     policyId,
-			CreationTime: ts,
 			Relationship: c.SetRelationshipCmd.Relationship,
 		})
 		if respErr != nil {

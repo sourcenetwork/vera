@@ -91,7 +91,7 @@ message CommitRegistrationsCmdResult {
 }
 
 message RevealRegistrationCmd {
-  string registrations_commitment_id = 1;
+  uint64 registrations_commitment_id = 1;
   RegistrationProof proof = 2;
 }
 
@@ -109,7 +109,7 @@ message RevealRegistrationCmdResult {
 }
 
 message FlagHijackAttemptCmd {
-  string event_id = 1;
+  uint64 event_id = 1;
 }
 
 message FlagHijackAttemptCmdResult {

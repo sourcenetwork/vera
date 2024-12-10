@@ -19,7 +19,7 @@ enum ObjectRegistrationEventType {
 }
 
 message ObjectRegistrationEvent {
-    string id = 1;
+    uint64 id = 1;
     ObjectRegistrationEventType type = 2;
     bytes tx_hash = 3;
     string policy_id = 4;
@@ -39,12 +39,12 @@ message EventDetail {
 message AmendmentEventDetail {
     bool hijack_flag = 1;
     sourcenetwork.acp_core.Actor previous_owner = 2;
-    string reveal_registration_event_id = 3;
+    uint64 reveal_registration_event_id = 3;
     Timestamp commitment_timestamp = 4;
 }
 
 message RevealRegistrationDetail {
     // id of the registration commitment which originally registered the relationship
-    string registration_commitment_id = 1;
+    uint64 registration_commitment_id = 1;
     Timestamp commitment_timestamp = 2;
 }

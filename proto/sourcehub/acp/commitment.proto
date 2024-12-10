@@ -23,7 +23,7 @@ message RegistrationProof {
 // RegistrationsCommitment models a batched cryptographic commitment
 // of a set of Object registrations issued by an Actor
 message RegistrationsCommitment {
-    string id = 1;
+    uint64 id = 1;
     string policy_id = 2;
     sourcenetwork.acp_core.Actor actor = 3;
 
