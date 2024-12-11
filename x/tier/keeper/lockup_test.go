@@ -19,17 +19,23 @@ func init() {
 func TestSetAndGetLockup(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
 
-	amount := math.NewInt(1000)
+	now := time.Now()
+	params := k.GetParams(ctx)
+	epochDuration := *params.EpochDuration
 	creationHeight := int64(10)
-	unbondTime := time.Now().Add(1 * time.Hour)
-	unlockTime := time.Now().Add(2 * time.Hour)
+	amount := math.NewInt(1000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.Nil(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.Nil(t, err)
 
-	k.SetLockup(ctx, false, delAddr, valAddr, amount, creationHeight, &unbondTime, &unlockTime)
+	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
+
+	unbondTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	unlockTime := unbondTime
+
+	k.SetLockup(ctx, false, delAddr, valAddr, amount, nil)
 
 	store := k.GetAllLockups(ctx)
 	require.Len(t, store, 1)
@@ -97,11 +103,11 @@ func TestGetAllLockups(t *testing.T) {
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.Nil(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.Nil(t, err)
 
-	k.SetLockup(ctx, false, delAddr1, valAddr1, amount1, 1, nil, nil)
-	k.SetLockup(ctx, false, delAddr2, valAddr2, amount2, 2, nil, nil)
+	k.SetLockup(ctx, false, delAddr1, valAddr1, amount1, nil)
+	k.SetLockup(ctx, false, delAddr2, valAddr2, amount2, nil)
 
 	lockups := k.GetAllLockups(ctx)
 	require.Len(t, lockups, 2)
@@ -145,10 +151,7 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.Nil(t, err)
 
-	unbondTime := time.Now().Add(24 * time.Hour)
-	unlockTime := time.Now().Add(48 * time.Hour)
-
-	k.SetLockup(ctx, true, delAddr, valAddr, amount, 1, &unbondTime, &unlockTime)
+	k.SetLockup(ctx, true, delAddr, valAddr, amount, nil)
 
 	count := 0
 	k.MustIterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) {
@@ -172,17 +175,21 @@ func TestIterateLockups(t *testing.T) {
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.Nil(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.Nil(t, err)
 
-	k.SetLockup(ctx, false, delAddr1, valAddr1, math.NewInt(1000), 1, nil, nil)
-	k.SetLockup(ctx, false, delAddr2, valAddr2, math.NewInt(500), 2, nil, nil)
+	ctx = ctx.WithBlockHeight(1)
+	k.SetLockup(ctx, false, delAddr1, valAddr1, math.NewInt(1000), nil)
+	k.SetLockup(ctx, false, delAddr2, valAddr2, math.NewInt(500), nil)
 
-	unbondTime := time.Now().Add(24 * time.Hour)
-	unlockTime := time.Now().Add(48 * time.Hour)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), 3, &unbondTime, &unlockTime)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), 4, &unbondTime, &unbondTime)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), 5, &unbondTime, &unbondTime)
+	ctx = ctx.WithBlockHeight(2)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
+
+	ctx = ctx.WithBlockHeight(3)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
+
+	ctx = ctx.WithBlockHeight(4)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
 
 	lockupsCount := 0
 	err = k.IterateLockups(ctx, false, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
@@ -219,7 +226,7 @@ func TestTotalAmountByAddr(t *testing.T) {
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.NoError(t, err)
 
 	k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(1000))
@@ -259,17 +266,23 @@ func TestHasLockup(t *testing.T) {
 func TestGetUnlockingLockup(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
 
+	now := time.Now()
+	params := k.GetParams(ctx)
+	epochDuration := *params.EpochDuration
+	creationHeight := int64(10)
+	amount := math.NewInt(300)
+
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
-	creationHeight := int64(42)
-	amount := math.NewInt(300)
-	unbondTime := time.Now().Add(24 * time.Hour).UTC()
-	unlockTime := time.Now().Add(48 * time.Hour).UTC()
+	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	k.SetLockup(ctx, true, delAddr, valAddr, amount, creationHeight, &unbondTime, &unlockTime)
+	unbondTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	unlockTime := unbondTime
+
+	k.SetLockup(ctx, true, delAddr, valAddr, amount, nil)
 
 	found, amt, gotUnbondTime, gotUnlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found, "unlocking lockup should be found")
@@ -282,4 +295,73 @@ func TestGetUnlockingLockup(t *testing.T) {
 	require.True(t, amt.IsZero(), "amount should be zero")
 	require.True(t, gotUnbondTime.IsZero(), "unbond time should be zero")
 	require.True(t, gotUnlockTime.IsZero(), "unlock time should be zero")
+}
+
+func TestGetLockup(t *testing.T) {
+	k, ctx := testutil.SetupKeeper(t)
+
+	now := time.Now()
+	creationHeight := int64(10)
+	amount := math.NewInt(1000)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
+
+	params := k.GetParams(ctx)
+	unbondTime := ctx.BlockTime().Add(*params.EpochDuration * time.Duration(params.UnlockingEpochs))
+	unlockTime := unbondTime
+
+	k.SetLockup(ctx, false, delAddr, valAddr, amount, nil)
+
+	lockup := k.GetLockup(ctx, delAddr, valAddr)
+
+	require.NotNil(t, lockup, "lockup should exist")
+	require.Equal(t, delAddr.String(), lockup.DelegatorAddress, "delegator address should match")
+	require.Equal(t, valAddr.String(), lockup.ValidatorAddress, "validator address should match")
+	require.Equal(t, amount, lockup.Amount, "amount should match")
+	require.Equal(t, creationHeight, lockup.CreationHeight, "creation height should match")
+	require.Equal(t, unbondTime.UTC(), *lockup.UnbondTime, "unbond time should match")
+	require.Equal(t, unlockTime.UTC(), *lockup.UnlockTime, "unlock time should match")
+
+	nonExistentValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	require.NoError(t, err)
+
+	nonExistentLockup := k.GetLockup(ctx, delAddr, nonExistentValAddr)
+	require.Nil(t, nonExistentLockup, "lockup should not exist for the given validator")
+}
+
+func TestGetLockups(t *testing.T) {
+	k, ctx := testutil.SetupKeeper(t)
+
+	amount1 := math.NewInt(1000)
+	amount2 := math.NewInt(500)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	require.NoError(t, err)
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	ctx = ctx.WithBlockHeight(10).WithBlockTime(time.Now())
+	k.SetLockup(ctx, false, delAddr, valAddr1, amount1, nil)
+
+	ctx = ctx.WithBlockHeight(11).WithBlockTime(time.Now().Add(time.Minute))
+	k.SetLockup(ctx, false, delAddr, valAddr2, amount2, nil)
+
+	lockups := k.GetLockups(ctx, delAddr)
+
+	require.Len(t, lockups, 2, "delegator should have 2 lockups")
+
+	require.Equal(t, delAddr.String(), lockups[0].DelegatorAddress)
+	require.Equal(t, valAddr1.String(), lockups[0].ValidatorAddress)
+	require.Equal(t, amount1, lockups[0].Amount)
+
+	require.Equal(t, delAddr.String(), lockups[1].DelegatorAddress)
+	require.Equal(t, valAddr2.String(), lockups[1].ValidatorAddress)
+	require.Equal(t, amount2, lockups[1].Amount)
 }
