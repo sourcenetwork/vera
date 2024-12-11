@@ -112,7 +112,7 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 			return errorsmod.Wrapf(err, "undelegate coins to %s for amount %s", delAddr, stake)
 		}
 
-		k.removeUnlockingLockup(ctx, delAddr, valAddr)
+		k.removeUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 
 		sdkCtx.EventManager().EmitEvent(
 			sdk.NewEvent(
@@ -187,7 +187,7 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 	unbondTime time.Time, unlockTime time.Time, creationHeight int64, err error) {
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	creationHeight = sdkCtx.BlockHeight()
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
@@ -198,12 +198,6 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 	if err != nil {
 		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "subtract lockup")
 	}
-
-	params := k.GetParams(ctx)
-	epochDuration := params.EpochDuration
-	unlockingDuration := time.Duration(params.UnlockingEpochs) * *epochDuration
-	unlockTime = sdkCtx.BlockTime().Add(unlockingDuration)
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, valAddr, amt)
 	if err != nil {
@@ -225,9 +219,7 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "undelegate")
 	}
 
-	k.removeLockup(ctx, delAddr, valAddr)
-
-	k.SetLockup(ctx, true, delAddr, valAddr, amt, creationHeight, &unbondTime, &unlockTime)
+	creationHeight, _, unlockTime = k.SetLockup(ctx, true, delAddr, valAddr, amt, &unbondTime)
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -284,8 +276,10 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	return completionTime, nil
 }
 
-// CancelUnlocking effectively cancels the pending unlocking lockup.
-func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt math.Int) error {
+// CancelUnlocking effectively cancels the pending unlocking lockup partially or in full.
+// Reverts the specified amt if a valid value is provided (e.g. amt != nil && 0 < amt < unbondEntry.Balance).
+// Otherwise, cancels unlocking lockup record in full (e.g. unbondEntry.Balance).
+func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt *math.Int) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	// use the module account address when interacting with unbonding delegations
@@ -302,6 +296,7 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	}
 
 	// find unbonding delegation entry by CreationHeight
+	// TODO: handle edge case with 2+ messages at the same height
 	var (
 		unbondEntryIndex int64 = -1
 		unbondEntry      stakingtypes.UnbondingDelegationEntry
@@ -323,10 +318,10 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 		)
 	}
 
-	// if amt is zero, revert entire UnbondingDelegationEntry. Otherwise, revert the specified amt.
-	restoreAmount := amt
-	if restoreAmount.IsZero() {
-		restoreAmount = unbondEntry.Balance
+	// revert the specified amt if set and is positive, otherwise revert the entire UnbondingDelegationEntry
+	restoreAmount := unbondEntry.Balance
+	if amt != nil && amt.IsPositive() && amt.LT(unbondEntry.Balance) {
+		restoreAmount = *amt
 	}
 
 	_, err = k.stakingKeeper.Delegate(ctx, modAddr, restoreAmount, stakingtypes.Unbonding, validator, false)
@@ -354,6 +349,10 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 		return errorsmod.Wrap(err, "failed to update unbonding delegation")
 	}
 
+	// remove unlocking lockup if no amt was specified (e.g. no partial unlocking lockup cancelation)
+	k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, restoreAmount)
+
+	// add restoreAmount back to the lockup (without modifying the unlock/unbond times)
 	k.AddLockup(ctx, delAddr, valAddr, restoreAmount)
 
 	sdkCtx.EventManager().EmitEvent(
