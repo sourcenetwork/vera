@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/app"
@@ -68,26 +69,36 @@ func TestAddLockup(t *testing.T) {
 func TestSubtractLockup(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
 
-	amount := math.NewInt(1000)
+	lockupAmount := math.NewInt(1000)
+	partialSubtractAmount := math.NewInt(500)
+	invalidSubtractAmount := math.NewInt(2000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.Nil(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.Nil(t, err)
 
-	k.AddLockup(ctx, delAddr, valAddr, amount)
+	k.AddLockup(ctx, delAddr, valAddr, lockupAmount)
 
-	err = k.SubtractLockup(ctx, delAddr, valAddr, math.NewInt(500))
+	// subtract a partial amount
+	err = k.SubtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
 	require.NoError(t, err)
 
-	lockupAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, math.NewInt(500), lockupAmt)
+	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, partialSubtractAmount, lockedAmt)
 
-	err = k.SubtractLockup(ctx, delAddr, valAddr, math.NewInt(500))
+	// attempt to subtract more than the locked amount
+	err = k.SubtractLockup(ctx, delAddr, valAddr, invalidSubtractAmount)
+	require.Error(t, err)
+
+	// subtract the remaining amount
+	err = k.SubtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
 	require.NoError(t, err)
 
-	lockupAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.True(t, lockupAmt.IsZero())
+	// verify that the lockup has been removed
+	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.True(t, lockedAmt.IsZero(), "remaining lockup amount should be zero")
+	require.False(t, k.HasLockup(ctx, delAddr, valAddr), "lockup should be removed")
 }
 
 func TestGetAllLockups(t *testing.T) {
@@ -214,6 +225,11 @@ func TestIterateLockups(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, 3, unlockingLockupsCount)
+
+	err = k.IterateLockups(ctx, false, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
+		return errorsmod.Wrapf(types.ErrNotFound, "not found")
+	})
+	require.Error(t, err)
 }
 
 func TestTotalAmountByAddr(t *testing.T) {
@@ -364,4 +380,41 @@ func TestGetLockups(t *testing.T) {
 	require.Equal(t, delAddr.String(), lockups[1].DelegatorAddress)
 	require.Equal(t, valAddr2.String(), lockups[1].ValidatorAddress)
 	require.Equal(t, amount2, lockups[1].Amount)
+}
+
+func TestSubtractUnlockingLockup(t *testing.T) {
+	k, ctx := testutil.SetupKeeper(t)
+
+	unlockingLockupAmount := math.NewInt(1000)
+	cancelUnlockAmount := math.NewInt(500)
+	cancelUnlockAmount2 := math.NewInt(2000)
+	creationHeight := int64(10)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	ctx = ctx.WithBlockHeight(creationHeight)
+	k.SetLockup(ctx, true, delAddr, valAddr, unlockingLockupAmount, nil)
+
+	// subtract partial amount
+	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
+	require.NoError(t, err)
+
+	found, lockedAmt, _, _ := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.True(t, found)
+	require.Equal(t, cancelUnlockAmount, lockedAmt)
+
+	// try to subtract more than the locked amount
+	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount2)
+	require.Error(t, err)
+
+	// subtract remaining amount
+	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
+	require.NoError(t, err)
+
+	found, lockedAmt, _, _ = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.False(t, found)
+	require.True(t, lockedAmt.IsZero())
 }
