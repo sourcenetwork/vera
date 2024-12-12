@@ -184,6 +184,11 @@ func (suite *KeeperTestSuite) TestUnlock() {
 
 	suite.tierKeeper.SetParams(suite.ctx, params)
 
+	// add a lockup and verify that it exists before trying to unlock
+	suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	lockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, valAddr)
+	suite.Require().Equal(amount, lockedAmt, "expected lockup amount to be set")
+
 	// perform unlock and verify that unlocking lockup is set correctly
 	unbondTime, unlockTime, creationHeight, err := suite.tierKeeper.Unlock(suite.ctx, delAddr, valAddr, amount)
 	suite.Require().NoError(err)

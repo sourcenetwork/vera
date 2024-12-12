@@ -42,7 +42,9 @@ func initializeDelegator(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context, de
 // TestLock verifies that a valid lockup is created on keeper.Lock().
 func TestLock(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
+
 	amount := math.NewInt(1000)
+	invalidAmount := math.NewInt(-100)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -57,6 +59,13 @@ func TestLock(t *testing.T) {
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
+	// locking invalid amounts should fail
+	err = k.Lock(ctx, delAddr, valAddr, invalidAmount)
+	require.Error(t, err)
+	err = k.Lock(ctx, delAddr, valAddr, math.ZeroInt())
+	require.Error(t, err)
+
+	// lock valid amount
 	err = k.Lock(ctx, delAddr, valAddr, amount)
 	require.NoError(t, err)
 
@@ -68,8 +77,10 @@ func TestLock(t *testing.T) {
 // TestUnlock verifies that a valid unlocking lockup is created on keeper.Unock().
 func TestUnlock(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
+
 	lockAmount := math.NewInt(1000)
 	unlockAmount := math.NewInt(500)
+	invalidUnlockAmount := math.NewInt(-500)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -91,6 +102,12 @@ func TestUnlock(t *testing.T) {
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.Equal(t, lockAmount, lockedAmt)
 
+	// unlocking invalid amounts should fail
+	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, invalidUnlockAmount)
+	require.Error(t, err)
+	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, math.ZeroInt())
+	require.Error(t, err)
+
 	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
@@ -109,7 +126,9 @@ func TestUnlock(t *testing.T) {
 // TestRedelegate verifies that a locked amount is correctly redelegated on keeper.Redelegate().
 func TestRedelegate(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
+
 	amount := math.NewInt(1000)
+	invalidAmount := math.NewInt(-100)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -130,6 +149,12 @@ func TestRedelegate(t *testing.T) {
 	// lock tokens with the source validator
 	require.NoError(t, k.Lock(ctx, delAddr, srcValAddr, amount))
 
+	// redelegating invalid amounts should fail
+	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, invalidAmount)
+	require.Error(t, err)
+	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.ZeroInt())
+	require.Error(t, err)
+
 	// redelegate from the source validator to the destination validator
 	completionTime, err := k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.NewInt(500))
 	require.NoError(t, err)
@@ -149,6 +174,7 @@ func TestRedelegate(t *testing.T) {
 // Block time is advanced by 60 days from when keeper.Unlock() is called to make sure that the unlock time is in the past.
 func TestCompleteUnlocking(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
+
 	lockAmount := math.NewInt(123_456)
 	unlockAmount := math.NewInt(123_456)
 
@@ -218,6 +244,7 @@ func TestCompleteUnlocking(t *testing.T) {
 // TestCancelUnlocking verifies that the unlocking lockup is removed on keeper.CancelUnlocking().
 func TestCancelUnlocking(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
+
 	initialAmount := math.NewInt(1000)
 	unlockAmount := math.NewInt(500)
 	partialUnlockAmount := math.NewInt(200)

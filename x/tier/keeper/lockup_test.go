@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
-	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/app"
@@ -227,7 +227,7 @@ func TestIterateLockups(t *testing.T) {
 	require.Equal(t, 3, unlockingLockupsCount)
 
 	err = k.IterateLockups(ctx, false, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
-		return errorsmod.Wrapf(types.ErrNotFound, "not found")
+		return errors.New("not found")
 	})
 	require.Error(t, err)
 }

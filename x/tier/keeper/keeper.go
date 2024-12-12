@@ -137,7 +137,13 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 
 // Lock locks the stake of a delegator to a validator.
 func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	// specified amt must be a positive integer
+	if !amt.IsPositive() {
+		return types.ErrInvalidAmount.Wrap("invalid amount")
+	}
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
@@ -153,7 +159,6 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 	}
 
 	// Delegate the stake to the validator.
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	_, err = k.stakingKeeper.Delegate(ctx, modAddr, stake.Amount, stakingtypes.Unbonded, validator, true)
 	if err != nil {
 		return errorsmod.Wrapf(err, "delegate %s", stake)
@@ -185,6 +190,11 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 // The stake will be unlocked after the unlocking period has passed.
 func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
 	unbondTime time.Time, unlockTime time.Time, creationHeight int64, err error) {
+
+	// specified amt must be a positive integer
+	if !amt.IsPositive() {
+		return time.Time{}, time.Time{}, 0, types.ErrInvalidAmount.Wrap("invalid amount")
+	}
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
@@ -241,7 +251,13 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress, amt math.Int) (
 	completionTime time.Time, err error) {
 
+	// specified amt must be a positive integer
+	if !amt.IsPositive() {
+		return time.Time{}, types.ErrInvalidAmount.Wrap("invalid amount")
+	}
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	err = k.SubtractLockup(ctx, delAddr, srcValAddr, amt)
 	if err != nil {
@@ -249,8 +265,6 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	}
 
 	k.AddLockup(ctx, delAddr, dstValAddr, amt)
-
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, srcValAddr, amt)
 	if err != nil {
@@ -281,8 +295,6 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 // Otherwise, cancels unlocking lockup record in full (e.g. unbondEntry.Balance).
 func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt *math.Int) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-
-	// use the module account address when interacting with unbonding delegations
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
