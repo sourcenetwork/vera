@@ -206,6 +206,11 @@ func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr s
 func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
 
+	// subtracted amt must not be larger than the lockedAmt
+	if amt.GT(lockedAmt) {
+		return types.ErrInvalidAmount.Wrap("invalid amount")
+	}
+
 	// remove lockup record completely if subtracted amt is equal to lockedAmt
 	if amt.Equal(lockedAmt) {
 		k.removeLockup(ctx, delAddr, valAddr)
@@ -223,7 +228,7 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 	return nil
 }
 
-// SubtractUnlockingLockup subtracts provided amt from the existing unbonding lockup (delAddr/valAddr/creationHeight/).
+// SubtractUnlockingLockup subtracts provided amt from the existing unlocking lockup (delAddr/valAddr/creationHeight/).
 func (k Keeper) SubtractUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt math.Int) error {
 	// get full unlocking lockup record because we must pass valid time(s) to SaveLockup
 	found, lockedAmt, unbondTime, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
@@ -231,6 +236,11 @@ func (k Keeper) SubtractUnlockingLockup(ctx context.Context, delAddr sdk.AccAddr
 	// return early if not found
 	if !found {
 		return nil
+	}
+
+	// subtracted amt must not be larger than the lockedAmt
+	if amt.GT(lockedAmt) {
+		return types.ErrInvalidAmount.Wrap("invalid amount")
 	}
 
 	// remove lockup record completely if subtracted amt is equal to lockedAmt
