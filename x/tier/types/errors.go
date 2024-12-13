@@ -8,7 +8,7 @@ import (
 
 // x/tier module sentinel errors
 var (
-	ErrUnauthorized   = sdkerrors.Register(ModuleName, 1101, "unathorized")
+	ErrUnauthorized   = sdkerrors.Register(ModuleName, 1101, "unauthorized")
 	ErrNotFound       = sdkerrors.Register(ModuleName, 1102, "not found")
 	ErrInvalidRequest = sdkerrors.Register(ModuleName, 1103, "invalid request")
 	ErrInvalidAddress = sdkerrors.Register(ModuleName, 1104, "invalid address")
