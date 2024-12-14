@@ -82,11 +82,40 @@ func TestMsgLock(t *testing.T) {
 			expErr:    true,
 			expErrMsg: "invalid amount",
 		},
+		{
+			name: "invalid delegator address",
+			input: &types.MsgLock{
+				DelegatorAddress: "invalid-delegator-address",
+				ValidatorAddress: valAddr,
+				Stake:            validCoin1,
+			},
+			expErr:    true,
+			expErrMsg: "delegator address",
+		},
+		{
+			name: "invalid validator address",
+			input: &types.MsgLock{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: "invalid-validator-address",
+				Stake:            validCoin1,
+			},
+			expErr:    true,
+			expErrMsg: "validator address",
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := ms.Lock(sdkCtx, tc.input)
+			err := tc.input.ValidateBasic()
+			if err != nil {
+				if tc.expErr {
+					require.Contains(t, err.Error(), tc.expErrMsg)
+					return
+				}
+				t.Fatalf("unexpected error in ValidateBasic: %v", err)
+			}
+
+			_, err = ms.Lock(sdkCtx, tc.input)
 
 			if tc.expErr {
 				require.Error(t, err)

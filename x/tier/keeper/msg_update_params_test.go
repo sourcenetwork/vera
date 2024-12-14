@@ -29,7 +29,7 @@ func TestMsgUpdateParams(t *testing.T) {
 				Params:    params,
 			},
 			expErr:    true,
-			expErrMsg: "expected authority: source10d07y265gmmuvt4z0w9aw880jnsr700ju32mxd, got: invalid: unauthorized",
+			expErrMsg: "invalid authority",
 		},
 		{
 			name: "send enabled param",

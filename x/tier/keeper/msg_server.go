@@ -22,7 +22,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
 	authority := m.Keeper.GetAuthority()
 	if msg.Authority != authority {
-		return nil, types.ErrUnauthorized.Wrapf("expected authority: %s, got: %s", authority, msg.Authority)
+		return nil, types.ErrUnauthorized.Wrapf("invalid authority: %s", msg.Authority)
 	}
 
 	err := msg.Params.Validate()
