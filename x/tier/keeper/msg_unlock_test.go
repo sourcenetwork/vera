@@ -20,6 +20,8 @@ func TestMsgUnlock(t *testing.T) {
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
 	zeroCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.ZeroInt())
 	negativeAmount := math.NewInt(-100)
+	initialDelegatorBalance := math.NewInt(2000)
+	initialValidatorBalance := math.NewInt(1000)
 
 	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
 	valAddr := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
@@ -29,9 +31,7 @@ func TestMsgUnlock(t *testing.T) {
 	valAddress, err := sdk.ValAddressFromBech32(valAddr)
 	require.NoError(t, err)
 
-	initialDelegatorBalance := math.NewInt(2000)
 	initializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
-	initialValidatorBalance := math.NewInt(1000)
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, valAddress, initialValidatorBalance)
 
 	// lock some tokens to test the unlock logic

@@ -79,6 +79,7 @@ func (k Keeper) SetLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAd
 	epochDuration := *params.EpochDuration
 
 	unlockTime := sdkCtx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	// use unbondTime from stakingKeeper.Undelegate() if present, set it to match unlockTime otherwise
 	var unbTime *time.Time
 	if unbondTime != nil {
 		utcTime := unbondTime.UTC()

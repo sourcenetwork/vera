@@ -20,6 +20,9 @@ func TestMsgRedelegate(t *testing.T) {
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
 	zeroCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.ZeroInt())
 	negativeAmount := math.NewInt(-100)
+	initialDelegatorBalance := math.NewInt(2000)
+	initialSrcValidatorBalance := math.NewInt(1000)
+	initialDstValidatorBalance := math.NewInt(500)
 
 	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
 	srcValAddr := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
@@ -32,10 +35,7 @@ func TestMsgRedelegate(t *testing.T) {
 	dstValAddress, err := sdk.ValAddressFromBech32(dstValAddr)
 	require.NoError(t, err)
 
-	initialDelegatorBalance := math.NewInt(2000)
 	initializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
-	initialSrcValidatorBalance := math.NewInt(1000)
-	initialDstValidatorBalance := math.NewInt(500)
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, srcValAddress, initialSrcValidatorBalance)
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, dstValAddress, initialDstValidatorBalance)
 
