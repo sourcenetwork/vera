@@ -22,7 +22,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
 	authority := m.Keeper.GetAuthority()
 	if msg.Authority != authority {
-		return nil, types.ErrUnauthorized.Wrapf("expected authority: %s, got: %s", authority, msg.Authority)
+		return nil, types.ErrUnauthorized.Wrapf("invalid authority: %s", msg.Authority)
 	}
 
 	err := msg.Params.Validate()
@@ -68,7 +68,7 @@ func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlo
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.Stake.Amount)
+	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.CreationHeight, &msg.Stake.Amount)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "cancel unlocking")
 	}

@@ -42,7 +42,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 	// Calculate the reward credits earned on the new lock.
 	rates := k.GetParams(ctx).RewardRates
 	lockedAmt := k.TotalAmountByAddr(ctx, delAddr)
-	credit := CalculateCredit(rates, lockedAmt, lockingAmt)
+	credit := calculateCredit(rates, lockedAmt, lockingAmt)
 
 	// Pro-rate the credit based on the time elapsed in the current epoch.
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
@@ -116,7 +116,7 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 
 	for delStrAddr, amt := range lockedAmts {
 		delAddr := sdk.MustAccAddressFromBech32(delStrAddr)
-		credit := CalculateCredit(rates, math.ZeroInt(), amt)
+		credit := calculateCredit(rates, math.ZeroInt(), amt)
 		err := k.MintCredit(ctx, delAddr, credit)
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s to %s", credit, delAddr)
@@ -124,41 +124,4 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 	}
 
 	return nil
-}
-
-// CalculateCredit calculates the reward earned on the lockingAmt.
-// lockingAmt is stacked up on top of the lockedAmt to earn at the
-// highest eligible reward.
-func CalculateCredit(rateList []types.Rate, lockedAmt, lockingAmt math.Int) math.Int {
-	credit := math.ZeroInt()
-	stakedAmt := lockedAmt.Add(lockingAmt)
-
-	// Iterate from the highest reward rate to the lowest.
-	for _, r := range rateList {
-		// Continue if the total lock does not reach the current rate requirement.
-		if stakedAmt.LT(r.Amount) {
-			continue
-		}
-
-		lower := math.MaxInt(r.Amount, lockedAmt)
-		diff := stakedAmt.Sub(lower)
-
-		diffDec := math.LegacyNewDecFromInt(diff)
-		rateDec := math.LegacyNewDec(r.Rate)
-
-		// rateDec MUST have 2 decimals of precision for the calculation to be correct.
-		amt := diffDec.Mul(rateDec).Quo(math.LegacyNewDec(100))
-		credit = credit.Add(amt.TruncateInt())
-
-		// Subtract the lock that has been rewarded.
-		stakedAmt = stakedAmt.Sub(diff)
-		lockingAmt = lockingAmt.Sub(diff)
-
-		// Break if all the new lock has been rewarded.
-		if lockingAmt.IsZero() {
-			break
-		}
-	}
-
-	return credit
 }

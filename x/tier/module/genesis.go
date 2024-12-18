@@ -21,7 +21,7 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState types.GenesisSta
 		if k.HasLockup(ctx, delAddr, valAddr) {
 			k.AddLockup(ctx, delAddr, valAddr, lockup.Amount)
 		} else {
-			k.SetLockup(ctx, lockup.UnlockTime != nil, delAddr, valAddr, lockup.Amount, lockup.CreationHeight, lockup.UnbondTime, lockup.UnlockTime)
+			k.SaveLockup(ctx, lockup.UnlockTime != nil, delAddr, valAddr, lockup.Amount, lockup.CreationHeight, lockup.UnbondTime, lockup.UnlockTime)
 		}
 	}
 }

@@ -91,7 +91,7 @@ func NewMsgRedelegate(delAddress, srcValAddr, dstValAddr string, stake sdk.Coin)
 
 func (msg *MsgRedelegate) ValidateBasic() error {
 	if msg.SrcValidatorAddress == msg.DstValidatorAddress {
-		return ErrInvalidAddress.Wrapf("src and dst validator addresses are the sames")
+		return ErrInvalidAddress.Wrapf("src and dst validator addresses are the same")
 	}
 	if err := validateAccAddr(msg.DelegatorAddress); err != nil {
 		return err

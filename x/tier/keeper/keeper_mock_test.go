@@ -81,7 +81,6 @@ func (suite *KeeperTestSuite) TestLock() {
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
-
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	suite.Require().NoError(err)
 
@@ -138,7 +137,6 @@ func (suite *KeeperTestSuite) TestUnlock() {
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
-
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	suite.Require().NoError(err)
 
@@ -186,6 +184,11 @@ func (suite *KeeperTestSuite) TestUnlock() {
 
 	suite.tierKeeper.SetParams(suite.ctx, params)
 
+	// add a lockup and verify that it exists before trying to unlock
+	suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	lockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, valAddr)
+	suite.Require().Equal(amount, lockedAmt, "expected lockup amount to be set")
+
 	// perform unlock and verify that unlocking lockup is set correctly
 	unbondTime, unlockTime, creationHeight, err := suite.tierKeeper.Unlock(suite.ctx, delAddr, valAddr, amount)
 	suite.Require().NoError(err)
@@ -200,14 +203,13 @@ func (suite *KeeperTestSuite) TestUnlock() {
 // TestRedelegate is using mock keepers to verify that required function calls are made as expected on Redelegate().
 func (suite *KeeperTestSuite) TestRedelegate() {
 	amount := math.NewInt(1000)
+	completionTime := suite.ctx.BlockTime()
 	shares := math.LegacyNewDecFromInt(amount)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
-
 	srcValAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	suite.Require().NoError(err)
-
 	dstValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	suite.Require().NoError(err)
 
@@ -218,7 +220,6 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 		ValidateUnbondAmount(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, amount).
 		Return(shares, nil).Times(1)
 
-	completionTime := suite.ctx.BlockTime().Add(24 * time.Hour)
 	suite.stakingKeeper.EXPECT().
 		BeginRedelegation(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, dstValAddr, shares).
 		Return(completionTime, nil).Times(1)
