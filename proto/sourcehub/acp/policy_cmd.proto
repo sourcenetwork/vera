@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/commitment.proto";
 import "sourcehub/acp/registration.proto";
+import "sourcehub/acp/record.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -104,7 +105,7 @@ enum RegistrationResultStatus {
 
 message RevealRegistrationCmdResult {
   RegistrationResultStatus result = 1;
-  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  RelationshipRecord record = 2;
   ObjectRegistrationEvent event = 3;
 }
 
@@ -121,7 +122,7 @@ message UnarchiveObjectCmd{
 }
 
 message UnarchiveObjectCmdResult{
-  sourcenetwork.acp_core.RelationshipRecord record = 1;
+  RelationshipRecord record = 1;
   bool relationship_modified = 2;
 }
 
@@ -145,7 +146,7 @@ message ArchiveObjectCmd {
 message SetRelationshipCmdResult {
   // Indicates whether the given Relationship previously existed, ie the Tx was a no op
   bool record_existed = 1;
-  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  RelationshipRecord record = 2;
 }
 
 // DeleteRelationshipCmdResult removes a Relationship in a Policy
@@ -155,7 +156,7 @@ message DeleteRelationshipCmdResult {
 
 // RegisterObjectCmdResult registers an Object in a Policy
 message RegisterObjectCmdResult {
-  sourcenetwork.acp_core.RelationshipRecord record = 1;
+  RelationshipRecord record = 1;
 }
 
 // ArchiveObjectCmdResult unregisters an Object in a Policy

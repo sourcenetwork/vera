@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/gogoproto/jsonpb"
@@ -112,7 +113,10 @@ func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			policyId := args[0]
-			commitId := args[1]
+			commitId, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid commitId: %w", err)
+			}
 			proofJson := args[2]
 
 			proof := &types.RegistrationProof{}
@@ -167,7 +171,10 @@ func CmdFlagHijack(dispatcher dispatcher) *cobra.Command {
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			polId := args[0]
-			eventId := args[1]
+			eventId, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid event id: %w", err)
+			}
 
 			polCmd := types.NewFlagHijackAttemptCmd(eventId)
 

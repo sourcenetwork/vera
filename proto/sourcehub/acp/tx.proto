@@ -10,6 +10,7 @@ import "google/protobuf/timestamp.proto";
 import "sourcehub/acp/access_decision.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/policy_cmd.proto";
+import "sourcehub/acp/record.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/policy.proto";
 
@@ -79,7 +80,7 @@ message MsgCreatePolicy {
 }
 
 message MsgCreatePolicyResponse {
-  sourcenetwork.acp_core.Policy policy = 1;
+  PolicyRecord record = 1;
 }
 
 message MsgCheckAccess {

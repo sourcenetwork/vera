@@ -81,7 +81,7 @@ func runDemo(chainId string, nodeAddr string, validatorKeyName string) {
 	record := registerObject(ctx, client, &txBuilder, txSigner, policy.Id)
 
 	log.Printf("Evaluating Access Request to read file:readme")
-	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.OwnerDid, []*acptypes.Operation{
+	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.Metadata.Creator.Identifier, []*acptypes.Operation{
 		{
 			Object:     coretypes.NewObject("file", "readme"),
 			Permission: "read",

@@ -17,7 +17,7 @@ const (
 	RegistrationsCommitmentPrefix = "commitments"
 
 	// ObjectEventsPrefix defines a key prefix for ObjectEvents
-	ObjectEventsPreix = "object_events"
+	ObjectEventsPrefix = "object_events"
 )
 
 var (

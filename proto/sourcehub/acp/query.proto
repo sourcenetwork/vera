@@ -9,6 +9,7 @@ import "google/api/annotations.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/access_decision.proto";
 import "sourcehub/acp/registration.proto";
+import "sourcehub/acp/record.proto";
 import "sourcehub/acp/commitment.proto";
 import "sourcenetwork/acp_core/policy.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
@@ -114,23 +115,14 @@ message QueryPolicyRequest {
 }
 
 message QueryPolicyResponse {
-  sourcenetwork.acp_core.Policy policy = 1;
-  
-  // policy_raw contains the raw policy document the user submitted to create
-  // the policy
-  string policy_raw = 2;
-  
-  // marshal_type flags the format of policy_raw
-  sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 3;
+ PolicyRecord record = 1;
 }
 
 message QueryPolicyIdsRequest {
-
   //cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryPolicyIdsResponse {
-  
   //cosmos.base.query.v1beta1.PageResponse pagination = 1;
   repeated string ids = 1;
 }
@@ -141,7 +133,7 @@ message QueryFilterRelationshipsRequest {
 }
 
 message QueryFilterRelationshipsResponse {
-  repeated sourcenetwork.acp_core.RelationshipRecord records = 1;
+  repeated RelationshipRecord records = 1;
 }
 
 message QueryVerifyAccessRequestRequest {

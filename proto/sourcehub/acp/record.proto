@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package sourcehub.acp;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "sourcehub/acp/access_decision.proto";
+import "sourcehub/acp/time.proto";
+import "sourcenetwork/acp_core/policy_short.proto";
+import "sourcenetwork/acp_core/policy.proto";
+import "sourcenetwork/acp_core/relationship.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
+
+message RecordMetadata {
+    Timestamp creation_ts  = 1;
+    bytes tx_hash = 2;
+    string tx_signer = 3;
+    string owner = 4;
+}
+
+message PolicyRecord {
+    sourcenetwork.acp_core.Policy policy = 1;
+    RecordMetadata metadata = 2;
+    string raw_policy = 3;
+    // marshal_type flags the format of policy_raw
+    sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 4;
+}
+
+message RelationshipRecord {
+    sourcenetwork.acp_core.Relationship relationship = 1;
+    RecordMetadata metadata = 2;
+}

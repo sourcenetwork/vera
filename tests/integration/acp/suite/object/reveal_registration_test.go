@@ -132,7 +132,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	result := a.Run(ctx)
 
 	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
-	require.Equal(ctx.T, result.Record.OwnerDid, ctx.GetActor("bob").DID)
+	require.Equal(ctx.T, result.Record.Metadata.Creator, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }
 
@@ -192,7 +192,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 
 	// Then Bob is the owner of foo.txt
 	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
-	require.Equal(ctx.T, result.Record.OwnerDid, ctx.GetActor("bob").DID)
+	require.Equal(ctx.T, result.Record.Metadata.Creator, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }
 

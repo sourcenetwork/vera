@@ -250,7 +250,7 @@ func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommit
 
 type RevealRegistrationAction struct {
 	PolicyId     string
-	CommitmentId string
+	CommitmentId uint64
 	Objects      []*coretypes.Object
 	Index        int
 	Actor        *TestActor

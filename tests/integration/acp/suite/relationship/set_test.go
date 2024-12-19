@@ -41,7 +41,6 @@ func setupSetRel(t *testing.T) *test.TestCtx {
 		},
 	}
 	action.Run(ctx)
-
 	return ctx
 }
 
@@ -57,8 +56,13 @@ func TestSetRelationship_OwnerCanShareObjectTheyOwn(t *testing.T) {
 		Expected: &types.SetRelationshipCmdResult{
 			RecordExisted: false,
 			Record: &coretypes.RelationshipRecord{
-				OwnerDid:     ctx.GetActor("alice").DID,
-				CreationTime: test.TimeToProto(ctx.Timestamp),
+				Metadata: &coretypes.RecordMetadata{
+					Creator: &coretypes.Principal{
+						Kind:       coretypes.PrincipalKind_DID,
+						Identifier: ctx.GetActor("alice").DID,
+					},
+					CreationTs: test.TimeToProto(ctx.Timestamp),
+				},
 				PolicyId:     ctx.State.PolicyId,
 				Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob),
 				Archived:     false,
@@ -118,8 +122,13 @@ func TestSetRelationship_ManagerActorCanDelegateAccessToAnotherActor(t *testing.
 		Expected: &types.SetRelationshipCmdResult{
 			RecordExisted: false,
 			Record: &coretypes.RelationshipRecord{
-				OwnerDid:     bob,
-				CreationTime: test.TimeToProto(ctx.Timestamp),
+				Metadata: &coretypes.RecordMetadata{
+					Creator: &coretypes.Principal{
+						Kind:       coretypes.PrincipalKind_DID,
+						Identifier: bob,
+					},
+					CreationTs: test.TimeToProto(ctx.Timestamp),
+				},
 				PolicyId:     ctx.State.PolicyId,
 				Relationship: coretypes.NewActorRelationship("file", "foo", "reader", charlie),
 				Archived:     false,

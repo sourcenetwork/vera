@@ -40,7 +40,7 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 	}
 
 	cmd := access_decision.EvaluateAccessRequestsCommand{
-		Policy:        record.Policy,
+		Policy:        record.Record.Policy,
 		Operations:    msg.AccessRequest.Operations,
 		Actor:         msg.AccessRequest.Actor.Id,
 		CreationTime:  msg.CreationTime,

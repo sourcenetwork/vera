@@ -266,7 +266,7 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 		return nil, nil, err
 	}
 
-	goCtx := auth.InjectPrincipal(ctx, auth.RootPrincipal())
+	goCtx := auth.InjectPrincipal(ctx, coretypes.RootPrincipal())
 	ctx = ctx.WithContext(goCtx)
 	result, err := s.engine.AmendRegistration(ctx, &coretypes.AmendRegistrationRequest{
 		PolicyId: commitment.PolicyId,
@@ -415,7 +415,7 @@ func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId strin
 	}
 
 	for _, obj := range objects {
-		resource := rec.Policy.GetResourceByName(obj.Resource)
+		resource := rec.Record.Policy.GetResourceByName(obj.Resource)
 		if resource == nil {
 			return nil, errors.Wrap("resource not found", errors.ErrorType_BAD_INPUT,
 				errors.Pair("policy", policyId),

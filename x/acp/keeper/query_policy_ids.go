@@ -23,6 +23,6 @@ func (k Keeper) PolicyIds(goCtx context.Context, req *types.QueryPolicyIdsReques
 	}
 
 	return &types.QueryPolicyIdsResponse{
-		Ids: utils.MapSlice(resp.Policies, func(p *coretypes.Policy) string { return p.Id }),
+		Ids: utils.MapSlice(resp.Records, func(r *coretypes.PolicyRecord) string { return r.Policy.Id }),
 	}, nil
 }

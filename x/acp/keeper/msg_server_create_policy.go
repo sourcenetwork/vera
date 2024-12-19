@@ -26,7 +26,7 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 		return nil, err
 	}
 
-	principal := auth.RootPrincipal()
+	principal := coretypes.RootPrincipal()
 	goCtx = auth.InjectPrincipal(goCtx, principal)
 
 	tx := comettypes.Tx(ctx.TxBytes())
@@ -35,9 +35,11 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
 		Policy:      msg.Policy,
 		MarshalType: msg.MarshalType,
-		Attributes: map[string]string{
-			txHashMapKey:  txHash,
-			creatorMapKey: msg.Creator,
+		Metadata: &coretypes.SuppliedMetadata{
+			Attributes: map[string]string{
+				txHashMapKey:  txHash,
+				creatorMapKey: msg.Creator,
+			},
 		},
 	})
 	if err != nil {
@@ -47,6 +49,6 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 	// TODO event
 
 	return &types.MsgCreatePolicyResponse{
-		Policy: coreResult.Policy,
+		Policy: coreResult.Record.Policy,
 	}, nil
 }

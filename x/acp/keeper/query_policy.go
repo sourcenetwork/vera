@@ -34,8 +34,8 @@ func (k Keeper) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*t
 	}
 
 	return &types.QueryPolicyResponse{
-		Policy:      rec.Policy,
-		PolicyRaw:   rec.PolicyRaw,
-		MarshalType: rec.MarshalType,
+		Policy:      rec.Record.Policy,
+		PolicyRaw:   rec.Record.PolicyDefinition,
+		MarshalType: rec.Record.MarshalType,
 	}, nil
 }

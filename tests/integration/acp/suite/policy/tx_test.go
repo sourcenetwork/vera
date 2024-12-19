@@ -38,10 +38,9 @@ actor:
   doc: my actor
 `
 	want := &coretypes.Policy{
-		Id:           "d011372c7e2cd34fd63777c513bb5eb16713834b855f424158474b77c1800410",
-		Name:         "policy",
-		Description:  "ok",
-		CreationTime: test.TimeToProto(ctx.Timestamp),
+		Id:          "d011372c7e2cd34fd63777c513bb5eb16713834b855f424158474b77c1800410",
+		Name:        "policy",
+		Description: "ok",
 		Resources: []*coretypes.Resource{
 			&coretypes.Resource{
 				Name: "file",

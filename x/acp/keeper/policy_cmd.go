@@ -24,7 +24,7 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 	result := &types.PolicyCmdResult{}
 
 	actor := coretypes.NewActor(authenticatedActor)
-	principal, err := auth.NewDIDPrincipal(authenticatedActor)
+	principal, err := coretypes.NewDIDPrincipal(authenticatedActor)
 	if err != nil {
 		return nil, err
 	}
@@ -88,36 +88,6 @@ func dispatchPolicyCmd(ctx sdk.Context, k *Keeper, policyId string, authenticate
 			},
 		}
 	case *types.PolicyCmd_CommitRegistrationsCmd:
-		/*
-			result.Result = &types.PolicyCmdResult_CommitRegistrationsResult{
-				CommitRegistrationsResult: &types.CommitRegistrationsCmdResult{
-					RegistrationsCommitment: &types.RegistrationsCommitment{
-						Id:         "1",
-						PolicyId:   "abc",
-						Actor:      coretypes.NewActor("abc"),
-						Commitment: []byte("wtf man"),
-						Expired:    true,
-						TxHash:     []byte("again, wtf man"),
-						Validity: &types.Duration{
-							Duration: &types.Duration_ProtoDuration{
-								ProtoDuration: &prototypes.Duration{
-									Seconds: 100,
-								},
-							},
-						},
-						CreationTs: &types.Timestamp{
-							ProtoTs: &prototypes.Timestamp{
-								Seconds: 6969,
-								Nanos:   6969,
-							},
-							BlockHeight: 144,
-						},
-					},
-				},
-			}
-			break
-		*/
-
 		regCmd := c.CommitRegistrationsCmd
 		params := k.GetParams(ctx)
 		commitment, respErr := registrationService.CommitRegistration(ctx, policyId, regCmd.Commitment, actor, &params)

@@ -7,8 +7,6 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	prototypes "github.com/cosmos/gogoproto/types"
-
 	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -41,12 +39,14 @@ func TestRegisterObject_RegisteringNewObjectIsSucessful(t *testing.T) {
 		Expected: &types.RegisterObjectCmdResult{
 			Record: &coretypes.RelationshipRecord{
 				PolicyId:     ctx.State.PolicyId,
-				OwnerDid:     bob.DID,
 				Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
 				Archived:     false,
-				CreationTime: &prototypes.Timestamp{
-					Seconds: -62135596800,
-					Nanos:   0,
+				Metadata: &coretypes.RecordMetadata{
+					Creator: &coretypes.Principal{
+						Kind:       coretypes.PrincipalKind_DID,
+						Identifier: bob.DID,
+					},
+					CreationTs: test.TimeToProto(ctx.Timestamp),
 				},
 			},
 		},

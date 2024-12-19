@@ -13,6 +13,7 @@ import (
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/raccoondb/v2/primitives"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
@@ -79,6 +80,7 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error
 	raccoonAdapted := stores.RaccoonKVFromCosmos(adapted)
 	runtime, err := acpruntime.NewRuntimeManager(
 		acpruntime.WithKVStore(raccoonAdapted),
+		acpruntime.WithTimeService(&SourcehubTimeProvider{}),
 	)
 	if err != nil {
 		return nil, err
@@ -88,17 +90,24 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error
 }
 
 func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) registration.CommitmentRepository {
-	kv := k.storeService.OpenKVStore(ctx)
-	prefixKey := []byte(types.RegistrationsCommitmentPrefix)
-	adapted := runtime.KVStoreAdapter(kv)
-	adapted = prefix.NewStore(adapted, prefixKey)
-	return registration.NewKVRegistrationRepository(adapted)
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := stores.NewRaccoonKV(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.RegistrationsCommitmentPrefix))
+	repo, err := registration.NewKVRegistrationRepository(kv)
+	if err != nil {
+		panic(err)
+	}
+	return repo
 }
 
 func (k *Keeper) GetObjectEventRepository(ctx sdk.Context) registration.RegistrationEventRepository {
-	kv := k.storeService.OpenKVStore(ctx)
-	prefixKey := []byte(types.ObjectEventsPreix)
-	adapted := runtime.KVStoreAdapter(kv)
-	adapted = prefix.NewStore(adapted, prefixKey)
-	return registration.NewObjectEventRepository(adapted)
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := stores.NewRaccoonKV(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.ObjectEventsPrefix))
+	repo, err := registration.NewObjectEventRepository(kv)
+	if err != nil {
+		panic(err)
+		// TODO not sure how to best handle this, don't think the chain should continue
+	}
+	return repo
 }
