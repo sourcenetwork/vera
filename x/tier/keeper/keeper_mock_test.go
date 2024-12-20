@@ -11,7 +11,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/golang/mock/gomock"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	test "github.com/sourcenetwork/sourcehub/testutil"
@@ -84,11 +83,6 @@ func (suite *KeeperTestSuite) TestLock() {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	suite.Require().NoError(err)
 
-	validator := stakingtypes.Validator{
-		OperatorAddress: valAddr.String(),
-		Status:          stakingtypes.Bonded,
-	}
-
 	epochInfo := epochstypes.EpochInfo{
 		Identifier:            types.EpochIdentifier,
 		CurrentEpochStartTime: suite.ctx.BlockTime().Add(-10 * time.Minute),
@@ -101,24 +95,16 @@ func (suite *KeeperTestSuite) TestLock() {
 		Return(nil).Times(1)
 
 	suite.bankKeeper.EXPECT().
-		SendCoinsFromModuleToAccount(gomock.Any(), moduleName, delAddr, creditCoins).
-		Return(nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		GetValidator(gomock.Any(), valAddr).
-		Return(validator, nil).Times(1)
-
-	suite.bankKeeper.EXPECT().
 		DelegateCoinsFromAccountToModule(gomock.Any(), delAddr, types.ModuleName, coins).
 		Return(nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		Delegate(gomock.Any(), gomock.Any(), amount, stakingtypes.Unbonded, validator, true).
-		Return(math.LegacyNewDecFromInt(amount), nil).Times(1)
 
 	suite.epochsKeeper.EXPECT().
 		GetEpochInfo(gomock.Any(), types.EpochIdentifier).
 		Return(epochInfo).Times(1)
+
+	suite.bankKeeper.EXPECT().
+		SendCoinsFromModuleToAccount(gomock.Any(), moduleName, delAddr, creditCoins).
+		Return(nil).Times(1)
 
 	// perform lock and verify that lockup is set correctly
 	err = suite.tierKeeper.Lock(suite.ctx, delAddr, valAddr, amount)
@@ -145,18 +131,7 @@ func (suite *KeeperTestSuite) TestUnlock() {
 		EpochDuration:   &epochDuration,
 	}
 
-	validator := stakingtypes.Validator{
-		OperatorAddress: valAddr.String(),
-		Status:          stakingtypes.Bonded,
-		DelegatorShares: math.LegacyNewDec(1_000_000),
-		Tokens:          math.NewInt(2_000_000),
-	}
-
 	// confirm that keeper methods are called as expected
-	suite.stakingKeeper.EXPECT().
-		GetValidator(gomock.Any(), valAddr).
-		Return(validator, nil).Times(1)
-
 	suite.bankKeeper.EXPECT().
 		GetBalance(
 			gomock.Any(),
@@ -166,22 +141,6 @@ func (suite *KeeperTestSuite) TestUnlock() {
 		sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(2000)),
 	).AnyTimes()
 
-	suite.stakingKeeper.EXPECT().
-		ValidateUnbondAmount(
-			gomock.Any(),
-			authtypes.NewModuleAddress(moduleName),
-			valAddr,
-			amount,
-		).Return(math.LegacyNewDecFromInt(amount), nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		Undelegate(
-			gomock.Any(),
-			authtypes.NewModuleAddress(moduleName),
-			valAddr,
-			math.LegacyNewDecFromInt(amount),
-		).Return(suite.ctx.BlockTime().Add(24*time.Hour), amount, nil).Times(1)
-
 	suite.tierKeeper.SetParams(suite.ctx, params)
 
 	// add a lockup and verify that it exists before trying to unlock
@@ -190,21 +149,19 @@ func (suite *KeeperTestSuite) TestUnlock() {
 	suite.Require().Equal(amount, lockedAmt, "expected lockup amount to be set")
 
 	// perform unlock and verify that unlocking lockup is set correctly
-	unbondTime, unlockTime, creationHeight, err := suite.tierKeeper.Unlock(suite.ctx, delAddr, valAddr, amount)
+	unlockTime, creationHeight, err := suite.tierKeeper.Unlock(suite.ctx, delAddr, valAddr, amount)
 	suite.Require().NoError(err)
 
 	expectedUnlockTime := suite.ctx.BlockTime().Add(time.Duration(params.UnlockingEpochs) * *params.EpochDuration)
-	suite.Require().Equal(expectedUnlockTime, unlockTime)
+	suite.Require().NotEmpty(unlockTime)
+	suite.Require().Equal(expectedUnlockTime, *unlockTime)
 	suite.Require().Equal(suite.ctx.BlockHeight(), creationHeight)
-	suite.Require().NotEmpty(unbondTime)
-	suite.Require().True(unbondTime.After(suite.ctx.BlockTime()))
 }
 
 // TestRedelegate is using mock keepers to verify that required function calls are made as expected on Redelegate().
 func (suite *KeeperTestSuite) TestRedelegate() {
 	amount := math.NewInt(1000)
 	completionTime := suite.ctx.BlockTime()
-	shares := math.LegacyNewDecFromInt(amount)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
@@ -216,18 +173,10 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 	// add initial lockup to the source validator
 	suite.tierKeeper.AddLockup(suite.ctx, delAddr, srcValAddr, amount)
 
-	suite.stakingKeeper.EXPECT().
-		ValidateUnbondAmount(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, amount).
-		Return(shares, nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		BeginRedelegation(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, dstValAddr, shares).
-		Return(completionTime, nil).Times(1)
-
 	// perform redelegate and verify that lockups were updated successfully
 	resultCompletionTime, err := suite.tierKeeper.Redelegate(suite.ctx, delAddr, srcValAddr, dstValAddr, amount)
 	suite.Require().NoError(err)
-	suite.Require().Equal(completionTime, resultCompletionTime)
+	suite.Require().Equal(completionTime, *resultCompletionTime)
 
 	srcLockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, srcValAddr)
 	dstLockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, dstValAddr)
