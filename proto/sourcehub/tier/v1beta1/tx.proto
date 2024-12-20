@@ -85,6 +85,7 @@ message MsgUnlockResponse {
     (amino.dont_omitempty) = true,
     (gogoproto.stdtime) = true
   ];
+  int64 creation_height = 2;
 }
 
 // MsgRedelegate is the Msg/Redelegate request type.
