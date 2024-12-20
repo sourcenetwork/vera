@@ -74,7 +74,7 @@ func TestMsgCancelUnlocking(t *testing.T) {
 		initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddress, initialValidatorBalance)
 		err = k.Lock(ctx, delAddress, valAddress, validCoin.Amount)
 		require.NoError(t, err)
-		_, _, _, err = k.Unlock(ctx, delAddress, valAddress, validCoin.Amount)
+		_, _, err = k.Unlock(ctx, delAddress, valAddress, validCoin.Amount)
 		require.NoError(t, err)
 		return ctx
 	}
@@ -106,6 +106,17 @@ func TestMsgCancelUnlocking(t *testing.T) {
 			expErrMsg: "invalid amount",
 		},
 		{
+			name: "excess unlocking amount",
+			input: &types.MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				CreationHeight:   1,
+				Stake:            excessCoin,
+			},
+			expErr:    true,
+			expErrMsg: "invalid amount",
+		},
+		{
 			name: "non-existent unlocking",
 			input: &types.MsgCancelUnlocking{
 				DelegatorAddress: delAddr,
@@ -114,7 +125,7 @@ func TestMsgCancelUnlocking(t *testing.T) {
 				Stake:            validCoin,
 			},
 			expErr:    true,
-			expErrMsg: "no unbonding delegation found",
+			expErrMsg: "not found",
 		},
 		{
 			name: "invalid delegator address",
@@ -158,18 +169,7 @@ func TestMsgCancelUnlocking(t *testing.T) {
 				Stake:            validCoin,
 			},
 			expErr:         false,
-			expectedAmount: validCoin.Amount.Sub(math.OneInt()),
-		},
-		{
-			name: "excess unlocking amount",
-			input: &types.MsgCancelUnlocking{
-				DelegatorAddress: delAddr,
-				ValidatorAddress: valAddr,
-				CreationHeight:   1,
-				Stake:            excessCoin,
-			},
-			expErr:         false,
-			expectedAmount: validCoin.Amount.Sub(math.OneInt()),
+			expectedAmount: validCoin.Amount,
 		},
 	}
 

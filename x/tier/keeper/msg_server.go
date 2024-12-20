@@ -56,19 +56,20 @@ func (m msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.Msg
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	_, unlockTime, _, err := m.Keeper.Unlock(ctx, delAddr, valAddr, msg.Stake.Amount)
+	unlockTime, creationHeight, err := m.Keeper.Unlock(ctx, delAddr, valAddr, msg.Stake.Amount)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "undelegate")
 	}
 
-	return &types.MsgUnlockResponse{CompletionTime: unlockTime}, nil
+	return &types.MsgUnlockResponse{CompletionTime: *unlockTime, CreationHeight: creationHeight}, nil
 }
 
 func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlocking) (*types.MsgCancelUnlockingResponse, error) {
+	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.CreationHeight, &msg.Stake.Amount)
+	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.CreationHeight, msg.Stake.Amount)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "cancel unlocking")
 	}
@@ -87,5 +88,5 @@ func (m msgServer) Redelegate(ctx context.Context, msg *types.MsgRedelegate) (*t
 		return nil, errorsmod.Wrap(err, "redelegate")
 	}
 
-	return &types.MsgRedelegateResponse{CompletionTime: completionTime}, nil
+	return &types.MsgRedelegateResponse{CompletionTime: *completionTime}, nil
 }

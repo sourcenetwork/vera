@@ -43,11 +43,8 @@ func TestMsgRedelegate(t *testing.T) {
 	err = k.Lock(ctx, delAddress, srcValAddress, validCoin.Amount)
 	require.NoError(t, err)
 
-	stakingParams, err := k.GetStakingKeeper().(*stakingkeeper.Keeper).GetParams(ctx)
-	require.NoError(t, err)
-
-	// expectedCompletionTime should match the default staking unbonding time (e.g. 21 days)
-	expectedCompletionTime := sdkCtx.BlockTime().Add(stakingParams.UnbondingTime)
+	// expectedCompletionTime should match current block time
+	expectedCompletionTime := sdkCtx.BlockTime()
 
 	testCases := []struct {
 		name      string
@@ -74,7 +71,7 @@ func TestMsgRedelegate(t *testing.T) {
 				Stake:               sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(500)),
 			},
 			expErr:    true,
-			expErrMsg: "subtract locked stake from source validator",
+			expErrMsg: "subtract lockup from source validator",
 		},
 		{
 			name: "invalid stake amount (zero)",
@@ -110,7 +107,7 @@ func TestMsgRedelegate(t *testing.T) {
 				Stake:               validCoin,
 			},
 			expErr:    true,
-			expErrMsg: "subtract locked stake from source validator",
+			expErrMsg: "subtract lockup from source validator",
 		},
 		{
 			name: "source and destination validator are the same",
