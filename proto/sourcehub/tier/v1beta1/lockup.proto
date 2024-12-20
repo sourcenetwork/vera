@@ -17,14 +17,9 @@ message Lockup {
     (gogoproto.nullable) = false
   ];
 
-  // The following fields are only used for unlocking lockups.
-  //
-  // The height at which the lockup was created.
+  // The height at which the lockup was created / updated.
   int64 creation_height = 4;
 
-  // The time at which the stake undelegation will be completed.
-  google.protobuf.Timestamp unbond_time = 5 [(gogoproto.stdtime) = true];
-
-  // The time at which the stake unlocking will be completed.
-  google.protobuf.Timestamp unlock_time = 6 [(gogoproto.stdtime) = true];
+  // The time after which the unlocking lockup can be completed.
+  google.protobuf.Timestamp unlock_time = 5 [(gogoproto.stdtime) = true];
 }
