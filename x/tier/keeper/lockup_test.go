@@ -288,19 +288,19 @@ func TestGetUnlockingLockup(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	unlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	expectedUnlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 
 	k.SetLockup(ctx, true, delAddr, valAddr, amount)
 
-	found, amt, gotUnlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	found, amt, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found, "unlocking lockup should be found")
 	require.Equal(t, amount, amt, "amount should match the one set")
-	require.Equal(t, unlockTime, *gotUnlockTime, "unlockTime should match the one set")
+	require.Equal(t, expectedUnlockTime, *unlockTime, "unlockTime should match the one set")
 
-	found, amt, gotUnlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight+1)
+	found, amt, unlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight+1)
 	require.False(t, found, "this unlocking lockup does not exist")
 	require.True(t, amt.IsZero(), "amount should be zero")
-	require.Nil(t, gotUnlockTime, "unlock time should be nil")
+	require.Nil(t, unlockTime, "unlock time should be nil")
 }
 
 func TestGetLockup(t *testing.T) {
@@ -370,6 +370,8 @@ func TestGetLockups(t *testing.T) {
 func TestSubtractUnlockingLockup(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
 
+	params := k.GetParams(ctx)
+	epochDuration := *params.EpochDuration
 	unlockingLockupAmount := math.NewInt(1000)
 	cancelUnlockAmount := math.NewInt(500)
 	cancelUnlockAmount2 := math.NewInt(2000)
@@ -380,7 +382,10 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
-	ctx = ctx.WithBlockHeight(creationHeight)
+	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(time.Now())
+
+	expectedUnlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+
 	k.SetLockup(ctx, true, delAddr, valAddr, unlockingLockupAmount)
 
 	// subtract partial amount
@@ -390,7 +395,7 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	found, lockedAmt, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found)
 	require.Equal(t, cancelUnlockAmount, lockedAmt)
-	require.Equal(t, unlockTime, unlockTime) // TODO: compare to expected unlock time
+	require.Equal(t, expectedUnlockTime, *unlockTime)
 
 	// try to subtract more than the locked amount
 	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount2)
@@ -403,5 +408,5 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	found, lockedAmt, unlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.False(t, found)
 	require.True(t, lockedAmt.IsZero())
-	require.Equal(t, unlockTime, unlockTime) // TODO: compare to expected unlock time
+	require.Nil(t, unlockTime)
 }
