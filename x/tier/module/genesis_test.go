@@ -30,7 +30,6 @@ func TestGenesis(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(1000),
 				CreationHeight:   1,
-				UnbondTime:       &timestamp1,
 				UnlockTime:       &timestamp1,
 			},
 			{
@@ -38,7 +37,6 @@ func TestGenesis(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(500),
 				CreationHeight:   2,
-				UnbondTime:       &timestamp2,
 				UnlockTime:       &timestamp2,
 			},
 			{
@@ -46,7 +44,6 @@ func TestGenesis(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(2000),
 				CreationHeight:   3,
-				UnbondTime:       &timestamp3,
 				UnlockTime:       &timestamp3,
 			},
 		},
@@ -63,12 +60,6 @@ func TestGenesis(t *testing.T) {
 		require.Equal(t, lockup.ValidatorAddress, got.Lockups[i].ValidatorAddress)
 		require.Equal(t, lockup.Amount, got.Lockups[i].Amount)
 		require.Equal(t, lockup.CreationHeight, got.Lockups[i].CreationHeight)
-		if lockup.UnbondTime != nil {
-			require.NotNil(t, got.Lockups[i].UnbondTime)
-			require.Equal(t, lockup.UnbondTime.UTC(), got.Lockups[i].UnbondTime.UTC())
-		} else {
-			require.Nil(t, got.Lockups[i].UnbondTime)
-		}
 		if lockup.UnlockTime != nil {
 			require.NotNil(t, got.Lockups[i].UnlockTime)
 			require.Equal(t, lockup.UnlockTime.UTC(), got.Lockups[i].UnlockTime.UTC())
@@ -82,10 +73,6 @@ func TestGenesis(t *testing.T) {
 }
 
 func TestInitWithMultipleIdenticalLockups(t *testing.T) {
-	timestamp1 := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
-	timestamp2 := time.Date(2006, time.January, 2, 15, 4, 5, 2, time.UTC)
-	timestamp3 := time.Date(2006, time.January, 2, 15, 4, 5, 3, time.UTC)
-
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 		Lockups: []types.Lockup{
@@ -94,7 +81,6 @@ func TestInitWithMultipleIdenticalLockups(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(1000),
 				CreationHeight:   1,
-				UnbondTime:       &timestamp1,
 				UnlockTime:       nil,
 			},
 			{
@@ -102,7 +88,6 @@ func TestInitWithMultipleIdenticalLockups(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(2000),
 				CreationHeight:   2,
-				UnbondTime:       &timestamp2,
 				UnlockTime:       nil,
 			},
 			{
@@ -110,7 +95,6 @@ func TestInitWithMultipleIdenticalLockups(t *testing.T) {
 				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
 				Amount:           math.NewInt(3000),
 				CreationHeight:   3,
-				UnbondTime:       &timestamp3,
 				UnlockTime:       nil,
 			},
 		},
