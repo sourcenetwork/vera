@@ -21,8 +21,6 @@ func TestSetAndGetLockup(t *testing.T) {
 	k, ctx := testutil.SetupKeeper(t)
 
 	now := time.Now()
-	params := k.GetParams(ctx)
-	epochDuration := *params.EpochDuration
 	creationHeight := int64(10)
 	amount := math.NewInt(1000)
 
@@ -33,10 +31,7 @@ func TestSetAndGetLockup(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	unbondTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime := unbondTime
-
-	k.SetLockup(ctx, false, delAddr, valAddr, amount, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr, amount)
 
 	store := k.GetAllLockups(ctx)
 	require.Len(t, store, 1)
@@ -46,8 +41,7 @@ func TestSetAndGetLockup(t *testing.T) {
 	require.Equal(t, valAddr.String(), lockup.ValidatorAddress)
 	require.Equal(t, amount, lockup.Amount)
 	require.Equal(t, creationHeight, lockup.CreationHeight)
-	require.Equal(t, unbondTime.UTC(), *lockup.UnbondTime)
-	require.Equal(t, unlockTime.UTC(), *lockup.UnlockTime)
+	require.Nil(t, lockup.UnlockTime)
 }
 
 func TestAddLockup(t *testing.T) {
@@ -117,8 +111,8 @@ func TestGetAllLockups(t *testing.T) {
 	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.Nil(t, err)
 
-	k.SetLockup(ctx, false, delAddr1, valAddr1, amount1, nil)
-	k.SetLockup(ctx, false, delAddr2, valAddr2, amount2, nil)
+	k.SetLockup(ctx, false, delAddr1, valAddr1, amount1)
+	k.SetLockup(ctx, false, delAddr2, valAddr2, amount2)
 
 	lockups := k.GetAllLockups(ctx)
 	require.Len(t, lockups, 2)
@@ -162,7 +156,7 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.Nil(t, err)
 
-	k.SetLockup(ctx, true, delAddr, valAddr, amount, nil)
+	k.SetLockup(ctx, true, delAddr, valAddr, amount)
 
 	count := 0
 	k.MustIterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) {
@@ -190,17 +184,17 @@ func TestIterateLockups(t *testing.T) {
 	require.Nil(t, err)
 
 	ctx = ctx.WithBlockHeight(1)
-	k.SetLockup(ctx, false, delAddr1, valAddr1, math.NewInt(1000), nil)
-	k.SetLockup(ctx, false, delAddr2, valAddr2, math.NewInt(500), nil)
+	k.SetLockup(ctx, false, delAddr1, valAddr1, math.NewInt(1000))
+	k.SetLockup(ctx, false, delAddr2, valAddr2, math.NewInt(500))
 
 	ctx = ctx.WithBlockHeight(2)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200))
 
 	ctx = ctx.WithBlockHeight(3)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200))
 
 	ctx = ctx.WithBlockHeight(4)
-	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200), nil)
+	k.SetLockup(ctx, true, delAddr1, valAddr1, math.NewInt(200))
 
 	lockupsCount := 0
 	err = k.IterateLockups(ctx, false, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
@@ -218,7 +212,6 @@ func TestIterateLockups(t *testing.T) {
 		require.NotNil(t, delAddr)
 		require.NotNil(t, valAddr)
 		require.True(t, lockup.Amount.IsPositive())
-		require.NotNil(t, lockup.UnbondTime)
 		require.NotNil(t, lockup.UnlockTime)
 		unlockingLockupsCount++
 		return nil
@@ -295,22 +288,19 @@ func TestGetUnlockingLockup(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	unbondTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime := unbondTime
+	unlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 
-	k.SetLockup(ctx, true, delAddr, valAddr, amount, nil)
+	k.SetLockup(ctx, true, delAddr, valAddr, amount)
 
-	found, amt, gotUnbondTime, gotUnlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	found, amt, gotUnlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found, "unlocking lockup should be found")
 	require.Equal(t, amount, amt, "amount should match the one set")
-	require.Equal(t, unbondTime, gotUnbondTime, "unbondTime should match the one set")
-	require.Equal(t, unlockTime, gotUnlockTime, "unlockTime should match the one set")
+	require.Equal(t, unlockTime, *gotUnlockTime, "unlockTime should match the one set")
 
-	found, amt, gotUnbondTime, gotUnlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight+1)
+	found, amt, gotUnlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight+1)
 	require.False(t, found, "this unlocking lockup does not exist")
 	require.True(t, amt.IsZero(), "amount should be zero")
-	require.True(t, gotUnbondTime.IsZero(), "unbond time should be zero")
-	require.True(t, gotUnlockTime.IsZero(), "unlock time should be zero")
+	require.Nil(t, gotUnlockTime, "unlock time should be nil")
 }
 
 func TestGetLockup(t *testing.T) {
@@ -327,11 +317,7 @@ func TestGetLockup(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	params := k.GetParams(ctx)
-	unbondTime := ctx.BlockTime().Add(*params.EpochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime := unbondTime
-
-	k.SetLockup(ctx, false, delAddr, valAddr, amount, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr, amount)
 
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 
@@ -340,8 +326,7 @@ func TestGetLockup(t *testing.T) {
 	require.Equal(t, valAddr.String(), lockup.ValidatorAddress, "validator address should match")
 	require.Equal(t, amount, lockup.Amount, "amount should match")
 	require.Equal(t, creationHeight, lockup.CreationHeight, "creation height should match")
-	require.Equal(t, unbondTime.UTC(), *lockup.UnbondTime, "unbond time should match")
-	require.Equal(t, unlockTime.UTC(), *lockup.UnlockTime, "unlock time should match")
+	require.Nil(t, lockup.UnlockTime, "unlock time should be nil")
 
 	nonExistentValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.NoError(t, err)
@@ -364,10 +349,10 @@ func TestGetLockups(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(10).WithBlockTime(time.Now())
-	k.SetLockup(ctx, false, delAddr, valAddr1, amount1, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr1, amount1)
 
 	ctx = ctx.WithBlockHeight(11).WithBlockTime(time.Now().Add(time.Minute))
-	k.SetLockup(ctx, false, delAddr, valAddr2, amount2, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr2, amount2)
 
 	lockups := k.GetLockups(ctx, delAddr)
 
@@ -396,15 +381,16 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight)
-	k.SetLockup(ctx, true, delAddr, valAddr, unlockingLockupAmount, nil)
+	k.SetLockup(ctx, true, delAddr, valAddr, unlockingLockupAmount)
 
 	// subtract partial amount
 	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
 	require.NoError(t, err)
 
-	found, lockedAmt, _, _ := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	found, lockedAmt, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.True(t, found)
 	require.Equal(t, cancelUnlockAmount, lockedAmt)
+	require.Equal(t, unlockTime, unlockTime) // TODO: compare to expected unlock time
 
 	// try to subtract more than the locked amount
 	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount2)
@@ -414,7 +400,8 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
 	require.NoError(t, err)
 
-	found, lockedAmt, _, _ = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	found, lockedAmt, unlockTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.False(t, found)
 	require.True(t, lockedAmt.IsZero())
+	require.Equal(t, unlockTime, unlockTime) // TODO: compare to expected unlock time
 }

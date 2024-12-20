@@ -36,14 +36,8 @@ func (k Keeper) GetAllLockups(ctx context.Context) []types.Lockup {
 // SaveLockup stores lockup or unlocking lockup based on the specified params.
 // It is used in SubtractUnlockingLockup to override the same record considering existing creationHeight,
 // as well as for importing lockups from the GenesisState.Lockups as part of the InitGenesis().
-func (k Keeper) SaveLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int,
-	creationHeight int64, unbondTime *time.Time, unlockTime *time.Time) {
-
-	var unbTime, unlTime *time.Time
-	if unbondTime != nil {
-		utcTime := unbondTime.UTC()
-		unbTime = &utcTime
-	}
+func (k Keeper) SaveLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int, creationHeight int64, unlockTime *time.Time) {
+	var unlTime *time.Time
 	if unlockTime != nil {
 		utcTime := unlockTime.UTC()
 		unlTime = &utcTime
@@ -53,7 +47,6 @@ func (k Keeper) SaveLockup(ctx context.Context, unlocking bool, delAddr sdk.AccA
 		ValidatorAddress: valAddr.String(),
 		Amount:           amt,
 		CreationHeight:   creationHeight,
-		UnbondTime:       unbTime,
 		UnlockTime:       unlTime,
 	}
 
@@ -72,20 +65,20 @@ func (k Keeper) SaveLockup(ctx context.Context, unlocking bool, delAddr sdk.AccA
 
 // SetLockup stores or updates a lockup in the state based on the key from LockupKey/UnlockingLockupKey.
 // We normalize lockup times to UTC before saving to the store for consistentcy.
-func (k Keeper) SetLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int, unbondTime *time.Time) (int64, *time.Time, time.Time) {
+func (k Keeper) SetLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (int64, *time.Time) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	params := k.GetParams(ctx)
 	creationHeight := sdkCtx.BlockHeight()
-	epochDuration := *params.EpochDuration
 
-	unlockTime := sdkCtx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	// use unbondTime from stakingKeeper.Undelegate() if present, set it to match unlockTime otherwise
-	var unbTime *time.Time
-	if unbondTime != nil {
-		utcTime := unbondTime.UTC()
-		unbTime = &utcTime
+	// use different key and set unlockTime for unlocking lockups
+	var unlockTime *time.Time
+	var key []byte
+	if unlocking {
+		unlTime := sdkCtx.BlockTime().Add(*params.EpochDuration * time.Duration(params.UnlockingEpochs))
+		unlockTime = &unlTime
+		key = types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
 	} else {
-		unbTime = &unlockTime
+		key = types.LockupKey(delAddr, valAddr)
 	}
 
 	lockup := &types.Lockup{
@@ -93,23 +86,14 @@ func (k Keeper) SetLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAd
 		ValidatorAddress: valAddr.String(),
 		Amount:           amt,
 		CreationHeight:   creationHeight,
-		UnbondTime:       unbTime,
-		UnlockTime:       &unlockTime,
-	}
-
-	// use different key for unlocking lockups
-	var key []byte
-	if unlocking {
-		key = types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
-	} else {
-		key = types.LockupKey(delAddr, valAddr)
+		UnlockTime:       unlockTime,
 	}
 
 	b := k.cdc.MustMarshal(lockup)
 	store := k.lockupStore(ctx, unlocking)
 	store.Set(key, b)
 
-	return creationHeight, unbTime, unlockTime
+	return creationHeight, unlockTime
 }
 
 func (k Keeper) GetLockups(ctx context.Context, delAddr sdk.AccAddress) []types.Lockup {
@@ -166,20 +150,18 @@ func (k Keeper) HasLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr s
 }
 
 // GetUnlockingLockup returns existing unlocking lockup data if found, otherwise returns defaults.
-func (k Keeper) GetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) (
-	found bool, amt math.Int, unbondTime time.Time, unlockTime time.Time) {
-
+func (k Keeper) GetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) (bool, math.Int, *time.Time) {
 	key := types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
 	store := k.lockupStore(ctx, true)
 	b := store.Get(key)
 	if b == nil {
-		return false, math.ZeroInt(), time.Time{}, time.Time{}
+		return false, math.ZeroInt(), nil
 	}
 
 	var lockup types.Lockup
 	k.cdc.MustUnmarshal(b, &lockup)
 
-	return true, lockup.Amount, *lockup.UnbondTime, *lockup.UnlockTime
+	return true, lockup.Amount, lockup.UnlockTime
 }
 
 // removeLockup removes existing lockup (delAddr/valAddr/).
@@ -200,7 +182,7 @@ func (k Keeper) removeUnlockingLockup(ctx context.Context, delAddr sdk.AccAddres
 func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) {
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
 	amt = amt.Add(lockedAmt)
-	k.SetLockup(ctx, false, delAddr, valAddr, amt, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr, amt)
 }
 
 // SubtractLockup subtracts provided amt from the existing delAddr/valAddr lockup.
@@ -209,7 +191,7 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 
 	// subtracted amt must not be larger than the lockedAmt
 	if amt.GT(lockedAmt) {
-		return types.ErrInvalidAmount.Wrap("invalid amount")
+		return types.ErrInvalidAmount.Wrap("subtract lockup")
 	}
 
 	// remove lockup record completely if subtracted amt is equal to lockedAmt
@@ -224,7 +206,7 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 		return errorsmod.Wrapf(err, "subtract %s from locked amount %s", amt, lockedAmt)
 	}
 
-	k.SetLockup(ctx, false, delAddr, valAddr, newAmt, nil)
+	k.SetLockup(ctx, false, delAddr, valAddr, newAmt)
 
 	return nil
 }
@@ -232,16 +214,16 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 // SubtractUnlockingLockup subtracts provided amt from the existing unlocking lockup (delAddr/valAddr/creationHeight/).
 func (k Keeper) SubtractUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt math.Int) error {
 	// get full unlocking lockup record because we must pass valid time(s) to SaveLockup
-	found, lockedAmt, unbondTime, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	found, lockedAmt, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 
 	// return early if not found
 	if !found {
-		return nil
+		return types.ErrNotFound.Wrap("subtract unlocking lockup")
 	}
 
 	// subtracted amt must not be larger than the lockedAmt
 	if amt.GT(lockedAmt) {
-		return types.ErrInvalidAmount.Wrap("invalid amount")
+		return types.ErrInvalidAmount.Wrap("subtract unlocking lockup")
 	}
 
 	// remove lockup record completely if subtracted amt is equal to lockedAmt
@@ -253,10 +235,10 @@ func (k Keeper) SubtractUnlockingLockup(ctx context.Context, delAddr sdk.AccAddr
 	// subtract amt from the lockedAmt othwerwise
 	newAmt, err := lockedAmt.SafeSub(amt)
 	if err != nil {
-		return errorsmod.Wrapf(err, "subtract %s from unlocking lockup locked amount %s", amt, lockedAmt)
+		return errorsmod.Wrapf(err, "subtract %s from unlocking lockup with amount %s", amt, lockedAmt)
 	}
 
-	k.SaveLockup(ctx, true, delAddr, valAddr, newAmt, creationHeight, &unbondTime, &unlockTime)
+	k.SaveLockup(ctx, true, delAddr, valAddr, newAmt, creationHeight, unlockTime)
 
 	return nil
 }
