@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"errors"
-	"time"
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
@@ -39,24 +38,17 @@ func (k Keeper) MintCredit(ctx context.Context, addr sdk.AccAddress, amt math.In
 
 // proratedCredit calculates the credits earned on the lockingAmt.
 func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
-	// Calculate the reward credits earned on the new lock.
 	rates := k.GetParams(ctx).RewardRates
 	lockedAmt := k.TotalAmountByAddr(ctx, delAddr)
-	credit := calculateCredit(rates, lockedAmt, lockingAmt)
-
-	// Pro-rate the credit based on the time elapsed in the current epoch.
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
-	sinceCurrentEpoch := time.Since(epochInfo.CurrentEpochStartTime).Milliseconds()
-	epochDuration := epochInfo.Duration.Milliseconds()
 
-	// TODO: is this check necessary?
-	// Under what condition can sinceCurrentEpoch be greater than epochDuration?
-	// What happens if the chain is paused for a long time?
-	if sinceCurrentEpoch < epochDuration {
-		credit = credit.MulRaw(sinceCurrentEpoch).QuoRaw(epochDuration)
-	}
-
-	return credit
+	return calculateProratedCredit(
+		rates,
+		lockedAmt,
+		lockingAmt,
+		epochInfo.CurrentEpochStartTime,
+		epochInfo.Duration,
+	)
 }
 
 // burnAllCredits burns all the reward credits in the system.
