@@ -150,6 +150,15 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		log.NewNopLogger(),
 	)
 
+	epochInfo := epochstypes.EpochInfo{
+		Identifier:            types.EpochIdentifier,
+		CurrentEpoch:          1,
+		CurrentEpochStartTime: ctx.BlockTime(),
+		Duration:              time.Hour * 24 * 30,
+	}
+
+	epochsKeeper.SetEpochInfo(ctx, epochInfo)
+
 	k := keeper.NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
