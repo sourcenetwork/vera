@@ -286,6 +286,70 @@ func Test_CalculateProratedCredit(t *testing.T) {
 			epochDuration:  time.Second * 9,
 			expectedCredit: 769,
 		},
+		{
+			name:           "Locking amount with 1.0 rate and previously locked amount",
+			lockedAmt:      40,
+			lockingAmt:     40,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 16, // 40 * 1.0 * 2/5
+		},
+		{
+			name:           "Locking amount with 1.1 rate and previously locked amount",
+			lockedAmt:      100,
+			lockingAmt:     100,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 44, // 100 * 1.1 * 2/5
+		},
+		{
+			name:           "Locking amount with 1.5 rate and previously locked amount",
+			lockedAmt:      300,
+			lockingAmt:     300,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 180, // 300 * 1.5 * 2/5
+		},
+		{
+			name:           "Locking amount with 1.2 + 1.1 rate and previously locked amount",
+			lockedAmt:      150,
+			lockingAmt:     150,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 70, // ((100 * 1.2) + (50 * 1.1)) * 2/5
+		},
+		{
+			name:           "Locking amount with 1.5 + 1.2 rate and previously locked amount",
+			lockedAmt:      200,
+			lockingAmt:     200,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 108, // ((100 * 1.5) + (100 * 1.2)) * 2/5
+		},
+		{
+			name:           "Locking amount with 1.5 + 1.2 + 1.1 + 1.0 rate and previously locked amount",
+			lockedAmt:      50,
+			lockingAmt:     350,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 172, // ((100 * 1.5) + (100 * 1.2) + (100 * 1.1) + (50 * 1.0)) * 2/5
+		},
+		{
+			name:           "Locking small amount with large previously locked amount",
+			lockedAmt:      1_000_000,
+			lockingAmt:     100,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 60, // 100 * 1.5 * 2/5
+		},
+		{
+			name:           "Locking large amount with large previously locked amount",
+			lockedAmt:      1_000_000,
+			lockingAmt:     10_000_000,
+			epochStartTime: time.Now().UTC().Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 6_000_000, // 10,000,000 * 1.5 * 2/5
+		},
 	}
 
 	rates := []types.Rate{
