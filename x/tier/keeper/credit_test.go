@@ -181,6 +181,7 @@ func Test_ResetAllCredits(t *testing.T) {
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {50, 50},
 				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {10, 20},
 				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {10, 10, 30},
+				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
 			},
 			expectedCredit: map[string]int64{
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100, // 50 + 50
@@ -195,6 +196,7 @@ func Test_ResetAllCredits(t *testing.T) {
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {100, 100},
 				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {100, 200, 300},
 				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {500, 1000},
+				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
 			},
 			expectedCredit: map[string]int64{
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 210,  // 100 + 100 + (10 rewards)
@@ -235,7 +237,8 @@ func Test_ResetAllCredits(t *testing.T) {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.CreditDenom)
 				if !bal.Amount.Equal(math.NewInt(expected)) {
-					t.Errorf("Incorrect credit balance for %s, got = %v, expected = %v", addrStr, bal.Amount, expected)
+					t.Errorf("Incorrect credit balance for %s, got = %v, expected = %v",
+						addrStr, bal.Amount, expected)
 				}
 			}
 
@@ -245,7 +248,8 @@ func Test_ResetAllCredits(t *testing.T) {
 					addr := sdk.MustAccAddressFromBech32(addrStr)
 					bal := k.GetBankKeeper().GetBalance(ctx, addr, params.CreditDenom)
 					if !bal.IsZero() {
-						t.Errorf("Address %s was not in expectedCredit, but has credit = %v", addrStr, bal.Amount)
+						t.Errorf("Address %s was not in expectedCredit, but has credit = %v",
+							addrStr, bal.Amount)
 					}
 				}
 			}
