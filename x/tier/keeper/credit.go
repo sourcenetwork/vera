@@ -51,9 +51,9 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 	)
 }
 
-// burnAllCredits burns all the reward credits in the system.
+// BurnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) burnAllCredits(ctx context.Context) error {
+func (k Keeper) BurnAllCredits(ctx context.Context) error {
 	// Note that we can't simply iterate through the lockup records because credits
 	// are transferrable and can be stored in accounts that are not tracked by lockups.
 	// Instead, we iterate through all the balances to find and burn the credits.
@@ -86,8 +86,8 @@ func (k Keeper) burnAllCredits(ctx context.Context) error {
 	return err
 }
 
-// resetAllCredits resets all the credits in the system.
-func (k Keeper) resetAllCredits(ctx context.Context) error {
+// ResetAllCredits resets all the credits in the system.
+func (k Keeper) ResetAllCredits(ctx context.Context) error {
 	// Reward to a delegator is calculated based on the total locked amount
 	// to all validators. Since each lockup entry only records locked amount
 	// for a single validator, we need to iterate through all the lockups to
