@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -51,6 +53,17 @@ func runMsgTestCase(t *testing.T, tc TestCase, k keeper.Keeper, ms types.MsgServ
 func TestMsgCancelUnlocking(t *testing.T) {
 	k, ms, ctx := setupMsgServer(t)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	epoch := epochstypes.EpochInfo{
+		Identifier:            types.EpochIdentifier,
+		CurrentEpoch:          1,
+		CurrentEpochStartTime: sdkCtx.BlockTime().Add(-5 * time.Minute),
+		Duration:              5 * time.Minute,
+	}
+	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
 	partialCancelCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(50))

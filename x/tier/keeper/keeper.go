@@ -81,6 +81,11 @@ func (k Keeper) GetBankKeeper() types.BankKeeper {
 	return k.bankKeeper
 }
 
+// GetEpochsKeeper returns the module's EpochsKeeper.
+func (k Keeper) GetEpochsKeeper() types.EpochsKeeper {
+	return k.epochsKeeper
+}
+
 // Logger returns a module-specific logger.
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))

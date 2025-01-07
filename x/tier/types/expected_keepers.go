@@ -12,8 +12,10 @@ import (
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 )
 
+// EpochsKeeper defines the expected interface for the Epochs module.
 type EpochsKeeper interface {
 	GetEpochInfo(ctx context.Context, identifier string) epochstypes.EpochInfo
+	SetEpochInfo(ctx context.Context, info epochstypes.EpochInfo)
 }
 
 // StakingKeeper defines the expected interface for the Staking module.
