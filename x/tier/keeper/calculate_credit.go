@@ -49,12 +49,13 @@ func calculateProratedCredit(
 	lockedAmt, lockingAmt math.Int,
 	currentEpochStartTime time.Time,
 	epochDuration time.Duration,
+	currentBlockTime time.Time,
 ) math.Int {
 	// Calculate the reward credits earned on the new lock.
 	credit := calculateCredit(rates, lockedAmt, lockingAmt)
 
 	// Prorate the credit based on the time elapsed in the current epoch.
-	sinceCurrentEpoch := time.Since(currentEpochStartTime).Milliseconds()
+	sinceCurrentEpoch := currentBlockTime.Sub(currentEpochStartTime).Milliseconds()
 	epochDurationMs := epochDuration.Milliseconds()
 
 	if epochDurationMs == 0 {

@@ -11,7 +11,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-func Test_CalculateCredit(t *testing.T) {
+func TestCalculateCredit(t *testing.T) {
 	rateList := []types.Rate{
 		{Amount: math.NewInt(300), Rate: 150},
 		{Amount: math.NewInt(200), Rate: 120},
@@ -99,7 +99,7 @@ func Test_CalculateCredit(t *testing.T) {
 	}
 }
 
-func Test_CalculateProratedCredit(t *testing.T) {
+func TestCalculateProratedCredit(t *testing.T) {
 	tests := []struct {
 		name           string
 		lockedAmt      int64
@@ -145,10 +145,10 @@ func Test_CalculateProratedCredit(t *testing.T) {
 		{
 			name:           "At the beginning of an epoch",
 			lockedAmt:      0,
-			lockingAmt:     0,
-			epochStartTime: time.Now().UTC(),
+			lockingAmt:     100,
+			epochStartTime: time.Now().UTC().Add(-5 * time.Minute),
 			epochDuration:  time.Minute * 5,
-			expectedCredit: 0,
+			expectedCredit: 100,
 		},
 		{
 			name:           "In the middle of an epoch",
@@ -162,9 +162,9 @@ func Test_CalculateProratedCredit(t *testing.T) {
 			name:           "At the end of an epoch",
 			lockedAmt:      0,
 			lockingAmt:     100,
-			epochStartTime: time.Now().UTC().Add(-5 * time.Minute),
+			epochStartTime: time.Now().UTC(),
 			epochDuration:  time.Minute * 5,
-			expectedCredit: 100,
+			expectedCredit: 0,
 		},
 		{
 			name:           "Negative locking amount",
@@ -226,7 +226,7 @@ func Test_CalculateProratedCredit(t *testing.T) {
 			name:           "Long epoch duration",
 			lockedAmt:      0,
 			lockingAmt:     100,
-			epochStartTime: time.Now().UTC().Add(-12 * 30 * time.Hour),
+			epochStartTime: time.Now().UTC().Add(-15 * 24 * time.Hour),
 			epochDuration:  time.Hour * 24 * 30,
 			expectedCredit: 50,
 		},
@@ -370,6 +370,7 @@ func Test_CalculateProratedCredit(t *testing.T) {
 				lockingAmt,
 				tt.epochStartTime,
 				tt.epochDuration,
+				time.Now().UTC(),
 			)
 
 			if !credit.Equal(math.NewInt(tt.expectedCredit)) {

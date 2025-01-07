@@ -48,6 +48,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 		lockingAmt,
 		epochInfo.CurrentEpochStartTime,
 		epochInfo.Duration,
+		sdk.UnwrapSDKContext(ctx).BlockTime(),
 	)
 }
 
