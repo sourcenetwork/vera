@@ -1,4 +1,4 @@
-package keeper_test
+package keeper
 
 import (
 	"testing"
@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/app/params"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
@@ -47,11 +46,11 @@ func Test_MintCredit(t *testing.T) {
 			}
 			amt := math.NewInt(tt.amt)
 
-			k, ctx := testutil.SetupKeeper(t)
+			k, ctx := setupKeeper(t)
 
-			err := k.MintCredit(ctx, addr, amt)
+			err := k.mintCredit(ctx, addr, amt)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("MintCredit() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("mintCredit() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -101,7 +100,7 @@ func Test_BurnAllCredits(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k, ctx := testutil.SetupKeeper(t)
+			k, ctx := setupKeeper(t)
 
 			// Mint and distribute credits
 			for addrStr, balance := range tt.creditBalances {
@@ -124,9 +123,9 @@ func Test_BurnAllCredits(t *testing.T) {
 			}
 
 			// Burn all credits
-			err := k.BurnAllCredits(ctx)
+			err := k.burnAllCredits(ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("BurnAllCredits() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("burnAllCredits() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			// Verify that all credit balances are zero
@@ -212,7 +211,7 @@ func Test_ResetAllCredits(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			k, ctx := testutil.SetupKeeper(t)
+			k, ctx := setupKeeper(t)
 
 			// Set default params
 			err := k.SetParams(ctx, types.DefaultParams())
@@ -227,9 +226,9 @@ func Test_ResetAllCredits(t *testing.T) {
 			}
 
 			// Reset all credits
-			err = k.ResetAllCredits(ctx)
+			err = k.resetAllCredits(ctx)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ResetAllCredits() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("resetAllCredits() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			// Check expected credits

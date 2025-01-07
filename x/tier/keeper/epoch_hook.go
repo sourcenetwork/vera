@@ -32,12 +32,12 @@ func (h EpochHooks) BeforeEpochStart(ctx context.Context, epochIdentifier string
 
 	h.keeper.Logger().Info("resetting all credits", "epochID", epochIdentifier, "epochNumber", epochNumber)
 
-	err := h.keeper.BurnAllCredits(ctx)
+	err := h.keeper.burnAllCredits(ctx)
 	if err != nil {
 		return errorsmod.Wrapf(err, "burn all credits")
 	}
 
-	err = h.keeper.ResetAllCredits(ctx)
+	err = h.keeper.resetAllCredits(ctx)
 	if err != nil {
 		return errorsmod.Wrapf(err, "reset all credits")
 	}

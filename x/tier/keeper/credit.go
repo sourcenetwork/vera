@@ -12,8 +12,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// MintCredit mints a coin and sends it to the specified address.
-func (k Keeper) MintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
+// mintCredit mints a coin and sends it to the specified address.
+func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
 	if _, err := sdk.AccAddressFromBech32(addr.String()); err != nil {
 		return errorsmod.Wrap(err, "invalid address")
 	}
@@ -51,9 +51,9 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 	)
 }
 
-// BurnAllCredits burns all the reward credits in the system.
+// burnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) BurnAllCredits(ctx context.Context) error {
+func (k Keeper) burnAllCredits(ctx context.Context) error {
 	// Note that we can't simply iterate through the lockup records because credits
 	// are transferrable and can be stored in accounts that are not tracked by lockups.
 	// Instead, we iterate through all the balances to find and burn the credits.
@@ -86,8 +86,8 @@ func (k Keeper) BurnAllCredits(ctx context.Context) error {
 	return err
 }
 
-// ResetAllCredits resets all the credits in the system.
-func (k Keeper) ResetAllCredits(ctx context.Context) error {
+// resetAllCredits resets all the credits in the system.
+func (k Keeper) resetAllCredits(ctx context.Context) error {
 	// Reward to a delegator is calculated based on the total locked amount
 	// to all validators. Since each lockup entry only records locked amount
 	// for a single validator, we need to iterate through all the lockups to
@@ -109,7 +109,7 @@ func (k Keeper) ResetAllCredits(ctx context.Context) error {
 	for delStrAddr, amt := range lockedAmts {
 		delAddr := sdk.MustAccAddressFromBech32(delStrAddr)
 		credit := calculateCredit(rates, math.ZeroInt(), amt)
-		err := k.MintCredit(ctx, delAddr, credit)
+		err := k.mintCredit(ctx, delAddr, credit)
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s to %s", credit, delAddr)
 		}

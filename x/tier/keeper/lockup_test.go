@@ -7,18 +7,13 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/app"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 
-func init() {
-	app.SetConfig(true)
-}
-
 func TestSetAndGetLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	now := time.Now()
 	creationHeight := int64(10)
@@ -45,7 +40,7 @@ func TestSetAndGetLockup(t *testing.T) {
 }
 
 func TestAddLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(500)
 
@@ -61,7 +56,7 @@ func TestAddLockup(t *testing.T) {
 }
 
 func TestSubtractLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	lockupAmount := math.NewInt(1000)
 	partialSubtractAmount := math.NewInt(500)
@@ -96,7 +91,7 @@ func TestSubtractLockup(t *testing.T) {
 }
 
 func TestGetAllLockups(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
@@ -124,7 +119,7 @@ func TestGetAllLockups(t *testing.T) {
 }
 
 func TestMustIterateLockups(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(1000)
 
@@ -147,7 +142,7 @@ func TestMustIterateLockups(t *testing.T) {
 }
 
 func TestMustIterateUnlockingLockups(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(1000)
 
@@ -171,7 +166,7 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 }
 
 func TestIterateLockups(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.Nil(t, err)
@@ -226,7 +221,7 @@ func TestIterateLockups(t *testing.T) {
 }
 
 func TestTotalAmountByAddr(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
@@ -255,7 +250,7 @@ func TestTotalAmountByAddr(t *testing.T) {
 }
 
 func TestHasLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
@@ -273,7 +268,7 @@ func TestHasLockup(t *testing.T) {
 }
 
 func TestGetUnlockingLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	now := time.Now()
 	params := k.GetParams(ctx)
@@ -304,7 +299,7 @@ func TestGetUnlockingLockup(t *testing.T) {
 }
 
 func TestGetLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	now := time.Now()
 	creationHeight := int64(10)
@@ -336,7 +331,7 @@ func TestGetLockup(t *testing.T) {
 }
 
 func TestGetLockups(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
@@ -368,7 +363,7 @@ func TestGetLockups(t *testing.T) {
 }
 
 func TestSubtractUnlockingLockup(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	params := k.GetParams(ctx)
 	epochDuration := *params.EpochDuration
