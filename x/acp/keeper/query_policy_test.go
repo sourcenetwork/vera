@@ -56,12 +56,14 @@ func TestQueryPolicy(t *testing.T) {
 }
 
 func (s *queryPolicySuite) TestQueryPolicy_Success() {
-	ctx, keeper, policyID := s.setupPolicy(s.T())
+	ctx, k, policyID := s.setupPolicy(s.T())
 
 	req := types.QueryPolicyRequest{
 		Id: policyID,
 	}
-	resp, err := keeper.Policy(ctx, &req)
+
+	querier := NewQuerier(k)
+	resp, err := querier.Policy(ctx, &req)
 
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
@@ -76,7 +78,8 @@ func (s *queryPolicySuite) TestQueryPolicy_UnknownPolicyReturnsPolicyNotFoundErr
 		Id: "not found",
 	}
 
-	resp, err := k.Policy(ctx, &req)
+	querier := NewQuerier(k)
+	resp, err := querier.Policy(ctx, &req)
 
 	require.Nil(s.T(), resp)
 	require.ErrorIs(s.T(), err, errors.ErrorType_NOT_FOUND)
@@ -86,7 +89,8 @@ func (s *queryPolicySuite) TestQueryPolicy_UnknownPolicyReturnsPolicyNotFoundErr
 func (s *queryPolicySuite) TestQueryPolicy_NilRequestReturnsInvalidRequestErr() {
 	ctx, k, _ := setupKeeper(s.T())
 
-	resp, err := k.Policy(ctx, nil)
+	querier := NewQuerier(k)
+	resp, err := querier.Policy(ctx, nil)
 
 	require.Nil(s.T(), resp)
 	require.Error(s.T(), err)
