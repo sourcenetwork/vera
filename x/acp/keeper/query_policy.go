@@ -16,24 +16,24 @@ func (q Querier) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine, err := q.GetACPEngine(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
+	resp, err := engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
 		Id: req.Id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if res == nil {
+	if resp == nil {
 		return nil, errors.NewPolicyNotFound(req.Id)
 	}
 
 	return &types.QueryPolicyResponse{
-		Policy: res.Policy,
+		Policy: resp.Policy,
 	}, nil
 }

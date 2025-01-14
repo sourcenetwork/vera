@@ -103,83 +103,88 @@ func TestPolicyIds(t *testing.T) {
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
-	ctx, keeper, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(s.T())
+	msgServer := NewMsgServerImpl(k)
+	querier := NewQuerier(k)
 	creator := accKeep.FirstAcc().GetAddress().String()
+
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_JSON() {
-	ctx, keeper, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(s.T())
+	msgServer := NewMsgServerImpl(k)
+	querier := NewQuerier(k)
 	creator := accKeep.FirstAcc().GetAddress().String()
+
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_JSON)
 
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_NoPoliciesRegistered() {
-	ctx, keeper, _ := setupKeeper(s.T())
+	ctx, k, _ := setupKeeper(s.T())
+	querier := NewQuerier(k)
 
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
-
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.Empty(s.T(), resp.Ids)
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
-	ctx, keeper, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(s.T())
+	msgServer := NewMsgServerImpl(k)
+	querier := NewQuerier(k)
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	_ = s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.Equal(s.T(), 2, len(resp.Ids))
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
-	ctx, keeper, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(s.T())
+	msgServer := NewMsgServerImpl(k)
+	querier := NewQuerier(k)
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	names := []string{}
+	policyNames := []string{}
 	for i := 0; i < 10_000; i++ {
-		names = append(names, "Policy"+strconv.Itoa(i))
+		policyNames = append(policyNames, "Policy"+strconv.Itoa(i))
 	}
+	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, policyNames, coretypes.PolicyMarshalingType_SHORT_JSON)
 
-	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, names, coretypes.PolicyMarshalingType_SHORT_JSON)
-
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
-	ctx, keeper, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(s.T())
+	msgServer := NewMsgServerImpl(k)
+	querier := NewQuerier(k)
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	names := []string{}
 	for i := 0; i < 10_000; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := keeper.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
