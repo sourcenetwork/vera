@@ -59,7 +59,8 @@ resources:
 }
 
 func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(t)
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -79,7 +80,7 @@ func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *te
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: true,
@@ -89,7 +90,8 @@ func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *te
 }
 
 func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(t)
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -105,7 +107,7 @@ func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
@@ -115,7 +117,8 @@ func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid
 }
 
 func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(t)
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -131,7 +134,7 @@ func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *t
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,

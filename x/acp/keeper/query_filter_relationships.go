@@ -11,13 +11,13 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) FilterRelationships(goCtx context.Context, req *types.QueryFilterRelationshipsRequest) (*types.QueryFilterRelationshipsResponse, error) {
+func (q Querier) FilterRelationships(goCtx context.Context, req *types.QueryFilterRelationshipsRequest) (*types.QueryFilterRelationshipsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
+	engine, err := q.GetACPEngine(ctx)
 	if err != nil {
 		return nil, err
 	}

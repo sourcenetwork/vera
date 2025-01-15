@@ -13,13 +13,13 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) VerifyAccessRequest(goCtx context.Context, req *types.QueryVerifyAccessRequestRequest) (*types.QueryVerifyAccessRequestResponse, error) {
+func (q Querier) VerifyAccessRequest(goCtx context.Context, req *types.QueryVerifyAccessRequestRequest) (*types.QueryVerifyAccessRequestResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
+	engine, err := q.GetACPEngine(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +27,8 @@ func (k Keeper) VerifyAccessRequest(goCtx context.Context, req *types.QueryVerif
 	actorId := req.AccessRequest.Actor.Id
 	addr, err := sdk.AccAddressFromBech32(actorId)
 	if err == nil {
-		// this means the actor ID is a cosmos account
-		// so convert it to a did
-		acc := k.accountKeeper.GetAccount(ctx, addr)
+		// this means the actor ID is a cosmos account, so convert it to a did
+		acc := q.accountKeeper.GetAccount(ctx, addr)
 		if acc == nil {
 			return nil, errors.Wrap("verify access request: could not produce did for actor", errors.ErrorType_BAD_INPUT, errors.Pair("actorId", actorId))
 		}
