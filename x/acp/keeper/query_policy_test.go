@@ -16,6 +16,10 @@ type queryPolicySuite struct {
 	suite.Suite
 }
 
+func TestQueryPolicy(t *testing.T) {
+	suite.Run(t, &queryPolicySuite{})
+}
+
 func (s *queryPolicySuite) setupPolicy(t *testing.T) (context.Context, Keeper, string) {
 	policyStr := `
 name: Source Policy
@@ -49,10 +53,6 @@ resources:
 	require.NoError(t, err)
 
 	return ctx, keeper, resp.Policy.Id
-}
-
-func TestQueryPolicy(t *testing.T) {
-	suite.Run(t, &queryPolicySuite{})
 }
 
 func (s *queryPolicySuite) TestQueryPolicy_Success() {

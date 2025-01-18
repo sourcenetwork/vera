@@ -19,6 +19,10 @@ type queryPolicyIdsSuite struct {
 	suite.Suite
 }
 
+func TestPolicyIds(t *testing.T) {
+	suite.Run(t, &queryPolicyIdsSuite{})
+}
+
 func (s *queryPolicyIdsSuite) setupPolicies(
 	t *testing.T,
 	ctx context.Context,
@@ -96,10 +100,6 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 	}
 
 	return policyIds
-}
-
-func TestPolicyIds(t *testing.T) {
-	suite.Run(t, &queryPolicyIdsSuite{})
 }
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {

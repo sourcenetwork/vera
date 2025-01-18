@@ -16,6 +16,10 @@ type queryVerifyAccessRequestSuite struct {
 	suite.Suite
 }
 
+func TestVerifyAccessRequest(t *testing.T) {
+	suite.Run(t, &queryVerifyAccessRequestSuite{})
+}
+
 func setupTestVerifyAccessRequest(t *testing.T) (context.Context, Keeper, *coretypes.Policy, string) {
 	ctx, keeper, accKeep := setupKeeper(t)
 	msgServer := NewMsgServerImpl(keeper)
@@ -61,10 +65,6 @@ resources:
 	require.Nil(t, err)
 
 	return ctx, keeper, resp.Policy, creatorDID
-}
-
-func TestVerifyAccessRequest(t *testing.T) {
-	suite.Run(t, &queryVerifyAccessRequestSuite{})
 }
 
 func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue() {

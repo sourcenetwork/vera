@@ -19,6 +19,10 @@ type queryAccessDecisionSuite struct {
 	testDecision *types.AccessDecision
 }
 
+func TestAccessDecision(t *testing.T) {
+	suite.Run(t, &queryAccessDecisionSuite{})
+}
+
 func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper) {
 	ctx, keeper, _ := setupKeeper(t)
 
@@ -52,10 +56,6 @@ func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper)
 
 	s.testDecision = decision
 	return ctx, keeper
-}
-
-func TestAccessDecision(t *testing.T) {
-	suite.Run(t, &queryAccessDecisionSuite{})
 }
 
 func (s *queryAccessDecisionSuite) TestQueryAccessDecision_ValidRequest() {
