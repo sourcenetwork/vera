@@ -50,12 +50,9 @@ func (q Querier) Lockup(ctx context.Context, req *types.LockupRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	amt := q.GetLockupAmount(ctx, delAddr, valAddr)
-
-	lockup := &types.Lockup{
-		DelegatorAddress: req.DelegatorAddress,
-		ValidatorAddress: req.ValidatorAddress,
-		Amount:           amt,
+	lockup := q.GetLockup(ctx, delAddr, valAddr)
+	if lockup == nil {
+		return nil, status.Error(codes.NotFound, "unlocking lockup does not exist")
 	}
 
 	return &types.LockupResponse{Lockup: *lockup}, nil
@@ -73,12 +70,12 @@ func (q Querier) Lockups(ctx context.Context, req *types.LockupsRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid delegator address")
 	}
 
-	lockups, pageRes, err := q.getLockupsPaginated(ctx, false, delAddr, req.Pagination)
+	lockups, pageRes, err := q.getLockupsPaginated(ctx, delAddr, req.Pagination)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.LockupsResponse{Lockup: lockups, Pagination: pageRes}, nil
+	return &types.LockupsResponse{Lockups: lockups, Pagination: pageRes}, nil
 }
 
 func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupRequest) (
@@ -98,20 +95,12 @@ func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockup
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	found, amt, unbondTime, unlockTime := q.GetUnlockingLockup(ctx, delAddr, valAddr, req.CreationHeight)
-	if !found {
-		return &types.UnlockingLockupResponse{Lockup: types.Lockup{DelegatorAddress: req.DelegatorAddress, ValidatorAddress: req.ValidatorAddress, Amount: amt}}, nil
+	unlockingLockup := q.GetUnlockingLockup(ctx, delAddr, valAddr, req.CreationHeight)
+	if unlockingLockup == nil {
+		return nil, status.Error(codes.NotFound, "unlocking lockup does not exist")
 	}
 
-	lockup := &types.Lockup{
-		DelegatorAddress: req.DelegatorAddress,
-		ValidatorAddress: req.ValidatorAddress,
-		Amount:           amt,
-		UnbondTime:       &unbondTime,
-		UnlockTime:       &unlockTime,
-	}
-
-	return &types.UnlockingLockupResponse{Lockup: *lockup}, nil
+	return &types.UnlockingLockupResponse{UnlockingLockup: *unlockingLockup}, nil
 }
 
 func (q Querier) UnlockingLockups(ctx context.Context, req *types.UnlockingLockupsRequest) (
@@ -126,19 +115,19 @@ func (q Querier) UnlockingLockups(ctx context.Context, req *types.UnlockingLocku
 		return nil, status.Error(codes.InvalidArgument, "invalid delegator address")
 	}
 
-	lockups, pageRes, err := q.getLockupsPaginated(ctx, true, delAddr, req.Pagination)
+	lockups, pageRes, err := q.getUnlockingLockupsPaginated(ctx, delAddr, req.Pagination)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	return &types.UnlockingLockupsResponse{Lockup: lockups, Pagination: pageRes}, nil
+	return &types.UnlockingLockupsResponse{UnlockingLockups: lockups, Pagination: pageRes}, nil
 }
 
-func (q Querier) getLockupsPaginated(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, page *query.PageRequest) (
+func (q Querier) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.Lockup, *query.PageResponse, error) {
 
 	var lockups []types.Lockup
-	store := q.lockupStore(ctx, unlocking)
+	store := q.lockupStore(ctx, false)
 	onResult := func(key []byte, value []byte) error {
 		if !bytes.HasPrefix(key, delAddr.Bytes()) {
 			return nil
@@ -155,4 +144,27 @@ func (q Querier) getLockupsPaginated(ctx context.Context, unlocking bool, delAdd
 	}
 
 	return lockups, pageRes, nil
+}
+
+func (q Querier) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
+	[]types.UnlockingLockup, *query.PageResponse, error) {
+
+	var unlockingLockups []types.UnlockingLockup
+	store := q.lockupStore(ctx, true)
+	onResult := func(key []byte, value []byte) error {
+		if !bytes.HasPrefix(key, delAddr.Bytes()) {
+			return nil
+		}
+		var unlockingLockup types.UnlockingLockup
+		q.cdc.MustUnmarshal(value, &unlockingLockup)
+		unlockingLockups = append(unlockingLockups, unlockingLockup)
+		return nil
+	}
+
+	pageRes, err := query.Paginate(store, page, onResult)
+	if err != nil {
+		return nil, nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return unlockingLockups, pageRes, nil
 }

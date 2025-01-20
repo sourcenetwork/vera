@@ -71,8 +71,8 @@ func TestLockupsQuery(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Len(t, response.Lockup, 1)
-	require.Equal(t, amount1.Add(amount2), response.Lockup[0].Amount)
+	require.Len(t, response.Lockups, 1)
+	require.Equal(t, amount1.Add(amount2), response.Lockups[0].Amount)
 }
 
 func TestUnlockingLockupQuery(t *testing.T) {
@@ -88,10 +88,10 @@ func TestUnlockingLockupQuery(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-	keeper.SetLockup(ctx, true, delAddr, valAddr, amount, nil)
+	completionTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	unlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 
-	unbondTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime := unbondTime
+	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount, completionTime, unlockTime)
 
 	querier := tierkeeper.NewQuerier(keeper)
 	response, err := querier.UnlockingLockup(ctx, &types.UnlockingLockupRequest{
@@ -100,18 +100,15 @@ func TestUnlockingLockupQuery(t *testing.T) {
 		CreationHeight:   1,
 	})
 
-	// use normalized time to confirm SetLockup() logic
-	unbondTimeUTC := unbondTime.UTC()
-	unlockTimeUTC := unlockTime.UTC()
-
 	require.NoError(t, err)
 	require.Equal(t, &types.UnlockingLockupResponse{
-		Lockup: types.Lockup{
+		UnlockingLockup: types.UnlockingLockup{
 			DelegatorAddress: delAddr.String(),
 			ValidatorAddress: valAddr.String(),
+			CreationHeight:   1,
 			Amount:           amount,
-			UnbondTime:       &unbondTimeUTC,
-			UnlockTime:       &unlockTimeUTC,
+			CompletionTime:   completionTime,
+			UnlockTime:       unlockTime,
 		},
 	}, response)
 }
@@ -129,16 +126,16 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
-	keeper.SetLockup(ctx, true, delAddr, valAddr, amount1, nil)
 
-	unbondTime1 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime1 := unbondTime1
+	completionTime1 := ctx.BlockTime().Add(time.Hour * 24 * 21)
+	unlockTime1 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount1, completionTime1, unlockTime1)
 
-	ctx = ctx.WithBlockHeight(2).WithBlockTime(unbondTime1)
-	keeper.SetLockup(ctx, true, delAddr, valAddr, amount2, nil)
+	ctx = ctx.WithBlockHeight(2).WithBlockTime(ctx.BlockTime().Add(time.Second))
 
-	unbondTime2 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	unlockTime2 := unbondTime2
+	completionTime2 := ctx.BlockTime().Add(time.Hour * 24 * 21)
+	unlockTime2 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
+	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(2), amount2, completionTime2, unlockTime2)
 
 	querier := tierkeeper.NewQuerier(keeper)
 	response, err := querier.UnlockingLockups(ctx, &types.UnlockingLockupsRequest{
@@ -146,15 +143,15 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 	})
 
 	require.NoError(t, err)
-	require.Len(t, response.Lockup, 2)
+	require.Len(t, response.UnlockingLockups, 2)
 
-	require.Equal(t, amount1, response.Lockup[0].Amount)
-	require.Equal(t, int64(1), response.Lockup[0].CreationHeight)
-	require.Equal(t, &unbondTime1, response.Lockup[0].UnbondTime)
-	require.Equal(t, &unlockTime1, response.Lockup[0].UnlockTime)
+	require.Equal(t, amount1, response.UnlockingLockups[0].Amount)
+	require.Equal(t, int64(1), response.UnlockingLockups[0].CreationHeight)
+	require.Equal(t, completionTime1, response.UnlockingLockups[0].CompletionTime)
+	require.Equal(t, unlockTime1, response.UnlockingLockups[0].UnlockTime)
 
-	require.Equal(t, amount2, response.Lockup[1].Amount)
-	require.Equal(t, int64(2), response.Lockup[1].CreationHeight)
-	require.Equal(t, &unbondTime2, response.Lockup[1].UnbondTime)
-	require.Equal(t, &unlockTime2, response.Lockup[1].UnlockTime)
+	require.Equal(t, amount2, response.UnlockingLockups[1].Amount)
+	require.Equal(t, int64(2), response.UnlockingLockups[1].CreationHeight)
+	require.Equal(t, completionTime2, response.UnlockingLockups[1].CompletionTime)
+	require.Equal(t, unlockTime2, response.UnlockingLockups[1].UnlockTime)
 }
