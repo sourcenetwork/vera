@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"time"
+
 	"cosmossdk.io/math"
 
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
@@ -37,6 +39,32 @@ func calculateCredit(rateList []types.Rate, lockedAmt, lockingAmt math.Int) math
 		if lockingAmt.IsZero() {
 			break
 		}
+	}
+
+	return credit
+}
+
+func calculateProratedCredit(
+	rates []types.Rate,
+	lockedAmt, lockingAmt math.Int,
+	currentEpochStartTime, currentBlockTime time.Time,
+	epochDuration time.Duration,
+) math.Int {
+	// Calculate the reward credits earned on the new lock.
+	credit := calculateCredit(rates, lockedAmt, lockingAmt)
+
+	// Prorate the credit based on the time elapsed in the current epoch.
+	sinceCurrentEpoch := currentBlockTime.Sub(currentEpochStartTime).Milliseconds()
+	epochDurationMs := epochDuration.Milliseconds()
+
+	if epochDurationMs == 0 {
+		return math.ZeroInt()
+	}
+
+	// This check is required because is possible that sinceCurrentEpoch can be greater than epochDuration
+	// (e.g. chain paused for longer than the epoch duration or misconfigured epoch duration).
+	if sinceCurrentEpoch < epochDurationMs {
+		credit = credit.MulRaw(sinceCurrentEpoch).QuoRaw(epochDurationMs)
 	}
 
 	return credit

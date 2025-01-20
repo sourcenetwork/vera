@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"errors"
-	"time"
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
@@ -13,8 +12,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// MintCredit mints a coin and sends it to the specified address.
-func (k Keeper) MintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
+// mintCredit mints a coin and sends it to the specified address.
+func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
 	if _, err := sdk.AccAddressFromBech32(addr.String()); err != nil {
 		return errorsmod.Wrap(err, "invalid address")
 	}
@@ -39,24 +38,18 @@ func (k Keeper) MintCredit(ctx context.Context, addr sdk.AccAddress, amt math.In
 
 // proratedCredit calculates the credits earned on the lockingAmt.
 func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
-	// Calculate the reward credits earned on the new lock.
 	rates := k.GetParams(ctx).RewardRates
 	lockedAmt := k.TotalAmountByAddr(ctx, delAddr)
-	credit := calculateCredit(rates, lockedAmt, lockingAmt)
-
-	// Pro-rate the credit based on the time elapsed in the current epoch.
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
-	sinceCurrentEpoch := time.Since(epochInfo.CurrentEpochStartTime).Milliseconds()
-	epochDuration := epochInfo.Duration.Milliseconds()
 
-	// TODO: is this check necessary?
-	// Under what condition can sinceCurrentEpoch be greater than epochDuration?
-	// What happens if the chain is paused for a long time?
-	if sinceCurrentEpoch < epochDuration {
-		credit = credit.MulRaw(sinceCurrentEpoch).QuoRaw(epochDuration)
-	}
-
-	return credit
+	return calculateProratedCredit(
+		rates,
+		lockedAmt,
+		lockingAmt,
+		epochInfo.CurrentEpochStartTime,
+		sdk.UnwrapSDKContext(ctx).BlockTime(),
+		epochInfo.Duration,
+	)
 }
 
 // burnAllCredits burns all the reward credits in the system.
@@ -117,7 +110,7 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 	for delStrAddr, amt := range lockedAmts {
 		delAddr := sdk.MustAccAddressFromBech32(delStrAddr)
 		credit := calculateCredit(rates, math.ZeroInt(), amt)
-		err := k.MintCredit(ctx, delAddr, credit)
+		err := k.mintCredit(ctx, delAddr, credit)
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s to %s", credit, delAddr)
 		}
