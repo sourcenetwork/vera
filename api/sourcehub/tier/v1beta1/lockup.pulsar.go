@@ -2,6 +2,7 @@
 package tierv1beta1
 
 import (
+	_ "cosmossdk.io/api/amino"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
@@ -20,9 +21,6 @@ var (
 	fd_Lockup_delegator_address protoreflect.FieldDescriptor
 	fd_Lockup_validator_address protoreflect.FieldDescriptor
 	fd_Lockup_amount            protoreflect.FieldDescriptor
-	fd_Lockup_creation_height   protoreflect.FieldDescriptor
-	fd_Lockup_unbond_time       protoreflect.FieldDescriptor
-	fd_Lockup_unlock_time       protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -31,9 +29,6 @@ func init() {
 	fd_Lockup_delegator_address = md_Lockup.Fields().ByName("delegator_address")
 	fd_Lockup_validator_address = md_Lockup.Fields().ByName("validator_address")
 	fd_Lockup_amount = md_Lockup.Fields().ByName("amount")
-	fd_Lockup_creation_height = md_Lockup.Fields().ByName("creation_height")
-	fd_Lockup_unbond_time = md_Lockup.Fields().ByName("unbond_time")
-	fd_Lockup_unlock_time = md_Lockup.Fields().ByName("unlock_time")
 }
 
 var _ protoreflect.Message = (*fastReflection_Lockup)(nil)
@@ -119,24 +114,6 @@ func (x *fastReflection_Lockup) Range(f func(protoreflect.FieldDescriptor, proto
 			return
 		}
 	}
-	if x.CreationHeight != int64(0) {
-		value := protoreflect.ValueOfInt64(x.CreationHeight)
-		if !f(fd_Lockup_creation_height, value) {
-			return
-		}
-	}
-	if x.UnbondTime != nil {
-		value := protoreflect.ValueOfMessage(x.UnbondTime.ProtoReflect())
-		if !f(fd_Lockup_unbond_time, value) {
-			return
-		}
-	}
-	if x.UnlockTime != nil {
-		value := protoreflect.ValueOfMessage(x.UnlockTime.ProtoReflect())
-		if !f(fd_Lockup_unlock_time, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -158,12 +135,6 @@ func (x *fastReflection_Lockup) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.ValidatorAddress != ""
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		return x.Amount != ""
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		return x.CreationHeight != int64(0)
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		return x.UnbondTime != nil
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		return x.UnlockTime != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -186,12 +157,6 @@ func (x *fastReflection_Lockup) Clear(fd protoreflect.FieldDescriptor) {
 		x.ValidatorAddress = ""
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		x.Amount = ""
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		x.CreationHeight = int64(0)
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		x.UnbondTime = nil
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		x.UnlockTime = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -217,15 +182,6 @@ func (x *fastReflection_Lockup) Get(descriptor protoreflect.FieldDescriptor) pro
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		value := x.Amount
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		value := x.CreationHeight
-		return protoreflect.ValueOfInt64(value)
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		value := x.UnbondTime
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		value := x.UnlockTime
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -252,12 +208,6 @@ func (x *fastReflection_Lockup) Set(fd protoreflect.FieldDescriptor, value proto
 		x.ValidatorAddress = value.Interface().(string)
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		x.Amount = value.Interface().(string)
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		x.CreationHeight = value.Int()
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		x.UnbondTime = value.Message().Interface().(*timestamppb.Timestamp)
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		x.UnlockTime = value.Message().Interface().(*timestamppb.Timestamp)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -278,24 +228,12 @@ func (x *fastReflection_Lockup) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Lockup) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		if x.UnbondTime == nil {
-			x.UnbondTime = new(timestamppb.Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.UnbondTime.ProtoReflect())
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		if x.UnlockTime == nil {
-			x.UnlockTime = new(timestamppb.Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.UnlockTime.ProtoReflect())
 	case "sourcehub.tier.v1beta1.Lockup.delegator_address":
 		panic(fmt.Errorf("field delegator_address of message sourcehub.tier.v1beta1.Lockup is not mutable"))
 	case "sourcehub.tier.v1beta1.Lockup.validator_address":
 		panic(fmt.Errorf("field validator_address of message sourcehub.tier.v1beta1.Lockup is not mutable"))
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		panic(fmt.Errorf("field amount of message sourcehub.tier.v1beta1.Lockup is not mutable"))
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		panic(fmt.Errorf("field creation_height of message sourcehub.tier.v1beta1.Lockup is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -315,14 +253,6 @@ func (x *fastReflection_Lockup) NewField(fd protoreflect.FieldDescriptor) protor
 		return protoreflect.ValueOfString("")
 	case "sourcehub.tier.v1beta1.Lockup.amount":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.tier.v1beta1.Lockup.creation_height":
-		return protoreflect.ValueOfInt64(int64(0))
-	case "sourcehub.tier.v1beta1.Lockup.unbond_time":
-		m := new(timestamppb.Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.tier.v1beta1.Lockup.unlock_time":
-		m := new(timestamppb.Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Lockup"))
@@ -404,17 +334,6 @@ func (x *fastReflection_Lockup) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.CreationHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.CreationHeight))
-		}
-		if x.UnbondTime != nil {
-			l = options.Size(x.UnbondTime)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.UnlockTime != nil {
-			l = options.Size(x.UnlockTime)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -443,39 +362,6 @@ func (x *fastReflection_Lockup) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if x.UnlockTime != nil {
-			encoded, err := options.Marshal(x.UnlockTime)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x32
-		}
-		if x.UnbondTime != nil {
-			encoded, err := options.Marshal(x.UnbondTime)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x2a
-		}
-		if x.CreationHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.CreationHeight))
-			i--
-			dAtA[i] = 0x20
 		}
 		if len(x.Amount) > 0 {
 			i -= len(x.Amount)
@@ -643,7 +529,638 @@ func (x *fastReflection_Lockup) ProtoMethods() *protoiface.Methods {
 				}
 				x.Amount = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_UnlockingLockup                   protoreflect.MessageDescriptor
+	fd_UnlockingLockup_delegator_address protoreflect.FieldDescriptor
+	fd_UnlockingLockup_validator_address protoreflect.FieldDescriptor
+	fd_UnlockingLockup_creation_height   protoreflect.FieldDescriptor
+	fd_UnlockingLockup_amount            protoreflect.FieldDescriptor
+	fd_UnlockingLockup_completion_time   protoreflect.FieldDescriptor
+	fd_UnlockingLockup_unlock_time       protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_tier_v1beta1_lockup_proto_init()
+	md_UnlockingLockup = File_sourcehub_tier_v1beta1_lockup_proto.Messages().ByName("UnlockingLockup")
+	fd_UnlockingLockup_delegator_address = md_UnlockingLockup.Fields().ByName("delegator_address")
+	fd_UnlockingLockup_validator_address = md_UnlockingLockup.Fields().ByName("validator_address")
+	fd_UnlockingLockup_creation_height = md_UnlockingLockup.Fields().ByName("creation_height")
+	fd_UnlockingLockup_amount = md_UnlockingLockup.Fields().ByName("amount")
+	fd_UnlockingLockup_completion_time = md_UnlockingLockup.Fields().ByName("completion_time")
+	fd_UnlockingLockup_unlock_time = md_UnlockingLockup.Fields().ByName("unlock_time")
+}
+
+var _ protoreflect.Message = (*fastReflection_UnlockingLockup)(nil)
+
+type fastReflection_UnlockingLockup UnlockingLockup
+
+func (x *UnlockingLockup) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_UnlockingLockup)(x)
+}
+
+func (x *UnlockingLockup) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_tier_v1beta1_lockup_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_UnlockingLockup_messageType fastReflection_UnlockingLockup_messageType
+var _ protoreflect.MessageType = fastReflection_UnlockingLockup_messageType{}
+
+type fastReflection_UnlockingLockup_messageType struct{}
+
+func (x fastReflection_UnlockingLockup_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_UnlockingLockup)(nil)
+}
+func (x fastReflection_UnlockingLockup_messageType) New() protoreflect.Message {
+	return new(fastReflection_UnlockingLockup)
+}
+func (x fastReflection_UnlockingLockup_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_UnlockingLockup
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_UnlockingLockup) Descriptor() protoreflect.MessageDescriptor {
+	return md_UnlockingLockup
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_UnlockingLockup) Type() protoreflect.MessageType {
+	return _fastReflection_UnlockingLockup_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_UnlockingLockup) New() protoreflect.Message {
+	return new(fastReflection_UnlockingLockup)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_UnlockingLockup) Interface() protoreflect.ProtoMessage {
+	return (*UnlockingLockup)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_UnlockingLockup) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.DelegatorAddress != "" {
+		value := protoreflect.ValueOfString(x.DelegatorAddress)
+		if !f(fd_UnlockingLockup_delegator_address, value) {
+			return
+		}
+	}
+	if x.ValidatorAddress != "" {
+		value := protoreflect.ValueOfString(x.ValidatorAddress)
+		if !f(fd_UnlockingLockup_validator_address, value) {
+			return
+		}
+	}
+	if x.CreationHeight != int64(0) {
+		value := protoreflect.ValueOfInt64(x.CreationHeight)
+		if !f(fd_UnlockingLockup_creation_height, value) {
+			return
+		}
+	}
+	if x.Amount != "" {
+		value := protoreflect.ValueOfString(x.Amount)
+		if !f(fd_UnlockingLockup_amount, value) {
+			return
+		}
+	}
+	if x.CompletionTime != nil {
+		value := protoreflect.ValueOfMessage(x.CompletionTime.ProtoReflect())
+		if !f(fd_UnlockingLockup_completion_time, value) {
+			return
+		}
+	}
+	if x.UnlockTime != nil {
+		value := protoreflect.ValueOfMessage(x.UnlockTime.ProtoReflect())
+		if !f(fd_UnlockingLockup_unlock_time, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_UnlockingLockup) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		return x.DelegatorAddress != ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		return x.ValidatorAddress != ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		return x.CreationHeight != int64(0)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		return x.Amount != ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		return x.CompletionTime != nil
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		return x.UnlockTime != nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_UnlockingLockup) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		x.DelegatorAddress = ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		x.ValidatorAddress = ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		x.CreationHeight = int64(0)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		x.Amount = ""
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		x.CompletionTime = nil
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		x.UnlockTime = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_UnlockingLockup) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		value := x.DelegatorAddress
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		value := x.ValidatorAddress
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		value := x.CreationHeight
+		return protoreflect.ValueOfInt64(value)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		value := x.Amount
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		value := x.CompletionTime
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		value := x.UnlockTime
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_UnlockingLockup) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		x.DelegatorAddress = value.Interface().(string)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		x.ValidatorAddress = value.Interface().(string)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		x.CreationHeight = value.Int()
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		x.Amount = value.Interface().(string)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		x.CompletionTime = value.Message().Interface().(*timestamppb.Timestamp)
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		x.UnlockTime = value.Message().Interface().(*timestamppb.Timestamp)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_UnlockingLockup) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		if x.CompletionTime == nil {
+			x.CompletionTime = new(timestamppb.Timestamp)
+		}
+		return protoreflect.ValueOfMessage(x.CompletionTime.ProtoReflect())
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		if x.UnlockTime == nil {
+			x.UnlockTime = new(timestamppb.Timestamp)
+		}
+		return protoreflect.ValueOfMessage(x.UnlockTime.ProtoReflect())
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message sourcehub.tier.v1beta1.UnlockingLockup is not mutable"))
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		panic(fmt.Errorf("field validator_address of message sourcehub.tier.v1beta1.UnlockingLockup is not mutable"))
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		panic(fmt.Errorf("field creation_height of message sourcehub.tier.v1beta1.UnlockingLockup is not mutable"))
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		panic(fmt.Errorf("field amount of message sourcehub.tier.v1beta1.UnlockingLockup is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_UnlockingLockup) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.UnlockingLockup.delegator_address":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.tier.v1beta1.UnlockingLockup.validator_address":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.tier.v1beta1.UnlockingLockup.creation_height":
+		return protoreflect.ValueOfInt64(int64(0))
+	case "sourcehub.tier.v1beta1.UnlockingLockup.amount":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.tier.v1beta1.UnlockingLockup.completion_time":
+		m := new(timestamppb.Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "sourcehub.tier.v1beta1.UnlockingLockup.unlock_time":
+		m := new(timestamppb.Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.UnlockingLockup"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.UnlockingLockup does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_UnlockingLockup) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.tier.v1beta1.UnlockingLockup", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_UnlockingLockup) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_UnlockingLockup) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_UnlockingLockup) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_UnlockingLockup) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*UnlockingLockup)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.DelegatorAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ValidatorAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.CreationHeight != 0 {
+			n += 1 + runtime.Sov(uint64(x.CreationHeight))
+		}
+		l = len(x.Amount)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.CompletionTime != nil {
+			l = options.Size(x.CompletionTime)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.UnlockTime != nil {
+			l = options.Size(x.UnlockTime)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*UnlockingLockup)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.UnlockTime != nil {
+			encoded, err := options.Marshal(x.UnlockTime)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if x.CompletionTime != nil {
+			encoded, err := options.Marshal(x.CompletionTime)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x2a
+		}
+		if len(x.Amount) > 0 {
+			i -= len(x.Amount)
+			copy(dAtA[i:], x.Amount)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Amount)))
+			i--
+			dAtA[i] = 0x22
+		}
+		if x.CreationHeight != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.CreationHeight))
+			i--
+			dAtA[i] = 0x18
+		}
+		if len(x.ValidatorAddress) > 0 {
+			i -= len(x.ValidatorAddress)
+			copy(dAtA[i:], x.ValidatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ValidatorAddress)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.DelegatorAddress) > 0 {
+			i -= len(x.DelegatorAddress)
+			copy(dAtA[i:], x.DelegatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.DelegatorAddress)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*UnlockingLockup)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: UnlockingLockup: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: UnlockingLockup: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DelegatorAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.DelegatorAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ValidatorAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CreationHeight", wireType)
 				}
@@ -662,9 +1179,41 @@ func (x *fastReflection_Lockup) ProtoMethods() *protoiface.Methods {
 						break
 					}
 				}
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Amount = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
 			case 5:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field UnbondTime", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CompletionTime", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -691,10 +1240,10 @@ func (x *fastReflection_Lockup) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.UnbondTime == nil {
-					x.UnbondTime = &timestamppb.Timestamp{}
+				if x.CompletionTime == nil {
+					x.CompletionTime = &timestamppb.Timestamp{}
 				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.UnbondTime); err != nil {
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CompletionTime); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -782,7 +1331,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Lockup tracks the locked and unlocking stake of a delegator.
+// Lockup tracks the locked stake of a delegator.
 type Lockup struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -791,14 +1340,6 @@ type Lockup struct {
 	DelegatorAddress string `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
 	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
 	Amount           string `protobuf:"bytes,3,opt,name=amount,proto3" json:"amount,omitempty"`
-	// The following fields are only used for unlocking lockups.
-	//
-	// The height at which the lockup was created.
-	CreationHeight int64 `protobuf:"varint,4,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
-	// The time at which the stake undelegation will be completed.
-	UnbondTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=unbond_time,json=unbondTime,proto3" json:"unbond_time,omitempty"`
-	// The time at which the stake unlocking will be completed.
-	UnlockTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=unlock_time,json=unlockTime,proto3" json:"unlock_time,omitempty"`
 }
 
 func (x *Lockup) Reset() {
@@ -842,21 +1383,78 @@ func (x *Lockup) GetAmount() string {
 	return ""
 }
 
-func (x *Lockup) GetCreationHeight() int64 {
+// UnlockingLockup tracks the unlocking stake of a delegator.
+type UnlockingLockup struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DelegatorAddress string `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
+	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
+	CreationHeight   int64  `protobuf:"varint,3,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
+	Amount           string `protobuf:"bytes,4,opt,name=amount,proto3" json:"amount,omitempty"`
+	// The time at which the stake undelegation will be completed.
+	CompletionTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=completion_time,json=completionTime,proto3" json:"completion_time,omitempty"`
+	// The time after which the unlocking lockup can be completed.
+	UnlockTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=unlock_time,json=unlockTime,proto3" json:"unlock_time,omitempty"`
+}
+
+func (x *UnlockingLockup) Reset() {
+	*x = UnlockingLockup{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_tier_v1beta1_lockup_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UnlockingLockup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnlockingLockup) ProtoMessage() {}
+
+// Deprecated: Use UnlockingLockup.ProtoReflect.Descriptor instead.
+func (*UnlockingLockup) Descriptor() ([]byte, []int) {
+	return file_sourcehub_tier_v1beta1_lockup_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UnlockingLockup) GetDelegatorAddress() string {
+	if x != nil {
+		return x.DelegatorAddress
+	}
+	return ""
+}
+
+func (x *UnlockingLockup) GetValidatorAddress() string {
+	if x != nil {
+		return x.ValidatorAddress
+	}
+	return ""
+}
+
+func (x *UnlockingLockup) GetCreationHeight() int64 {
 	if x != nil {
 		return x.CreationHeight
 	}
 	return 0
 }
 
-func (x *Lockup) GetUnbondTime() *timestamppb.Timestamp {
+func (x *UnlockingLockup) GetAmount() string {
 	if x != nil {
-		return x.UnbondTime
+		return x.Amount
+	}
+	return ""
+}
+
+func (x *UnlockingLockup) GetCompletionTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CompletionTime
 	}
 	return nil
 }
 
-func (x *Lockup) GetUnlockTime() *timestamppb.Timestamp {
+func (x *UnlockingLockup) GetUnlockTime() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UnlockTime
 	}
@@ -869,52 +1467,70 @@ var file_sourcehub_tier_v1beta1_lockup_proto_rawDesc = []byte{
 	0x0a, 0x23, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x74, 0x69, 0x65, 0x72,
 	0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x6c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x16, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x1a, 0x19, 0x63,
-	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d,
-	0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f,
-	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
-	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22,
-	0x93, 0x03, 0x0a, 0x06, 0x4c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65,
-	0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
-	0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
-	0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4,
-	0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
-	0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x12, 0x43, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x42, 0x2b, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x15, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
-	0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x49, 0x6e, 0x74,
-	0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x49, 0x6e, 0x74, 0x52, 0x06,
-	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52,
-	0x0e, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12,
-	0x41, 0x0a, 0x0b, 0x75, 0x6e, 0x62, 0x6f, 0x6e, 0x64, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x05,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x42, 0x04, 0x90, 0xdf, 0x1f, 0x01, 0x52, 0x0a, 0x75, 0x6e, 0x62, 0x6f, 0x6e, 0x64, 0x54, 0x69,
-	0x6d, 0x65, 0x12, 0x41, 0x0a, 0x0b, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x69, 0x6d,
-	0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
-	0x61, 0x6d, 0x70, 0x42, 0x04, 0x90, 0xdf, 0x1f, 0x01, 0x52, 0x0a, 0x75, 0x6e, 0x6c, 0x6f, 0x63,
-	0x6b, 0x54, 0x69, 0x6d, 0x65, 0x42, 0xd8, 0x01, 0x0a, 0x1a, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62,
-	0x65, 0x74, 0x61, 0x31, 0x42, 0x0b, 0x4c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x50, 0x01, 0x5a, 0x33, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69,
-	0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f,
-	0x74, 0x69, 0x65, 0x72, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x3b, 0x74, 0x69, 0x65,
-	0x72, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x54, 0x58, 0xaa, 0x02,
-	0x16, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x54, 0x69, 0x65, 0x72, 0x2e,
-	0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x16, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x5c, 0x54, 0x69, 0x65, 0x72, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
-	0xe2, 0x02, 0x22, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x54, 0x69, 0x65,
-	0x72, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74,
-	0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x18, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
-	0x62, 0x3a, 0x3a, 0x54, 0x69, 0x65, 0x72, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x1a, 0x11, 0x61,
+	0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67,
+	0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x22, 0xe4, 0x01, 0x0a, 0x06, 0x4c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x12, 0x45, 0x0a,
+	0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x12, 0x43, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x42, 0x2b, 0xc8, 0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x15, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e,
+	0x49, 0x6e, 0x74, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x49, 0x6e,
+	0x74, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0xb6, 0x03, 0x0a, 0x0f, 0x55, 0x6e,
+	0x6c, 0x6f, 0x63, 0x6b, 0x69, 0x6e, 0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x12, 0x45, 0x0a,
+	0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f,
+	0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
+	0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x43, 0x0a,
+	0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x42, 0x2b, 0xc8,
+	0xde, 0x1f, 0x00, 0xda, 0xde, 0x1f, 0x15, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b,
+	0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x49, 0x6e, 0x74, 0xd2, 0xb4, 0x2d, 0x0a,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x49, 0x6e, 0x74, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75,
+	0x6e, 0x74, 0x12, 0x52, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f,
+	0x01, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69,
+	0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x4a, 0x0a, 0x0b, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b,
+	0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f,
+	0x01, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0a, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69,
+	0x6d, 0x65, 0x42, 0xd8, 0x01, 0x0a, 0x1a, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x42, 0x0b, 0x4c, 0x6f, 0x63, 0x6b, 0x75, 0x70, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
+	0x5a, 0x33, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61,
+	0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x74, 0x69, 0x65,
+	0x72, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x3b, 0x74, 0x69, 0x65, 0x72, 0x76, 0x31,
+	0x62, 0x65, 0x74, 0x61, 0x31, 0xa2, 0x02, 0x03, 0x53, 0x54, 0x58, 0xaa, 0x02, 0x16, 0x53, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x54, 0x69, 0x65, 0x72, 0x2e, 0x56, 0x31, 0x62,
+	0x65, 0x74, 0x61, 0x31, 0xca, 0x02, 0x16, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x5c, 0x54, 0x69, 0x65, 0x72, 0x5c, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0xe2, 0x02, 0x22,
+	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x54, 0x69, 0x65, 0x72, 0x5c, 0x56,
+	0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
+	0x74, 0x61, 0xea, 0x02, 0x18, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a,
+	0x54, 0x69, 0x65, 0x72, 0x3a, 0x3a, 0x56, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x62, 0x06, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -929,14 +1545,15 @@ func file_sourcehub_tier_v1beta1_lockup_proto_rawDescGZIP() []byte {
 	return file_sourcehub_tier_v1beta1_lockup_proto_rawDescData
 }
 
-var file_sourcehub_tier_v1beta1_lockup_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_sourcehub_tier_v1beta1_lockup_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_sourcehub_tier_v1beta1_lockup_proto_goTypes = []interface{}{
 	(*Lockup)(nil),                // 0: sourcehub.tier.v1beta1.Lockup
-	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
+	(*UnlockingLockup)(nil),       // 1: sourcehub.tier.v1beta1.UnlockingLockup
+	(*timestamppb.Timestamp)(nil), // 2: google.protobuf.Timestamp
 }
 var file_sourcehub_tier_v1beta1_lockup_proto_depIdxs = []int32{
-	1, // 0: sourcehub.tier.v1beta1.Lockup.unbond_time:type_name -> google.protobuf.Timestamp
-	1, // 1: sourcehub.tier.v1beta1.Lockup.unlock_time:type_name -> google.protobuf.Timestamp
+	2, // 0: sourcehub.tier.v1beta1.UnlockingLockup.completion_time:type_name -> google.protobuf.Timestamp
+	2, // 1: sourcehub.tier.v1beta1.UnlockingLockup.unlock_time:type_name -> google.protobuf.Timestamp
 	2, // [2:2] is the sub-list for method output_type
 	2, // [2:2] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -962,6 +1579,18 @@ func file_sourcehub_tier_v1beta1_lockup_proto_init() {
 				return nil
 			}
 		}
+		file_sourcehub_tier_v1beta1_lockup_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*UnlockingLockup); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -969,7 +1598,7 @@ func file_sourcehub_tier_v1beta1_lockup_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_tier_v1beta1_lockup_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

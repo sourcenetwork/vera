@@ -1,13 +1,14 @@
 syntax = "proto3";
 package sourcehub.tier.v1beta1;
 
+import "amino/amino.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
 
-// Lockup tracks the locked and unlocking stake of a delegator.
+// Lockup tracks the locked stake of a delegator.
 message Lockup {
   string delegator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
@@ -16,15 +17,31 @@ message Lockup {
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
+}
 
-  // The following fields are only used for unlocking lockups.
-  //
-  // The height at which the lockup was created.
-  int64 creation_height = 4;
+// UnlockingLockup tracks the unlocking stake of a delegator.
+message UnlockingLockup {
+  string delegator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+  int64 creation_height = 3;
+
+  string amount = 4 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
 
   // The time at which the stake undelegation will be completed.
-  google.protobuf.Timestamp unbond_time = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp completion_time = 5 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.stdtime) = true
+  ];
 
-  // The time at which the stake unlocking will be completed.
-  google.protobuf.Timestamp unlock_time = 6 [(gogoproto.stdtime) = true];
+  // The time after which the unlocking lockup can be completed.
+  google.protobuf.Timestamp unlock_time = 6 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.stdtime) = true
+  ];
 }
