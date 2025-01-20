@@ -58,8 +58,10 @@ func TestLock(t *testing.T) {
 	// locking invalid amounts should fail
 	err = k.Lock(ctx, delAddr, valAddr, invalidAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "lock non-positive amount")
 	err = k.Lock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "lock non-positive amount")
 
 	// lock valid amount
 	err = k.Lock(ctx, delAddr, valAddr, amount)
@@ -101,8 +103,10 @@ func TestUnlock(t *testing.T) {
 	// unlocking invalid amounts should fail
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, invalidUnlockAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "unlock non-positive amount")
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "unlock non-positive amount")
 
 	creationHeight, completionTime, unlockTime, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
@@ -148,8 +152,10 @@ func TestRedelegate(t *testing.T) {
 	// redelegating invalid amounts should fail
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, invalidAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "redelegate non-positive amount")
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "redelegate non-positive amount")
 
 	// redelegate from the source validator to the destination validator
 	completionTime, err := k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.NewInt(500))
@@ -212,8 +218,20 @@ func TestCompleteUnlocking(t *testing.T) {
 	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
 	require.Equal(t, initialDelegatorBalance.Sub(lockAmount), balance.Amount)
 
+	// completing unlocking lockup should be skipped if unlock time was not reached
+	err = k.CompleteUnlocking(ctx)
+	require.NoError(t, err)
+	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
+	require.Equal(t, initialDelegatorBalance.Sub(unlockAmount), balance.Amount)
+
 	// advance block time by 60 days
 	ctx = ctx.WithBlockHeight(3600 * 24 * 60).WithBlockTime(ctx.BlockTime().Add(60 * 24 * time.Hour))
+
+	// completing unlocking lockup should be skipped if module balance is less than required amount
+	err = k.CompleteUnlocking(ctx)
+	require.NoError(t, err)
+	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
+	require.Equal(t, initialDelegatorBalance.Sub(unlockAmount), balance.Amount)
 
 	// complete unbonding via the staking keeper
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
@@ -280,6 +298,13 @@ func TestCancelUnlocking(t *testing.T) {
 	require.Equal(t, unlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 499
 	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
 	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
+
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.NewInt(-100))
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.ZeroInt())
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
 
 	// partially cancel the unlocking lockup
 	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, partialUnlockAmount)

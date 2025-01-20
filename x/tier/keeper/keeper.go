@@ -144,7 +144,7 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return types.ErrInvalidAmount.Wrap("lock negative amount")
+		return types.ErrInvalidAmount.Wrap("lock non-positive amount")
 	}
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
@@ -195,7 +195,7 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return 0, time.Time{}, time.Time{}, types.ErrInvalidAmount.Wrap("unlock negative amount")
+		return 0, time.Time{}, time.Time{}, types.ErrInvalidAmount.Wrap("unlock non-positive amount")
 	}
 
 	err = k.SubtractLockup(ctx, delAddr, valAddr, amt)
@@ -251,7 +251,7 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	amt math.Int) (time.Time, error) {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return time.Time{}, types.ErrInvalidAmount.Wrap("redelegate negative amount")
+		return time.Time{}, types.ErrInvalidAmount.Wrap("redelegate non-positive amount")
 	}
 
 	// Subtract the lockup from the source validator
@@ -294,7 +294,7 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	creationHeight int64, amt math.Int) error {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return types.ErrInvalidAmount.Wrap("cancel unlocking negative amount")
+		return types.ErrInvalidAmount.Wrap("cancel unlocking non-positive amount")
 	}
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
