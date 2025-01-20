@@ -25,6 +25,19 @@ func TestParamsQuery(t *testing.T) {
 	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
 }
 
+func TestParamsQuery_InvalidRequest(t *testing.T) {
+	keeper, ctx := keepertest.TierKeeper(t)
+	params := types.DefaultParams()
+	require.NoError(t, keeper.SetParams(ctx, params))
+
+	querier := tierkeeper.NewQuerier(keeper)
+	response, err := querier.Params(ctx, nil)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
+}
+
 func TestLockupQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
 	amount := math.NewInt(1000)
@@ -52,6 +65,19 @@ func TestLockupQuery(t *testing.T) {
 	}, response)
 }
 
+func TestLockupQuery_InvalidRequest(t *testing.T) {
+	keeper, ctx := keepertest.TierKeeper(t)
+	params := types.DefaultParams()
+	require.NoError(t, keeper.SetParams(ctx, params))
+
+	querier := tierkeeper.NewQuerier(keeper)
+	response, err := querier.Lockup(ctx, nil)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
+}
+
 func TestLockupsQuery(t *testing.T) {
 	keeper, ctx := keepertest.TierKeeper(t)
 	amount1 := math.NewInt(1000)
@@ -73,6 +99,19 @@ func TestLockupsQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, response.Lockups, 1)
 	require.Equal(t, amount1.Add(amount2), response.Lockups[0].Amount)
+}
+
+func TestLockupsQuery_InvalidRequest(t *testing.T) {
+	keeper, ctx := keepertest.TierKeeper(t)
+	params := types.DefaultParams()
+	require.NoError(t, keeper.SetParams(ctx, params))
+
+	querier := tierkeeper.NewQuerier(keeper)
+	response, err := querier.Lockups(ctx, nil)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
 }
 
 func TestUnlockingLockupQuery(t *testing.T) {
@@ -111,6 +150,19 @@ func TestUnlockingLockupQuery(t *testing.T) {
 			UnlockTime:       unlockTime,
 		},
 	}, response)
+}
+
+func TestUnlockingLockupQuery_InvalidRequest(t *testing.T) {
+	keeper, ctx := keepertest.TierKeeper(t)
+	params := types.DefaultParams()
+	require.NoError(t, keeper.SetParams(ctx, params))
+
+	querier := tierkeeper.NewQuerier(keeper)
+	response, err := querier.UnlockingLockup(ctx, nil)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
 }
 
 func TestUnlockingLockupsQuery(t *testing.T) {
@@ -154,4 +206,17 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 	require.Equal(t, int64(2), response.UnlockingLockups[1].CreationHeight)
 	require.Equal(t, completionTime2, response.UnlockingLockups[1].CompletionTime)
 	require.Equal(t, unlockTime2, response.UnlockingLockups[1].UnlockTime)
+}
+
+func TestUnlockingLockupsQuery_InvalidRequest(t *testing.T) {
+	keeper, ctx := keepertest.TierKeeper(t)
+	params := types.DefaultParams()
+	require.NoError(t, keeper.SetParams(ctx, params))
+
+	querier := tierkeeper.NewQuerier(keeper)
+	response, err := querier.UnlockingLockups(ctx, nil)
+
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
 }
