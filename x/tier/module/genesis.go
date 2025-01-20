@@ -10,7 +10,6 @@ import (
 
 // InitGenesis initializes the module's state from a provided genesis state.
 func InitGenesis(ctx context.Context, k keeper.Keeper, genState types.GenesisState) {
-	// this line is used by starport scaffolding # genesis/module/init
 	if err := k.SetParams(ctx, genState.Params); err != nil {
 		panic(err)
 	}
@@ -18,10 +17,22 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState types.GenesisSta
 	for _, lockup := range genState.Lockups {
 		delAddr := sdk.MustAccAddressFromBech32(lockup.DelegatorAddress)
 		valAddr := types.MustValAddressFromBech32(lockup.ValidatorAddress)
-		if k.HasLockup(ctx, delAddr, valAddr) {
-			k.AddLockup(ctx, delAddr, valAddr, lockup.Amount)
-		} else {
-			k.SaveLockup(ctx, lockup.UnlockTime != nil, delAddr, valAddr, lockup.Amount, lockup.CreationHeight, lockup.UnbondTime, lockup.UnlockTime)
+		k.AddLockup(ctx, delAddr, valAddr, lockup.Amount)
+	}
+
+	for _, unlockingLockup := range genState.UnlockingLockups {
+		delAddr := sdk.MustAccAddressFromBech32(unlockingLockup.DelegatorAddress)
+		valAddr := types.MustValAddressFromBech32(unlockingLockup.ValidatorAddress)
+		if !k.HasUnlockingLockup(ctx, delAddr, valAddr, unlockingLockup.CreationHeight) {
+			k.SetUnlockingLockup(
+				ctx,
+				delAddr,
+				valAddr,
+				unlockingLockup.CreationHeight,
+				unlockingLockup.Amount,
+				unlockingLockup.CompletionTime,
+				unlockingLockup.UnlockTime,
+			)
 		}
 	}
 }
@@ -31,8 +42,8 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 	genesis := types.DefaultGenesis()
 	genesis.Params = k.GetParams(ctx)
 
-	// this line is used by starport scaffolding # genesis/module/export
 	genesis.Lockups = k.GetAllLockups(ctx)
+	genesis.UnlockingLockups = k.GetAllUnlockingLockups(ctx)
 
 	return genesis
 }
