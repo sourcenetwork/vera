@@ -2,13 +2,16 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -52,7 +55,19 @@ func TestMsgCancelUnlocking(t *testing.T) {
 	k, ms, ctx := setupMsgServer(t)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	epoch := epochstypes.EpochInfo{
+		Identifier:            types.EpochIdentifier,
+		CurrentEpoch:          1,
+		CurrentEpochStartTime: sdkCtx.BlockTime().Add(-5 * time.Minute),
+		Duration:              5 * time.Minute,
+	}
+	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
+
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
+	validCoinRounded := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100).Sub(math.OneInt()))
 	partialCancelCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(50))
 	excessCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(500))
 	zeroCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.ZeroInt())
@@ -106,6 +121,17 @@ func TestMsgCancelUnlocking(t *testing.T) {
 			expErrMsg: "invalid amount",
 		},
 		{
+			name: "excess unlocking amount",
+			input: &types.MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				CreationHeight:   1,
+				Stake:            excessCoin,
+			},
+			expErr:    true,
+			expErrMsg: "invalid amount",
+		},
+		{
 			name: "non-existent unlocking",
 			input: &types.MsgCancelUnlocking{
 				DelegatorAddress: delAddr,
@@ -114,7 +140,7 @@ func TestMsgCancelUnlocking(t *testing.T) {
 				Stake:            validCoin,
 			},
 			expErr:    true,
-			expErrMsg: "no unbonding delegation found",
+			expErrMsg: stakingtypes.ErrNoUnbondingDelegation.Error(),
 		},
 		{
 			name: "invalid delegator address",
@@ -155,21 +181,10 @@ func TestMsgCancelUnlocking(t *testing.T) {
 				DelegatorAddress: delAddr,
 				ValidatorAddress: valAddr,
 				CreationHeight:   1,
-				Stake:            validCoin,
+				Stake:            validCoinRounded,
 			},
 			expErr:         false,
-			expectedAmount: validCoin.Amount.Sub(math.OneInt()),
-		},
-		{
-			name: "excess unlocking amount",
-			input: &types.MsgCancelUnlocking{
-				DelegatorAddress: delAddr,
-				ValidatorAddress: valAddr,
-				CreationHeight:   1,
-				Stake:            excessCoin,
-			},
-			expErr:         false,
-			expectedAmount: validCoin.Amount.Sub(math.OneInt()),
+			expectedAmount: validCoinRounded.Amount,
 		},
 	}
 

@@ -10,12 +10,24 @@ import (
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
 func TestMsgUnlock(t *testing.T) {
 	k, ms, ctx := setupMsgServer(t)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	epoch := epochstypes.EpochInfo{
+		Identifier:            types.EpochIdentifier,
+		CurrentEpoch:          1,
+		CurrentEpochStartTime: sdkCtx.BlockTime().Add(-5 * time.Minute),
+		Duration:              5 * time.Minute,
+	}
+	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
 	zeroCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.ZeroInt())
@@ -41,6 +53,7 @@ func TestMsgUnlock(t *testing.T) {
 	// expectedUnlockTime should match the SetLockup logic for setting the unlock time
 	params := k.GetParams(ctx)
 	epochDuration := *params.EpochDuration
+	expectedCompletionTime := sdkCtx.BlockTime().Add(time.Hour * 24 * 21)
 	expectedUnlockTime := sdkCtx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 
 	testCases := []struct {
@@ -146,7 +159,9 @@ func TestMsgUnlock(t *testing.T) {
 				lockup := k.GetLockup(sdkCtx, delAddress, valAddress)
 				require.Nil(t, lockup, "Lockup should be nil after valid unlock")
 
-				require.WithinDuration(t, expectedUnlockTime, resp.CompletionTime, time.Second)
+				require.WithinDuration(t, expectedCompletionTime, resp.CompletionTime, time.Second)
+				require.WithinDuration(t, expectedUnlockTime, resp.UnlockTime, time.Second)
+
 			}
 		})
 	}

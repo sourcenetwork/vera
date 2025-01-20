@@ -10,12 +10,24 @@ import (
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
 func TestMsgRedelegate(t *testing.T) {
 	k, ms, ctx := setupMsgServer(t)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	epoch := epochstypes.EpochInfo{
+		Identifier:            types.EpochIdentifier,
+		CurrentEpoch:          1,
+		CurrentEpochStartTime: sdkCtx.BlockTime().Add(-5 * time.Minute),
+		Duration:              5 * time.Minute,
+	}
+	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
 	validCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(100))
 	zeroCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.ZeroInt())
@@ -74,7 +86,7 @@ func TestMsgRedelegate(t *testing.T) {
 				Stake:               sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(500)),
 			},
 			expErr:    true,
-			expErrMsg: "subtract locked stake from source validator",
+			expErrMsg: "subtract lockup from source validator",
 		},
 		{
 			name: "invalid stake amount (zero)",
@@ -110,7 +122,7 @@ func TestMsgRedelegate(t *testing.T) {
 				Stake:               validCoin,
 			},
 			expErr:    true,
-			expErrMsg: "subtract locked stake from source validator",
+			expErrMsg: "subtract lockup from source validator",
 		},
 		{
 			name: "source and destination validator are the same",
