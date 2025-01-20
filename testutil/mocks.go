@@ -433,3 +433,17 @@ func (mr *MockEpochsKeeperMockRecorder) GetEpochInfo(ctx, identifier interface{}
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEpochInfo", reflect.TypeOf((*MockEpochsKeeper)(nil).GetEpochInfo), ctx, identifier)
 }
+
+func (m *MockEpochsKeeper) SetEpochInfo(ctx context.Context, info epochstypes.EpochInfo) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetEpochInfo", ctx, info)
+}
+
+func (mr *MockEpochsKeeperMockRecorder) SetEpochInfo(ctx, info interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(
+		mr.mock, "SetEpochInfo",
+		reflect.TypeOf((*MockEpochsKeeper)(nil).SetEpochInfo),
+		ctx, info,
+	)
+}
