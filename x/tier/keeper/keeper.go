@@ -81,6 +81,11 @@ func (k Keeper) GetBankKeeper() types.BankKeeper {
 	return k.bankKeeper
 }
 
+// GetEpochsKeeper returns the module's EpochsKeeper.
+func (k Keeper) GetEpochsKeeper() types.EpochsKeeper {
+	return k.epochsKeeper
+}
+
 // Logger returns a module-specific logger.
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
@@ -91,25 +96,25 @@ func (k Keeper) Logger() log.Logger {
 func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error {
-		if sdk.UnwrapSDKContext(ctx).BlockTime().Before(*lockup.UnlockTime) {
+	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, unlockingLockup types.UnlockingLockup) error {
+		// Check both CompletionTime and UnlockTime so that CompleteUnlocking works correctly regardless of the
+		// staking module Undelegate/Redelegate completion time and tier module EpochDuration/UnlockingEpochs params
+		if sdkCtx.BlockTime().Before(unlockingLockup.CompletionTime) || sdkCtx.BlockTime().Before(unlockingLockup.UnlockTime) {
 			fmt.Printf("Unlock time not reached for %s/%s\n", delAddr, valAddr)
 			return nil
 		}
 
-		// Redeem the unlocked lockup for stake.
-		stake := sdk.NewCoin(appparams.DefaultBondDenom, lockup.Amount)
-		coins := sdk.NewCoins(stake)
-
 		moduleBalance := k.bankKeeper.GetBalance(ctx, authtypes.NewModuleAddress(types.ModuleName), appparams.DefaultBondDenom)
-		if moduleBalance.Amount.LT(lockup.Amount) {
-			fmt.Printf("Module account balance %s is smaller than required amount %s\n", delAddr, valAddr)
+		if moduleBalance.Amount.LT(unlockingLockup.Amount) {
+			fmt.Printf("Module account balance is less than required amount. delAddr: %s, valAddr: %s\n", delAddr, valAddr)
 			return nil
 		}
 
+		// Redeem the unlocked lockup for stake.
+		coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, unlockingLockup.Amount))
 		err := k.bankKeeper.UndelegateCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, coins)
 		if err != nil {
-			return errorsmod.Wrapf(err, "undelegate coins to %s for amount %s", delAddr, stake)
+			return errorsmod.Wrapf(err, "undelegate coins to %s for amount %s", delAddr, coins)
 		}
 
 		k.removeUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
@@ -119,15 +124,15 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 				types.EventTypeCompleteUnlocking,
 				sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
 				sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
-				sdk.NewAttribute(sdk.AttributeKeyAmount, lockup.Amount.String()),
 				sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
+				sdk.NewAttribute(sdk.AttributeKeyAmount, unlockingLockup.Amount.String()),
 			),
 		)
 
 		return nil
 	}
 
-	err := k.IterateLockups(ctx, true, cb)
+	err := k.IterateUnlockingLockups(ctx, cb)
 	if err != nil {
 		return errorsmod.Wrap(err, "iterate unlocking lockups")
 	}
@@ -137,13 +142,10 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 
 // Lock locks the stake of a delegator to a validator.
 func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
-	// specified amt must be a positive integer
+	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return types.ErrInvalidAmount.Wrap("invalid amount")
+		return types.ErrInvalidAmount.Wrap("lock negative amount")
 	}
-
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
@@ -159,6 +161,7 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 	}
 
 	// Delegate the stake to the validator.
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	_, err = k.stakingKeeper.Delegate(ctx, modAddr, stake.Amount, stakingtypes.Unbonded, validator, true)
 	if err != nil {
 		return errorsmod.Wrapf(err, "delegate %s", stake)
@@ -169,12 +172,12 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 
 	// Mint credits
 	creditAmt := k.proratedCredit(ctx, delAddr, amt)
-	err = k.MintCredit(ctx, delAddr, creditAmt)
+	err = k.mintCredit(ctx, delAddr, creditAmt)
 	if err != nil {
 		return errorsmod.Wrap(err, "mint credit")
 	}
 
-	sdkCtx.EventManager().EmitEvent(
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeLock,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
@@ -186,97 +189,92 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 	return nil
 }
 
-// Unlock initiates the unlocking of stake of a delegator from a validator.
-// The stake will be unlocked after the unlocking period has passed.
-func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
-	unbondTime time.Time, unlockTime time.Time, creationHeight int64, err error) {
-
-	// specified amt must be a positive integer
+// Unlock initiates the unlocking of the specified lockup amount of a delegator from a validator.
+// The specified lockup amount will be unlocked in CompleteUnlocking after the unlocking period has passed.
+func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
+	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return time.Time{}, time.Time{}, 0, types.ErrInvalidAmount.Wrap("invalid amount")
-	}
-
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
-
-	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
-	if err != nil {
-		return time.Time{}, time.Time{}, 0, types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
+		return 0, time.Time{}, time.Time{}, types.ErrInvalidAmount.Wrap("unlock negative amount")
 	}
 
 	err = k.SubtractLockup(ctx, delAddr, valAddr, amt)
 	if err != nil {
-		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "subtract lockup")
+		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(err, "subtract lockup")
 	}
 
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, valAddr, amt)
 	if err != nil {
-		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "validate unbond amount")
+		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(err, "validate unbond amount")
+	}
+	if !shares.IsPositive() {
+		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(stakingtypes.ErrInsufficientShares, "shares are not positive")
 	}
 
-	if shares.IsZero() {
-		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(stakingtypes.ErrInsufficientShares, "calculated shares are zero")
-	}
-
-	// adjust token amount to match the actual undelegated tokens
-	tokenAmount := validator.TokensFromSharesTruncated(shares).TruncateInt()
-	if tokenAmount.LT(amt) {
-		amt = tokenAmount
-	}
-
-	unbondTime, _, err = k.stakingKeeper.Undelegate(ctx, modAddr, valAddr, shares)
+	completionTime, returnAmount, err := k.stakingKeeper.Undelegate(ctx, modAddr, valAddr, shares)
 	if err != nil {
-		return time.Time{}, time.Time{}, 0, errorsmod.Wrap(err, "undelegate")
+		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(err, "undelegate")
 	}
 
-	creationHeight, _, unlockTime = k.SetLockup(ctx, true, delAddr, valAddr, amt, &unbondTime)
+	// Adjust token amount to match the actual undelegated tokens
+	if returnAmount.LT(amt) {
+		amt = returnAmount
+	}
+
+	params := k.GetParams(ctx)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	creationHeight = sdkCtx.BlockHeight()
+	unlockTime = sdkCtx.BlockTime().Add(*params.EpochDuration * time.Duration(params.UnlockingEpochs))
+
+	// Create unlocking lockup record at the current block height
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, creationHeight, amt, completionTime, unlockTime)
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeUnlock,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
-			sdk.NewAttribute(types.AttributeKeyUnbondTime, unbondTime.String()),
-			sdk.NewAttribute(types.AttributeKeyUnlockTime, unlockTime.String()),
 			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.String()),
+			sdk.NewAttribute(types.AttributeKeyUnlockTime, unlockTime.String()),
 		),
 	)
 
-	return unbondTime, unlockTime, creationHeight, nil
+	return creationHeight, completionTime, unlockTime, nil
 }
 
 // Redelegate redelegates the stake of a delegator from a source validator to a destination validator.
-// The redelegation will be completed after the unbonding period has passed.
-func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress, amt math.Int) (
-	completionTime time.Time, err error) {
-
-	// specified amt must be a positive integer
+// The redelegation will be completed after the unbonding period has passed (e.g. at completionTime).
+func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress,
+	amt math.Int) (time.Time, error) {
+	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
-		return time.Time{}, types.ErrInvalidAmount.Wrap("invalid amount")
+		return time.Time{}, types.ErrInvalidAmount.Wrap("redelegate negative amount")
 	}
 
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
-
-	err = k.SubtractLockup(ctx, delAddr, srcValAddr, amt)
+	// Subtract the lockup from the source validator
+	err := k.SubtractLockup(ctx, delAddr, srcValAddr, amt)
 	if err != nil {
-		return time.Time{}, errorsmod.Wrap(err, "subtract locked stake from source validator")
+		return time.Time{}, errorsmod.Wrap(err, "subtract lockup from source validator")
 	}
 
+	// Add the lockup to the destination validator
 	k.AddLockup(ctx, delAddr, dstValAddr, amt)
 
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, srcValAddr, amt)
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "validate unbond amount")
 	}
 
-	completionTime, err = k.stakingKeeper.BeginRedelegation(ctx, modAddr, srcValAddr, dstValAddr, shares)
+	completionTime, err := k.stakingKeeper.BeginRedelegation(ctx, modAddr, srcValAddr, dstValAddr, shares)
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "begin redelegation")
 	}
 
-	sdkCtx.EventManager().EmitEvent(
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeRedelegate,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
@@ -291,23 +289,28 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 }
 
 // CancelUnlocking effectively cancels the pending unlocking lockup partially or in full.
-// Reverts the specified amt if a valid value is provided (e.g. amt != nil && 0 < amt < unbondEntry.Balance).
-// Otherwise, cancels unlocking lockup record in full (e.g. unbondEntry.Balance).
-func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt *math.Int) error {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	modAddr := authtypes.NewModuleAddress(types.ModuleName)
+// Reverts the specified amt if a valid value is provided (e.g. 0 < amt < unlocking lockup amount).
+func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+	creationHeight int64, amt math.Int) error {
+	// Specified amt must be a positive integer
+	if !amt.IsPositive() {
+		return types.ErrInvalidAmount.Wrap("cancel unlocking negative amount")
+	}
 
 	validator, err := k.stakingKeeper.GetValidator(ctx, valAddr)
 	if err != nil {
 		return types.ErrInvalidAddress.Wrapf("validator address %s: %s", valAddr, err)
 	}
 
+	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	ubd, err := k.stakingKeeper.GetUnbondingDelegation(ctx, modAddr, valAddr)
 	if err != nil {
 		return errorsmod.Wrapf(err, "unbonding delegation not found for delegator %s and validator %s", modAddr, valAddr)
 	}
 
-	// find unbonding delegation entry by CreationHeight
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	// Find unbonding delegation entry by CreationHeight
 	// TODO: handle edge case with 2+ messages at the same height
 	var (
 		unbondEntryIndex int64 = -1
@@ -323,31 +326,24 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	}
 
 	if unbondEntryIndex == -1 {
-		return errorsmod.Wrapf(
-			stakingtypes.ErrNoUnbondingDelegation,
-			"no valid unbonding entry found for creation height %d",
-			creationHeight,
-		)
+		return errorsmod.Wrapf(stakingtypes.ErrNoUnbondingDelegation, "no valid entry for height %d", creationHeight)
 	}
 
-	// revert the specified amt if set and is positive, otherwise revert the entire UnbondingDelegationEntry
-	restoreAmount := unbondEntry.Balance
-	if amt != nil && amt.IsPositive() && amt.LT(unbondEntry.Balance) {
-		restoreAmount = *amt
+	if amt.GT(unbondEntry.Balance) {
+		return types.ErrInvalidAmount.Wrap("cancel unlocking amount exceeds unbonding entry balance")
 	}
 
-	_, err = k.stakingKeeper.Delegate(ctx, modAddr, restoreAmount, stakingtypes.Unbonding, validator, false)
+	_, err = k.stakingKeeper.Delegate(ctx, modAddr, amt, stakingtypes.Unbonding, validator, false)
 	if err != nil {
 		return errorsmod.Wrap(err, "failed to delegate tokens back to validator")
 	}
 
-	// update or remove the unbonding delegation entry
-	remainingBalance := unbondEntry.Balance.Sub(restoreAmount)
+	// Update or remove the unbonding delegation entry
+	remainingBalance := unbondEntry.Balance.Sub(amt)
 	if remainingBalance.IsZero() {
 		ubd.RemoveEntry(unbondEntryIndex)
 	} else {
 		unbondEntry.Balance = remainingBalance
-		unbondEntry.InitialBalance = unbondEntry.InitialBalance.Sub(restoreAmount)
 		ubd.Entries[unbondEntryIndex] = unbondEntry
 	}
 
@@ -361,19 +357,22 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 		return errorsmod.Wrap(err, "failed to update unbonding delegation")
 	}
 
-	// remove unlocking lockup if no amt was specified (e.g. no partial unlocking lockup cancelation)
-	k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, restoreAmount)
+	// Subtract the specified unlocking lockup amt
+	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, amt)
+	if err != nil {
+		return errorsmod.Wrap(err, "subtract unlocking lockup")
+	}
 
-	// add restoreAmount back to the lockup (without modifying the unlock/unbond times)
-	k.AddLockup(ctx, delAddr, valAddr, restoreAmount)
+	// Add the specified amt back to existing lockup
+	k.AddLockup(ctx, delAddr, valAddr, amt)
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeCancelUnlocking,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
-			sdk.NewAttribute(sdk.AttributeKeyAmount, restoreAmount.String()),
 			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
+			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
 		),
 	)
 
