@@ -263,6 +263,27 @@ func TestHasLockup(t *testing.T) {
 	require.False(t, k.HasLockup(ctx, delAddr, valAddr), "lockup should no longer exist after removing the entire amount")
 }
 
+func TestHasUnlockingLockup(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	creationHeight := int64(1)
+	timestamp := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	require.False(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, int64(1)))
+
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, creationHeight, math.NewInt(100), timestamp, timestamp)
+	require.True(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, creationHeight))
+
+	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, math.NewInt(100))
+	require.NoError(t, err)
+	require.False(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, creationHeight))
+}
+
 func TestGetUnlockingLockup(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 

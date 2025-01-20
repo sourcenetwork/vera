@@ -178,7 +178,7 @@ func TestInitWithMultipleIdenticalUnlockingLockups(t *testing.T) {
 	require.NotNil(t, got)
 	require.Equal(t, genesisState.Params, got.Params)
 
-	// Unlocking lockups with identical del/val/creationHeight are added and exported as multiple records.
+	// Unlocking lockups with identical del/val and different creationHeight are added and exported separately.
 	require.Equal(t, 3, len(got.UnlockingLockups))
 	require.Equal(t, int64(1000), got.UnlockingLockups[0].Amount.Int64())
 	require.Equal(t, int64(2000), got.UnlockingLockups[1].Amount.Int64())
