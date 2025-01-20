@@ -112,8 +112,51 @@ func TestGetAllLockups(t *testing.T) {
 
 	require.Equal(t, delAddr1.String(), lockups[0].DelegatorAddress)
 	require.Equal(t, valAddr1.String(), lockups[0].ValidatorAddress)
+	require.Equal(t, amount1, lockups[0].Amount)
 	require.Equal(t, delAddr2.String(), lockups[1].DelegatorAddress)
 	require.Equal(t, valAddr2.String(), lockups[1].ValidatorAddress)
+	require.Equal(t, amount2, lockups[1].Amount)
+}
+
+func TestGetAllUnlockingLockups(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	creationHeight1 := int64(1)
+	creationHeight2 := int64(2)
+	timestamp1 := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
+	timestamp2 := time.Date(2006, time.January, 2, 15, 4, 5, 2, time.UTC)
+	amount1 := math.NewInt(1000)
+	amount2 := math.NewInt(500)
+
+	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.Nil(t, err)
+	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.Nil(t, err)
+
+	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.Nil(t, err)
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	require.Nil(t, err)
+
+	k.SetUnlockingLockup(ctx, delAddr1, valAddr1, creationHeight1, amount1, timestamp1, timestamp1)
+	k.SetUnlockingLockup(ctx, delAddr2, valAddr2, creationHeight2, amount2, timestamp2, timestamp2)
+
+	unlockingLockups := k.GetAllUnlockingLockups(ctx)
+	require.Len(t, unlockingLockups, 2)
+
+	require.Equal(t, delAddr1.String(), unlockingLockups[0].DelegatorAddress)
+	require.Equal(t, valAddr1.String(), unlockingLockups[0].ValidatorAddress)
+	require.Equal(t, creationHeight1, unlockingLockups[0].CreationHeight)
+	require.Equal(t, amount1, unlockingLockups[0].Amount)
+	require.Equal(t, timestamp1, unlockingLockups[0].CompletionTime)
+	require.Equal(t, timestamp1, unlockingLockups[0].UnlockTime)
+
+	require.Equal(t, delAddr2.String(), unlockingLockups[1].DelegatorAddress)
+	require.Equal(t, valAddr2.String(), unlockingLockups[1].ValidatorAddress)
+	require.Equal(t, creationHeight2, unlockingLockups[1].CreationHeight)
+	require.Equal(t, amount2, unlockingLockups[1].Amount)
+	require.Equal(t, timestamp2, unlockingLockups[1].CompletionTime)
+	require.Equal(t, timestamp2, unlockingLockups[1].UnlockTime)
 }
 
 func TestMustIterateLockups(t *testing.T) {
