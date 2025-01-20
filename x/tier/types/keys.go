@@ -89,8 +89,8 @@ func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
 	return delAddr, valAddr
 }
 
-// LockupKeyToAddressesAtHeight retreives delAddr, valAddr, and creationHeight from provided unlocking Lockup key.
-func LockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValAddress, int64) {
+// UnlockingLockupKeyToAddressesAtHeight retreives delAddr, valAddr, and creationHeight from provided unlocking Lockup key.
+func UnlockingLockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValAddress, int64) {
 	// Find the positions of the delimiters
 	parts := bytes.Split(key, []byte{'/'})
 	if len(parts) != 4 {
