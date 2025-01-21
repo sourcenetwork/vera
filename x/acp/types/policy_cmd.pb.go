@@ -431,7 +431,7 @@ func (m *RegisterObjectCmd) GetObject() *types1.Object {
 	return nil
 }
 
-// UnregisterObject let's an Object's Owner effectively "unshare" their Object.
+// ArchiveObject let's an Object's Owner effectively "unshare" their Object.
 // This method wipes all Relationships referencing the given Object.
 //
 // A caveat is that after removing the Relationships, a record of the original Object owner

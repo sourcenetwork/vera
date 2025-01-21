@@ -131,7 +131,7 @@ func (b *CmdBuilder) RegisterObject(obj *coretypes.Object) {
 	b.cmd.Cmd = types.NewRegisterObjectCmd(obj)
 }
 
-// UnregisterObject builds a Payload for a ArchiveObject command
+// ArchiveObject builds a Payload for a ArchiveObject command
 func (b *CmdBuilder) ArchiveObject(obj *coretypes.Object) {
 	b.cmd.Cmd = types.NewArchiveObjectCmd(obj)
 }
