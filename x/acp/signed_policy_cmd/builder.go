@@ -131,9 +131,9 @@ func (b *CmdBuilder) RegisterObject(obj *coretypes.Object) {
 	b.cmd.Cmd = types.NewRegisterObjectCmd(obj)
 }
 
-// UnregisterObject builds a Payload for a UnregisterObject command
-func (b *CmdBuilder) UnregisterObject(obj *coretypes.Object) {
-	b.cmd.Cmd = types.NewUnregisterObjectCmd(obj)
+// UnregisterObject builds a Payload for a ArchiveObject command
+func (b *CmdBuilder) ArchiveObject(obj *coretypes.Object) {
+	b.cmd.Cmd = types.NewArchiveObjectCmd(obj)
 }
 
 // SignPayload produces a JWS serialized version of a Payload from a signing key

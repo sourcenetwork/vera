@@ -24,7 +24,6 @@ func dispatchPolicyCmd(ctx sdk.Context, engine coretypes.ACPEngineServer, policy
 	case *types.PolicyCmd_SetRelationshipCmd:
 		resp, respErr := engine.SetRelationship(goCtx, &coretypes.SetRelationshipRequest{
 			PolicyId:     policyId,
-			CreationTime: ts,
 			Relationship: c.SetRelationshipCmd.Relationship,
 		})
 		if respErr != nil {
@@ -55,9 +54,8 @@ func dispatchPolicyCmd(ctx sdk.Context, engine coretypes.ACPEngineServer, policy
 		}
 	case *types.PolicyCmd_RegisterObjectCmd:
 		resp, respErr := engine.RegisterObject(goCtx, &coretypes.RegisterObjectRequest{
-			PolicyId:     policyId,
-			CreationTime: ts,
-			Object:       c.RegisterObjectCmd.Object,
+			PolicyId: policyId,
+			Object:   c.RegisterObjectCmd.Object,
 		})
 		if respErr != nil {
 			err = respErr
@@ -65,22 +63,21 @@ func dispatchPolicyCmd(ctx sdk.Context, engine coretypes.ACPEngineServer, policy
 		}
 		result.Result = &types.PolicyCmdResult_RegisterObjectResult{
 			RegisterObjectResult: &types.RegisterObjectCmdResult{
-				Result: resp.Result,
 				Record: resp.Record,
 			},
 		}
-	case *types.PolicyCmd_UnregisterObjectCmd:
-		resp, respErr := engine.UnregisterObject(goCtx, &coretypes.UnregisterObjectRequest{
+	case *types.PolicyCmd_ArchiveObjectCmd:
+		resp, respErr := engine.ArchiveObject(goCtx, &coretypes.ArchiveObjectRequest{
 			PolicyId: policyId,
-			Object:   c.UnregisterObjectCmd.Object,
+			Object:   c.ArchiveObjectCmd.Object,
 		})
 		if respErr != nil {
 			err = respErr
 			break
 		}
-		result.Result = &types.PolicyCmdResult_UnregisterObjectResult{
-			UnregisterObjectResult: &types.UnregisterObjectCmdResult{
-				Found:                resp.Found,
+		result.Result = &types.PolicyCmdResult_ArchiveObjectCmdResult{
+			ArchiveObjectCmdResult: &types.ArchiveObjectCmdResult{
+				Found:                resp.RecordModified,
 				RelationshipsRemoved: resp.RelationshipsRemoved,
 			},
 		}
