@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/acp_core/pkg/engine"
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
+	services "github.com/sourcenetwork/acp_core/pkg/services"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
@@ -83,5 +83,5 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error
 		return nil, err
 	}
 
-	return engine.NewACPEngine(runtime), nil
+	return services.NewACPEngine(runtime), nil
 }
