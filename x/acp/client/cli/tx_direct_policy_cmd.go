@@ -30,7 +30,7 @@ func CmdDirectPolicyCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdRegisterObject(directDispatcher))
-	cmd.AddCommand(CmdUnregisterObject(directDispatcher))
+	cmd.AddCommand(CmdArchiveObject(directDispatcher))
 	cmd.AddCommand(CmdSetRelationship(directDispatcher))
 	cmd.AddCommand(CmdDeleteRelationship(directDispatcher))
 	return cmd
