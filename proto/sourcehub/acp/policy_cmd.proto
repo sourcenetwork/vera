@@ -47,7 +47,7 @@ message PolicyCmd {
     SetRelationshipCmd set_relationship_cmd = 1;
     DeleteRelationshipCmd delete_relationship_cmd = 2;
     RegisterObjectCmd register_object_cmd = 3;
-    UnregisterObjectCmd unregister_object_cmd = 4;
+    ArchiveObjectCmd archive_object_cmd = 4;
   }
 }
 
@@ -89,7 +89,7 @@ message RegisterObjectCmd {
 // If Charlie has a copy of the object, Eve could convince Charlie to share his copy, granting Eve access to Foo.
 // The previous scenario where an unauthorized user is able to claim ownership to data previously unaccessible to them
 // is an "ownership hijack".
-message UnregisterObjectCmd {
+message ArchiveObjectCmd {
   sourcenetwork.acp_core.Object object = 1;
 }
 
@@ -107,12 +107,12 @@ message DeleteRelationshipCmdResult {
 
 // RegisterObjectCmdResult registers an Object in a Policy
 message RegisterObjectCmdResult {
-  sourcenetwork.acp_core.RegistrationResult result = 1;
+  // sourcenetwork.acp_core.RegistrationResult result = 1 [deprecated = true];
   sourcenetwork.acp_core.RelationshipRecord record = 2;
 }
 
-// UnregisterObjectCmdResult unregisters an Object in a Policy
-message UnregisterObjectCmdResult {
+// ArchiveObjectCmdResult unregisters an Object in a Policy
+message ArchiveObjectCmdResult {
   bool found = 1;
   uint64 relationships_removed = 2;
 }
@@ -122,6 +122,6 @@ message PolicyCmdResult {
     SetRelationshipCmdResult set_relationship_result = 1;
     DeleteRelationshipCmdResult delete_relationship_result = 2;
     RegisterObjectCmdResult register_object_result = 3;
-    UnregisterObjectCmdResult unregister_object_result = 4;
+    ArchiveObjectCmdResult archive_object_cmd_result = 4;
   }
 }
