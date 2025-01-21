@@ -174,7 +174,7 @@ func registerObjectDispatcher(ctx *TestCtx, action *RegisterObjectAction) (resul
 	return result, err
 }
 
-func unregisterObjectDispatcher(ctx *TestCtx, action *UnregisterObjectAction) (result *types.UnregisterObjectCmdResult, err error) {
+func archiveObjectDispatcher(ctx *TestCtx, action *ArchiveObjectAction) (result *types.ArchiveObjectCmdResult, err error) {
 	switch ctx.Strategy {
 	case BearerToken:
 		jws := genToken(ctx, action.Actor)
@@ -182,18 +182,18 @@ func unregisterObjectDispatcher(ctx *TestCtx, action *UnregisterObjectAction) (r
 			Creator:      ctx.TxSigner.SourceHubAddr,
 			BearerToken:  jws,
 			PolicyId:     action.PolicyId,
-			Cmd:          types.NewUnregisterObjectCmd(action.Object),
+			Cmd:          types.NewArchiveObjectCmd(action.Object),
 			CreationTime: TimeToProto(ctx.Timestamp),
 		}
 		resp, respErr := ctx.Executor.BearerPolicyCmd(ctx, msg)
 		if resp != nil {
-			result = resp.Result.GetUnregisterObjectResult()
+			result = resp.Result.GetArchiveObjectCmdResult()
 		}
 		err = respErr
 	case SignedPayload:
 		var jws string
 		builder := signed_policy_cmd.NewCmdBuilder(ctx.LogicalClock, ctx.GetParams())
-		builder.UnregisterObject(action.Object)
+		builder.ArchiveObject(action.Object)
 		builder.Actor(action.Actor.DID)
 		builder.CreationTimestamp(TimeToProto(ctx.Timestamp))
 		builder.PolicyID(action.PolicyId)
@@ -208,7 +208,7 @@ func unregisterObjectDispatcher(ctx *TestCtx, action *UnregisterObjectAction) (r
 		}
 		resp, respErr := ctx.Executor.SignedPolicyCmd(ctx, msg)
 		if resp != nil {
-			result = resp.Result.GetUnregisterObjectResult()
+			result = resp.Result.GetArchiveObjectCmdResult()
 		}
 		err = respErr
 	case Direct:
@@ -217,12 +217,12 @@ func unregisterObjectDispatcher(ctx *TestCtx, action *UnregisterObjectAction) (r
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:      action.Actor.SourceHubAddr,
 			PolicyId:     action.PolicyId,
-			Cmd:          types.NewUnregisterObjectCmd(action.Object),
+			Cmd:          types.NewArchiveObjectCmd(action.Object),
 			CreationTime: TimeToProto(ctx.Timestamp),
 		}
 		resp, respErr := ctx.Executor.DirectPolicyCmd(ctx, msg)
 		if resp != nil {
-			result = resp.Result.GetUnregisterObjectResult()
+			result = resp.Result.GetArchiveObjectCmdResult()
 		}
 		err = respErr
 	}
