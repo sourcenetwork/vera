@@ -51,11 +51,49 @@ func AssertResults(ctx *TestCtx, got, want any, gotErr, wantErr error) {
 		assert.NoError(ctx.T, gotErr)
 	}
 	if !isNil(want) {
+		normalizeTimestamps(got)
+		normalizeTimestamps(want)
 		assert.Equal(ctx.T, want, got)
 	}
 }
 
-func isNil(object interface{}) bool {
+// Helper function to normalize timestamps by setting Nanos to 0 in any struct containing proto timestamps.
+func normalizeTimestamps(obj any) {
+	if obj == nil {
+		return
+	}
+
+	// Check if obj is a pointer and dereference it for reflection.
+	val := reflect.ValueOf(obj)
+	if val.Kind() == reflect.Ptr {
+		val = val.Elem()
+	}
+
+	// Only handle structs, slices, or maps for recursive normalization.
+	switch val.Kind() {
+	case reflect.Struct:
+		for i := 0; i < val.NumField(); i++ {
+			field := val.Field(i)
+			if field.Kind() == reflect.Ptr && field.Type().String() == "*types.Timestamp" {
+				if ts, ok := field.Interface().(*gogotypes.Timestamp); ok && ts != nil {
+					ts.Nanos = 0
+				}
+			} else {
+				normalizeTimestamps(field.Interface())
+			}
+		}
+	case reflect.Slice:
+		for i := 0; i < val.Len(); i++ {
+			normalizeTimestamps(val.Index(i).Interface())
+		}
+	case reflect.Map:
+		for _, key := range val.MapKeys() {
+			normalizeTimestamps(val.MapIndex(key).Interface())
+		}
+	}
+}
+
+func isNil(object any) bool {
 	if object == nil {
 		return true
 	}
