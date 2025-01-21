@@ -10,7 +10,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-var unregisterTestPol = `
+var archiveTestPol = `
 name: policy
 resources:
   file:
@@ -23,11 +23,11 @@ resources:
           - actor
 `
 
-func setupUnregister(t *testing.T) *test.TestCtx {
+func setupArchive(t *testing.T) *test.TestCtx {
 	ctx := test.NewTestCtx(t)
 	a1 := test.CreatePolicyAction{
 		Creator: ctx.TxSigner,
-		Policy:  unregisterTestPol,
+		Policy:  archiveTestPol,
 	}
 	a1.Run(ctx)
 	a2 := test.RegisterObjectAction{
@@ -45,15 +45,15 @@ func setupUnregister(t *testing.T) *test.TestCtx {
 	return ctx
 }
 
-func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
-		Expected: &types.UnregisterObjectCmdResult{
+		Expected: &types.ArchiveObjectCmdResult{
 			Found:                true,
 			RelationshipsRemoved: 2,
 		},
@@ -61,11 +61,11 @@ func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId:    ctx.State.PolicyId,
 		Object:      coretypes.NewObject("file", "foo"),
 		Actor:       ctx.GetActor("bob"),
@@ -74,49 +74,61 @@ func TestUnregisterObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) 
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_UnregisteringAnObjectThatDoesNotExist_ReturnsBadInput(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
-		PolicyId: ctx.State.PolicyId,
-		Object:   coretypes.NewObject("file", "file-isnt-registerd"),
-		Actor:    ctx.GetActor("bob"),
-		Expected: &types.UnregisterObjectCmdResult{
-			Found:                false,
-			RelationshipsRemoved: 0,
-		},
+	action := test.ArchiveObjectAction{
+		PolicyId:    ctx.State.PolicyId,
+		Object:      coretypes.NewObject("file", "file-isnt-registerd"),
+		Actor:       ctx.GetActor("bob"),
+		Expected:    nil,
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_UnregisteringAnObjectWithoutManagePermission_ReturnsUnauthorized(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
+		PolicyId:    ctx.State.PolicyId,
+		Object:      coretypes.NewObject("file", "foo"),
+		Actor:       ctx.GetActor("bob"),
+		Expected:    nil,
+		ExpectedErr: errors.ErrorType_UNAUTHORIZED,
+	}
+	action.Run(ctx)
+}
+
+func TestArchiveObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing.T) {
+	ctx := setupArchive(t)
+	defer ctx.Cleanup()
+
+	action := test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
 	}
 	action.Run(ctx)
 
-	action = test.UnregisterObjectAction{
+	action = test.ArchiveObjectAction{
 		PolicyId: ctx.State.PolicyId,
 		Object:   coretypes.NewObject("file", "foo"),
 		Actor:    ctx.GetActor("alice"),
-		Expected: &types.UnregisterObjectCmdResult{
-			Found: true,
+		Expected: &types.ArchiveObjectCmdResult{
+			Found: false,
 		},
 	}
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_SendingInvalidPolicyIdErrors(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_SendingInvalidPolicyIdErrors(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
-	action := test.UnregisterObjectAction{
+	action := test.ArchiveObjectAction{
 		PolicyId:    "abc1234",
 		Object:      coretypes.NewObject("file", "foo"),
 		Actor:       ctx.GetActor("alice"),
