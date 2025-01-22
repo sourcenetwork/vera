@@ -6,11 +6,13 @@ import (
 
 	cosmosstore "cosmossdk.io/core/store"
 	"github.com/sourcenetwork/raccoondb/v2/errors"
+	"github.com/sourcenetwork/raccoondb/v2/iterator"
 	"github.com/sourcenetwork/raccoondb/v2/store"
 	"github.com/sourcenetwork/raccoondb/v2/types"
 )
 
 var _ store.KVStore = (*kvAdapter)(nil)
+var _ iterator.Iterator[[]byte] = (*iterAdapter)(nil)
 
 var ErrCosmosKV = errors.New("cosmossdk store")
 
@@ -37,18 +39,19 @@ func (k *kvAdapter) Iterate(ctx context.Context, opt store.IterationParam) (stor
 	} else {
 		iter, err = k.db.Iterator(opt.GetLeftBound(), opt.GetRightBound())
 	}
-
 	if err != nil {
 		return nil, wrapErr(err)
 	}
-	wrapped := &iterAdapter{
-		iter:        iter,
-		initialized: false,
-		finished:    false,
-		params:      opt,
+
+	if iter.Error() != nil {
+		return nil, wrapErr(iter.Error())
 	}
 
-	return wrapped, nil
+	return &iterAdapter{
+		iter:     iter,
+		finished: false,
+		params:   opt,
+	}, nil
 }
 
 func (k *kvAdapter) Get(ctx context.Context, key []byte) (types.Option[[]byte], error) {
@@ -114,41 +117,30 @@ func (k *kvAdapter) Delete(ctx context.Context, key []byte) (store.KeyRemoved, e
 }
 
 type iterAdapter struct {
-	iter        cosmosstore.Iterator
-	params      store.IterationParam
-	initialized bool
-	finished    bool
+	iter     cosmosstore.Iterator
+	params   store.IterationParam
+	finished bool
 }
 
 func (i *iterAdapter) Next(ctx context.Context) error {
-	if !i.initialized {
-		i.initialized = true
-		// cometbft-db's iterator is created ready to use (yields first value right away)
-		// as such it may have an error set during creation
-		// if it fails to yield the first value, therefore we check for it
-		if i.iter.Error() != nil {
-			return wrapErr(i.iter.Error())
-		}
-		return nil
-	}
-
 	i.iter.Next()
-	err := i.iter.Error()
+
 	if !i.iter.Valid() {
 		i.finished = true
 	}
 
+	err := i.iter.Error()
 	if err != nil {
 		return wrapErr(err)
 	}
 	return nil
 }
 
-func (i *iterAdapter) Value() types.Option[[]byte] {
-	if i.finished || !i.initialized {
-		return types.None[[]byte]()
+func (i *iterAdapter) Value() ([]byte, error) {
+	if i.finished {
+		return nil, nil
 	}
-	return types.Some(i.iter.Value())
+	return i.iter.Value(), nil
 }
 
 func (i *iterAdapter) Finished() bool {
@@ -168,7 +160,7 @@ func (i *iterAdapter) GetParams() store.IterationParam {
 }
 
 func (i *iterAdapter) CurrentKey() []byte {
-	if i.finished || !i.initialized {
+	if i.finished {
 		return nil
 	}
 	return i.iter.Key()
