@@ -1,15 +1,10 @@
 package registration
 
 import (
-	"slices"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	acputils "github.com/sourcenetwork/acp_core/pkg/utils"
-	"github.com/sourcenetwork/raccoondb/v2/iterator"
-	rctypes "github.com/sourcenetwork/raccoondb/v2/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
@@ -54,34 +49,6 @@ func (s *EventService) NewEvent(ctx sdk.Context, t types.ObjectRegistrationEvent
 	return event, nil
 }
 
-func (s *EventService) GetLatestRegistrationEvent(ctx sdk.Context, polId string, object *coretypes.Object) (rctypes.Option[*types.ObjectRegistrationEvent], error) {
-	iter, err := s.repo.GetObjectEvents(ctx, polId, object)
-	if err != nil {
-		return rctypes.None[*types.ObjectRegistrationEvent](), err
-	}
-	iter = iterator.Filter(iter, func(ev *types.ObjectRegistrationEvent) bool {
-		return slices.Contains(types.ObjectClaimEvents, ev.Type)
-	})
-
-	evs, err := iterator.Consume(ctx, iter)
-	if err != nil {
-		return rctypes.None[*types.ObjectRegistrationEvent](), err
-	}
-	if len(evs) == 0 {
-		return rctypes.None[*types.ObjectRegistrationEvent](), nil
-	}
-
-	// ACP should maintain an invariant where, after the first claim event,
-	// any further object amendment can only reference an ealier commitment.
-	// this means that the lastest event is the one that corresponds to the earliest registration"
-	sortable := acputils.FromExtractor(evs, func(ev *types.ObjectRegistrationEvent) uint64 {
-		return ev.Ts.BlockHeight
-	})
-	sortable.SortInPlace()
-
-	return rctypes.Some(evs[0]), nil
-}
-
 func (s *EventService) FlagHijackEvent(ctx sdk.Context, eventId uint64, actor *coretypes.Actor) (*types.ObjectRegistrationEvent, error) {
 	opt, err := s.repo.GetById(ctx, eventId)
 	if err != nil {
@@ -124,13 +91,21 @@ func NewRegistrationService(engine coretypes.ACPEngineServer, eventService *Even
 	}
 }
 
+// RegistrationService abstracts object registration operations
 type RegistrationService struct {
-	engine       coretypes.ACPEngineServer
-	eventService *EventService
-	repository   CommitmentRepository
+	engine            coretypes.ACPEngineServer
+	eventService      *EventService
+	repository        CommitmentRepository
+	commitmentService *CommitmentService
 }
 
-func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+// UnarchiveObject flags a given object as active, effectively re-establishing the owner relationship.
+// Only the previous owner can unarchive an object.
+// This operation is idempotent.
+//
+// If no change to the state was made, returns a nil ObjectRegistrationEvent.
+// If an error happened, returns nil, nil and error
+func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, msgCreator string) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: polId,
 		Object:   object,
@@ -138,17 +113,23 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 	if err != nil {
 		return nil, nil, err
 	}
+
 	if !status.IsRegistered {
 		return nil, nil, errors.Wrap("object not registered", errors.ErrorType_BAD_INPUT,
 			errors.Pair("policy", polId),
 			errors.Pair("resource", object.Resource),
 			errors.Pair("id", object.Id))
 	}
-	if !status.Record.Archived {
-		return nil, nil, errors.Wrap("object not archived", errors.ErrorType_BAD_INPUT,
+
+	if status.OwnerId != actor.Id {
+		return nil, nil, errors.Wrap("unarchiving must be done by previous owner", errors.ErrorType_UNAUTHORIZED,
 			errors.Pair("policy", polId),
 			errors.Pair("resource", object.Resource),
 			errors.Pair("id", object.Id))
+	}
+
+	if !status.Record.Archived {
+		return status.Record, nil, nil
 	}
 
 	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_UNARCHIVAL, polId, object, actor, nil)
@@ -156,7 +137,11 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 		return nil, nil, err
 	}
 
-	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
+	ctx, err = utils.InjectPrincipal(ctx, actor.Id)
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := s.engine.UnarchiveObject(ctx, &coretypes.UnarchiveObjectRequest{
 		PolicyId: polId,
 		Object:   object,
 	})
@@ -167,11 +152,11 @@ func (s *RegistrationService) UnarchiveObject(ctx sdk.Context, polId string, obj
 	return result.Record, ev, nil
 }
 
-func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
-	return s.registerWithEvent(ctx, polId, object, actor, types.ObjectRegistrationEventType_REGISTRATION, nil)
+func (s *RegistrationService) RegisterObject(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, msgCreator string) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	return s.registerWithEvent(ctx, polId, object, actor, msgCreator, types.ObjectRegistrationEventType_REGISTRATION, nil)
 }
 
-func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, eventType types.ObjectRegistrationEventType, detail *types.EventDetail) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, object *coretypes.Object, actor *coretypes.Actor, msgCreator string, eventType types.ObjectRegistrationEventType, detail *types.EventDetail) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: polId,
 		Object:   object,
@@ -197,9 +182,20 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 		return nil, nil, err
 	}
 
+	ctx, err = utils.InjectPrincipal(ctx, actor.Id)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	metadata, err := utils.BuildACPSuppliedMetadata(ctx, actor.Id, msgCreator)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	result, err := s.engine.RegisterObject(ctx, &coretypes.RegisterObjectRequest{
 		PolicyId: polId,
 		Object:   object,
+		Metadata: metadata,
 	})
 	if err != nil {
 		return nil, nil, err
@@ -208,32 +204,17 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 	return result.Record, ev, nil
 }
 
-func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *types.RegistrationsCommitment, object *coretypes.Object, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
-	// FIXME this name is bad because due to how i called all events are registration events.
-	// refactor event to simply ObjectEvent
-	opt, err := s.eventService.GetLatestRegistrationEvent(ctx, commitment.PolicyId, object)
+func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *types.RegistrationsCommitment, record *coretypes.RelationshipRecord, actor *coretypes.Actor, msgCreator string) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	object := record.Relationship.Object
+
+	metadata := &types.RecordMetadata{}
+	err := metadata.Unmarshal(record.Metadata.Supplied.Blob)
 	if err != nil {
 		return nil, nil, err
 	}
-	// this shouldn't happen because the object was verified
-	// to be registered beforehand.
-	// return an internal error if it ever does
-	if opt.Empty() {
-		return nil, nil, errors.Wrap("no registration event for object", errors.ErrorType_INTERNAL,
-			errors.Pair("policy", commitment.PolicyId),
-			errors.Pair("resource", object.Resource),
-			errors.Pair("id", object.Id))
-	}
 
-	event := opt.GetValue()
-	claimTs := event.Ts
-	if event.Type == types.ObjectRegistrationEventType_REVEAL_REGISTRATION {
-		claimTs = event.Detail.GetRevealEvent().CommitmentTimestamp
-	} else if event.Type == types.ObjectRegistrationEventType_AMENDMENT {
-		claimTs = event.Detail.GetAmendmentEvent().CommitmentTimestamp
-	}
-
-	if commitment.CreationTs.BlockHeight > claimTs.BlockHeight {
+	// registration is older than commitment
+	if metadata.CreationTs.BlockHeight < commitment.Metadata.CreationTs.BlockHeight {
 		return nil, nil, errors.Wrap("amendment failed: current registration older than commitment", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("policy", commitment.PolicyId),
 			errors.Pair("resource", object.Resource),
@@ -241,38 +222,44 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 		)
 	}
 
-	registrationRecord, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
-		PolicyId: commitment.PolicyId,
-		Object:   object,
+	goCtx := auth.InjectPrincipal(ctx, coretypes.RootPrincipal())
+	ctx = ctx.WithContext(goCtx)
+	metadata = &types.RecordMetadata{
+		CreationTs: commitment.Metadata.CreationTs,
+		TxHash:     utils.HashTx(ctx.TxBytes()),
+		OwnerDid:   actor.Id,
+		TxSigner:   msgCreator,
+	}
+	blob, err := metadata.Marshal()
+	if err != nil {
+		return nil, nil, err
+	}
+	result, err := s.engine.AmendRegistration(ctx, &coretypes.AmendRegistrationRequest{
+		PolicyId:      commitment.PolicyId,
+		Object:        object,
+		NewOwner:      actor,
+		NewCreationTs: commitment.Metadata.CreationTs.ProtoTs,
+		Metadata: &coretypes.SuppliedMetadata{
+			Blob: blob,
+		},
 	})
 	if err != nil {
 		return nil, nil, err
 	}
 
-	metadata := &types.EventDetail{
+	event := &types.EventDetail{
 		Detail: &types.EventDetail_AmendmentEvent{
 			AmendmentEvent: &types.AmendmentEventDetail{
 				RevealRegistrationEventId: commitment.Id,
-				CommitmentTimestamp:       commitment.CreationTs,
+				CommitmentTimestamp:       commitment.Metadata.CreationTs,
 				HijackFlag:                false,
 				PreviousOwner: &coretypes.Actor{
-					Id: registrationRecord.OwnerId,
+					Id: record.Metadata.Creator.Identifier,
 				},
 			},
 		},
 	}
-	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_AMENDMENT, commitment.PolicyId, object, actor, metadata)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	goCtx := auth.InjectPrincipal(ctx, coretypes.RootPrincipal())
-	ctx = ctx.WithContext(goCtx)
-	result, err := s.engine.AmendRegistration(ctx, &coretypes.AmendRegistrationRequest{
-		PolicyId: commitment.PolicyId,
-		Object:   object,
-		NewOwner: actor,
-	})
+	ev, err := s.eventService.NewEvent(ctx, types.ObjectRegistrationEventType_AMENDMENT, commitment.PolicyId, object, actor, event)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -280,76 +267,21 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 	return result.Record, ev, nil
 }
 
-func (s *RegistrationService) CommitRegistration(ctx sdk.Context, policyId string, commitment []byte, actor *coretypes.Actor, params *types.Params) (*types.RegistrationsCommitment, error) {
-	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
-		Id: policyId,
-	})
+// RevealRegistation attempts to register an object from a commitment opening.
+// If the opening is valid, registers the object.
+//
+// In the event where the opening is valid and the object was already registered,
+// if the commitment is older than the registration, run the amendment protocol
+// which transfers the object's ownership to the commitment author.
+func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor, msgSigner string) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
+	ok, err := s.commitmentService.ValidateOpening(ctx, commitmentId, proof, actor)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if rec == nil {
-		return nil, errors.NewPolicyNotFound(policyId)
+	if !ok {
+		return nil, nil, errors.Wrap("invalid registration opening", errors.ErrorType_UNAUTHORIZED)
 	}
 
-	if len(commitment) != commitmentLen {
-		return nil, newErrInvalidCommitment(policyId, commitment)
-	}
-
-	now, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	registration := &types.RegistrationsCommitment{
-		Id:         0,
-		PolicyId:   policyId,
-		Actor:      actor,
-		Commitment: commitment,
-		Expired:    false,
-		TxHash:     utils.HashTx(ctx.TxBytes()),
-		CreationTs: now,
-		Validity:   params.RegistrationsCommitmentValidity,
-	}
-
-	err = s.repository.Create(ctx, registration)
-	if err != nil {
-		return nil, err
-	}
-	return registration, nil
-}
-
-// FlagExpiredCommitments iterates over stored commitments,
-// filters for expired commitments wrt the current block time,
-// flags them as expired and returns the expired commitments
-func (s *RegistrationService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.RegistrationsCommitment, error) {
-	now, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	iter, err := s.repository.GetExpiredCommitments(ctx, now)
-	if err != nil {
-		return nil, err
-	}
-	commitments, err := iterator.Consume(ctx, iter)
-	if err != nil {
-		return nil, err
-	}
-	processed := make([]*types.RegistrationsCommitment, 0, len(commitments))
-	for _, c := range commitments {
-		if c.Expired {
-			continue
-		}
-		c.Expired = true
-		err := s.repository.Set(ctx, c)
-		if err != nil {
-			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", c.Id))
-		}
-		processed = append(processed, c)
-	}
-	return commitments, nil
-}
-
-func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (*coretypes.RelationshipRecord, *types.ObjectRegistrationEvent, error) {
 	opt, err := s.repository.GetById(ctx, commitmentId)
 	if err != nil {
 		return nil, nil, err
@@ -358,30 +290,10 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId u
 		return nil, nil, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
 			errors.Pair("id", commitmentId))
 	}
-
 	commitment := opt.GetValue()
-	now, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return nil, nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
-	}
-	after, err := types.IsAfter(commitment.CreationTs, commitment.Validity, now)
-	if err != nil {
-		return nil, nil, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
-	}
-	if after {
-		return nil, nil, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
-			errors.Pair("commitment", commitmentId))
-	}
-
-	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, commitment.Actor, proof)
-	if err != nil {
-		return nil, nil, errors.Wrap("invalid registration opening", err)
-	} else if !ok {
-		return nil, nil, errors.Wrap("invalid registration opening", errors.ErrorType_BAD_INPUT)
-	}
 
 	registrationRecord, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
-		PolicyId: commitment.PolicyId,
+		PolicyId: opt.GetValue().PolicyId,
 		Object:   proof.Object,
 	})
 	if err != nil {
@@ -392,18 +304,30 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId u
 		detail := &types.EventDetail{
 			Detail: &types.EventDetail_RevealEvent{
 				RevealEvent: &types.RevealRegistrationDetail{
-					CommitmentTimestamp:      commitment.CreationTs,
+					CommitmentTimestamp:      commitment.Metadata.CreationTs,
 					RegistrationCommitmentId: commitment.Id,
 				},
 			},
 		}
-		return s.registerWithEvent(ctx, commitment.PolicyId, proof.Object, actor, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
+		// FIXME this is a problem, i need to fiddle with the current timestamp
+		// which means i'll have to fiddle with the engine and the time service
+		panic("fixme")
+		return s.registerWithEvent(ctx, commitment.PolicyId, proof.Object, actor, msgSigner, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
 	}
 
-	return s.amendRegistration(ctx, commitment, proof.Object, actor)
+	return s.amendRegistration(ctx, commitment, registrationRecord.Record, actor, msgSigner)
 }
 
-func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId string, actor *coretypes.Actor, objects []*coretypes.Object) ([]byte, error) {
+// CommitmentService abstracts registration commitment operations
+type CommitmentService struct {
+	engine       coretypes.ACPEngineServer
+	eventService *EventService
+	repository   CommitmentRepository
+}
+
+// BuildCommitment produces a byte commitment for actor and objects.
+// The commitment is guaranteed to be valid, as we verify that no object has been registered yet.
+func (s *CommitmentService) BuildCommitment(ctx sdk.Context, policyId string, actor *coretypes.Actor, objects []*coretypes.Object) ([]byte, error) {
 	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
 		Id: policyId,
 	})
@@ -411,18 +335,141 @@ func (s *RegistrationService) GenerateCommitment(ctx sdk.Context, policyId strin
 		return nil, err
 	}
 	if rec == nil {
-		return nil, errors.NewPolicyNotFound(policyId)
+		return nil, errors.ErrPolicyNotFound(policyId)
 	}
 
 	for _, obj := range objects {
-		resource := rec.Record.Policy.GetResourceByName(obj.Resource)
-		if resource == nil {
-			return nil, errors.Wrap("resource not found", errors.ErrorType_BAD_INPUT,
+		status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
+			PolicyId: policyId,
+			Object:   obj,
+		})
+		if err != nil {
+			return nil, err
+		}
+		if status.IsRegistered {
+			return nil, errors.Wrap("object already registered", errors.ErrorType_BAD_INPUT,
 				errors.Pair("policy", policyId),
 				errors.Pair("resource", obj.Resource),
+				errors.Pair("object", obj.Id),
 			)
 		}
 	}
 
 	return GenerateCommitmentWithoutValidation(policyId, actor, objects)
+}
+
+// FlagExpiredCommitments iterates over stored commitments,
+// filters for expired commitments wrt the current block time,
+// flags them as expired and returns the newly expired commitments
+func (s *CommitmentService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.RegistrationsCommitment, error) {
+	now, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	iter, err := s.repository.GetNonExpiredCommitments(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+
+	var processed []*types.RegistrationsCommitment
+	for !iter.Finished() {
+		commitment, err := iter.Value()
+		if err != nil {
+			return nil, err
+		}
+		expired, err := commitment.IsExpiredAgainst(now)
+		if err != nil {
+			return nil, err
+		}
+		if expired {
+			commitment.Expired = true
+			processed = append(processed, commitment)
+		}
+
+		err = iter.Next(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	for _, commitment := range processed {
+		err := s.repository.Set(ctx, commitment)
+		if err != nil {
+			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", commitment.Id))
+		}
+	}
+
+	return processed, nil
+}
+
+// SetNewCommitment sets a new RegistrationCommitment
+func (s *CommitmentService) SetNewCommitment(ctx sdk.Context, policyId string, commitment []byte, actor *coretypes.Actor, params *types.Params, msgCreator string) (*types.RegistrationsCommitment, error) {
+	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
+		Id: policyId,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if rec == nil {
+		return nil, errors.ErrPolicyNotFound(policyId)
+	}
+
+	if len(commitment) != commitmentLen {
+		return nil, errInvalidCommitment(policyId, commitment)
+	}
+
+	metadata, err := utils.BuildRecordMetadata(ctx, actor.Id, msgCreator)
+	if err != nil {
+		return nil, err
+	}
+
+	registration := &types.RegistrationsCommitment{
+		Id:         0, // doesn't matter since it will be auto-generated
+		PolicyId:   policyId,
+		Commitment: commitment,
+		Expired:    false,
+		Validity:   params.RegistrationsCommitmentValidity,
+		Metadata:   metadata,
+	}
+
+	err = s.repository.Create(ctx, registration)
+	if err != nil {
+		return nil, err
+	}
+	return registration, nil
+}
+
+// ValidateOpening verifies whether the given opening proof is valid for the authenticated actor and
+// the objects
+// returns true if opening is valid
+func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (bool, error) {
+	opt, err := s.repository.GetById(ctx, commitmentId)
+	if err != nil {
+		return false, err
+	}
+	if opt.Empty() {
+		return false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
+			errors.Pair("id", commitmentId))
+	}
+
+	commitment := opt.GetValue()
+	now, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
+	}
+	after, err := types.IsAfter(commitment.Metadata.CreationTs, commitment.Validity, now)
+	if err != nil {
+		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
+	}
+	if after {
+		return false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
+			errors.Pair("commitment", commitmentId))
+	}
+
+	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, actor, proof)
+	if err != nil {
+		return false, errors.Wrap("invalid registration opening", err)
+	}
+	return ok, nil
 }

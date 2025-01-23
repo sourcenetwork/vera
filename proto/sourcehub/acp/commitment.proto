@@ -3,6 +3,7 @@ syntax = "proto3";
 package sourcehub.acp;
 
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcehub/acp/record.proto";
 import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
@@ -24,20 +25,17 @@ message RegistrationProof {
 // of a set of Object registrations issued by an Actor
 message RegistrationsCommitment {
     uint64 id = 1;
+
     string policy_id = 2;
-    sourcenetwork.acp_core.Actor actor = 3;
 
     // commitment is a merkle root of registrations 
     // TODO reference to doc containing commitment format
-    bytes commitment = 4;
+    bytes commitment = 3;
 
-    // timestamp of the block which processed the tx
-    Timestamp creation_ts = 5;
+    bool expired = 4;
 
-    bool expired = 6;
     // validity models the duration for which the commitment is valid for 
-    Duration validity = 7;
+    Duration validity = 5;
 
-    // hash of tx which created the commitment
-    bytes tx_hash = 8;
+    RecordMetadata metadata = 6;
 }

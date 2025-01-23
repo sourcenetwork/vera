@@ -255,7 +255,7 @@ require (
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/sourcenetwork/zanzi v0.3.1-0.20240814180502-4f29069b6164 // indirect
+	github.com/sourcenetwork/zanzi v0.3.1-0.20250117191617-40400ffac5e3 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect

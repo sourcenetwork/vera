@@ -63,8 +63,8 @@ func (b *CmdBuilder) Build(ctx context.Context) (types.SignedPolicyCmdPayload, e
 
 	b.cmd.IssuedHeight = height
 
-	if b.cmd.CreationTime == nil {
-		b.cmd.CreationTime = prototypes.TimestampNow()
+	if b.cmd.IssuedAt == nil {
+		b.cmd.IssuedAt = prototypes.TimestampNow()
 	}
 
 	if b.cmd.ExpirationDelta == 0 {
@@ -96,8 +96,8 @@ func (b *CmdBuilder) Build(ctx context.Context) (types.SignedPolicyCmdPayload, e
 }
 
 // CreationTimestamp sets the creation timestamp
-func (b *CmdBuilder) CreationTimestamp(ts *prototypes.Timestamp) {
-	b.cmd.CreationTime = ts
+func (b *CmdBuilder) IssuedAt(ts *prototypes.Timestamp) {
+	b.cmd.IssuedAt = ts
 }
 
 // Actor sets the Actor for the Command

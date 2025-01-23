@@ -25,10 +25,10 @@ func NewKVRegistrationRepository(kv store.KVStore) (CommitmentRepository, error)
 	})
 	t := table.NewTable(kv, marshaler)
 
-	tsExtractor := func(rec **types.RegistrationsCommitment) uint64 {
-		return (*rec).CreationTs.BlockHeight
+	tsExtractor := func(rec **types.RegistrationsCommitment) bool {
+		return (*rec).Expired
 	}
-	tsIdx, err := table.NewIndex(t, "ts", tsExtractor, marshal.UIntMarshaler{})
+	expiredIdx, err := table.NewIndex(t, "expired", tsExtractor, marshal.BoolMarshaler{})
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +53,7 @@ func NewKVRegistrationRepository(kv store.KVStore) (CommitmentRepository, error)
 		table:       t,
 		incrementer: incrementer,
 		commIndex:   commIdx,
-		tsIdx:       tsIdx,
+		expiredIdx:  expiredIdx,
 	}, nil
 }
 
@@ -61,7 +61,7 @@ type KVRegistrationRepository struct {
 	table       *table.Table[*types.RegistrationsCommitment]
 	incrementer *table.Autoincrementer[*types.RegistrationsCommitment]
 	commIndex   table.IndexReader[*types.RegistrationsCommitment, []byte]
-	tsIdx       table.IndexReader[*types.RegistrationsCommitment, uint64]
+	expiredIdx  table.IndexReader[*types.RegistrationsCommitment, bool]
 }
 
 func (r *KVRegistrationRepository) wrapErr(err error) error {
@@ -100,20 +100,13 @@ func (r *KVRegistrationRepository) FilterByCommitment(ctx context.Context, commi
 	return iter, nil
 }
 
-func (r *KVRegistrationRepository) GetExpiredCommitments(ctx context.Context, now *types.Timestamp) (iterator.Iterator[*types.RegistrationsCommitment], error) {
-	param := table.NewOpenIterator[uint64]().WithRightBound(now.BlockHeight)
-	keyIter, err := r.tsIdx.Iterate(ctx, param)
+func (r *KVRegistrationRepository) GetNonExpiredCommitments(ctx context.Context) (iterator.Iterator[*types.RegistrationsCommitment], error) {
+	bkt := false
+	keyIter, err := r.expiredIdx.IterateKeys(ctx, &bkt, store.NewOpenIterator())
 	if err != nil {
 		return nil, err
 	}
 
 	iter := table.MaterializeObjects(ctx, r.table, keyIter)
-	iter = iterator.While(iter, func(rec *types.RegistrationsCommitment) bool {
-		expired, err := rec.IsExpiredAgainst(now)
-		if err != nil {
-			panic("invalid registration commitment") // TODO maybe log or skip - throw error
-		}
-		return expired
-	})
 	return iter, nil
 }

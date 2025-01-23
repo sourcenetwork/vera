@@ -30,7 +30,7 @@ func (k Keeper) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*t
 		return nil, err
 	}
 	if rec == nil {
-		return nil, errors.NewPolicyNotFound(req.Id)
+		return nil, errors.ErrPolicyNotFound(req.Id)
 	}
 
 	return &types.QueryPolicyResponse{

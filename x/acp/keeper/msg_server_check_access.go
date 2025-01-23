@@ -27,7 +27,7 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 		return nil, err
 	}
 	if record == nil {
-		return nil, errors.NewPolicyNotFound(msg.PolicyId)
+		return nil, errors.ErrPolicyNotFound(msg.PolicyId)
 	}
 
 	creatorAddr, err := sdk.AccAddressFromBech32(msg.Creator)

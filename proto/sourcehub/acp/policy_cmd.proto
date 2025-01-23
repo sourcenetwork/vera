@@ -31,13 +31,13 @@ message SignedPolicyCmdPayload {
   // issued_height is the SourceHub block height of when the Payload was created
   uint64 issued_height = 2;
 
+  // issued_at contains a client generated timestamp for the creation of the command.
+  // This is used only as metadata and isn't trusted
+  google.protobuf.Timestamp issued_at = 3;
+
   // expiration_delta specifies the maximum number of blocks from the issued height during which the Command Payload will be accepted.
   // This field is mandatory and is used to prevent replay attacks
-  uint64 expiration_delta = 3;
-
-  // creation_time contains a client generated timestamp for the creation of the command.
-  // This is used only as metadata and isn't trusted
-  google.protobuf.Timestamp creation_time = 4;
+  uint64 expiration_delta = 4;
 
   // policy_id is the ID of the policy under which the Command will be executed
   string policy_id = 5;
@@ -96,15 +96,14 @@ message RevealRegistrationCmd {
   RegistrationProof proof = 2;
 }
 
-enum RegistrationResultStatus {
+enum RevealRegistrationResult {
   NO_OP = 0;
-  OK = 1;
+  CREATED = 1;
   AMENDED = 2;
-  UNARCHIVED = 3;
 }
 
 message RevealRegistrationCmdResult {
-  RegistrationResultStatus result = 1;
+  RevealRegistrationResult result = 1;
   RelationshipRecord record = 2;
   ObjectRegistrationEvent event = 3;
 }

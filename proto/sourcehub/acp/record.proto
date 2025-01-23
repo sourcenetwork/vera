@@ -16,10 +16,11 @@ import "sourcenetwork/acp_core/relationship.proto";
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
 message RecordMetadata {
+    // creation_ts contains the timestamp of the moment the msg was processed.
     Timestamp creation_ts  = 1;
     bytes tx_hash = 2;
     string tx_signer = 3;
-    string owner = 4;
+    string owner_did = 4;
 }
 
 message PolicyRecord {
@@ -31,6 +32,8 @@ message PolicyRecord {
 }
 
 message RelationshipRecord {
-    sourcenetwork.acp_core.Relationship relationship = 1;
-    RecordMetadata metadata = 2;
+    string policy_id = 1;
+    sourcenetwork.acp_core.Relationship relationship = 2;
+    bool archived = 3;
+    RecordMetadata metadata = 4;
 }

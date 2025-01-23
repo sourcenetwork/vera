@@ -21,7 +21,7 @@ func NewRecordMetadata(ctx sdk.Context, txSigner string, actor string) (*types.R
 		CreationTs: ts,
 		TxHash:     utils.HashTx(ctx.TxBytes()),
 		TxSigner:   txSigner,
-		Owner:      actor,
+		OwnerDid:   actor,
 	}, nil
 }
 
@@ -29,6 +29,7 @@ type Handler struct {
 	engine              coretypes.ACPEngineServer
 	eventService        registration.EventService
 	registrationService registration.RegistrationService
+	commitmentService   registration.CommitmentService
 }
 
 func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.PolicyCmdResult, error) {
@@ -68,7 +69,7 @@ func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipC
 		PolicyId:     ctx.PolicyId,
 		Relationship: cmd.Relationship,
 		Metadata: &coretypes.SuppliedMetadata{
-			Misc: bytes,
+			Blob: bytes,
 		},
 	})
 	if err != nil {
@@ -110,14 +111,20 @@ func (h *Handler) DeleteRelationship(ctx *PolicyCmdCtx, cmd *types.DeleteRelatio
 
 func (h *Handler) RegisterObject(ctx *PolicyCmdCtx, cmd *types.RegisterObjectCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, _, err := h.registrationService.RegisterObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor)
+	rec, _, err := h.registrationService.RegisterObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
+
+	r, err := MapRelationshipRecord(rec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.PolicyCmdResult{
 		Result: &types.PolicyCmdResult_RegisterObjectResult{
 			RegisterObjectResult: &types.RegisterObjectCmdResult{
-				Record: rec,
+				Record: r,
 			},
 		},
 	}, nil
@@ -144,7 +151,7 @@ func (h *Handler) ArchiveObject(ctx *PolicyCmdCtx, cmd *types.ArchiveObjectCmd) 
 
 func (h *Handler) CommitRegistrations(ctx *PolicyCmdCtx, cmd *types.CommitRegistrationsCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	commitment, err := h.registrationService.CommitRegistration(ctx.SDKCtx, ctx.PolicyId, cmd.Commitment, actor, &ctx.Params)
+	commitment, err := h.commitmentService.SetNewCommitment(ctx.SDKCtx, ctx.PolicyId, cmd.Commitment, actor, &ctx.Params, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
@@ -159,14 +166,19 @@ func (h *Handler) CommitRegistrations(ctx *PolicyCmdCtx, cmd *types.CommitRegist
 
 func (h *Handler) RevealRegistration(ctx *PolicyCmdCtx, cmd *types.RevealRegistrationCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, ev, err := h.registrationService.RevealRegistration(ctx.SDKCtx, cmd.RegistrationsCommitmentId, cmd.Proof, actor)
+	rec, ev, err := h.registrationService.RevealRegistration(ctx.SDKCtx, cmd.RegistrationsCommitmentId, cmd.Proof, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
+	r, err := MapRelationshipRecord(rec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.PolicyCmdResult{
 		Result: &types.PolicyCmdResult_RevealRegistrationResult{
 			RevealRegistrationResult: &types.RevealRegistrationCmdResult{
-				Record: rec,
+				Record: r,
 				Event:  ev,
 				Result: types.RegistrationResultStatus_UNARCHIVED, // TODO
 			},
@@ -191,15 +203,20 @@ func (h *Handler) FlagHijackAttempt(ctx *PolicyCmdCtx, cmd *types.FlagHijackAtte
 
 func (h *Handler) UnarchiveObject(ctx *PolicyCmdCtx, cmd *types.UnarchiveObjectCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, _, err := h.registrationService.UnarchiveObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor)
+	rec, ev, err := h.registrationService.UnarchiveObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
+	r, err := MapRelationshipRecord(rec)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.PolicyCmdResult{
 		Result: &types.PolicyCmdResult_UnarchiveObjectResult{
 			UnarchiveObjectResult: &types.UnarchiveObjectCmdResult{
-				Record:               rec,
-				RelationshipModified: true, // TODO
+				Record:               r,
+				RelationshipModified: ev != nil,
 			},
 		},
 	}, nil
