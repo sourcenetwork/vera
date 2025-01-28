@@ -3,36 +3,31 @@ package policy_cmd
 import (
 	"fmt"
 
+	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 )
-
-func NewRecordMetadata(ctx sdk.Context, txSigner string, actor string) (*types.RecordMetadata, error) {
-	ts, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	return &types.RecordMetadata{
-		CreationTs: ts,
-		TxHash:     utils.HashTx(ctx.TxBytes()),
-		TxSigner:   txSigner,
-		OwnerDid:   actor,
-	}, nil
-}
 
 type Handler struct {
 	engine              coretypes.ACPEngineServer
 	eventService        registration.EventService
 	registrationService registration.RegistrationService
-	commitmentService   registration.CommitmentService
+	commitmentService   commitment.CommitmentService
 }
 
 func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.PolicyCmdResult, error) {
+	principal, err := coretypes.NewDIDPrincipal(ctx.PrincipalDID)
+	if err != nil {
+		return nil, err
+	}
+	goCtx := ctx.Ctx.Context()
+	goCtx = auth.InjectPrincipal(goCtx, principal)
+	ctx.Ctx = ctx.Ctx.WithContext(goCtx)
+
 	switch c := cmd.Cmd.(type) {
 	case *types.PolicyCmd_SetRelationshipCmd:
 		return h.SetRelationship(ctx, c.SetRelationshipCmd)
@@ -56,7 +51,7 @@ func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.Poli
 }
 
 func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipCmd) (*types.PolicyCmdResult, error) {
-	metadata, err := NewRecordMetadata(ctx.SDKCtx, ctx.Signer, ctx.PrincipalDID)
+	metadata, err := types.BuildRecordMetadata(ctx.Ctx, ctx.PrincipalDID, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +60,7 @@ func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipC
 		return nil, fmt.Errorf("marshaling metadata: %w", err)
 	}
 
-	resp, err := h.engine.SetRelationship(ctx.EngineContext, &coretypes.SetRelationshipRequest{
+	resp, err := h.engine.SetRelationship(ctx.Ctx, &coretypes.SetRelationshipRequest{
 		PolicyId:     ctx.PolicyId,
 		Relationship: cmd.Relationship,
 		Metadata: &coretypes.SuppliedMetadata{
@@ -76,7 +71,7 @@ func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipC
 		return nil, err
 	}
 
-	rec, err := MapRelationshipRecord(resp.Record)
+	rec, err := types.MapRelationshipRecord(resp.Record)
 	if err != nil {
 		return nil, fmt.Errorf("mapping relationship record: %w", err)
 
@@ -93,7 +88,7 @@ func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipC
 }
 
 func (h *Handler) DeleteRelationship(ctx *PolicyCmdCtx, cmd *types.DeleteRelationshipCmd) (*types.PolicyCmdResult, error) {
-	resp, err := h.engine.DeleteRelationship(ctx.EngineContext, &coretypes.DeleteRelationshipRequest{
+	resp, err := h.engine.DeleteRelationship(ctx.Ctx, &coretypes.DeleteRelationshipRequest{
 		PolicyId:     ctx.PolicyId,
 		Relationship: cmd.Relationship,
 	})
@@ -111,12 +106,12 @@ func (h *Handler) DeleteRelationship(ctx *PolicyCmdCtx, cmd *types.DeleteRelatio
 
 func (h *Handler) RegisterObject(ctx *PolicyCmdCtx, cmd *types.RegisterObjectCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, _, err := h.registrationService.RegisterObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
+	rec, _, err := h.registrationService.RegisterObject(ctx.Ctx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
 
-	r, err := MapRelationshipRecord(rec)
+	r, err := types.MapRelationshipRecord(rec)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +126,7 @@ func (h *Handler) RegisterObject(ctx *PolicyCmdCtx, cmd *types.RegisterObjectCmd
 }
 
 func (h *Handler) ArchiveObject(ctx *PolicyCmdCtx, cmd *types.ArchiveObjectCmd) (*types.PolicyCmdResult, error) {
-	resp, err := h.engine.ArchiveObject(ctx.EngineContext, &coretypes.ArchiveObjectRequest{
+	resp, err := h.engine.ArchiveObject(ctx.Ctx, &coretypes.ArchiveObjectRequest{
 		PolicyId: ctx.PolicyId,
 		Object:   cmd.Object,
 	})
@@ -151,10 +146,11 @@ func (h *Handler) ArchiveObject(ctx *PolicyCmdCtx, cmd *types.ArchiveObjectCmd) 
 
 func (h *Handler) CommitRegistrations(ctx *PolicyCmdCtx, cmd *types.CommitRegistrationsCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	commitment, err := h.commitmentService.SetNewCommitment(ctx.SDKCtx, ctx.PolicyId, cmd.Commitment, actor, &ctx.Params, ctx.Signer)
+	commitment, err := h.commitmentService.SetNewCommitment(ctx.Ctx, ctx.PolicyId, cmd.Commitment, actor, &ctx.Params, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
+
 	return &types.PolicyCmdResult{
 		Result: &types.PolicyCmdResult_CommitRegistrationsResult{
 			CommitRegistrationsResult: &types.CommitRegistrationsCmdResult{
@@ -166,11 +162,12 @@ func (h *Handler) CommitRegistrations(ctx *PolicyCmdCtx, cmd *types.CommitRegist
 
 func (h *Handler) RevealRegistration(ctx *PolicyCmdCtx, cmd *types.RevealRegistrationCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, ev, err := h.registrationService.RevealRegistration(ctx.SDKCtx, cmd.RegistrationsCommitmentId, cmd.Proof, actor, ctx.Signer)
+
+	rec, ev, err := h.registrationService.RevealRegistration(ctx.Ctx, cmd.RegistrationsCommitmentId, cmd.Proof, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
-	r, err := MapRelationshipRecord(rec)
+	r, err := types.MapRelationshipRecord(rec)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +177,6 @@ func (h *Handler) RevealRegistration(ctx *PolicyCmdCtx, cmd *types.RevealRegistr
 			RevealRegistrationResult: &types.RevealRegistrationCmdResult{
 				Record: r,
 				Event:  ev,
-				Result: types.RegistrationResultStatus_UNARCHIVED, // TODO
 			},
 		},
 	}, nil
@@ -188,7 +184,7 @@ func (h *Handler) RevealRegistration(ctx *PolicyCmdCtx, cmd *types.RevealRegistr
 
 func (h *Handler) FlagHijackAttempt(ctx *PolicyCmdCtx, cmd *types.FlagHijackAttemptCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	event, err := h.eventService.FlagHijackEvent(ctx.SDKCtx, cmd.EventId, actor)
+	event, err := h.eventService.FlagHijackEvent(ctx.Ctx, cmd.EventId, actor)
 	if err != nil {
 		return nil, err
 	}
@@ -203,11 +199,11 @@ func (h *Handler) FlagHijackAttempt(ctx *PolicyCmdCtx, cmd *types.FlagHijackAtte
 
 func (h *Handler) UnarchiveObject(ctx *PolicyCmdCtx, cmd *types.UnarchiveObjectCmd) (*types.PolicyCmdResult, error) {
 	actor := coretypes.NewActor(ctx.PrincipalDID)
-	rec, ev, err := h.registrationService.UnarchiveObject(ctx.SDKCtx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
+	rec, ev, err := h.registrationService.UnarchiveObject(ctx.Ctx, ctx.PolicyId, cmd.Object, actor, ctx.Signer)
 	if err != nil {
 		return nil, err
 	}
-	r, err := MapRelationshipRecord(rec)
+	r, err := types.MapRelationshipRecord(rec)
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/jsonpb"
 	"github.com/sourcenetwork/sourcehub/utils"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
+	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -26,19 +26,17 @@ func (k Keeper) GenerateCommitment(goCtx context.Context, req *types.QueryGenera
 		return nil, err
 	}
 
-	eventRepo := k.GetObjectEventRepository(ctx)
 	commitRepo := k.GetRegistrationsCommitmentRepository(ctx)
-	eventService := registration.NewEventService(eventRepo)
-	service := registration.NewRegistrationService(engine, eventService, commitRepo)
+	commitmentService := commitment.NewCommitmentService(engine, commitRepo)
 
-	commitment, err := service.GenerateCommitment(ctx, req.PolicyId, req.Actor, req.Objects)
+	comm, err := commitmentService.BuildCommitment(ctx, req.PolicyId, req.Actor, req.Objects)
 	if err != nil {
 		return nil, err
 	}
 
 	proofs := make([]*types.RegistrationProof, 0, len(req.Objects))
 	for i := range req.Objects {
-		proof, err := registration.ProofForObject(req.PolicyId, req.Actor, i, req.Objects)
+		proof, err := commitment.ProofForObject(req.PolicyId, req.Actor, i, req.Objects)
 		if err != nil {
 			return nil, fmt.Errorf("generating proof for obj %v: %v", i, err)
 		}
@@ -53,8 +51,8 @@ func (k Keeper) GenerateCommitment(goCtx context.Context, req *types.QueryGenera
 	}
 
 	return &types.QueryGenerateCommitmentResponse{
-		Commitment:    commitment,
-		HexCommitment: hex.EncodeToString(commitment),
+		Commitment:    comm,
+		HexCommitment: hex.EncodeToString(comm),
 		Proofs:        proofs,
 		ProofsJson:    proofsJson,
 	}, nil

@@ -4,13 +4,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
+	"github.com/sourcenetwork/acp_core/pkg/services"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
-
-// commitmentLen is a Sha256 Hash, meaning we expect 32 bytes
-const commitmentLen int = 256 / 8
 
 func NewEventService(repo RegistrationEventRepository) *EventService {
 	return &EventService{
@@ -83,20 +82,21 @@ func (s *EventService) FlagHijackEvent(ctx sdk.Context, eventId uint64, actor *c
 	return event, nil
 }
 
-func NewRegistrationService(engine coretypes.ACPEngineServer, eventService *EventService, repo CommitmentRepository) *RegistrationService {
+func NewRegistrationService(engine *services.EngineService, eventService *EventService, repo commitment.CommitmentRepository, commitmentService commitment.CommitmentService) *RegistrationService {
 	return &RegistrationService{
-		engine:       engine,
-		eventService: eventService,
-		repository:   repo,
+		engine:            engine,
+		eventService:      eventService,
+		repository:        repo,
+		commitmentService: commitmentService,
 	}
 }
 
 // RegistrationService abstracts object registration operations
 type RegistrationService struct {
-	engine            coretypes.ACPEngineServer
+	engine            *services.EngineService
 	eventService      *EventService
-	repository        CommitmentRepository
-	commitmentService *CommitmentService
+	repository        commitment.CommitmentRepository
+	commitmentService commitment.CommitmentService
 }
 
 // UnarchiveObject flags a given object as active, effectively re-establishing the owner relationship.
@@ -187,7 +187,7 @@ func (s *RegistrationService) registerWithEvent(ctx sdk.Context, polId string, o
 		return nil, nil, err
 	}
 
-	metadata, err := utils.BuildACPSuppliedMetadata(ctx, actor.Id, msgCreator)
+	metadata, err := types.BuildACPSuppliedMetadata(ctx, actor.Id, msgCreator)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -301,175 +301,38 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId u
 	}
 
 	if !registrationRecord.IsRegistered {
-		detail := &types.EventDetail{
-			Detail: &types.EventDetail_RevealEvent{
-				RevealEvent: &types.RevealRegistrationDetail{
-					CommitmentTimestamp:      commitment.Metadata.CreationTs,
-					RegistrationCommitmentId: commitment.Id,
-				},
-			},
+		metadata, err := types.BuildACPSuppliedMetadata(ctx, actor.Id, msgSigner)
+		if err != nil {
+			return nil, nil, err
 		}
-		// FIXME this is a problem, i need to fiddle with the current timestamp
-		// which means i'll have to fiddle with the engine and the time service
-		panic("fixme")
-		return s.registerWithEvent(ctx, commitment.PolicyId, proof.Object, actor, msgSigner, types.ObjectRegistrationEventType_REVEAL_REGISTRATION, detail)
+
+		result, err := s.engine.RevealRegistration(ctx, &coretypes.RevealRegistrationRequest{
+			PolicyId: commitment.PolicyId,
+			Object:   proof.Object,
+			Metadata: metadata,
+		})
+		if err != nil {
+			return nil, nil, err
+		}
+
+		ev, err := s.eventService.NewEvent(ctx,
+			types.ObjectRegistrationEventType_REVEAL_REGISTRATION,
+			commitment.PolicyId,
+			proof.Object,
+			coretypes.NewActor(commitment.Metadata.OwnerDid),
+			&types.EventDetail{
+				Detail: &types.EventDetail_RevealEvent{
+					RevealEvent: &types.RevealRegistrationDetail{
+						CommitmentTimestamp:      commitment.Metadata.CreationTs,
+						RegistrationCommitmentId: commitment.Id,
+					},
+				},
+			})
+		if err != nil {
+			return nil, nil, err
+		}
+		return result.Record, ev, nil
 	}
 
 	return s.amendRegistration(ctx, commitment, registrationRecord.Record, actor, msgSigner)
-}
-
-// CommitmentService abstracts registration commitment operations
-type CommitmentService struct {
-	engine       coretypes.ACPEngineServer
-	eventService *EventService
-	repository   CommitmentRepository
-}
-
-// BuildCommitment produces a byte commitment for actor and objects.
-// The commitment is guaranteed to be valid, as we verify that no object has been registered yet.
-func (s *CommitmentService) BuildCommitment(ctx sdk.Context, policyId string, actor *coretypes.Actor, objects []*coretypes.Object) ([]byte, error) {
-	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
-		Id: policyId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if rec == nil {
-		return nil, errors.ErrPolicyNotFound(policyId)
-	}
-
-	for _, obj := range objects {
-		status, err := s.engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
-			PolicyId: policyId,
-			Object:   obj,
-		})
-		if err != nil {
-			return nil, err
-		}
-		if status.IsRegistered {
-			return nil, errors.Wrap("object already registered", errors.ErrorType_BAD_INPUT,
-				errors.Pair("policy", policyId),
-				errors.Pair("resource", obj.Resource),
-				errors.Pair("object", obj.Id),
-			)
-		}
-	}
-
-	return GenerateCommitmentWithoutValidation(policyId, actor, objects)
-}
-
-// FlagExpiredCommitments iterates over stored commitments,
-// filters for expired commitments wrt the current block time,
-// flags them as expired and returns the newly expired commitments
-func (s *CommitmentService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.RegistrationsCommitment, error) {
-	now, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-	iter, err := s.repository.GetNonExpiredCommitments(ctx)
-	if err != nil {
-		return nil, err
-	}
-	defer iter.Close()
-
-	var processed []*types.RegistrationsCommitment
-	for !iter.Finished() {
-		commitment, err := iter.Value()
-		if err != nil {
-			return nil, err
-		}
-		expired, err := commitment.IsExpiredAgainst(now)
-		if err != nil {
-			return nil, err
-		}
-		if expired {
-			commitment.Expired = true
-			processed = append(processed, commitment)
-		}
-
-		err = iter.Next(ctx)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	for _, commitment := range processed {
-		err := s.repository.Set(ctx, commitment)
-		if err != nil {
-			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", commitment.Id))
-		}
-	}
-
-	return processed, nil
-}
-
-// SetNewCommitment sets a new RegistrationCommitment
-func (s *CommitmentService) SetNewCommitment(ctx sdk.Context, policyId string, commitment []byte, actor *coretypes.Actor, params *types.Params, msgCreator string) (*types.RegistrationsCommitment, error) {
-	rec, err := s.engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
-		Id: policyId,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if rec == nil {
-		return nil, errors.ErrPolicyNotFound(policyId)
-	}
-
-	if len(commitment) != commitmentLen {
-		return nil, errInvalidCommitment(policyId, commitment)
-	}
-
-	metadata, err := utils.BuildRecordMetadata(ctx, actor.Id, msgCreator)
-	if err != nil {
-		return nil, err
-	}
-
-	registration := &types.RegistrationsCommitment{
-		Id:         0, // doesn't matter since it will be auto-generated
-		PolicyId:   policyId,
-		Commitment: commitment,
-		Expired:    false,
-		Validity:   params.RegistrationsCommitmentValidity,
-		Metadata:   metadata,
-	}
-
-	err = s.repository.Create(ctx, registration)
-	if err != nil {
-		return nil, err
-	}
-	return registration, nil
-}
-
-// ValidateOpening verifies whether the given opening proof is valid for the authenticated actor and
-// the objects
-// returns true if opening is valid
-func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (bool, error) {
-	opt, err := s.repository.GetById(ctx, commitmentId)
-	if err != nil {
-		return false, err
-	}
-	if opt.Empty() {
-		return false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
-			errors.Pair("id", commitmentId))
-	}
-
-	commitment := opt.GetValue()
-	now, err := types.TimestampFromCtx(ctx)
-	if err != nil {
-		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
-	}
-	after, err := types.IsAfter(commitment.Metadata.CreationTs, commitment.Validity, now)
-	if err != nil {
-		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
-	}
-	if after {
-		return false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
-			errors.Pair("commitment", commitmentId))
-	}
-
-	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, actor, proof)
-	if err != nil {
-		return false, errors.Wrap("invalid registration opening", err)
-	}
-	return ok, nil
 }

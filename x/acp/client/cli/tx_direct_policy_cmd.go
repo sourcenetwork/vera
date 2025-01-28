@@ -19,7 +19,7 @@ func directDispatcher(cmd *cobra.Command, polId string, polCmd *types.PolicyCmd)
 	}
 
 	creator := clientCtx.GetFromAddress().String()
-	msg := types.NewMsgDirectPolicyCmdNow(creator, polId, polCmd)
+	msg := types.NewMsgDirectPolicyCmd(creator, polId, polCmd)
 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 }
 

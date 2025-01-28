@@ -2,13 +2,14 @@ package keeper
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
-	comettypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/auth"
+	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	hubtypes "github.com/sourcenetwork/sourcehub/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/did"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -26,29 +27,45 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 		return nil, err
 	}
 
+	addr, err := hubtypes.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePolicy: %v: %w", err, types.NewErrInvalidAccAddrErr(err, msg.Creator))
+	}
+
+	acc := k.accountKeeper.GetAccount(ctx, addr)
+	if acc == nil {
+		return nil, fmt.Errorf("CreatePolicy: %w", types.NewAccNotFoundErr(msg.Creator))
+	}
+
+	actorID, err := did.IssueDID(acc)
+	if err != nil {
+		return nil, errors.Wrap("DirectPolicyCmd: could not issue did to creator",
+			errors.ErrorType_BAD_INPUT, errors.Pair("address", msg.Creator))
+	}
+
+	metadata, err := types.BuildACPSuppliedMetadata(ctx, actorID, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
 	principal := coretypes.RootPrincipal()
 	goCtx = auth.InjectPrincipal(goCtx, principal)
-
-	tx := comettypes.Tx(ctx.TxBytes())
-	txHash := hex.EncodeToString(tx.Hash())
-
 	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
 		Policy:      msg.Policy,
 		MarshalType: msg.MarshalType,
-		Metadata: &coretypes.SuppliedMetadata{
-			Attributes: map[string]string{
-				txHashMapKey:  txHash,
-				creatorMapKey: msg.Creator,
-			},
-		},
+		Metadata:    metadata,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("CreatePolicy: %w", err)
 	}
 
+	rec, err := types.MapPolicy(coreResult.Record)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePolicy: %w", err)
+	}
 	// TODO event
 
 	return &types.MsgCreatePolicyResponse{
-		Policy: coreResult.Record.Policy,
+		Record: rec,
 	}, nil
 }

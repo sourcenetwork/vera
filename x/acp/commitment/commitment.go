@@ -1,4 +1,4 @@
-package registration
+package commitment
 
 import (
 	"crypto/sha256"

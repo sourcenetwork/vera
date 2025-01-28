@@ -39,11 +39,16 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 		return nil, types.NewAccNotFoundErr(msg.Creator)
 	}
 
+	ts, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	cmd := access_decision.EvaluateAccessRequestsCommand{
 		Policy:        record.Record.Policy,
 		Operations:    msg.AccessRequest.Operations,
 		Actor:         msg.AccessRequest.Actor.Id,
-		CreationTime:  msg.CreationTime,
+		CreationTime:  ts,
 		Creator:       creatorAcc,
 		CurrentHeight: uint64(ctx.BlockHeight()),
 	}

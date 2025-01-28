@@ -4,7 +4,7 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
+	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -17,24 +17,18 @@ type CreatePolicyAction struct {
 
 func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	msg := &types.MsgCreatePolicy{
-		Policy:       a.Policy,
-		Creator:      a.Creator.SourceHubAddr,
-		MarshalType:  coretypes.PolicyMarshalingType_SHORT_YAML,
-		CreationTime: TimeToProto(ctx.Timestamp),
+		Policy:      a.Policy,
+		Creator:     a.Creator.SourceHubAddr,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	response, err := ctx.Executor.CreatePolicy(ctx, msg)
 
-	var expected any = nil
-	if a.Expected != nil {
-		expected = &types.MsgCreatePolicyResponse{
-			Policy: a.Expected,
-		}
-	}
-	AssertResults(ctx, response, expected, err, a.ExpectedErr)
+	AssertError(ctx, err, a.ExpectedErr)
 	if response != nil {
+		require.Equal(ctx.T, a.Expected, response.Record.Policy)
 		ctx.State.PolicyCreator = a.Creator.SourceHubAddr
-		ctx.State.PolicyId = response.Policy.Id
-		return response.Policy
+		ctx.State.PolicyId = response.Record.Policy.Id
+		return response.Record.Policy
 	}
 	return nil
 }
@@ -47,13 +41,14 @@ type SetRelationshipAction struct {
 	ExpectedErr  error
 }
 
-func (a *SetRelationshipAction) Run(ctx *TestCtx) *coretypes.RelationshipRecord {
+func (a *SetRelationshipAction) Run(ctx *TestCtx) *types.RelationshipRecord {
 	cmd := types.NewSetRelationshipCmd(a.Relationship)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
 	got := (*types.SetRelationshipCmdResult)(nil)
 	if result != nil {
 		got = result.GetSetRelationshipResult()
 	}
+
 	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
 	if got != nil {
 		return got.Record
@@ -69,7 +64,7 @@ type RegisterObjectAction struct {
 	ExpectedErr error
 }
 
-func (a *RegisterObjectAction) Run(ctx *TestCtx) *coretypes.RelationshipRecord {
+func (a *RegisterObjectAction) Run(ctx *TestCtx) *types.RelationshipRecord {
 	cmd := types.NewRegisterObjectCmd(a.Object)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
 	got := (*types.RegisterObjectCmdResult)(nil)
@@ -209,7 +204,7 @@ func (a *PolicySetupAction) Run(ctx *TestCtx) {
 
 type GetPolicyAction struct {
 	Id          string
-	Expected    *types.QueryPolicyResponse
+	Expected    *types.PolicyRecord
 	ExpectedErr error
 }
 
@@ -233,7 +228,7 @@ type CommitRegistrationsAction struct {
 
 func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommitment {
 	actor := coretypes.NewActor(a.Actor.DID)
-	commitment, err := registration.GenerateCommitmentWithoutValidation(a.PolicyId, actor, a.Objects)
+	commitment, err := commitment.GenerateCommitmentWithoutValidation(a.PolicyId, actor, a.Objects)
 	require.NoError(ctx.T, err)
 	cmd := types.NewCommitRegistrationCmd(commitment)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
@@ -260,7 +255,7 @@ type RevealRegistrationAction struct {
 
 func (a *RevealRegistrationAction) Run(ctx *TestCtx) *types.RevealRegistrationCmdResult {
 	actor := coretypes.NewActor(a.Actor.DID)
-	proof, err := registration.ProofForObject(a.PolicyId, actor, a.Index, a.Objects)
+	proof, err := commitment.ProofForObject(a.PolicyId, actor, a.Index, a.Objects)
 	require.NoError(ctx.T, err)
 	cmd := types.NewRevealRegistrationCmd(a.CommitmentId, proof)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)

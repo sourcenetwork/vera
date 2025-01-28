@@ -56,10 +56,9 @@ actor:
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	msg := types.MsgCreatePolicy{
-		Creator:      creator,
-		Policy:       policyStr,
-		MarshalType:  coretypes.PolicyMarshalingType_SHORT_YAML,
-		CreationTime: timestamp,
+		Creator:     creator,
+		Policy:      policyStr,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
 	msgServer := NewMsgServerImpl(keeper)
@@ -68,14 +67,13 @@ actor:
 	require.Nil(t, err)
 
 	_, err = msgServer.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
-		Creator:      creator,
-		PolicyId:     resp.Policy.Id,
-		Cmd:          types.NewRegisterObjectCmd(s.obj),
-		CreationTime: timestamp,
+		Creator:  creator,
+		PolicyId: resp.Record.Policy.Id,
+		Cmd:      types.NewRegisterObjectCmd(s.obj),
 	})
 	require.Nil(t, err)
 
-	return ctx, keeper, accKeep.FirstAcc(), creator, resp.Policy.Id
+	return ctx, keeper, accKeep.FirstAcc(), creator, resp.Record.Policy.Id
 }
 
 func (s *queryObjectOwnerSuite) TestQueryReturnsObjectOwner() {

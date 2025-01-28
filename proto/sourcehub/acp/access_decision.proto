@@ -4,6 +4,7 @@ package sourcehub.acp;
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -23,7 +24,7 @@ message AccessDecision {
 
   DecisionParams params = 7; // used as part of id generation
 
-  google.protobuf.Timestamp creation_time = 8;
+  Timestamp creation_time = 8;
 
   // issued_height stores the block height when the Decision was evaluated
   uint64 issued_height = 9;

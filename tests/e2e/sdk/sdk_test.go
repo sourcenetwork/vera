@@ -34,7 +34,7 @@ name: test policy
 `
 	msgSet := sdk.MsgSet{}
 	mapper := msgSet.WithCreatePolicy(
-		types.NewMsgCreatePolicyNow(
+		types.NewMsgCreatePolicy(
 			network.GetValidatorAddr(),
 			policy,
 			coretypes.PolicyMarshalingType_SHORT_YAML,

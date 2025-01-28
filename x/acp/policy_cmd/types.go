@@ -1,19 +1,31 @@
 package policy_cmd
 
 import (
-	"context"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
+func NewPolicyCmdCtx(ctx sdk.Context, policyId string, actorDID string, signer string, params types.Params) (PolicyCmdCtx, error) {
+	ts, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return PolicyCmdCtx{}, err
+	}
+
+	return PolicyCmdCtx{
+		Ctx:          ctx,
+		PolicyId:     policyId,
+		PrincipalDID: actorDID,
+		Now:          ts,
+		Params:       params,
+		Signer:       signer,
+	}, nil
+}
+
 type PolicyCmdCtx struct {
-	PolicyId      string
-	PrincipalDID  string
-	Now           *prototypes.Timestamp
-	SDKCtx        sdk.Context
-	EngineContext context.Context
-	Params        types.Params
-	Signer        string
+	Ctx          sdk.Context
+	PolicyId     string
+	PrincipalDID string
+	Now          *types.Timestamp
+	Params       types.Params
+	Signer       string
 }

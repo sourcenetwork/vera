@@ -12,10 +12,10 @@ import (
 
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
-	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
+	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -74,7 +74,7 @@ func (k *Keeper) GetAccessDecisionRepository(ctx sdk.Context) access_decision.Re
 	return access_decision.NewAccessDecisionRepository(adapted)
 }
 
-func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error) {
+func (k *Keeper) GetACPEngine(ctx sdk.Context) (*services.EngineService, error) {
 	kv := k.storeService.OpenKVStore(ctx)
 	adapted := runtime.KVStoreAdapter(kv)
 	raccoonAdapted := stores.RaccoonKVFromCosmos(adapted)
@@ -85,15 +85,14 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (coretypes.ACPEngineServer, error
 	if err != nil {
 		return nil, err
 	}
-
 	return services.NewACPEngine(runtime), nil
 }
 
-func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) registration.CommitmentRepository {
+func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) commitment.CommitmentRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := stores.NewRaccoonKV(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.RegistrationsCommitmentPrefix))
-	repo, err := registration.NewKVRegistrationRepository(kv)
+	repo, err := commitment.NewKVRegistrationRepository(kv)
 	if err != nil {
 		panic(err)
 	}

@@ -26,10 +26,11 @@ name: policy
 
 	action := test.GetPolicyAction{
 		Id: pol.Id,
-		Expected: &acptypes.QueryPolicyResponse{
+		Expected: &acptypes.PolicyRecord{
 			Policy:      pol,
 			MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
-			PolicyRaw:   policyStr,
+			RawPolicy:   policyStr,
+			Metadata:    ctx.GetRootRecordMetadata(),
 		},
 	}
 	action.Run(ctx)

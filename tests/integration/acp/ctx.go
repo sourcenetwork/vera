@@ -6,11 +6,13 @@ import (
 	"testing"
 	"time"
 
+	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
 
 var DefaultTs = MustDateTimeToProto("2024-01-01 00:00:00")
@@ -29,21 +31,32 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 	}
 	executor := NewExecutor(t, config.ExecutorStrategy, params)
 
+	logicalClk := &logicalClockImpl{}
+	height, err := logicalClk.GetTimestampNow(context.TODO())
+	require.NoError(t, err)
+
+	tx := GenRandomTx(t)
 	root := MustNewSourceHubActorFromName("root")
 	ctx := &TestCtx{
-		Ctx:          context.TODO(),
-		T:            t,
-		TxSigner:     root,
-		Timestamp:    time.Now(),
-		TokenIssueTs: time.Now(),
+		Ctx:               context.TODO(),
+		T:                 t,
+		TxSigner:          root,
+		TokenIssueTs:      time.Now(),
+		TokenIssueProtoTs: prototypes.TimestampNow(),
+		ExecutionTs: &types.Timestamp{
+			ProtoTs:     prototypes.TimestampNow(),
+			BlockHeight: height,
+		},
 		Executor:     executor,
 		Strategy:     config.AuthStrategy,
 		ActorType:    config.ActorType,
-		LogicalClock: &logicalClockImpl{},
+		LogicalClock: logicalClk,
 		Params:       params,
+		Tx:           tx,
+		TxHash:       utils.HashTx(tx),
 	}
 
-	_, err := executor.GetOrCreateAccountFromActor(ctx, root)
+	_, err = executor.GetOrCreateAccountFromActor(ctx, root)
 	require.NoError(t, err)
 
 	return ctx
@@ -54,17 +67,18 @@ type TestCtx struct {
 	T     *testing.T
 	State TestState
 	// Signer for Txs while running tests under Bearer or Signed Auth modes
-	TxSigner *TestActor
-	// Timestamp used to generate Msgs in Test
-	Timestamp     time.Time
-	TokenIssueTs  time.Time
-	Executor      MsgExecutor
-	Strategy      AuthenticationStrategy
-	AccountKeeper *testutil.AccountKeeperStub
-	ActorType     ActorKeyType
-	LogicalClock  signed_policy_cmd.LogicalClock
-	TxHash        string
-	Params        types.Params
+	TxSigner          *TestActor
+	ExecutionTs       *types.Timestamp
+	TokenIssueTs      time.Time
+	TokenIssueProtoTs *prototypes.Timestamp
+	Executor          MsgExecutor
+	Strategy          AuthenticationStrategy
+	AccountKeeper     *testutil.AccountKeeperStub
+	ActorType         ActorKeyType
+	LogicalClock      signed_policy_cmd.LogicalClock
+	Tx                []byte
+	TxHash            []byte
+	Params            types.Params
 }
 
 func NewTestCtx(t *testing.T) *TestCtx {
@@ -98,6 +112,24 @@ func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
 	acc := MustNewSourceHubActorFromName(alias)
 	c.AccountKeeper.NewAccount(acc.PubKey)
 	return acc
+}
+
+func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata {
+	return &types.RecordMetadata{
+		CreationTs: c.ExecutionTs,
+		TxHash:     c.TxHash,
+		TxSigner:   c.TxSigner.SourceHubAddr,
+		OwnerDid:   c.GetActor(actor).DID,
+	}
+}
+
+func (c *TestCtx) GetRootRecordMetadata() *types.RecordMetadata {
+	return &types.RecordMetadata{
+		CreationTs: c.ExecutionTs,
+		TxHash:     c.TxHash,
+		TxSigner:   c.TxSigner.SourceHubAddr,
+		OwnerDid:   c.TxSigner.DID,
+	}
 }
 
 func (c *TestCtx) GetParams() types.Params {

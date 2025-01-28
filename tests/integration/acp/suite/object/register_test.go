@@ -37,17 +37,11 @@ func TestRegisterObject_RegisteringNewObjectIsSucessful(t *testing.T) {
 		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
 		Expected: &types.RegisterObjectCmdResult{
-			Record: &coretypes.RelationshipRecord{
+			Record: &types.RelationshipRecord{
 				PolicyId:     ctx.State.PolicyId,
 				Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
 				Archived:     false,
-				Metadata: &coretypes.RecordMetadata{
-					Creator: &coretypes.Principal{
-						Kind:       coretypes.PrincipalKind_DID,
-						Identifier: bob.DID,
-					},
-					CreationTs: test.TimeToProto(ctx.Timestamp),
-				},
+				Metadata:     ctx.GetRecordMetadataForActor("bob"),
 			},
 		},
 	}

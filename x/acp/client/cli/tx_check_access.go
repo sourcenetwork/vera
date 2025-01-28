@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	gogotypes "github.com/cosmos/gogoproto/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
@@ -51,7 +50,6 @@ func CmdCheckAccess() *cobra.Command {
 			msg := &types.MsgCheckAccess{
 				Creator:       clientCtx.GetFromAddress().String(),
 				PolicyId:      policyId,
-				CreationTime:  gogotypes.TimestampNow(),
 				AccessRequest: accessRequest,
 			}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)

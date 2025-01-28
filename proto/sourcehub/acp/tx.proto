@@ -76,7 +76,6 @@ message MsgCreatePolicy {
   string creator = 1;
   string policy = 2;
   sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 3;
-  google.protobuf.Timestamp creation_time = 4;
 }
 
 message MsgCreatePolicyResponse {
@@ -87,8 +86,7 @@ message MsgCheckAccess {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string policy_id = 2;
-  google.protobuf.Timestamp creation_time = 3;
-  AccessRequest access_request = 4;
+  AccessRequest access_request = 3;
 }
 
 message MsgCheckAccessResponse {
@@ -116,7 +114,6 @@ message MsgBearerPolicyCmd {
   string                    bearer_token  = 2;
   string                    policy_id     = 3;
   PolicyCmd                 cmd           = 4;
-  google.protobuf.Timestamp creation_time = 5;
 }
 
 message MsgBearerPolicyCmdResponse {
@@ -128,7 +125,6 @@ message MsgDirectPolicyCmd {
   string creator = 1;
   string                    policy_id     = 2;
   PolicyCmd                 cmd           = 3;
-  google.protobuf.Timestamp creation_time = 4;
 }
 
 message MsgDirectPolicyCmdResponse {

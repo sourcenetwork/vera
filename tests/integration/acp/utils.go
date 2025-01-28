@@ -1,8 +1,10 @@
 package test
 
 import (
+	"crypto/rand"
 	"errors"
 	"reflect"
+	"testing"
 	"time"
 
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -33,26 +35,33 @@ func TimeToProto(ts time.Time) *gogotypes.Timestamp {
 		Nanos:   0,
 	}
 }
-
-func AssertResults(ctx *TestCtx, got, want any, gotErr, wantErr error) {
-	if wantErr != nil {
-		require.NotNil(ctx.T, gotErr, "expected an error but got none")
-		if errors.Is(gotErr, wantErr) {
-			assert.ErrorIs(ctx.T, gotErr, wantErr)
+func AssertError(ctx *TestCtx, got, want error) {
+	if want != nil {
+		require.NotNil(ctx.T, got, "expected an error but got none")
+		if errors.Is(got, want) {
+			assert.ErrorIs(ctx.T, got, want)
 		} else {
 			// Errors returned from SDK operations (RPC communication to a SourceHub node)
 			// no longer have the original errors wrapped, therefore we compare a string as fallback strat.
 
-			gotErrStr := gotErr.Error()
-			wantErrStr := wantErr.Error()
+			gotErrStr := got.Error()
+			wantErrStr := want.Error()
 			assert.Contains(ctx.T, gotErrStr, wantErrStr)
 		}
 	} else {
-		assert.NoError(ctx.T, gotErr)
+		assert.NoError(ctx.T, got)
 	}
+}
+
+func AssertValue(ctx *TestCtx, got, want any) {
 	if !isNil(want) {
 		assert.Equal(ctx.T, want, got)
 	}
+}
+
+func AssertResults(ctx *TestCtx, got, want any, gotErr, wantErr error) {
+	AssertError(ctx, gotErr, wantErr)
+	AssertValue(ctx, got, want)
 }
 
 func isNil(object interface{}) bool {
@@ -85,4 +94,11 @@ func containsKind(kinds []reflect.Kind, kind reflect.Kind) bool {
 	}
 
 	return false
+}
+
+func GenRandomTx(t *testing.T) []byte {
+	tx := make([]byte, 0, 100)
+	_, err := rand.Read(tx)
+	require.NoError(t, err)
+	return tx
 }

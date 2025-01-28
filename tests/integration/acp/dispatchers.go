@@ -13,11 +13,10 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 	case BearerToken:
 		jws := genToken(ctx, actor)
 		msg := &types.MsgBearerPolicyCmd{
-			Creator:      ctx.TxSigner.SourceHubAddr,
-			BearerToken:  jws,
-			PolicyId:     policyId,
-			Cmd:          policyCmd,
-			CreationTime: TimeToProto(ctx.Timestamp),
+			Creator:     ctx.TxSigner.SourceHubAddr,
+			BearerToken: jws,
+			PolicyId:    policyId,
+			Cmd:         policyCmd,
 		}
 		resp, respErr := ctx.Executor.BearerPolicyCmd(ctx, msg)
 		if resp != nil {
@@ -29,7 +28,7 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		builder := signed_policy_cmd.NewCmdBuilder(ctx.LogicalClock, ctx.GetParams())
 		builder.PolicyCmd(policyCmd)
 		builder.Actor(actor.DID)
-		builder.CreationTimestamp(TimeToProto(ctx.Timestamp))
+		builder.IssuedAt(ctx.TokenIssueProtoTs)
 		builder.PolicyID(policyId)
 		builder.SetSigner(actor.Signer)
 		jws, err = builder.BuildJWS(ctx)
@@ -49,10 +48,9 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		// For Direct Authentication we use the action Action as the signer
 		ctx.TxSigner = actor
 		msg := &types.MsgDirectPolicyCmd{
-			Creator:      actor.SourceHubAddr,
-			PolicyId:     policyId,
-			Cmd:          policyCmd,
-			CreationTime: TimeToProto(ctx.Timestamp),
+			Creator:  actor.SourceHubAddr,
+			PolicyId: policyId,
+			Cmd:      policyCmd,
 		}
 		resp, respErr := ctx.Executor.DirectPolicyCmd(ctx, msg)
 		if resp != nil {

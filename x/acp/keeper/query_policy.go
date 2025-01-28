@@ -33,9 +33,17 @@ func (k Keeper) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*t
 		return nil, errors.ErrPolicyNotFound(req.Id)
 	}
 
+	md, err := types.UmarshalRecordMetadata(rec.Record.Metadata)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.QueryPolicyResponse{
-		Policy:      rec.Record.Policy,
-		PolicyRaw:   rec.Record.PolicyDefinition,
-		MarshalType: rec.Record.MarshalType,
+		Record: &types.PolicyRecord{
+			Policy:      rec.Record.Policy,
+			RawPolicy:   rec.Record.PolicyDefinition,
+			MarshalType: rec.Record.MarshalType,
+			Metadata:    md,
+		},
 	}, nil
 }

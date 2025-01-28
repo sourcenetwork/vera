@@ -96,16 +96,9 @@ message RevealRegistrationCmd {
   RegistrationProof proof = 2;
 }
 
-enum RevealRegistrationResult {
-  NO_OP = 0;
-  CREATED = 1;
-  AMENDED = 2;
-}
-
 message RevealRegistrationCmdResult {
-  RevealRegistrationResult result = 1;
-  RelationshipRecord record = 2;
-  ObjectRegistrationEvent event = 3;
+  RelationshipRecord record = 1;
+  ObjectRegistrationEvent event = 2;
 }
 
 message FlagHijackAttemptCmd {

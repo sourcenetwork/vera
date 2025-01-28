@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	gogotypes "github.com/cosmos/gogoproto/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
@@ -73,10 +72,9 @@ func CmdCreatePolicy() *cobra.Command {
 			}
 
 			msg := &types.MsgCreatePolicy{
-				Creator:      clientCtx.GetFromAddress().String(),
-				Policy:       string(policy),
-				MarshalType:  marshalingType,
-				CreationTime: gogotypes.TimestampNow(),
+				Creator:     clientCtx.GetFromAddress().String(),
+				Policy:      string(policy),
+				MarshalType: marshalingType,
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -21,7 +20,7 @@ type EvaluateAccessRequestsCommand struct {
 	Operations []*types.Operation
 	Actor      string
 
-	CreationTime *prototypes.Timestamp
+	CreationTime *types.Timestamp
 
 	// Creator is the same as the Tx signer
 	Creator authtypes.AccountI

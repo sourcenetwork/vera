@@ -31,7 +31,7 @@ func (decision *AccessDecision) hashDecision() []byte {
 	hasher.Write([]byte(decision.Actor))
 	hasher.Write([]byte(fmt.Sprintf("%v", decision.CreatorAccSequence)))
 	hasher.Write([]byte(fmt.Sprintf("%v", decision.IssuedHeight)))
-	hasher.Write([]byte(prototypes.TimestampString(decision.CreationTime)))
+	hasher.Write([]byte(prototypes.TimestampString(decision.CreationTime.ProtoTs)))
 
 	for _, operation := range operations {
 		hasher.Write([]byte(operation.Object.Resource))

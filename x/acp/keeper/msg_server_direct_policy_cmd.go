@@ -9,6 +9,7 @@ import (
 
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -31,7 +32,13 @@ func (k msgServer) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPo
 			errors.ErrorType_BAD_INPUT, errors.Pair("address", msg.Creator))
 	}
 
-	result, err := dispatchPolicyCmd(ctx, &k.Keeper, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
+	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, msg.PolicyId, actorID, msg.Creator, k.GetParams(ctx))
+	if err != nil {
+		return nil, err
+	}
+
+	handler := policy_cmd.Handler{}
+	result, err := handler.Dispatch(&cmdCtx, msg.Cmd)
 	if err != nil {
 		return nil, err
 	}

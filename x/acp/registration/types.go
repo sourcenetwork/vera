@@ -11,21 +11,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-type CommitmentRepository interface {
-	// Create sets a new RegistrationCommitment using the next free up id.
-	// Sets reg.Id with the effective record Id used.
-	Create(ctx context.Context, reg *types.RegistrationsCommitment) error
-
-	Set(ctx context.Context, reg *types.RegistrationsCommitment) error
-
-	GetById(ctx context.Context, id uint64) (rctypes.Option[*types.RegistrationsCommitment], error)
-
-	FilterByCommitment(ctx context.Context, commitment []byte) (iterator.Iterator[*types.RegistrationsCommitment], error)
-
-	// GetNonExpiredCommitments returns all commitments whose expiration flag is false
-	GetNonExpiredCommitments(ctx context.Context) (iterator.Iterator[*types.RegistrationsCommitment], error)
-}
-
 type RegistrationEventRepository interface {
 	Set(ctx context.Context, event *types.ObjectRegistrationEvent) error
 	Create(ctx context.Context, event *types.ObjectRegistrationEvent) error

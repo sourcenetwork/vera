@@ -38,24 +38,22 @@ resources:
 `
 
 	msg := types.MsgCreatePolicy{
-		Creator:      creator,
-		Policy:       policyStr,
-		MarshalType:  coretypes.PolicyMarshalingType_SHORT_YAML,
-		CreationTime: timestamp,
+		Creator:     creator,
+		Policy:      policyStr,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
 	resp, err := msgServer.CreatePolicy(ctx, &msg)
 	require.Nil(t, err)
 
 	_, err = msgServer.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
-		Creator:      creator,
-		PolicyId:     resp.Policy.Id,
-		Cmd:          types.NewRegisterObjectCmd(obj),
-		CreationTime: timestamp,
+		Creator:  creator,
+		PolicyId: resp.Record.Policy.Id,
+		Cmd:      types.NewRegisterObjectCmd(obj),
 	})
 	require.Nil(t, err)
 
-	return ctx, keeper, resp.Policy, creatorDID
+	return ctx, keeper, resp.Record.Policy, creatorDID
 }
 
 func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *testing.T) {

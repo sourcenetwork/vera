@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -22,8 +23,13 @@ func (k msgServer) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPo
 		return nil, fmt.Errorf("PolicyCmd: %w", err)
 	}
 
-	result, err := dispatchPolicyCmd(ctx, &k.Keeper, payload.PolicyId, payload.Actor, payload.CreationTime, payload.Cmd)
+	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, payload.PolicyId, payload.Actor, msg.Creator, k.GetParams(ctx))
+	if err != nil {
+		return nil, err
+	}
 
+	handler := policy_cmd.Handler{}
+	result, err := handler.Dispatch(&cmdCtx, payload.Cmd)
 	if err != nil {
 		return nil, err
 	}

@@ -4,24 +4,17 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	prototypes "github.com/cosmos/gogoproto/types"
 	acptypes "github.com/sourcenetwork/acp_core/pkg/types"
 )
 
 var _ sdk.Msg = &MsgCreatePolicy{}
 
-func NewMsgCreatePolicy(creator string, policy string, marshalingType acptypes.PolicyMarshalingType, creationTime *prototypes.Timestamp) *MsgCreatePolicy {
+func NewMsgCreatePolicy(creator string, policy string, marshalingType acptypes.PolicyMarshalingType) *MsgCreatePolicy {
 	return &MsgCreatePolicy{
-		Creator:      creator,
-		Policy:       policy,
-		MarshalType:  marshalingType,
-		CreationTime: creationTime,
+		Creator:     creator,
+		Policy:      policy,
+		MarshalType: marshalingType,
 	}
-}
-
-// NewMsgCreatePolicyNow creates a MsgCreatePolicy with CreatedAt set to the current time
-func NewMsgCreatePolicyNow(creator string, policy string, marshalingType acptypes.PolicyMarshalingType) *MsgCreatePolicy {
-	return NewMsgCreatePolicy(creator, policy, marshalingType, prototypes.TimestampNow())
 }
 
 func (msg *MsgCreatePolicy) ValidateBasic() error {

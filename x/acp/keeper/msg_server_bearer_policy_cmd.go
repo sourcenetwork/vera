@@ -8,6 +8,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -20,8 +21,13 @@ func (k msgServer) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPo
 		return nil, err
 	}
 
-	result, err := dispatchPolicyCmd(ctx, &k.Keeper, msg.PolicyId, actorID, msg.CreationTime, msg.Cmd)
+	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, msg.PolicyId, actorID, msg.Creator, k.GetParams(ctx))
+	if err != nil {
+		return nil, err
+	}
 
+	handler := policy_cmd.Handler{}
+	result, err := handler.Dispatch(&cmdCtx, msg.Cmd)
 	if err != nil {
 		return nil, fmt.Errorf("PolicyCmd failed: %w", err)
 	}
