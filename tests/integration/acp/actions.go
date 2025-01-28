@@ -222,29 +222,42 @@ func (a *GetPolicyAction) Run(ctx *TestCtx) {
 }
 
 type CommitRegistrationsAction struct {
-	PolicyId    string
-	Objects     []*coretypes.Object
-	Actor       *TestActor
-	Expected    *types.RegistrationsCommitment
-	commitment  []byte
+	PolicyId string
+	Objects  []*coretypes.Object
+	Actor    *TestActor
+	Expected *types.RegistrationsCommitment
+	// Commitment is optional and is automatically generated if Objects is provided
+	Commitment  []byte
 	ExpectedErr error
 }
 
 func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommitment {
+	if a.Objects != nil {
+		actor := coretypes.NewActor(a.Actor.DID)
+		commitment, err := commitment.GenerateCommitmentWithoutValidation(a.PolicyId, actor, a.Objects)
+		require.NoError(ctx.T, err)
+		a.Commitment = commitment
+	}
+	cmd := types.NewCommitRegistrationCmd(a.Commitment)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	AssertError(ctx, err, a.ExpectedErr)
+	if a.ExpectedErr != nil {
+		return nil
+	}
+	require.NotNil(ctx.T, result)
+	comm := result.GetCommitRegistrationsResult().RegistrationsCommitment
+
+	if a.Expected != nil {
+		AssertValue(ctx, comm, a.Expected)
+	}
+	return comm
+}
+
+func (a *CommitRegistrationsAction) GetCommitment(ctx *TestCtx) []byte {
 	actor := coretypes.NewActor(a.Actor.DID)
 	commitment, err := commitment.GenerateCommitmentWithoutValidation(a.PolicyId, actor, a.Objects)
 	require.NoError(ctx.T, err)
-	cmd := types.NewCommitRegistrationCmd(commitment)
-	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
-	got := (*types.CommitRegistrationsCmdResult)(nil)
-	if result != nil {
-		got = result.GetCommitRegistrationsResult()
-	}
-	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
-	if result != nil {
-		return got.RegistrationsCommitment
-	}
-	return nil
+	return commitment
 }
 
 type RevealRegistrationAction struct {

@@ -57,7 +57,10 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 	t.Logf("created relationship: %v", result.Record)
 }
 
-func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T) {
+// This tests documents deals with the edge case where the object owner
+// commits to the object, performs explicit registration and then reveals the same object.
+// We assert that the record timestamp invariant holds, even for this odd scenario
+func TestRevealRegistration_ObjectRegisteredToActor_ReturnRecordWithCommitmentTimestamp(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
@@ -66,6 +69,7 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T
 		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
+	// Given commitment and object registered after commitment
 	a2 := test.CommitRegistrationsAction{
 		PolicyId: pol.Id,
 		Actor:    ctx.GetActor("bob"),
@@ -77,6 +81,15 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T
 	commitment := a2.Run(ctx)
 	ctx.WaitBlock()
 
+	a3 := test.RegisterObjectAction{
+		PolicyId: pol.Id,
+		Actor:    ctx.GetActor("bob"),
+		Object:   coretypes.NewObject("file", "foo.txt"),
+	}
+	a3.Run(ctx)
+	ctx.WaitBlock()
+
+	// When Bob opens commitment for foo.txt
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
 		PolicyId:     pol.Id,
@@ -87,14 +100,20 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T
 		},
 		Index: 0,
 	}
-	a.Run(ctx)
-	// TODO
+	result := a.Run(ctx)
+
+	// Then result contains relationship registered
+	// at commit creation time
+	require.Equal(ctx.T, commitment.Metadata.CreationTs, result.Record.Metadata.CreationTs)
+	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
 }
 
 func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
+	// Given a commitment by bob to foo.txt
+	// followed by Alice's registration of foo.txt
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
 		Creator: ctx.TxSigner,
@@ -119,6 +138,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	a3.Run(ctx)
 	ctx.WaitBlock()
 
+	// When Bob reveals the commitment to foo.txt
 	a := test.RevealRegistrationAction{
 		Actor:        ctx.GetActor("bob"),
 		PolicyId:     pol.Id,
@@ -131,6 +151,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	}
 	result := a.Run(ctx)
 
+	// Then foo.txt is transfered to bob
 	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
@@ -194,12 +215,6 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
-}
-
-func TestRevealRegistration_ObjectOwnedByUserAfterCommitment_NoOp(t *testing.T) {
-	ctx := test.NewTestCtx(t)
-	defer ctx.Cleanup()
-	t.FailNow()
 }
 
 func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsUnauthorized(t *testing.T) {
@@ -321,4 +336,51 @@ func TestRevealRegistration_ValidProofToExpiredCommitment_ReturnsProtocolError(t
 		ExpectedErr: types.ErrorType_OPERATION_FORBIDDEN,
 	}
 	a.Run(ctx)
+}
+
+func TestRevealRegistration_RevealingRegistrationTwice_Errors(t *testing.T) {
+	ctx := test.NewTestCtx(t)
+	defer ctx.Cleanup()
+
+	a1 := test.CreatePolicyAction{
+		Policy:  revealPolicy,
+		Creator: ctx.TxSigner,
+	}
+	pol := a1.Run(ctx)
+	a2 := test.CommitRegistrationsAction{
+		PolicyId: pol.Id,
+		Actor:    ctx.GetActor("bob"),
+		Objects: []*coretypes.Object{
+			coretypes.NewObject("file", "foo.txt"),
+			coretypes.NewObject("file", "bar.txt"),
+		},
+	}
+	commitment := a2.Run(ctx)
+	ctx.WaitBlock()
+
+	a := test.RevealRegistrationAction{
+		Actor:        ctx.GetActor("bob"),
+		PolicyId:     pol.Id,
+		CommitmentId: commitment.Id,
+		Objects: []*coretypes.Object{
+			coretypes.NewObject("file", "foo.txt"),
+			coretypes.NewObject("file", "bar.txt"),
+		},
+		Index: 0,
+	}
+	a.Run(ctx)
+	ctx.WaitBlock()
+
+	// When bob reveals the same registartion twice
+	a = test.RevealRegistrationAction{
+		Actor:        ctx.GetActor("bob"),
+		PolicyId:     pol.Id,
+		CommitmentId: commitment.Id,
+		Objects: []*coretypes.Object{
+			coretypes.NewObject("file", "foo.txt"),
+			coretypes.NewObject("file", "bar.txt"),
+		},
+		Index:       0,
+		ExpectedErr: types.ErrorType_OPERATION_FORBIDDEN,
+	}
 }

@@ -3,6 +3,7 @@ package object
 import (
 	"testing"
 
+	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -37,6 +38,15 @@ func TestCommitRegistration_CreatingCommitmentReturnsID(t *testing.T) {
 		Objects: []*coretypes.Object{
 			coretypes.NewObject("file", "foo.txt"),
 		},
+	}
+	commitment := a2.GetCommitment(ctx)
+	a2.Expected = &types.RegistrationsCommitment{
+		Id:         1,
+		PolicyId:   ctx.State.PolicyId,
+		Commitment: commitment,
+		Expired:    false,
+		Validity:   ctx.Params.RegistrationsCommitmentValidity,
+		Metadata:   ctx.GetRecordMetadataForActor("bob"),
 	}
 	a2.Run(ctx)
 }
@@ -98,4 +108,24 @@ func TestCommitRegistration_CommitmentsGenerateDifferentIds(t *testing.T) {
 	c2 := a3.Run(ctx)
 
 	require.NotEqual(ctx.T, c1.Id, c2.Id)
+}
+
+func TestCommitRegistration_CommitmentWithInvalidId_Errors(t *testing.T) {
+	ctx := test.NewTestCtx(t)
+	defer ctx.Cleanup()
+
+	// Given Policy
+	a1 := test.CreatePolicyAction{
+		Policy:  commitPolicy,
+		Creator: ctx.TxSigner,
+	}
+	pol := a1.Run(ctx)
+
+	a2 := test.CommitRegistrationsAction{
+		PolicyId:    pol.Id,
+		Actor:       ctx.GetActor("bob"),
+		Commitment:  []byte{0x0, 0x1, 0x2},
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
+	}
+	a2.Run(ctx)
 }
