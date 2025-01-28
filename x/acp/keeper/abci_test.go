@@ -10,11 +10,10 @@ import (
 )
 
 func TestEndBlocker(t *testing.T) {
-	// TODO
 	ctx, k, _ := setupKeeper(t)
 
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
-	err := repo.Set(ctx, &types.RegistrationsCommitment{
+	comm := &types.RegistrationsCommitment{
 		Id:       1,
 		PolicyId: "abc",
 		Metadata: &types.RecordMetadata{
@@ -38,9 +37,13 @@ func TestEndBlocker(t *testing.T) {
 				},
 			},
 		},
-	})
+	}
+
+	err := repo.Set(ctx, comm)
 	require.NoError(t, err)
 
-	_, err = k.EndBlocker(ctx)
+	expired, err := k.EndBlocker(ctx)
 	require.NoError(t, err)
+	require.Len(t, expired, 1)
+	require.Equal(t, comm, expired[0])
 }
