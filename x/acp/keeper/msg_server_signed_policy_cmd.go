@@ -28,7 +28,7 @@ func (k msgServer) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPo
 		return nil, err
 	}
 
-	handler := policy_cmd.Handler{}
+	handler := k.GetPolicyCmdHandler(ctx)
 	result, err := handler.Dispatch(&cmdCtx, payload.Cmd)
 	if err != nil {
 		return nil, err

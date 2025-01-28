@@ -37,7 +37,7 @@ func (k msgServer) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPo
 		return nil, err
 	}
 
-	handler := policy_cmd.Handler{}
+	handler := k.GetPolicyCmdHandler(ctx)
 	result, err := handler.Dispatch(&cmdCtx, msg.Cmd)
 	if err != nil {
 		return nil, err

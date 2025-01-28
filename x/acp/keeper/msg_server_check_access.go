@@ -17,10 +17,7 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 
 	repository := k.GetAccessDecisionRepository(ctx)
 	paramsRepository := access_decision.StaticParamsRepository{}
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.GetACPEngine(ctx)
 
 	record, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{Id: msg.PolicyId})
 	if err != nil {

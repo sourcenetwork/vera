@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -44,7 +45,7 @@ func (e *KeeperExecutor) WaitBlock() {
 	e.baseCtx = e.baseCtx.WithBlockHeight(newHeight)
 }
 
-func (e *KeeperExecutor) getSDKCtx(ctx context.Context) context.Context {
+func (e *KeeperExecutor) getSDKCtx(ctx context.Context) sdk.Context {
 	return e.baseCtx.WithContext(ctx)
 }
 
@@ -90,6 +91,13 @@ func (e *KeeperExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *
 func (e *KeeperExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.keeper.ListObjectEvents(sdkCtx, msg)
+}
+
+func (e *KeeperExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
+	sdkCtx := e.getSDKCtx(ctx)
+	ts, err := types.TimestampFromCtx(sdkCtx)
+	require.NoError(ctx.T, err)
+	return ts, nil
 }
 
 func NewExecutor(t *testing.T, strategy ExecutorStrategy, params types.Params) MsgExecutor {
@@ -143,6 +151,7 @@ func newKeeperExecutor(params types.Params) (MsgExecutor, error) {
 	ctx = ctx.WithEventManager(sdk.NewEventManager())
 	ctx = ctx.WithMultiStore(stateStore)
 	ctx = ctx.WithBlockHeight(1)
+	ctx = ctx.WithBlockTime(time.Now())
 
 	// Initialize params
 	k.SetParams(ctx, params)
@@ -309,5 +318,9 @@ func (e *SDKClientExecutor) Cleanup() {
 }
 
 func (e *SDKClientExecutor) WaitBlock() {
+	panic("not implemented")
+}
+
+func (e *SDKClientExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
 	panic("not implemented")
 }

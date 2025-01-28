@@ -56,7 +56,7 @@ func TestSetRelationship_OwnerCanShareObjectTheyOwn(t *testing.T) {
 		Expected: &types.SetRelationshipCmdResult{
 			RecordExisted: false,
 			Record: &types.RelationshipRecord{
-				Metadata:     ctx.GetRecordMetadataForActor("bob"),
+				Metadata:     ctx.GetRecordMetadataForActor("alice"),
 				PolicyId:     ctx.State.PolicyId,
 				Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob),
 				Archived:     false,

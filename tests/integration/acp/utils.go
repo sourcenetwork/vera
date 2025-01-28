@@ -35,21 +35,21 @@ func TimeToProto(ts time.Time) *gogotypes.Timestamp {
 		Nanos:   0,
 	}
 }
-func AssertError(ctx *TestCtx, got, want error) {
+
+func AssertError(ctx *TestCtx, got, want error) bool {
 	if want != nil {
 		require.NotNil(ctx.T, got, "expected an error but got none")
 		if errors.Is(got, want) {
-			assert.ErrorIs(ctx.T, got, want)
+			return assert.ErrorIs(ctx.T, got, want)
 		} else {
 			// Errors returned from SDK operations (RPC communication to a SourceHub node)
 			// no longer have the original errors wrapped, therefore we compare a string as fallback strat.
-
 			gotErrStr := got.Error()
 			wantErrStr := want.Error()
-			assert.Contains(ctx.T, gotErrStr, wantErrStr)
+			return assert.Contains(ctx.T, gotErrStr, wantErrStr)
 		}
 	} else {
-		assert.NoError(ctx.T, got)
+		return assert.NoError(ctx.T, got)
 	}
 }
 

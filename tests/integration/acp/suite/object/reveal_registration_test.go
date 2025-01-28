@@ -26,7 +26,7 @@ func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t 
 
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	a2 := test.CommitRegistrationsAction{
@@ -63,7 +63,7 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnOldRecord(t *testing.T
 
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	a2 := test.CommitRegistrationsAction{
@@ -97,7 +97,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	a2 := test.CommitRegistrationsAction{
@@ -143,7 +143,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	// Given a commitment made by bob to foo.txt
@@ -199,7 +199,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 func TestRevealRegistration_ObjectOwnedByUserAfterCommitment_NoOp(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
-	//TODOt.FailNow()
+	t.FailNow()
 }
 
 func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsUnauthorized(t *testing.T) {
@@ -209,7 +209,7 @@ func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsU
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	// Given alice as owner of foo.txt
@@ -252,7 +252,7 @@ func TestRevealRegistration_InvalidProof_ReturnsError(t *testing.T) {
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	// Given alice as owner of foo.txt
@@ -295,7 +295,7 @@ func TestRevealRegistration_ValidProofToExpiredCommitment_ReturnsProtocolError(t
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  revealPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 	// Given a commitment made by bob to foo.txt

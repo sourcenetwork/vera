@@ -32,8 +32,6 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 	executor := NewExecutor(t, config.ExecutorStrategy, params)
 
 	logicalClk := &logicalClockImpl{}
-	height, err := logicalClk.GetTimestampNow(context.TODO())
-	require.NoError(t, err)
 
 	tx := GenRandomTx(t)
 	root := MustNewSourceHubActorFromName("root")
@@ -43,20 +41,16 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 		TxSigner:          root,
 		TokenIssueTs:      time.Now(),
 		TokenIssueProtoTs: prototypes.TimestampNow(),
-		ExecutionTs: &types.Timestamp{
-			ProtoTs:     prototypes.TimestampNow(),
-			BlockHeight: height,
-		},
-		Executor:     executor,
-		Strategy:     config.AuthStrategy,
-		ActorType:    config.ActorType,
-		LogicalClock: logicalClk,
-		Params:       params,
-		Tx:           tx,
-		TxHash:       utils.HashTx(tx),
+		Executor:          executor,
+		Strategy:          config.AuthStrategy,
+		ActorType:         config.ActorType,
+		LogicalClock:      logicalClk,
+		Params:            params,
+		Tx:                tx,
+		TxHash:            utils.HashTx(tx),
 	}
 
-	_, err = executor.GetOrCreateAccountFromActor(ctx, root)
+	_, err := executor.GetOrCreateAccountFromActor(ctx, root)
 	require.NoError(t, err)
 
 	return ctx
@@ -68,7 +62,6 @@ type TestCtx struct {
 	State TestState
 	// Signer for Txs while running tests under Bearer or Signed Auth modes
 	TxSigner          *TestActor
-	ExecutionTs       *types.Timestamp
 	TokenIssueTs      time.Time
 	TokenIssueProtoTs *prototypes.Timestamp
 	Executor          MsgExecutor
@@ -116,7 +109,7 @@ func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
 
 func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata {
 	return &types.RecordMetadata{
-		CreationTs: c.ExecutionTs,
+		CreationTs: c.GetBlockTs(),
 		TxHash:     c.TxHash,
 		TxSigner:   c.TxSigner.SourceHubAddr,
 		OwnerDid:   c.GetActor(actor).DID,
@@ -124,8 +117,9 @@ func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata 
 }
 
 func (c *TestCtx) GetRootRecordMetadata() *types.RecordMetadata {
+
 	return &types.RecordMetadata{
-		CreationTs: c.ExecutionTs,
+		CreationTs: c.GetBlockTs(),
 		TxHash:     c.TxHash,
 		TxSigner:   c.TxSigner.SourceHubAddr,
 		OwnerDid:   c.TxSigner.DID,
@@ -150,4 +144,11 @@ func (c *TestCtx) WaitBlocks(n uint64) {
 	for i := uint64(0); i < n; i += 1 {
 		c.Executor.WaitBlock()
 	}
+}
+
+// GetBlockTs returns the timestamp of the last processed block
+func (c *TestCtx) GetBlockTs() *types.Timestamp {
+	ts, err := c.Executor.GetLastBlockTs(c)
+	require.NoError(c.T, err)
+	return ts
 }

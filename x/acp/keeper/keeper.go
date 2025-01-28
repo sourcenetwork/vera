@@ -16,6 +16,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
+	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -74,7 +75,7 @@ func (k *Keeper) GetAccessDecisionRepository(ctx sdk.Context) access_decision.Re
 	return access_decision.NewAccessDecisionRepository(adapted)
 }
 
-func (k *Keeper) GetACPEngine(ctx sdk.Context) (*services.EngineService, error) {
+func (k *Keeper) GetACPEngine(ctx sdk.Context) *services.EngineService {
 	kv := k.storeService.OpenKVStore(ctx)
 	adapted := runtime.KVStoreAdapter(kv)
 	raccoonAdapted := stores.RaccoonKVFromCosmos(adapted)
@@ -83,9 +84,9 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) (*services.EngineService, error) 
 		acpruntime.WithTimeService(&SourcehubTimeProvider{}),
 	)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return services.NewACPEngine(runtime), nil
+	return services.NewACPEngine(runtime)
 }
 
 func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) commitment.CommitmentRepository {
@@ -109,4 +110,33 @@ func (k *Keeper) GetObjectEventRepository(ctx sdk.Context) registration.Registra
 		// TODO not sure how to best handle this, don't think the chain should continue
 	}
 	return repo
+}
+
+func (k *Keeper) GetEventService(ctx sdk.Context) *registration.EventService {
+	return registration.NewEventService(k.GetObjectEventRepository(ctx))
+}
+
+func (k *Keeper) GetCommitmentService(ctx sdk.Context) *commitment.CommitmentService {
+	return commitment.NewCommitmentService(
+		k.GetACPEngine(ctx),
+		k.GetRegistrationsCommitmentRepository(ctx),
+	)
+}
+
+func (k *Keeper) GetRegistrationService(ctx sdk.Context) *registration.RegistrationService {
+	return registration.NewRegistrationService(
+		k.GetACPEngine(ctx),
+		k.GetEventService(ctx),
+		k.GetRegistrationsCommitmentRepository(ctx),
+		*k.GetCommitmentService(ctx),
+	)
+}
+
+func (k *Keeper) GetPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
+	return policy_cmd.NewPolcyCmdHandler(
+		k.GetACPEngine(ctx),
+		k.GetEventService(ctx),
+		k.GetRegistrationService(ctx),
+		k.GetCommitmentService(ctx),
+	)
 }

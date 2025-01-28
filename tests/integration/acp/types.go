@@ -46,6 +46,9 @@ type MsgExecutor interface {
 	RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error)
 	RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error)
 
+	// GetLastBlockTs returns an ACP Timestamp for the last accepted block in SourceHub
+	GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error)
+
 	Cleanup()
 	// WaitBlock waits until the Executor has advanced to the next block
 	WaitBlock()

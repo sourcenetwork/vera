@@ -24,8 +24,11 @@ func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	response, err := ctx.Executor.CreatePolicy(ctx, msg)
 
 	AssertError(ctx, err, a.ExpectedErr)
+	if a.Expected != nil {
+		require.NotNil(ctx.T, response)
+		AssertValue(ctx, response.Record.Policy, a.Expected)
+	}
 	if response != nil {
-		require.Equal(ctx.T, a.Expected, response.Record.Policy)
 		ctx.State.PolicyCreator = a.Creator.SourceHubAddr
 		ctx.State.PolicyId = response.Record.Policy.Id
 		return response.Record.Policy
@@ -48,7 +51,6 @@ func (a *SetRelationshipAction) Run(ctx *TestCtx) *types.RelationshipRecord {
 	if result != nil {
 		got = result.GetSetRelationshipResult()
 	}
-
 	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
 	if got != nil {
 		return got.Record
@@ -213,8 +215,10 @@ func (a *GetPolicyAction) Run(ctx *TestCtx) {
 		Id: a.Id,
 	}
 	result, err := ctx.Executor.Policy(ctx, msg)
-
-	AssertResults(ctx, result, a.Expected, err, a.ExpectedErr)
+	AssertError(ctx, err, a.ExpectedErr)
+	if result != nil {
+		AssertValue(ctx, a.Expected, result.Record)
+	}
 }
 
 type CommitRegistrationsAction struct {

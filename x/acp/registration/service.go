@@ -307,9 +307,10 @@ func (s *RegistrationService) RevealRegistration(ctx sdk.Context, commitmentId u
 		}
 
 		result, err := s.engine.RevealRegistration(ctx, &coretypes.RevealRegistrationRequest{
-			PolicyId: commitment.PolicyId,
-			Object:   proof.Object,
-			Metadata: metadata,
+			PolicyId:   commitment.PolicyId,
+			Object:     proof.Object,
+			Metadata:   metadata,
+			CreationTs: commitment.Metadata.CreationTs.ProtoTs,
 		})
 		if err != nil {
 			return nil, nil, err

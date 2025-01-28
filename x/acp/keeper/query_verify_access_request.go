@@ -19,10 +19,7 @@ func (k Keeper) VerifyAccessRequest(goCtx context.Context, req *types.QueryVerif
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.GetACPEngine(ctx)
 
 	actorId := req.AccessRequest.Actor.Id
 	addr, err := sdk.AccAddressFromBech32(actorId)

@@ -11,10 +11,7 @@ import (
 
 func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommitment, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.GetACPEngine(ctx)
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
 	service := commitment.NewCommitmentService(engine, repo)
 

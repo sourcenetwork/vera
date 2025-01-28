@@ -18,10 +18,7 @@ func (k Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRe
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.GetACPEngine(ctx)
 
 	result, err := engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: req.PolicyId,

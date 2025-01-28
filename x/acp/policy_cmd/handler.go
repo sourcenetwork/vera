@@ -14,9 +14,22 @@ import (
 
 type Handler struct {
 	engine              coretypes.ACPEngineServer
-	eventService        registration.EventService
-	registrationService registration.RegistrationService
-	commitmentService   commitment.CommitmentService
+	eventService        *registration.EventService
+	registrationService *registration.RegistrationService
+	commitmentService   *commitment.CommitmentService
+}
+
+func NewPolcyCmdHandler(engine coretypes.ACPEngineServer,
+	eventService *registration.EventService,
+	registrationService *registration.RegistrationService,
+	commitmentService *commitment.CommitmentService,
+) *Handler {
+	return &Handler{
+		engine:              engine,
+		eventService:        eventService,
+		registrationService: registrationService,
+		commitmentService:   commitmentService,
+	}
 }
 
 func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.PolicyCmdResult, error) {

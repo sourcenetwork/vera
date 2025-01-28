@@ -26,7 +26,7 @@ func TestCommitRegistration_CreatingCommitmentReturnsID(t *testing.T) {
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  commitPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 
@@ -48,7 +48,7 @@ func TestCommitRegistration_CreateAndGetCommitment(t *testing.T) {
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  commitPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 
@@ -75,7 +75,7 @@ func TestCommitRegistration_CommitmentsGenerateDifferentIds(t *testing.T) {
 	// Given Policy
 	a1 := test.CreatePolicyAction{
 		Policy:  commitPolicy,
-		Creator: ctx.GetActor("bob"),
+		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
 
