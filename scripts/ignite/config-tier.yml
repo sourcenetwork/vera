@@ -6,22 +6,22 @@ accounts:
     mnemonic: 'near smoke great nasty alley food crush nurse rubber say danger search employ under gaze today alien eager risk letter drum relief sponsor current'
     # address: source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9
     coins:
-      - 100000open
+      - 100000000open
   - name: bob
     mnemonic: 'kingdom race grab ask size settle gesture vendor certain purpose clump gauge firm kiwi muffin term hello addict laugh tornado copper all sheriff reflect'
     # address: source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et
     coins:
-      - 100000open
+      - 100000000open
   - name: charlie
-    mnemonic: 'violin foster walnut trial jungle lucky reward odor loud cube spend jaguar ketchup ramp shock south omit cliff twice release sample hover tribe hair'
-    # address: source14shhdf9p668r8m6qqxwmg5rm8dpr7tfm659j4l
+    mnemonic: 'vast brand cannon priority equip comfort mixed connect belt holiday either bleak employ sauce wrong memory cover appear symptom assume faint fire bargain guide'
+    # address: source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4
     coins:
-      - 100000open
+      - 100000000open
   - name: frank
     mnemonic: 'trophy space shove poverty armor trap foil siege poem keen cancel device garage item desert mention school multiply viable practice silent push flip blame'
     # address: source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy
     coins:
-      - 100000open
+      - 100000000open
   - name: victor
     mnemonic: 'divert tenant reveal hire thing jar carry lonely magic oak audit fiber earth catalog cheap merry print clown portion speak daring giant weird slight'
     # address: source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme
@@ -43,18 +43,42 @@ build:
 
 genesis:
   app_state:
+    crisis:
+      constant_fee:
+        amount: "1000"
+        denom: "open"
+
+    gov:
+      params:
+        min_deposit:
+          - amount: '10000000'
+            denom: 'open'
+        expedited_min_deposit:
+          - amount: '50000000'
+            denom: 'open'
+
+    mint:
+      params:
+        blocks_per_year: "31557600"
+        goal_bonded: "0.67"
+        inflation_min: "0.02"
+        inflation_max: "0.15"
+        inflation_rate_change: "0.13"
+        mint_denom: 'open'
+
     staking:
       params:
-        unbonding_time: '10s'
+        bond_denom: 'open'
+        unbonding_time: '60s'
 
     epochs:
       epochs:
         - 'identifier': 'tier'
-          'duration': '10s'
+          'duration': '60s'
 
     tier:
       params:
-        epoch_duration: '10s'
+        epoch_duration: '60s'
         unlocking_epochs: 2
         reward_rates:
           - amount: '300'
