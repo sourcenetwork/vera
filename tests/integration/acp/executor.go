@@ -204,7 +204,7 @@ func (e *SDKClientExecutor) GetOrCreateAccountFromActor(ctx *TestCtx, actor *Tes
 
 	var defaultSendAmt sdk.Coins = []sdk.Coin{
 		{
-			Denom:  "stake",
+			Denom:  "open",
 			Amount: math.NewInt(10000),
 		},
 	}
