@@ -86,6 +86,11 @@ func (k Keeper) GetEpochsKeeper() types.EpochsKeeper {
 	return k.epochsKeeper
 }
 
+// GetDistributionKeeper returns the module's DistributionKeeper.
+func (k Keeper) GetDistributionKeeper() types.DistributionKeeper {
+	return k.distributionKeeper
+}
+
 // Logger returns a module-specific logger.
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
@@ -377,4 +382,17 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	)
 
 	return nil
+}
+
+// GetDeveloperStake calculates and returns the total amount of all active lockups.
+func (k Keeper) GetDeveloperStake(ctx sdk.Context) math.Int {
+	totalDeveloperStake := math.ZeroInt()
+
+	lockupsCallback := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
+		totalDeveloperStake = totalDeveloperStake.Add(lockup.Amount)
+	}
+
+	k.MustIterateLockups(ctx, lockupsCallback)
+
+	return totalDeveloperStake
 }
