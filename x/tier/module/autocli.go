@@ -37,9 +37,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				// },
 				{
 					RpcMethod:      "UnlockingLockup",
-					Use:            "unlocking-lockup [delegator-address] [validator-address]",
+					Use:            "unlocking-lockup [delegator-address] [validator-address] [creation-height]",
 					Short:          "Query an unlocking stake based on address and validator addres",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}, {ProtoField: "validator_address"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}, {ProtoField: "validator_address"}, {ProtoField: "creation_height"}},
 				},
 				{
 					RpcMethod:      "UnlockingLockups",
@@ -85,7 +85,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod:      "CancelUnlocking",
 					Use:            "cancel-unlocking [validator-address] [stake] [creation-height]",
-					Short:          "Send a cancel-unlocking-stake tx",
+					Short:          "Send a cancel-unlocking tx",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validator_address"}, {ProtoField: "stake"}, {ProtoField: "creation_height"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
