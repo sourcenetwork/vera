@@ -5,8 +5,6 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -22,10 +20,9 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 }
 
 func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
-
 	authority := m.Keeper.GetAuthority()
 	if msg.Authority != authority {
-		return nil, types.ErrUnauthorized.Wrapf("expected authority: %s, got: %s", authority, msg.Authority)
+		return nil, types.ErrUnauthorized.Wrapf("invalid authority: %s", msg.Authority)
 	}
 
 	err := msg.Params.Validate()
@@ -42,7 +39,6 @@ func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams)
 }
 
 func (m msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLockResponse, error) {
-
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
@@ -56,12 +52,11 @@ func (m msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLock
 }
 
 func (m msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.MsgUnlockResponse, error) {
-
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	_, unlockTime, err := m.Keeper.Unlock(ctx, delAddr, valAddr, msg.Stake.Amount)
+	_, unlockTime, _, err := m.Keeper.Unlock(ctx, delAddr, valAddr, msg.Stake.Amount)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "undelegate")
 	}
@@ -70,13 +65,18 @@ func (m msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.Msg
 }
 
 func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlocking) (*types.MsgCancelUnlockingResponse, error) {
+	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
+	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
 
-	// TODO: Implement MsgCancelUnlocking
-	return &types.MsgCancelUnlockingResponse{}, status.Error(codes.Unimplemented, "not implemented")
+	err := m.Keeper.CancelUnlocking(ctx, delAddr, valAddr, msg.CreationHeight, &msg.Stake.Amount)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "cancel unlocking")
+	}
+
+	return &types.MsgCancelUnlockingResponse{}, nil
 }
 
 func (m msgServer) Redelegate(ctx context.Context, msg *types.MsgRedelegate) (*types.MsgRedelegateResponse, error) {
-
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	srcValAddr := types.MustValAddressFromBech32(msg.SrcValidatorAddress)

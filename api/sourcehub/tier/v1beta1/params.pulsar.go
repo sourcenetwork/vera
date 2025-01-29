@@ -3,7 +3,6 @@ package tierv1beta1
 
 import (
 	_ "cosmossdk.io/api/amino"
-	binary "encoding/binary"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
@@ -13,7 +12,6 @@ import (
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	io "io"
-	math "math"
 	reflect "reflect"
 	sync "sync"
 )
@@ -723,8 +721,8 @@ func (x *fastReflection_Rate) Range(f func(protoreflect.FieldDescriptor, protore
 			return
 		}
 	}
-	if x.Rate != float64(0) || math.Signbit(x.Rate) {
-		value := protoreflect.ValueOfFloat64(x.Rate)
+	if x.Rate != int64(0) {
+		value := protoreflect.ValueOfInt64(x.Rate)
 		if !f(fd_Rate_rate, value) {
 			return
 		}
@@ -747,7 +745,7 @@ func (x *fastReflection_Rate) Has(fd protoreflect.FieldDescriptor) bool {
 	case "sourcehub.tier.v1beta1.Rate.amount":
 		return x.Amount != ""
 	case "sourcehub.tier.v1beta1.Rate.rate":
-		return x.Rate != float64(0) || math.Signbit(x.Rate)
+		return x.Rate != int64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Rate"))
@@ -767,7 +765,7 @@ func (x *fastReflection_Rate) Clear(fd protoreflect.FieldDescriptor) {
 	case "sourcehub.tier.v1beta1.Rate.amount":
 		x.Amount = ""
 	case "sourcehub.tier.v1beta1.Rate.rate":
-		x.Rate = float64(0)
+		x.Rate = int64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Rate"))
@@ -789,7 +787,7 @@ func (x *fastReflection_Rate) Get(descriptor protoreflect.FieldDescriptor) proto
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.tier.v1beta1.Rate.rate":
 		value := x.Rate
-		return protoreflect.ValueOfFloat64(value)
+		return protoreflect.ValueOfInt64(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Rate"))
@@ -813,7 +811,7 @@ func (x *fastReflection_Rate) Set(fd protoreflect.FieldDescriptor, value protore
 	case "sourcehub.tier.v1beta1.Rate.amount":
 		x.Amount = value.Interface().(string)
 	case "sourcehub.tier.v1beta1.Rate.rate":
-		x.Rate = value.Float()
+		x.Rate = value.Int()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Rate"))
@@ -854,7 +852,7 @@ func (x *fastReflection_Rate) NewField(fd protoreflect.FieldDescriptor) protoref
 	case "sourcehub.tier.v1beta1.Rate.amount":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.tier.v1beta1.Rate.rate":
-		return protoreflect.ValueOfFloat64(float64(0))
+		return protoreflect.ValueOfInt64(int64(0))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.Rate"))
@@ -928,8 +926,8 @@ func (x *fastReflection_Rate) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Rate != 0 || math.Signbit(x.Rate) {
-			n += 9
+		if x.Rate != 0 {
+			n += 1 + runtime.Sov(uint64(x.Rate))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -960,11 +958,10 @@ func (x *fastReflection_Rate) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.Rate != 0 || math.Signbit(x.Rate) {
-			i -= 8
-			binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(x.Rate))))
+		if x.Rate != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Rate))
 			i--
-			dAtA[i] = 0x11
+			dAtA[i] = 0x10
 		}
 		if len(x.Amount) > 0 {
 			i -= len(x.Amount)
@@ -1055,16 +1052,24 @@ func (x *fastReflection_Rate) ProtoMethods() *protoiface.Methods {
 				x.Amount = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 2:
-				if wireType != 1 {
+				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Rate", wireType)
 				}
-				var v uint64
-				if (iNdEx + 8) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				x.Rate = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.Rate |= int64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				v = uint64(binary.LittleEndian.Uint64(dAtA[iNdEx:]))
-				iNdEx += 8
-				x.Rate = float64(math.Float64frombits(v))
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1172,8 +1177,8 @@ type Rate struct {
 	unknownFields protoimpl.UnknownFields
 
 	// amount of locked stake required for earning rewards at this rate.
-	Amount string  `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount,omitempty"`
-	Rate   float64 `protobuf:"fixed64,2,opt,name=rate,proto3" json:"rate,omitempty"`
+	Amount string `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount,omitempty"`
+	Rate   int64  `protobuf:"varint,2,opt,name=rate,proto3" json:"rate,omitempty"`
 }
 
 func (x *Rate) Reset() {
@@ -1203,7 +1208,7 @@ func (x *Rate) GetAmount() string {
 	return ""
 }
 
-func (x *Rate) GetRate() float64 {
+func (x *Rate) GetRate() int64 {
 	if x != nil {
 		return x.Rate
 	}
@@ -1241,7 +1246,7 @@ var file_sourcehub_tier_v1beta1_params_proto_rawDesc = []byte{
 	0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x6d, 0x61, 0x74, 0x68, 0x2e, 0x49,
 	0x6e, 0x74, 0xd2, 0xb4, 0x2d, 0x0a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x49, 0x6e, 0x74,
 	0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x61, 0x74, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x04, 0x72, 0x61, 0x74, 0x65, 0x42, 0xd8, 0x01, 0x0a,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x04, 0x72, 0x61, 0x74, 0x65, 0x42, 0xd8, 0x01, 0x0a,
 	0x1a, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74,
 	0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x42, 0x0b, 0x50, 0x61, 0x72,
 	0x61, 0x6d, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x33, 0x63, 0x6f, 0x73, 0x6d,

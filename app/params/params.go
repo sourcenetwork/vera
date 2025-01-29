@@ -53,7 +53,6 @@ var denomMetadatas = []banktypes.Metadata{
 
 // RegisterDenoms registers token denoms.
 func RegisterDenoms(ctx context.Context, bk bankkeeper.Keeper) {
-
 	for _, denomMetadata := range denomMetadatas {
 		bk.SetDenomMetaData(ctx, denomMetadata)
 	}

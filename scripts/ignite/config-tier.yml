@@ -58,10 +58,10 @@ genesis:
         unlocking_epochs: 2
         reward_rates:
           - amount: '300'
-            rate: 1.50
+            rate: 150
           - amount: '200'
-            rate: 1.20
+            rate: 120
           - amount: '100'
-            rate: 1.10
+            rate: 110
           - amount: '0'
-            rate: 1.00
+            rate: 100

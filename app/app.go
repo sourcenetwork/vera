@@ -344,16 +344,10 @@ func New(
 	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
 	//
 	initChainer := func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-
-		// TODO: Is there a cleaner way to update the denom without having to unmarshal and marshal the genesis state?
-		// At the time of validator being created, the denom is still the old one if we just set the params here:
-		//
-		//   stakingParams := app.StakingKeeper.GetParams(ctx)
-		//   stakingParams.BondDenom = BondDenom
-		//   app.StakingKeeper.SetParams(ctx, stakingParams)
-		//
-		// The above approach doesn't work because the params need to be set before InitGenesis runs.
-		// Hence, we need to update the genesis state directly.
+		// Temp workaround to set default IBC params until app wiring is fully supported.
+		if req.InitialHeight == 1 {
+			app.setDefaultIBCParams(ctx)
+		}
 
 		var genesisState GenesisState
 		err := json.Unmarshal(req.AppStateBytes, &genesisState)
@@ -376,8 +370,8 @@ func New(
 		}
 
 		return app.App.InitChainer(ctx, req)
-
 	}
+
 	app.SetInitChainer(initChainer)
 
 	if err := app.Load(loadLatest); err != nil {
@@ -418,7 +412,6 @@ func (app *App) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	if !ok {
 		return nil
 	}
-
 	return key
 }
 
@@ -430,7 +423,6 @@ func (app *App) kvStoreKeys() map[string]*storetypes.KVStoreKey {
 			keys[kv.Name()] = kv
 		}
 	}
-
 	return keys
 }
 

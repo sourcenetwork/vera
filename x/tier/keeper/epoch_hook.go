@@ -26,12 +26,11 @@ func (EpochHooks) GetModuleName() string {
 
 // BeforeEpochStart is the epoch start hook.
 func (h EpochHooks) BeforeEpochStart(ctx context.Context, epochIdentifier string, epochNumber int64) error {
-
 	if epochIdentifier != types.EpochIdentifier {
 		return nil
 	}
 
-	h.keeper.Logger().Info("reseting all crdits", "epochID", epochIdentifier, "epochNumber", epochNumber)
+	h.keeper.Logger().Info("resetting all credits", "epochID", epochIdentifier, "epochNumber", epochNumber)
 
 	err := h.keeper.burnAllCredits(ctx)
 	if err != nil {
@@ -47,7 +46,6 @@ func (h EpochHooks) BeforeEpochStart(ctx context.Context, epochIdentifier string
 }
 
 func (h EpochHooks) AfterEpochEnd(ctx context.Context, epochIdentifier string, epochNumber int64) error {
-
 	if epochIdentifier != types.EpochIdentifier {
 		return nil
 	}

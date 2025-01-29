@@ -9,8 +9,9 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
 
 // Lockup tracks the locked and unlocking stake of a delegator.
 message Lockup {
-  string validator_address = 1 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
-  string amount = 2 [
+  string delegator_address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
+  string amount = 3 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
@@ -19,11 +20,11 @@ message Lockup {
   // The following fields are only used for unlocking lockups.
   //
   // The height at which the lockup was created.
-  int64 creation_height = 3;
+  int64 creation_height = 4;
 
   // The time at which the stake undelegation will be completed.
-  google.protobuf.Timestamp unbond_time = 4 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp unbond_time = 5 [(gogoproto.stdtime) = true];
 
   // The time at which the stake unlocking will be completed.
-  google.protobuf.Timestamp unlock_time = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp unlock_time = 6 [(gogoproto.stdtime) = true];
 }

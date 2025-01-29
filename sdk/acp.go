@@ -10,7 +10,7 @@ import (
 
 // NewCmdBuilder returns a builder for PolicyCmd objects from a client.
 //
-// The client is used to fetch the latests acp module params from SourceHub
+// The client is used to fetch the latest ACP module params from SourceHub
 // and as a block height fetcher.
 func NewCmdBuilder(ctx context.Context, client *Client) (*signed_policy_cmd.CmdBuilder, error) {
 	acpClient := client.ACPQueryClient()

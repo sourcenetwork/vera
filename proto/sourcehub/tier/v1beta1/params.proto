@@ -26,5 +26,5 @@ message Rate {
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
-  double rate = 2;
+  int64 rate = 2;
 }

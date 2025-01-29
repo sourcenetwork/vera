@@ -29,17 +29,19 @@ func NewParams(epochDuration *time.Duration, unlockingEpochs int64, creditReward
 	}
 }
 
-// DefaultParams returns default parameters
+// DefaultParams returns default parameters.
+// Rates in RewardRates are integers representing percentages with 2 decimal precision.
+// For example, a rate of 150 represents 1.50 (150 / 100).
 func DefaultParams() Params {
 	du := 5 * time.Minute
 	return Params{
 		EpochDuration:   &du,
 		UnlockingEpochs: 2,
 		RewardRates: []Rate{
-			{Amount: math.NewInt(300), Rate: 1.50},
-			{Amount: math.NewInt(200), Rate: 1.20},
-			{Amount: math.NewInt(100), Rate: 1.10},
-			{Amount: math.NewInt(0), Rate: 1.00},
+			{Amount: math.NewInt(300), Rate: 150},
+			{Amount: math.NewInt(200), Rate: 120},
+			{Amount: math.NewInt(100), Rate: 110},
+			{Amount: math.NewInt(0), Rate: 100},
 		},
 	}
 }
@@ -90,7 +92,7 @@ func validateCreditRewardRate(i interface{}) error {
 			return fmt.Errorf("invalid locked stake: %s", rate.Amount)
 		}
 		if rate.Rate <= 0 {
-			return fmt.Errorf("invalid rate: %f", rate.Rate)
+			return fmt.Errorf("invalid rate: %d", rate.Rate)
 		}
 	}
 	return nil

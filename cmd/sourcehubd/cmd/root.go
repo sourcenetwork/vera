@@ -29,7 +29,7 @@ import (
 
 // NewRootCmd creates a new root command for sourcehubd. It is called once in the main function.
 func NewRootCmd() *cobra.Command {
-	initSDKConfig()
+	app.SetConfig(true)
 
 	var (
 		txConfigOpts       tx.ConfigOptions

@@ -31,11 +31,11 @@ service Msg {
   // CheckAccess executes an Access Request for an User and stores the result of the evaluation in SourceHub.
   // The resulting evaluation is used to generate a cryptographic proof that the given Access Request
   // was valid at a particular block height.
-  rpc CheckAccess (MsgCheckAccess) returns (MsgCheckAccessResponse);
+  rpc CheckAccess(MsgCheckAccess) returns (MsgCheckAccessResponse);
   
   // SignedPolicyCmd is a wrapper for a Command which is executed within the Context of a Policy.
   // The Command is signed by the Actor issuing it.
-  rpc SignedPolicyCmd (MsgSignedPolicyCmd) returns (MsgSignedPolicyCmdResponse);
+  rpc SignedPolicyCmd(MsgSignedPolicyCmd) returns (MsgSignedPolicyCmdResponse);
 
   // BearerPolicyCmd is a Msg containing an instruction which changes the authorization
   // rules in a Policy.
@@ -45,9 +45,9 @@ service Msg {
   // This token MUST be issued and signed by some DID Actor, the verification of the signature
   // is used as authentication proof.
   // Lastly, the Bearer token MUST be bound to some SourceHub account.
-  rpc BearerPolicyCmd (MsgBearerPolicyCmd) returns (MsgBearerPolicyCmdResponse);
+  rpc BearerPolicyCmd(MsgBearerPolicyCmd) returns (MsgBearerPolicyCmdResponse);
 
-  rpc DirectPolicyCmd (MsgDirectPolicyCmd) returns (MsgDirectPolicyCmdResponse);
+  rpc DirectPolicyCmd(MsgDirectPolicyCmd) returns (MsgDirectPolicyCmdResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.

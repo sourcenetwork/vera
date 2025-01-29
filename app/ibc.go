@@ -4,6 +4,7 @@ import (
 	"cosmossdk.io/core/appmodule"
 	storetypes "cosmossdk.io/store/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
@@ -28,6 +29,7 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	ibcchanneltypes "github.com/cosmos/ibc-go/v8/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
@@ -177,6 +179,19 @@ func (app *App) registerIBCModules() {
 	); err != nil {
 		panic(err)
 	}
+}
+
+// setDefaultIBCParams is used to set default IBC params until app wiring is fully supported.
+func (app *App) setDefaultIBCParams(ctx sdk.Context) {
+	app.IBCKeeper.ClientKeeper.SetNextClientSequence(ctx, 0)
+	app.IBCKeeper.ConnectionKeeper.SetNextConnectionSequence(ctx, 0)
+	app.IBCKeeper.ChannelKeeper.SetNextChannelSequence(ctx, 0)
+	app.IBCKeeper.ClientKeeper.SetParams(ctx, ibcclienttypes.DefaultParams())
+	app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
+	app.IBCKeeper.ChannelKeeper.SetParams(ctx, ibcchanneltypes.DefaultParams())
+	app.ICAControllerKeeper.SetParams(ctx, icacontrollertypes.DefaultParams())
+	app.ICAHostKeeper.SetParams(ctx, icahosttypes.DefaultParams())
+	app.TransferKeeper.SetParams(ctx, ibctransfertypes.DefaultParams())
 }
 
 // Since the IBC modules don't support dependency injection, we need to

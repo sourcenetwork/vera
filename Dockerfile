@@ -1,4 +1,4 @@
-FROM golang:1.21-bookworm as builder
+FROM golang:1.22 as builder
 
 ARG IGNITE_VERSION="28.1.0"
 
@@ -25,6 +25,10 @@ WORKDIR /app
 
 # Cache deps
 COPY go.* /app/
+
+# Copy submodules
+# COPY submodules/acp_core /app/submodules/acp_core
+
 RUN go mod download
 
 # Build
@@ -33,7 +37,7 @@ RUN --mount=type=cache,target=/root/.cache make build
 
 # Dev image entrypoint
 ENTRYPOINT ["scripts/dev-entrypoint.sh"]
-CMD ["start"]
+CMD ["start", "--minimum-gas-prices=0.001uopen"]
 
 
 # Deployment entrypoint
