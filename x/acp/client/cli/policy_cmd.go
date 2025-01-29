@@ -107,17 +107,16 @@ func CmdArchiveObject(dispatcher dispatcher) *cobra.Command {
 
 func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "reveal-registration policy-id commitment-id json-proof",
+		Use:   "reveal-registration commitment-id json-proof",
 		Short: "Reveal an Object Registration for a Commitment",
 		Long:  ``,
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			policyId := args[0]
-			commitId, err := strconv.ParseUint(args[1], 10, 64)
+			commitId, err := strconv.ParseUint(args[0], 10, 64)
 			if err != nil {
 				return fmt.Errorf("invalid commitId: %w", err)
 			}
-			proofJson := args[2]
+			proofJson := args[1]
 
 			proof := &types.RegistrationProof{}
 			err = jsonpb.UnmarshalString(proofJson, proof)
@@ -127,7 +126,7 @@ func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 
 			polCmd := types.NewRevealRegistrationCmd(commitId, proof)
 
-			err = dispatcher(cmd, policyId, polCmd)
+			err = dispatcher(cmd, "", polCmd)
 			if err != nil {
 				return err
 			}

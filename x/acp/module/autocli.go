@@ -50,10 +50,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 
 				{
-					RpcMethod:      "RegistrationsCommitment",
-					Use:            "registrations-commitment",
-					Short:          "Query RegistrationsCommitment",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
+					RpcMethod: "RegistrationsCommitment",
+					Use:       "registrations-commitment",
+					Short:     "Query RegistrationsCommitment",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "id"},
+					},
 				},
 
 				{
