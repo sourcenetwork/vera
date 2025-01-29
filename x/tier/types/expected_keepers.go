@@ -28,8 +28,8 @@ type StakingKeeper interface {
 		sharesAmount math.LegacyDec) (completionTime time.Time, err error)
 	BondDenom(ctx context.Context) (string, error)
 	GetValidator(ctx context.Context, addr sdk.ValAddress) (validator stakingtypes.Validator, err error)
-	IterateValidators(context.Context, func(index int64, validator stakingtypes.ValidatorI) (stop bool)) error
-	TotalBondedTokens(context.Context) (math.Int, error)
+	IterateValidators(ctx context.Context, cb func(index int64, validator stakingtypes.ValidatorI) (stop bool)) error
+	TotalBondedTokens(ctx context.Context) (math.Int, error)
 	ValidateUnbondAmount(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (
 		shares math.LegacyDec, err error)
 	GetUnbondingDelegation(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (
@@ -39,6 +39,10 @@ type StakingKeeper interface {
 	SetValidatorByConsAddr(ctx context.Context, addr stakingtypes.Validator) error
 	SetValidator(ctx context.Context, addr stakingtypes.Validator) error
 	CompleteUnbonding(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
+	BondedRatio(ctx context.Context) (math.LegacyDec, error)
+	StakingTokenSupply(ctx context.Context) (math.Int, error)
+	GetValidatorDelegations(ctx context.Context, valAddr sdk.ValAddress) ([]stakingtypes.Delegation, error)
+	GetAllValidators(ctx context.Context) ([]stakingtypes.Validator, error)
 }
 
 // BankKeeper defines the expected interface for the Bank module.
