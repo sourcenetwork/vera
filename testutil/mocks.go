@@ -402,6 +402,58 @@ func (mr *MockStakingKeeperRecorder) ValidateUnbondAmount(ctx, delAddr, valAddr,
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateUnbondAmount", reflect.TypeOf((*MockStakingKeeper)(nil).ValidateUnbondAmount), ctx, delAddr, valAddr, amt)
 }
 
+func (m *MockStakingKeeper) BondedRatio(ctx context.Context) (math.LegacyDec, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "BondedRatio", ctx)
+	ret0, _ := ret[0].(math.LegacyDec)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockStakingKeeperRecorder) BondedRatio(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BondedRatio", reflect.TypeOf((*MockStakingKeeper)(nil).BondedRatio), ctx)
+}
+
+func (m *MockStakingKeeper) StakingTokenSupply(ctx context.Context) (math.Int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StakingTokenSupply", ctx)
+	ret0, _ := ret[0].(math.Int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockStakingKeeperRecorder) StakingTokenSupply(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StakingTokenSupply", reflect.TypeOf((*MockStakingKeeper)(nil).StakingTokenSupply), ctx)
+}
+
+func (m *MockStakingKeeper) GetValidatorDelegations(ctx context.Context, valAddr sdk.ValAddress) ([]stakingtypes.Delegation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetValidatorDelegations", ctx, valAddr)
+	ret0, _ := ret[0].([]stakingtypes.Delegation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockStakingKeeperRecorder) GetValidatorDelegations(ctx, valAddr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorDelegations", reflect.TypeOf((*MockStakingKeeper)(nil).GetValidatorDelegations), ctx, valAddr)
+}
+
+func (m *MockStakingKeeper) GetAllValidators(ctx context.Context) ([]stakingtypes.Validator, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllValidators", ctx)
+	ret0, _ := ret[0].([]stakingtypes.Validator)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockStakingKeeperRecorder) GetAllValidators(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllValidators", reflect.TypeOf((*MockStakingKeeper)(nil).GetAllValidators), ctx)
+}
+
 // Mock epochs keeper
 type MockEpochsKeeper struct {
 	ctrl     *gomock.Controller
