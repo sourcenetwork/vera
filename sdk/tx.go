@@ -41,7 +41,7 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	builder := TxBuilder{ // TODO evaluate tx
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
-		feeTokenDenom: "open",
+		feeTokenDenom: "stake",
 		feeAmt:        100,
 		gasLimit:      200000,
 	}
