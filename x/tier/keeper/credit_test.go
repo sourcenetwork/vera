@@ -393,7 +393,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Mint and distribute $OPEN
 			for addrStr, balance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				coins := sdk.NewCoins(sdk.NewCoin(params.OpenDenom, math.NewInt(balance)))
+				coins := sdk.NewCoins(sdk.NewCoin(params.DefaultBondDenom, math.NewInt(balance)))
 				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
 				require.NoError(t, err, "MintCoins $OPEN failed")
 				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
@@ -419,7 +419,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Verify that $OPEN balances are unchanged
 			for addrStr, expectedBalance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.OpenDenom)
+				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.DefaultBondDenom)
 				if !bal.Amount.Equal(math.NewInt(expectedBalance)) {
 					t.Errorf("Non-credit denom incorrectly burned. For %s, got = %d, expected = %d",
 						addrStr, bal.Amount.Int64(), expectedBalance)
