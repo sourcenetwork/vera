@@ -6,37 +6,37 @@ accounts:
     mnemonic: 'near smoke great nasty alley food crush nurse rubber say danger search employ under gaze today alien eager risk letter drum relief sponsor current'
     # address: source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9
     coins:
-      - 100000open
+      - 100000000000000uopen # 100m open
   - name: bob
     mnemonic: 'kingdom race grab ask size settle gesture vendor certain purpose clump gauge firm kiwi muffin term hello addict laugh tornado copper all sheriff reflect'
     # address: source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et
     coins:
-      - 100000open
+       - 100000000000000uopen # 100m open
   - name: charlie
     mnemonic: 'vast brand cannon priority equip comfort mixed connect belt holiday either bleak employ sauce wrong memory cover appear symptom assume faint fire bargain guide'
     # address: source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4
     coins:
-      - 100000open
+       - 100000000000000uopen # 100m open
   - name: frank
     mnemonic: 'trophy space shove poverty armor trap foil siege poem keen cancel device garage item desert mention school multiply viable practice silent push flip blame'
     # address: source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy
     coins:
-      - 100000open
+       - 100000000000000uopen # 100m open
   - name: victor
     mnemonic: 'divert tenant reveal hire thing jar carry lonely magic oak audit fiber earth catalog cheap merry print clown portion speak daring giant weird slight'
     # address: source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme
     coins:
-      - 200000000open
+      - 200000000000000uopen # 200m open
 
 faucet:
   name: frank
   coins:
-    - 100000open
+    - 100000000000000uopen # 100m open
 
 validators:
   - name: victor
     # address: sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm
-    bonded: 100000000open
+    bonded: 100000000000000uopen # 100m open
 
 build:
   main: cmd/sourcehubd
