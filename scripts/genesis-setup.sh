@@ -6,7 +6,7 @@ VALIDATOR="validator"
 NODE_NAME="node"
 BIN="build/sourcehubd"
 
-$BIN init $NODE_NAME --chain-id $CHAIN_ID --default-denom="open"
+$BIN init $NODE_NAME --chain-id $CHAIN_ID --default-denom="uopen"
 
 $BIN keys add $VALIDATOR --keyring-backend test
 VALIDATOR_ADDR=$($BIN keys show $VALIDATOR -a --keyring-backend test)
