@@ -77,7 +77,7 @@ func (suite *KeeperTestSuite) TestLock() {
 	amount := math.NewInt(1000)
 	moduleName := types.ModuleName
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
-	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.CreditDenom, math.NewInt(250)))
+	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(250)))
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)

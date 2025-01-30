@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -383,7 +383,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Mint and distribute credits
 			for addrStr, balance := range tt.creditBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				coins := sdk.NewCoins(sdk.NewCoin(params.CreditDenom, math.NewInt(balance)))
+				coins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(balance)))
 				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
 				require.NoError(t, err, "MintCoins failed")
 				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
@@ -393,7 +393,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Mint and distribute $OPEN
 			for addrStr, balance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				coins := sdk.NewCoins(sdk.NewCoin(params.DefaultBondDenom, math.NewInt(balance)))
+				coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(balance)))
 				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
 				require.NoError(t, err, "MintCoins $OPEN failed")
 				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
@@ -409,7 +409,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Verify that all credit balances are zero
 			for addrStr, origBalance := range tt.creditBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.CreditDenom)
+				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
 				if !bal.IsZero() {
 					t.Errorf("Expected all credit burned for %s, original = %d, still found = %s",
 						addrStr, origBalance, bal.Amount)
@@ -419,7 +419,7 @@ func TestBurnAllCredits(t *testing.T) {
 			// Verify that $OPEN balances are unchanged
 			for addrStr, expectedBalance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.DefaultBondDenom)
+				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.DefaultBondDenom)
 				if !bal.Amount.Equal(math.NewInt(expectedBalance)) {
 					t.Errorf("Non-credit denom incorrectly burned. For %s, got = %d, expected = %d",
 						addrStr, bal.Amount.Int64(), expectedBalance)
@@ -512,7 +512,7 @@ func TestResetAllCredits(t *testing.T) {
 			// Check expected credits
 			for addrStr, expected := range tt.expectedCredit {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, params.CreditDenom)
+				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
 				if !bal.Amount.Equal(math.NewInt(expected)) {
 					t.Errorf("Incorrect credit balance for %s, got = %v, expected = %v",
 						addrStr, bal.Amount, expected)
@@ -523,7 +523,7 @@ func TestResetAllCredits(t *testing.T) {
 			for addrStr := range tt.lockups {
 				if _, ok := tt.expectedCredit[addrStr]; !ok {
 					addr := sdk.MustAccAddressFromBech32(addrStr)
-					bal := k.GetBankKeeper().GetBalance(ctx, addr, params.CreditDenom)
+					bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
 					if !bal.IsZero() {
 						t.Errorf("Address %s was not in expectedCredit, but has credit = %v",
 							addrStr, bal.Amount)

@@ -22,7 +22,7 @@ func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.In
 		return errors.New("invalid amount")
 	}
 
-	coins := sdk.NewCoins(sdk.NewCoin(appparams.CreditDenom, amt))
+	coins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, amt))
 	err := k.bankKeeper.MintCoins(ctx, types.ModuleName, coins)
 	if err != nil {
 		return errorsmod.Wrap(err, "mint coins")
@@ -61,7 +61,7 @@ func (k Keeper) burnAllCredits(ctx context.Context) error {
 	var err error
 
 	cb := func(addr sdk.AccAddress, coin sdk.Coin) (stop bool) {
-		if coin.Denom != appparams.CreditDenom {
+		if coin.Denom != appparams.MicroCreditDenom {
 			return false
 		}
 

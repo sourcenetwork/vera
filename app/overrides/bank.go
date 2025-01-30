@@ -56,7 +56,7 @@ func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	}
 
 	creditSendEnabled := banktypes.SendEnabled{
-		Denom:   appparams.CreditDenom,
+		Denom:   appparams.MicroCreditDenom,
 		Enabled: false,
 	}
 
