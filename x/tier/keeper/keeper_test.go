@@ -28,7 +28,7 @@ func initializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context,
 
 // initializeDelegator initializes ba delegator with balance.
 func initializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
-	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin("open", initialBalance))
+	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
 	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
 	require.NoError(t, err)
 	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
