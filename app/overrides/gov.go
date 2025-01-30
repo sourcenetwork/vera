@@ -43,8 +43,6 @@ func (GovModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	genState.Params.VotingPeriod = &twoWeeks
 	genState.Params.ExpeditedVotingPeriod = &oneWeek
 
-	// TODO: should we also require $CREDIT tokens for gov proposals?
-
 	genState.Params.MinDeposit = sdk.NewCoins(
 		sdk.NewCoin(appparams.MicroOpenDenom, math.NewInt(1_000_000_000)),
 	)
