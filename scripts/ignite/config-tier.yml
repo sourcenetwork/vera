@@ -51,10 +51,10 @@ genesis:
     gov:
       params:
         min_deposit:
-          - amount: '10000000'
+          - amount: '1000'
             denom: 'open'
         expedited_min_deposit:
-          - amount: '50000000'
+          - amount: '5000'
             denom: 'open'
 
     mint:
