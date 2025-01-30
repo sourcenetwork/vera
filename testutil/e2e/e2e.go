@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -9,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/sdk"
 )
 
@@ -24,7 +26,10 @@ func (n *TestNetwork) Setup(t *testing.T) {
 
 	cfg, err := network.DefaultConfigWithAppConfig(injectConfig)
 	require.NoError(t, err)
+
 	cfg.NumValidators = 1
+	cfg.BondDenom = appparams.DefaultBondDenom
+	cfg.MinGasPrices = fmt.Sprintf("%v%s", appparams.DefaultMinGasPrice, appparams.DefaultBondDenom)
 
 	network, err := network.New(t, t.TempDir(), cfg)
 	require.NoError(t, err)
