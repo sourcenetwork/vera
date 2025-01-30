@@ -10,7 +10,7 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
-// MintModuleBasic defines a wrapper of the x/mint module AppModuleBasic to provide custom default genesis state.
+// StakingModuleBasic defines a wrapper of the x/staking module AppModuleBasic to provide custom default genesis state.
 type StakingModuleBasic struct {
 	staking.AppModuleBasic
 }

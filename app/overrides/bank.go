@@ -42,6 +42,7 @@ func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 			{
 				Denom:    appparams.MicroCreditDenom,
 				Exponent: 0,
+				Aliases:  []string{appparams.CreditDenom},
 			},
 			{
 				Denom:    appparams.CreditDenom,
