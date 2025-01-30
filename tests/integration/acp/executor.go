@@ -24,6 +24,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	hubsdk "github.com/sourcenetwork/sourcehub/sdk"
 	"github.com/sourcenetwork/sourcehub/testutil/e2e"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
@@ -204,7 +205,7 @@ func (e *SDKClientExecutor) GetOrCreateAccountFromActor(ctx *TestCtx, actor *Tes
 
 	var defaultSendAmt sdk.Coins = []sdk.Coin{
 		{
-			Denom:  "uopen",
+			Denom:  appparams.DefaultBondDenom,
 			Amount: math.NewInt(10000),
 		},
 	}

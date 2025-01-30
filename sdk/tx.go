@@ -15,6 +15,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
 type TxBuilder struct {
@@ -41,7 +42,7 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	builder := TxBuilder{ // TODO evaluate tx
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
-		feeTokenDenom: "uopen",
+		feeTokenDenom: appparams.DefaultBondDenom,
 		feeAmt:        200,
 		gasLimit:      200000,
 	}
