@@ -88,11 +88,6 @@ func (e *KeeperExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *
 	return e.keeper.RegistrationsCommitmentByCommitment(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.keeper.ListObjectEvents(sdkCtx, msg)
-}
-
 func (e *KeeperExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	ts, err := types.TimestampFromCtx(sdkCtx)
@@ -307,10 +302,6 @@ func (e *SDKClientExecutor) RegistrationsCommitment(ctx *TestCtx, msg *types.Que
 
 func (e *SDKClientExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
 	return e.Network.Client.ACPQueryClient().RegistrationsCommitmentByCommitment(ctx, msg)
-}
-
-func (e *SDKClientExecutor) ListObjectEvents(ctx *TestCtx, msg *types.QueryListObjectEventsRequest) (*types.QueryListObjectEventsResponse, error) {
-	return e.Network.Client.ACPQueryClient().ListObjectEvents(ctx, msg)
 }
 
 func (e *SDKClientExecutor) Cleanup() {

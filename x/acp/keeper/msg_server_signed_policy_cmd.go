@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
+	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )

@@ -20,27 +20,22 @@ func (k Keeper) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*t
 
 	engine := k.GetACPEngine(ctx)
 
-	rec, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{
+	response, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{
 		Id: req.Id,
 	})
 	if err != nil {
 		return nil, err
 	}
-	if rec == nil {
+	if response == nil {
 		return nil, errors.ErrPolicyNotFound(req.Id)
 	}
 
-	md, err := types.UmarshalRecordMetadata(rec.Record.Metadata)
+	record, err := types.MapPolicy(response.Record)
 	if err != nil {
 		return nil, err
 	}
 
 	return &types.QueryPolicyResponse{
-		Record: &types.PolicyRecord{
-			Policy:      rec.Record.Policy,
-			RawPolicy:   rec.Record.PolicyDefinition,
-			MarshalType: rec.Record.MarshalType,
-			Metadata:    md,
-		},
+		Record: record,
 	}, nil
 }

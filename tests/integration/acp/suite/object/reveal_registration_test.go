@@ -105,7 +105,6 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnRecordWithCommitmentTi
 	// Then result contains relationship registered
 	// at commit creation time
 	require.Equal(ctx.T, commitment.Metadata.CreationTs, result.Record.Metadata.CreationTs)
-	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
 }
 
 func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(t *testing.T) {
@@ -152,7 +151,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	result := a.Run(ctx)
 
 	// Then foo.txt is transfered to bob
-	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
+	require.Equal(ctx.T, 1, result.Event.Id)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }
@@ -212,7 +211,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 	result := a.Run(ctx)
 
 	// Then Bob is the owner of foo.txt
-	require.Equal(ctx.T, result.Event.Type, types.ObjectRegistrationEventType_AMENDMENT)
+	require.Equal(ctx.T, 1, result.Event.Id)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }

@@ -7,6 +7,8 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 )
 
+// NewBlockCountDuration returns a Duration object
+// based on number of blocks
 func NewBlockCountDuration(blocks uint64) *Duration {
 	return &Duration{
 		Duration: &Duration_BlockCount{
@@ -15,6 +17,8 @@ func NewBlockCountDuration(blocks uint64) *Duration {
 	}
 }
 
+// NewDurationFromTimeDuration returns a new Duration object
+// based on wall time
 func NewDurationFromTimeDuration(duration time.Duration) *Duration {
 	return &Duration{
 		Duration: &Duration_ProtoDuration{
@@ -23,6 +27,7 @@ func NewDurationFromTimeDuration(duration time.Duration) *Duration {
 	}
 }
 
+// ToISOString returns an ISO8601 timestamp
 func (ts *Timestamp) ToISOString() (string, error) {
 	t, err := prototypes.TimestampFromProto(ts.ProtoTs)
 	if err != nil {
@@ -58,6 +63,8 @@ func IsAfter(ts *Timestamp, duration *Duration, now *Timestamp) (bool, error) {
 	}
 }
 
+// TimestampFromCtx returns a new Timestamp
+// from a Cosmos Ctx
 func TimestampFromCtx(ctx sdk.Context) (*Timestamp, error) {
 	ts, err := prototypes.TimestampProto(ctx.BlockTime())
 	if err != nil {
@@ -66,6 +73,7 @@ func TimestampFromCtx(ctx sdk.Context) (*Timestamp, error) {
 	return NewTimestamp(ts, uint64(ctx.BlockHeight())), nil
 }
 
+// NewTimestamp returns a Timestamp from a protobuff timestamp and block height
 func NewTimestamp(time *prototypes.Timestamp, height uint64) *Timestamp {
 	return &Timestamp{
 		BlockHeight: height,

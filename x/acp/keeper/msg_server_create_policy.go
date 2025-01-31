@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -45,8 +45,11 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 		return nil, err
 	}
 
-	principal := coretypes.RootPrincipal()
-	goCtx = auth.InjectPrincipal(goCtx, principal)
+	ctx, err = utils.InjectPrincipal(ctx, actorID)
+	if err != nil {
+		return nil, err
+	}
+
 	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
 		Policy:      msg.Policy,
 		MarshalType: msg.MarshalType,

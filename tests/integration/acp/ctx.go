@@ -107,6 +107,8 @@ func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
 	return acc
 }
 
+// GetSignerRecordMetadata, fetches actor from the actor registry
+// and builds a RecordMetadata object for the recovered DID
 func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata {
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
@@ -116,8 +118,9 @@ func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata 
 	}
 }
 
-func (c *TestCtx) GetRootRecordMetadata() *types.RecordMetadata {
-
+// GetSignerRecordMetadata builds RecordMetadata for the current
+// Tx Signer
+func (c *TestCtx) GetSignerRecordMetadata() *types.RecordMetadata {
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
 		TxHash:     c.TxHash,

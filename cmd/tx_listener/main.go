@@ -11,9 +11,15 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "tx-listener [comet-rpc-addr]",
-	Short: "",
-	Long:  ``,
-	Args:  cobra.MaximumNArgs(1),
+	Short: "listens to proposed txs and unmarshal results into structured SourceHub msgs",
+	Long: `tx-listener is a cli utility which connects to SourceHub's cometbft rpc connection
+	and listens for Tx processing events.
+	The received events are expanded and the Tx results are unmarshaled into the correct
+	Msg response types.
+
+	This is meant to be used a development tool to monitor the result of executed Txs by SourceHub.
+	`,
+	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		var opts []sdk.Opt
 		if len(args) == 1 {
@@ -29,7 +35,7 @@ var rootCmd = &cobra.Command{
 		ctx := context.Background()
 
 		ch, errCh, err := listener.ListenTxs(ctx)
-		defer listener.Stop()
+		defer listener.Close()
 		if err != nil {
 			log.Fatal(err)
 		}

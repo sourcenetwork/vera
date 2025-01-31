@@ -70,31 +70,29 @@ service Query {
   
   }
   
-  // Queries a list of RegistrationsCommitment items.
+  // RegistrationsCommitment returns a specific RegistrationsCommitment record
   rpc RegistrationsCommitment (QueryRegistrationsCommitmentRequest) returns (QueryRegistrationsCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment";
   
   }
   
-  // Queries a list of RegistrationsCommitmentByCommitment items.
+  // RegistrationsCommitmentByCommitment returns all RegistrationCommitment records with a given commitment
   rpc RegistrationsCommitmentByCommitment (QueryRegistrationsCommitmentByCommitmentRequest) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment_by_commitment";
   
   }
   
-  // Queries a list of ListObjectEvents items.
-  rpc ListObjectEvents (QueryListObjectEventsRequest) returns (QueryListObjectEventsResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/acp/list_object_events";
-  
-  }
-  
-  // Queries a list of GenerateCommitment items.
+  // GenerateCommitment generates a Object registration commitment for the given objects
+  //
+  // Note: this operation assures the commitment is valid (no object is registered and the policy exists)
+  // but exposes the Object Ids to the RPC node.
+  // ONLY use this method if the node is trusted
   rpc GenerateCommitment (QueryGenerateCommitmentRequest) returns (QueryGenerateCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/generate_commitment";
   
   }
   
-  // Queries a list of HijackAttemptsByPolicy items.
+  // HijackAttemptsByPolicy returns, for a given policy, all AmendmentEvent whose hijack flag is true
   rpc HijackAttemptsByPolicy (QueryHijackAttemptsByPolicyRequest) returns (QueryHijackAttemptsByPolicyResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/hijack_attempts_by_policy";
   
@@ -189,15 +187,6 @@ message QueryRegistrationsCommitmentByCommitmentResponse {
   repeated RegistrationsCommitment registrations_commitments = 1;
 }
 
-message QueryListObjectEventsRequest {
-  string                        policy_id = 1;
-  sourcenetwork.acp_core.Object object    = 2;
-}
-
-message QueryListObjectEventsResponse {
-  repeated ObjectRegistrationEvent events = 1;
-}
-
 message QueryGenerateCommitmentRequest {
            string                        policy_id = 1;
   repeated sourcenetwork.acp_core.Object objects   = 2;
@@ -216,6 +205,6 @@ message QueryHijackAttemptsByPolicyRequest {
 }
 
 message QueryHijackAttemptsByPolicyResponse {
-  repeated ObjectRegistrationEvent events = 1;
+  repeated AmendmentEvent events = 1;
 }
 

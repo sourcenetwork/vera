@@ -34,6 +34,11 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 
+// registerResponses additionally registers all acp modules
+// tx response types in the InterfaceRegistry.
+//
+// This is done in order to ease tx response unmarshaling
+// from cometbft TxResult structure
 func registerResponses(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCreatePolicyResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCheckAccessResponse{})

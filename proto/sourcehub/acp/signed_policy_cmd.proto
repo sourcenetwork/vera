@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package sourcehub.acp;
+
+import "google/protobuf/timestamp.proto";
+import "sourcenetwork/acp_core/relationship.proto";
+import "sourcehub/acp/commitment.proto";
+import "sourcehub/acp/registration.proto";
+import "sourcehub/acp/record.proto";
+import "sourcehub/acp/policy_cmd.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
+
+// SignedPolicyCmd represents a Command issued by an Actor in the context of a Policy
+// The command represents an instruction to be executed
+// The message type contains a signature which is used to authenticate the Command's Actor
+message SignedPolicyCmd {
+  // payload contains the command context
+  SignedPolicyCmdPayload payload = 1;
+
+  // signature is a signature of the payload.
+  // The signature is generated using the VerificationMethod / Authorization fields
+  // specificied by the DID document of the Actor.
+  bytes signature = 2;
+}
+
+// SignedPolicyCmdPayload represents the payload containing the context of the issued command
+message SignedPolicyCmdPayload {
+  // actor is a did string representing the actor which issued the command
+  string actor = 1;
+
+  // issued_height is the SourceHub block height of when the Payload was created
+  uint64 issued_height = 2;
+
+  // issued_at contains a client generated timestamp for the creation of the command.
+  // This is used only as metadata and isn't trusted
+  google.protobuf.Timestamp issued_at = 3;
+
+  // expiration_delta specifies the maximum number of blocks from the issued height during which the Command Payload will be accepted.
+  // This field is mandatory and is used to prevent replay attacks
+  uint64 expiration_delta = 4;
+
+  // policy_id is the ID of the policy under which the Command will be executed
+  string policy_id = 5;
+
+  PolicyCmd cmd = 6;
+}

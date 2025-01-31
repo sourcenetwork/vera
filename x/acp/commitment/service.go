@@ -7,7 +7,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func NewCommitmentService(engine coretypes.ACPEngineServer, repository CommitmentRepository) *CommitmentService {
+func NewCommitmentService(engine coretypes.ACPEngineServer, repository *CommitmentRepository) *CommitmentService {
 	return &CommitmentService{
 		engine:     engine,
 		repository: repository,
@@ -17,7 +17,7 @@ func NewCommitmentService(engine coretypes.ACPEngineServer, repository Commitmen
 // CommitmentService abstracts registration commitment operations
 type CommitmentService struct {
 	engine     coretypes.ACPEngineServer
-	repository CommitmentRepository
+	repository *CommitmentRepository
 }
 
 // BuildCommitment produces a byte commitment for actor and objects.
@@ -89,7 +89,7 @@ func (s *CommitmentService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.Re
 	}
 
 	for _, commitment := range processed {
-		err := s.repository.Set(ctx, commitment)
+		err := s.repository.update(ctx, commitment)
 		if err != nil {
 			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", commitment.Id))
 		}
@@ -110,7 +110,7 @@ func (s *CommitmentService) SetNewCommitment(ctx sdk.Context, policyId string, c
 		return nil, errors.ErrPolicyNotFound(policyId)
 	}
 
-	if len(commitment) != commitmentLen {
+	if len(commitment) != commitmentBytes {
 		return nil, errInvalidCommitment(policyId, commitment)
 	}
 
@@ -128,7 +128,7 @@ func (s *CommitmentService) SetNewCommitment(ctx sdk.Context, policyId string, c
 		Metadata:   metadata,
 	}
 
-	err = s.repository.Create(ctx, registration)
+	err = s.repository.create(ctx, registration)
 	if err != nil {
 		return nil, err
 	}
@@ -138,33 +138,33 @@ func (s *CommitmentService) SetNewCommitment(ctx sdk.Context, policyId string, c
 // ValidateOpening verifies whether the given opening proof is valid for the authenticated actor and
 // the objects
 // returns true if opening is valid
-func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (bool, error) {
+func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64, proof *types.RegistrationProof, actor *coretypes.Actor) (*types.RegistrationsCommitment, bool, error) {
 	opt, err := s.repository.GetById(ctx, commitmentId)
 	if err != nil {
-		return false, err
+		return nil, false, err
 	}
 	if opt.Empty() {
-		return false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
+		return nil, false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
 			errors.Pair("id", commitmentId))
 	}
 
 	commitment := opt.GetValue()
 	now, err := types.TimestampFromCtx(ctx)
 	if err != nil {
-		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
+		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
 	}
 	after, err := types.IsAfter(commitment.Metadata.CreationTs, commitment.Validity, now)
 	if err != nil {
-		return false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
+		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
 	}
 	if after {
-		return false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
+		return commitment, false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
 			errors.Pair("commitment", commitmentId))
 	}
 
 	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, actor, proof)
 	if err != nil {
-		return false, errors.Wrap("invalid registration opening", err)
+		return commitment, false, errors.Wrap("invalid registration opening", err)
 	}
-	return ok, nil
+	return commitment, ok, nil
 }

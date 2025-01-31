@@ -7,7 +7,7 @@ import "google/protobuf/duration.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
-// Duration models a time interval expressed either as a protobuf
+// Duration models a time interval expressed either as a wallclock
 // Duration interval or a number of blocks
 message Duration {
     oneof duration {
@@ -16,7 +16,7 @@ message Duration {
     }
 }
 
-// Timestamp models an instant in time expressed as a protobuf
+// Timestamp models an instant in time expressed as a wallclock
 // Timestamp and a block height
 message Timestamp {
     google.protobuf.Timestamp proto_ts = 1;

@@ -29,13 +29,9 @@ func MustDateTimeToProto(timestamp string) *gogotypes.Timestamp {
 	return ts
 }
 
-func TimeToProto(ts time.Time) *gogotypes.Timestamp {
-	return &gogotypes.Timestamp{
-		Seconds: ts.Unix(),
-		Nanos:   0,
-	}
-}
-
+// AssertError asserts that got and want match
+// if want is not nil.
+// If ant is nil, it asserts that got has no error
 func AssertError(ctx *TestCtx, got, want error) bool {
 	if want != nil {
 		require.NotNil(ctx.T, got, "expected an error but got none")
@@ -53,6 +49,7 @@ func AssertError(ctx *TestCtx, got, want error) bool {
 	}
 }
 
+// AssertValue asserts got matches want, if want is not nil
 func AssertValue(ctx *TestCtx, got, want any) {
 	if !isNil(want) {
 		assert.Equal(ctx.T, want, got)
@@ -96,6 +93,7 @@ func containsKind(kinds []reflect.Kind, kind reflect.Kind) bool {
 	return false
 }
 
+// GenRandomTx returns a random 100 byte slice to model Tx data
 func GenRandomTx(t *testing.T) []byte {
 	tx := make([]byte, 0, 100)
 	_, err := rand.Read(tx)

@@ -13,10 +13,11 @@ import (
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
+	cosmosadapter "github.com/sourcenetwork/raccoondb/v2/store/cosmos"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
+	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/registration"
 	"github.com/sourcenetwork/sourcehub/x/acp/stores"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -81,7 +82,7 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) *services.EngineService {
 	raccoonAdapted := stores.RaccoonKVFromCosmos(adapted)
 	runtime, err := acpruntime.NewRuntimeManager(
 		acpruntime.WithKVStore(raccoonAdapted),
-		acpruntime.WithTimeService(&SourcehubTimeProvider{}),
+		acpruntime.WithTimeService(&SourceHubTimeProvider{}),
 	)
 	if err != nil {
 		panic(err)
@@ -89,31 +90,26 @@ func (k *Keeper) GetACPEngine(ctx sdk.Context) *services.EngineService {
 	return services.NewACPEngine(runtime)
 }
 
-func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) commitment.CommitmentRepository {
+func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) *commitment.CommitmentRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
-	kv := stores.NewRaccoonKV(cmtkv)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.RegistrationsCommitmentPrefix))
-	repo, err := commitment.NewKVRegistrationRepository(kv)
+	repo, err := commitment.NewCommitmentRepository(kv)
 	if err != nil {
 		panic(err)
 	}
 	return repo
 }
 
-func (k *Keeper) GetObjectEventRepository(ctx sdk.Context) registration.RegistrationEventRepository {
+func (k *Keeper) GetObjectEventRepository(ctx sdk.Context) *registration.AmendmentEventRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
-	kv := stores.NewRaccoonKV(cmtkv)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.ObjectEventsPrefix))
-	repo, err := registration.NewObjectEventRepository(kv)
+	repo, err := registration.NewAmendmentEventRepository(kv)
 	if err != nil {
 		panic(err)
-		// TODO not sure how to best handle this, don't think the chain should continue
 	}
 	return repo
-}
-
-func (k *Keeper) GetEventService(ctx sdk.Context) *registration.EventService {
-	return registration.NewEventService(k.GetObjectEventRepository(ctx))
 }
 
 func (k *Keeper) GetCommitmentService(ctx sdk.Context) *commitment.CommitmentService {
@@ -126,16 +122,14 @@ func (k *Keeper) GetCommitmentService(ctx sdk.Context) *commitment.CommitmentSer
 func (k *Keeper) GetRegistrationService(ctx sdk.Context) *registration.RegistrationService {
 	return registration.NewRegistrationService(
 		k.GetACPEngine(ctx),
-		k.GetEventService(ctx),
-		k.GetRegistrationsCommitmentRepository(ctx),
-		*k.GetCommitmentService(ctx),
+		k.GetObjectEventRepository(ctx),
+		k.GetCommitmentService(ctx),
 	)
 }
 
 func (k *Keeper) GetPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
-	return policy_cmd.NewPolcyCmdHandler(
+	return policy_cmd.NewPolicyCmdHandler(
 		k.GetACPEngine(ctx),
-		k.GetEventService(ctx),
 		k.GetRegistrationService(ctx),
 		k.GetCommitmentService(ctx),
 	)

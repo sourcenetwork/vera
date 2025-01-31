@@ -15,11 +15,15 @@ import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
+// RecordMetadata models metadata which is stored alongside acp records
 message RecordMetadata {
-    // creation_ts contains the timestamp of the moment the msg was processed.
+    // creation_ts is the timestamp of record creation
     Timestamp creation_ts  = 1;
+    // tx_hash is the hash256 of the tx bytes which produced the record
     bytes tx_hash = 2;
+    // tx_signer is the SourceHub bech32 address of the account that signed the Tx
     string tx_signer = 3;
+    // owner_did is the DID of the PolicyCmd actor
     string owner_did = 4;
 }
 

@@ -8,7 +8,7 @@ import (
 )
 
 func errInvalidCommitment(policy string, commitment []byte) error {
-	return types.New(fmt.Sprintf("invalid commitment: got %v: want %v", len(commitment), commitmentLen),
+	return types.New(fmt.Sprintf("invalid commitment size : got %v, want %v bytes", len(commitment), commitmentBytes),
 		types.ErrorType_BAD_INPUT,
 		errors.Pair("policy", policy))
 }

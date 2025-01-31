@@ -8,7 +8,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
+	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 

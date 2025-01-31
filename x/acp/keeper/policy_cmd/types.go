@@ -12,7 +12,6 @@ func NewPolicyCmdCtx(ctx sdk.Context, policyId string, actorDID string, signer s
 	}
 
 	return PolicyCmdCtx{
-		Ctx:          ctx,
 		PolicyId:     policyId,
 		PrincipalDID: actorDID,
 		Now:          ts,
@@ -21,6 +20,7 @@ func NewPolicyCmdCtx(ctx sdk.Context, policyId string, actorDID string, signer s
 	}, nil
 }
 
+// PolicyCmdCtx bundles actor and time data bound to a PolicyCmd
 type PolicyCmdCtx struct {
 	Ctx          sdk.Context
 	PolicyId     string

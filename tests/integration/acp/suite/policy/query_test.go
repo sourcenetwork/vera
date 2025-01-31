@@ -30,7 +30,7 @@ name: policy
 			Policy:      pol,
 			MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 			RawPolicy:   policyStr,
-			Metadata:    ctx.GetRootRecordMetadata(),
+			Metadata:    ctx.GetSignerRecordMetadata(),
 		},
 	}
 	action.Run(ctx)

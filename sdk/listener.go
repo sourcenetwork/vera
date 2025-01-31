@@ -14,18 +14,22 @@ import (
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
+// TxListener is a client which subscribes to Tx events in SourceHub's cometbft socket
+// and parses the received events into version with unmarshaled Msg Responses.
 type TxListener struct {
 	rpc       cometclient.Client
 	cleanupFn func()
 }
 
+// NewTxListener creates a new listenver from a comet client
 func NewTxListener(client cometclient.Client) TxListener {
 	return TxListener{
 		rpc: client,
 	}
 }
 
-type Thing struct {
+// Event models a Cometbft Tx event with unmarsheled Msg responses
+type Event struct {
 	Height    int64     `json:"height"`
 	Index     uint32    `json:"index"`
 	Tx        []byte    `json:"tx"`
@@ -38,28 +42,32 @@ type Thing struct {
 	Responses []sdk.Msg `json:"responses"`
 }
 
-func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Thing, <-chan error, error) {
+// ListenTxs spawns a go routine which continously listens for Tx events from a cometbft connection.
+// The received events are returned into the Events channel, all errors are sent to the errors channel.
+//
+// If ListenTxs fails to connect to the comet client, returns an error and nil channels.
+func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error, error) {
 	ch, err := l.rpc.Subscribe(ctx, "", "tm.event='Tx'")
 	if err != nil {
 		return nil, nil, fmt.Errorf("TxListener: subscribing to Tx event: %w", err)
 	}
 
-	mapper := func(in rpctypes.ResultEvent) (Thing, error) {
+	mapper := func(in rpctypes.ResultEvent) (Event, error) {
 		resultBytes, err := json.Marshal(in.Data)
 		if err != nil {
-			return Thing{}, fmt.Errorf("marshaling result data to json: %v", err)
+			return Event{}, fmt.Errorf("marshaling result data to json: %v", err)
 		}
 
 		txResult := &abcitypes.TxResult{}
 		err = json.Unmarshal(resultBytes, txResult)
 		if err != nil {
-			return Thing{}, fmt.Errorf("unmarshaling into TxResult: %w", err)
+			return Event{}, fmt.Errorf("unmarshaling into TxResult: %w", err)
 		}
 
 		msgData := sdk.TxMsgData{}
 		err = msgData.Unmarshal(txResult.Result.Data)
 		if err != nil {
-			return Thing{}, fmt.Errorf("unmarshaling TxResult.ExecResultTx.Data into TxMsgData: %v", err)
+			return Event{}, fmt.Errorf("unmarshaling TxResult.ExecResultTx.Data into TxMsgData: %v", err)
 		}
 
 		registry := cdctypes.NewInterfaceRegistry()
@@ -69,11 +77,11 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Thing, <-chan error,
 			var msg sdk.Msg
 			err := registry.UnpackAny(resp, &msg)
 			if err != nil {
-				return Thing{}, fmt.Errorf("unmarshaling response %v: %w", i, err)
+				return Event{}, fmt.Errorf("unmarshaling response %v: %w", i, err)
 			}
 			responses = append(responses, msg)
 		}
-		return Thing{
+		return Event{
 			Height:    txResult.Height,
 			Index:     txResult.Index,
 			Tx:        txResult.Tx,
@@ -92,11 +100,13 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Thing, <-chan error,
 	return resultCh, errChn, err
 }
 
+// Done returns a channel which will be closed when the connection fails
 func (l *TxListener) Done() <-chan struct{} {
 	return l.rpc.Quit()
 }
 
-func (l *TxListener) Stop() {
+// Close stops listening for events and cleans up
+func (l *TxListener) Close() {
 	l.rpc.Stop()
 	l.cleanupFn()
 }

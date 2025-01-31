@@ -5,46 +5,26 @@ package sourcehub.acp;
 import "google/protobuf/timestamp.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/time.proto";
+import "sourcehub/acp/record.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
-enum ObjectRegistrationEventType {
-    UNKNOWN = 0;
-    REGISTRATION = 1;
-    REVEAL_REGISTRATION = 2;
-    ARCHIVAL = 3;
-    UNARCHIVAL = 4;
-    AMENDMENT = 5;
-    TRANSFER = 6;
-}
-
-message ObjectRegistrationEvent {
+// AmendmentEvent is a record which tracks executions of the Registration Amendment rule in SourceHub ACP
+message AmendmentEvent {
+    // event id
     uint64 id = 1;
-    ObjectRegistrationEventType type = 2;
-    bytes tx_hash = 3;
-    string policy_id = 4;
-    Timestamp ts = 5;
-    sourcenetwork.acp_core.Object object = 6;
-    sourcenetwork.acp_core.Actor actor = 7;
-    EventDetail detail = 8;
-}
-
-message EventDetail {
-    oneof detail {
-        RevealRegistrationDetail reveal_event = 2;
-        AmendmentEventDetail amendment_event = 3;
-    }
-}
-
-message AmendmentEventDetail {
-    bool hijack_flag = 1;
-    sourcenetwork.acp_core.Actor previous_owner = 2;
-    uint64 reveal_registration_event_id = 3;
-    Timestamp commitment_timestamp = 4;
-}
-
-message RevealRegistrationDetail {
-    // id of the registration commitment which originally registered the relationship
-    uint64 registration_commitment_id = 1;
-    Timestamp commitment_timestamp = 2;
+    // id of affected policy
+    string policy_id = 2;
+    // object whose registration was amended
+    sourcenetwork.acp_core.Object object = 3;
+    // new_owner is the new object owner
+    sourcenetwork.acp_core.Actor new_owner = 4;
+    // previous_owner is the previous object owner
+    sourcenetwork.acp_core.Actor previous_owner = 5;
+    // commitment_id is the id of the commitment which generated the amendment
+    uint64 commitment_id = 6;
+    // hijack_flag is true if the amendment rule was executed and the new_owner chose to flag
+    // the previous_owner as a potential object hijacker
+    bool hijack_flag = 7;
+    RecordMetadata metadata = 8;
 }

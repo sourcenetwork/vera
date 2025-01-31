@@ -24,69 +24,31 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-type ObjectRegistrationEventType int32
-
-const (
-	ObjectRegistrationEventType_UNKNOWN             ObjectRegistrationEventType = 0
-	ObjectRegistrationEventType_REGISTRATION        ObjectRegistrationEventType = 1
-	ObjectRegistrationEventType_REVEAL_REGISTRATION ObjectRegistrationEventType = 2
-	ObjectRegistrationEventType_ARCHIVAL            ObjectRegistrationEventType = 3
-	ObjectRegistrationEventType_UNARCHIVAL          ObjectRegistrationEventType = 4
-	ObjectRegistrationEventType_AMENDMENT           ObjectRegistrationEventType = 5
-	ObjectRegistrationEventType_TRANSFER            ObjectRegistrationEventType = 6
-)
-
-var ObjectRegistrationEventType_name = map[int32]string{
-	0: "UNKNOWN",
-	1: "REGISTRATION",
-	2: "REVEAL_REGISTRATION",
-	3: "ARCHIVAL",
-	4: "UNARCHIVAL",
-	5: "AMENDMENT",
-	6: "TRANSFER",
+type AmendmentEvent struct {
+	// event id
+	Id            uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	PolicyId      string        `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Object        *types.Object `protobuf:"bytes,3,opt,name=object,proto3" json:"object,omitempty"`
+	NewOwner      *types.Actor  `protobuf:"bytes,4,opt,name=new_owner,json=newOwner,proto3" json:"new_owner,omitempty"`
+	PreviousOwner *types.Actor  `protobuf:"bytes,5,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
+	// commitment_id is the id of the commitment made for the object
+	CommitmentId uint64          `protobuf:"varint,6,opt,name=commitment_id,json=commitmentId,proto3" json:"commitment_id,omitempty"`
+	HijackFlag   bool            `protobuf:"varint,7,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
+	Metadata     *RecordMetadata `protobuf:"bytes,8,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
-var ObjectRegistrationEventType_value = map[string]int32{
-	"UNKNOWN":             0,
-	"REGISTRATION":        1,
-	"REVEAL_REGISTRATION": 2,
-	"ARCHIVAL":            3,
-	"UNARCHIVAL":          4,
-	"AMENDMENT":           5,
-	"TRANSFER":            6,
-}
-
-func (x ObjectRegistrationEventType) String() string {
-	return proto.EnumName(ObjectRegistrationEventType_name, int32(x))
-}
-
-func (ObjectRegistrationEventType) EnumDescriptor() ([]byte, []int) {
+func (m *AmendmentEvent) Reset()         { *m = AmendmentEvent{} }
+func (m *AmendmentEvent) String() string { return proto.CompactTextString(m) }
+func (*AmendmentEvent) ProtoMessage()    {}
+func (*AmendmentEvent) Descriptor() ([]byte, []int) {
 	return fileDescriptor_1356cd7eda5c526d, []int{0}
 }
-
-type ObjectRegistrationEvent struct {
-	Id       uint64                      `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type     ObjectRegistrationEventType `protobuf:"varint,2,opt,name=type,proto3,enum=sourcehub.acp.ObjectRegistrationEventType" json:"type,omitempty"`
-	TxHash   []byte                      `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	PolicyId string                      `protobuf:"bytes,4,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Ts       *Timestamp                  `protobuf:"bytes,5,opt,name=ts,proto3" json:"ts,omitempty"`
-	Object   *types.Object               `protobuf:"bytes,6,opt,name=object,proto3" json:"object,omitempty"`
-	Actor    *types.Actor                `protobuf:"bytes,7,opt,name=actor,proto3" json:"actor,omitempty"`
-	Detail   *EventDetail                `protobuf:"bytes,8,opt,name=detail,proto3" json:"detail,omitempty"`
-}
-
-func (m *ObjectRegistrationEvent) Reset()         { *m = ObjectRegistrationEvent{} }
-func (m *ObjectRegistrationEvent) String() string { return proto.CompactTextString(m) }
-func (*ObjectRegistrationEvent) ProtoMessage()    {}
-func (*ObjectRegistrationEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1356cd7eda5c526d, []int{0}
-}
-func (m *ObjectRegistrationEvent) XXX_Unmarshal(b []byte) error {
+func (m *AmendmentEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *ObjectRegistrationEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *AmendmentEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_ObjectRegistrationEvent.Marshal(b, m, deterministic)
+		return xxx_messageInfo_AmendmentEvent.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -96,339 +58,110 @@ func (m *ObjectRegistrationEvent) XXX_Marshal(b []byte, deterministic bool) ([]b
 		return b[:n], nil
 	}
 }
-func (m *ObjectRegistrationEvent) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ObjectRegistrationEvent.Merge(m, src)
+func (m *AmendmentEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AmendmentEvent.Merge(m, src)
 }
-func (m *ObjectRegistrationEvent) XXX_Size() int {
+func (m *AmendmentEvent) XXX_Size() int {
 	return m.Size()
 }
-func (m *ObjectRegistrationEvent) XXX_DiscardUnknown() {
-	xxx_messageInfo_ObjectRegistrationEvent.DiscardUnknown(m)
+func (m *AmendmentEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_AmendmentEvent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_ObjectRegistrationEvent proto.InternalMessageInfo
+var xxx_messageInfo_AmendmentEvent proto.InternalMessageInfo
 
-func (m *ObjectRegistrationEvent) GetId() uint64 {
+func (m *AmendmentEvent) GetId() uint64 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *ObjectRegistrationEvent) GetType() ObjectRegistrationEventType {
-	if m != nil {
-		return m.Type
-	}
-	return ObjectRegistrationEventType_UNKNOWN
-}
-
-func (m *ObjectRegistrationEvent) GetTxHash() []byte {
-	if m != nil {
-		return m.TxHash
-	}
-	return nil
-}
-
-func (m *ObjectRegistrationEvent) GetPolicyId() string {
+func (m *AmendmentEvent) GetPolicyId() string {
 	if m != nil {
 		return m.PolicyId
 	}
 	return ""
 }
 
-func (m *ObjectRegistrationEvent) GetTs() *Timestamp {
-	if m != nil {
-		return m.Ts
-	}
-	return nil
-}
-
-func (m *ObjectRegistrationEvent) GetObject() *types.Object {
+func (m *AmendmentEvent) GetObject() *types.Object {
 	if m != nil {
 		return m.Object
 	}
 	return nil
 }
 
-func (m *ObjectRegistrationEvent) GetActor() *types.Actor {
+func (m *AmendmentEvent) GetNewOwner() *types.Actor {
 	if m != nil {
-		return m.Actor
+		return m.NewOwner
 	}
 	return nil
 }
 
-func (m *ObjectRegistrationEvent) GetDetail() *EventDetail {
-	if m != nil {
-		return m.Detail
-	}
-	return nil
-}
-
-type EventDetail struct {
-	// Types that are valid to be assigned to Detail:
-	//
-	//	*EventDetail_RevealEvent
-	//	*EventDetail_AmendmentEvent
-	Detail isEventDetail_Detail `protobuf_oneof:"detail"`
-}
-
-func (m *EventDetail) Reset()         { *m = EventDetail{} }
-func (m *EventDetail) String() string { return proto.CompactTextString(m) }
-func (*EventDetail) ProtoMessage()    {}
-func (*EventDetail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1356cd7eda5c526d, []int{1}
-}
-func (m *EventDetail) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *EventDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_EventDetail.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *EventDetail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EventDetail.Merge(m, src)
-}
-func (m *EventDetail) XXX_Size() int {
-	return m.Size()
-}
-func (m *EventDetail) XXX_DiscardUnknown() {
-	xxx_messageInfo_EventDetail.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_EventDetail proto.InternalMessageInfo
-
-type isEventDetail_Detail interface {
-	isEventDetail_Detail()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type EventDetail_RevealEvent struct {
-	RevealEvent *RevealRegistrationDetail `protobuf:"bytes,2,opt,name=reveal_event,json=revealEvent,proto3,oneof" json:"reveal_event,omitempty"`
-}
-type EventDetail_AmendmentEvent struct {
-	AmendmentEvent *AmendmentEventDetail `protobuf:"bytes,3,opt,name=amendment_event,json=amendmentEvent,proto3,oneof" json:"amendment_event,omitempty"`
-}
-
-func (*EventDetail_RevealEvent) isEventDetail_Detail()    {}
-func (*EventDetail_AmendmentEvent) isEventDetail_Detail() {}
-
-func (m *EventDetail) GetDetail() isEventDetail_Detail {
-	if m != nil {
-		return m.Detail
-	}
-	return nil
-}
-
-func (m *EventDetail) GetRevealEvent() *RevealRegistrationDetail {
-	if x, ok := m.GetDetail().(*EventDetail_RevealEvent); ok {
-		return x.RevealEvent
-	}
-	return nil
-}
-
-func (m *EventDetail) GetAmendmentEvent() *AmendmentEventDetail {
-	if x, ok := m.GetDetail().(*EventDetail_AmendmentEvent); ok {
-		return x.AmendmentEvent
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*EventDetail) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*EventDetail_RevealEvent)(nil),
-		(*EventDetail_AmendmentEvent)(nil),
-	}
-}
-
-type AmendmentEventDetail struct {
-	HijackFlag                bool         `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
-	PreviousOwner             *types.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
-	RevealRegistrationEventId uint64       `protobuf:"varint,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
-	CommitmentTimestamp       *Timestamp   `protobuf:"bytes,4,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
-}
-
-func (m *AmendmentEventDetail) Reset()         { *m = AmendmentEventDetail{} }
-func (m *AmendmentEventDetail) String() string { return proto.CompactTextString(m) }
-func (*AmendmentEventDetail) ProtoMessage()    {}
-func (*AmendmentEventDetail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1356cd7eda5c526d, []int{2}
-}
-func (m *AmendmentEventDetail) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *AmendmentEventDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_AmendmentEventDetail.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *AmendmentEventDetail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AmendmentEventDetail.Merge(m, src)
-}
-func (m *AmendmentEventDetail) XXX_Size() int {
-	return m.Size()
-}
-func (m *AmendmentEventDetail) XXX_DiscardUnknown() {
-	xxx_messageInfo_AmendmentEventDetail.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_AmendmentEventDetail proto.InternalMessageInfo
-
-func (m *AmendmentEventDetail) GetHijackFlag() bool {
-	if m != nil {
-		return m.HijackFlag
-	}
-	return false
-}
-
-func (m *AmendmentEventDetail) GetPreviousOwner() *types.Actor {
+func (m *AmendmentEvent) GetPreviousOwner() *types.Actor {
 	if m != nil {
 		return m.PreviousOwner
 	}
 	return nil
 }
 
-func (m *AmendmentEventDetail) GetRevealRegistrationEventId() uint64 {
+func (m *AmendmentEvent) GetCommitmentId() uint64 {
 	if m != nil {
-		return m.RevealRegistrationEventId
+		return m.CommitmentId
 	}
 	return 0
 }
 
-func (m *AmendmentEventDetail) GetCommitmentTimestamp() *Timestamp {
+func (m *AmendmentEvent) GetHijackFlag() bool {
 	if m != nil {
-		return m.CommitmentTimestamp
+		return m.HijackFlag
 	}
-	return nil
+	return false
 }
 
-type RevealRegistrationDetail struct {
-	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId uint64     `protobuf:"varint,1,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
-	CommitmentTimestamp      *Timestamp `protobuf:"bytes,2,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
-}
-
-func (m *RevealRegistrationDetail) Reset()         { *m = RevealRegistrationDetail{} }
-func (m *RevealRegistrationDetail) String() string { return proto.CompactTextString(m) }
-func (*RevealRegistrationDetail) ProtoMessage()    {}
-func (*RevealRegistrationDetail) Descriptor() ([]byte, []int) {
-	return fileDescriptor_1356cd7eda5c526d, []int{3}
-}
-func (m *RevealRegistrationDetail) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *RevealRegistrationDetail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_RevealRegistrationDetail.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *RevealRegistrationDetail) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RevealRegistrationDetail.Merge(m, src)
-}
-func (m *RevealRegistrationDetail) XXX_Size() int {
-	return m.Size()
-}
-func (m *RevealRegistrationDetail) XXX_DiscardUnknown() {
-	xxx_messageInfo_RevealRegistrationDetail.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_RevealRegistrationDetail proto.InternalMessageInfo
-
-func (m *RevealRegistrationDetail) GetRegistrationCommitmentId() uint64 {
+func (m *AmendmentEvent) GetMetadata() *RecordMetadata {
 	if m != nil {
-		return m.RegistrationCommitmentId
-	}
-	return 0
-}
-
-func (m *RevealRegistrationDetail) GetCommitmentTimestamp() *Timestamp {
-	if m != nil {
-		return m.CommitmentTimestamp
+		return m.Metadata
 	}
 	return nil
 }
 
 func init() {
-	proto.RegisterEnum("sourcehub.acp.ObjectRegistrationEventType", ObjectRegistrationEventType_name, ObjectRegistrationEventType_value)
-	proto.RegisterType((*ObjectRegistrationEvent)(nil), "sourcehub.acp.ObjectRegistrationEvent")
-	proto.RegisterType((*EventDetail)(nil), "sourcehub.acp.EventDetail")
-	proto.RegisterType((*AmendmentEventDetail)(nil), "sourcehub.acp.AmendmentEventDetail")
-	proto.RegisterType((*RevealRegistrationDetail)(nil), "sourcehub.acp.RevealRegistrationDetail")
+	proto.RegisterType((*AmendmentEvent)(nil), "sourcehub.acp.AmendmentEvent")
 }
 
 func init() { proto.RegisterFile("sourcehub/acp/registration.proto", fileDescriptor_1356cd7eda5c526d) }
 
 var fileDescriptor_1356cd7eda5c526d = []byte{
-	// 679 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0xc1, 0x4e, 0xdb, 0x4a,
-	0x14, 0x8d, 0x9d, 0x10, 0xc2, 0x4d, 0xc8, 0x8b, 0x06, 0x24, 0xfc, 0xc2, 0x7b, 0x21, 0x4a, 0x17,
-	0x4d, 0x59, 0x24, 0x52, 0x90, 0xba, 0xaa, 0x5a, 0x19, 0x08, 0x4d, 0x04, 0x38, 0xd2, 0x10, 0xa8,
-	0xd4, 0x8d, 0x35, 0xb1, 0x87, 0xc4, 0x60, 0x67, 0x2c, 0x7b, 0x02, 0xe4, 0x1b, 0xba, 0xe1, 0x27,
-	0xfa, 0x09, 0xfd, 0x87, 0x2e, 0x59, 0x76, 0x59, 0xc1, 0xae, 0x5f, 0x51, 0x79, 0x1c, 0x07, 0x3b,
-	0x2d, 0x54, 0xea, 0xd2, 0x77, 0xce, 0x39, 0x73, 0xee, 0xf1, 0x9d, 0x0b, 0x55, 0x9f, 0x4d, 0x3c,
-	0x83, 0x8e, 0x26, 0x83, 0x26, 0x31, 0xdc, 0xa6, 0x47, 0x87, 0x96, 0xcf, 0x3d, 0xc2, 0x2d, 0x36,
-	0x6e, 0xb8, 0x1e, 0xe3, 0x0c, 0xad, 0xce, 0x11, 0x0d, 0x62, 0xb8, 0xe5, 0xad, 0x21, 0x63, 0x43,
-	0x9b, 0x36, 0xc5, 0xe1, 0x60, 0x72, 0xde, 0xe4, 0x96, 0x43, 0x7d, 0x4e, 0x1c, 0x37, 0xc4, 0x97,
-	0x5f, 0x85, 0xf8, 0x31, 0xe5, 0xd7, 0xcc, 0xbb, 0x0c, 0x54, 0x75, 0x83, 0x79, 0xb4, 0xe9, 0x51,
-	0x5b, 0xc8, 0xfa, 0x23, 0x2b, 0x82, 0x2a, 0xc9, 0xcb, 0x03, 0xa5, 0xf0, 0xa4, 0xf6, 0x43, 0x86,
-	0x8d, 0xde, 0xe0, 0x82, 0x1a, 0x1c, 0xc7, 0x1c, 0xb5, 0xaf, 0xe8, 0x98, 0xa3, 0x22, 0xc8, 0x96,
-	0xa9, 0x48, 0x55, 0xa9, 0x9e, 0xc1, 0xb2, 0x65, 0xa2, 0xb7, 0x90, 0xe1, 0x53, 0x97, 0x2a, 0x72,
-	0x55, 0xaa, 0x17, 0x5b, 0xdb, 0x8d, 0x84, 0xdf, 0xc6, 0x13, 0x2a, 0xfd, 0xa9, 0x4b, 0xb1, 0xe0,
-	0xa1, 0x0d, 0x58, 0xe6, 0x37, 0xfa, 0x88, 0xf8, 0x23, 0x25, 0x5d, 0x95, 0xea, 0x05, 0x9c, 0xe5,
-	0x37, 0x1d, 0xe2, 0x8f, 0xd0, 0x26, 0xac, 0xb8, 0xcc, 0xb6, 0x8c, 0xa9, 0x6e, 0x99, 0x4a, 0xa6,
-	0x2a, 0xd5, 0x57, 0x70, 0x2e, 0x2c, 0x74, 0x4d, 0x54, 0x07, 0x99, 0xfb, 0xca, 0x52, 0x55, 0xaa,
-	0xe7, 0x5b, 0xca, 0xc2, 0x9d, 0xfd, 0x28, 0x12, 0x2c, 0x73, 0x1f, 0xbd, 0x86, 0x2c, 0x13, 0x26,
-	0x94, 0xac, 0x40, 0x57, 0x1a, 0x89, 0x84, 0x1a, 0x51, 0x42, 0x91, 0xd5, 0x19, 0x1a, 0xed, 0xc0,
-	0x12, 0x31, 0x38, 0xf3, 0x94, 0x65, 0x41, 0xfb, 0xff, 0x29, 0x9a, 0x1a, 0x80, 0x70, 0x88, 0x45,
-	0x2d, 0xc8, 0x9a, 0x94, 0x13, 0xcb, 0x56, 0x72, 0x82, 0x55, 0x5e, 0xb0, 0x26, 0x9a, 0xdf, 0x17,
-	0x08, 0x3c, 0x43, 0xd6, 0xbe, 0x48, 0x90, 0x8f, 0xd5, 0xd1, 0x11, 0x14, 0x3c, 0x7a, 0x45, 0x89,
-	0xad, 0xd3, 0xa0, 0x2a, 0x82, 0xcd, 0xb7, 0x5e, 0x2e, 0x28, 0x61, 0x01, 0x89, 0x07, 0x1b, 0xd2,
-	0x3b, 0x29, 0x9c, 0x0f, 0xe9, 0xe1, 0xef, 0xd2, 0xe0, 0x1f, 0xe2, 0xd0, 0xb1, 0xe9, 0xd0, 0x31,
-	0x9f, 0x09, 0xa6, 0x85, 0xe0, 0x8b, 0x05, 0x41, 0x35, 0x42, 0xc5, 0xbc, 0x74, 0x52, 0xb8, 0x48,
-	0x12, 0xf5, 0xdd, 0x5c, 0xd4, 0x61, 0xed, 0x93, 0x0c, 0xeb, 0xbf, 0x23, 0xa1, 0x2d, 0xc8, 0x8f,
-	0xac, 0x0b, 0x62, 0x5c, 0xea, 0xe7, 0x36, 0x19, 0x8a, 0x51, 0xc9, 0x61, 0x08, 0x4b, 0x07, 0x36,
-	0x19, 0xa2, 0x7d, 0x28, 0xba, 0x1e, 0xbd, 0xb2, 0xd8, 0xc4, 0xd7, 0xd9, 0xf5, 0x98, 0x7a, 0xb3,
-	0x1e, 0xff, 0x90, 0xf1, 0x6a, 0x44, 0xea, 0x05, 0x1c, 0xf4, 0x0e, 0xfe, 0x9b, 0xe5, 0x14, 0x7f,
-	0x36, 0x61, 0x8f, 0xc1, 0xc8, 0xa4, 0xc5, 0x88, 0xfe, 0xeb, 0xfd, 0x12, 0x94, 0xf0, 0xda, 0x35,
-	0xd1, 0x21, 0xac, 0x1b, 0xcc, 0x71, 0x2c, 0x2e, 0xb2, 0x99, 0x3f, 0x24, 0x31, 0x6b, 0xcf, 0x4d,
-	0xd5, 0xda, 0x23, 0x6b, 0x5e, 0xac, 0x7d, 0x96, 0x40, 0x79, 0xea, 0x9f, 0xa0, 0x37, 0x50, 0x4e,
-	0x78, 0x8c, 0x5d, 0x3b, 0x7f, 0x4b, 0x4a, 0x1c, 0xb1, 0x37, 0x07, 0x3c, 0xe3, 0x53, 0xfe, 0x0b,
-	0x9f, 0xdb, 0xb7, 0x12, 0x6c, 0x3e, 0xf3, 0x28, 0x51, 0x1e, 0x96, 0x4f, 0xb5, 0x43, 0xad, 0xf7,
-	0x41, 0x2b, 0xa5, 0x50, 0x09, 0x0a, 0xb8, 0xfd, 0xbe, 0x7b, 0xd2, 0xc7, 0x6a, 0xbf, 0xdb, 0xd3,
-	0x4a, 0x12, 0xda, 0x80, 0x35, 0xdc, 0x3e, 0x6b, 0xab, 0x47, 0x7a, 0xe2, 0x40, 0x46, 0x05, 0xc8,
-	0xa9, 0x78, 0xaf, 0xd3, 0x3d, 0x53, 0x8f, 0x4a, 0x69, 0x54, 0x04, 0x38, 0xd5, 0xe6, 0xdf, 0x19,
-	0xb4, 0x0a, 0x2b, 0xea, 0x71, 0x5b, 0xdb, 0x3f, 0x6e, 0x6b, 0xfd, 0xd2, 0x52, 0x00, 0xee, 0x63,
-	0x55, 0x3b, 0x39, 0x68, 0xe3, 0x52, 0x76, 0xb7, 0xf3, 0xf5, 0xbe, 0x22, 0xdd, 0xdd, 0x57, 0xa4,
-	0xef, 0xf7, 0x15, 0xe9, 0xf6, 0xa1, 0x92, 0xba, 0x7b, 0xa8, 0xa4, 0xbe, 0x3d, 0x54, 0x52, 0x1f,
-	0x1b, 0x43, 0x8b, 0x07, 0x7d, 0x19, 0xcc, 0x69, 0x26, 0xf7, 0xda, 0xe3, 0xea, 0xba, 0x09, 0x97,
-	0xd7, 0xd4, 0xa5, 0xfe, 0x20, 0x2b, 0xd6, 0xd7, 0xce, 0xcf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe0,
-	0xb7, 0x7e, 0x86, 0x57, 0x05, 0x00, 0x00,
+	// 399 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x3f, 0x6f, 0xd4, 0x40,
+	0x10, 0xc5, 0x6f, 0x8f, 0x70, 0xf8, 0x36, 0xdc, 0x15, 0x5b, 0x59, 0x87, 0x70, 0x2c, 0x68, 0x4c,
+	0x63, 0x4b, 0x20, 0x21, 0x41, 0x17, 0x04, 0x88, 0x14, 0x28, 0x92, 0x4b, 0x1a, 0x6b, 0xbd, 0x3b,
+	0xf1, 0x6d, 0xe2, 0xdd, 0xb1, 0xd6, 0xeb, 0x98, 0x7c, 0x0b, 0x3e, 0x16, 0x65, 0x4a, 0x4a, 0x74,
+	0xf7, 0x25, 0x28, 0x91, 0xff, 0x5c, 0x22, 0x23, 0x21, 0xa5, 0x9d, 0xf9, 0xbd, 0xe7, 0x37, 0x7e,
+	0x4b, 0xc3, 0x1a, 0x1b, 0x2b, 0x60, 0xdb, 0xe4, 0x09, 0x17, 0x55, 0x62, 0xa1, 0x50, 0xb5, 0xb3,
+	0xdc, 0x29, 0x34, 0x71, 0x65, 0xd1, 0x21, 0x5b, 0xdd, 0x11, 0x31, 0x17, 0xd5, 0xe6, 0xa4, 0x40,
+	0x2c, 0x4a, 0x48, 0xfa, 0x65, 0xde, 0x5c, 0x24, 0x4e, 0x69, 0xa8, 0x1d, 0xd7, 0xd5, 0xc0, 0x6f,
+	0x5e, 0x0d, 0xbc, 0x01, 0xd7, 0xa2, 0xbd, 0xea, 0x5c, 0x33, 0x81, 0x16, 0x12, 0x0b, 0x65, 0x6f,
+	0x5b, 0x6f, 0xd5, 0x01, 0xf5, 0xa7, 0x1f, 0xef, 0x9c, 0xc6, 0xcd, 0xe6, 0xdf, 0x58, 0x02, 0xad,
+	0x1c, 0x76, 0x2f, 0xfe, 0xcc, 0xe9, 0xfa, 0x54, 0x83, 0x91, 0x1a, 0x8c, 0xfb, 0x74, 0x0d, 0xc6,
+	0xb1, 0x35, 0x9d, 0x2b, 0xe9, 0x93, 0x90, 0x44, 0x47, 0xe9, 0x5c, 0x49, 0xf6, 0x8c, 0x2e, 0x2b,
+	0x2c, 0x95, 0xb8, 0xc9, 0x94, 0xf4, 0xe7, 0x21, 0x89, 0x96, 0xa9, 0x37, 0x0c, 0xce, 0x24, 0x7b,
+	0x4b, 0x17, 0x98, 0x5f, 0x82, 0x70, 0xfe, 0xa3, 0x90, 0x44, 0xc7, 0xaf, 0x83, 0x78, 0x92, 0x38,
+	0x3e, 0x24, 0x8e, 0xcf, 0x7b, 0x2a, 0x1d, 0x69, 0xf6, 0x9e, 0x2e, 0x0d, 0xb4, 0x19, 0xb6, 0x06,
+	0xac, 0x7f, 0xd4, 0x4b, 0x9f, 0xff, 0x4f, 0x7a, 0x2a, 0x1c, 0xda, 0xd4, 0x33, 0xd0, 0x9e, 0x77,
+	0x38, 0xfb, 0x48, 0xd7, 0x95, 0x85, 0x6b, 0x85, 0x4d, 0x3d, 0x1a, 0x3c, 0x7e, 0x88, 0xc1, 0xea,
+	0x20, 0x1a, 0x5c, 0x5e, 0xd2, 0x95, 0x40, 0xad, 0x95, 0xeb, 0x2e, 0xef, 0x4e, 0x5b, 0xf4, 0x17,
+	0x3f, 0xbd, 0x1f, 0x9e, 0x49, 0x76, 0x42, 0x8f, 0xb7, 0xea, 0x92, 0x8b, 0xab, 0xec, 0xa2, 0xe4,
+	0x85, 0xff, 0x24, 0x24, 0x91, 0x97, 0xd2, 0x61, 0xf4, 0xb9, 0xe4, 0x05, 0x7b, 0x47, 0x3d, 0x0d,
+	0x8e, 0x4b, 0xee, 0xb8, 0xef, 0x4d, 0x52, 0x8c, 0x1d, 0xc7, 0x69, 0xff, 0xbb, 0xbf, 0x8e, 0x50,
+	0x7a, 0x87, 0x7f, 0xf8, 0xf2, 0x73, 0x17, 0x90, 0xdb, 0x5d, 0x40, 0x7e, 0xef, 0x02, 0xf2, 0x63,
+	0x1f, 0xcc, 0x6e, 0xf7, 0xc1, 0xec, 0xd7, 0x3e, 0x98, 0x7d, 0x8b, 0x0b, 0xe5, 0x3a, 0xb9, 0x40,
+	0x9d, 0x4c, 0x1f, 0xc0, 0x7d, 0x93, 0xdf, 0x87, 0x96, 0x6f, 0x2a, 0xa8, 0xf3, 0x45, 0xdf, 0xe5,
+	0x9b, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x56, 0xd3, 0xfb, 0xe8, 0x80, 0x02, 0x00, 0x00,
 }
 
-func (m *ObjectRegistrationEvent) Marshal() (dAtA []byte, err error) {
+func (m *AmendmentEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -438,19 +171,19 @@ func (m *ObjectRegistrationEvent) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *ObjectRegistrationEvent) MarshalTo(dAtA []byte) (int, error) {
+func (m *AmendmentEvent) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *ObjectRegistrationEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *AmendmentEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.Detail != nil {
+	if m.Metadata != nil {
 		{
-			size, err := m.Detail.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Metadata.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -460,179 +193,20 @@ func (m *ObjectRegistrationEvent) MarshalToSizedBuffer(dAtA []byte) (int, error)
 		i--
 		dAtA[i] = 0x42
 	}
-	if m.Actor != nil {
-		{
-			size, err := m.Actor.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
+	if m.HijackFlag {
+		i--
+		if m.HijackFlag {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x38
 	}
-	if m.Object != nil {
-		{
-			size, err := m.Object.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
+	if m.CommitmentId != 0 {
+		i = encodeVarintRegistration(dAtA, i, uint64(m.CommitmentId))
 		i--
-		dAtA[i] = 0x32
-	}
-	if m.Ts != nil {
-		{
-			size, err := m.Ts.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x2a
-	}
-	if len(m.PolicyId) > 0 {
-		i -= len(m.PolicyId)
-		copy(dAtA[i:], m.PolicyId)
-		i = encodeVarintRegistration(dAtA, i, uint64(len(m.PolicyId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.TxHash) > 0 {
-		i -= len(m.TxHash)
-		copy(dAtA[i:], m.TxHash)
-		i = encodeVarintRegistration(dAtA, i, uint64(len(m.TxHash)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if m.Type != 0 {
-		i = encodeVarintRegistration(dAtA, i, uint64(m.Type))
-		i--
-		dAtA[i] = 0x10
-	}
-	if m.Id != 0 {
-		i = encodeVarintRegistration(dAtA, i, uint64(m.Id))
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *EventDetail) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *EventDetail) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *EventDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Detail != nil {
-		{
-			size := m.Detail.Size()
-			i -= size
-			if _, err := m.Detail.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *EventDetail_RevealEvent) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *EventDetail_RevealEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.RevealEvent != nil {
-		{
-			size, err := m.RevealEvent.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-func (m *EventDetail_AmendmentEvent) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *EventDetail_AmendmentEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	if m.AmendmentEvent != nil {
-		{
-			size, err := m.AmendmentEvent.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x1a
-	}
-	return len(dAtA) - i, nil
-}
-func (m *AmendmentEventDetail) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *AmendmentEventDetail) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *AmendmentEventDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.CommitmentTimestamp != nil {
-		{
-			size, err := m.CommitmentTimestamp.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintRegistration(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
-	if m.RevealRegistrationEventId != 0 {
-		i = encodeVarintRegistration(dAtA, i, uint64(m.RevealRegistrationEventId))
-		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x30
 	}
 	if m.PreviousOwner != nil {
 		{
@@ -644,44 +218,11 @@ func (m *AmendmentEventDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i = encodeVarintRegistration(dAtA, i, uint64(size))
 		}
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x2a
 	}
-	if m.HijackFlag {
-		i--
-		if m.HijackFlag {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x8
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *RevealRegistrationDetail) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *RevealRegistrationDetail) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *RevealRegistrationDetail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.CommitmentTimestamp != nil {
+	if m.NewOwner != nil {
 		{
-			size, err := m.CommitmentTimestamp.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.NewOwner.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -689,10 +230,29 @@ func (m *RevealRegistrationDetail) MarshalToSizedBuffer(dAtA []byte) (int, error
 			i = encodeVarintRegistration(dAtA, i, uint64(size))
 		}
 		i--
+		dAtA[i] = 0x22
+	}
+	if m.Object != nil {
+		{
+			size, err := m.Object.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintRegistration(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.PolicyId) > 0 {
+		i -= len(m.PolicyId)
+		copy(dAtA[i:], m.PolicyId)
+		i = encodeVarintRegistration(dAtA, i, uint64(len(m.PolicyId)))
+		i--
 		dAtA[i] = 0x12
 	}
-	if m.RegistrationCommitmentId != 0 {
-		i = encodeVarintRegistration(dAtA, i, uint64(m.RegistrationCommitmentId))
+	if m.Id != 0 {
+		i = encodeVarintRegistration(dAtA, i, uint64(m.Id))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -710,7 +270,7 @@ func encodeVarintRegistration(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *ObjectRegistrationEvent) Size() (n int) {
+func (m *AmendmentEvent) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -719,106 +279,30 @@ func (m *ObjectRegistrationEvent) Size() (n int) {
 	if m.Id != 0 {
 		n += 1 + sovRegistration(uint64(m.Id))
 	}
-	if m.Type != 0 {
-		n += 1 + sovRegistration(uint64(m.Type))
-	}
-	l = len(m.TxHash)
-	if l > 0 {
-		n += 1 + l + sovRegistration(uint64(l))
-	}
 	l = len(m.PolicyId)
 	if l > 0 {
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	if m.Ts != nil {
-		l = m.Ts.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
 	if m.Object != nil {
 		l = m.Object.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
-	if m.Actor != nil {
-		l = m.Actor.Size()
+	if m.NewOwner != nil {
+		l = m.NewOwner.Size()
 		n += 1 + l + sovRegistration(uint64(l))
-	}
-	if m.Detail != nil {
-		l = m.Detail.Size()
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	return n
-}
-
-func (m *EventDetail) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Detail != nil {
-		n += m.Detail.Size()
-	}
-	return n
-}
-
-func (m *EventDetail_RevealEvent) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.RevealEvent != nil {
-		l = m.RevealEvent.Size()
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	return n
-}
-func (m *EventDetail_AmendmentEvent) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.AmendmentEvent != nil {
-		l = m.AmendmentEvent.Size()
-		n += 1 + l + sovRegistration(uint64(l))
-	}
-	return n
-}
-func (m *AmendmentEventDetail) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.HijackFlag {
-		n += 2
 	}
 	if m.PreviousOwner != nil {
 		l = m.PreviousOwner.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
-	if m.RevealRegistrationEventId != 0 {
-		n += 1 + sovRegistration(uint64(m.RevealRegistrationEventId))
+	if m.CommitmentId != 0 {
+		n += 1 + sovRegistration(uint64(m.CommitmentId))
 	}
-	if m.CommitmentTimestamp != nil {
-		l = m.CommitmentTimestamp.Size()
-		n += 1 + l + sovRegistration(uint64(l))
+	if m.HijackFlag {
+		n += 2
 	}
-	return n
-}
-
-func (m *RevealRegistrationDetail) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.RegistrationCommitmentId != 0 {
-		n += 1 + sovRegistration(uint64(m.RegistrationCommitmentId))
-	}
-	if m.CommitmentTimestamp != nil {
-		l = m.CommitmentTimestamp.Size()
+	if m.Metadata != nil {
+		l = m.Metadata.Size()
 		n += 1 + l + sovRegistration(uint64(l))
 	}
 	return n
@@ -830,7 +314,7 @@ func sovRegistration(x uint64) (n int) {
 func sozRegistration(x uint64) (n int) {
 	return sovRegistration(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
+func (m *AmendmentEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -853,10 +337,10 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: ObjectRegistrationEvent: wiretype end group for non-group")
+			return fmt.Errorf("proto: AmendmentEvent: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: ObjectRegistrationEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: AmendmentEvent: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -879,59 +363,6 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			m.Type = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Type |= ObjectRegistrationEventType(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TxHash = append(m.TxHash[:0], dAtA[iNdEx:postIndex]...)
-			if m.TxHash == nil {
-				m.TxHash = []byte{}
-			}
-			iNdEx = postIndex
-		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
@@ -963,43 +394,7 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 			}
 			m.PolicyId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Ts", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Ts == nil {
-				m.Ts = &Timestamp{}
-			}
-			if err := m.Ts.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
 			}
@@ -1035,9 +430,9 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 7:
+		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NewOwner", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1064,240 +459,14 @@ func (m *ObjectRegistrationEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Actor == nil {
-				m.Actor = &types.Actor{}
+			if m.NewOwner == nil {
+				m.NewOwner = &types.Actor{}
 			}
-			if err := m.Actor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.NewOwner.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Detail", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Detail == nil {
-				m.Detail = &EventDetail{}
-			}
-			if err := m.Detail.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegistration(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *EventDetail) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegistration
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: EventDetail: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: EventDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RevealEvent", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &RevealRegistrationDetail{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Detail = &EventDetail_RevealEvent{v}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AmendmentEvent", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			v := &AmendmentEventDetail{}
-			if err := v.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			m.Detail = &EventDetail_AmendmentEvent{v}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegistration(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *AmendmentEventDetail) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegistration
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: AmendmentEventDetail: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: AmendmentEventDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HijackFlag", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.HijackFlag = bool(v != 0)
-		case 2:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PreviousOwner", wireType)
 			}
@@ -1333,11 +502,11 @@ func (m *AmendmentEventDetail) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 3:
+		case 6:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RevealRegistrationEventId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CommitmentId", wireType)
 			}
-			m.RevealRegistrationEventId = 0
+			m.CommitmentId = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowRegistration
@@ -1347,14 +516,34 @@ func (m *AmendmentEventDetail) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.RevealRegistrationEventId |= uint64(b&0x7F) << shift
+				m.CommitmentId |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-		case 4:
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HijackFlag", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRegistration
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.HijackFlag = bool(v != 0)
+		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1381,115 +570,10 @@ func (m *AmendmentEventDetail) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.CommitmentTimestamp == nil {
-				m.CommitmentTimestamp = &Timestamp{}
+			if m.Metadata == nil {
+				m.Metadata = &RecordMetadata{}
 			}
-			if err := m.CommitmentTimestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipRegistration(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *RevealRegistrationDetail) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowRegistration
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: RevealRegistrationDetail: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RevealRegistrationDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
-			}
-			m.RegistrationCommitmentId = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.RegistrationCommitmentId |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRegistration
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthRegistration
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.CommitmentTimestamp == nil {
-				m.CommitmentTimestamp = &Timestamp{}
-			}
-			if err := m.CommitmentTimestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Metadata.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

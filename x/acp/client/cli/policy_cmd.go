@@ -197,7 +197,7 @@ func CmdUnarchiveObject(dispatcher dispatcher) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			polId := args[0]
 			obj := coretypes.NewObject(args[1], args[2])
-			polCmd := types.NewArchiveObjectCmd(obj)
+			polCmd := types.NewUnarchiveObjectCmd(obj)
 			err = dispatcher(cmd, polId, polCmd)
 			if err != nil {
 				return err

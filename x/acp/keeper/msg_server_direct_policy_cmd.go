@@ -9,7 +9,7 @@ import (
 
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/policy_cmd"
+	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
