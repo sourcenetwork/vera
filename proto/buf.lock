@@ -2,6 +2,11 @@
 version: v1
 deps:
   - remote: buf.build
+    owner: cometbft
+    repository: cometbft
+    commit: c0d3497e35d649538679874acdd86660
+    digest: shake256:05d2fb9e6b6bf82385ac26b250afbba281a2ca79f51729291373d24ca676d743183bf70a921daae6feafd5f9917120e2548a7c477d9743f668bca27cc1e12fdf
+  - remote: buf.build
     owner: cosmos
     repository: cosmos-proto
     commit: 04467658e59e44bbb22fe568206e1f70
@@ -19,8 +24,8 @@ deps:
   - remote: buf.build
     owner: cosmos
     repository: ibc
-    commit: 41fbc441e4d645119d275150719c5441
-    digest: shake256:a61d3e152909abddc91dcc1aec8ac997007bebd48a7921bc243681c708e6c9068f6484aa7ed4e6ff60101d3422c98744a4a5294bbda6aacdba07f1dfa4291020
+    commit: baf134b1c13a45e9903beeba3b2a92ec
+    digest: shake256:0069c2b35e359966bfe3f30ec98bc76180f277eb6fe722cdc6d20e68257d9b888db3b801c9fdc8ae1014439d786420f21ba2147d8fee7b1dc1dc748ff84e1fe4
   - remote: buf.build
     owner: cosmos
     repository: ics23
@@ -29,18 +34,18 @@ deps:
   - remote: buf.build
     owner: googleapis
     repository: googleapis
-    commit: e7f8d366f5264595bcc4cd4139af9973
-    digest: shake256:e5e5f1c12f82e028ea696faa43b4f9dc6258a6d1226282962a8c8b282e10946281d815884f574bd279ebd9cd7588629beb3db17b892af6c33b56f92f8f67f509
+    commit: e93e34f48be043dab55be31b4b47f458
+    digest: shake256:93dbe51c27606999eef918360df509485a4d272e79aaed6d0016940379a9b06d316fc5228b7b50cca94bb310f34c5fc5955ce7474f655f0d0a224c4121dda3c1
   - remote: buf.build
     owner: protocolbuffers
     repository: wellknowntypes
-    commit: d59b7d45e69d4e129a1b797e2766f067
-    digest: shake256:e4bb315f5a90aace88fe39709c831eda8eb0ce66b4cf947065888100b9867c2eb9a0f61f6b8d73c51b1fcccdfe8611090f55ce5db1aee6901ec9b4e6d8fa8e52
+    commit: d4f14e5e0a9c40889c90d373c74e95eb
+    digest: shake256:c9824714afd6cc432c2e1fafa20df47c87a8a0aca9e27192cd5732619453997af1721c2eac5c0fbbe7b29a741af5b8d7ba4ee89c85903e782d9c725d7b9436b5
   - remote: buf.build
     owner: sourcenetwork
     repository: acp-core
-    commit: b6f94fa155414e3cb1c771d9b4665c61
-    digest: shake256:1bcba7dd668ad7bc197c7bd6235eff8a5e433c691844730de6108692d77987768cc28ed23dd0a74af1582a5582792a9c7890cf3669fdc43d8dd20183b593d253
+    commit: 2bc3b586bded42e99b059a2c10675060
+    digest: shake256:7ee3050de0ed5e6488450f011a6d641bc7bb496dc2c9cd072d34c70150ca2f89b609b9e833d29ea3a6872a936e51c7d7115b6ef55d6629f82d18764625e57250
   - remote: buf.build
     owner: tendermint
     repository: tendermint

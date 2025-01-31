@@ -7,10 +7,11 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
-import "sourcehub/acp/access_decision.proto";
+import "sourcenetwork/acp_core/request.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/policy_cmd.proto";
 import "sourcehub/acp/record.proto";
+import "sourcehub/acp/access_decision.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/policy.proto";
 
@@ -86,7 +87,7 @@ message MsgCheckAccess {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string policy_id = 2;
-  AccessRequest access_request = 3;
+  sourcenetwork.acp_core.AccessRequest access_request = 3;
 }
 
 message MsgCheckAccessResponse {

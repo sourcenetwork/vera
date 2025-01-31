@@ -2,9 +2,9 @@
 package acp
 
 import (
-	acp_core "github.com/sourcenetwork/acp_core/pkg/pulsar/types"
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	types "github.com/sourcenetwork/acp_core/pkg/pulsar/types"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -104,8 +104,8 @@ func (x *fastReflection_ObjectRegistrationEvent) Interface() protoreflect.ProtoM
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_ObjectRegistrationEvent) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Id != "" {
-		value := protoreflect.ValueOfString(x.Id)
+	if x.Id != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.Id)
 		if !f(fd_ObjectRegistrationEvent_id, value) {
 			return
 		}
@@ -168,7 +168,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Range(f func(protoreflect.Field
 func (x *fastReflection_ObjectRegistrationEvent) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.id":
-		return x.Id != ""
+		return x.Id != uint64(0)
 	case "sourcehub.acp.ObjectRegistrationEvent.type":
 		return x.Type_ != 0
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
@@ -200,7 +200,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Has(fd protoreflect.FieldDescri
 func (x *fastReflection_ObjectRegistrationEvent) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.id":
-		x.Id = ""
+		x.Id = uint64(0)
 	case "sourcehub.acp.ObjectRegistrationEvent.type":
 		x.Type_ = 0
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
@@ -233,7 +233,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Get(descriptor protoreflect.Fie
 	switch descriptor.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.id":
 		value := x.Id
-		return protoreflect.ValueOfString(value)
+		return protoreflect.ValueOfUint64(value)
 	case "sourcehub.acp.ObjectRegistrationEvent.type":
 		value := x.Type_
 		return protoreflect.ValueOfEnum((protoreflect.EnumNumber)(value))
@@ -276,7 +276,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Get(descriptor protoreflect.Fie
 func (x *fastReflection_ObjectRegistrationEvent) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.id":
-		x.Id = value.Interface().(string)
+		x.Id = value.Uint()
 	case "sourcehub.acp.ObjectRegistrationEvent.type":
 		x.Type_ = (ObjectRegistrationEventType)(value.Enum())
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
@@ -286,9 +286,9 @@ func (x *fastReflection_ObjectRegistrationEvent) Set(fd protoreflect.FieldDescri
 	case "sourcehub.acp.ObjectRegistrationEvent.ts":
 		x.Ts = value.Message().Interface().(*Timestamp)
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
-		x.Object = value.Message().Interface().(*acp_core.Object)
+		x.Object = value.Message().Interface().(*types.Object)
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		x.Actor = value.Message().Interface().(*acp_core.Actor)
+		x.Actor = value.Message().Interface().(*types.Actor)
 	case "sourcehub.acp.ObjectRegistrationEvent.detail":
 		x.Detail = value.Message().Interface().(*EventDetail)
 	default:
@@ -318,12 +318,12 @@ func (x *fastReflection_ObjectRegistrationEvent) Mutable(fd protoreflect.FieldDe
 		return protoreflect.ValueOfMessage(x.Ts.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
 		if x.Object == nil {
-			x.Object = new(acp_core.Object)
+			x.Object = new(types.Object)
 		}
 		return protoreflect.ValueOfMessage(x.Object.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
 		if x.Actor == nil {
-			x.Actor = new(acp_core.Actor)
+			x.Actor = new(types.Actor)
 		}
 		return protoreflect.ValueOfMessage(x.Actor.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.detail":
@@ -353,7 +353,7 @@ func (x *fastReflection_ObjectRegistrationEvent) Mutable(fd protoreflect.FieldDe
 func (x *fastReflection_ObjectRegistrationEvent) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "sourcehub.acp.ObjectRegistrationEvent.id":
-		return protoreflect.ValueOfString("")
+		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.acp.ObjectRegistrationEvent.type":
 		return protoreflect.ValueOfEnum(0)
 	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
@@ -364,10 +364,10 @@ func (x *fastReflection_ObjectRegistrationEvent) NewField(fd protoreflect.FieldD
 		m := new(Timestamp)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.object":
-		m := new(acp_core.Object)
+		m := new(types.Object)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		m := new(acp_core.Actor)
+		m := new(types.Actor)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.ObjectRegistrationEvent.detail":
 		m := new(EventDetail)
@@ -441,9 +441,8 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 		var n int
 		var l int
 		_ = l
-		l = len(x.Id)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if x.Id != 0 {
+			n += 1 + runtime.Sov(uint64(x.Id))
 		}
 		if x.Type_ != 0 {
 			n += 1 + runtime.Sov(uint64(x.Type_))
@@ -576,12 +575,10 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			i--
 			dAtA[i] = 0x10
 		}
-		if len(x.Id) > 0 {
-			i -= len(x.Id)
-			copy(dAtA[i:], x.Id)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Id)))
+		if x.Id != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Id))
 			i--
-			dAtA[i] = 0xa
+			dAtA[i] = 0x8
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -633,10 +630,10 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			}
 			switch fieldNum {
 			case 1:
-				if wireType != 2 {
+				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
 				}
-				var stringLen uint64
+				x.Id = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -646,24 +643,11 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					x.Id |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Id = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			case 2:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Type_", wireType)
@@ -815,7 +799,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Object == nil {
-					x.Object = &acp_core.Object{}
+					x.Object = &types.Object{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Object); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -851,7 +835,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Actor == nil {
-					x.Actor = &acp_core.Actor{}
+					x.Actor = &types.Actor{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Actor); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -1600,8 +1584,8 @@ func (x *fastReflection_AmendmentEventDetail) Range(f func(protoreflect.FieldDes
 			return
 		}
 	}
-	if x.RevealRegistrationEventId != "" {
-		value := protoreflect.ValueOfString(x.RevealRegistrationEventId)
+	if x.RevealRegistrationEventId != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.RevealRegistrationEventId)
 		if !f(fd_AmendmentEventDetail_reveal_registration_event_id, value) {
 			return
 		}
@@ -1632,7 +1616,7 @@ func (x *fastReflection_AmendmentEventDetail) Has(fd protoreflect.FieldDescripto
 	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
 		return x.PreviousOwner != nil
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		return x.RevealRegistrationEventId != ""
+		return x.RevealRegistrationEventId != uint64(0)
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
 		return x.CommitmentTimestamp != nil
 	default:
@@ -1656,7 +1640,7 @@ func (x *fastReflection_AmendmentEventDetail) Clear(fd protoreflect.FieldDescrip
 	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
 		x.PreviousOwner = nil
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		x.RevealRegistrationEventId = ""
+		x.RevealRegistrationEventId = uint64(0)
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
 		x.CommitmentTimestamp = nil
 	default:
@@ -1683,7 +1667,7 @@ func (x *fastReflection_AmendmentEventDetail) Get(descriptor protoreflect.FieldD
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
 		value := x.RevealRegistrationEventId
-		return protoreflect.ValueOfString(value)
+		return protoreflect.ValueOfUint64(value)
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
 		value := x.CommitmentTimestamp
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
@@ -1710,9 +1694,9 @@ func (x *fastReflection_AmendmentEventDetail) Set(fd protoreflect.FieldDescripto
 	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
 		x.HijackFlag = value.Bool()
 	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		x.PreviousOwner = value.Message().Interface().(*acp_core.Actor)
+		x.PreviousOwner = value.Message().Interface().(*types.Actor)
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		x.RevealRegistrationEventId = value.Interface().(string)
+		x.RevealRegistrationEventId = value.Uint()
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
 		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
 	default:
@@ -1737,7 +1721,7 @@ func (x *fastReflection_AmendmentEventDetail) Mutable(fd protoreflect.FieldDescr
 	switch fd.FullName() {
 	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
 		if x.PreviousOwner == nil {
-			x.PreviousOwner = new(acp_core.Actor)
+			x.PreviousOwner = new(types.Actor)
 		}
 		return protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
@@ -1765,10 +1749,10 @@ func (x *fastReflection_AmendmentEventDetail) NewField(fd protoreflect.FieldDesc
 	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
 		return protoreflect.ValueOfBool(false)
 	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		m := new(acp_core.Actor)
+		m := new(types.Actor)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		return protoreflect.ValueOfString("")
+		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
 		m := new(Timestamp)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
@@ -1848,9 +1832,8 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 			l = options.Size(x.PreviousOwner)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.RevealRegistrationEventId)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if x.RevealRegistrationEventId != 0 {
+			n += 1 + runtime.Sov(uint64(x.RevealRegistrationEventId))
 		}
 		if x.CommitmentTimestamp != nil {
 			l = options.Size(x.CommitmentTimestamp)
@@ -1899,12 +1882,10 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 			i--
 			dAtA[i] = 0x22
 		}
-		if len(x.RevealRegistrationEventId) > 0 {
-			i -= len(x.RevealRegistrationEventId)
-			copy(dAtA[i:], x.RevealRegistrationEventId)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RevealRegistrationEventId)))
+		if x.RevealRegistrationEventId != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.RevealRegistrationEventId))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x18
 		}
 		if x.PreviousOwner != nil {
 			encoded, err := options.Marshal(x.PreviousOwner)
@@ -2029,17 +2010,17 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.PreviousOwner == nil {
-					x.PreviousOwner = &acp_core.Actor{}
+					x.PreviousOwner = &types.Actor{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.PreviousOwner); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
 			case 3:
-				if wireType != 2 {
+				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RevealRegistrationEventId", wireType)
 				}
-				var stringLen uint64
+				x.RevealRegistrationEventId = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2049,24 +2030,11 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					x.RevealRegistrationEventId |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.RevealRegistrationEventId = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
@@ -2216,8 +2184,8 @@ func (x *fastReflection_RevealRegistrationDetail) Interface() protoreflect.Proto
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_RevealRegistrationDetail) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.RegistrationCommitmentId != "" {
-		value := protoreflect.ValueOfString(x.RegistrationCommitmentId)
+	if x.RegistrationCommitmentId != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.RegistrationCommitmentId)
 		if !f(fd_RevealRegistrationDetail_registration_commitment_id, value) {
 			return
 		}
@@ -2244,7 +2212,7 @@ func (x *fastReflection_RevealRegistrationDetail) Range(f func(protoreflect.Fiel
 func (x *fastReflection_RevealRegistrationDetail) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		return x.RegistrationCommitmentId != ""
+		return x.RegistrationCommitmentId != uint64(0)
 	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
 		return x.CommitmentTimestamp != nil
 	default:
@@ -2264,7 +2232,7 @@ func (x *fastReflection_RevealRegistrationDetail) Has(fd protoreflect.FieldDescr
 func (x *fastReflection_RevealRegistrationDetail) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		x.RegistrationCommitmentId = ""
+		x.RegistrationCommitmentId = uint64(0)
 	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
 		x.CommitmentTimestamp = nil
 	default:
@@ -2285,7 +2253,7 @@ func (x *fastReflection_RevealRegistrationDetail) Get(descriptor protoreflect.Fi
 	switch descriptor.FullName() {
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
 		value := x.RegistrationCommitmentId
-		return protoreflect.ValueOfString(value)
+		return protoreflect.ValueOfUint64(value)
 	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
 		value := x.CommitmentTimestamp
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
@@ -2310,7 +2278,7 @@ func (x *fastReflection_RevealRegistrationDetail) Get(descriptor protoreflect.Fi
 func (x *fastReflection_RevealRegistrationDetail) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		x.RegistrationCommitmentId = value.Interface().(string)
+		x.RegistrationCommitmentId = value.Uint()
 	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
 		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
 	default:
@@ -2354,7 +2322,7 @@ func (x *fastReflection_RevealRegistrationDetail) Mutable(fd protoreflect.FieldD
 func (x *fastReflection_RevealRegistrationDetail) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		return protoreflect.ValueOfString("")
+		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
 		m := new(Timestamp)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
@@ -2427,9 +2395,8 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 		var n int
 		var l int
 		_ = l
-		l = len(x.RegistrationCommitmentId)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
+		if x.RegistrationCommitmentId != 0 {
+			n += 1 + runtime.Sov(uint64(x.RegistrationCommitmentId))
 		}
 		if x.CommitmentTimestamp != nil {
 			l = options.Size(x.CommitmentTimestamp)
@@ -2478,12 +2445,10 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 			i--
 			dAtA[i] = 0x12
 		}
-		if len(x.RegistrationCommitmentId) > 0 {
-			i -= len(x.RegistrationCommitmentId)
-			copy(dAtA[i:], x.RegistrationCommitmentId)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RegistrationCommitmentId)))
+		if x.RegistrationCommitmentId != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.RegistrationCommitmentId))
 			i--
-			dAtA[i] = 0xa
+			dAtA[i] = 0x8
 		}
 		if input.Buf != nil {
 			input.Buf = append(input.Buf, dAtA...)
@@ -2535,10 +2500,10 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 			}
 			switch fieldNum {
 			case 1:
-				if wireType != 2 {
+				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
 				}
-				var stringLen uint64
+				x.RegistrationCommitmentId = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2548,24 +2513,11 @@ func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Met
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					x.RegistrationCommitmentId |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.RegistrationCommitmentId = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
@@ -2716,13 +2668,13 @@ type ObjectRegistrationEvent struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       string                      `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id       uint64                      `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type_    ObjectRegistrationEventType `protobuf:"varint,2,opt,name=type,proto3,enum=sourcehub.acp.ObjectRegistrationEventType" json:"type,omitempty"`
 	TxHash   []byte                      `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
 	PolicyId string                      `protobuf:"bytes,4,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	Ts       *Timestamp                  `protobuf:"bytes,5,opt,name=ts,proto3" json:"ts,omitempty"`
-	Object   *acp_core.Object            `protobuf:"bytes,6,opt,name=object,proto3" json:"object,omitempty"`
-	Actor    *acp_core.Actor             `protobuf:"bytes,7,opt,name=actor,proto3" json:"actor,omitempty"`
+	Object   *types.Object               `protobuf:"bytes,6,opt,name=object,proto3" json:"object,omitempty"`
+	Actor    *types.Actor                `protobuf:"bytes,7,opt,name=actor,proto3" json:"actor,omitempty"`
 	Detail   *EventDetail                `protobuf:"bytes,8,opt,name=detail,proto3" json:"detail,omitempty"`
 }
 
@@ -2746,11 +2698,11 @@ func (*ObjectRegistrationEvent) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ObjectRegistrationEvent) GetId() string {
+func (x *ObjectRegistrationEvent) GetId() uint64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *ObjectRegistrationEvent) GetType_() ObjectRegistrationEventType {
@@ -2781,14 +2733,14 @@ func (x *ObjectRegistrationEvent) GetTs() *Timestamp {
 	return nil
 }
 
-func (x *ObjectRegistrationEvent) GetObject() *acp_core.Object {
+func (x *ObjectRegistrationEvent) GetObject() *types.Object {
 	if x != nil {
 		return x.Object
 	}
 	return nil
 }
 
-func (x *ObjectRegistrationEvent) GetActor() *acp_core.Actor {
+func (x *ObjectRegistrationEvent) GetActor() *types.Actor {
 	if x != nil {
 		return x.Actor
 	}
@@ -2876,10 +2828,10 @@ type AmendmentEventDetail struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	HijackFlag                bool            `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
-	PreviousOwner             *acp_core.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
-	RevealRegistrationEventId string          `protobuf:"bytes,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
-	CommitmentTimestamp       *Timestamp      `protobuf:"bytes,4,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
+	HijackFlag                bool         `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
+	PreviousOwner             *types.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
+	RevealRegistrationEventId uint64       `protobuf:"varint,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
+	CommitmentTimestamp       *Timestamp   `protobuf:"bytes,4,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
 }
 
 func (x *AmendmentEventDetail) Reset() {
@@ -2909,18 +2861,18 @@ func (x *AmendmentEventDetail) GetHijackFlag() bool {
 	return false
 }
 
-func (x *AmendmentEventDetail) GetPreviousOwner() *acp_core.Actor {
+func (x *AmendmentEventDetail) GetPreviousOwner() *types.Actor {
 	if x != nil {
 		return x.PreviousOwner
 	}
 	return nil
 }
 
-func (x *AmendmentEventDetail) GetRevealRegistrationEventId() string {
+func (x *AmendmentEventDetail) GetRevealRegistrationEventId() uint64 {
 	if x != nil {
 		return x.RevealRegistrationEventId
 	}
-	return ""
+	return 0
 }
 
 func (x *AmendmentEventDetail) GetCommitmentTimestamp() *Timestamp {
@@ -2936,7 +2888,7 @@ type RevealRegistrationDetail struct {
 	unknownFields protoimpl.UnknownFields
 
 	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId string     `protobuf:"bytes,1,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
+	RegistrationCommitmentId uint64     `protobuf:"varint,1,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
 	CommitmentTimestamp      *Timestamp `protobuf:"bytes,2,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
 }
 
@@ -2960,11 +2912,11 @@ func (*RevealRegistrationDetail) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *RevealRegistrationDetail) GetRegistrationCommitmentId() string {
+func (x *RevealRegistrationDetail) GetRegistrationCommitmentId() uint64 {
 	if x != nil {
 		return x.RegistrationCommitmentId
 	}
-	return ""
+	return 0
 }
 
 func (x *RevealRegistrationDetail) GetCommitmentTimestamp() *Timestamp {
@@ -2988,7 +2940,7 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x74, 0x69, 0x6d,
 	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xea, 0x02, 0x0a, 0x17, 0x4f, 0x62, 0x6a, 0x65,
 	0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
 	0x02, 0x69, 0x64, 0x12, 0x3e, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x0e, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
 	0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
@@ -3031,7 +2983,7 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x3f, 0x0a, 0x1c,
 	0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x5f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x19, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
+	0x28, 0x04, 0x52, 0x19, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
 	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a,
 	0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65,
 	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f,
@@ -3041,7 +2993,7 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
 	0x6e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x3c, 0x0a, 0x1a, 0x72, 0x65, 0x67, 0x69, 0x73,
 	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65,
-	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x18, 0x72, 0x65, 0x67,
+	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x18, 0x72, 0x65, 0x67,
 	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
 	0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
 	0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20,
@@ -3091,8 +3043,8 @@ var file_sourcehub_acp_registration_proto_goTypes = []interface{}{
 	(*AmendmentEventDetail)(nil),     // 3: sourcehub.acp.AmendmentEventDetail
 	(*RevealRegistrationDetail)(nil), // 4: sourcehub.acp.RevealRegistrationDetail
 	(*Timestamp)(nil),                // 5: sourcehub.acp.Timestamp
-	(*acp_core.Object)(nil),          // 6: sourcenetwork.acp_core.Object
-	(*acp_core.Actor)(nil),           // 7: sourcenetwork.acp_core.Actor
+	(*types.Object)(nil),             // 6: sourcenetwork.acp_core.Object
+	(*types.Actor)(nil),              // 7: sourcenetwork.acp_core.Actor
 }
 var file_sourcehub_acp_registration_proto_depIdxs = []int32{
 	0,  // 0: sourcehub.acp.ObjectRegistrationEvent.type:type_name -> sourcehub.acp.ObjectRegistrationEventType

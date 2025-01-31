@@ -7,7 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/acp/params.proto";
-import "sourcehub/acp/access_decision.proto";
+import "sourcenetwork/acp_core/request.proto";
 import "sourcehub/acp/registration.proto";
 import "sourcehub/acp/record.proto";
 import "sourcehub/acp/commitment.proto";
@@ -15,7 +15,7 @@ import "sourcenetwork/acp_core/policy.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcenetwork/acp_core/relationship_selector.proto";
-import "sourcenetwork/acp_core/access_decision.proto";
+import "sourcehub/acp/access_decision.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
