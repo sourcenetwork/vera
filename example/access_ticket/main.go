@@ -81,7 +81,7 @@ func runDemo(chainId string, nodeAddr string, validatorKeyName string) {
 	record := registerObject(ctx, client, &txBuilder, txSigner, policy.Id)
 
 	log.Printf("Evaluating Access Request to read file:readme")
-	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.Metadata.OwnerDid, []*acptypes.Operation{
+	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.Metadata.OwnerDid, []*coretypes.Operation{
 		{
 			Object:     coretypes.NewObject("file", "readme"),
 			Permission: "read",
@@ -197,10 +197,10 @@ func registerObject(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBu
 	return response.Result.GetRegisterObjectResult().Record
 }
 
-func checkAccess(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string, actorId string, operations []*acptypes.Operation) *acptypes.AccessDecision {
+func checkAccess(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string, actorId string, operations []*coretypes.Operation) *acptypes.AccessDecision {
 	msgSet := sdk.MsgSet{}
 	mapper := msgSet.WithCheckAccess(
-		acptypes.NewMsgCheckAccess(txSigner.GetAccAddress(), policyId, &acptypes.AccessRequest{
+		acptypes.NewMsgCheckAccess(txSigner.GetAccAddress(), policyId, &coretypes.AccessRequest{
 			Operations: operations,
 			Actor:      &coretypes.Actor{Id: actorId},
 		}),

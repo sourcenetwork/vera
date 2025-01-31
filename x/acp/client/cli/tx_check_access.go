@@ -24,18 +24,18 @@ func CmdCheckAccess() *cobra.Command {
 			policyId := args[0]
 			subject := args[1]
 
-			var operations []*types.Operation
+			var operations []*coretypes.Operation
 			for _, operationStr := range args[2:] {
 				resource, operationStr, _ := strings.Cut(operationStr, ":")
 				objId, relation, _ := strings.Cut(operationStr, "#")
-				operation := &types.Operation{
+				operation := &coretypes.Operation{
 					Object:     coretypes.NewObject(resource, objId),
 					Permission: relation,
 				}
 				operations = append(operations, operation)
 			}
 
-			accessRequest := &types.AccessRequest{
+			accessRequest := &coretypes.AccessRequest{
 				Operations: operations,
 				Actor: &coretypes.Actor{
 					Id: subject,

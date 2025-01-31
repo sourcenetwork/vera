@@ -21,6 +21,6 @@ func (k Keeper) PolicyIds(goCtx context.Context, req *types.QueryPolicyIdsReques
 
 	// Use MapNullableSlice instead of MapSlice to filter out 'nil' policies.
 	return &types.QueryPolicyIdsResponse{
-		Ids: utils.MapNullableSlice(resp.Policies, func(p *coretypes.Policy) string { return p.Id }),
+		Ids: utils.MapNullableSlice(resp.Records, func(p *coretypes.PolicyRecord) string { return p.Policy.Id }),
 	}, nil
 }
