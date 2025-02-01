@@ -18,12 +18,12 @@ type BankModuleBasic struct {
 // DefaultGenesis returns custom x/bank module genesis state.
 func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	openMetadata := banktypes.Metadata{
-		Description: "OPEN is the native staking token of SourceHub",
+		Description: appparams.OpenDescription,
 		DenomUnits: []*banktypes.DenomUnit{
 			{
 				Denom:    appparams.MicroOpenDenom,
 				Exponent: 0,
-				Aliases:  []string{appparams.OpenDenom},
+				Aliases:  []string{appparams.MicroOpenDenomAlias},
 			},
 			{
 				Denom:    appparams.OpenDenom,
@@ -37,12 +37,12 @@ func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	}
 
 	creditMetadata := banktypes.Metadata{
-		Description: "Credit is the utility token for access services on SourceHub. Non transferrable.",
+		Description: appparams.CreditDescription,
 		DenomUnits: []*banktypes.DenomUnit{
 			{
 				Denom:    appparams.MicroCreditDenom,
 				Exponent: 0,
-				Aliases:  []string{appparams.CreditDenom},
+				Aliases:  []string{appparams.MicroCreditDenomAlias},
 			},
 			{
 				Denom:    appparams.CreditDenom,
