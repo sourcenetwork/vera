@@ -58,6 +58,7 @@ import (
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
+	"github.com/sourcenetwork/sourcehub/app/ante"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
@@ -307,10 +308,23 @@ func New(
 	// Register legacy modules
 	app.registerIBCModules()
 
-	// register streaming services
+	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err
 	}
+
+	// AnteHandler performs stateful checks on transactions before internal messages are processed.
+	anteHandler := ante.NewAnteHandler(
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.FeeGrantKeeper,
+		app.txConfig.SignModeHandler(),
+		ante.DefaultSigVerificationGasConsumer,
+		app.IBCKeeper,
+		app.txConfig.TxEncoder(),
+	)
+
+	app.SetAnteHandler(anteHandler)
 
 	/****  Module Options ****/
 
