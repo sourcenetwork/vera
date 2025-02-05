@@ -151,10 +151,8 @@ func init() {
 func AppConfig() depinject.Config {
 	return depinject.Configs(
 		appConfig,
-		// Loads the app config from a YAML file.
-		// appconfig.LoadYAML(AppConfigYAML),
 		depinject.Supply(
-			// supply custom module basics
+			// Supply custom module basics
 			map[string]module.AppModuleBasic{
 				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
 				banktypes.ModuleName:    overrides.BankModuleBasic{},
