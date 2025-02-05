@@ -9,7 +9,6 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
@@ -22,6 +21,21 @@ var _ context.Context = (*TestCtx)(nil)
 type TestState struct {
 	PolicyId      string
 	PolicyCreator string
+	// Txs is a list of bytes which contains the Txs that have been broadcast during a test
+	Txs               [][]byte
+	TokenIssueTs      time.Time
+	TokenIssueProtoTs *prototypes.Timestamp
+}
+
+func (s *TestState) PushTx(tx []byte) {
+	s.Txs = append(s.Txs, tx)
+}
+
+func (s *TestState) GetLastTx() []byte {
+	if len(s.Txs) == 0 {
+		return nil
+	}
+	return s.Txs[len(s.Txs)-1]
 }
 
 func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
@@ -29,25 +43,17 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 		PolicyCommandMaxExpirationDelta: 1,
 		RegistrationsCommitmentValidity: types.NewBlockCountDuration(7),
 	}
-	executor := NewExecutor(t, config.ExecutorStrategy, params)
+	executor := NewACPClient(t, config.ExecutorStrategy, params)
 
-	logicalClk := &logicalClockImpl{}
-
-	tx := GenRandomTx(t)
 	root := MustNewSourceHubActorFromName("root")
 	ctx := &TestCtx{
-		Ctx:               context.TODO(),
-		T:                 t,
-		TxSigner:          root,
-		TokenIssueTs:      time.Now(),
-		TokenIssueProtoTs: prototypes.TimestampNow(),
-		Executor:          executor,
-		Strategy:          config.AuthStrategy,
-		ActorType:         config.ActorType,
-		LogicalClock:      logicalClk,
-		Params:            params,
-		Tx:                tx,
-		TxHash:            utils.HashTx(tx),
+		Ctx:       context.TODO(),
+		T:         t,
+		TxSigner:  root,
+		Executor:  executor,
+		Strategy:  config.AuthStrategy,
+		ActorType: config.ActorType,
+		Params:    params,
 	}
 
 	_, err := executor.GetOrCreateAccountFromActor(ctx, root)
@@ -61,17 +67,12 @@ type TestCtx struct {
 	T     *testing.T
 	State TestState
 	// Signer for Txs while running tests under Bearer or Signed Auth modes
-	TxSigner          *TestActor
-	TokenIssueTs      time.Time
-	TokenIssueProtoTs *prototypes.Timestamp
-	Executor          MsgExecutor
-	Strategy          AuthenticationStrategy
-	AccountKeeper     *testutil.AccountKeeperStub
-	ActorType         ActorKeyType
-	LogicalClock      signed_policy_cmd.LogicalClock
-	Tx                []byte
-	TxHash            []byte
-	Params            types.Params
+	TxSigner      *TestActor
+	Executor      ACPClient
+	Strategy      AuthenticationStrategy
+	AccountKeeper *testutil.AccountKeeperStub
+	ActorType     ActorKeyType
+	Params        types.Params
 }
 
 func NewTestCtx(t *testing.T) *TestCtx {
@@ -107,12 +108,12 @@ func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
 	return acc
 }
 
-// GetSignerRecordMetadata, fetches actor from the actor registry
+// GetRecordMetadataForActor, fetches actor from the actor registry
 // and builds a RecordMetadata object for the recovered DID
 func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata {
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
-		TxHash:     c.TxHash,
+		TxHash:     utils.HashTx(c.State.GetLastTx()),
 		TxSigner:   c.TxSigner.SourceHubAddr,
 		OwnerDid:   c.GetActor(actor).DID,
 	}
@@ -123,7 +124,7 @@ func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata 
 func (c *TestCtx) GetSignerRecordMetadata() *types.RecordMetadata {
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
-		TxHash:     c.TxHash,
+		TxHash:     utils.HashTx(c.State.GetLastTx()),
 		TxSigner:   c.TxSigner.SourceHubAddr,
 		OwnerDid:   c.TxSigner.DID,
 	}

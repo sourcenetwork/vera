@@ -63,11 +63,7 @@ func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.Poli
 }
 
 func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipCmd) (*types.PolicyCmdResult, error) {
-	metadata, err := types.BuildRecordMetadata(ctx.Ctx, ctx.PrincipalDID, ctx.Signer)
-	if err != nil {
-		return nil, err
-	}
-	bytes, err := metadata.Marshal()
+	metadata, err := types.BuildACPSuppliedMetadata(ctx.Ctx, ctx.PrincipalDID, ctx.Signer)
 	if err != nil {
 		return nil, fmt.Errorf("marshaling metadata: %w", err)
 	}
@@ -75,9 +71,7 @@ func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipC
 	resp, err := h.engine.SetRelationship(ctx.Ctx, &coretypes.SetRelationshipRequest{
 		PolicyId:     ctx.PolicyId,
 		Relationship: cmd.Relationship,
-		Metadata: &coretypes.SuppliedMetadata{
-			Blob: bytes,
-		},
+		Metadata:     metadata,
 	})
 	if err != nil {
 		return nil, err

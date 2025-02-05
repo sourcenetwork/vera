@@ -37,9 +37,9 @@ func setupUnregister(t *testing.T) *test.TestCtx {
 	}
 	a2.Run(ctx)
 	a3 := test.SetRelationshipAction{
-		Actor:        ctx.GetActor("alice"),
 		PolicyId:     ctx.State.PolicyId,
 		Relationship: coretypes.NewActorRelationship("file", "foo", "reader", ctx.GetActor("alice").DID),
+		Actor:        ctx.GetActor("alice"),
 	}
 	a3.Run(ctx)
 	return ctx

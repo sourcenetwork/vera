@@ -47,37 +47,50 @@ type SetRelationshipAction struct {
 func (a *SetRelationshipAction) Run(ctx *TestCtx) *types.RelationshipRecord {
 	cmd := types.NewSetRelationshipCmd(a.Relationship)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
-	got := (*types.SetRelationshipCmdResult)(nil)
-	if result != nil {
-		got = result.GetSetRelationshipResult()
+	if a.Expected != nil {
+		a.Expected.Record.Metadata = ctx.GetRecordMetadataForActor(a.Actor.Name)
+		want := &types.PolicyCmdResult{
+			Result: &types.PolicyCmdResult_SetRelationshipResult{
+				SetRelationshipResult: a.Expected,
+			},
+		}
+		require.Equal(ctx.T, want, result)
 	}
-	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
-	if got != nil {
-		return got.Record
+	AssertError(ctx, err, a.ExpectedErr)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return result.GetSetRelationshipResult().Record
 }
 
 type RegisterObjectAction struct {
 	PolicyId    string
 	Object      *coretypes.Object
 	Actor       *TestActor
-	Expected    *types.RegisterObjectCmdResult
+	Expected    *types.RelationshipRecord
 	ExpectedErr error
 }
 
 func (a *RegisterObjectAction) Run(ctx *TestCtx) *types.RelationshipRecord {
 	cmd := types.NewRegisterObjectCmd(a.Object)
 	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
-	got := (*types.RegisterObjectCmdResult)(nil)
-	if result != nil {
-		got = result.GetRegisterObjectResult()
+	if a.Expected != nil {
+		a.Expected.Metadata = ctx.GetRecordMetadataForActor(a.Actor.Name)
+		want := &types.PolicyCmdResult{
+			Result: &types.PolicyCmdResult_RegisterObjectResult{
+				RegisterObjectResult: &types.RegisterObjectCmdResult{
+					Record: a.Expected,
+				},
+			},
+		}
+		ctx.T.Logf("want: %v", want)
+		require.Equal(ctx.T, want, result)
 	}
-	AssertResults(ctx, got, a.Expected, err, a.ExpectedErr)
-	if result != nil {
-		return got.Record
+	AssertError(ctx, err, a.ExpectedErr)
+	if err != nil {
+		return nil
 	}
-	return nil
+	return result.GetRegisterObjectResult().Record
 }
 
 type RegisterObjectsAction struct {
@@ -106,8 +119,8 @@ type SetRelationshipsAction struct {
 func (a *SetRelationshipsAction) Run(ctx *TestCtx) {
 	for _, rel := range a.Relationships {
 		action := SetRelationshipAction{
-			Relationship: rel,
 			PolicyId:     a.PolicyId,
+			Relationship: rel,
 			Actor:        a.Actor,
 		}
 		action.Run(ctx)
@@ -184,21 +197,19 @@ func (a *PolicySetupAction) Run(ctx *TestCtx) {
 	policy := polAction.Run(ctx)
 
 	for actorName, objs := range a.ObjectsPerActor {
-		actor := ctx.GetActor(actorName)
 		action := RegisterObjectsAction{
-			Objects:  objs,
-			Actor:    actor,
 			PolicyId: policy.Id,
+			Objects:  objs,
+			Actor:    ctx.GetActor(actorName),
 		}
 		action.Run(ctx)
 	}
 
 	for actorName, rels := range a.RelationshipsPerActor {
-		actor := ctx.GetActor(actorName)
 		action := SetRelationshipsAction{
-			Relationships: rels,
-			Actor:         actor,
 			PolicyId:      policy.Id,
+			Relationships: rels,
+			Actor:         ctx.GetActor(actorName),
 		}
 		action.Run(ctx)
 	}

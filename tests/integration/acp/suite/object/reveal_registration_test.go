@@ -83,8 +83,8 @@ func TestRevealRegistration_ObjectRegisteredToActor_ReturnRecordWithCommitmentTi
 
 	a3 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("file", "foo.txt"),
+		Actor:    ctx.GetActor("bob"),
 	}
 	a3.Run(ctx)
 	ctx.WaitBlock()
@@ -130,9 +130,9 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	ctx.WaitBlock()
 
 	a3 := test.RegisterObjectAction{
-		Actor:    ctx.GetActor("alice"),
 		PolicyId: pol.Id,
 		Object:   coretypes.NewObject("file", "foo.txt"),
+		Actor:    ctx.GetActor("alice"),
 	}
 	a3.Run(ctx)
 	ctx.WaitBlock()
@@ -151,7 +151,7 @@ func TestRevealRegistration_ObjectRegisteredAfterCommitment_RegistrationAmended(
 	result := a.Run(ctx)
 
 	// Then foo.txt is transfered to bob
-	require.Equal(ctx.T, 1, result.Event.Id)
+	require.Equal(ctx.T, uint64(1), result.Event.Id)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }
@@ -211,7 +211,7 @@ func TestRevealRegistration_ObjectRegisteredThroughNewerCommitment_RegistrationI
 	result := a.Run(ctx)
 
 	// Then Bob is the owner of foo.txt
-	require.Equal(ctx.T, 1, result.Event.Id)
+	require.Equal(ctx.T, uint64(1), result.Event.Id)
 	require.Equal(ctx.T, result.Record.Metadata.OwnerDid, ctx.GetActor("bob").DID)
 	require.Equal(ctx.T, result.Record.Relationship, coretypes.NewActorRelationship("file", "foo.txt", "owner", ctx.GetActor("bob").DID))
 }
@@ -228,9 +228,9 @@ func TestRevealRegistration_ObjectRegisteredToSomeoneElseAfterCommitment_ErrorsU
 	pol := a1.Run(ctx)
 	// Given alice as owner of foo.txt
 	a2 := test.RegisterObjectAction{
-		Actor:    ctx.GetActor("alice"),
 		PolicyId: pol.Id,
 		Object:   coretypes.NewObject("file", "foo.txt"),
+		Actor:    ctx.GetActor("alice"),
 	}
 	a2.Run(ctx)
 	ctx.WaitBlock()
@@ -271,9 +271,9 @@ func TestRevealRegistration_InvalidProof_ReturnsError(t *testing.T) {
 	pol := a1.Run(ctx)
 	// Given alice as owner of foo.txt
 	a2 := test.RegisterObjectAction{
-		Actor:    ctx.GetActor("alice"),
 		PolicyId: pol.Id,
 		Object:   coretypes.NewObject("file", "foo.txt"),
+		Actor:    ctx.GetActor("alice"),
 	}
 	a2.Run(ctx)
 	ctx.WaitBlock()

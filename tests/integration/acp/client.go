@@ -2,9 +2,9 @@ package test
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"testing"
-	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -20,6 +20,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -31,71 +32,102 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
 )
 
-type KeeperExecutor struct {
+type KeeperACPClient struct {
 	baseCtx        sdk.Context
 	k              types.MsgServer
 	keeper         types.QueryServer
 	accountCreator *testutil.AccountKeeperStub
+	ts             types.Timestamp
 }
 
-func (e *KeeperExecutor) Cleanup() {}
+func (e *KeeperACPClient) Cleanup() {}
 
-func (e *KeeperExecutor) WaitBlock() {
-	newHeight := e.baseCtx.BlockHeight() + 1
-	e.baseCtx = e.baseCtx.WithBlockHeight(newHeight)
+// WaitBlock bumps the current keeper Ts
+func (e *KeeperACPClient) WaitBlock() {
+	e.ts = e.nextBlockTs()
 }
 
-func (e *KeeperExecutor) getSDKCtx(ctx context.Context) sdk.Context {
-	return e.baseCtx.WithContext(ctx)
+func (e *KeeperACPClient) nextBlockTs() types.Timestamp {
+	ts := e.ts
+	ts.BlockHeight += 1
+	ts.ProtoTs.Seconds += 1
+	return ts
 }
 
-func (e *KeeperExecutor) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
+// genTx generates a random byte slice to model the comet Tx bytes
+//
+// This is done because the keeper executor doesn't receive an actual
+// cometbft signed Tx but this data is used by the code paths
+func (e *KeeperACPClient) genTx(ctx *TestCtx) {
+	tx := make([]byte, 50)
+	_, err := rand.Read(tx)
+	require.NoError(ctx.T, err)
+	ctx.State.PushTx(tx)
+}
+
+func (e *KeeperACPClient) getSDKCtx(ctx context.Context) sdk.Context {
+	time, err := prototypes.TimestampFromProto(e.ts.ProtoTs)
+	if err != nil {
+		panic(err)
+	}
+	header := cmtproto.Header{
+		Time:   time.UTC(),
+		Height: int64(e.ts.BlockHeight),
+	}
+	sdkCtx := e.baseCtx.WithContext(ctx)
+	sdkCtx = e.baseCtx.WithBlockHeader(header)
+	return sdkCtx
+}
+
+func (e *KeeperACPClient) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.k.BearerPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
+func (e *KeeperACPClient) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.k.SignedPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
+func (e *KeeperACPClient) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.k.DirectPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
+func (e *KeeperACPClient) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.k.CreatePolicy(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
+func (e *KeeperACPClient) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
 	return e.accountCreator.NewAccount(actor.PubKey), nil
 }
 
-func (e *KeeperExecutor) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
+func (e *KeeperACPClient) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.keeper.Policy(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
+func (e *KeeperACPClient) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.keeper.RegistrationsCommitment(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
+func (e *KeeperACPClient) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
 	return e.keeper.RegistrationsCommitmentByCommitment(sdkCtx, msg)
 }
 
-func (e *KeeperExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	ts, err := types.TimestampFromCtx(sdkCtx)
-	require.NoError(ctx.T, err)
-	return ts, nil
+func (e *KeeperACPClient) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
+	ts := e.ts
+	return &ts, nil
 }
 
-func NewExecutor(t *testing.T, strategy ExecutorStrategy, params types.Params) MsgExecutor {
+func (c *KeeperACPClient) GetTimestampNow(context.Context) (uint64, error) {
+	return c.ts.BlockHeight, nil
+}
+
+func NewACPClient(t *testing.T, strategy ExecutorStrategy, params types.Params) ACPClient {
 	switch strategy {
 	case Keeper:
 		exec, err := newKeeperExecutor(params)
@@ -114,7 +146,7 @@ func NewExecutor(t *testing.T, strategy ExecutorStrategy, params types.Params) M
 	}
 }
 
-func newKeeperExecutor(params types.Params) (MsgExecutor, error) {
+func newKeeperExecutor(params types.Params) (ACPClient, error) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()
@@ -145,18 +177,20 @@ func newKeeperExecutor(params types.Params) (MsgExecutor, error) {
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
 	ctx = ctx.WithEventManager(sdk.NewEventManager())
 	ctx = ctx.WithMultiStore(stateStore)
-	ctx = ctx.WithBlockHeight(1)
-	ctx = ctx.WithBlockTime(time.Now())
 
 	// Initialize params
 	k.SetParams(ctx, params)
 
 	msgServer := keeper.NewMsgServerImpl(k)
-	executor := &KeeperExecutor{
+	executor := &KeeperACPClient{
 		baseCtx:        ctx,
 		k:              msgServer,
 		keeper:         k,
 		accountCreator: accKeeper,
+		ts: types.Timestamp{
+			BlockHeight: 1,
+			ProtoTs:     prototypes.TimestampNow(),
+		},
 	}
 	return executor, nil
 }
@@ -313,5 +347,9 @@ func (e *SDKClientExecutor) WaitBlock() {
 }
 
 func (e *SDKClientExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
+	panic("not implemented")
+}
+
+func (c *SDKClientExecutor) GetTimestampNow(context.Context) (uint64, error) {
 	panic("not implemented")
 }

@@ -1,6 +1,9 @@
 package test
 
 import (
+	"time"
+
+	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
@@ -9,9 +12,19 @@ import (
 )
 
 func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCmd *types.PolicyCmd) (result *types.PolicyCmdResult, err error) {
+	ctx.State.TokenIssueTs = time.Now()
+	ctx.State.TokenIssueProtoTs = prototypes.TimestampNow()
 	switch ctx.Strategy {
 	case BearerToken:
-		jws := genToken(ctx, actor)
+		ts := ctx.State.TokenIssueTs
+		token := bearer_token.BearerToken{
+			IssuerID:          actor.DID,
+			AuthorizedAccount: ctx.TxSigner.SourceHubAddr,
+			IssuedTime:        ts.Unix(),
+			ExpirationTime:    ts.Add(bearer_token.DefaultExpirationTime).Unix(),
+		}
+		jws, jwsErr := token.ToJWS(actor.Signer)
+		require.NoError(ctx.T, jwsErr)
 		msg := &types.MsgBearerPolicyCmd{
 			Creator:     ctx.TxSigner.SourceHubAddr,
 			BearerToken: jws,
@@ -25,10 +38,10 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		err = respErr
 	case SignedPayload:
 		var jws string
-		builder := signed_policy_cmd.NewCmdBuilder(ctx.LogicalClock, ctx.GetParams())
+		builder := signed_policy_cmd.NewCmdBuilder(ctx.Executor, ctx.GetParams())
 		builder.PolicyCmd(policyCmd)
 		builder.Actor(actor.DID)
-		builder.IssuedAt(ctx.TokenIssueProtoTs)
+		builder.IssuedAt(ctx.State.TokenIssueProtoTs)
 		builder.PolicyID(policyId)
 		builder.SetSigner(actor.Signer)
 		jws, err = builder.BuildJWS(ctx)
@@ -59,16 +72,4 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		err = respErr
 	}
 	return result, err
-}
-
-func genToken(ctx *TestCtx, actor *TestActor) string {
-	token := bearer_token.BearerToken{
-		IssuerID:          actor.DID,
-		AuthorizedAccount: ctx.TxSigner.SourceHubAddr,
-		IssuedTime:        ctx.TokenIssueTs.Unix(),
-		ExpirationTime:    ctx.TokenIssueTs.Add(bearer_token.DefaultExpirationTime).Unix(),
-	}
-	jws, err := token.ToJWS(actor.Signer)
-	require.NoError(ctx.T, err)
-	return jws
 }

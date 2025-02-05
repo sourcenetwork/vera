@@ -1,10 +1,8 @@
 package test
 
 import (
-	"crypto/rand"
 	"errors"
 	"reflect"
-	"testing"
 	"time"
 
 	gogotypes "github.com/cosmos/gogoproto/types"
@@ -91,12 +89,4 @@ func containsKind(kinds []reflect.Kind, kind reflect.Kind) bool {
 	}
 
 	return false
-}
-
-// GenRandomTx returns a random 100 byte slice to model Tx data
-func GenRandomTx(t *testing.T) []byte {
-	tx := make([]byte, 0, 100)
-	_, err := rand.Read(tx)
-	require.NoError(t, err)
-	return tx
 }

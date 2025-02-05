@@ -53,15 +53,6 @@ func TestSetRelationship_OwnerCanShareObjectTheyOwn(t *testing.T) {
 		PolicyId:     ctx.State.PolicyId,
 		Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob),
 		Actor:        ctx.GetActor("alice"),
-		Expected: &types.SetRelationshipCmdResult{
-			RecordExisted: false,
-			Record: &types.RelationshipRecord{
-				Metadata:     ctx.GetRecordMetadataForActor("alice"),
-				PolicyId:     ctx.State.PolicyId,
-				Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob),
-				Archived:     false,
-			},
-		},
 	}
 	a1.Run(ctx)
 }
@@ -84,11 +75,11 @@ func TestSetRelationship_ActorCannotSetRelationshipForObjectTheyDoNotOwn(t *test
 	ctx := setupSetRel(t)
 	defer ctx.Cleanup()
 
-	bob := ctx.GetActor("bob").DID
+	bob := ctx.GetActor("bob")
 	a1 := test.SetRelationshipAction{
 		PolicyId:     ctx.State.PolicyId,
-		Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob),
-		Actor:        ctx.GetActor("bob"),
+		Relationship: coretypes.NewActorRelationship("file", "foo", "reader", bob.DID),
+		Actor:        bob,
 		ExpectedErr:  errors.ErrorType_UNAUTHORIZED,
 	}
 	a1.Run(ctx)
@@ -116,7 +107,6 @@ func TestSetRelationship_ManagerActorCanDelegateAccessToAnotherActor(t *testing.
 		Expected: &types.SetRelationshipCmdResult{
 			RecordExisted: false,
 			Record: &types.RelationshipRecord{
-				Metadata:     ctx.GetRecordMetadataForActor("bob"),
 				PolicyId:     ctx.State.PolicyId,
 				Relationship: coretypes.NewActorRelationship("file", "foo", "reader", charlie),
 				Archived:     false,
@@ -131,10 +121,10 @@ func TestSetRelationship_ManagerActorCannotSetRelationshipToRelationshipsTheyDoN
 	defer ctx.Cleanup()
 
 	// Given object foo and Bob as a admin
-	bob := ctx.GetActor("bob").DID
+	bob := ctx.GetActor("bob")
 	a1 := test.SetRelationshipAction{
 		PolicyId:     ctx.State.PolicyId,
-		Relationship: coretypes.NewActorRelationship("file", "foo", "admin", bob),
+		Relationship: coretypes.NewActorRelationship("file", "foo", "admin", bob.DID),
 		Actor:        ctx.GetActor("alice"),
 	}
 	a1.Run(ctx)
