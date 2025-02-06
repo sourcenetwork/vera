@@ -30,7 +30,7 @@ jobs:
 
       - name: Run Tests and Generate Coverage
         run: |
-          go test ./... -coverprofile=coverage.txt
+          go test -coverpkg=all ./... -coverprofile=coverage.txt
 
       - name: Upload Coverage to Codecov
         uses: codecov/codecov-action@v5
