@@ -13,7 +13,7 @@ import (
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
-	cosmosadapter "github.com/sourcenetwork/raccoondb/v2/store/cosmos"
+	cosmosadapter "github.com/sourcenetwork/sourcehub/x/acp/stores/cosmos"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"

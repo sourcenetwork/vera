@@ -2,12 +2,6 @@ module github.com/sourcenetwork/sourcehub
 
 go 1.23.5
 
-replace github.com/sourcenetwork/acp_core => ../../acp_core
-
-replace github.com/sourcenetwork/raccoondb/v2 => ../../raccoondb
-
-replace github.com/sourcenetwork/raccoondb/v2/store/cosmos => ../../raccoondb/store/cosmos
-
 replace (
 	// fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.7.0
@@ -51,10 +45,9 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.0
-	github.com/sourcenetwork/acp_core v0.0.0-00010101000000-000000000000
+	github.com/sourcenetwork/acp_core v0.4.0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
-	github.com/sourcenetwork/raccoondb/v2 v2.0.0-00010101000000-000000000000
-	github.com/sourcenetwork/raccoondb/v2/store/cosmos v0.0.0-00010101000000-000000000000
+	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
