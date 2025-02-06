@@ -182,6 +182,32 @@ func (a *ArchiveObjectAction) Run(ctx *TestCtx) *types.ArchiveObjectCmdResult {
 	return got
 }
 
+type UnarchiveObjectAction struct {
+	PolicyId    string
+	Object      *coretypes.Object
+	Actor       *TestActor
+	Expected    *types.UnarchiveObjectCmdResult
+	ExpectedErr error
+}
+
+func (a *UnarchiveObjectAction) Run(ctx *TestCtx) *types.UnarchiveObjectCmdResult {
+	cmd := types.NewUnarchiveObjectCmd(a.Object)
+	result, err := dispatchPolicyCmd(ctx, a.PolicyId, a.Actor, cmd)
+	if a.Expected != nil {
+		want := &types.PolicyCmdResult{
+			Result: &types.PolicyCmdResult_UnarchiveObjectResult{
+				UnarchiveObjectResult: a.Expected,
+			},
+		}
+		require.Equal(ctx.T, want, result)
+	}
+	AssertError(ctx, err, a.ExpectedErr)
+	if err != nil {
+		return nil
+	}
+	return result.GetUnarchiveObjectResult()
+}
+
 type PolicySetupAction struct {
 	Policy                string
 	PolicyCreator         *TestActor

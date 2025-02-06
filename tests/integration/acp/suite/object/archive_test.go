@@ -23,7 +23,7 @@ resources:
           - actor
 `
 
-func setupUnregister(t *testing.T) *test.TestCtx {
+func setupArchive(t *testing.T) *test.TestCtx {
 	ctx := test.NewTestCtx(t)
 	a1 := test.CreatePolicyAction{
 		Creator: ctx.TxSigner,
@@ -45,8 +45,8 @@ func setupUnregister(t *testing.T) *test.TestCtx {
 	return ctx
 }
 
-func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
 	action := test.ArchiveObjectAction{
@@ -61,8 +61,8 @@ func TestUnregisterObject_RegisteredObjectCanBeUnregisteredByAuthor(t *testing.T
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
 	action := test.ArchiveObjectAction{
@@ -74,8 +74,8 @@ func TestUnregisterObject_ActorCannotUnregisterObjectTheyDoNotOwn(t *testing.T) 
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
 	action := test.ArchiveObjectAction{
@@ -87,8 +87,8 @@ func TestUnregisterObject_UnregisteringAnObjectThatDoesNotExistReturnsFoundFalse
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
 	action := test.ArchiveObjectAction{
@@ -109,8 +109,8 @@ func TestUnregisterObject_UnregisteringAnAlreadyArchivedObjectIsANoop(t *testing
 	action.Run(ctx)
 }
 
-func TestUnregisterObject_SendingInvalidPolicyIdErrors(t *testing.T) {
-	ctx := setupUnregister(t)
+func TestArchiveObject_SendingInvalidPolicyIdErrors(t *testing.T) {
+	ctx := setupArchive(t)
 	defer ctx.Cleanup()
 
 	action := test.ArchiveObjectAction{
@@ -120,4 +120,39 @@ func TestUnregisterObject_SendingInvalidPolicyIdErrors(t *testing.T) {
 		ExpectedErr: errors.ErrorType_NOT_FOUND,
 	}
 	action.Run(ctx)
+}
+
+func TestArchiveThenUnarchive_NoError(t *testing.T) {
+	ctx := setupArchive(t)
+	defer ctx.Cleanup()
+
+	a0 := test.RegisterObjectAction{
+		PolicyId: ctx.State.PolicyId,
+		Object:   coretypes.NewObject("file", "bar"),
+		Actor:    ctx.GetActor("alice"),
+	}
+	result := a0.Run(ctx)
+
+	a1 := test.ArchiveObjectAction{
+		PolicyId: ctx.State.PolicyId,
+		Object:   coretypes.NewObject("file", "bar"),
+		Actor:    ctx.GetActor("alice"),
+	}
+	a1.Run(ctx)
+
+	a2 := test.UnarchiveObjectAction{
+		PolicyId: ctx.State.PolicyId,
+		Object:   coretypes.NewObject("file", "bar"),
+		Actor:    ctx.GetActor("alice"),
+		Expected: &types.UnarchiveObjectCmdResult{
+			RelationshipModified: true,
+			Record: &types.RelationshipRecord{
+				PolicyId:     ctx.State.PolicyId,
+				Relationship: coretypes.NewActorRelationship("file", "bar", "owner", ctx.GetActor("alice").DID),
+				Archived:     false,
+				Metadata:     result.Metadata,
+			},
+		},
+	}
+	a2.Run(ctx)
 }

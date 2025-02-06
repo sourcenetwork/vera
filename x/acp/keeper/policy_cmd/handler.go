@@ -132,19 +132,15 @@ func (h *Handler) registerObject(ctx *PolicyCmdCtx, cmd *types.RegisterObjectCmd
 }
 
 func (h *Handler) archiveObject(ctx *PolicyCmdCtx, cmd *types.ArchiveObjectCmd) (*types.PolicyCmdResult, error) {
-	resp, err := h.engine.ArchiveObject(ctx.Ctx, &coretypes.ArchiveObjectRequest{
-		PolicyId: ctx.PolicyId,
-		Object:   cmd.Object,
-	})
+	response, err := h.registrationService.ArchiveObject(ctx.Ctx, ctx.PolicyId, cmd.Object)
 	if err != nil {
 		return nil, err
 	}
 	return &types.PolicyCmdResult{
-
 		Result: &types.PolicyCmdResult_ArchiveObjectResult{
 			ArchiveObjectResult: &types.ArchiveObjectCmdResult{
 				Found:                true,
-				RelationshipsRemoved: resp.RelationshipsRemoved,
+				RelationshipsRemoved: response.RelationshipsRemoved,
 			},
 		},
 	}, nil
