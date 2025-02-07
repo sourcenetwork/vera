@@ -3,6 +3,7 @@ package overrides
 import (
 	"encoding/json"
 
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 
 	"github.com/cosmos/cosmos-sdk/x/mint"
@@ -19,6 +20,10 @@ type MintModuleBasic struct {
 func (MintModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	genState := minttypes.DefaultGenesisState()
 	genState.Params.MintDenom = appparams.DefaultBondDenom
+	genState.Params.BlocksPerYear = appparams.BlocksPerYear
+	genState.Params.InflationMin = math.LegacyMustNewDecFromStr(appparams.InflationMin)
+	genState.Params.InflationMax = math.LegacyMustNewDecFromStr(appparams.InflationMax)
+	genState.Params.InflationRateChange = math.LegacyMustNewDecFromStr(appparams.InflationRateChange)
 
 	return cdc.MustMarshalJSON(genState)
 }

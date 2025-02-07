@@ -17,4 +17,10 @@ const (
 
 	DefaultBondDenom   = MicroOpenDenom
 	DefaultMinGasPrice = 0.001
+
+	BlocksPerYear       = 31557600
+	GoalBonded          = "0.67"
+	InflationMin        = "0.02"
+	InflationMax        = "0.15"
+	InflationRateChange = "0.13"
 )
