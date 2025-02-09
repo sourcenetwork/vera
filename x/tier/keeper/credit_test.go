@@ -326,7 +326,8 @@ func TestProratedCredit(t *testing.T) {
 
 			k.removeLockup(ctx, delAddr, valAddr)
 			if tc.locked > 0 {
-				k.AddLockup(ctx, delAddr, valAddr, math.NewInt(tc.locked))
+				err = k.AddLockup(ctx, delAddr, valAddr, math.NewInt(tc.locked))
+				require.NoError(t, err)
 			}
 			got := k.proratedCredit(ctx, delAddr, math.NewInt(tc.locking))
 			require.Equal(t, tc.want, got.Int64())
@@ -499,7 +500,8 @@ func TestResetAllCredits(t *testing.T) {
 			for addrStr, lockupAmounts := range tt.lockups {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				for _, amt := range lockupAmounts {
-					k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
+					err = k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
+					require.NoError(t, err)
 				}
 			}
 
