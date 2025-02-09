@@ -165,12 +165,22 @@ func (k Keeper) removeUnlockingLockup(ctx context.Context, delAddr sdk.AccAddres
 }
 
 // AddLockup adds provided amt to the existing delAddr/valAddr lockup.
-func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) {
+func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	total := k.GetTotalLockupsAmount(ctx)
+	total = total.Add(amt)
+	err := k.SetTotalLockupsAmount(ctx, total)
+	if err != nil {
+		return err
+	}
+
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 	if lockup != nil {
 		amt = amt.Add(lockup.Amount)
 	}
+
 	k.SetLockup(ctx, delAddr, valAddr, amt)
+
+	return nil
 }
 
 // SubtractLockup subtracts provided amt from the existing delAddr/valAddr lockup.
@@ -198,6 +208,17 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 	}
 
 	k.SetLockup(ctx, delAddr, valAddr, newAmt)
+
+	total := k.GetTotalLockupsAmount(ctx)
+	newTotal, err := total.SafeSub(amt)
+	if err != nil {
+		return errorsmod.Wrapf(err, "subtract %s from total lockups amount %s", amt, lockup.Amount)
+	}
+
+	err = k.SetTotalLockupsAmount(ctx, newTotal)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -294,7 +315,7 @@ func (k Keeper) IterateUnlockingLockups(ctx context.Context,
 
 		err := cb(delAddr, valAddr, creationHeight, unlockingLockup)
 		if err != nil {
-			return errorsmod.Wrapf(err, "%s/%s/, amt: %s", delAddr, valAddr, unlockingLockup.Amount)
+			return errorsmod.Wrapf(err, "%s/%s/%d, amt: %s", delAddr, valAddr, creationHeight, unlockingLockup.Amount)
 		}
 	}
 
@@ -339,4 +360,33 @@ func (k Keeper) lockupStore(ctx context.Context, unlocking bool) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	storePrefix := types.KeyPrefix(unlocking)
 	return prefix.NewStore(storeAdapter, storePrefix)
+}
+
+// GetTotalLockupsAmount retrieves the total lockup amount from the store.
+func (k Keeper) GetTotalLockupsAmount(ctx context.Context) (total math.Int) {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	bz := store.Get(types.TotalLockupsKey)
+	if bz == nil {
+		return math.ZeroInt()
+	}
+
+	err := total.Unmarshal(bz)
+	if err != nil {
+		return math.ZeroInt()
+	}
+
+	return total
+}
+
+// SetTotalLockupsAmount updates the total lockup amount in the store.
+func (k Keeper) SetTotalLockupsAmount(ctx context.Context, total math.Int) error {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	bz, err := total.Marshal()
+	if err != nil {
+		return errorsmod.Wrapf(err, "marshal total lockups amount")
+	}
+
+	store.Set(types.TotalLockupsKey, bz)
+
+	return nil
 }
