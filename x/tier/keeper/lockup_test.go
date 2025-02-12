@@ -533,3 +533,27 @@ func TestSubtractLockupUpdatesTotalLockups(t *testing.T) {
 	total = k.GetTotalLockupsAmount(ctx)
 	require.Equal(t, initialAmount.Sub(subtractAmount), total, "Total lockups amount should be 3500")
 }
+
+func TestRemoveLockupUpdatesTotalLockups(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	initialAmount := math.NewInt(5000)
+	subtractAmount := math.NewInt(5000)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	err = k.AddLockup(ctx, delAddr, valAddr, initialAmount)
+	require.NoError(t, err, "Adding lockup should not fail")
+
+	total := k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialAmount, total, "Total lockups amount should be 5000")
+
+	err = k.SubtractLockup(ctx, delAddr, valAddr, subtractAmount)
+	require.NoError(t, err, "Subtracting lockup should not fail")
+
+	total = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, math.ZeroInt(), total, "Total lockups amount should be 0")
+}

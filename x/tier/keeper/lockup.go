@@ -185,6 +185,17 @@ func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr s
 
 // SubtractLockup subtracts provided amt from the existing delAddr/valAddr lockup.
 func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	total := k.GetTotalLockupsAmount(ctx)
+	newTotal, err := total.SafeSub(amt)
+	if err != nil {
+		return errorsmod.Wrapf(err, "subtract %s from total lockups amount %s", amt, total)
+	}
+
+	err = k.SetTotalLockupsAmount(ctx, newTotal)
+	if err != nil {
+		return err
+	}
+
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 	if lockup == nil {
 		return types.ErrNotFound.Wrap("subtract lockup")
@@ -208,17 +219,6 @@ func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valA
 	}
 
 	k.SetLockup(ctx, delAddr, valAddr, newAmt)
-
-	total := k.GetTotalLockupsAmount(ctx)
-	newTotal, err := total.SafeSub(amt)
-	if err != nil {
-		return errorsmod.Wrapf(err, "subtract %s from total lockups amount %s", amt, lockup.Amount)
-	}
-
-	err = k.SetTotalLockupsAmount(ctx, newTotal)
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
@@ -372,6 +372,10 @@ func (k Keeper) GetTotalLockupsAmount(ctx context.Context) (total math.Int) {
 
 	err := total.Unmarshal(bz)
 	if err != nil {
+		return math.ZeroInt()
+	}
+
+	if total.IsNegative() {
 		return math.ZeroInt()
 	}
 
