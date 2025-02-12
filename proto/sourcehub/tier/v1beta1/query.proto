@@ -29,7 +29,7 @@ service Query {
 
   // UnlockingLockup queries an unlocking lockup by delegator and validator address.
   rpc UnlockingLockup(UnlockingLockupRequest) returns (UnlockingLockupResponse) {
-    option (google.api.http).get = "/sourcehub/tier/v1beta1/unlocking/{delegator_address}/{validator_address}";
+    option (google.api.http).get = "/sourcehub/tier/v1beta1/unlocking/{delegator_address}/{validator_address}/{creation_height}";
   }
 
   // UnlockingLockups queries all the unlocking lockups of a delegator.
