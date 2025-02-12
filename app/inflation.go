@@ -11,6 +11,22 @@ import (
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 )
 
+func CalculateInflation(
+	minter minttypes.Minter,
+	params minttypes.Params,
+	defaultBondedRatio math.LegacyDec,
+	devStake, totalBonded, totalSupply math.Int,
+) math.LegacyDec {
+	// Use default bonded raito for inflation calculation if one of the inputs is invalid.
+	if !totalSupply.IsPositive() || !totalBonded.IsPositive() || totalBonded.LT(devStake) || totalBonded.GT(totalSupply) {
+		return minter.NextInflationRate(params, defaultBondedRatio)
+	}
+
+	adjustedBonded := totalBonded.Sub(devStake)
+	adjustedBondedRatio := adjustedBonded.ToLegacyDec().QuoInt(totalSupply)
+	return minter.NextInflationRate(params, adjustedBondedRatio)
+}
+
 func ProvideInflationCalculationFn(
 	tierKeeper tierkeeper.Keeper,
 	bankKeeper bankkeeper.Keeper,
@@ -26,9 +42,6 @@ func ProvideInflationCalculationFn(
 			totalBonded = math.ZeroInt()
 		}
 
-		adjustedBonded := totalBonded.Sub(devStake)
-		adjustedBondedRatio := adjustedBonded.ToLegacyDec().QuoInt(totalSupply)
-
-		return minter.NextInflationRate(params, adjustedBondedRatio)
+		return CalculateInflation(minter, params, bondedRatio, devStake, totalBonded, totalSupply)
 	}
 }
