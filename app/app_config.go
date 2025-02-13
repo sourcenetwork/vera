@@ -196,6 +196,8 @@ var (
 		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
 		{Account: tiertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner, authtypes.Staking}},
+		{Account: tiertypes.DeveloperPoolName},
+		{Account: tiertypes.InsurancePoolName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -206,6 +208,8 @@ var (
 		minttypes.ModuleName,
 		stakingtypes.BondedPoolName,
 		stakingtypes.NotBondedPoolName,
+		tiertypes.DeveloperPoolName,
+		tiertypes.InsurancePoolName,
 		// We allow the following module accounts to receive funds:
 		// govtypes.ModuleName
 	}

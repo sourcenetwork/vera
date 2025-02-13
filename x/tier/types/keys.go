@@ -11,6 +11,12 @@ const (
 	// ModuleName defines the module name
 	ModuleName = "tier"
 
+	// DeveloperPoolName defines the developer pool module account
+	DeveloperPoolName = "developer_pool"
+
+	// InsurancePoolName defines the developer insurance pool module account
+	InsurancePoolName = "insurance_pool"
+
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
 
@@ -23,10 +29,10 @@ const (
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_tier"
 
-	// LockupKeyPrefix is the prefix to retrieve all Lockup
+	// LockupKeyPrefix is the prefix to retrieve all Lockups
 	LockupKeyPrefix = "Lockup/"
 
-	// UnlockingLockupKeyPrefix is the prefix to retrieve all UnlockingLockup
+	// UnlockingLockupKeyPrefix is the prefix to retrieve all UnlockingLockups
 	UnlockingLockupKeyPrefix = "UnlockingLockup/"
 )
 
