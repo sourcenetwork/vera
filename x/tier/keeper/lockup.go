@@ -165,12 +165,15 @@ func (k Keeper) removeUnlockingLockup(ctx context.Context, delAddr sdk.AccAddres
 }
 
 // AddLockup adds provided amt to the existing delAddr/valAddr lockup.
-func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) {
+func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 	if lockup != nil {
 		amt = amt.Add(lockup.Amount)
 	}
+
 	k.SetLockup(ctx, delAddr, valAddr, amt)
+
+	return nil
 }
 
 // SubtractLockup subtracts provided amt from the existing delAddr/valAddr lockup.
@@ -294,7 +297,7 @@ func (k Keeper) IterateUnlockingLockups(ctx context.Context,
 
 		err := cb(delAddr, valAddr, creationHeight, unlockingLockup)
 		if err != nil {
-			return errorsmod.Wrapf(err, "%s/%s/, amt: %s", delAddr, valAddr, unlockingLockup.Amount)
+			return errorsmod.Wrapf(err, "%s/%s/%d, amt: %s", delAddr, valAddr, creationHeight, unlockingLockup.Amount)
 		}
 	}
 

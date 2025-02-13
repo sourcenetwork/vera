@@ -165,21 +165,24 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 		return errorsmod.Wrapf(err, "delegate %s from account to module", stake)
 	}
 
-	// Delegate the stake to the validator.
+	// Delegate the stake to the validator
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	_, err = k.stakingKeeper.Delegate(ctx, modAddr, stake.Amount, stakingtypes.Unbonded, validator, true)
 	if err != nil {
 		return errorsmod.Wrapf(err, "delegate %s", stake)
 	}
 
-	// Record the lockup
-	k.AddLockup(ctx, delAddr, valAddr, stake.Amount)
-
 	// Mint credits
 	creditAmt := k.proratedCredit(ctx, delAddr, amt)
 	err = k.mintCredit(ctx, delAddr, creditAmt)
 	if err != nil {
 		return errorsmod.Wrap(err, "mint credit")
+	}
+
+	// Record the lockup after minting credits
+	err = k.AddLockup(ctx, delAddr, valAddr, stake.Amount)
+	if err != nil {
+		return errorsmod.Wrap(err, "add lockup")
 	}
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
@@ -266,7 +269,10 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	}
 
 	// Add the lockup to the destination validator
-	k.AddLockup(ctx, delAddr, dstValAddr, amt)
+	err = k.AddLockup(ctx, delAddr, dstValAddr, amt)
+	if err != nil {
+		return time.Time{}, errorsmod.Wrap(err, "add lockup")
+	}
 
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, srcValAddr, amt)
@@ -369,7 +375,10 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	}
 
 	// Add the specified amt back to existing lockup
-	k.AddLockup(ctx, delAddr, valAddr, amt)
+	err = k.AddLockup(ctx, delAddr, valAddr, amt)
+	if err != nil {
+		return errorsmod.Wrap(err, "add lockup")
+	}
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -382,17 +391,4 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	)
 
 	return nil
-}
-
-// GetDeveloperStake calculates and returns the total amount of all active lockups.
-func (k Keeper) GetDeveloperStake(ctx sdk.Context) math.Int {
-	totalDeveloperStake := math.ZeroInt()
-
-	lockupsCallback := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
-		totalDeveloperStake = totalDeveloperStake.Add(lockup.Amount)
-	}
-
-	k.MustIterateLockups(ctx, lockupsCallback)
-
-	return totalDeveloperStake
 }
