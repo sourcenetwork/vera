@@ -10,9 +10,12 @@ import (
 
 // Parameter store keys
 var (
-	KeyEpochDuration    = []byte("EpochDuration")
-	KeyUnlockingEpochs  = []byte("UnlockingEpochs")
-	KeyCreditRewardRate = []byte("RewardRates")
+	KeyEpochDuration          = []byte("EpochDuration")
+	KeyUnlockingEpochs        = []byte("UnlockingEpochs")
+	KeyDeveloperPoolFee       = []byte("DeveloperPoolFee")
+	KeyInsurancePoolFee       = []byte("InsurancePoolFee")
+	KeyInsurancePoolThreshold = []byte("InsurancePoolThreshold")
+	KeyRewardRates            = []byte("RewardRates")
 )
 
 // ParamKeyTable for module parameters
@@ -21,27 +24,35 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params object
-func NewParams(epochDuration *time.Duration, unlockingEpochs int64, creditRewardRate []Rate) Params {
+func NewParams(epochDuration *time.Duration, unlockingEpochs, developerPoolFee, insurancePoolFee, insurancePoolThreshold int64, rewardRates []Rate) Params {
 	return Params{
-		EpochDuration:   epochDuration,
-		UnlockingEpochs: unlockingEpochs,
-		RewardRates:     creditRewardRate,
+		EpochDuration:          epochDuration,
+		UnlockingEpochs:        unlockingEpochs,
+		DeveloperPoolFee:       developerPoolFee,
+		InsurancePoolFee:       insurancePoolFee,
+		InsurancePoolThreshold: insurancePoolThreshold,
+		RewardRates:            rewardRates,
 	}
 }
 
 // DefaultParams returns default parameters.
-// Rates in RewardRates are integers representing percentages with 2 decimal precision.
-// For example, a rate of 150 represents 1.50 (150 / 100).
+// Rate in RewardRates, DeveloperPoolFee, and InsurancePoolFee are integers representing percentages
+// with 2 decimal precision (e.g. a rate of 150 represents 150%, a fee of 2 represents 2%).
+// InsurancePoolThreshold represents a threshold in "uopen", after which insurance pool is considered "full".
+// When the insurance pool is full, the insurance fee is allocated to the developer pool instead.
 func DefaultParams() Params {
-	du := 5 * time.Minute
+	epochDuration := DefaultEpochDuration
 	return Params{
-		EpochDuration:   &du,
-		UnlockingEpochs: 2,
+		EpochDuration:          &epochDuration,                // 5 minutes
+		UnlockingEpochs:        DefaultUnlockingEpochs,        // 2 epochs
+		DeveloperPoolFee:       DefaultDeveloperPoolFee,       // 2%
+		InsurancePoolFee:       DefaultInsurancePoolFee,       // 1%
+		InsurancePoolThreshold: DefaultInsurancePoolThreshold, // 100,000 open
 		RewardRates: []Rate{
-			{Amount: math.NewInt(300), Rate: 150},
-			{Amount: math.NewInt(200), Rate: 120},
-			{Amount: math.NewInt(100), Rate: 110},
-			{Amount: math.NewInt(0), Rate: 100},
+			{Amount: math.NewInt(300), Rate: 150}, // x1.5 from 300
+			{Amount: math.NewInt(200), Rate: 120}, // x1.2 from 200 to 300
+			{Amount: math.NewInt(100), Rate: 110}, // x1.1 from 100 to 200
+			{Amount: math.NewInt(0), Rate: 100},   // x1.0 from 0 to 100
 		},
 	}
 }
@@ -51,7 +62,19 @@ func (p Params) Validate() error {
 	if err := validateEpochDuration(p.EpochDuration); err != nil {
 		return err
 	}
-	if err := validateCreditRewardRate(p.RewardRates); err != nil {
+	if err := validateUnlockingEpochs(p.UnlockingEpochs); err != nil {
+		return err
+	}
+	if err := validateDeveloperPoolFee(p.DeveloperPoolFee); err != nil {
+		return err
+	}
+	if err := validateInsurancePoolFee(p.InsurancePoolFee); err != nil {
+		return err
+	}
+	if err := validateInsurancePoolThreshold(p.InsurancePoolThreshold); err != nil {
+		return err
+	}
+	if err := validateRewardRates(p.RewardRates); err != nil {
 		return err
 	}
 	return nil
@@ -62,7 +85,10 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		{Key: KeyEpochDuration, Value: &p.EpochDuration, ValidatorFn: validateEpochDuration},
 		{Key: KeyUnlockingEpochs, Value: &p.UnlockingEpochs, ValidatorFn: validateUnlockingEpochs},
-		{Key: KeyCreditRewardRate, Value: &p.RewardRates, ValidatorFn: validateCreditRewardRate},
+		{Key: KeyDeveloperPoolFee, Value: &p.DeveloperPoolFee, ValidatorFn: validateDeveloperPoolFee},
+		{Key: KeyInsurancePoolFee, Value: &p.InsurancePoolFee, ValidatorFn: validateInsurancePoolFee},
+		{Key: KeyInsurancePoolThreshold, Value: &p.InsurancePoolThreshold, ValidatorFn: validateInsurancePoolThreshold},
+		{Key: KeyRewardRates, Value: &p.RewardRates, ValidatorFn: validateRewardRates},
 	}
 }
 
@@ -82,7 +108,31 @@ func validateUnlockingEpochs(i interface{}) error {
 	return nil
 }
 
-func validateCreditRewardRate(i interface{}) error {
+func validateDeveloperPoolFee(i interface{}) error {
+	_, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}
+
+func validateInsurancePoolFee(i interface{}) error {
+	_, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}
+
+func validateInsurancePoolThreshold(i interface{}) error {
+	_, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	return nil
+}
+
+func validateRewardRates(i interface{}) error {
 	rates, ok := i.([]Rate)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
