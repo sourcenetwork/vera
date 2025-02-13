@@ -172,23 +172,19 @@ func (am AppModule) BeginBlock(ctx context.Context) error {
 		amountToInsurancePool := totalAmount.MulRaw(params.InsurancePoolFee).QuoRaw(100)
 		amountToBurn := totalAmount.Sub(amountToDevPool).Sub(amountToInsurancePool)
 
-		// Send InsurancePoolFee to the insurance pool (or to the developer pool if insurance pool threshold reached)
+		// Send InsurancePoolFee to the insurance pool if threshold not reached, update amountToDevPool otherwise
 		if !amountToInsurancePool.IsZero() {
 			insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 			insurancePoolBalance := am.keeper.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-			insuranceCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToInsurancePool))
 			if insurancePoolBalance.Amount.LT(math.NewInt(params.InsurancePoolThreshold)) {
+				insuranceCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToInsurancePool))
 				err := am.keeper.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.InsurancePoolName, insuranceCoins)
 				if err != nil {
 					am.keeper.Logger().Error("Failed to send rewards to the insurance pool", "error", err)
 					return false
 				}
 			} else {
-				err := am.keeper.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.DeveloperPoolName, insuranceCoins)
-				if err != nil {
-					am.keeper.Logger().Error("Failed to send insurance pool rewards to the developer pool", "error", err)
-					return false
-				}
+				amountToDevPool = amountToDevPool.Add(amountToInsurancePool)
 			}
 		}
 
