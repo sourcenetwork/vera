@@ -232,9 +232,6 @@ func New(
 				// custom function that implements the minttypes.InflationCalculationFn
 				// interface.
 			),
-			depinject.Provide(
-				ProvideInflationCalculationFn,
-			),
 		)
 	)
 
