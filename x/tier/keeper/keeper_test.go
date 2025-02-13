@@ -22,7 +22,7 @@ import (
 func initializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
 	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
 	gotValidator, err := k.GetValidator(ctx, valAddr)
-	require.Nil(t, err)
+	require.NoError(t, err)
 	require.Equal(t, validator.OperatorAddress, gotValidator.OperatorAddress)
 }
 

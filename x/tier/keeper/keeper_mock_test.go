@@ -77,7 +77,7 @@ func (suite *KeeperTestSuite) TestLock() {
 	amount := math.NewInt(1000)
 	moduleName := types.ModuleName
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
-	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(250)))
+	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(230)))
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
@@ -178,7 +178,9 @@ func (suite *KeeperTestSuite) TestUnlock() {
 	suite.tierKeeper.SetParams(suite.ctx, params)
 
 	// add a lockup and verify that it exists before trying to unlock
-	suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	err = suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	suite.Require().NoError(err)
+
 	lockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, valAddr)
 	suite.Require().Equal(amount, lockedAmt, "expected lockup amount to be set")
 
@@ -205,7 +207,8 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 	suite.Require().NoError(err)
 
 	// add initial lockup to the source validator
-	suite.tierKeeper.AddLockup(suite.ctx, delAddr, srcValAddr, amount)
+	err = suite.tierKeeper.AddLockup(suite.ctx, delAddr, srcValAddr, amount)
+	suite.Require().NoError(err)
 
 	suite.stakingKeeper.EXPECT().
 		ValidateUnbondAmount(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, amount).
