@@ -24,6 +24,7 @@ func (MintModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	genState.Params.InflationMin = math.LegacyMustNewDecFromStr(appparams.InflationMin)
 	genState.Params.InflationMax = math.LegacyMustNewDecFromStr(appparams.InflationMax)
 	genState.Params.InflationRateChange = math.LegacyMustNewDecFromStr(appparams.InflationRateChange)
+	genState.Minter.Inflation = math.LegacyMustNewDecFromStr(appparams.InitialInflation)
 
 	return cdc.MustMarshalJSON(genState)
 }

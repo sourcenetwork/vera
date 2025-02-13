@@ -23,4 +23,5 @@ const (
 	InflationMin        = "0.02"
 	InflationMax        = "0.15"
 	InflationRateChange = "0.13"
+	InitialInflation    = "0.13"
 )

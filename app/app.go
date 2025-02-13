@@ -64,7 +64,9 @@ import (
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -160,6 +162,8 @@ func AppConfig() depinject.Config {
 				govtypes.ModuleName:     overrides.NewGovModuleBasic(),
 				minttypes.ModuleName:    overrides.MintModuleBasic{},
 				stakingtypes.ModuleName: overrides.StakingModuleBasic{},
+				epochstypes.ModuleName:  overrides.EpochsModuleBasic{},
+				tiertypes.ModuleName:    overrides.TierModuleBasic{},
 			},
 		),
 	)
@@ -231,9 +235,6 @@ func New(
 				// For providing a custom inflation function for x/mint add here your
 				// custom function that implements the minttypes.InflationCalculationFn
 				// interface.
-			),
-			depinject.Provide(
-				ProvideInflationCalculationFn,
 			),
 		)
 	)
