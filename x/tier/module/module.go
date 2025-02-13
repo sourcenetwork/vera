@@ -9,6 +9,7 @@ import (
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -16,7 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 
 	// this line is used by starport scaffolding # 1
 
@@ -146,6 +149,77 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block.
 // The begin block implementation is optional.
 func (am AppModule) BeginBlock(ctx context.Context) error {
+	params := am.keeper.GetParams(ctx)
+	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
+
+	err := am.keeper.GetStakingKeeper().IterateDelegations(ctx, tierModuleAddr, func(index int64, delegation stakingtypes.DelegationI) bool {
+		// Claim rewards for the tier module from this validator
+		valAddr := types.MustValAddressFromBech32(delegation.GetValidatorAddr())
+		rewards, err := am.keeper.GetDistributionKeeper().WithdrawDelegationRewards(ctx, tierModuleAddr, valAddr)
+		if err != nil {
+			am.keeper.Logger().Error("Failed to claim tier module staking rewards", "error", err)
+			return false
+		}
+
+		// Proceed to the next record if there are no rewards
+		if rewards.IsZero() {
+			am.keeper.Logger().Info("No tier module staking rewards in validator", "validator", valAddr)
+			return false
+		}
+
+		totalAmount := rewards.AmountOf(appparams.DefaultBondDenom)
+		amountToDevPool := totalAmount.MulRaw(params.DeveloperPoolFee).QuoRaw(100)
+		amountToInsurancePool := totalAmount.MulRaw(params.InsurancePoolFee).QuoRaw(100)
+		amountToBurn := totalAmount.Sub(amountToDevPool).Sub(amountToInsurancePool)
+
+		// Send InsurancePoolFee to the insurance pool (or to the developer pool if insurance pool threshold reached)
+		if !amountToInsurancePool.IsZero() {
+			insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
+			insurancePoolBalance := am.keeper.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
+			insuranceCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToInsurancePool))
+			if insurancePoolBalance.Amount.LT(math.NewInt(params.InsurancePoolThreshold)) {
+				err := am.keeper.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.InsurancePoolName, insuranceCoins)
+				if err != nil {
+					am.keeper.Logger().Error("Failed to send rewards to the insurance pool", "error", err)
+					return false
+				}
+			} else {
+				err := am.keeper.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.DeveloperPoolName, insuranceCoins)
+				if err != nil {
+					am.keeper.Logger().Error("Failed to send insurance pool rewards to the developer pool", "error", err)
+					return false
+				}
+			}
+		}
+
+		// Send DeveloperPoolFee to the developer pool
+		if !amountToDevPool.IsZero() {
+			devPoolCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToDevPool))
+			err := am.keeper.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.DeveloperPoolName, devPoolCoins)
+			if err != nil {
+				am.keeper.Logger().Error("Failed to send rewards to the developer pool", "error", err)
+				return false
+			}
+		}
+
+		// Burn remaining tier module staking rewards
+		if !amountToBurn.IsZero() {
+			burnCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToBurn))
+			err := am.keeper.GetBankKeeper().BurnCoins(ctx, types.ModuleName, burnCoins)
+			if err != nil {
+				am.keeper.Logger().Error("Failed to burn tier module staking rewards", "error", err)
+				return false
+			}
+		}
+
+		return false
+	})
+
+	if err != nil {
+		am.keeper.Logger().Error("Error iterating over tier module delegations", "error", err)
+		return err
+	}
+
 	return nil
 }
 
