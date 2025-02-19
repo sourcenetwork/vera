@@ -80,7 +80,13 @@ message MsgUnlock {
 
 // MsgUnlockResponse defines the response structure for executing a MsgUnlock message.
 message MsgUnlockResponse {
-  google.protobuf.Timestamp completion_time = 1 [
+  int64 creation_height = 1;
+  google.protobuf.Timestamp completion_time = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.stdtime) = true
+  ];
+  google.protobuf.Timestamp unlock_time = 3 [
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true,
     (gogoproto.stdtime) = true

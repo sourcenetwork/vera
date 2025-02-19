@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"fmt"
+
 	cmtcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -25,9 +28,9 @@ func initAppConfig() (string, interface{}) {
 		serverconfig.Config `mapstructure:",squash"`
 	}
 
-	// Optionally allow the chain developer to overwrite the SDK's default
-	// server config.
+	// Optionally allow the chain developer to overwrite the SDK's default server config.
 	srvCfg := serverconfig.DefaultConfig()
+	srvCfg.MinGasPrices = fmt.Sprintf("%v%s", appparams.DefaultMinGasPrice, appparams.DefaultBondDenom)
 	// The SDK's default minimum gas price is set to "" (empty value) inside
 	// app.toml. If left empty by validators, the node will halt on startup.
 	// However, the chain developer can set a default app.toml value for their

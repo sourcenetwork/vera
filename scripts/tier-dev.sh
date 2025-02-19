@@ -73,3 +73,11 @@ sh-unlock() {
     amount=$3
     $CMD tx tier unlock `sh-val-addr $validator_name` $amount --from $from -y --chain-id $CHAINID --gas auto
 }
+
+sh-cancel-unlocking() {
+    validator_name=$1
+    from=$2
+    amount=$3
+    creation_height=$4
+    $CMD tx tier cancel-unlocking `sh-val-addr $validator_name` $amount $creation_height --from $from -y --chain-id $CHAINID --gas auto
+}

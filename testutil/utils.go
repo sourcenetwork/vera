@@ -17,8 +17,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/gogoproto/proto"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/stretchr/testify/require"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -94,9 +92,4 @@ func CreateTestEncodingConfig() EncodingConfig {
 		TxConfig:          tx.NewTxConfig(protoCodec, tx.DefaultSignModes),
 		Amino:             codec.NewLegacyAmino(),
 	}
-}
-
-func SetupKeeper(t *testing.T) (*tierkeeper.Keeper, sdk.Context) {
-	k, ctx := keepertest.TierKeeper(t)
-	return &k, ctx
 }

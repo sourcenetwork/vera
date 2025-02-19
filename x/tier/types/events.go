@@ -11,6 +11,5 @@ const (
 	AttributeKeyCreationHeight       = "creation_height"
 	AttributeKeyDestinationValidator = "destination_validator"
 	AttributeKeySourceValidator      = "source_validator"
-	AttributeKeyUnbondTime           = "unbond_time"
 	AttributeKeyUnlockTime           = "unlock_time"
 )

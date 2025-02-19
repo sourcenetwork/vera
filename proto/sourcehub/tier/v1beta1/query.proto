@@ -29,7 +29,7 @@ service Query {
 
   // UnlockingLockup queries an unlocking lockup by delegator and validator address.
   rpc UnlockingLockup(UnlockingLockupRequest) returns (UnlockingLockupResponse) {
-    option (google.api.http).get = "/sourcehub/tier/v1beta1/unlocking/{delegator_address}/{validator_address}";
+    option (google.api.http).get = "/sourcehub/tier/v1beta1/unlocking/{delegator_address}/{validator_address}/{creation_height}";
   }
 
   // UnlockingLockups queries all the unlocking lockups of a delegator.
@@ -69,7 +69,7 @@ message LockupsRequest {
 
 // LockupsResponse is the response type for the Query/Lockups RPC method.
 message LockupsResponse {
-  repeated Lockup lockup = 1 [(gogoproto.nullable) = false];
+  repeated Lockup lockups = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
@@ -82,7 +82,7 @@ message UnlockingLockupRequest {
 
 // UnlockingLockupResponse is the response type for the Query/UnlockingLockup RPC method.
 message UnlockingLockupResponse {
-  Lockup lockup = 1 [(gogoproto.nullable) = false];
+  UnlockingLockup unlockingLockup = 1 [(gogoproto.nullable) = false];
 }
 
 // UnlockingLockupsRequest is the request type for the Query/UnlockingLockups RPC method.
@@ -93,6 +93,6 @@ message UnlockingLockupsRequest {
 
 // UnlockingLockupsResponse is the response type for the Query/UnlockingLockups RPC method.
 message UnlockingLockupsResponse {
-  repeated Lockup lockup = 1 [(gogoproto.nullable) = false];
+  repeated UnlockingLockup unlockingLockups = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

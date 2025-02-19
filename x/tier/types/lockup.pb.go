@@ -7,6 +7,7 @@ import (
 	cosmossdk_io_math "cosmossdk.io/math"
 	fmt "fmt"
 	_ "github.com/cosmos/cosmos-proto"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 	_ "github.com/cosmos/gogoproto/types"
@@ -29,19 +30,11 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Lockup tracks the locked and unlocking stake of a delegator.
+// Lockup tracks the locked stake of a delegator.
 type Lockup struct {
 	DelegatorAddress string                `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
 	ValidatorAddress string                `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
 	Amount           cosmossdk_io_math.Int `protobuf:"bytes,3,opt,name=amount,proto3,customtype=cosmossdk.io/math.Int" json:"amount"`
-	// The following fields are only used for unlocking lockups.
-	//
-	// The height at which the lockup was created.
-	CreationHeight int64 `protobuf:"varint,4,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
-	// The time at which the stake undelegation will be completed.
-	UnbondTime *time.Time `protobuf:"bytes,5,opt,name=unbond_time,json=unbondTime,proto3,stdtime" json:"unbond_time,omitempty"`
-	// The time at which the stake unlocking will be completed.
-	UnlockTime *time.Time `protobuf:"bytes,6,opt,name=unlock_time,json=unlockTime,proto3,stdtime" json:"unlock_time,omitempty"`
 }
 
 func (m *Lockup) Reset()         { *m = Lockup{} }
@@ -91,29 +84,89 @@ func (m *Lockup) GetValidatorAddress() string {
 	return ""
 }
 
-func (m *Lockup) GetCreationHeight() int64 {
+// UnlockingLockup tracks the unlocking stake of a delegator.
+type UnlockingLockup struct {
+	DelegatorAddress string                `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
+	ValidatorAddress string                `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
+	CreationHeight   int64                 `protobuf:"varint,3,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
+	Amount           cosmossdk_io_math.Int `protobuf:"bytes,4,opt,name=amount,proto3,customtype=cosmossdk.io/math.Int" json:"amount"`
+	// The time at which the stake undelegation will be completed.
+	CompletionTime time.Time `protobuf:"bytes,5,opt,name=completion_time,json=completionTime,proto3,stdtime" json:"completion_time"`
+	// The time after which the unlocking lockup can be completed.
+	UnlockTime time.Time `protobuf:"bytes,6,opt,name=unlock_time,json=unlockTime,proto3,stdtime" json:"unlock_time"`
+}
+
+func (m *UnlockingLockup) Reset()         { *m = UnlockingLockup{} }
+func (m *UnlockingLockup) String() string { return proto.CompactTextString(m) }
+func (*UnlockingLockup) ProtoMessage()    {}
+func (*UnlockingLockup) Descriptor() ([]byte, []int) {
+	return fileDescriptor_2e0e6f58f533fc52, []int{1}
+}
+func (m *UnlockingLockup) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UnlockingLockup) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UnlockingLockup.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UnlockingLockup) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UnlockingLockup.Merge(m, src)
+}
+func (m *UnlockingLockup) XXX_Size() int {
+	return m.Size()
+}
+func (m *UnlockingLockup) XXX_DiscardUnknown() {
+	xxx_messageInfo_UnlockingLockup.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UnlockingLockup proto.InternalMessageInfo
+
+func (m *UnlockingLockup) GetDelegatorAddress() string {
+	if m != nil {
+		return m.DelegatorAddress
+	}
+	return ""
+}
+
+func (m *UnlockingLockup) GetValidatorAddress() string {
+	if m != nil {
+		return m.ValidatorAddress
+	}
+	return ""
+}
+
+func (m *UnlockingLockup) GetCreationHeight() int64 {
 	if m != nil {
 		return m.CreationHeight
 	}
 	return 0
 }
 
-func (m *Lockup) GetUnbondTime() *time.Time {
+func (m *UnlockingLockup) GetCompletionTime() time.Time {
 	if m != nil {
-		return m.UnbondTime
+		return m.CompletionTime
 	}
-	return nil
+	return time.Time{}
 }
 
-func (m *Lockup) GetUnlockTime() *time.Time {
+func (m *UnlockingLockup) GetUnlockTime() time.Time {
 	if m != nil {
 		return m.UnlockTime
 	}
-	return nil
+	return time.Time{}
 }
 
 func init() {
 	proto.RegisterType((*Lockup)(nil), "sourcehub.tier.v1beta1.Lockup")
+	proto.RegisterType((*UnlockingLockup)(nil), "sourcehub.tier.v1beta1.UnlockingLockup")
 }
 
 func init() {
@@ -121,33 +174,36 @@ func init() {
 }
 
 var fileDescriptor_2e0e6f58f533fc52 = []byte{
-	// 407 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xd1, 0x8a, 0x13, 0x31,
-	0x14, 0x86, 0x1b, 0xbb, 0x16, 0xcc, 0x82, 0xba, 0xc3, 0x2a, 0x63, 0xc1, 0x69, 0xd5, 0x0b, 0x0b,
-	0xd2, 0x84, 0xd5, 0x27, 0xd8, 0x8a, 0x60, 0x41, 0xbc, 0xa8, 0xe2, 0x85, 0x37, 0x25, 0x33, 0x13,
-	0xd3, 0xd0, 0x4e, 0x4e, 0x49, 0xce, 0x54, 0x7d, 0x8b, 0x05, 0x5f, 0xa5, 0x0f, 0xb1, 0x97, 0x4b,
-	0xaf, 0xc4, 0x8b, 0x55, 0xda, 0x17, 0x91, 0x4c, 0xd2, 0x15, 0xf7, 0x6a, 0xef, 0xe6, 0xfc, 0xf3,
-	0xff, 0xdf, 0x0f, 0x27, 0x87, 0x3e, 0x73, 0x50, 0xdb, 0x42, 0xce, 0xea, 0x9c, 0xa3, 0x96, 0x96,
-	0xaf, 0x4e, 0x72, 0x89, 0xe2, 0x84, 0x2f, 0xa0, 0x98, 0xd7, 0x4b, 0xb6, 0xb4, 0x80, 0x90, 0x3c,
-	0xbc, 0x32, 0x31, 0x6f, 0x62, 0xd1, 0xd4, 0x7d, 0x54, 0x80, 0xab, 0xc0, 0x4d, 0x1b, 0x17, 0x0f,
-	0x43, 0x88, 0x74, 0x8f, 0x15, 0x28, 0x08, 0xba, 0xff, 0x8a, 0x6a, 0x4f, 0x01, 0xa8, 0x85, 0xe4,
-	0xcd, 0x94, 0xd7, 0x5f, 0x38, 0xea, 0x4a, 0x3a, 0x14, 0x55, 0x6c, 0x7a, 0xfa, 0xa3, 0x4d, 0x3b,
-	0xef, 0x9a, 0xea, 0xe4, 0x0d, 0x3d, 0x2a, 0xe5, 0x42, 0x2a, 0x81, 0x60, 0xa7, 0xa2, 0x2c, 0xad,
-	0x74, 0x2e, 0x25, 0x7d, 0x32, 0xb8, 0x33, 0x4a, 0x37, 0xeb, 0xe1, 0x71, 0xac, 0x3b, 0x0d, 0x7f,
-	0x3e, 0xa0, 0xd5, 0x46, 0x4d, 0xee, 0x5f, 0x45, 0xa2, 0x9e, 0xbc, 0xa7, 0x47, 0x2b, 0xb1, 0xd0,
-	0xe5, 0x7f, 0x98, 0x5b, 0x0d, 0xe6, 0xc9, 0x66, 0x3d, 0x7c, 0x1c, 0x31, 0x9f, 0xf6, 0x9e, 0x6b,
-	0xbc, 0xd5, 0x35, 0x3d, 0x79, 0x4d, 0x3b, 0xa2, 0x82, 0xda, 0x60, 0xda, 0x6e, 0x20, 0x2f, 0xce,
-	0x2f, 0x7b, 0xad, 0x5f, 0x97, 0xbd, 0x07, 0x01, 0xe4, 0xca, 0x39, 0xd3, 0xc0, 0x2b, 0x81, 0x33,
-	0x36, 0x36, 0xb8, 0x59, 0x0f, 0x69, 0x6c, 0x18, 0x1b, 0x9c, 0xc4, 0x68, 0xf2, 0x9c, 0xde, 0x2b,
-	0xac, 0x14, 0xa8, 0xc1, 0x4c, 0x67, 0x52, 0xab, 0x19, 0xa6, 0x07, 0x7d, 0x32, 0x68, 0x4f, 0xee,
-	0xee, 0xe5, 0xb7, 0x8d, 0x9a, 0x9c, 0xd2, 0xc3, 0xda, 0xe4, 0x60, 0xca, 0xa9, 0xdf, 0x54, 0x7a,
-	0xbb, 0x4f, 0x06, 0x87, 0x2f, 0xbb, 0x2c, 0xac, 0x91, 0xed, 0xd7, 0xc8, 0x3e, 0xee, 0xd7, 0x38,
-	0x3a, 0x38, 0xfb, 0xdd, 0x23, 0x13, 0x1a, 0x42, 0x5e, 0x0e, 0x08, 0xff, 0x9c, 0x01, 0xd1, 0xb9,
-	0x39, 0xc2, 0x87, 0xbc, 0x3c, 0x1a, 0x9f, 0x6f, 0x33, 0x72, 0xb1, 0xcd, 0xc8, 0x9f, 0x6d, 0x46,
-	0xce, 0x76, 0x59, 0xeb, 0x62, 0x97, 0xb5, 0x7e, 0xee, 0xb2, 0xd6, 0x67, 0xae, 0x34, 0xfa, 0xb3,
-	0x28, 0xa0, 0xe2, 0xe1, 0x48, 0x8c, 0xc4, 0xaf, 0x60, 0xe7, 0xfc, 0xdf, 0x5d, 0x7d, 0x0b, 0x97,
-	0x85, 0xdf, 0x97, 0xd2, 0xe5, 0x9d, 0xa6, 0xf0, 0xd5, 0xdf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xe7,
-	0x59, 0x99, 0xc1, 0x78, 0x02, 0x00, 0x00,
+	// 451 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x53, 0xcd, 0x8a, 0x13, 0x41,
+	0x10, 0x4e, 0x1b, 0x0d, 0xd8, 0x8b, 0x1b, 0x33, 0xac, 0x12, 0x03, 0x4e, 0xd6, 0xf5, 0xe0, 0xa2,
+	0x64, 0x9a, 0xd5, 0x27, 0x30, 0x22, 0x18, 0x11, 0x0f, 0xe3, 0xcf, 0xc1, 0x4b, 0xe8, 0xcc, 0xb4,
+	0x9d, 0x26, 0x33, 0x5d, 0xa1, 0xbb, 0x27, 0xea, 0x5b, 0xec, 0x63, 0x78, 0xf4, 0x10, 0x7c, 0x86,
+	0x3d, 0x2e, 0x39, 0x89, 0x87, 0x55, 0x12, 0xc1, 0xd7, 0x90, 0xfe, 0x99, 0x5d, 0xdd, 0x9b, 0x9e,
+	0xbc, 0x0c, 0x53, 0x5f, 0x7d, 0xf5, 0x7d, 0x5d, 0x45, 0x15, 0xbe, 0xad, 0xa1, 0x52, 0x19, 0x9b,
+	0x56, 0x13, 0x62, 0x04, 0x53, 0x64, 0x71, 0x30, 0x61, 0x86, 0x1e, 0x90, 0x02, 0xb2, 0x59, 0x35,
+	0x4f, 0xe6, 0x0a, 0x0c, 0x44, 0xd7, 0x4f, 0x49, 0x89, 0x25, 0x25, 0x81, 0xd4, 0xeb, 0xd0, 0x52,
+	0x48, 0x20, 0xee, 0xeb, 0xa9, 0xbd, 0x1b, 0x19, 0xe8, 0x12, 0xf4, 0xd8, 0x45, 0xc4, 0x07, 0x21,
+	0xb5, 0xc3, 0x81, 0x83, 0xc7, 0xed, 0x5f, 0x40, 0xfb, 0x1c, 0x80, 0x17, 0x8c, 0xb8, 0x68, 0x52,
+	0xbd, 0x25, 0x46, 0x94, 0x4c, 0x1b, 0x5a, 0x06, 0xf3, 0xbd, 0x1f, 0x08, 0xb7, 0x9e, 0xb9, 0xd7,
+	0x44, 0x8f, 0x71, 0x27, 0x67, 0x05, 0xe3, 0xd4, 0x80, 0x1a, 0xd3, 0x3c, 0x57, 0x4c, 0xeb, 0x2e,
+	0xda, 0x45, 0xfb, 0x97, 0x87, 0xdd, 0xd5, 0x72, 0xb0, 0x13, 0xec, 0x1e, 0xfa, 0xcc, 0x0b, 0xa3,
+	0x84, 0xe4, 0xe9, 0xd5, 0xd3, 0x92, 0x80, 0x47, 0xcf, 0x71, 0x67, 0x41, 0x0b, 0x91, 0xff, 0x21,
+	0x73, 0xc1, 0xc9, 0xdc, 0x5a, 0x2d, 0x07, 0x37, 0x83, 0xcc, 0xeb, 0x9a, 0x73, 0x4e, 0x6f, 0x71,
+	0x0e, 0x8f, 0x1e, 0xe1, 0x16, 0x2d, 0xa1, 0x92, 0xa6, 0xdb, 0x74, 0x22, 0xf7, 0x8e, 0x4e, 0xfa,
+	0x8d, 0xaf, 0x27, 0xfd, 0x6b, 0x5e, 0x48, 0xe7, 0xb3, 0x44, 0x00, 0x29, 0xa9, 0x99, 0x26, 0x23,
+	0x69, 0x56, 0xcb, 0x01, 0x0e, 0x0e, 0x23, 0x69, 0xd2, 0x50, 0xba, 0xf7, 0xb9, 0x89, 0xdb, 0xaf,
+	0xa4, 0x1d, 0xbb, 0x90, 0xfc, 0xff, 0xee, 0xf7, 0x0e, 0x6e, 0x67, 0x8a, 0x51, 0x23, 0x40, 0x8e,
+	0xa7, 0x4c, 0xf0, 0xa9, 0x6f, 0xbc, 0x99, 0x6e, 0xd7, 0xf0, 0x13, 0x87, 0xfe, 0x36, 0x98, 0x8b,
+	0xff, 0x3c, 0x98, 0x28, 0xc5, 0xed, 0x0c, 0xca, 0x79, 0xc1, 0x9c, 0x9f, 0xdd, 0x8e, 0xee, 0xa5,
+	0x5d, 0xb4, 0xbf, 0x75, 0xbf, 0x97, 0xf8, 0xd5, 0x49, 0xea, 0xd5, 0x49, 0x5e, 0xd6, 0xab, 0x33,
+	0xbc, 0x62, 0x9d, 0x0e, 0xbf, 0xf5, 0xd1, 0xc7, 0x9f, 0x9f, 0xee, 0xa2, 0x74, 0xfb, 0x4c, 0xc1,
+	0x72, 0xa2, 0xa7, 0x78, 0xab, 0x72, 0xb3, 0xf6, 0x7a, 0xad, 0xbf, 0xd5, 0xc3, 0xbe, 0xda, 0xe6,
+	0x87, 0xa3, 0xa3, 0x75, 0x8c, 0x8e, 0xd7, 0x31, 0xfa, 0xbe, 0x8e, 0xd1, 0xe1, 0x26, 0x6e, 0x1c,
+	0x6f, 0xe2, 0xc6, 0x97, 0x4d, 0xdc, 0x78, 0x43, 0xb8, 0x30, 0xf6, 0x66, 0x32, 0x28, 0x89, 0xbf,
+	0x20, 0xc9, 0xcc, 0x3b, 0x50, 0x33, 0x72, 0x76, 0x74, 0xef, 0xfd, 0xd9, 0x99, 0x0f, 0x73, 0xa6,
+	0x27, 0x2d, 0xe7, 0xfc, 0xe0, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x68, 0xb5, 0xd7, 0x34, 0x95,
+	0x03, 0x00, 0x00,
 }
 
 func (m *Lockup) Marshal() (dAtA []byte, err error) {
@@ -170,31 +226,6 @@ func (m *Lockup) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.UnlockTime != nil {
-		n1, err1 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.UnlockTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.UnlockTime):])
-		if err1 != nil {
-			return 0, err1
-		}
-		i -= n1
-		i = encodeVarintLockup(dAtA, i, uint64(n1))
-		i--
-		dAtA[i] = 0x32
-	}
-	if m.UnbondTime != nil {
-		n2, err2 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.UnbondTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.UnbondTime):])
-		if err2 != nil {
-			return 0, err2
-		}
-		i -= n2
-		i = encodeVarintLockup(dAtA, i, uint64(n2))
-		i--
-		dAtA[i] = 0x2a
-	}
-	if m.CreationHeight != 0 {
-		i = encodeVarintLockup(dAtA, i, uint64(m.CreationHeight))
-		i--
-		dAtA[i] = 0x20
-	}
 	{
 		size := m.Amount.Size()
 		i -= size
@@ -205,6 +236,74 @@ func (m *Lockup) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	i--
 	dAtA[i] = 0x1a
+	if len(m.ValidatorAddress) > 0 {
+		i -= len(m.ValidatorAddress)
+		copy(dAtA[i:], m.ValidatorAddress)
+		i = encodeVarintLockup(dAtA, i, uint64(len(m.ValidatorAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.DelegatorAddress) > 0 {
+		i -= len(m.DelegatorAddress)
+		copy(dAtA[i:], m.DelegatorAddress)
+		i = encodeVarintLockup(dAtA, i, uint64(len(m.DelegatorAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UnlockingLockup) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UnlockingLockup) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UnlockingLockup) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	n1, err1 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.UnlockTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UnlockTime):])
+	if err1 != nil {
+		return 0, err1
+	}
+	i -= n1
+	i = encodeVarintLockup(dAtA, i, uint64(n1))
+	i--
+	dAtA[i] = 0x32
+	n2, err2 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.CompletionTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.CompletionTime):])
+	if err2 != nil {
+		return 0, err2
+	}
+	i -= n2
+	i = encodeVarintLockup(dAtA, i, uint64(n2))
+	i--
+	dAtA[i] = 0x2a
+	{
+		size := m.Amount.Size()
+		i -= size
+		if _, err := m.Amount.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLockup(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x22
+	if m.CreationHeight != 0 {
+		i = encodeVarintLockup(dAtA, i, uint64(m.CreationHeight))
+		i--
+		dAtA[i] = 0x18
+	}
 	if len(m.ValidatorAddress) > 0 {
 		i -= len(m.ValidatorAddress)
 		copy(dAtA[i:], m.ValidatorAddress)
@@ -249,17 +348,32 @@ func (m *Lockup) Size() (n int) {
 	}
 	l = m.Amount.Size()
 	n += 1 + l + sovLockup(uint64(l))
+	return n
+}
+
+func (m *UnlockingLockup) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.DelegatorAddress)
+	if l > 0 {
+		n += 1 + l + sovLockup(uint64(l))
+	}
+	l = len(m.ValidatorAddress)
+	if l > 0 {
+		n += 1 + l + sovLockup(uint64(l))
+	}
 	if m.CreationHeight != 0 {
 		n += 1 + sovLockup(uint64(m.CreationHeight))
 	}
-	if m.UnbondTime != nil {
-		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.UnbondTime)
-		n += 1 + l + sovLockup(uint64(l))
-	}
-	if m.UnlockTime != nil {
-		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.UnlockTime)
-		n += 1 + l + sovLockup(uint64(l))
-	}
+	l = m.Amount.Size()
+	n += 1 + l + sovLockup(uint64(l))
+	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.CompletionTime)
+	n += 1 + l + sovLockup(uint64(l))
+	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.UnlockTime)
+	n += 1 + l + sovLockup(uint64(l))
 	return n
 }
 
@@ -396,7 +510,121 @@ func (m *Lockup) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
-		case 4:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipLockup(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthLockup
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UnlockingLockup) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowLockup
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UnlockingLockup: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UnlockingLockup: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DelegatorAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLockup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLockup
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLockup
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DelegatorAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLockup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLockup
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLockup
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ValidatorAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreationHeight", wireType)
 			}
@@ -415,9 +643,43 @@ func (m *Lockup) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLockup
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLockup
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLockup
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field UnbondTime", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field CompletionTime", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -444,10 +706,7 @@ func (m *Lockup) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.UnbondTime == nil {
-				m.UnbondTime = new(time.Time)
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.UnbondTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.CompletionTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -480,10 +739,7 @@ func (m *Lockup) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.UnlockTime == nil {
-				m.UnlockTime = new(time.Time)
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.UnlockTime, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.UnlockTime, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

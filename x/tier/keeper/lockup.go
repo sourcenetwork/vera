@@ -15,7 +15,6 @@ import (
 )
 
 // GetAllockups returns all lockups in the store.
-// It is only used for exporting all lockups as part of the app state.
 func (k Keeper) GetAllLockups(ctx context.Context) []types.Lockup {
 	var lockups []types.Lockup
 
@@ -23,93 +22,55 @@ func (k Keeper) GetAllLockups(ctx context.Context) []types.Lockup {
 		lockups = append(lockups, lockup)
 	}
 
-	unlockingLockupsCallback := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) {
-		lockups = append(lockups, lockup)
-	}
-
-	k.MustIterateUnlockingLockups(ctx, unlockingLockupsCallback)
 	k.MustIterateLockups(ctx, lockupsCallback)
 
 	return lockups
 }
 
-// SaveLockup stores lockup or unlocking lockup based on the specified params.
-// It is used in SubtractUnlockingLockup to override the same record considering existing creationHeight,
-// as well as for importing lockups from the GenesisState.Lockups as part of the InitGenesis().
-func (k Keeper) SaveLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int,
-	creationHeight int64, unbondTime *time.Time, unlockTime *time.Time) {
+// GetAllUnlockingLockups returns all unlocking lockups in the store.
+func (k Keeper) GetAllUnlockingLockups(ctx context.Context) []types.UnlockingLockup {
+	var unlockingLockups []types.UnlockingLockup
 
-	var unbTime, unlTime *time.Time
-	if unbondTime != nil {
-		utcTime := unbondTime.UTC()
-		unbTime = &utcTime
+	unlockingLockupsCallback := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.UnlockingLockup) {
+		unlockingLockups = append(unlockingLockups, lockup)
 	}
-	if unlockTime != nil {
-		utcTime := unlockTime.UTC()
-		unlTime = &utcTime
-	}
+
+	k.MustIterateUnlockingLockups(ctx, unlockingLockupsCallback)
+
+	return unlockingLockups
+}
+
+// SetLockup sets a lockup in the state based on the LockupKey.
+func (k Keeper) SetLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) {
 	lockup := &types.Lockup{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
 		Amount:           amt,
-		CreationHeight:   creationHeight,
-		UnbondTime:       unbTime,
-		UnlockTime:       unlTime,
 	}
 
-	// use different key for unlocking lockups
-	var key []byte
-	if unlocking {
-		key = types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
-	} else {
-		key = types.LockupKey(delAddr, valAddr)
-	}
-
+	key := types.LockupKey(delAddr, valAddr)
 	b := k.cdc.MustMarshal(lockup)
-	store := k.lockupStore(ctx, unlocking)
+	store := k.lockupStore(ctx, false)
 	store.Set(key, b)
 }
 
-// SetLockup stores or updates a lockup in the state based on the key from LockupKey/UnlockingLockupKey.
-// We normalize lockup times to UTC before saving to the store for consistentcy.
-func (k Keeper) SetLockup(ctx context.Context, unlocking bool, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int, unbondTime *time.Time) (int64, *time.Time, time.Time) {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	params := k.GetParams(ctx)
-	creationHeight := sdkCtx.BlockHeight()
-	epochDuration := *params.EpochDuration
+// SetUnlockingLockup sets an unlocking lockup in the state based on the UnlockingLockupKey.
+func (k Keeper) SetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64,
+	amt math.Int, completionTime time.Time, unlockTime time.Time) {
 
-	unlockTime := sdkCtx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	// use unbondTime from stakingKeeper.Undelegate() if present, set it to match unlockTime otherwise
-	var unbTime *time.Time
-	if unbondTime != nil {
-		utcTime := unbondTime.UTC()
-		unbTime = &utcTime
-	} else {
-		unbTime = &unlockTime
-	}
-
-	lockup := &types.Lockup{
+	unlockingLockup := &types.UnlockingLockup{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
-		Amount:           amt,
 		CreationHeight:   creationHeight,
-		UnbondTime:       unbTime,
-		UnlockTime:       &unlockTime,
+		Amount:           amt,
+		CompletionTime:   completionTime,
+		UnlockTime:       unlockTime,
 	}
 
-	// use different key for unlocking lockups
-	var key []byte
-	if unlocking {
-		key = types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
-	} else {
-		key = types.LockupKey(delAddr, valAddr)
-	}
-
-	b := k.cdc.MustMarshal(lockup)
-	store := k.lockupStore(ctx, unlocking)
+	key := types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
+	b := k.cdc.MustMarshal(unlockingLockup)
+	store := k.lockupStore(ctx, true)
 	store.Set(key, b)
-
-	return creationHeight, unbTime, unlockTime
 }
 
 func (k Keeper) GetLockups(ctx context.Context, delAddr sdk.AccAddress) []types.Lockup {
@@ -165,21 +126,28 @@ func (k Keeper) HasLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr s
 	return b != nil
 }
 
-// GetUnlockingLockup returns existing unlocking lockup data if found, otherwise returns defaults.
-func (k Keeper) GetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) (
-	found bool, amt math.Int, unbondTime time.Time, unlockTime time.Time) {
+// HasUnlockingLockup returns true if a provided delAddr/valAddr/creationHeight unlocking lockup exists.
+func (k Keeper) HasUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) bool {
+	key := types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
+	store := k.lockupStore(ctx, true)
+	b := store.Get(key)
 
+	return b != nil
+}
+
+// GetUnlockingLockup returns existing unlocking lockup data if found, otherwise returns defaults.
+func (k Keeper) GetUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) *types.UnlockingLockup {
 	key := types.UnlockingLockupKey(delAddr, valAddr, creationHeight)
 	store := k.lockupStore(ctx, true)
 	b := store.Get(key)
 	if b == nil {
-		return false, math.ZeroInt(), time.Time{}, time.Time{}
+		return nil
 	}
 
-	var lockup types.Lockup
-	k.cdc.MustUnmarshal(b, &lockup)
+	var unlockingLockup types.UnlockingLockup
+	k.cdc.MustUnmarshal(b, &unlockingLockup)
 
-	return true, lockup.Amount, *lockup.UnbondTime, *lockup.UnlockTime
+	return &unlockingLockup
 }
 
 // removeLockup removes existing lockup (delAddr/valAddr/).
@@ -198,65 +166,67 @@ func (k Keeper) removeUnlockingLockup(ctx context.Context, delAddr sdk.AccAddres
 
 // AddLockup adds provided amt to the existing delAddr/valAddr lockup.
 func (k Keeper) AddLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) {
-	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
-	amt = amt.Add(lockedAmt)
-	k.SetLockup(ctx, false, delAddr, valAddr, amt, nil)
+	lockup := k.GetLockup(ctx, delAddr, valAddr)
+	if lockup != nil {
+		amt = amt.Add(lockup.Amount)
+	}
+	k.SetLockup(ctx, delAddr, valAddr, amt)
 }
 
 // SubtractLockup subtracts provided amt from the existing delAddr/valAddr lockup.
 func (k Keeper) SubtractLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
-	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
-
-	// subtracted amt must not be larger than the lockedAmt
-	if amt.GT(lockedAmt) {
-		return types.ErrInvalidAmount.Wrap("invalid amount")
+	lockup := k.GetLockup(ctx, delAddr, valAddr)
+	if lockup == nil {
+		return types.ErrNotFound.Wrap("subtract lockup")
 	}
 
-	// remove lockup record completely if subtracted amt is equal to lockedAmt
-	if amt.Equal(lockedAmt) {
+	// Subtracted amt must not be larger than the lockedAmt
+	if amt.GT(lockup.Amount) {
+		return types.ErrInvalidAmount.Wrap("subtract lockup")
+	}
+
+	// Remove lockup record completely if subtracted amt is equal to lockedAmt
+	if amt.Equal(lockup.Amount) {
 		k.removeLockup(ctx, delAddr, valAddr)
 		return nil
 	}
 
-	// subtract amt from the lockedAmt othwerwise
-	newAmt, err := lockedAmt.SafeSub(amt)
+	// Subtract amt from the lockedAmt othwerwise
+	newAmt, err := lockup.Amount.SafeSub(amt)
 	if err != nil {
-		return errorsmod.Wrapf(err, "subtract %s from locked amount %s", amt, lockedAmt)
+		return errorsmod.Wrapf(err, "subtract %s from locked amount %s", amt, lockup.Amount)
 	}
 
-	k.SetLockup(ctx, false, delAddr, valAddr, newAmt, nil)
+	k.SetLockup(ctx, delAddr, valAddr, newAmt)
 
 	return nil
 }
 
 // SubtractUnlockingLockup subtracts provided amt from the existing unlocking lockup (delAddr/valAddr/creationHeight/).
 func (k Keeper) SubtractUnlockingLockup(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, amt math.Int) error {
-	// get full unlocking lockup record because we must pass valid time(s) to SaveLockup
-	found, lockedAmt, unbondTime, unlockTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-
-	// return early if not found
-	if !found {
-		return nil
+	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	if unlockingLockup == nil {
+		return types.ErrNotFound.Wrap("subtract unlocking lockup")
 	}
 
-	// subtracted amt must not be larger than the lockedAmt
-	if amt.GT(lockedAmt) {
-		return types.ErrInvalidAmount.Wrap("invalid amount")
+	// Subtracted amt must not be larger than the lockedAmt
+	if amt.GT(unlockingLockup.Amount) {
+		return types.ErrInvalidAmount.Wrap("subtract unlocking lockup")
 	}
 
-	// remove lockup record completely if subtracted amt is equal to lockedAmt
-	if amt.Equal(lockedAmt) {
+	// Remove lockup record completely if subtracted amt is equal to lockedAmt
+	if amt.Equal(unlockingLockup.Amount) {
 		k.removeUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 		return nil
 	}
 
-	// subtract amt from the lockedAmt othwerwise
-	newAmt, err := lockedAmt.SafeSub(amt)
+	// Subtract amt from the lockedAmt othwerwise
+	newAmt, err := unlockingLockup.Amount.SafeSub(amt)
 	if err != nil {
-		return errorsmod.Wrapf(err, "subtract %s from unlocking lockup locked amount %s", amt, lockedAmt)
+		return errorsmod.Wrapf(err, "subtract %s from unlocking lockup with amount %s", amt, unlockingLockup.Amount)
 	}
 
-	k.SaveLockup(ctx, true, delAddr, valAddr, newAmt, creationHeight, &unbondTime, &unlockTime)
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, creationHeight, newAmt, unlockingLockup.CompletionTime, unlockingLockup.UnlockTime)
 
 	return nil
 }
@@ -279,10 +249,36 @@ func (k Keeper) TotalAmountByAddr(ctx context.Context, delAddr sdk.AccAddress) m
 // IterateLockups iterates over all lockups in the store and performs the provided callback function.
 // The iterator itself doesn't return an error, but the callback does.
 // If the callback returns an error, the iteration stops and the error is returned.
-func (k Keeper) IterateLockups(ctx context.Context, unlocking bool,
-	cb func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup) error) error {
+func (k Keeper) IterateLockups(ctx context.Context, cb func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) error) error {
+	store := k.lockupStore(ctx, false)
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
-	store := k.lockupStore(ctx, unlocking)
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var delAddr sdk.AccAddress
+		var valAddr sdk.ValAddress
+		var lockup types.Lockup
+		k.cdc.MustUnmarshal(iterator.Value(), &lockup)
+
+		delAddr, valAddr = types.LockupKeyToAddresses(iterator.Key())
+
+		err := cb(delAddr, valAddr, lockup)
+		if err != nil {
+			return errorsmod.Wrapf(err, "%s/%s/, amt: %s", delAddr, valAddr, lockup.Amount)
+		}
+	}
+
+	return nil
+}
+
+// IterateUnlockingLockups iterates over all unlocking lockups in the store and performs the provided callback function.
+// The iterator itself doesn't return an error, but the callback does.
+// If the callback returns an error, the iteration stops and the error is returned.
+func (k Keeper) IterateUnlockingLockups(ctx context.Context,
+	cb func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.UnlockingLockup) error) error {
+
+	store := k.lockupStore(ctx, true)
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
@@ -291,18 +287,14 @@ func (k Keeper) IterateLockups(ctx context.Context, unlocking bool,
 		var delAddr sdk.AccAddress
 		var valAddr sdk.ValAddress
 		var creationHeight int64
-		var lockup types.Lockup
-		k.cdc.MustUnmarshal(iterator.Value(), &lockup)
+		var unlockingLockup types.UnlockingLockup
+		k.cdc.MustUnmarshal(iterator.Value(), &unlockingLockup)
 
-		if unlocking {
-			delAddr, valAddr, creationHeight = types.LockupKeyToAddressesAtHeight(iterator.Key())
-		} else {
-			delAddr, valAddr = types.LockupKeyToAddresses(iterator.Key())
-		}
+		delAddr, valAddr, creationHeight = types.UnlockingLockupKeyToAddressesAtHeight(iterator.Key())
 
-		err := cb(delAddr, valAddr, creationHeight, lockup)
+		err := cb(delAddr, valAddr, creationHeight, unlockingLockup)
 		if err != nil {
-			return errorsmod.Wrapf(err, "%s/%s/, amt: %s", delAddr, valAddr, lockup.Amount)
+			return errorsmod.Wrapf(err, "%s/%s/, amt: %s", delAddr, valAddr, unlockingLockup.Amount)
 		}
 	}
 
@@ -328,7 +320,7 @@ func (k Keeper) MustIterateLockups(ctx context.Context,
 
 // MustIterateUnlockingLockups iterates over all unlocking lockups in the store and performs the provided callback function.
 func (k Keeper) MustIterateUnlockingLockups(ctx context.Context,
-	cb func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.Lockup)) {
+	cb func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, unlockingLockup types.UnlockingLockup)) {
 
 	store := k.lockupStore(ctx, true)
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
@@ -336,10 +328,10 @@ func (k Keeper) MustIterateUnlockingLockups(ctx context.Context,
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		var lockup types.Lockup
-		k.cdc.MustUnmarshal(iterator.Value(), &lockup)
-		delAddr, valAddr, creationHeight := types.LockupKeyToAddressesAtHeight(iterator.Key())
-		cb(delAddr, valAddr, creationHeight, lockup)
+		var unlockingLockup types.UnlockingLockup
+		k.cdc.MustUnmarshal(iterator.Value(), &unlockingLockup)
+		delAddr, valAddr, creationHeight := types.UnlockingLockupKeyToAddressesAtHeight(iterator.Key())
+		cb(delAddr, valAddr, creationHeight, unlockingLockup)
 	}
 }
 

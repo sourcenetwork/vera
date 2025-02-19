@@ -30,12 +30,11 @@ import (
 
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 
-func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
+func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
 	bankStoreKey := storetypes.NewKVStoreKey(banktypes.StoreKey)
@@ -148,16 +147,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		log.NewNopLogger(),
 	)
 
-	epochInfo := epochstypes.EpochInfo{
-		Identifier:            types.EpochIdentifier,
-		CurrentEpoch:          1,
-		CurrentEpochStartTime: ctx.BlockTime(),
-		Duration:              time.Hour * 24 * 30,
-	}
-
-	epochsKeeper.SetEpochInfo(ctx, epochInfo)
-
-	k := keeper.NewKeeper(
+	k := NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),

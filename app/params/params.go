@@ -1,59 +1,26 @@
 package params
 
-import (
-	"context"
-
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-)
-
 const (
-	OpenDenom   = "open"
-	CreditDenom = "credit"
+	MicroOpenDenom      = "uopen"
+	MicroOpenDenomAlias = "microopen"
+	OpenDenom           = "open"
+	OpenName            = "Source Open"
+	OpenSymbol          = "OPEN"
+	OpenDescription     = "OPEN is the native staking token of SourceHub."
 
-	DefaultBondDenom = OpenDenom
+	MicroCreditDenom      = "ucredit"
+	MicroCreditDenomAlias = "microcredit"
+	CreditDenom           = "credit"
+	CreditName            = "Source Credit"
+	CreditSymbol          = "CREDIT"
+	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non transferrable."
+
+	DefaultBondDenom   = MicroOpenDenom
+	DefaultMinGasPrice = 0.001
+
+	BlocksPerYear       = 31557600
+	GoalBonded          = "0.67"
+	InflationMin        = "0.02"
+	InflationMax        = "0.15"
+	InflationRateChange = "0.13"
 )
-
-var denomMetadatas = []banktypes.Metadata{
-	{
-		Description: "OPEN is the native staking token of SourceHub",
-		DenomUnits: []*banktypes.DenomUnit{
-			{
-				Denom:    "open",
-				Exponent: 0,
-			},
-			{
-				Denom:    "uopen",
-				Exponent: 6,
-			},
-		},
-		Base:    "open",
-		Display: "open",
-		Name:    "Source Open",
-		Symbol:  "OPEN",
-	},
-	{
-		Description: "Credit is the utility token for access services on SourceHub",
-		DenomUnits: []*banktypes.DenomUnit{
-			{
-				Denom:    "credit",
-				Exponent: 0,
-			},
-			{
-				Denom:    "ucredit",
-				Exponent: 6,
-			},
-		},
-		Base:    "credit",
-		Display: "credit",
-		Name:    "Source Credit",
-		Symbol:  "CREDIT",
-	},
-}
-
-// RegisterDenoms registers token denoms.
-func RegisterDenoms(ctx context.Context, bk bankkeeper.Keeper) {
-	for _, denomMetadata := range denomMetadatas {
-		bk.SetDenomMetaData(ctx, denomMetadata)
-	}
-}

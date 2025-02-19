@@ -9,21 +9,17 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/sourcenetwork/sourcehub/app"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
+	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 
-func init() {
-	app.SetConfig(false)
-}
-
 // initializeValidator creates a validator and verifies that it was set correctly.
-func initializeValidator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
+func initializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
 	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
 	gotValidator, err := k.GetValidator(ctx, valAddr)
 	require.Nil(t, err)
@@ -31,8 +27,8 @@ func initializeValidator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, valAdd
 }
 
 // initializeDelegator initializes ba delegator with balance.
-func initializeDelegator(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
-	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin("open", initialBalance))
+func initializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
+	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
 	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
 	require.NoError(t, err)
 	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
@@ -41,7 +37,7 @@ func initializeDelegator(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context, de
 
 // TestLock verifies that a valid lockup is created on keeper.Lock().
 func TestLock(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(1000)
 	invalidAmount := math.NewInt(-100)
@@ -52,9 +48,9 @@ func TestLock(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -62,8 +58,10 @@ func TestLock(t *testing.T) {
 	// locking invalid amounts should fail
 	err = k.Lock(ctx, delAddr, valAddr, invalidAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "lock non-positive amount")
 	err = k.Lock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "lock non-positive amount")
 
 	// lock valid amount
 	err = k.Lock(ctx, delAddr, valAddr, amount)
@@ -76,7 +74,7 @@ func TestLock(t *testing.T) {
 
 // TestUnlock verifies that a valid unlocking lockup is created on keeper.Unock().
 func TestUnlock(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	lockAmount := math.NewInt(1000)
 	unlockAmount := math.NewInt(500)
@@ -88,9 +86,9 @@ func TestUnlock(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -105,10 +103,12 @@ func TestUnlock(t *testing.T) {
 	// unlocking invalid amounts should fail
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, invalidUnlockAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "unlock non-positive amount")
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "unlock non-positive amount")
 
-	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
+	creationHeight, completionTime, unlockTime, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was updated
@@ -116,16 +116,16 @@ func TestUnlock(t *testing.T) {
 	require.Equal(t, lockAmount.Sub(unlockAmount), lockedAmt)
 
 	// check the unlocking entry
-	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.True(t, found)
-	require.Equal(t, unlockAmount, amt)
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, unlockAmount, unlockingLockup.Amount)
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
 }
 
 // TestRedelegate verifies that a locked amount is correctly redelegated on keeper.Redelegate().
 func TestRedelegate(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(1000)
 	invalidAmount := math.NewInt(-100)
@@ -138,10 +138,10 @@ func TestRedelegate(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, srcValAddr, initialValidatorBalance)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, dstValAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, srcValAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, dstValAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -152,8 +152,10 @@ func TestRedelegate(t *testing.T) {
 	// redelegating invalid amounts should fail
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, invalidAmount)
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "redelegate non-positive amount")
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.ZeroInt())
 	require.Error(t, err)
+	require.Contains(t, err.Error(), "redelegate non-positive amount")
 
 	// redelegate from the source validator to the destination validator
 	completionTime, err := k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.NewInt(500))
@@ -173,7 +175,7 @@ func TestRedelegate(t *testing.T) {
 // TestCompleteUnlocking verifies that 'fully unlocked' unlocking lockups are removed on keeper.CompleteUnlocking().
 // Block time is advanced by 60 days from when keeper.Unlock() is called to make sure that the unlock time is in the past.
 func TestCompleteUnlocking(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
 	lockAmount := math.NewInt(123_456)
 	unlockAmount := math.NewInt(123_456)
@@ -184,9 +186,9 @@ func TestCompleteUnlocking(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
-	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1_000_000)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -200,37 +202,47 @@ func TestCompleteUnlocking(t *testing.T) {
 	balance := k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
 	require.Equal(t, initialDelegatorBalance.Sub(lockAmount), balance.Amount)
 
-	adjustedUnlockAmount := unlockAmount.Sub(math.OneInt())
-
 	// unlock tokens
-	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
+	creationHeight, completionTime, unlockTime, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
 	lockup = k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.Equal(t, math.ZeroInt(), lockup)
 
-	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.True(t, found)
-	require.Equal(t, adjustedUnlockAmount, amt)
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, unlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 123_455
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
 
 	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
 	require.Equal(t, initialDelegatorBalance.Sub(lockAmount), balance.Amount)
 
+	// completing unlocking lockup should be skipped if unlock time was not reached
+	err = k.CompleteUnlocking(ctx)
+	require.NoError(t, err)
+	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
+	require.Equal(t, initialDelegatorBalance.Sub(unlockAmount), balance.Amount)
+
 	// advance block time by 60 days
-	ctx = ctx.WithBlockTime(sdk.UnwrapSDKContext(ctx).BlockTime().Add(60 * 24 * time.Hour))
+	ctx = ctx.WithBlockHeight(3600 * 24 * 60).WithBlockTime(ctx.BlockTime().Add(60 * 24 * time.Hour))
+
+	// completing unlocking lockup should be skipped if module balance is less than required amount
+	err = k.CompleteUnlocking(ctx)
+	require.NoError(t, err)
+	balance = k.GetBankKeeper().GetBalance(ctx, delAddr, appparams.DefaultBondDenom)
+	require.Equal(t, initialDelegatorBalance.Sub(unlockAmount), balance.Amount)
 
 	// complete unbonding via the staking keeper
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	_, err = k.GetStakingKeeper().CompleteUnbonding(ctx, modAddr, valAddr)
 	require.NoError(t, err)
 
-	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.True(t, found)
-	require.Equal(t, adjustedUnlockAmount, amt)
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, unlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 123_455
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
 
 	// complete unlocking of matured unlocking lockups
 	err = k.CompleteUnlocking(ctx)
@@ -243,15 +255,13 @@ func TestCompleteUnlocking(t *testing.T) {
 
 // TestCancelUnlocking verifies that the unlocking lockup is removed on keeper.CancelUnlocking().
 func TestCancelUnlocking(t *testing.T) {
-	k, ctx := testutil.SetupKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 
-	initialAmount := math.NewInt(1000)
+	initialLockAmount := math.NewInt(1000)
+	updatedLockAmount := math.NewInt(700)
 	unlockAmount := math.NewInt(500)
 	partialUnlockAmount := math.NewInt(200)
-	adjustedInitialAmount := initialAmount.Sub(math.OneInt()) // 999
-	adjustedUnlockAmount := unlockAmount.Sub(math.OneInt())   // 499
-	newLockAmount := initialAmount.Sub(unlockAmount).Add(partialUnlockAmount)
-	adjustedUnlockAmountFinal := initialAmount.Sub(unlockAmount).Sub(partialUnlockAmount).Sub(math.OneInt())
+	remainingUnlockAmount := math.NewInt(300)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
@@ -259,50 +269,57 @@ func TestCancelUnlocking(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
-	initializeDelegator(t, k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(10_000_000)
-	initializeValidator(t, k.GetStakingKeeper().(*keeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
 	// lock the initialAmount
-	err = k.Lock(ctx, delAddr, valAddr, initialAmount)
+	err = k.Lock(ctx, delAddr, valAddr, initialLockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was added
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, initialAmount, lockedAmt)
+	require.Equal(t, initialLockAmount, lockedAmt)
 
 	// unlock the unlockAmount (partial unlock)
-	unbondTime, unlockTime, creationHeight, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
+	creationHeight, completionTime, unlockTime, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was updated
 	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, initialAmount.Sub(unlockAmount), lockedAmt) // 500
+	require.Equal(t, initialLockAmount.Sub(unlockAmount), lockedAmt) // 500
 
 	// check the unlocking entry based on adjusted unlock amount
-	found, amt, unbTime, unlTime := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.True(t, found)
-	require.Equal(t, adjustedUnlockAmount, amt) // 499
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, unlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 499
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
+
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.NewInt(-100))
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.ZeroInt())
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
 
 	// partially cancel the unlocking lockup
-	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, &partialUnlockAmount)
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, partialUnlockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was updated
 	lockupAmount := k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, newLockAmount, lockupAmount) // 700
+	require.Equal(t, updatedLockAmount, lockupAmount) // 700
 
 	// check the unlocking entry
-	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.Equal(t, true, found)
-	require.Equal(t, adjustedUnlockAmountFinal, amt) // 299
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, remainingUnlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 299
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
 
 	// advance block height by 1 so that subsequent unlocking lockup is stored separately
 	// otherwise, existing unlocking lockup is overrirden (e.g. delAddr/valAddr/creationHeight/)
@@ -310,47 +327,44 @@ func TestCancelUnlocking(t *testing.T) {
 	ctx = ctx.WithBlockHeight(2).WithBlockTime(ctx.BlockTime().Add(time.Minute))
 
 	// add new unlocking lockup record at height 2 to fully unlock the remaining adjustedUnlockAmountFinal
-	unbondTime2, unlockTime2, creationHeight2, err := k.Unlock(ctx, delAddr, valAddr, adjustedUnlockAmountFinal)
+	creationHeight2, completionTime2, unlockTime2, err := k.Unlock(ctx, delAddr, valAddr, remainingUnlockAmount)
 	require.NoError(t, err)
 
 	// verify that lockup was updated
 	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, newLockAmount.Sub(adjustedUnlockAmountFinal), lockedAmt) // 401
+	require.Equal(t, updatedLockAmount.Sub(remainingUnlockAmount), lockedAmt) // 400
 
 	// check the unlocking entry based on adjusted unlock amount
-	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight2)
-	require.True(t, found)
-	require.Equal(t, adjustedUnlockAmountFinal.Sub(math.OneInt()), amt) // 298
-	require.Equal(t, unbondTime2, unbTime)
-	require.Equal(t, unlockTime2, unlTime)
+	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight2)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, remainingUnlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 299
+	require.Equal(t, completionTime2, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime2, unlockingLockup.UnlockTime)
 
 	// cancel (remove) the unlocking lockup at height 2
-	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight2, nil)
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight2, remainingUnlockAmount.Sub(math.OneInt())) // 299
 	require.NoError(t, err)
 
 	// verify that lockup was updated
 	lockupAmount = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, newLockAmount.Sub(math.OneInt()), lockupAmount) // 699
+	require.Equal(t, updatedLockAmount.Sub(math.OneInt()), lockupAmount) // 699
 
 	// there is still a partial unlocking lockup at height 1 since we did not cancel it's whole amount
-	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, 1)
-	require.Equal(t, true, found)
-	require.Equal(t, adjustedUnlockAmountFinal, amt) // 299
-	require.Equal(t, unbondTime, unbTime)
-	require.Equal(t, unlockTime, unlTime)
+	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.NotNil(t, unlockingLockup)
+	require.Equal(t, remainingUnlockAmount.Sub(math.OneInt()), unlockingLockup.Amount) // 299
+	require.Equal(t, completionTime, unlockingLockup.CompletionTime)
+	require.Equal(t, unlockTime, unlockingLockup.UnlockTime)
 
 	// cancel (remove) the remaining unlocking lockup at height 1
-	err = k.CancelUnlocking(ctx, delAddr, valAddr, 1, nil)
+	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, remainingUnlockAmount.Sub(math.OneInt())) // 299
 	require.NoError(t, err)
 
 	// verify that lockup was updated
 	lockupAmount = k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, adjustedInitialAmount.Sub(math.OneInt()), lockupAmount) // 998
+	require.Equal(t, initialLockAmount.Sub(math.NewInt(2)), lockupAmount) // 998
 
 	// confirm that unlocking lockup was removed if we cancel whole amount (e.g. use nil)
-	found, amt, unbTime, unlTime = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
-	require.Equal(t, false, found)
-	require.Equal(t, math.ZeroInt(), amt)
-	require.Equal(t, time.Time{}, unbTime)
-	require.Equal(t, time.Time{}, unlTime)
+	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
+	require.Nil(t, unlockingLockup)
 }

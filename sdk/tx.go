@@ -16,6 +16,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/app"
 	"github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
 type TxBuilder struct {
@@ -42,8 +43,8 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	builder := TxBuilder{ // TODO evaluate tx
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
-		feeTokenDenom: params.DefaultBondDenom,
-		feeAmt:        100,
+		feeTokenDenom: appparams.DefaultBondDenom,
+		feeAmt:        200,
 		gasLimit:      200000,
 	}
 
@@ -121,7 +122,7 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 	return txBuilder, nil
 }
 
-func (b *TxBuilder) finalizeTx(ctx context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
+func (b *TxBuilder) finalizeTx(_ context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
 	signerData := xauthsigning.SignerData{
 		ChainID:       b.chainID,
 		AccountNumber: b.account.GetAccountNumber(),

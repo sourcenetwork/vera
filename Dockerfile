@@ -37,7 +37,7 @@ RUN --mount=type=cache,target=/root/.cache make build
 
 # Dev image entrypoint
 ENTRYPOINT ["scripts/dev-entrypoint.sh"]
-CMD ["start", "--minimum-gas-prices=0.001uopen"]
+CMD ["start"]
 
 
 # Deployment entrypoint
