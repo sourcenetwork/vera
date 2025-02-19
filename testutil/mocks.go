@@ -188,7 +188,7 @@ func (m *MockDistributionKeeper) AllocateTokensToValidator(ctx context.Context, 
 	return nil
 }
 
-func (mr *MockDistributionKeeperRecorder) AllocateTokensToValidator(ctx any, val any, tokens any) *gomock.Call {
+func (mr *MockDistributionKeeperRecorder) AllocateTokensToValidator(ctx, val, tokens any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocateTokensToValidator", reflect.TypeOf((*MockDistributionKeeper)(nil).AllocateTokensToValidator), ctx, val, tokens)
 }
@@ -199,7 +199,7 @@ func (m *MockDistributionKeeper) AllocateTokens(ctx context.Context, totalReward
 	return nil
 }
 
-func (mr *MockDistributionKeeperRecorder) AllocateTokens(ctx any, totalReward any, bondedValidators any) *gomock.Call {
+func (mr *MockDistributionKeeperRecorder) AllocateTokens(ctx, totalReward, bondedValidators any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocateTokens", reflect.TypeOf((*MockDistributionKeeper)(nil).AllocateTokens), ctx, totalReward, bondedValidators)
 }
@@ -210,7 +210,7 @@ func (m *MockDistributionKeeper) GetValidatorOutstandingRewards(ctx context.Cont
 	return distrtypes.ValidatorOutstandingRewards{}, nil
 }
 
-func (mr *MockDistributionKeeperRecorder) GetValidatorOutstandingRewards(ctx any, valAddr any) *gomock.Call {
+func (mr *MockDistributionKeeperRecorder) GetValidatorOutstandingRewards(ctx, valAddr any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorOutstandingRewards", reflect.TypeOf((*MockDistributionKeeper)(nil).GetValidatorOutstandingRewards), ctx, valAddr)
 }
@@ -221,7 +221,7 @@ func (m *MockDistributionKeeper) WithdrawDelegationRewards(ctx context.Context, 
 	return ret[0].(sdk.Coins), ret[1].(error)
 }
 
-func (mr *MockDistributionKeeperRecorder) WithdrawDelegationRewards(ctx any, delAddr any, valAddr any) *gomock.Call {
+func (mr *MockDistributionKeeperRecorder) WithdrawDelegationRewards(ctx, delAddr, valAddr any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawDelegationRewards", reflect.TypeOf((*MockDistributionKeeper)(nil).WithdrawDelegationRewards), ctx, delAddr, valAddr)
 }
