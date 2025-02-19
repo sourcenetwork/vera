@@ -9,6 +9,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 )
 
+// NewAnteHandler extends the default AnteHandler with custom decorators.
 func NewAnteHandler(
 	accountKeeper ante.AccountKeeper,
 	bankKeeper bankkeeper.Keeper,
