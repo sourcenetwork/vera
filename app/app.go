@@ -249,7 +249,6 @@ func New(
 		&app.BankKeeper,
 		&app.StakingKeeper,
 		&app.SlashingKeeper,
-		&app.MintKeeper,
 		&app.DistrKeeper,
 		&app.GovKeeper,
 		&app.CrisisKeeper,
@@ -307,6 +306,8 @@ func New(
 	// Register legacy modules
 	app.registerIBCModules()
 
+	customMintModule := app.registerCustomMintModule()
+
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err
@@ -350,9 +351,11 @@ func New(
 	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
 	//
 	initChainer := func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-		// Temp workaround to set default IBC params until app wiring is fully supported.
 		if req.InitialHeight == 1 {
+			// Temp workaround to set default IBC params until app wiring is fully supported.
 			app.setDefaultIBCParams(ctx)
+			// Call InitGenesis() to set default state for the custom mint module
+			customMintModule.InitGenesis(ctx, app.appCodec, json.RawMessage{})
 		}
 
 		var genesisState GenesisState
