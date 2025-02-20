@@ -157,7 +157,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		authKeeper,
 		bankKeeper,
 		stakingKeeper,
-		authority.String(),
+		authtypes.FeeCollectorName,
 		authority.String(),
 	)
 

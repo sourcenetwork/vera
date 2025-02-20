@@ -44,7 +44,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
@@ -160,7 +159,6 @@ func AppConfig() depinject.Config {
 				banktypes.ModuleName:    overrides.BankModuleBasic{},
 				crisistypes.ModuleName:  overrides.CrisisModuleBasic{},
 				govtypes.ModuleName:     overrides.NewGovModuleBasic(),
-				minttypes.ModuleName:    overrides.MintModuleBasic{},
 				stakingtypes.ModuleName: overrides.StakingModuleBasic{},
 				epochstypes.ModuleName:  overrides.EpochsModuleBasic{},
 				tiertypes.ModuleName:    overrides.TierModuleBasic{},

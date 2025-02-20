@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"cosmossdk.io/log"
+
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -51,18 +53,21 @@ type CustomMintQueryServer struct {
 	minttypes.QueryServer
 	mintKeeper mintkeeper.Keeper
 	tierKeeper tierkeeper.Keeper
+	logger     log.Logger
 }
 
 // NewCustomMintQueryServer creates new custom mint query server instance.
 func NewCustomMintQueryServer(
+	defaultQueryServer minttypes.QueryServer,
 	mintKeeper mintkeeper.Keeper,
 	tierKeeper tierkeeper.Keeper,
-	defaultQueryServer minttypes.QueryServer,
+	logger log.Logger,
 ) minttypes.QueryServer {
 	return &CustomMintQueryServer{
 		QueryServer: defaultQueryServer,
 		mintKeeper:  mintKeeper,
 		tierKeeper:  tierKeeper,
+		logger:      logger,
 	}
 }
 
@@ -89,12 +94,14 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 
 	// If inputs are invalid, return default inflation
 	if !delStake.IsPositive() || !totalStake.IsPositive() {
+		q.logger.Info("Returning default inflation", "inflation", minter.Inflation)
 		return &minttypes.QueryInflationResponse{Inflation: minter.Inflation}, nil
 	}
 
 	// Compute the delegator stake rate and adjusted inflation
 	delStakeRate := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
 	adjustedInflation := minter.Inflation.Mul(delStakeRate)
+	q.logger.Info("Returning effective inflation", "inflation", adjustedInflation)
 
 	return &minttypes.QueryInflationResponse{Inflation: adjustedInflation}, nil
 }
@@ -103,7 +110,7 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 func (cm CustomMintModule) RegisterServices(cfg module.Configurator) {
 	minttypes.RegisterMsgServer(cfg.MsgServer(), mintkeeper.NewMsgServerImpl(cm.mintKeeper))
 	defaultMintQueryServer := mintkeeper.NewQueryServerImpl(cm.mintKeeper)
-	customMintQueryServer := NewCustomMintQueryServer(cm.mintKeeper, cm.tierKeeper, defaultMintQueryServer)
+	customMintQueryServer := NewCustomMintQueryServer(defaultMintQueryServer, cm.mintKeeper, cm.tierKeeper, cm.tierKeeper.Logger())
 	minttypes.RegisterQueryServer(cfg.QueryServer(), customMintQueryServer)
 }
 
