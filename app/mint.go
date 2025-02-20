@@ -8,6 +8,7 @@ import (
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -146,11 +147,22 @@ func (app *App) registerCustomMintModule() CustomMintModule {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	oldMintModule := mint.NewAppModule(app.appCodec, app.MintKeeper, app.AccountKeeper, nil, nil)
-	customMintModule := NewCustomMintModule(oldMintModule, app.MintKeeper, app.TierKeeper, app.appCodec)
+	defaultMintModule := mint.NewAppModule(app.appCodec, app.MintKeeper, app.AccountKeeper, nil, nil)
+	customMintModule := NewCustomMintModule(defaultMintModule, app.MintKeeper, app.TierKeeper, app.appCodec)
 	if err := app.RegisterModules(customMintModule); err != nil {
 		panic(err)
 	}
 
 	return customMintModule
+}
+
+// RegisterMintInterfaces registers interfaces for the mint module and returns mint.AppModule.
+func RegisterMintInterfaces(registry codectypes.InterfaceRegistry) appmodule.AppModule {
+	module := mint.AppModule{}
+	if mod, ok := any(module).(interface {
+		RegisterInterfaces(registry codectypes.InterfaceRegistry)
+	}); ok {
+		mod.RegisterInterfaces(registry)
+	}
+	return module
 }

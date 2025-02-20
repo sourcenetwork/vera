@@ -24,6 +24,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/sourcenetwork/sourcehub/app"
 )
 
@@ -111,6 +112,10 @@ func NewRootCmd() *cobra.Command {
 	for name, module := range ibcModules {
 		autoCliOpts.Modules[name] = module
 	}
+
+	// Manually set auto cli options for the mint module since we removed it from depinject
+	autoCliOpts.Modules[minttypes.ModuleName] = app.RegisterMintInterfaces(clientCtx.InterfaceRegistry)
+
 	initRootCmd(rootCmd, clientCtx.TxConfig, clientCtx.InterfaceRegistry, clientCtx.Codec, moduleBasicManager)
 
 	overwriteFlagDefaults(rootCmd, map[string]string{
