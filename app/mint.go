@@ -87,7 +87,11 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 
 	// Get developer and delegator stake amounts
 	devStake := q.tierKeeper.GetTotalLockupsAmount(ctx)
-	delStake, err := totalStake.SafeSub(devStake)
+	params := q.tierKeeper.GetParams(ctx)
+	totalFees := params.DeveloperPoolFee + params.InsurancePoolFee
+	devStakeMinusFees := devStake.MulRaw(100 - totalFees).QuoRaw(100)
+
+	delStake, err := totalStake.SafeSub(devStakeMinusFees)
 	if err != nil {
 		return nil, err
 	}
@@ -100,10 +104,10 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 
 	// Compute the delegator stake rate and adjusted inflation
 	delStakeRate := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
-	adjustedInflation := minter.Inflation.Mul(delStakeRate)
-	q.logger.Info("Returning effective inflation", "inflation", adjustedInflation)
+	effectiveInflation := minter.Inflation.Mul(delStakeRate)
+	q.logger.Info("Returning effective inflation", "inflation", effectiveInflation)
 
-	return &minttypes.QueryInflationResponse{Inflation: adjustedInflation}, nil
+	return &minttypes.QueryInflationResponse{Inflation: effectiveInflation}, nil
 }
 
 // RegisterServices registers default message server and custom query server.
