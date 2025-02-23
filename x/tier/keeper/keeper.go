@@ -137,7 +137,7 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 		return nil
 	}
 
-	err := k.IterateUnlockingLockups(ctx, cb)
+	err := k.iterateUnlockingLockups(ctx, cb)
 	if err != nil {
 		return errorsmod.Wrap(err, "iterate unlocking lockups")
 	}
@@ -206,7 +206,7 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 		return 0, time.Time{}, time.Time{}, types.ErrInvalidAmount.Wrap("unlock non-positive amount")
 	}
 
-	err = k.SubtractLockup(ctx, delAddr, valAddr, amt)
+	err = k.subtractLockup(ctx, delAddr, valAddr, amt)
 	if err != nil {
 		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(err, "subtract lockup")
 	}
@@ -263,7 +263,7 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 	}
 
 	// Subtract the lockup from the source validator
-	err := k.SubtractLockup(ctx, delAddr, srcValAddr, amt)
+	err := k.subtractLockup(ctx, delAddr, srcValAddr, amt)
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "subtract lockup from source validator")
 	}
@@ -369,7 +369,7 @@ func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, val
 	}
 
 	// Subtract the specified unlocking lockup amt
-	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, amt)
+	err = k.subtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, amt)
 	if err != nil {
 		return errorsmod.Wrap(err, "subtract unlocking lockup")
 	}

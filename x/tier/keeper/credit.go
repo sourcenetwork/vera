@@ -39,7 +39,7 @@ func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.In
 // proratedCredit calculates the credits earned on the lockingAmt.
 func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
 	rates := k.GetParams(ctx).RewardRates
-	lockedAmt := k.TotalAmountByAddr(ctx, delAddr)
+	lockedAmt := k.totalAmountByAddr(ctx, delAddr)
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
 
 	return calculateProratedCredit(
@@ -103,7 +103,7 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount)
 	}
 
-	k.MustIterateLockups(ctx, cb)
+	k.mustIterateLockups(ctx, cb)
 
 	rates := k.GetParams(ctx).RewardRates
 
