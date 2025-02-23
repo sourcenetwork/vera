@@ -14,7 +14,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// GetAllockups returns all lockups in the store.
+// GetAllLockups returns all lockups in the store.
 func (k Keeper) GetAllLockups(ctx context.Context) []types.Lockup {
 	var lockups []types.Lockup
 

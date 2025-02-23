@@ -12,7 +12,7 @@ var (
 	EpochHookFailedMetricName = formatEpochMetricName("hook_failed")
 )
 
-// formatTxFeesMetricName formats the epochs module metric name.
+// formatEpochMetricName formats the epochs module metric name.
 func formatEpochMetricName(metricName string) string {
 	return FormatMetricName(ModuleName, metricName)
 }
