@@ -40,7 +40,6 @@ func TestLock(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
 	amount := math.NewInt(1000)
-	invalidAmount := math.NewInt(-100)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
@@ -55,20 +54,27 @@ func TestLock(t *testing.T) {
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
+	// initial lockup amount should be zero
+	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, math.ZeroInt(), lockedAmt)
+
 	// locking invalid amounts should fail
-	err = k.Lock(ctx, delAddr, valAddr, invalidAmount)
+	err = k.Lock(ctx, delAddr, valAddr, math.NewInt(-100))
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "lock non-positive amount")
 	err = k.Lock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "lock non-positive amount")
+	err = k.Lock(ctx, delAddr, valAddr, math.NewInt(10_000_000))
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "insufficient funds")
 
 	// lock valid amount
 	err = k.Lock(ctx, delAddr, valAddr, amount)
 	require.NoError(t, err)
 
 	// verify that lockup was added
-	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
+	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.Equal(t, amount, lockedAmt)
 }
 
