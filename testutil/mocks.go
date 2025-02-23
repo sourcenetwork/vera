@@ -107,8 +107,12 @@ func (mr *MockBankKeeperMockRecorder) SendCoinsFromAccountToModule(ctx, senderAd
 func (m *MockBankKeeper) SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendCoinsFromModuleToModule", ctx, senderModule, recipientModule, amt)
-	ret0 := ret[0].(error)
-	return ret0
+
+	var err error
+	if len(ret) > 0 && ret[0] != nil {
+		err = ret[0].(error)
+	}
+	return err
 }
 
 func (mr *MockBankKeeperMockRecorder) SendCoinsFromModuleToModule(ctx, senderModule, recipientModule, amt interface{}) *gomock.Call {
@@ -218,7 +222,21 @@ func (mr *MockDistributionKeeperRecorder) GetValidatorOutstandingRewards(ctx, va
 func (m *MockDistributionKeeper) WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "WithdrawDelegationRewards", ctx, delAddr, valAddr)
-	return ret[0].(sdk.Coins), ret[1].(error)
+	var coins sdk.Coins
+	if len(ret) > 0 {
+		if ret[0] != nil {
+			coins = ret[0].(sdk.Coins)
+		} else {
+			coins = sdk.NewCoins()
+		}
+	}
+	var err error
+	if len(ret) > 1 {
+		if ret[1] != nil {
+			err = ret[1].(error)
+		}
+	}
+	return coins, err
 }
 
 func (mr *MockDistributionKeeperRecorder) WithdrawDelegationRewards(ctx, delAddr, valAddr any) *gomock.Call {
