@@ -46,7 +46,7 @@ func setRelationshipDispatcher(ctx *TestCtx, action *SetRelationshipAction) (res
 		}
 		err = respErr
 	case Direct:
-		// For Direct Authentication we use the action Action as the signer
+		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = action.Actor
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:      action.Actor.SourceHubAddr,
@@ -102,7 +102,7 @@ func deleteRelationshipDispatcher(ctx *TestCtx, action *DeleteRelationshipAction
 		}
 		resultErr = respErr
 	case Direct:
-		// For Direct Authentication we use the action Action as the signer
+		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = action.Actor
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:      action.Actor.SourceHubAddr,
@@ -157,7 +157,7 @@ func registerObjectDispatcher(ctx *TestCtx, action *RegisterObjectAction) (resul
 		}
 		err = respErr
 	case Direct:
-		// For Direct Authentication we use the action Action as the signer
+		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = action.Actor
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:      action.Actor.SourceHubAddr,
@@ -212,7 +212,7 @@ func unregisterObjectDispatcher(ctx *TestCtx, action *UnregisterObjectAction) (r
 		}
 		err = respErr
 	case Direct:
-		// For Direct Authentication we use the action Action as the signer
+		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = action.Actor
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:      action.Actor.SourceHubAddr,

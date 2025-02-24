@@ -47,11 +47,11 @@ func NewAccessDecisionRepository(store storetypes.KVStore) *AccessDecisionReposi
 	}
 }
 
-func (r *AccessDecisionRepository) getStore(ctx context.Context) raccoon.ObjectStore[*types.AccessDecision] {
+func (r *AccessDecisionRepository) getStore(_ context.Context) raccoon.ObjectStore[*types.AccessDecision] {
 	rcKV := stores.RaccoonKVFromCosmos(r.kv)
-	marshaler := NewGogoProtoMarshaler[*types.AccessDecision](func() *types.AccessDecision { return &types.AccessDecision{} })
+	marshaler := NewGogoProtoMarshaler(func() *types.AccessDecision { return &types.AccessDecision{} })
 	ider := &decisionIder{}
-	return raccoon.NewObjStore[*types.AccessDecision](rcKV, marshaler, ider)
+	return raccoon.NewObjStore(rcKV, marshaler, ider)
 }
 
 func (r *AccessDecisionRepository) wrapErr(err error) error {

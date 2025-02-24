@@ -6,10 +6,19 @@ import (
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
+
+type queryVerifyAccessRequestSuite struct {
+	suite.Suite
+}
+
+func TestVerifyAccessRequest(t *testing.T) {
+	suite.Run(t, &queryVerifyAccessRequestSuite{})
+}
 
 func setupTestVerifyAccessRequest(t *testing.T) (context.Context, Keeper, *coretypes.Policy, string) {
 	ctx, keeper, accKeep := setupKeeper(t)
@@ -58,8 +67,9 @@ resources:
 	return ctx, keeper, resp.Policy, creatorDID
 }
 
-func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -79,17 +89,18 @@ func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *te
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: true,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }
 
-func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -105,17 +116,18 @@ func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }
 
-func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
+	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -131,11 +143,11 @@ func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *t
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := querier.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }
