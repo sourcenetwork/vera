@@ -24,9 +24,6 @@ func (q Querier) PolicyIds(goCtx context.Context, req *types.QueryPolicyIdsReque
 	if err != nil {
 		return nil, err
 	}
-	if resp == nil {
-		return nil, status.Error(codes.NotFound, "no policies found")
-	}
 
 	// Use MapNullableSlice instead of MapSlice to filter out 'nil' policies.
 	return &types.QueryPolicyIdsResponse{

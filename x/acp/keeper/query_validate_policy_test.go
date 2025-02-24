@@ -142,7 +142,7 @@ resources:
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
-	require.Contains(s.T(), result.ErrorMsg, "resource file: resource missing owner relation")
+	require.Contains(s.T(), result.ErrorMsg, "missing owner relation")
 	require.Nil(s.T(), err)
 }
 
