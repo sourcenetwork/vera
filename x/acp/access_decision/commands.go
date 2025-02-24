@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -23,7 +23,7 @@ type EvaluateAccessRequestsCommand struct {
 	CreationTime *types.Timestamp
 
 	// Creator is the same as the Tx signer
-	Creator authtypes.AccountI
+	Creator sdktypes.AccountI
 
 	// Current block height
 	CurrentHeight uint64
@@ -84,7 +84,9 @@ func (c *EvaluateAccessRequestsCommand) evaluateRequest(ctx context.Context, eng
 		PolicyId: c.Policy.Id,
 		AccessRequest: &coretypes.AccessRequest{
 			Operations: operations,
-			Actor:      &coretypes.Actor{c.Actor},
+			Actor: &coretypes.Actor{
+				Id: c.Actor,
+			},
 		},
 	})
 	if err != nil {

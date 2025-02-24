@@ -12,13 +12,13 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
+func (q Querier) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.GetACPEngine(ctx)
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	engine := q.GetACPEngine(ctx)
 
 	response, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{
 		Id: req.Id,

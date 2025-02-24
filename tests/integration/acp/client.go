@@ -36,7 +36,7 @@ import (
 type KeeperACPClient struct {
 	baseCtx        sdk.Context
 	k              types.MsgServer
-	keeper         types.QueryServer
+	querier        types.QueryServer
 	accountCreator *testutil.AccountKeeperStub
 	ts             types.Timestamp
 }
@@ -106,17 +106,17 @@ func (e *KeeperACPClient) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestAct
 
 func (e *KeeperACPClient) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
-	return e.keeper.Policy(sdkCtx, msg)
+	return e.querier.Policy(sdkCtx, msg)
 }
 
 func (e *KeeperACPClient) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
-	return e.keeper.RegistrationsCommitment(sdkCtx, msg)
+	return e.querier.RegistrationsCommitment(sdkCtx, msg)
 }
 
 func (e *KeeperACPClient) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
 	sdkCtx := e.getSDKCtx(ctx)
-	return e.keeper.RegistrationsCommitmentByCommitment(sdkCtx, msg)
+	return e.querier.RegistrationsCommitmentByCommitment(sdkCtx, msg)
 }
 
 func (e *KeeperACPClient) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
@@ -186,7 +186,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 	executor := &KeeperACPClient{
 		baseCtx:        ctx,
 		k:              msgServer,
-		keeper:         k,
+		querier:        keeper.NewQuerier(k),
 		accountCreator: accKeeper,
 		ts: types.Timestamp{
 			BlockHeight: 1,

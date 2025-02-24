@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) HijackAttemptsByPolicy(goCtx context.Context, req *types.QueryHijackAttemptsByPolicyRequest) (*types.QueryHijackAttemptsByPolicyResponse, error) {
+func (q Querier) HijackAttemptsByPolicy(goCtx context.Context, req *types.QueryHijackAttemptsByPolicyRequest) (*types.QueryHijackAttemptsByPolicyResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	repo := k.GetObjectEventRepository(ctx)
+	repo := q.GetObjectEventRepository(ctx)
 	iter, err := repo.ListHijackEventsByPolicy(ctx, req.PolicyId)
 	if err != nil {
 		return nil, err

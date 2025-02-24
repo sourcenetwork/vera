@@ -58,7 +58,7 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		}
 		err = respErr
 	case Direct:
-		// For Direct Authentication we use the action Action as the signer
+		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = actor
 		msg := &types.MsgDirectPolicyCmd{
 			Creator:  actor.SourceHubAddr,

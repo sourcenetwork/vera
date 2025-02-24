@@ -10,13 +10,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) RegistrationsCommitmentByCommitment(goCtx context.Context, req *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
+func (q Querier) RegistrationsCommitmentByCommitment(goCtx context.Context, req *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	repo := k.GetRegistrationsCommitmentRepository(ctx)
+	repo := q.GetRegistrationsCommitmentRepository(ctx)
 
 	iter, err := repo.FilterByCommitment(ctx, req.Commitment)
 	if err != nil {
