@@ -41,6 +41,10 @@ type MintTestSuite struct {
 	logger           log.Logger
 }
 
+func TestMintTestSuite(t *testing.T) {
+	suite.Run(t, new(MintTestSuite))
+}
+
 func (suite *MintTestSuite) SetupTest() {
 	key := storetypes.NewKVStoreKey(minttypes.StoreKey)
 	testCtx := testutil.DefaultContextWithDB(suite.T(), key, storetypes.NewTransientStoreKey("transient_test"))
@@ -136,8 +140,4 @@ func (suite *MintTestSuite) TestInflationQuery() {
 
 	logs = suite.logBuffer.String()
 	suite.Require().Contains(logs, "Returning effective inflation")
-}
-
-func TestMintTestSuite(t *testing.T) {
-	suite.Run(t, new(MintTestSuite))
 }

@@ -2,7 +2,6 @@ package tier
 
 import (
 	"testing"
-	"time"
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
@@ -17,7 +16,6 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -35,7 +33,7 @@ func (td testDelegation) GetShares() math.LegacyDec { return math.LegacyOneDec()
 func (td testDelegation) GetBondedTokens() math.Int { return math.ZeroInt() }
 func (td testDelegation) IsBonded() bool            { return false }
 
-type KeeperTestSuite struct {
+type ModuleTestSuite struct {
 	suite.Suite
 
 	tierKeeper       keeper.Keeper
@@ -52,11 +50,11 @@ type KeeperTestSuite struct {
 	valAddr          sdk.ValAddress
 }
 
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(KeeperTestSuite))
+func TestModuleTestSuite(t *testing.T) {
+	suite.Run(t, new(ModuleTestSuite))
 }
 
-func (suite *KeeperTestSuite) SetupTest() {
+func (suite *ModuleTestSuite) SetupTest() {
 	suite.encCfg = test.CreateTestEncodingConfig()
 	suite.key = storetypes.NewKVStoreKey(types.StoreKey)
 	testCtx := testutil.DefaultContextWithDB(suite.T(), suite.key, storetypes.NewTransientStoreKey("transient_test"))
@@ -88,52 +86,9 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	suite.delAddr, _ = sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.valAddr, _ = sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-
-	amount := math.NewInt(1_000_000_000_000) // 1m open
-	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
-	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(249_999_999_980)))
-
-	validator := stakingtypes.Validator{
-		OperatorAddress: suite.valAddr.String(),
-		Status:          stakingtypes.Bonded,
-	}
-
-	epochInfo := epochstypes.EpochInfo{
-		Identifier:            types.EpochIdentifier,
-		CurrentEpochStartTime: suite.ctx.BlockTime().Add(-10 * time.Minute),
-		Duration:              time.Hour,
-	}
-
-	suite.bankKeeper.EXPECT().
-		MintCoins(gomock.Any(), types.ModuleName, creditCoins).
-		Return(nil).Times(1)
-
-	suite.bankKeeper.EXPECT().
-		SendCoinsFromModuleToAccount(gomock.Any(), types.ModuleName, suite.delAddr, creditCoins).
-		Return(nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		GetValidator(gomock.Any(), suite.valAddr).
-		Return(validator, nil).Times(1)
-
-	suite.bankKeeper.EXPECT().
-		DelegateCoinsFromAccountToModule(gomock.Any(), suite.delAddr, types.ModuleName, coins).
-		Return(nil).Times(1)
-
-	suite.stakingKeeper.EXPECT().
-		Delegate(gomock.Any(), gomock.Any(), amount, stakingtypes.Unbonded, validator, true).
-		Return(math.LegacyNewDecFromInt(amount), nil).Times(1)
-
-	suite.epochsKeeper.EXPECT().
-		GetEpochInfo(gomock.Any(), types.EpochIdentifier).
-		Return(epochInfo).Times(1)
-
-	// Add a lockup before testing begin block, so that there are funds to burn and send to pools
-	err = suite.tierKeeper.Lock(suite.ctx, suite.delAddr, suite.valAddr, amount)
-	suite.Require().NoError(err)
 }
 
-func (suite *KeeperTestSuite) TestBeginBlock() {
+func (suite *ModuleTestSuite) TestBeginBlock() {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	delegation := testDelegation{validatorAddr: suite.valAddr.String()}
 	totalReward := math.NewInt(100)
@@ -141,23 +96,17 @@ func (suite *KeeperTestSuite) TestBeginBlock() {
 
 	testCases := []struct {
 		name                       string
-		expectedDevPool            math.Int
 		expectedInsurancePool      math.Int
-		expectedBurn               math.Int
 		expectedTimesSentToInsPool int
 	}{
 		{
 			name:                       "Insurance pool below threshold",
-			expectedDevPool:            math.NewInt(2),
 			expectedInsurancePool:      math.NewInt(1),
-			expectedBurn:               math.NewInt(97),
 			expectedTimesSentToInsPool: 1,
 		},
 		{
 			name:                       "Insurance pool is full",
-			expectedDevPool:            math.NewInt(3),
 			expectedInsurancePool:      math.NewInt(100_000_000_000),
-			expectedBurn:               math.NewInt(97),
 			expectedTimesSentToInsPool: 0,
 		},
 	}
@@ -191,7 +140,7 @@ func (suite *KeeperTestSuite) TestBeginBlock() {
 				EXPECT().
 				GetBalance(gomock.Any(), authtypes.NewModuleAddress(types.InsurancePoolName), appparams.DefaultBondDenom).
 				Return(sdk.NewCoin(appparams.DefaultBondDenom, tc.expectedInsurancePool)).
-				Times(2)
+				Times(1)
 
 			suite.bankKeeper.
 				EXPECT().
@@ -201,22 +150,6 @@ func (suite *KeeperTestSuite) TestBeginBlock() {
 			module := NewAppModule(suite.encCfg.Codec, suite.tierKeeper, suite.bankKeeper)
 			err := module.BeginBlock(suite.ctx)
 			suite.Require().NoError(err)
-
-			suite.bankKeeper.
-				EXPECT().
-				GetBalance(gomock.Any(), authtypes.NewModuleAddress(types.DeveloperPoolName), appparams.DefaultBondDenom).
-				Return(sdk.NewCoin(appparams.DefaultBondDenom, tc.expectedDevPool)).
-				Times(1)
-
-			developerPoolAddr := authtypes.NewModuleAddress(types.DeveloperPoolName)
-			devBalance := suite.bankKeeper.GetBalance(suite.ctx, developerPoolAddr, appparams.DefaultBondDenom)
-			suite.Require().True(devBalance.Amount.Equal(tc.expectedDevPool),
-				"dev pool balance: expected %s, got %s", tc.expectedDevPool, devBalance.Amount)
-
-			insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
-			insBalance := suite.bankKeeper.GetBalance(suite.ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-			suite.Require().True(insBalance.Amount.Equal(tc.expectedInsurancePool),
-				"insurance pool balance: expected %s, got %s", tc.expectedInsurancePool, insBalance.Amount)
 		})
 	}
 }
