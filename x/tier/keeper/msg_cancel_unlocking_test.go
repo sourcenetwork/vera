@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
@@ -85,8 +86,8 @@ func TestMsgCancelUnlocking(t *testing.T) {
 
 	initState := func() sdk.Context {
 		ctx, _ := sdkCtx.CacheContext()
-		initializeDelegator(t, &k, ctx, delAddress, initialDelegatorBalance)
-		initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddress, initialValidatorBalance)
+		keepertest.InitializeDelegator(t, &k, ctx, delAddress, initialDelegatorBalance)
+		keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddress, initialValidatorBalance)
 		err = k.Lock(ctx, delAddress, valAddress, validCoin.Amount)
 		require.NoError(t, err)
 		_, _, _, err = k.Unlock(ctx, delAddress, valAddress, validCoin.Amount)

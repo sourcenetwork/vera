@@ -5,9 +5,10 @@ import (
 	"time"
 
 	cryptocdc "github.com/cosmos/cosmos-sdk/crypto/codec"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
@@ -28,12 +29,31 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
+
+// initializeValidator creates a validator and verifies that it was set correctly.
+func InitializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
+	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
+	gotValidator, err := k.GetValidator(ctx, valAddr)
+	require.NoError(t, err)
+	require.Equal(t, validator.OperatorAddress, gotValidator.OperatorAddress)
+}
+
+// initializeDelegator initializes a delegator with balance.
+func InitializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
+	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
+	require.NoError(t, err)
+}
 
 func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)

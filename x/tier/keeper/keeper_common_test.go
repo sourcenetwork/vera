@@ -5,9 +5,12 @@ import (
 	"time"
 
 	cryptocdc "github.com/cosmos/cosmos-sdk/crypto/codec"
+	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
@@ -34,6 +37,23 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
+
+// initializeValidator creates a validator and verifies that it was set correctly.
+func initializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
+	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
+	gotValidator, err := k.GetValidator(ctx, valAddr)
+	require.NoError(t, err)
+	require.Equal(t, validator.OperatorAddress, gotValidator.OperatorAddress)
+}
+
+// initializeDelegator initializes a delegator with balance.
+func initializeDelegator(t *testing.T, k *Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
+	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
+	require.NoError(t, err)
+}
 
 func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)

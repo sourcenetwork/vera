@@ -4,36 +4,15 @@ import (
 	"testing"
 	"time"
 
-	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
-
-// initializeValidator creates a validator and verifies that it was set correctly.
-func initializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
-	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
-	gotValidator, err := k.GetValidator(ctx, valAddr)
-	require.NoError(t, err)
-	require.Equal(t, validator.OperatorAddress, gotValidator.OperatorAddress)
-}
-
-// initializeDelegator initializes ba delegator with balance.
-func initializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
-	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
-	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
-	require.NoError(t, err)
-	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
-	require.NoError(t, err)
-}
 
 // TestLock verifies that a valid lockup is created on keeper.Lock().
 func TestLock(t *testing.T) {
@@ -47,9 +26,9 @@ func TestLock(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -92,9 +71,9 @@ func TestUnlock(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -144,10 +123,10 @@ func TestRedelegate(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
-	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1000)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, srcValAddr, initialValidatorBalance)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, dstValAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, srcValAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, dstValAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -192,9 +171,9 @@ func TestCompleteUnlocking(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
-	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(1_000_000)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -275,9 +254,9 @@ func TestCancelUnlocking(t *testing.T) {
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
-	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
 	initialValidatorBalance := math.NewInt(10_000_000)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 
 	// set initial block height and time
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())

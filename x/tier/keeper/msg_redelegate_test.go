@@ -10,6 +10,7 @@ import (
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -47,9 +48,9 @@ func TestMsgRedelegate(t *testing.T) {
 	dstValAddress, err := sdk.ValAddressFromBech32(dstValAddr)
 	require.NoError(t, err)
 
-	initializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, srcValAddress, initialSrcValidatorBalance)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, dstValAddress, initialDstValidatorBalance)
+	keepertest.InitializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, srcValAddress, initialSrcValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, dstValAddress, initialDstValidatorBalance)
 
 	// lock some tokens to test redelegate logic
 	err = k.Lock(ctx, delAddress, srcValAddress, validCoin.Amount)
