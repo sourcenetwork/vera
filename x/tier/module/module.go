@@ -150,8 +150,14 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // The begin block implementation is optional.
 func (am AppModule) BeginBlock(ctx context.Context) error {
 	params := am.keeper.GetParams(ctx)
-	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 
+	// Process rewards every N blocks
+	height := sdk.UnwrapSDKContext(ctx).BlockHeight()
+	if height%params.ProcessRewardsInterval != 0 {
+		return nil
+	}
+
+	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	err := am.keeper.GetStakingKeeper().IterateDelegations(ctx, tierModuleAddr, func(index int64, delegation stakingtypes.DelegationI) bool {
 		// Claim rewards for the tier module from this validator
 		valAddr := types.MustValAddressFromBech32(delegation.GetValidatorAddr())

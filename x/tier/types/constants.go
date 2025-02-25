@@ -4,10 +4,11 @@ import time "time"
 
 // Tier module constants
 const (
-	EpochIdentifier               = ModuleName
-	DefaultUnlockingEpochs        = 2
-	DefaultDeveloperPoolFee       = 2
-	DefaultInsurancePoolFee       = 1
-	DefaultInsurancePoolThreshold = 100_000_000_000
-	DefaultEpochDuration          = time.Minute * 5
+	EpochIdentifier               = ModuleName      // tier
+	DefaultEpochDuration          = time.Minute * 5 // 5 minutes
+	DefaultUnlockingEpochs        = 2               // 2 epochs
+	DefaultDeveloperPoolFee       = 2               // 2%
+	DefaultInsurancePoolFee       = 1               // 1%
+	DefaultInsurancePoolThreshold = 100_000_000_000 // 100,000 open
+	DefaultProcessRewardsInterval = 1000            // process rewards every 1000 blocks
 )

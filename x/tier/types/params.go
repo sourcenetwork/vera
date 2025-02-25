@@ -24,13 +24,18 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params object
-func NewParams(epochDuration *time.Duration, unlockingEpochs, developerPoolFee, insurancePoolFee, insurancePoolThreshold int64, rewardRates []Rate) Params {
+func NewParams(
+	epochDuration *time.Duration,
+	unlockingEpochs, developerPoolFee, insurancePoolFee, insurancePoolThreshold, processRewardsInterval int64,
+	rewardRates []Rate,
+) Params {
 	return Params{
 		EpochDuration:          epochDuration,
 		UnlockingEpochs:        unlockingEpochs,
 		DeveloperPoolFee:       developerPoolFee,
 		InsurancePoolFee:       insurancePoolFee,
 		InsurancePoolThreshold: insurancePoolThreshold,
+		ProcessRewardsInterval: processRewardsInterval,
 		RewardRates:            rewardRates,
 	}
 }
@@ -42,19 +47,20 @@ func NewParams(epochDuration *time.Duration, unlockingEpochs, developerPoolFee, 
 // When the insurance pool is full, the insurance fee is allocated to the developer pool instead.
 func DefaultParams() Params {
 	epochDuration := DefaultEpochDuration
-	return Params{
-		EpochDuration:          &epochDuration,                // 5 minutes
-		UnlockingEpochs:        DefaultUnlockingEpochs,        // 2 epochs
-		DeveloperPoolFee:       DefaultDeveloperPoolFee,       // 2%
-		InsurancePoolFee:       DefaultInsurancePoolFee,       // 1%
-		InsurancePoolThreshold: DefaultInsurancePoolThreshold, // 100,000 open
-		RewardRates: []Rate{
+	return NewParams(
+		&epochDuration,                // 5 minutes
+		DefaultUnlockingEpochs,        // 2 epochs
+		DefaultDeveloperPoolFee,       // 2%
+		DefaultInsurancePoolFee,       // 1%
+		DefaultInsurancePoolThreshold, // 100,000 open
+		DefaultProcessRewardsInterval, // 1000 blocks
+		[]Rate{
 			{Amount: math.NewInt(300), Rate: 150}, // x1.5 from 300
 			{Amount: math.NewInt(200), Rate: 120}, // x1.2 from 200 to 300
 			{Amount: math.NewInt(100), Rate: 110}, // x1.1 from 100 to 200
 			{Amount: math.NewInt(0), Rate: 100},   // x1.0 from 0 to 100
 		},
-	}
+	)
 }
 
 // Validate validates the params
