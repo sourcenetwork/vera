@@ -50,7 +50,7 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 		if !amountToInsurancePool.IsZero() {
 			insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 			insurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-			if insurancePoolBalance.Amount.LT(math.NewInt(params.InsurancePoolThreshold)) {
+			if insurancePoolBalance.Amount.Add(amountToInsurancePool).LTE(math.NewInt(params.InsurancePoolThreshold)) {
 				insuranceCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToInsurancePool))
 				err := k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.InsurancePoolName, insuranceCoins)
 				if err != nil {
