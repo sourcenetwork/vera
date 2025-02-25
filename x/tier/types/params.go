@@ -15,6 +15,7 @@ var (
 	KeyDeveloperPoolFee       = []byte("DeveloperPoolFee")
 	KeyInsurancePoolFee       = []byte("InsurancePoolFee")
 	KeyInsurancePoolThreshold = []byte("InsurancePoolThreshold")
+	KeyProcessRewardsInterval = []byte("ProcessRewardsInterval")
 	KeyRewardRates            = []byte("RewardRates")
 )
 
@@ -80,6 +81,9 @@ func (p Params) Validate() error {
 	if err := validateInsurancePoolThreshold(p.InsurancePoolThreshold); err != nil {
 		return err
 	}
+	if err := validateProcessRewardsInterval(p.ProcessRewardsInterval); err != nil {
+		return err
+	}
 	if err := validateRewardRates(p.RewardRates); err != nil {
 		return err
 	}
@@ -94,46 +98,73 @@ func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 		{Key: KeyDeveloperPoolFee, Value: &p.DeveloperPoolFee, ValidatorFn: validateDeveloperPoolFee},
 		{Key: KeyInsurancePoolFee, Value: &p.InsurancePoolFee, ValidatorFn: validateInsurancePoolFee},
 		{Key: KeyInsurancePoolThreshold, Value: &p.InsurancePoolThreshold, ValidatorFn: validateInsurancePoolThreshold},
+		{Key: KeyProcessRewardsInterval, Value: &p.ProcessRewardsInterval, ValidatorFn: validateProcessRewardsInterval},
 		{Key: KeyRewardRates, Value: &p.RewardRates, ValidatorFn: validateRewardRates},
 	}
 }
 
 func validateEpochDuration(i interface{}) error {
-	_, ok := i.(*time.Duration)
+	duration, ok := i.(*time.Duration)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if duration == nil || *duration <= 0 {
+		return fmt.Errorf("invalid epoch duration: %d", duration)
 	}
 	return nil
 }
 
 func validateUnlockingEpochs(i interface{}) error {
-	_, ok := i.(int64)
+	epochs, ok := i.(int64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if epochs <= 0 {
+		return fmt.Errorf("invalid unlocking epochs: %d", epochs)
 	}
 	return nil
 }
 
 func validateDeveloperPoolFee(i interface{}) error {
-	_, ok := i.(int64)
+	fee, ok := i.(int64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if fee < 0 {
+		return fmt.Errorf("invalid developer pool fee: %d", fee)
 	}
 	return nil
 }
 
 func validateInsurancePoolFee(i interface{}) error {
-	_, ok := i.(int64)
+	fee, ok := i.(int64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if fee < 0 {
+		return fmt.Errorf("invalid insurance pool fee: %d", fee)
 	}
 	return nil
 }
 
 func validateInsurancePoolThreshold(i interface{}) error {
-	_, ok := i.(int64)
+	threshold, ok := i.(int64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if threshold < 0 {
+		return fmt.Errorf("invalid insurance pool threshold: %d", threshold)
+	}
+	return nil
+}
+
+func validateProcessRewardsInterval(i interface{}) error {
+	interval, ok := i.(int64)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", i)
+	}
+	if interval <= 0 {
+		return fmt.Errorf("invalid process rewards interval: %d", interval)
 	}
 	return nil
 }
