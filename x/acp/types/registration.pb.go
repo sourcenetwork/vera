@@ -24,17 +24,24 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// AmendmentEvent is a record which tracks executions of the Registration Amendment rule in SourceHub ACP
 type AmendmentEvent struct {
 	// event id
-	Id            uint64        `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	PolicyId      string        `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Object        *types.Object `protobuf:"bytes,3,opt,name=object,proto3" json:"object,omitempty"`
-	NewOwner      *types.Actor  `protobuf:"bytes,4,opt,name=new_owner,json=newOwner,proto3" json:"new_owner,omitempty"`
-	PreviousOwner *types.Actor  `protobuf:"bytes,5,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
-	// commitment_id is the id of the commitment made for the object
-	CommitmentId uint64          `protobuf:"varint,6,opt,name=commitment_id,json=commitmentId,proto3" json:"commitment_id,omitempty"`
-	HijackFlag   bool            `protobuf:"varint,7,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
-	Metadata     *RecordMetadata `protobuf:"bytes,8,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	// id of affected policy
+	PolicyId string `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	// object whose registration was amended
+	Object *types.Object `protobuf:"bytes,3,opt,name=object,proto3" json:"object,omitempty"`
+	// new_owner is the new object owner
+	NewOwner *types.Actor `protobuf:"bytes,4,opt,name=new_owner,json=newOwner,proto3" json:"new_owner,omitempty"`
+	// previous_owner is the previous object owner
+	PreviousOwner *types.Actor `protobuf:"bytes,5,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
+	// commitment_id is the id of the commitment which generated the amendment
+	CommitmentId uint64 `protobuf:"varint,6,opt,name=commitment_id,json=commitmentId,proto3" json:"commitment_id,omitempty"`
+	// hijack_flag is true if the amendment rule was executed and the new_owner chose to flag
+	// the previous_owner as a potential object hijacker
+	HijackFlag bool            `protobuf:"varint,7,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
+	Metadata   *RecordMetadata `protobuf:"bytes,8,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
 func (m *AmendmentEvent) Reset()         { *m = AmendmentEvent{} }

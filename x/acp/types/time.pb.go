@@ -23,7 +23,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Duration models a time interval expressed either as a protobuf
+// Duration models a time interval expressed either as a wallclock
 // Duration interval or a number of blocks
 type Duration struct {
 	// Types that are valid to be assigned to Duration:
@@ -110,7 +110,7 @@ func (*Duration) XXX_OneofWrappers() []interface{} {
 	}
 }
 
-// Timestamp models an instant in time expressed as a protobuf
+// Timestamp models an instant in time expressed as a wallclock
 // Timestamp and a block height
 type Timestamp struct {
 	ProtoTs     *types.Timestamp `protobuf:"bytes,1,opt,name=proto_ts,json=protoTs,proto3" json:"proto_ts,omitempty"`

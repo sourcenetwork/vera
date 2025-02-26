@@ -153,7 +153,7 @@ func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64
 	if err != nil {
 		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
 	}
-	after, err := types.IsAfter(commitment.Metadata.CreationTs, commitment.Validity, now)
+	after, err := commitment.Metadata.CreationTs.IsAfter(commitment.Validity, now)
 	if err != nil {
 		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
 	}

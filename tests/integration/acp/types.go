@@ -37,6 +37,8 @@ type ACPClient interface {
 	RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error)
 	RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error)
 
+	ObjectOwner(ctx *TestCtx, msg *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error)
+
 	// GetLastBlockTs returns an ACP Timestamp for the last accepted block in SourceHub
 	GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error)
 

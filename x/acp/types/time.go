@@ -37,7 +37,7 @@ func (ts *Timestamp) ToISOString() (string, error) {
 }
 
 // IsAfter returns whether now is after ts + duration
-func IsAfter(ts *Timestamp, duration *Duration, now *Timestamp) (bool, error) {
+func (ts *Timestamp) IsAfter(duration *Duration, now *Timestamp) (bool, error) {
 	switch d := duration.Duration.(type) {
 	case *Duration_BlockCount:
 		return ts.BlockHeight+d.BlockCount < now.BlockHeight, nil

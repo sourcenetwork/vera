@@ -168,7 +168,7 @@ message QueryObjectOwnerRequest {
 
 message QueryObjectOwnerResponse {
   bool   is_registered = 1;
-  string owner_id      = 2;
+  RelationshipRecord record      = 2;
 }
 
 message QueryRegistrationsCommitmentRequest {

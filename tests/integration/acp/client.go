@@ -41,86 +41,94 @@ type KeeperACPClient struct {
 	ts             types.Timestamp
 }
 
-func (e *KeeperACPClient) Cleanup() {}
+func (c *KeeperACPClient) Cleanup() {}
 
 // WaitBlock bumps the current keeper Ts
-func (e *KeeperACPClient) WaitBlock() {
-	e.ts = e.nextBlockTs()
+func (c *KeeperACPClient) WaitBlock() {
+	c.nextBlockTs()
 }
 
-func (e *KeeperACPClient) nextBlockTs() types.Timestamp {
-	ts := e.ts
-	ts.BlockHeight += 1
-	ts.ProtoTs.Seconds += 1
-	return ts
+// nextBlockTs increments the internal block count
+func (c *KeeperACPClient) nextBlockTs() {
+	c.ts.BlockHeight++
+	c.ts.ProtoTs.Seconds++
 }
 
 // genTx generates a random byte slice to model the comet Tx bytes
 //
 // This is done because the keeper executor doesn't receive an actual
 // cometbft signed Tx but this data is used by the code paths
-func (e *KeeperACPClient) genTx(ctx *TestCtx) {
+func (c *KeeperACPClient) genTx(ctx *TestCtx) {
 	tx := make([]byte, 50)
 	_, err := rand.Read(tx)
 	require.NoError(ctx.T, err)
 	ctx.State.PushTx(tx)
 }
 
-func (e *KeeperACPClient) getSDKCtx(ctx context.Context) sdk.Context {
-	time, err := prototypes.TimestampFromProto(e.ts.ProtoTs)
+// getSDKCtx returns the context which must be used before executing
+// calls to the keeper.
+// it increments the current timestamp, such that every function call happens with its own block time
+func (c *KeeperACPClient) getSDKCtx(ctx context.Context) sdk.Context {
+	c.nextBlockTs()
+	time, err := prototypes.TimestampFromProto(c.ts.ProtoTs)
 	if err != nil {
 		panic(err)
 	}
 	header := cmtproto.Header{
 		Time:   time.UTC(),
-		Height: int64(e.ts.BlockHeight),
+		Height: int64(c.ts.BlockHeight),
 	}
-	sdkCtx := e.baseCtx.WithContext(ctx)
-	sdkCtx = e.baseCtx.WithBlockHeader(header)
+	sdkCtx := c.baseCtx.WithContext(ctx)
+	sdkCtx = c.baseCtx.WithBlockHeader(header)
 	return sdkCtx
 }
 
-func (e *KeeperACPClient) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.k.BearerPolicyCmd(sdkCtx, msg)
+func (c *KeeperACPClient) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.k.BearerPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.k.SignedPolicyCmd(sdkCtx, msg)
+func (c *KeeperACPClient) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.k.SignedPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.k.DirectPolicyCmd(sdkCtx, msg)
+func (c *KeeperACPClient) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.k.DirectPolicyCmd(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.k.CreatePolicy(sdkCtx, msg)
+func (c *KeeperACPClient) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.k.CreatePolicy(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
-	return e.accountCreator.NewAccount(actor.PubKey), nil
+func (c *KeeperACPClient) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
+	return c.accountCreator.NewAccount(actor.PubKey), nil
 }
 
-func (e *KeeperACPClient) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.querier.Policy(sdkCtx, msg)
+func (c *KeeperACPClient) Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.querier.Policy(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.querier.RegistrationsCommitment(sdkCtx, msg)
+func (c *KeeperACPClient) RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.querier.RegistrationsCommitment(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
-	sdkCtx := e.getSDKCtx(ctx)
-	return e.querier.RegistrationsCommitmentByCommitment(sdkCtx, msg)
+func (c *KeeperACPClient) RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.querier.RegistrationsCommitmentByCommitment(sdkCtx, msg)
 }
 
-func (e *KeeperACPClient) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
-	ts := e.ts
+func (c *KeeperACPClient) ObjectOwner(ctx *TestCtx, msg *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.querier.ObjectOwner(sdkCtx, msg)
+}
+
+func (c *KeeperACPClient) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error) {
+	ts := c.ts
 	return &ts, nil
 }
 
@@ -353,4 +361,8 @@ func (e *SDKClientExecutor) GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, erro
 
 func (c *SDKClientExecutor) GetTimestampNow(context.Context) (uint64, error) {
 	panic("not implemented")
+}
+
+func (c *SDKClientExecutor) ObjectOwner(ctx *TestCtx, req *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
+	return c.Network.Client.ACPQueryClient().ObjectOwner(ctx, req)
 }
