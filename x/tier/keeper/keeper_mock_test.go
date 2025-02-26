@@ -35,7 +35,21 @@ type KeeperTestSuite struct {
 	msgServer        types.MsgServer
 	key              *storetypes.KVStoreKey
 	authorityAccount sdk.AccAddress
+	valAddr          sdk.ValAddress
 }
+
+// testDelegation is a minimal implementation of stakingtypes.DelegationI.
+type testDelegation struct {
+	validatorAddr string
+}
+
+func (td testDelegation) GetValidatorAddr() string { return td.validatorAddr }
+func (td testDelegation) GetDelegatorAddr() string {
+	return "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+}
+func (td testDelegation) GetShares() math.LegacyDec { return math.LegacyOneDec() }
+func (td testDelegation) GetBondedTokens() math.Int { return math.ZeroInt() }
+func (td testDelegation) IsBonded() bool            { return false }
 
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(KeeperTestSuite))
@@ -70,6 +84,8 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.Require().NoError(err)
 
 	suite.msgServer = keeper.NewMsgServerImpl(suite.tierKeeper)
+
+	suite.valAddr, _ = sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 }
 
 // TestLock is using mock keepers to verify that required function calls are made as expected on Lock().
@@ -77,7 +93,7 @@ func (suite *KeeperTestSuite) TestLock() {
 	amount := math.NewInt(1000)
 	moduleName := types.ModuleName
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
-	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(250)))
+	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(230)))
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	suite.Require().NoError(err)
@@ -178,7 +194,9 @@ func (suite *KeeperTestSuite) TestUnlock() {
 	suite.tierKeeper.SetParams(suite.ctx, params)
 
 	// add a lockup and verify that it exists before trying to unlock
-	suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	err = suite.tierKeeper.AddLockup(suite.ctx, delAddr, valAddr, amount)
+	suite.Require().NoError(err)
+
 	lockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, valAddr)
 	suite.Require().Equal(amount, lockedAmt, "expected lockup amount to be set")
 
@@ -205,7 +223,8 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 	suite.Require().NoError(err)
 
 	// add initial lockup to the source validator
-	suite.tierKeeper.AddLockup(suite.ctx, delAddr, srcValAddr, amount)
+	err = suite.tierKeeper.AddLockup(suite.ctx, delAddr, srcValAddr, amount)
+	suite.Require().NoError(err)
 
 	suite.stakingKeeper.EXPECT().
 		ValidateUnbondAmount(gomock.Any(), authtypes.NewModuleAddress(types.ModuleName), srcValAddr, amount).
@@ -224,4 +243,69 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 	dstLockedAmt := suite.tierKeeper.GetLockupAmount(suite.ctx, delAddr, dstValAddr)
 	suite.Require().Equal(math.ZeroInt(), srcLockedAmt, "source validator lockup should be zero")
 	suite.Require().Equal(amount, dstLockedAmt, "destination validator lockup should match the redelegated amount")
+}
+
+func (suite *KeeperTestSuite) TestBeginBlock() {
+	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
+	delegation := testDelegation{validatorAddr: suite.valAddr.String()}
+	totalReward := math.NewInt(100)
+	rewardCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, totalReward))
+
+	testCases := []struct {
+		name                       string
+		expectedInsurancePool      math.Int
+		expectedTimesSentToInsPool int
+	}{
+		{
+			name:                       "Insurance pool below threshold",
+			expectedInsurancePool:      math.NewInt(1),
+			expectedTimesSentToInsPool: 1,
+		},
+		{
+			name:                       "Insurance pool is full",
+			expectedInsurancePool:      math.NewInt(100_000_000_000),
+			expectedTimesSentToInsPool: 0,
+		},
+	}
+
+	suite.stakingKeeper.
+		EXPECT().
+		IterateDelegations(suite.ctx, tierModuleAddr, gomock.Any()).
+		DoAndReturn(func(ctx sdk.Context, delegator sdk.AccAddress, fn func(int64, stakingtypes.DelegationI) bool) error {
+			fn(0, delegation)
+			return nil
+		}).Times(len(testCases))
+
+	suite.distrKeeper.
+		EXPECT().
+		WithdrawDelegationRewards(suite.ctx, tierModuleAddr, suite.valAddr).
+		Return(rewardCoins, nil).Times(len(testCases))
+
+	suite.bankKeeper.
+		EXPECT().
+		SendCoinsFromModuleToModule(gomock.Any(), types.ModuleName, types.DeveloperPoolName, gomock.Any()).
+		Return(nil).Times(len(testCases))
+
+	suite.bankKeeper.
+		EXPECT().
+		BurnCoins(gomock.Any(), types.ModuleName, gomock.Any()).
+		Return(nil).Times(len(testCases))
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			suite.bankKeeper.
+				EXPECT().
+				GetBalance(gomock.Any(), authtypes.NewModuleAddress(types.InsurancePoolName), appparams.DefaultBondDenom).
+				Return(sdk.NewCoin(appparams.DefaultBondDenom, tc.expectedInsurancePool)).
+				Times(1)
+
+			suite.bankKeeper.
+				EXPECT().
+				SendCoinsFromModuleToModule(gomock.Any(), types.ModuleName, types.InsurancePoolName, gomock.Any()).
+				Return(nil).Times(tc.expectedTimesSentToInsPool)
+
+			err := suite.tierKeeper.BeginBlocker(suite.ctx)
+			suite.Require().NoError(err)
+		})
+	}
 }

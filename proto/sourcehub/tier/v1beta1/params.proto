@@ -12,7 +12,11 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
 message Params {
   google.protobuf.Duration epoch_duration = 1 [(gogoproto.stdduration) = true];
   int64 unlocking_epochs = 2;
-  repeated Rate reward_rates = 3 [
+  int64 developer_pool_fee = 3;
+  int64 insurance_pool_fee = 4;
+  int64 insurance_pool_threshold = 5;
+  int64 process_rewards_interval = 6;
+  repeated Rate reward_rates = 7 [
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];

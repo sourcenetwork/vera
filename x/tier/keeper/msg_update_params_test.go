@@ -11,11 +11,10 @@ import (
 
 func TestMsgUpdateParams(t *testing.T) {
 	k, ms, ctx := setupMsgServer(t)
-	params := types.DefaultParams()
+	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	// default params
 	testCases := []struct {
 		name      string
 		input     *types.MsgUpdateParams
@@ -32,12 +31,13 @@ func TestMsgUpdateParams(t *testing.T) {
 			expErrMsg: "invalid authority",
 		},
 		{
-			name: "send enabled param",
+			name: "invalid params",
 			input: &types.MsgUpdateParams{
 				Authority: k.GetAuthority(),
 				Params:    types.Params{},
 			},
-			expErr: false,
+			expErr:    true,
+			expErrMsg: "invalid params",
 		},
 		{
 			name: "all good",

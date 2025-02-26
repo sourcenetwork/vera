@@ -5,9 +5,10 @@ import (
 	"time"
 
 	cryptocdc "github.com/cosmos/cosmos-sdk/crypto/codec"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	cosmosed25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
@@ -22,18 +23,37 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
+	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
+
+// initializeValidator creates a validator and verifies that it was set correctly.
+func InitializeValidator(t *testing.T, k *stakingkeeper.Keeper, ctx sdk.Context, valAddr sdk.ValAddress, initialTokens math.Int) {
+	validator := testutil.CreateTestValidator(t, ctx, k, valAddr, cosmosed25519.GenPrivKey().PubKey(), initialTokens)
+	gotValidator, err := k.GetValidator(ctx, valAddr)
+	require.NoError(t, err)
+	require.Equal(t, validator.OperatorAddress, gotValidator.OperatorAddress)
+}
+
+// initializeDelegator initializes a delegator with balance.
+func InitializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAddr sdk.AccAddress, initialBalance math.Int) {
+	initialDelegatorBalance := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, initialBalance))
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, initialDelegatorBalance)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, delAddr, initialDelegatorBalance)
+	require.NoError(t, err)
+}
 
 func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
@@ -42,15 +62,17 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	stakingStoreKey := storetypes.NewKVStoreKey(stakingtypes.StoreKey)
 	distrStoreKey := storetypes.NewKVStoreKey(distrtypes.StoreKey)
 	epochsStoreKey := storetypes.NewKVStoreKey(epochstypes.StoreKey)
+	mintStoreKey := storetypes.NewKVStoreKey(minttypes.StoreKey)
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(bankStoreKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(stakingStoreKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(distrStoreKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(epochsStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(stakingStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(distrStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(epochsStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(mintStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -59,6 +81,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	banktypes.RegisterInterfaces(registry)
 	stakingtypes.RegisterInterfaces(registry)
 	distrtypes.RegisterInterfaces(registry)
+	minttypes.RegisterInterfaces(registry)
 
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
@@ -69,10 +92,13 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	maccPerms := map[string][]string{
 		authtypes.FeeCollectorName:     nil,
-		types.ModuleName:               {authtypes.Minter, authtypes.Burner, authtypes.Staking},
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		distrtypes.ModuleName:          {authtypes.Minter, authtypes.Burner},
+		minttypes.ModuleName:           {authtypes.Minter, authtypes.Burner},
+		types.ModuleName:               {authtypes.Minter, authtypes.Burner, authtypes.Staking},
+		types.InsurancePoolName:        nil,
+		types.DeveloperPoolName:        nil,
 	}
 
 	authKeeper := authkeeper.NewAccountKeeper(
@@ -103,8 +129,11 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 
 	bondedPool := authtypes.NewEmptyModuleAccount(stakingtypes.BondedPoolName, authtypes.Burner, authtypes.Staking)
 	notBondedPool := authtypes.NewEmptyModuleAccount(stakingtypes.NotBondedPoolName, authtypes.Burner, authtypes.Staking)
-	tierPool := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter, authtypes.Burner)
 	distrPool := authtypes.NewEmptyModuleAccount(distrtypes.ModuleName)
+	mintAcc := authtypes.NewEmptyModuleAccount(minttypes.ModuleName)
+	tierPool := authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter, authtypes.Burner, authtypes.Staking)
+	insurancePool := authtypes.NewEmptyModuleAccount(types.InsurancePoolName)
+	developerPool := authtypes.NewEmptyModuleAccount(types.DeveloperPoolName)
 
 	if authKeeper.GetModuleAccount(ctx, stakingtypes.BondedPoolName) == nil {
 		authKeeper.SetModuleAccount(ctx, bondedPool)
@@ -117,6 +146,15 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	}
 	if authKeeper.GetModuleAccount(ctx, distrtypes.ModuleName) == nil {
 		authKeeper.SetModuleAccount(ctx, distrPool)
+	}
+	if authKeeper.GetModuleAccount(ctx, minttypes.ModuleName) == nil {
+		authKeeper.SetModuleAccount(ctx, mintAcc)
+	}
+	if authKeeper.GetModuleAccount(ctx, types.InsurancePoolName) == nil {
+		authKeeper.SetModuleAccount(ctx, insurancePool)
+	}
+	if authKeeper.GetModuleAccount(ctx, types.DeveloperPoolName) == nil {
+		authKeeper.SetModuleAccount(ctx, developerPool)
 	}
 
 	stakingKeeper := stakingkeeper.NewKeeper(
@@ -139,7 +177,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authKeeper,
 		bankKeeper,
 		stakingKeeper,
-		authority.String(),
+		authtypes.FeeCollectorName,
 		authority.String(),
 	)
 
@@ -154,7 +192,6 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		CurrentEpochStartTime: ctx.BlockTime(),
 		Duration:              time.Hour * 24 * 30,
 	}
-
 	epochsKeeper.SetEpochInfo(ctx, epochInfo)
 
 	k := keeper.NewKeeper(

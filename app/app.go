@@ -44,7 +44,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
@@ -64,7 +63,9 @@ import (
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
@@ -158,8 +159,9 @@ func AppConfig() depinject.Config {
 				banktypes.ModuleName:    overrides.BankModuleBasic{},
 				crisistypes.ModuleName:  overrides.CrisisModuleBasic{},
 				govtypes.ModuleName:     overrides.NewGovModuleBasic(),
-				minttypes.ModuleName:    overrides.MintModuleBasic{},
 				stakingtypes.ModuleName: overrides.StakingModuleBasic{},
+				epochstypes.ModuleName:  overrides.EpochsModuleBasic{},
+				tiertypes.ModuleName:    overrides.TierModuleBasic{},
 			},
 		),
 	)
@@ -245,7 +247,6 @@ func New(
 		&app.BankKeeper,
 		&app.StakingKeeper,
 		&app.SlashingKeeper,
-		&app.MintKeeper,
 		&app.DistrKeeper,
 		&app.GovKeeper,
 		&app.CrisisKeeper,
@@ -303,6 +304,8 @@ func New(
 	// Register legacy modules
 	app.registerIBCModules()
 
+	customMintModule := app.registerCustomMintModule()
+
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err
@@ -346,9 +349,11 @@ func New(
 	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
 	//
 	initChainer := func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-		// Temp workaround to set default IBC params until app wiring is fully supported.
 		if req.InitialHeight == 1 {
+			// Temp workaround to set default IBC params until app wiring is fully supported.
 			app.setDefaultIBCParams(ctx)
+			// Call InitGenesis() to set default state for the custom mint module
+			customMintModule.InitGenesis(ctx, app.appCodec, json.RawMessage{})
 		}
 
 		var genesisState GenesisState

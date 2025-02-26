@@ -1,4 +1,4 @@
-package keeper_test
+package keeper
 
 import (
 	"errors"
@@ -7,26 +7,25 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSetAndGetLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	now := time.Now()
 	creationHeight := int64(10)
 	amount := math.NewInt(1000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	k.SetLockup(ctx, delAddr, valAddr, amount)
+	k.setLockup(ctx, delAddr, valAddr, amount)
 
 	store := k.GetAllLockups(ctx)
 	require.Len(t, store, 1)
@@ -38,74 +37,76 @@ func TestSetAndGetLockup(t *testing.T) {
 }
 
 func TestAddLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	amount := math.NewInt(500)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	k.AddLockup(ctx, delAddr, valAddr, amount)
+	err = k.AddLockup(ctx, delAddr, valAddr, amount)
+	require.NoError(t, err)
 
 	lockup := k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.Equal(t, amount, lockup)
 }
 
 func TestSubtractLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	lockupAmount := math.NewInt(1000)
 	partialSubtractAmount := math.NewInt(500)
 	invalidSubtractAmount := math.NewInt(2000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	k.AddLockup(ctx, delAddr, valAddr, lockupAmount)
+	err = k.AddLockup(ctx, delAddr, valAddr, lockupAmount)
+	require.NoError(t, err)
 
 	// subtract a partial amount
-	err = k.SubtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
+	err = k.subtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
 	require.NoError(t, err)
 
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.Equal(t, partialSubtractAmount, lockedAmt)
 
 	// attempt to subtract more than the locked amount
-	err = k.SubtractLockup(ctx, delAddr, valAddr, invalidSubtractAmount)
+	err = k.subtractLockup(ctx, delAddr, valAddr, invalidSubtractAmount)
 	require.Error(t, err)
 
 	// subtract the remaining amount
-	err = k.SubtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
+	err = k.subtractLockup(ctx, delAddr, valAddr, partialSubtractAmount)
 	require.NoError(t, err)
 
 	// verify that the lockup has been removed
 	lockedAmt = k.GetLockupAmount(ctx, delAddr, valAddr)
 	require.True(t, lockedAmt.IsZero(), "remaining lockup amount should be zero")
-	require.False(t, k.HasLockup(ctx, delAddr, valAddr), "lockup should be removed")
+	require.Nil(t, k.GetLockup(ctx, delAddr, valAddr), "lockup should be removed")
 }
 
 func TestGetAllLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	k.SetLockup(ctx, delAddr1, valAddr1, amount1)
-	k.SetLockup(ctx, delAddr2, valAddr2, amount2)
+	k.setLockup(ctx, delAddr1, valAddr1, amount1)
+	k.setLockup(ctx, delAddr2, valAddr2, amount2)
 
 	lockups := k.GetAllLockups(ctx)
 	require.Len(t, lockups, 2)
@@ -119,7 +120,7 @@ func TestGetAllLockups(t *testing.T) {
 }
 
 func TestGetAllUnlockingLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	creationHeight1 := int64(1)
 	creationHeight2 := int64(2)
@@ -129,14 +130,14 @@ func TestGetAllUnlockingLockups(t *testing.T) {
 	amount2 := math.NewInt(500)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	k.SetUnlockingLockup(ctx, delAddr1, valAddr1, creationHeight1, amount1, timestamp1, timestamp1)
 	k.SetUnlockingLockup(ctx, delAddr2, valAddr2, creationHeight2, amount2, timestamp2, timestamp2)
@@ -160,19 +161,20 @@ func TestGetAllUnlockingLockups(t *testing.T) {
 }
 
 func TestMustIterateLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	amount := math.NewInt(1000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
-	k.AddLockup(ctx, delAddr, valAddr, amount)
+	err = k.AddLockup(ctx, delAddr, valAddr, amount)
+	require.NoError(t, err)
 
 	count := 0
-	k.MustIterateLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
+	k.mustIterateLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
 		require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", delAddr.String())
 		require.Equal(t, "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm", valAddr.String())
 		require.Equal(t, amount, lockup.Amount)
@@ -183,19 +185,19 @@ func TestMustIterateLockups(t *testing.T) {
 }
 
 func TestMustIterateUnlockingLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	amount := math.NewInt(1000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, 1, amount, time.Time{}, time.Time{})
 
 	count := 0
-	k.MustIterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.UnlockingLockup) {
+	k.mustIterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.UnlockingLockup) {
 		require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", delAddr.String())
 		require.Equal(t, "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm", valAddr.String())
 		require.Equal(t, creationHeight, lockup.CreationHeight)
@@ -207,7 +209,7 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 }
 
 func TestIterateUnlockingLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	timestamp1 := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
 	timestamp2 := time.Date(2006, time.January, 2, 15, 4, 5, 2, time.UTC)
@@ -216,14 +218,14 @@ func TestIterateUnlockingLockups(t *testing.T) {
 	timestamp5 := time.Date(2006, time.January, 2, 15, 4, 5, 5, time.UTC)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.Nil(t, err)
+	require.NoError(t, err)
 	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
-	require.Nil(t, err)
+	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(1)
 	k.SetUnlockingLockup(ctx, delAddr1, valAddr1, ctx.BlockHeight(), math.NewInt(1000), timestamp1, timestamp1)
@@ -239,7 +241,7 @@ func TestIterateUnlockingLockups(t *testing.T) {
 	k.SetUnlockingLockup(ctx, delAddr1, valAddr1, ctx.BlockHeight(), math.NewInt(200), timestamp5, timestamp5)
 
 	unlockingLockupsCount := 0
-	err = k.IterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+	err = k.iterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 		creationHeight int64, unlockingLockup types.UnlockingLockup) error {
 		require.NotNil(t, delAddr)
 		require.NotNil(t, valAddr)
@@ -252,7 +254,7 @@ func TestIterateUnlockingLockups(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 5, unlockingLockupsCount)
 
-	err = k.IterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+	err = k.iterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 		creationHeight int64, lockup types.UnlockingLockup) error {
 		return errors.New("not found")
 	})
@@ -260,7 +262,7 @@ func TestIterateUnlockingLockups(t *testing.T) {
 }
 
 func TestTotalAmountByAddr(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	delAddr1, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
@@ -272,42 +274,27 @@ func TestTotalAmountByAddr(t *testing.T) {
 	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
 	require.NoError(t, err)
 
-	k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(1000))
-	k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(500))
-	k.AddLockup(ctx, delAddr2, valAddr2, math.NewInt(700))
+	err = k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(1000))
+	require.NoError(t, err)
+	err = k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(500))
+	require.NoError(t, err)
+	err = k.AddLockup(ctx, delAddr2, valAddr2, math.NewInt(700))
+	require.NoError(t, err)
 
-	totalDel1 := k.TotalAmountByAddr(ctx, delAddr1)
+	totalDel1 := k.totalAmountByAddr(ctx, delAddr1)
 	require.Equal(t, math.NewInt(1500), totalDel1, "delAddr1 should have a total of 1500")
 
-	totalDel2 := k.TotalAmountByAddr(ctx, delAddr2)
+	totalDel2 := k.totalAmountByAddr(ctx, delAddr2)
 	require.Equal(t, math.NewInt(700), totalDel2, "delAddr2 should have a total of 700")
 
 	delAddr3, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
 	require.NoError(t, err)
-	totalDel3 := k.TotalAmountByAddr(ctx, delAddr3)
+	totalDel3 := k.totalAmountByAddr(ctx, delAddr3)
 	require.True(t, totalDel3.IsZero(), "delAddr3 should have no lockups")
 }
 
-func TestHasLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
-
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.NoError(t, err)
-
-	require.False(t, k.HasLockup(ctx, delAddr, valAddr))
-
-	k.AddLockup(ctx, delAddr, valAddr, math.NewInt(100))
-	require.True(t, k.HasLockup(ctx, delAddr, valAddr))
-
-	err = k.SubtractLockup(ctx, delAddr, valAddr, math.NewInt(100))
-	require.NoError(t, err)
-	require.False(t, k.HasLockup(ctx, delAddr, valAddr), "lockup should no longer exist after removing the entire amount")
-}
-
 func TestHasUnlockingLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	creationHeight := int64(1)
 	timestamp := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
@@ -322,13 +309,13 @@ func TestHasUnlockingLockup(t *testing.T) {
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, creationHeight, math.NewInt(100), timestamp, timestamp)
 	require.True(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, creationHeight))
 
-	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, math.NewInt(100))
+	err = k.subtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, math.NewInt(100))
 	require.NoError(t, err)
 	require.False(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, creationHeight))
 }
 
 func TestGetUnlockingLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	now := time.Now()
 	params := k.GetParams(ctx)
@@ -359,7 +346,7 @@ func TestGetUnlockingLockup(t *testing.T) {
 }
 
 func TestGetLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	now := time.Now()
 	creationHeight := int64(10)
@@ -372,7 +359,7 @@ func TestGetLockup(t *testing.T) {
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
 
-	k.SetLockup(ctx, delAddr, valAddr, amount)
+	k.setLockup(ctx, delAddr, valAddr, amount)
 
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 
@@ -388,41 +375,8 @@ func TestGetLockup(t *testing.T) {
 	require.Nil(t, nonExistentLockup, "lockup should not exist for the given validator")
 }
 
-func TestGetLockups(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
-
-	creationHeight := int64(10)
-	amount1 := math.NewInt(1000)
-	amount2 := math.NewInt(500)
-
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
-	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-	require.NoError(t, err)
-
-	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(time.Now())
-	k.SetLockup(ctx, delAddr, valAddr1, amount1)
-
-	ctx = ctx.WithBlockHeight(creationHeight + 1).WithBlockTime(time.Now().Add(time.Minute))
-	k.SetLockup(ctx, delAddr, valAddr2, amount2)
-
-	lockups := k.GetLockups(ctx, delAddr)
-
-	require.Len(t, lockups, 2, "delegator should have 2 lockups")
-
-	require.Equal(t, delAddr.String(), lockups[0].DelegatorAddress)
-	require.Equal(t, valAddr1.String(), lockups[0].ValidatorAddress)
-	require.Equal(t, amount1, lockups[0].Amount)
-
-	require.Equal(t, delAddr.String(), lockups[1].DelegatorAddress)
-	require.Equal(t, valAddr2.String(), lockups[1].ValidatorAddress)
-	require.Equal(t, amount2, lockups[1].Amount)
-}
-
 func TestSubtractUnlockingLockup(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
+	k, ctx := setupKeeper(t)
 
 	params := k.GetParams(ctx)
 	epochDuration := *params.EpochDuration
@@ -444,7 +398,7 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, creationHeight, unlockingLockupAmount, expectedCompletionTime, expectedUnlockTime)
 
 	// subtract partial amount
-	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
+	err = k.subtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
 	require.NoError(t, err)
 
 	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
@@ -454,13 +408,99 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	require.Equal(t, expectedUnlockTime, unlockingLockup.UnlockTime)
 
 	// try to subtract more than the locked amount
-	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount2)
+	err = k.subtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount2)
 	require.Error(t, err)
 
 	// subtract remaining amount
-	err = k.SubtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
+	err = k.subtractUnlockingLockup(ctx, delAddr, valAddr, creationHeight, cancelUnlockAmount)
 	require.NoError(t, err)
 
 	invalidUnlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.Nil(t, invalidUnlockingLockup)
+}
+
+func TestSetAndGetTotalLockupsAmount(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	total := k.GetTotalLockupsAmount(ctx)
+	require.True(t, total.IsZero(), "Initial total lockups amount should be zero")
+
+	expectedTotal := math.NewInt(1000)
+	err := k.setTotalLockupsAmount(ctx, expectedTotal)
+	require.NoError(t, err, "Setting total lockups amount should not fail")
+
+	total = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, expectedTotal, total, "Total lockups amount should be 1000")
+}
+
+func TestAddLockupUpdatesTotalLockups(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	amount1 := math.NewInt(500)
+	amount2 := math.NewInt(1000)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	err = k.AddLockup(ctx, delAddr, valAddr, amount1)
+	require.NoError(t, err, "Adding first lockup should not fail")
+
+	total := k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, amount1, total, "Total lockups amount should be 500")
+
+	err = k.AddLockup(ctx, delAddr, valAddr, amount2)
+	require.NoError(t, err, "Adding another lockup should not fail")
+
+	total = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, amount1.Add(amount2), total, "Total lockups amount should be 1500")
+}
+
+func TestSubtractLockupUpdatesTotalLockups(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	initialAmount := math.NewInt(5000)
+	subtractAmount := math.NewInt(1500)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	err = k.AddLockup(ctx, delAddr, valAddr, initialAmount)
+	require.NoError(t, err, "Adding lockup should not fail")
+
+	total := k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialAmount, total, "Total lockups amount should be 5000")
+
+	err = k.subtractLockup(ctx, delAddr, valAddr, subtractAmount)
+	require.NoError(t, err, "Subtracting lockup should not fail")
+
+	total = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialAmount.Sub(subtractAmount), total, "Total lockups amount should be 3500")
+}
+
+func TestRemoveLockupUpdatesTotalLockups(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	initialAmount := math.NewInt(5000)
+	subtractAmount := math.NewInt(5000)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	err = k.AddLockup(ctx, delAddr, valAddr, initialAmount)
+	require.NoError(t, err, "Adding lockup should not fail")
+
+	total := k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialAmount, total, "Total lockups amount should be 5000")
+
+	err = k.subtractLockup(ctx, delAddr, valAddr, subtractAmount)
+	require.NoError(t, err, "Subtracting lockup should not fail")
+
+	total = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, math.ZeroInt(), total, "Total lockups amount should be 0")
 }

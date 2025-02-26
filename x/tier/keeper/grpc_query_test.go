@@ -14,11 +14,11 @@ import (
 )
 
 func TestParamsQuery(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Params(ctx, &types.QueryParamsRequest{})
 
 	require.NoError(t, err)
@@ -26,11 +26,11 @@ func TestParamsQuery(t *testing.T) {
 }
 
 func TestParamsQuery_InvalidRequest(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Params(ctx, nil)
 
 	require.Error(t, err)
@@ -39,7 +39,7 @@ func TestParamsQuery_InvalidRequest(t *testing.T) {
 }
 
 func TestLockupQuery(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 	amount := math.NewInt(1000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
@@ -47,9 +47,10 @@ func TestLockupQuery(t *testing.T) {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
-	keeper.AddLockup(ctx, delAddr, valAddr, amount)
+	err = k.AddLockup(ctx, delAddr, valAddr, amount)
+	require.NoError(t, err)
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Lockup(ctx, &types.LockupRequest{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
@@ -66,11 +67,11 @@ func TestLockupQuery(t *testing.T) {
 }
 
 func TestLockupQuery_InvalidRequest(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Lockup(ctx, nil)
 
 	require.Error(t, err)
@@ -79,7 +80,7 @@ func TestLockupQuery_InvalidRequest(t *testing.T) {
 }
 
 func TestLockupsQuery(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
+	k, ctx := keepertest.TierKeeper(t)
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 
@@ -88,10 +89,12 @@ func TestLockupsQuery(t *testing.T) {
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
-	keeper.AddLockup(ctx, delAddr, valAddr, amount1)
-	keeper.AddLockup(ctx, delAddr, valAddr, amount2)
+	err = k.AddLockup(ctx, delAddr, valAddr, amount1)
+	require.NoError(t, err)
+	err = k.AddLockup(ctx, delAddr, valAddr, amount2)
+	require.NoError(t, err)
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Lockups(ctx, &types.LockupsRequest{
 		DelegatorAddress: delAddr.String(),
 	})
@@ -102,11 +105,11 @@ func TestLockupsQuery(t *testing.T) {
 }
 
 func TestLockupsQuery_InvalidRequest(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.Lockups(ctx, nil)
 
 	require.Error(t, err)
@@ -115,8 +118,8 @@ func TestLockupsQuery_InvalidRequest(t *testing.T) {
 }
 
 func TestUnlockingLockupQuery(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := keeper.GetParams(ctx)
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
 	epochDuration := *params.EpochDuration
 	amount := math.NewInt(1000)
 
@@ -130,9 +133,9 @@ func TestUnlockingLockupQuery(t *testing.T) {
 	completionTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 	unlockTime := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 
-	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount, completionTime, unlockTime)
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount, completionTime, unlockTime)
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.UnlockingLockup(ctx, &types.UnlockingLockupRequest{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
@@ -153,11 +156,11 @@ func TestUnlockingLockupQuery(t *testing.T) {
 }
 
 func TestUnlockingLockupQuery_InvalidRequest(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.UnlockingLockup(ctx, nil)
 
 	require.Error(t, err)
@@ -166,8 +169,8 @@ func TestUnlockingLockupQuery_InvalidRequest(t *testing.T) {
 }
 
 func TestUnlockingLockupsQuery(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := keeper.GetParams(ctx)
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
 	epochDuration := *params.EpochDuration
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
@@ -181,15 +184,15 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 
 	completionTime1 := ctx.BlockTime().Add(time.Hour * 24 * 21)
 	unlockTime1 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount1, completionTime1, unlockTime1)
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount1, completionTime1, unlockTime1)
 
 	ctx = ctx.WithBlockHeight(2).WithBlockTime(ctx.BlockTime().Add(time.Second))
 
 	completionTime2 := ctx.BlockTime().Add(time.Hour * 24 * 21)
 	unlockTime2 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
-	keeper.SetUnlockingLockup(ctx, delAddr, valAddr, int64(2), amount2, completionTime2, unlockTime2)
+	k.SetUnlockingLockup(ctx, delAddr, valAddr, int64(2), amount2, completionTime2, unlockTime2)
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.UnlockingLockups(ctx, &types.UnlockingLockupsRequest{
 		DelegatorAddress: delAddr.String(),
 	})
@@ -209,11 +212,11 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 }
 
 func TestUnlockingLockupsQuery_InvalidRequest(t *testing.T) {
-	keeper, ctx := keepertest.TierKeeper(t)
-	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(keeper)
+	querier := tierkeeper.NewQuerier(k)
 	response, err := querier.UnlockingLockups(ctx, nil)
 
 	require.Error(t, err)

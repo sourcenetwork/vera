@@ -10,6 +10,7 @@ import (
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -44,8 +45,8 @@ func TestMsgLock(t *testing.T) {
 	valAddress, err := sdk.ValAddressFromBech32(valAddr)
 	require.NoError(t, err)
 
-	initializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
-	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, valAddress, initialValidatorBalance)
+	keepertest.InitializeDelegator(t, &k, sdkCtx, delAddress, initialDelegatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, valAddress, initialValidatorBalance)
 
 	testCases := []struct {
 		name      string

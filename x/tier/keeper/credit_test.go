@@ -326,7 +326,8 @@ func TestProratedCredit(t *testing.T) {
 
 			k.removeLockup(ctx, delAddr, valAddr)
 			if tc.locked > 0 {
-				k.AddLockup(ctx, delAddr, valAddr, math.NewInt(tc.locked))
+				err = k.AddLockup(ctx, delAddr, valAddr, math.NewInt(tc.locked))
+				require.NoError(t, err)
 			}
 			got := k.proratedCredit(ctx, delAddr, math.NewInt(tc.locking))
 			require.Equal(t, tc.want, got.Int64())
@@ -363,7 +364,7 @@ func TestBurnAllCredits(t *testing.T) {
 			wantErr:      false,
 		},
 		{
-			name: "Burn credits when addresses also hold $OPEN",
+			name: "Burn credits when addresses also hold uopen",
 			creditBalances: map[string]int64{
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 80,
 				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 200,
@@ -390,14 +391,14 @@ func TestBurnAllCredits(t *testing.T) {
 				require.NoError(t, err, "SendCoinsFromModuleToAccount failed")
 			}
 
-			// Mint and distribute $OPEN
+			// Mint and distribute uopen
 			for addrStr, balance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(balance)))
 				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
-				require.NoError(t, err, "MintCoins $OPEN failed")
+				require.NoError(t, err, "MintCoins uopen failed")
 				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
-				require.NoError(t, err, "SendCoinsFromModuleToAccount $OPEN failed")
+				require.NoError(t, err, "SendCoinsFromModuleToAccount uopen failed")
 			}
 
 			// Burn all credits
@@ -416,7 +417,7 @@ func TestBurnAllCredits(t *testing.T) {
 				}
 			}
 
-			// Verify that $OPEN balances are unchanged
+			// Verify that uopen balances are unchanged
 			for addrStr, expectedBalance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.DefaultBondDenom)
@@ -499,7 +500,8 @@ func TestResetAllCredits(t *testing.T) {
 			for addrStr, lockupAmounts := range tt.lockups {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				for _, amt := range lockupAmounts {
-					k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
+					err = k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
+					require.NoError(t, err)
 				}
 			}
 

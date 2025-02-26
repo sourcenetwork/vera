@@ -92,18 +92,6 @@ func (mr *MockBankKeeperMockRecorder) SendCoinsFromModuleToAccount(ctx, senderMo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendCoinsFromModuleToAccount", reflect.TypeOf((*MockBankKeeper)(nil).SendCoinsFromModuleToAccount), ctx, senderModule, recipientAddr, amt)
 }
 
-func (m *MockBankKeeper) DelegateCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DelegateCoinsFromAccountToModule", ctx, senderAddr, recipientModule, amt)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-func (mr *MockBankKeeperMockRecorder) DelegateCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DelegateCoinsFromAccountToModule", reflect.TypeOf((*MockBankKeeper)(nil).DelegateCoinsFromAccountToModule), ctx, senderAddr, recipientModule, amt)
-}
-
 func (m *MockBankKeeper) SendCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendCoinsFromAccountToModule", ctx, senderAddr, recipientModule, amt)
@@ -114,6 +102,34 @@ func (m *MockBankKeeper) SendCoinsFromAccountToModule(ctx context.Context, sende
 func (mr *MockBankKeeperMockRecorder) SendCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendCoinsFromAccountToModule", reflect.TypeOf((*MockBankKeeper)(nil).SendCoinsFromAccountToModule), ctx, senderAddr, recipientModule, amt)
+}
+
+func (m *MockBankKeeper) SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt sdk.Coins) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SendCoinsFromModuleToModule", ctx, senderModule, recipientModule, amt)
+
+	var err error
+	if len(ret) > 0 && ret[0] != nil {
+		err = ret[0].(error)
+	}
+	return err
+}
+
+func (mr *MockBankKeeperMockRecorder) SendCoinsFromModuleToModule(ctx, senderModule, recipientModule, amt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SendCoinsFromModuleToModule", reflect.TypeOf((*MockBankKeeper)(nil).SendCoinsFromModuleToModule), ctx, senderModule, recipientModule, amt)
+}
+
+func (m *MockBankKeeper) DelegateCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DelegateCoinsFromAccountToModule", ctx, senderAddr, recipientModule, amt)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockBankKeeperMockRecorder) DelegateCoinsFromAccountToModule(ctx, senderAddr, recipientModule, amt interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DelegateCoinsFromAccountToModule", reflect.TypeOf((*MockBankKeeper)(nil).DelegateCoinsFromAccountToModule), ctx, senderAddr, recipientModule, amt)
 }
 
 func (m *MockBankKeeper) UndelegateCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error {
@@ -176,16 +192,56 @@ func (m *MockDistributionKeeper) AllocateTokensToValidator(ctx context.Context, 
 	return nil
 }
 
+func (mr *MockDistributionKeeperRecorder) AllocateTokensToValidator(ctx, val, tokens any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocateTokensToValidator", reflect.TypeOf((*MockDistributionKeeper)(nil).AllocateTokensToValidator), ctx, val, tokens)
+}
+
 func (m *MockDistributionKeeper) AllocateTokens(ctx context.Context, totalReward int64, bondedValidators []abcitypes.VoteInfo) error {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "AllocateTokensToValidator", ctx, totalReward, bondedValidators)
+	m.ctrl.Call(m, "AllocateTokens", ctx, totalReward, bondedValidators)
 	return nil
+}
+
+func (mr *MockDistributionKeeperRecorder) AllocateTokens(ctx, totalReward, bondedValidators any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AllocateTokens", reflect.TypeOf((*MockDistributionKeeper)(nil).AllocateTokens), ctx, totalReward, bondedValidators)
 }
 
 func (m *MockDistributionKeeper) GetValidatorOutstandingRewards(ctx context.Context, valAddr sdk.ValAddress) (distrtypes.ValidatorOutstandingRewards, error) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "GetValidatorOutstandingRewards", ctx, valAddr)
 	return distrtypes.ValidatorOutstandingRewards{}, nil
+}
+
+func (mr *MockDistributionKeeperRecorder) GetValidatorOutstandingRewards(ctx, valAddr any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetValidatorOutstandingRewards", reflect.TypeOf((*MockDistributionKeeper)(nil).GetValidatorOutstandingRewards), ctx, valAddr)
+}
+
+func (m *MockDistributionKeeper) WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithdrawDelegationRewards", ctx, delAddr, valAddr)
+	var coins sdk.Coins
+	if len(ret) > 0 {
+		if ret[0] != nil {
+			coins = ret[0].(sdk.Coins)
+		} else {
+			coins = sdk.NewCoins()
+		}
+	}
+	var err error
+	if len(ret) > 1 {
+		if ret[1] != nil {
+			err = ret[1].(error)
+		}
+	}
+	return coins, err
+}
+
+func (mr *MockDistributionKeeperRecorder) WithdrawDelegationRewards(ctx, delAddr, valAddr any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithdrawDelegationRewards", reflect.TypeOf((*MockDistributionKeeper)(nil).WithdrawDelegationRewards), ctx, delAddr, valAddr)
 }
 
 // Mock staking keeper
@@ -243,6 +299,18 @@ func (m *MockStakingKeeper) IterateValidators(ctx context.Context, fn func(index
 func (mr *MockStakingKeeperRecorder) IterateValidators(ctx, fn interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IterateValidators", reflect.TypeOf((*MockStakingKeeper)(nil).IterateValidators), ctx, fn)
+}
+
+func (m *MockStakingKeeper) IterateDelegations(ctx context.Context, delAddr sdk.AccAddress, fn func(index int64, delegation stakingtypes.DelegationI) (stop bool)) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IterateDelegations", ctx, delAddr, fn)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockStakingKeeperRecorder) IterateDelegations(ctx, delAddr, fn interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IterateDelegations", reflect.TypeOf((*MockStakingKeeper)(nil).IterateDelegations), ctx, delAddr, fn)
 }
 
 func (m *MockStakingKeeper) TotalBondedTokens(ctx context.Context) (math.Int, error) {
