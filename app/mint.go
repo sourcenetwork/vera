@@ -103,8 +103,8 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 	}
 
 	// Compute the delegator stake rate and adjusted inflation
-	delStakeRate := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
-	effectiveInflation := minter.Inflation.Mul(delStakeRate)
+	delStakeRatio := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
+	effectiveInflation := minter.Inflation.Mul(delStakeRatio)
 	q.logger.Info("Returning effective inflation", "inflation", effectiveInflation)
 
 	return &minttypes.QueryInflationResponse{Inflation: effectiveInflation}, nil
@@ -118,7 +118,7 @@ func (cm CustomMintModule) RegisterServices(cfg module.Configurator) {
 	minttypes.RegisterQueryServer(cfg.QueryServer(), customMintQueryServer)
 }
 
-// InitGenesis initializes default state for the mint keeper.
+// InitGenesis initializes default state for the mint keeper and overrides the default params.
 func (cm CustomMintModule) InitGenesis(ctx context.Context, cdc codec.JSONCodec, data json.RawMessage) {
 	genesisState := minttypes.DefaultGenesisState()
 
@@ -131,12 +131,11 @@ func (cm CustomMintModule) InitGenesis(ctx context.Context, cdc codec.JSONCodec,
 	genesisState.Params.InflationMax = math.LegacyMustNewDecFromStr(appparams.InflationMax)
 	genesisState.Params.InflationRateChange = math.LegacyMustNewDecFromStr(appparams.InflationRateChange)
 
-	err := cm.mintKeeper.Minter.Set(ctx, genesisState.Minter)
-	if err != nil {
+	if err := cm.mintKeeper.Minter.Set(ctx, genesisState.Minter); err != nil {
 		panic(err)
 	}
-	err = cm.mintKeeper.Params.Set(ctx, genesisState.Params)
-	if err != nil {
+
+	if err := cm.mintKeeper.Params.Set(ctx, genesisState.Params); err != nil {
 		panic(err)
 	}
 }
