@@ -254,6 +254,7 @@ func (a *GetPolicyAction) Run(ctx *TestCtx) {
 	result, err := ctx.Executor.Policy(ctx, msg)
 	AssertError(ctx, err, a.ExpectedErr)
 	if result != nil {
+		a.Expected.Metadata.CreationTs = result.Record.Metadata.CreationTs
 		AssertValue(ctx, a.Expected, result.Record)
 	}
 }
@@ -285,6 +286,7 @@ func (a *CommitRegistrationsAction) Run(ctx *TestCtx) *types.RegistrationsCommit
 	comm := result.GetCommitRegistrationsResult().RegistrationsCommitment
 
 	if a.Expected != nil {
+		a.Expected.Metadata.CreationTs = comm.Metadata.CreationTs
 		AssertValue(ctx, comm, a.Expected)
 	}
 	return comm

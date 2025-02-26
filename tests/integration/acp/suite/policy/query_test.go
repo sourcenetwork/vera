@@ -24,13 +24,15 @@ name: policy
 	pol := a1.Run(ctx)
 	pol.Resources = nil
 
+	metadata := ctx.GetSignerRecordMetadata()
+	metadata.CreationTs.BlockHeight++
 	action := test.GetPolicyAction{
 		Id: pol.Id,
 		Expected: &acptypes.PolicyRecord{
 			Policy:      pol,
 			MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 			RawPolicy:   policyStr,
-			Metadata:    ctx.GetSignerRecordMetadata(),
+			Metadata:    metadata,
 		},
 	}
 	action.Run(ctx)

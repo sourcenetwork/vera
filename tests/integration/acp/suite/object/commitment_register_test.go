@@ -40,13 +40,15 @@ func TestCommitRegistration_CreatingCommitmentReturnsID(t *testing.T) {
 		},
 	}
 	commitment := a2.GetCommitment(ctx)
+	metadata := ctx.GetRecordMetadataForActor("bob")
+	metadata.CreationTs.BlockHeight++
 	a2.Expected = &types.RegistrationsCommitment{
 		Id:         1,
 		PolicyId:   ctx.State.PolicyId,
 		Commitment: commitment,
 		Expired:    false,
 		Validity:   ctx.Params.RegistrationsCommitmentValidity,
-		Metadata:   ctx.GetRecordMetadataForActor("bob"),
+		Metadata:   metadata,
 	}
 	a2.Run(ctx)
 }
