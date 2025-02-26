@@ -98,30 +98,30 @@ func NextState(t *testing.T, state State, op Operation) State {
 
 	switch op.Kind {
 	case Register:
-		state.Model.RegistrationTs = *op.Result.GetRegisterObjectResult().Record.Metadata.CreationTs
-		state.Model.Owner = op.Actor.DID
-		state.Registered = true
+		if !state.Registered {
+			state.Model.RegistrationTs = *op.Result.GetRegisterObjectResult().Record.Metadata.CreationTs
+			state.Model.Owner = op.Actor.DID
+			state.Registered = true
+		}
 	case Archive:
-		if op.Actor.DID == state.Model.Owner && !state.Model.Archived {
+		if op.Actor.DID == state.Model.Owner {
 			state.Model.Archived = true
 		}
 	case Commit:
 		result := op.Result.Result.(*types.PolicyCmdResult_CommitRegistrationsResult).CommitRegistrationsResult
 		state.Commitments = append(state.Commitments, result.RegistrationsCommitment)
 	case Unarchive:
-		if op.Actor.DID == state.Model.Owner && state.Model.Archived {
+		if op.Actor.DID == state.Model.Owner {
 			state.Model.Archived = false
 		}
 	case Reveal:
 		commitId := op.Request.GetRevealRegistrationCmd().RegistrationsCommitmentId
 		c := state.MustCommitmentById(commitId)
 
-		nextSourceHubTs := state.LastTs
-		next := nextSourceHubTs.BlockHeight
+		expirationHeight := c.Metadata.CreationTs.BlockHeight + c.Validity.GetBlockCount()
+		blockHeight := state.LastTs.BlockHeight
+		isValid := blockHeight < expirationHeight
 
-		expiration := c.Metadata.CreationTs.BlockHeight + c.Validity.GetBlockCount()
-
-		isValid := next < expiration
 		isCommitmentOwner := c.Metadata.OwnerDid == op.Actor.DID
 		isCommitmentOlder := c.Metadata.CreationTs.BlockHeight < state.Model.RegistrationTs.BlockHeight
 
