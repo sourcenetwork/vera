@@ -15,39 +15,39 @@ import (
 )
 
 var (
-	md_ObjectRegistrationEvent           protoreflect.MessageDescriptor
-	fd_ObjectRegistrationEvent_id        protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_type      protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_tx_hash   protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_policy_id protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_ts        protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_object    protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_actor     protoreflect.FieldDescriptor
-	fd_ObjectRegistrationEvent_detail    protoreflect.FieldDescriptor
+	md_AmendmentEvent                protoreflect.MessageDescriptor
+	fd_AmendmentEvent_id             protoreflect.FieldDescriptor
+	fd_AmendmentEvent_policy_id      protoreflect.FieldDescriptor
+	fd_AmendmentEvent_object         protoreflect.FieldDescriptor
+	fd_AmendmentEvent_new_owner      protoreflect.FieldDescriptor
+	fd_AmendmentEvent_previous_owner protoreflect.FieldDescriptor
+	fd_AmendmentEvent_commitment_id  protoreflect.FieldDescriptor
+	fd_AmendmentEvent_hijack_flag    protoreflect.FieldDescriptor
+	fd_AmendmentEvent_metadata       protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_acp_registration_proto_init()
-	md_ObjectRegistrationEvent = File_sourcehub_acp_registration_proto.Messages().ByName("ObjectRegistrationEvent")
-	fd_ObjectRegistrationEvent_id = md_ObjectRegistrationEvent.Fields().ByName("id")
-	fd_ObjectRegistrationEvent_type = md_ObjectRegistrationEvent.Fields().ByName("type")
-	fd_ObjectRegistrationEvent_tx_hash = md_ObjectRegistrationEvent.Fields().ByName("tx_hash")
-	fd_ObjectRegistrationEvent_policy_id = md_ObjectRegistrationEvent.Fields().ByName("policy_id")
-	fd_ObjectRegistrationEvent_ts = md_ObjectRegistrationEvent.Fields().ByName("ts")
-	fd_ObjectRegistrationEvent_object = md_ObjectRegistrationEvent.Fields().ByName("object")
-	fd_ObjectRegistrationEvent_actor = md_ObjectRegistrationEvent.Fields().ByName("actor")
-	fd_ObjectRegistrationEvent_detail = md_ObjectRegistrationEvent.Fields().ByName("detail")
+	md_AmendmentEvent = File_sourcehub_acp_registration_proto.Messages().ByName("AmendmentEvent")
+	fd_AmendmentEvent_id = md_AmendmentEvent.Fields().ByName("id")
+	fd_AmendmentEvent_policy_id = md_AmendmentEvent.Fields().ByName("policy_id")
+	fd_AmendmentEvent_object = md_AmendmentEvent.Fields().ByName("object")
+	fd_AmendmentEvent_new_owner = md_AmendmentEvent.Fields().ByName("new_owner")
+	fd_AmendmentEvent_previous_owner = md_AmendmentEvent.Fields().ByName("previous_owner")
+	fd_AmendmentEvent_commitment_id = md_AmendmentEvent.Fields().ByName("commitment_id")
+	fd_AmendmentEvent_hijack_flag = md_AmendmentEvent.Fields().ByName("hijack_flag")
+	fd_AmendmentEvent_metadata = md_AmendmentEvent.Fields().ByName("metadata")
 }
 
-var _ protoreflect.Message = (*fastReflection_ObjectRegistrationEvent)(nil)
+var _ protoreflect.Message = (*fastReflection_AmendmentEvent)(nil)
 
-type fastReflection_ObjectRegistrationEvent ObjectRegistrationEvent
+type fastReflection_AmendmentEvent AmendmentEvent
 
-func (x *ObjectRegistrationEvent) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_ObjectRegistrationEvent)(x)
+func (x *AmendmentEvent) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_AmendmentEvent)(x)
 }
 
-func (x *ObjectRegistrationEvent) slowProtoReflect() protoreflect.Message {
+func (x *AmendmentEvent) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_acp_registration_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -59,43 +59,43 @@ func (x *ObjectRegistrationEvent) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_ObjectRegistrationEvent_messageType fastReflection_ObjectRegistrationEvent_messageType
-var _ protoreflect.MessageType = fastReflection_ObjectRegistrationEvent_messageType{}
+var _fastReflection_AmendmentEvent_messageType fastReflection_AmendmentEvent_messageType
+var _ protoreflect.MessageType = fastReflection_AmendmentEvent_messageType{}
 
-type fastReflection_ObjectRegistrationEvent_messageType struct{}
+type fastReflection_AmendmentEvent_messageType struct{}
 
-func (x fastReflection_ObjectRegistrationEvent_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_ObjectRegistrationEvent)(nil)
+func (x fastReflection_AmendmentEvent_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_AmendmentEvent)(nil)
 }
-func (x fastReflection_ObjectRegistrationEvent_messageType) New() protoreflect.Message {
-	return new(fastReflection_ObjectRegistrationEvent)
+func (x fastReflection_AmendmentEvent_messageType) New() protoreflect.Message {
+	return new(fastReflection_AmendmentEvent)
 }
-func (x fastReflection_ObjectRegistrationEvent_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_ObjectRegistrationEvent
+func (x fastReflection_AmendmentEvent_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_AmendmentEvent
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_ObjectRegistrationEvent) Descriptor() protoreflect.MessageDescriptor {
-	return md_ObjectRegistrationEvent
+func (x *fastReflection_AmendmentEvent) Descriptor() protoreflect.MessageDescriptor {
+	return md_AmendmentEvent
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_ObjectRegistrationEvent) Type() protoreflect.MessageType {
-	return _fastReflection_ObjectRegistrationEvent_messageType
+func (x *fastReflection_AmendmentEvent) Type() protoreflect.MessageType {
+	return _fastReflection_AmendmentEvent_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_ObjectRegistrationEvent) New() protoreflect.Message {
-	return new(fastReflection_ObjectRegistrationEvent)
+func (x *fastReflection_AmendmentEvent) New() protoreflect.Message {
+	return new(fastReflection_AmendmentEvent)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_ObjectRegistrationEvent) Interface() protoreflect.ProtoMessage {
-	return (*ObjectRegistrationEvent)(x)
+func (x *fastReflection_AmendmentEvent) Interface() protoreflect.ProtoMessage {
+	return (*AmendmentEvent)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -103,52 +103,52 @@ func (x *fastReflection_ObjectRegistrationEvent) Interface() protoreflect.ProtoM
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_ObjectRegistrationEvent) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_AmendmentEvent) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Id != uint64(0) {
 		value := protoreflect.ValueOfUint64(x.Id)
-		if !f(fd_ObjectRegistrationEvent_id, value) {
-			return
-		}
-	}
-	if x.Type_ != 0 {
-		value := protoreflect.ValueOfEnum((protoreflect.EnumNumber)(x.Type_))
-		if !f(fd_ObjectRegistrationEvent_type, value) {
-			return
-		}
-	}
-	if len(x.TxHash) != 0 {
-		value := protoreflect.ValueOfBytes(x.TxHash)
-		if !f(fd_ObjectRegistrationEvent_tx_hash, value) {
+		if !f(fd_AmendmentEvent_id, value) {
 			return
 		}
 	}
 	if x.PolicyId != "" {
 		value := protoreflect.ValueOfString(x.PolicyId)
-		if !f(fd_ObjectRegistrationEvent_policy_id, value) {
-			return
-		}
-	}
-	if x.Ts != nil {
-		value := protoreflect.ValueOfMessage(x.Ts.ProtoReflect())
-		if !f(fd_ObjectRegistrationEvent_ts, value) {
+		if !f(fd_AmendmentEvent_policy_id, value) {
 			return
 		}
 	}
 	if x.Object != nil {
 		value := protoreflect.ValueOfMessage(x.Object.ProtoReflect())
-		if !f(fd_ObjectRegistrationEvent_object, value) {
+		if !f(fd_AmendmentEvent_object, value) {
 			return
 		}
 	}
-	if x.Actor != nil {
-		value := protoreflect.ValueOfMessage(x.Actor.ProtoReflect())
-		if !f(fd_ObjectRegistrationEvent_actor, value) {
+	if x.NewOwner != nil {
+		value := protoreflect.ValueOfMessage(x.NewOwner.ProtoReflect())
+		if !f(fd_AmendmentEvent_new_owner, value) {
 			return
 		}
 	}
-	if x.Detail != nil {
-		value := protoreflect.ValueOfMessage(x.Detail.ProtoReflect())
-		if !f(fd_ObjectRegistrationEvent_detail, value) {
+	if x.PreviousOwner != nil {
+		value := protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
+		if !f(fd_AmendmentEvent_previous_owner, value) {
+			return
+		}
+	}
+	if x.CommitmentId != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.CommitmentId)
+		if !f(fd_AmendmentEvent_commitment_id, value) {
+			return
+		}
+	}
+	if x.HijackFlag != false {
+		value := protoreflect.ValueOfBool(x.HijackFlag)
+		if !f(fd_AmendmentEvent_hijack_flag, value) {
+			return
+		}
+	}
+	if x.Metadata != nil {
+		value := protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
+		if !f(fd_AmendmentEvent_metadata, value) {
 			return
 		}
 	}
@@ -165,29 +165,29 @@ func (x *fastReflection_ObjectRegistrationEvent) Range(f func(protoreflect.Field
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_ObjectRegistrationEvent) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_AmendmentEvent) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
+	case "sourcehub.acp.AmendmentEvent.id":
 		return x.Id != uint64(0)
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		return x.Type_ != 0
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		return len(x.TxHash) != 0
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
+	case "sourcehub.acp.AmendmentEvent.policy_id":
 		return x.PolicyId != ""
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		return x.Ts != nil
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		return x.Object != nil
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		return x.Actor != nil
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		return x.Detail != nil
+	case "sourcehub.acp.AmendmentEvent.new_owner":
+		return x.NewOwner != nil
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		return x.PreviousOwner != nil
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		return x.CommitmentId != uint64(0)
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		return x.HijackFlag != false
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		return x.Metadata != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -197,29 +197,29 @@ func (x *fastReflection_ObjectRegistrationEvent) Has(fd protoreflect.FieldDescri
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ObjectRegistrationEvent) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_AmendmentEvent) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
+	case "sourcehub.acp.AmendmentEvent.id":
 		x.Id = uint64(0)
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		x.Type_ = 0
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		x.TxHash = nil
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
+	case "sourcehub.acp.AmendmentEvent.policy_id":
 		x.PolicyId = ""
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		x.Ts = nil
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		x.Object = nil
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		x.Actor = nil
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		x.Detail = nil
+	case "sourcehub.acp.AmendmentEvent.new_owner":
+		x.NewOwner = nil
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		x.PreviousOwner = nil
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		x.CommitmentId = uint64(0)
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		x.HijackFlag = false
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		x.Metadata = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -229,37 +229,37 @@ func (x *fastReflection_ObjectRegistrationEvent) Clear(fd protoreflect.FieldDesc
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_ObjectRegistrationEvent) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_AmendmentEvent) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
+	case "sourcehub.acp.AmendmentEvent.id":
 		value := x.Id
 		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		value := x.Type_
-		return protoreflect.ValueOfEnum((protoreflect.EnumNumber)(value))
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		value := x.TxHash
-		return protoreflect.ValueOfBytes(value)
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
+	case "sourcehub.acp.AmendmentEvent.policy_id":
 		value := x.PolicyId
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		value := x.Ts
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		value := x.Object
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		value := x.Actor
+	case "sourcehub.acp.AmendmentEvent.new_owner":
+		value := x.NewOwner
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		value := x.Detail
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		value := x.PreviousOwner
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		value := x.CommitmentId
+		return protoreflect.ValueOfUint64(value)
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		value := x.HijackFlag
+		return protoreflect.ValueOfBool(value)
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		value := x.Metadata
 		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -273,29 +273,29 @@ func (x *fastReflection_ObjectRegistrationEvent) Get(descriptor protoreflect.Fie
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ObjectRegistrationEvent) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_AmendmentEvent) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
+	case "sourcehub.acp.AmendmentEvent.id":
 		x.Id = value.Uint()
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		x.Type_ = (ObjectRegistrationEventType)(value.Enum())
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		x.TxHash = value.Bytes()
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
+	case "sourcehub.acp.AmendmentEvent.policy_id":
 		x.PolicyId = value.Interface().(string)
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		x.Ts = value.Message().Interface().(*Timestamp)
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		x.Object = value.Message().Interface().(*types.Object)
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		x.Actor = value.Message().Interface().(*types.Actor)
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		x.Detail = value.Message().Interface().(*EventDetail)
+	case "sourcehub.acp.AmendmentEvent.new_owner":
+		x.NewOwner = value.Message().Interface().(*types.Actor)
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		x.PreviousOwner = value.Message().Interface().(*types.Actor)
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		x.CommitmentId = value.Uint()
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		x.HijackFlag = value.Bool()
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		x.Metadata = value.Message().Interface().(*RecordMetadata)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -309,84 +309,84 @@ func (x *fastReflection_ObjectRegistrationEvent) Set(fd protoreflect.FieldDescri
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ObjectRegistrationEvent) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_AmendmentEvent) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		if x.Ts == nil {
-			x.Ts = new(Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.Ts.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		if x.Object == nil {
 			x.Object = new(types.Object)
 		}
 		return protoreflect.ValueOfMessage(x.Object.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
-		if x.Actor == nil {
-			x.Actor = new(types.Actor)
+	case "sourcehub.acp.AmendmentEvent.new_owner":
+		if x.NewOwner == nil {
+			x.NewOwner = new(types.Actor)
 		}
-		return protoreflect.ValueOfMessage(x.Actor.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		if x.Detail == nil {
-			x.Detail = new(EventDetail)
+		return protoreflect.ValueOfMessage(x.NewOwner.ProtoReflect())
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		if x.PreviousOwner == nil {
+			x.PreviousOwner = new(types.Actor)
 		}
-		return protoreflect.ValueOfMessage(x.Detail.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
-		panic(fmt.Errorf("field id of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		panic(fmt.Errorf("field type of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		panic(fmt.Errorf("field tx_hash of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
-		panic(fmt.Errorf("field policy_id of message sourcehub.acp.ObjectRegistrationEvent is not mutable"))
+		return protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		if x.Metadata == nil {
+			x.Metadata = new(RecordMetadata)
+		}
+		return protoreflect.ValueOfMessage(x.Metadata.ProtoReflect())
+	case "sourcehub.acp.AmendmentEvent.id":
+		panic(fmt.Errorf("field id of message sourcehub.acp.AmendmentEvent is not mutable"))
+	case "sourcehub.acp.AmendmentEvent.policy_id":
+		panic(fmt.Errorf("field policy_id of message sourcehub.acp.AmendmentEvent is not mutable"))
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		panic(fmt.Errorf("field commitment_id of message sourcehub.acp.AmendmentEvent is not mutable"))
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		panic(fmt.Errorf("field hijack_flag of message sourcehub.acp.AmendmentEvent is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_ObjectRegistrationEvent) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_AmendmentEvent) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.acp.ObjectRegistrationEvent.id":
+	case "sourcehub.acp.AmendmentEvent.id":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.ObjectRegistrationEvent.type":
-		return protoreflect.ValueOfEnum(0)
-	case "sourcehub.acp.ObjectRegistrationEvent.tx_hash":
-		return protoreflect.ValueOfBytes(nil)
-	case "sourcehub.acp.ObjectRegistrationEvent.policy_id":
+	case "sourcehub.acp.AmendmentEvent.policy_id":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.acp.ObjectRegistrationEvent.ts":
-		m := new(Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.object":
+	case "sourcehub.acp.AmendmentEvent.object":
 		m := new(types.Object)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.actor":
+	case "sourcehub.acp.AmendmentEvent.new_owner":
 		m := new(types.Actor)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.ObjectRegistrationEvent.detail":
-		m := new(EventDetail)
+	case "sourcehub.acp.AmendmentEvent.previous_owner":
+		m := new(types.Actor)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "sourcehub.acp.AmendmentEvent.commitment_id":
+		return protoreflect.ValueOfUint64(uint64(0))
+	case "sourcehub.acp.AmendmentEvent.hijack_flag":
+		return protoreflect.ValueOfBool(false)
+	case "sourcehub.acp.AmendmentEvent.metadata":
+		m := new(RecordMetadata)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.ObjectRegistrationEvent"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEvent"))
 		}
-		panic(fmt.Errorf("message sourcehub.acp.ObjectRegistrationEvent does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.acp.AmendmentEvent does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_ObjectRegistrationEvent) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_AmendmentEvent) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.ObjectRegistrationEvent", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.AmendmentEvent", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -394,7 +394,7 @@ func (x *fastReflection_ObjectRegistrationEvent) WhichOneof(d protoreflect.Oneof
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_ObjectRegistrationEvent) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_AmendmentEvent) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -405,7 +405,7 @@ func (x *fastReflection_ObjectRegistrationEvent) GetUnknown() protoreflect.RawFi
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_ObjectRegistrationEvent) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_AmendmentEvent) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -417,7 +417,7 @@ func (x *fastReflection_ObjectRegistrationEvent) SetUnknown(fields protoreflect.
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_ObjectRegistrationEvent) IsValid() bool {
+func (x *fastReflection_AmendmentEvent) IsValid() bool {
 	return x != nil
 }
 
@@ -427,9 +427,9 @@ func (x *fastReflection_ObjectRegistrationEvent) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_AmendmentEvent) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*ObjectRegistrationEvent)
+		x := input.Message.Interface().(*AmendmentEvent)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -444,31 +444,30 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 		if x.Id != 0 {
 			n += 1 + runtime.Sov(uint64(x.Id))
 		}
-		if x.Type_ != 0 {
-			n += 1 + runtime.Sov(uint64(x.Type_))
-		}
-		l = len(x.TxHash)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		l = len(x.PolicyId)
 		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.Ts != nil {
-			l = options.Size(x.Ts)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.Object != nil {
 			l = options.Size(x.Object)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Actor != nil {
-			l = options.Size(x.Actor)
+		if x.NewOwner != nil {
+			l = options.Size(x.NewOwner)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.Detail != nil {
-			l = options.Size(x.Detail)
+		if x.PreviousOwner != nil {
+			l = options.Size(x.PreviousOwner)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.CommitmentId != 0 {
+			n += 1 + runtime.Sov(uint64(x.CommitmentId))
+		}
+		if x.HijackFlag {
+			n += 2
+		}
+		if x.Metadata != nil {
+			l = options.Size(x.Metadata)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -481,7 +480,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*ObjectRegistrationEvent)
+		x := input.Message.Interface().(*AmendmentEvent)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -500,8 +499,8 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.Detail != nil {
-			encoded, err := options.Marshal(x.Detail)
+		if x.Metadata != nil {
+			encoded, err := options.Marshal(x.Metadata)
 			if err != nil {
 				return protoiface.MarshalOutput{
 					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -514,8 +513,23 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			i--
 			dAtA[i] = 0x42
 		}
-		if x.Actor != nil {
-			encoded, err := options.Marshal(x.Actor)
+		if x.HijackFlag {
+			i--
+			if x.HijackFlag {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x38
+		}
+		if x.CommitmentId != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.CommitmentId))
+			i--
+			dAtA[i] = 0x30
+		}
+		if x.PreviousOwner != nil {
+			encoded, err := options.Marshal(x.PreviousOwner)
 			if err != nil {
 				return protoiface.MarshalOutput{
 					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -526,7 +540,21 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x2a
+		}
+		if x.NewOwner != nil {
+			encoded, err := options.Marshal(x.NewOwner)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x22
 		}
 		if x.Object != nil {
 			encoded, err := options.Marshal(x.Object)
@@ -540,40 +568,14 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			copy(dAtA[i:], encoded)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
-			dAtA[i] = 0x32
-		}
-		if x.Ts != nil {
-			encoded, err := options.Marshal(x.Ts)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x1a
 		}
 		if len(x.PolicyId) > 0 {
 			i -= len(x.PolicyId)
 			copy(dAtA[i:], x.PolicyId)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
 			i--
-			dAtA[i] = 0x22
-		}
-		if len(x.TxHash) > 0 {
-			i -= len(x.TxHash)
-			copy(dAtA[i:], x.TxHash)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TxHash)))
-			i--
-			dAtA[i] = 0x1a
-		}
-		if x.Type_ != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.Type_))
-			i--
-			dAtA[i] = 0x10
+			dAtA[i] = 0x12
 		}
 		if x.Id != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.Id))
@@ -591,7 +593,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*ObjectRegistrationEvent)
+		x := input.Message.Interface().(*AmendmentEvent)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -623,10 +625,10 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ObjectRegistrationEvent: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: AmendmentEvent: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: ObjectRegistrationEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: AmendmentEvent: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -649,59 +651,6 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					}
 				}
 			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Type_", wireType)
-				}
-				x.Type_ = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.Type_ |= ObjectRegistrationEventType(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
-				}
-				var byteLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					byteLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if byteLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + byteLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.TxHash = append(x.TxHash[:0], dAtA[iNdEx:postIndex]...)
-				if x.TxHash == nil {
-					x.TxHash = []byte{}
-				}
-				iNdEx = postIndex
-			case 4:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 				}
@@ -733,43 +682,7 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 				}
 				x.PolicyId = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 5:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Ts", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Ts == nil {
-					x.Ts = &Timestamp{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Ts); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 6:
+			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Object", wireType)
 				}
@@ -805,9 +718,9 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 7:
+			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field NewOwner", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -834,1153 +747,14 @@ func (x *fastReflection_ObjectRegistrationEvent) ProtoMethods() *protoiface.Meth
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.Actor == nil {
-					x.Actor = &types.Actor{}
+				if x.NewOwner == nil {
+					x.NewOwner = &types.Actor{}
 				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Actor); err != nil {
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.NewOwner); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 8:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Detail", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Detail == nil {
-					x.Detail = &EventDetail{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Detail); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
-var (
-	md_EventDetail                 protoreflect.MessageDescriptor
-	fd_EventDetail_reveal_event    protoreflect.FieldDescriptor
-	fd_EventDetail_amendment_event protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_sourcehub_acp_registration_proto_init()
-	md_EventDetail = File_sourcehub_acp_registration_proto.Messages().ByName("EventDetail")
-	fd_EventDetail_reveal_event = md_EventDetail.Fields().ByName("reveal_event")
-	fd_EventDetail_amendment_event = md_EventDetail.Fields().ByName("amendment_event")
-}
-
-var _ protoreflect.Message = (*fastReflection_EventDetail)(nil)
-
-type fastReflection_EventDetail EventDetail
-
-func (x *EventDetail) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_EventDetail)(x)
-}
-
-func (x *EventDetail) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_registration_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_EventDetail_messageType fastReflection_EventDetail_messageType
-var _ protoreflect.MessageType = fastReflection_EventDetail_messageType{}
-
-type fastReflection_EventDetail_messageType struct{}
-
-func (x fastReflection_EventDetail_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_EventDetail)(nil)
-}
-func (x fastReflection_EventDetail_messageType) New() protoreflect.Message {
-	return new(fastReflection_EventDetail)
-}
-func (x fastReflection_EventDetail_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_EventDetail
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_EventDetail) Descriptor() protoreflect.MessageDescriptor {
-	return md_EventDetail
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_EventDetail) Type() protoreflect.MessageType {
-	return _fastReflection_EventDetail_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_EventDetail) New() protoreflect.Message {
-	return new(fastReflection_EventDetail)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_EventDetail) Interface() protoreflect.ProtoMessage {
-	return (*EventDetail)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_EventDetail) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Detail != nil {
-		switch o := x.Detail.(type) {
-		case *EventDetail_RevealEvent:
-			v := o.RevealEvent
-			value := protoreflect.ValueOfMessage(v.ProtoReflect())
-			if !f(fd_EventDetail_reveal_event, value) {
-				return
-			}
-		case *EventDetail_AmendmentEvent:
-			v := o.AmendmentEvent
-			value := protoreflect.ValueOfMessage(v.ProtoReflect())
-			if !f(fd_EventDetail_amendment_event, value) {
-				return
-			}
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_EventDetail) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		if x.Detail == nil {
-			return false
-		} else if _, ok := x.Detail.(*EventDetail_RevealEvent); ok {
-			return true
-		} else {
-			return false
-		}
-	case "sourcehub.acp.EventDetail.amendment_event":
-		if x.Detail == nil {
-			return false
-		} else if _, ok := x.Detail.(*EventDetail_AmendmentEvent); ok {
-			return true
-		} else {
-			return false
-		}
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventDetail) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		x.Detail = nil
-	case "sourcehub.acp.EventDetail.amendment_event":
-		x.Detail = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_EventDetail) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		if x.Detail == nil {
-			return protoreflect.ValueOfMessage((*RevealRegistrationDetail)(nil).ProtoReflect())
-		} else if v, ok := x.Detail.(*EventDetail_RevealEvent); ok {
-			return protoreflect.ValueOfMessage(v.RevealEvent.ProtoReflect())
-		} else {
-			return protoreflect.ValueOfMessage((*RevealRegistrationDetail)(nil).ProtoReflect())
-		}
-	case "sourcehub.acp.EventDetail.amendment_event":
-		if x.Detail == nil {
-			return protoreflect.ValueOfMessage((*AmendmentEventDetail)(nil).ProtoReflect())
-		} else if v, ok := x.Detail.(*EventDetail_AmendmentEvent); ok {
-			return protoreflect.ValueOfMessage(v.AmendmentEvent.ProtoReflect())
-		} else {
-			return protoreflect.ValueOfMessage((*AmendmentEventDetail)(nil).ProtoReflect())
-		}
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventDetail) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		cv := value.Message().Interface().(*RevealRegistrationDetail)
-		x.Detail = &EventDetail_RevealEvent{RevealEvent: cv}
-	case "sourcehub.acp.EventDetail.amendment_event":
-		cv := value.Message().Interface().(*AmendmentEventDetail)
-		x.Detail = &EventDetail_AmendmentEvent{AmendmentEvent: cv}
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventDetail) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		if x.Detail == nil {
-			value := &RevealRegistrationDetail{}
-			oneofValue := &EventDetail_RevealEvent{RevealEvent: value}
-			x.Detail = oneofValue
-			return protoreflect.ValueOfMessage(value.ProtoReflect())
-		}
-		switch m := x.Detail.(type) {
-		case *EventDetail_RevealEvent:
-			return protoreflect.ValueOfMessage(m.RevealEvent.ProtoReflect())
-		default:
-			value := &RevealRegistrationDetail{}
-			oneofValue := &EventDetail_RevealEvent{RevealEvent: value}
-			x.Detail = oneofValue
-			return protoreflect.ValueOfMessage(value.ProtoReflect())
-		}
-	case "sourcehub.acp.EventDetail.amendment_event":
-		if x.Detail == nil {
-			value := &AmendmentEventDetail{}
-			oneofValue := &EventDetail_AmendmentEvent{AmendmentEvent: value}
-			x.Detail = oneofValue
-			return protoreflect.ValueOfMessage(value.ProtoReflect())
-		}
-		switch m := x.Detail.(type) {
-		case *EventDetail_AmendmentEvent:
-			return protoreflect.ValueOfMessage(m.AmendmentEvent.ProtoReflect())
-		default:
-			value := &AmendmentEventDetail{}
-			oneofValue := &EventDetail_AmendmentEvent{AmendmentEvent: value}
-			x.Detail = oneofValue
-			return protoreflect.ValueOfMessage(value.ProtoReflect())
-		}
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_EventDetail) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.EventDetail.reveal_event":
-		value := &RevealRegistrationDetail{}
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.EventDetail.amendment_event":
-		value := &AmendmentEventDetail{}
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.EventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.EventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_EventDetail) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	case "sourcehub.acp.EventDetail.detail":
-		if x.Detail == nil {
-			return nil
-		}
-		switch x.Detail.(type) {
-		case *EventDetail_RevealEvent:
-			return x.Descriptor().Fields().ByName("reveal_event")
-		case *EventDetail_AmendmentEvent:
-			return x.Descriptor().Fields().ByName("amendment_event")
-		}
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.EventDetail", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_EventDetail) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventDetail) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_EventDetail) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_EventDetail) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*EventDetail)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		switch x := x.Detail.(type) {
-		case *EventDetail_RevealEvent:
-			if x == nil {
-				break
-			}
-			l = options.Size(x.RevealEvent)
-			n += 1 + l + runtime.Sov(uint64(l))
-		case *EventDetail_AmendmentEvent:
-			if x == nil {
-				break
-			}
-			l = options.Size(x.AmendmentEvent)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*EventDetail)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		switch x := x.Detail.(type) {
-		case *EventDetail_RevealEvent:
-			encoded, err := options.Marshal(x.RevealEvent)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
-		case *EventDetail_AmendmentEvent:
-			encoded, err := options.Marshal(x.AmendmentEvent)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x1a
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*EventDetail)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventDetail: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RevealEvent", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				v := &RevealRegistrationDetail{}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], v); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				x.Detail = &EventDetail_RevealEvent{v}
-				iNdEx = postIndex
-			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AmendmentEvent", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				v := &AmendmentEventDetail{}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], v); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				x.Detail = &EventDetail_AmendmentEvent{v}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
-var (
-	md_AmendmentEventDetail                              protoreflect.MessageDescriptor
-	fd_AmendmentEventDetail_hijack_flag                  protoreflect.FieldDescriptor
-	fd_AmendmentEventDetail_previous_owner               protoreflect.FieldDescriptor
-	fd_AmendmentEventDetail_reveal_registration_event_id protoreflect.FieldDescriptor
-	fd_AmendmentEventDetail_commitment_timestamp         protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_sourcehub_acp_registration_proto_init()
-	md_AmendmentEventDetail = File_sourcehub_acp_registration_proto.Messages().ByName("AmendmentEventDetail")
-	fd_AmendmentEventDetail_hijack_flag = md_AmendmentEventDetail.Fields().ByName("hijack_flag")
-	fd_AmendmentEventDetail_previous_owner = md_AmendmentEventDetail.Fields().ByName("previous_owner")
-	fd_AmendmentEventDetail_reveal_registration_event_id = md_AmendmentEventDetail.Fields().ByName("reveal_registration_event_id")
-	fd_AmendmentEventDetail_commitment_timestamp = md_AmendmentEventDetail.Fields().ByName("commitment_timestamp")
-}
-
-var _ protoreflect.Message = (*fastReflection_AmendmentEventDetail)(nil)
-
-type fastReflection_AmendmentEventDetail AmendmentEventDetail
-
-func (x *AmendmentEventDetail) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_AmendmentEventDetail)(x)
-}
-
-func (x *AmendmentEventDetail) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_registration_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_AmendmentEventDetail_messageType fastReflection_AmendmentEventDetail_messageType
-var _ protoreflect.MessageType = fastReflection_AmendmentEventDetail_messageType{}
-
-type fastReflection_AmendmentEventDetail_messageType struct{}
-
-func (x fastReflection_AmendmentEventDetail_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_AmendmentEventDetail)(nil)
-}
-func (x fastReflection_AmendmentEventDetail_messageType) New() protoreflect.Message {
-	return new(fastReflection_AmendmentEventDetail)
-}
-func (x fastReflection_AmendmentEventDetail_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_AmendmentEventDetail
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_AmendmentEventDetail) Descriptor() protoreflect.MessageDescriptor {
-	return md_AmendmentEventDetail
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_AmendmentEventDetail) Type() protoreflect.MessageType {
-	return _fastReflection_AmendmentEventDetail_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_AmendmentEventDetail) New() protoreflect.Message {
-	return new(fastReflection_AmendmentEventDetail)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_AmendmentEventDetail) Interface() protoreflect.ProtoMessage {
-	return (*AmendmentEventDetail)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_AmendmentEventDetail) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.HijackFlag != false {
-		value := protoreflect.ValueOfBool(x.HijackFlag)
-		if !f(fd_AmendmentEventDetail_hijack_flag, value) {
-			return
-		}
-	}
-	if x.PreviousOwner != nil {
-		value := protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
-		if !f(fd_AmendmentEventDetail_previous_owner, value) {
-			return
-		}
-	}
-	if x.RevealRegistrationEventId != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.RevealRegistrationEventId)
-		if !f(fd_AmendmentEventDetail_reveal_registration_event_id, value) {
-			return
-		}
-	}
-	if x.CommitmentTimestamp != nil {
-		value := protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
-		if !f(fd_AmendmentEventDetail_commitment_timestamp, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_AmendmentEventDetail) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		return x.HijackFlag != false
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		return x.PreviousOwner != nil
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		return x.RevealRegistrationEventId != uint64(0)
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		return x.CommitmentTimestamp != nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_AmendmentEventDetail) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		x.HijackFlag = false
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		x.PreviousOwner = nil
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		x.RevealRegistrationEventId = uint64(0)
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		x.CommitmentTimestamp = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_AmendmentEventDetail) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		value := x.HijackFlag
-		return protoreflect.ValueOfBool(value)
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		value := x.PreviousOwner
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		value := x.RevealRegistrationEventId
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		value := x.CommitmentTimestamp
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_AmendmentEventDetail) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		x.HijackFlag = value.Bool()
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		x.PreviousOwner = value.Message().Interface().(*types.Actor)
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		x.RevealRegistrationEventId = value.Uint()
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_AmendmentEventDetail) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		if x.PreviousOwner == nil {
-			x.PreviousOwner = new(types.Actor)
-		}
-		return protoreflect.ValueOfMessage(x.PreviousOwner.ProtoReflect())
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		if x.CommitmentTimestamp == nil {
-			x.CommitmentTimestamp = new(Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		panic(fmt.Errorf("field hijack_flag of message sourcehub.acp.AmendmentEventDetail is not mutable"))
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		panic(fmt.Errorf("field reveal_registration_event_id of message sourcehub.acp.AmendmentEventDetail is not mutable"))
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_AmendmentEventDetail) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.AmendmentEventDetail.hijack_flag":
-		return protoreflect.ValueOfBool(false)
-	case "sourcehub.acp.AmendmentEventDetail.previous_owner":
-		m := new(types.Actor)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.AmendmentEventDetail.reveal_registration_event_id":
-		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.AmendmentEventDetail.commitment_timestamp":
-		m := new(Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.AmendmentEventDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.AmendmentEventDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_AmendmentEventDetail) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.AmendmentEventDetail", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_AmendmentEventDetail) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_AmendmentEventDetail) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_AmendmentEventDetail) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*AmendmentEventDetail)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		if x.HijackFlag {
-			n += 2
-		}
-		if x.PreviousOwner != nil {
-			l = options.Size(x.PreviousOwner)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.RevealRegistrationEventId != 0 {
-			n += 1 + runtime.Sov(uint64(x.RevealRegistrationEventId))
-		}
-		if x.CommitmentTimestamp != nil {
-			l = options.Size(x.CommitmentTimestamp)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*AmendmentEventDetail)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if x.CommitmentTimestamp != nil {
-			encoded, err := options.Marshal(x.CommitmentTimestamp)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x22
-		}
-		if x.RevealRegistrationEventId != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.RevealRegistrationEventId))
-			i--
-			dAtA[i] = 0x18
-		}
-		if x.PreviousOwner != nil {
-			encoded, err := options.Marshal(x.PreviousOwner)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
-		}
-		if x.HijackFlag {
-			i--
-			if x.HijackFlag {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x8
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*AmendmentEventDetail)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: AmendmentEventDetail: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: AmendmentEventDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HijackFlag", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.HijackFlag = bool(v != 0)
-			case 2:
+			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PreviousOwner", wireType)
 				}
@@ -2016,11 +790,11 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
-			case 3:
+			case 6:
 				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RevealRegistrationEventId", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentId", wireType)
 				}
-				x.RevealRegistrationEventId = 0
+				x.CommitmentId = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2030,14 +804,34 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.RevealRegistrationEventId |= uint64(b&0x7F) << shift
+					x.CommitmentId |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-			case 4:
+			case 7:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HijackFlag", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.HijackFlag = bool(v != 0)
+			case 8:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Metadata", wireType)
 				}
 				var msglen int
 				for shift := uint(0); ; shift += 7 {
@@ -2064,493 +858,10 @@ func (x *fastReflection_AmendmentEventDetail) ProtoMethods() *protoiface.Methods
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				if x.CommitmentTimestamp == nil {
-					x.CommitmentTimestamp = &Timestamp{}
+				if x.Metadata == nil {
+					x.Metadata = &RecordMetadata{}
 				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CommitmentTimestamp); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
-var (
-	md_RevealRegistrationDetail                            protoreflect.MessageDescriptor
-	fd_RevealRegistrationDetail_registration_commitment_id protoreflect.FieldDescriptor
-	fd_RevealRegistrationDetail_commitment_timestamp       protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_sourcehub_acp_registration_proto_init()
-	md_RevealRegistrationDetail = File_sourcehub_acp_registration_proto.Messages().ByName("RevealRegistrationDetail")
-	fd_RevealRegistrationDetail_registration_commitment_id = md_RevealRegistrationDetail.Fields().ByName("registration_commitment_id")
-	fd_RevealRegistrationDetail_commitment_timestamp = md_RevealRegistrationDetail.Fields().ByName("commitment_timestamp")
-}
-
-var _ protoreflect.Message = (*fastReflection_RevealRegistrationDetail)(nil)
-
-type fastReflection_RevealRegistrationDetail RevealRegistrationDetail
-
-func (x *RevealRegistrationDetail) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_RevealRegistrationDetail)(x)
-}
-
-func (x *RevealRegistrationDetail) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_registration_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_RevealRegistrationDetail_messageType fastReflection_RevealRegistrationDetail_messageType
-var _ protoreflect.MessageType = fastReflection_RevealRegistrationDetail_messageType{}
-
-type fastReflection_RevealRegistrationDetail_messageType struct{}
-
-func (x fastReflection_RevealRegistrationDetail_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_RevealRegistrationDetail)(nil)
-}
-func (x fastReflection_RevealRegistrationDetail_messageType) New() protoreflect.Message {
-	return new(fastReflection_RevealRegistrationDetail)
-}
-func (x fastReflection_RevealRegistrationDetail_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_RevealRegistrationDetail
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_RevealRegistrationDetail) Descriptor() protoreflect.MessageDescriptor {
-	return md_RevealRegistrationDetail
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_RevealRegistrationDetail) Type() protoreflect.MessageType {
-	return _fastReflection_RevealRegistrationDetail_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_RevealRegistrationDetail) New() protoreflect.Message {
-	return new(fastReflection_RevealRegistrationDetail)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_RevealRegistrationDetail) Interface() protoreflect.ProtoMessage {
-	return (*RevealRegistrationDetail)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_RevealRegistrationDetail) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.RegistrationCommitmentId != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.RegistrationCommitmentId)
-		if !f(fd_RevealRegistrationDetail_registration_commitment_id, value) {
-			return
-		}
-	}
-	if x.CommitmentTimestamp != nil {
-		value := protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
-		if !f(fd_RevealRegistrationDetail_commitment_timestamp, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_RevealRegistrationDetail) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		return x.RegistrationCommitmentId != uint64(0)
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		return x.CommitmentTimestamp != nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_RevealRegistrationDetail) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		x.RegistrationCommitmentId = uint64(0)
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		x.CommitmentTimestamp = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_RevealRegistrationDetail) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		value := x.RegistrationCommitmentId
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		value := x.CommitmentTimestamp
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_RevealRegistrationDetail) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		x.RegistrationCommitmentId = value.Uint()
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		x.CommitmentTimestamp = value.Message().Interface().(*Timestamp)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_RevealRegistrationDetail) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		if x.CommitmentTimestamp == nil {
-			x.CommitmentTimestamp = new(Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.CommitmentTimestamp.ProtoReflect())
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		panic(fmt.Errorf("field registration_commitment_id of message sourcehub.acp.RevealRegistrationDetail is not mutable"))
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_RevealRegistrationDetail) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.RevealRegistrationDetail.registration_commitment_id":
-		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.RevealRegistrationDetail.commitment_timestamp":
-		m := new(Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationDetail"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.RevealRegistrationDetail does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_RevealRegistrationDetail) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.RevealRegistrationDetail", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_RevealRegistrationDetail) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_RevealRegistrationDetail) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_RevealRegistrationDetail) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_RevealRegistrationDetail) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*RevealRegistrationDetail)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		if x.RegistrationCommitmentId != 0 {
-			n += 1 + runtime.Sov(uint64(x.RegistrationCommitmentId))
-		}
-		if x.CommitmentTimestamp != nil {
-			l = options.Size(x.CommitmentTimestamp)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*RevealRegistrationDetail)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if x.CommitmentTimestamp != nil {
-			encoded, err := options.Marshal(x.CommitmentTimestamp)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x12
-		}
-		if x.RegistrationCommitmentId != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.RegistrationCommitmentId))
-			i--
-			dAtA[i] = 0x8
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*RevealRegistrationDetail)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: RevealRegistrationDetail: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: RevealRegistrationDetail: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RegistrationCommitmentId", wireType)
-				}
-				x.RegistrationCommitmentId = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.RegistrationCommitmentId |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CommitmentTimestamp", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.CommitmentTimestamp == nil {
-					x.CommitmentTimestamp = &Timestamp{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CommitmentTimestamp); err != nil {
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Metadata); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
@@ -2602,84 +913,32 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ObjectRegistrationEventType int32
-
-const (
-	ObjectRegistrationEventType_UNKNOWN             ObjectRegistrationEventType = 0
-	ObjectRegistrationEventType_REGISTRATION        ObjectRegistrationEventType = 1
-	ObjectRegistrationEventType_REVEAL_REGISTRATION ObjectRegistrationEventType = 2
-	ObjectRegistrationEventType_ARCHIVAL            ObjectRegistrationEventType = 3
-	ObjectRegistrationEventType_UNARCHIVAL          ObjectRegistrationEventType = 4
-	ObjectRegistrationEventType_AMENDMENT           ObjectRegistrationEventType = 5
-	ObjectRegistrationEventType_TRANSFER            ObjectRegistrationEventType = 6
-)
-
-// Enum value maps for ObjectRegistrationEventType.
-var (
-	ObjectRegistrationEventType_name = map[int32]string{
-		0: "UNKNOWN",
-		1: "REGISTRATION",
-		2: "REVEAL_REGISTRATION",
-		3: "ARCHIVAL",
-		4: "UNARCHIVAL",
-		5: "AMENDMENT",
-		6: "TRANSFER",
-	}
-	ObjectRegistrationEventType_value = map[string]int32{
-		"UNKNOWN":             0,
-		"REGISTRATION":        1,
-		"REVEAL_REGISTRATION": 2,
-		"ARCHIVAL":            3,
-		"UNARCHIVAL":          4,
-		"AMENDMENT":           5,
-		"TRANSFER":            6,
-	}
-)
-
-func (x ObjectRegistrationEventType) Enum() *ObjectRegistrationEventType {
-	p := new(ObjectRegistrationEventType)
-	*p = x
-	return p
-}
-
-func (x ObjectRegistrationEventType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ObjectRegistrationEventType) Descriptor() protoreflect.EnumDescriptor {
-	return file_sourcehub_acp_registration_proto_enumTypes[0].Descriptor()
-}
-
-func (ObjectRegistrationEventType) Type() protoreflect.EnumType {
-	return &file_sourcehub_acp_registration_proto_enumTypes[0]
-}
-
-func (x ObjectRegistrationEventType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ObjectRegistrationEventType.Descriptor instead.
-func (ObjectRegistrationEventType) EnumDescriptor() ([]byte, []int) {
-	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{0}
-}
-
-type ObjectRegistrationEvent struct {
+// AmendmentEvent is a record which tracks executions of the Registration Amendment rule in SourceHub ACP
+type AmendmentEvent struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       uint64                      `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type_    ObjectRegistrationEventType `protobuf:"varint,2,opt,name=type,proto3,enum=sourcehub.acp.ObjectRegistrationEventType" json:"type,omitempty"`
-	TxHash   []byte                      `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	PolicyId string                      `protobuf:"bytes,4,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Ts       *Timestamp                  `protobuf:"bytes,5,opt,name=ts,proto3" json:"ts,omitempty"`
-	Object   *types.Object               `protobuf:"bytes,6,opt,name=object,proto3" json:"object,omitempty"`
-	Actor    *types.Actor                `protobuf:"bytes,7,opt,name=actor,proto3" json:"actor,omitempty"`
-	Detail   *EventDetail                `protobuf:"bytes,8,opt,name=detail,proto3" json:"detail,omitempty"`
+	// event id
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	// id of affected policy
+	PolicyId string `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	// object whose registration was amended
+	Object *types.Object `protobuf:"bytes,3,opt,name=object,proto3" json:"object,omitempty"`
+	// new_owner is the new object owner
+	NewOwner *types.Actor `protobuf:"bytes,4,opt,name=new_owner,json=newOwner,proto3" json:"new_owner,omitempty"`
+	// previous_owner is the previous object owner
+	PreviousOwner *types.Actor `protobuf:"bytes,5,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
+	// commitment_id is the id of the commitment which generated the amendment
+	CommitmentId uint64 `protobuf:"varint,6,opt,name=commitment_id,json=commitmentId,proto3" json:"commitment_id,omitempty"`
+	// hijack_flag is true if the amendment rule was executed and the new_owner chose to flag
+	// the previous_owner as a potential object hijacker
+	HijackFlag bool            `protobuf:"varint,7,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
+	Metadata   *RecordMetadata `protobuf:"bytes,8,opt,name=metadata,proto3" json:"metadata,omitempty"`
 }
 
-func (x *ObjectRegistrationEvent) Reset() {
-	*x = ObjectRegistrationEvent{}
+func (x *AmendmentEvent) Reset() {
+	*x = AmendmentEvent{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_acp_registration_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2687,241 +946,69 @@ func (x *ObjectRegistrationEvent) Reset() {
 	}
 }
 
-func (x *ObjectRegistrationEvent) String() string {
+func (x *AmendmentEvent) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*ObjectRegistrationEvent) ProtoMessage() {}
+func (*AmendmentEvent) ProtoMessage() {}
 
-// Deprecated: Use ObjectRegistrationEvent.ProtoReflect.Descriptor instead.
-func (*ObjectRegistrationEvent) Descriptor() ([]byte, []int) {
+// Deprecated: Use AmendmentEvent.ProtoReflect.Descriptor instead.
+func (*AmendmentEvent) Descriptor() ([]byte, []int) {
 	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *ObjectRegistrationEvent) GetId() uint64 {
+func (x *AmendmentEvent) GetId() uint64 {
 	if x != nil {
 		return x.Id
 	}
 	return 0
 }
 
-func (x *ObjectRegistrationEvent) GetType_() ObjectRegistrationEventType {
-	if x != nil {
-		return x.Type_
-	}
-	return ObjectRegistrationEventType_UNKNOWN
-}
-
-func (x *ObjectRegistrationEvent) GetTxHash() []byte {
-	if x != nil {
-		return x.TxHash
-	}
-	return nil
-}
-
-func (x *ObjectRegistrationEvent) GetPolicyId() string {
+func (x *AmendmentEvent) GetPolicyId() string {
 	if x != nil {
 		return x.PolicyId
 	}
 	return ""
 }
 
-func (x *ObjectRegistrationEvent) GetTs() *Timestamp {
-	if x != nil {
-		return x.Ts
-	}
-	return nil
-}
-
-func (x *ObjectRegistrationEvent) GetObject() *types.Object {
+func (x *AmendmentEvent) GetObject() *types.Object {
 	if x != nil {
 		return x.Object
 	}
 	return nil
 }
 
-func (x *ObjectRegistrationEvent) GetActor() *types.Actor {
+func (x *AmendmentEvent) GetNewOwner() *types.Actor {
 	if x != nil {
-		return x.Actor
+		return x.NewOwner
 	}
 	return nil
 }
 
-func (x *ObjectRegistrationEvent) GetDetail() *EventDetail {
-	if x != nil {
-		return x.Detail
-	}
-	return nil
-}
-
-type EventDetail struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// Types that are assignable to Detail:
-	//
-	//	*EventDetail_RevealEvent
-	//	*EventDetail_AmendmentEvent
-	Detail isEventDetail_Detail `protobuf_oneof:"detail"`
-}
-
-func (x *EventDetail) Reset() {
-	*x = EventDetail{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_registration_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *EventDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EventDetail) ProtoMessage() {}
-
-// Deprecated: Use EventDetail.ProtoReflect.Descriptor instead.
-func (*EventDetail) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *EventDetail) GetDetail() isEventDetail_Detail {
-	if x != nil {
-		return x.Detail
-	}
-	return nil
-}
-
-func (x *EventDetail) GetRevealEvent() *RevealRegistrationDetail {
-	if x, ok := x.GetDetail().(*EventDetail_RevealEvent); ok {
-		return x.RevealEvent
-	}
-	return nil
-}
-
-func (x *EventDetail) GetAmendmentEvent() *AmendmentEventDetail {
-	if x, ok := x.GetDetail().(*EventDetail_AmendmentEvent); ok {
-		return x.AmendmentEvent
-	}
-	return nil
-}
-
-type isEventDetail_Detail interface {
-	isEventDetail_Detail()
-}
-
-type EventDetail_RevealEvent struct {
-	RevealEvent *RevealRegistrationDetail `protobuf:"bytes,2,opt,name=reveal_event,json=revealEvent,proto3,oneof"`
-}
-
-type EventDetail_AmendmentEvent struct {
-	AmendmentEvent *AmendmentEventDetail `protobuf:"bytes,3,opt,name=amendment_event,json=amendmentEvent,proto3,oneof"`
-}
-
-func (*EventDetail_RevealEvent) isEventDetail_Detail() {}
-
-func (*EventDetail_AmendmentEvent) isEventDetail_Detail() {}
-
-type AmendmentEventDetail struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	HijackFlag                bool         `protobuf:"varint,1,opt,name=hijack_flag,json=hijackFlag,proto3" json:"hijack_flag,omitempty"`
-	PreviousOwner             *types.Actor `protobuf:"bytes,2,opt,name=previous_owner,json=previousOwner,proto3" json:"previous_owner,omitempty"`
-	RevealRegistrationEventId uint64       `protobuf:"varint,3,opt,name=reveal_registration_event_id,json=revealRegistrationEventId,proto3" json:"reveal_registration_event_id,omitempty"`
-	CommitmentTimestamp       *Timestamp   `protobuf:"bytes,4,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
-}
-
-func (x *AmendmentEventDetail) Reset() {
-	*x = AmendmentEventDetail{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_registration_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *AmendmentEventDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AmendmentEventDetail) ProtoMessage() {}
-
-// Deprecated: Use AmendmentEventDetail.ProtoReflect.Descriptor instead.
-func (*AmendmentEventDetail) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *AmendmentEventDetail) GetHijackFlag() bool {
-	if x != nil {
-		return x.HijackFlag
-	}
-	return false
-}
-
-func (x *AmendmentEventDetail) GetPreviousOwner() *types.Actor {
+func (x *AmendmentEvent) GetPreviousOwner() *types.Actor {
 	if x != nil {
 		return x.PreviousOwner
 	}
 	return nil
 }
 
-func (x *AmendmentEventDetail) GetRevealRegistrationEventId() uint64 {
+func (x *AmendmentEvent) GetCommitmentId() uint64 {
 	if x != nil {
-		return x.RevealRegistrationEventId
+		return x.CommitmentId
 	}
 	return 0
 }
 
-func (x *AmendmentEventDetail) GetCommitmentTimestamp() *Timestamp {
+func (x *AmendmentEvent) GetHijackFlag() bool {
 	if x != nil {
-		return x.CommitmentTimestamp
+		return x.HijackFlag
 	}
-	return nil
+	return false
 }
 
-type RevealRegistrationDetail struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// id of the registration commitment which originally registered the relationship
-	RegistrationCommitmentId uint64     `protobuf:"varint,1,opt,name=registration_commitment_id,json=registrationCommitmentId,proto3" json:"registration_commitment_id,omitempty"`
-	CommitmentTimestamp      *Timestamp `protobuf:"bytes,2,opt,name=commitment_timestamp,json=commitmentTimestamp,proto3" json:"commitment_timestamp,omitempty"`
-}
-
-func (x *RevealRegistrationDetail) Reset() {
-	*x = RevealRegistrationDetail{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_registration_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *RevealRegistrationDetail) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RevealRegistrationDetail) ProtoMessage() {}
-
-// Deprecated: Use RevealRegistrationDetail.ProtoReflect.Descriptor instead.
-func (*RevealRegistrationDetail) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_registration_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *RevealRegistrationDetail) GetRegistrationCommitmentId() uint64 {
+func (x *AmendmentEvent) GetMetadata() *RecordMetadata {
 	if x != nil {
-		return x.RegistrationCommitmentId
-	}
-	return 0
-}
-
-func (x *RevealRegistrationDetail) GetCommitmentTimestamp() *Timestamp {
-	if x != nil {
-		return x.CommitmentTimestamp
+		return x.Metadata
 	}
 	return nil
 }
@@ -2938,88 +1025,43 @@ var file_sourcehub_acp_registration_proto_rawDesc = []byte{
 	0x6b, 0x2f, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2f, 0x72, 0x65, 0x6c, 0x61, 0x74,
 	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x18, 0x73,
 	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x74, 0x69, 0x6d,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xea, 0x02, 0x0a, 0x17, 0x4f, 0x62, 0x6a, 0x65,
-	0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76,
-	0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
-	0x02, 0x69, 0x64, 0x12, 0x3e, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0e, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
-	0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74,
-	0x79, 0x70, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x78, 0x5f, 0x68, 0x61, 0x73, 0x68, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x74, 0x78, 0x48, 0x61, 0x73, 0x68, 0x12, 0x1b, 0x0a, 0x09,
-	0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x49, 0x64, 0x12, 0x28, 0x0a, 0x02, 0x74, 0x73, 0x18,
-	0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
-	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
-	0x02, 0x74, 0x73, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x06, 0x20,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1a, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x22, 0xf8, 0x02, 0x0a, 0x0e, 0x41, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e,
+	0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
+	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63,
+	0x79, 0x49, 0x64, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x03, 0x20,
 	0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77,
 	0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a,
-	0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x33, 0x0a, 0x05, 0x61,
-	0x63, 0x74, 0x6f, 0x72, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63,
-	0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x05, 0x61, 0x63, 0x74, 0x6f, 0x72,
-	0x12, 0x32, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x1a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
-	0x2e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x06, 0x64, 0x65,
-	0x74, 0x61, 0x69, 0x6c, 0x22, 0xb5, 0x01, 0x0a, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65,
-	0x74, 0x61, 0x69, 0x6c, 0x12, 0x4c, 0x0a, 0x0c, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x65,
-	0x76, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x76, 0x65, 0x61,
-	0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x44, 0x65, 0x74,
-	0x61, 0x69, 0x6c, 0x48, 0x00, 0x52, 0x0b, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x12, 0x4e, 0x0a, 0x0f, 0x61, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x5f,
-	0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x41, 0x6d, 0x65, 0x6e,
-	0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c,
-	0x48, 0x00, 0x52, 0x0e, 0x61, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x22, 0x8b, 0x02, 0x0a,
-	0x14, 0x41, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44,
-	0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x1f, 0x0a, 0x0b, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f,
-	0x66, 0x6c, 0x61, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x68, 0x69, 0x6a, 0x61,
-	0x63, 0x6b, 0x46, 0x6c, 0x61, 0x67, 0x12, 0x44, 0x0a, 0x0e, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f,
-	0x75, 0x73, 0x5f, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d,
+	0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x12, 0x3a, 0x0a, 0x09, 0x6e,
+	0x65, 0x77, 0x5f, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d,
 	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61,
-	0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x0d, 0x70,
-	0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x3f, 0x0a, 0x1c,
-	0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x5f, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x04, 0x52, 0x19, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a,
-	0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65,
-	0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65,
-	0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x13, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e,
-	0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x22, 0xa5, 0x01, 0x0a, 0x18, 0x52,
-	0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12, 0x3c, 0x0a, 0x1a, 0x72, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65,
-	0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x18, 0x72, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
-	0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x4b, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d,
-	0x65, 0x6e, 0x74, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x18, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
-	0x61, 0x63, 0x70, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x13, 0x63,
-	0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x2a, 0x90, 0x01, 0x0a, 0x1b, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x54, 0x79,
-	0x70, 0x65, 0x12, 0x0b, 0x0a, 0x07, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12,
-	0x10, 0x0a, 0x0c, 0x52, 0x45, 0x47, 0x49, 0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x10,
-	0x01, 0x12, 0x17, 0x0a, 0x13, 0x52, 0x45, 0x56, 0x45, 0x41, 0x4c, 0x5f, 0x52, 0x45, 0x47, 0x49,
-	0x53, 0x54, 0x52, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x02, 0x12, 0x0c, 0x0a, 0x08, 0x41, 0x52,
-	0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x03, 0x12, 0x0e, 0x0a, 0x0a, 0x55, 0x4e, 0x41, 0x52,
-	0x43, 0x48, 0x49, 0x56, 0x41, 0x4c, 0x10, 0x04, 0x12, 0x0d, 0x0a, 0x09, 0x41, 0x4d, 0x45, 0x4e,
-	0x44, 0x4d, 0x45, 0x4e, 0x54, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x54, 0x52, 0x41, 0x4e, 0x53,
-	0x46, 0x45, 0x52, 0x10, 0x06, 0x42, 0x9b, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42, 0x11, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70,
-	0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a,
-	0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x08, 0x6e,
+	0x65, 0x77, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x44, 0x0a, 0x0e, 0x70, 0x72, 0x65, 0x76, 0x69,
+	0x6f, 0x75, 0x73, 0x5f, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e,
+	0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x41, 0x63, 0x74, 0x6f, 0x72, 0x52, 0x0d,
+	0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x4f, 0x77, 0x6e, 0x65, 0x72, 0x12, 0x23, 0x0a,
+	0x0d, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x06,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x0c, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74,
+	0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f, 0x66, 0x6c, 0x61,
+	0x67, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0a, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x46,
+	0x6c, 0x61, 0x67, 0x12, 0x39, 0x0a, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x18,
+	0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0x52, 0x08, 0x6d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0x42, 0x9b,
+	0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x61, 0x63, 0x70, 0x42, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa,
+	0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca,
+	0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2,
+	0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3034,34 +1076,23 @@ func file_sourcehub_acp_registration_proto_rawDescGZIP() []byte {
 	return file_sourcehub_acp_registration_proto_rawDescData
 }
 
-var file_sourcehub_acp_registration_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_sourcehub_acp_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_sourcehub_acp_registration_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_sourcehub_acp_registration_proto_goTypes = []interface{}{
-	(ObjectRegistrationEventType)(0), // 0: sourcehub.acp.ObjectRegistrationEventType
-	(*ObjectRegistrationEvent)(nil),  // 1: sourcehub.acp.ObjectRegistrationEvent
-	(*EventDetail)(nil),              // 2: sourcehub.acp.EventDetail
-	(*AmendmentEventDetail)(nil),     // 3: sourcehub.acp.AmendmentEventDetail
-	(*RevealRegistrationDetail)(nil), // 4: sourcehub.acp.RevealRegistrationDetail
-	(*Timestamp)(nil),                // 5: sourcehub.acp.Timestamp
-	(*types.Object)(nil),             // 6: sourcenetwork.acp_core.Object
-	(*types.Actor)(nil),              // 7: sourcenetwork.acp_core.Actor
+	(*AmendmentEvent)(nil), // 0: sourcehub.acp.AmendmentEvent
+	(*types.Object)(nil),   // 1: sourcenetwork.acp_core.Object
+	(*types.Actor)(nil),    // 2: sourcenetwork.acp_core.Actor
+	(*RecordMetadata)(nil), // 3: sourcehub.acp.RecordMetadata
 }
 var file_sourcehub_acp_registration_proto_depIdxs = []int32{
-	0,  // 0: sourcehub.acp.ObjectRegistrationEvent.type:type_name -> sourcehub.acp.ObjectRegistrationEventType
-	5,  // 1: sourcehub.acp.ObjectRegistrationEvent.ts:type_name -> sourcehub.acp.Timestamp
-	6,  // 2: sourcehub.acp.ObjectRegistrationEvent.object:type_name -> sourcenetwork.acp_core.Object
-	7,  // 3: sourcehub.acp.ObjectRegistrationEvent.actor:type_name -> sourcenetwork.acp_core.Actor
-	2,  // 4: sourcehub.acp.ObjectRegistrationEvent.detail:type_name -> sourcehub.acp.EventDetail
-	4,  // 5: sourcehub.acp.EventDetail.reveal_event:type_name -> sourcehub.acp.RevealRegistrationDetail
-	3,  // 6: sourcehub.acp.EventDetail.amendment_event:type_name -> sourcehub.acp.AmendmentEventDetail
-	7,  // 7: sourcehub.acp.AmendmentEventDetail.previous_owner:type_name -> sourcenetwork.acp_core.Actor
-	5,  // 8: sourcehub.acp.AmendmentEventDetail.commitment_timestamp:type_name -> sourcehub.acp.Timestamp
-	5,  // 9: sourcehub.acp.RevealRegistrationDetail.commitment_timestamp:type_name -> sourcehub.acp.Timestamp
-	10, // [10:10] is the sub-list for method output_type
-	10, // [10:10] is the sub-list for method input_type
-	10, // [10:10] is the sub-list for extension type_name
-	10, // [10:10] is the sub-list for extension extendee
-	0,  // [0:10] is the sub-list for field type_name
+	1, // 0: sourcehub.acp.AmendmentEvent.object:type_name -> sourcenetwork.acp_core.Object
+	2, // 1: sourcehub.acp.AmendmentEvent.new_owner:type_name -> sourcenetwork.acp_core.Actor
+	2, // 2: sourcehub.acp.AmendmentEvent.previous_owner:type_name -> sourcenetwork.acp_core.Actor
+	3, // 3: sourcehub.acp.AmendmentEvent.metadata:type_name -> sourcehub.acp.RecordMetadata
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_acp_registration_proto_init() }
@@ -3070,9 +1101,10 @@ func file_sourcehub_acp_registration_proto_init() {
 		return
 	}
 	file_sourcehub_acp_time_proto_init()
+	file_sourcehub_acp_record_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_sourcehub_acp_registration_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ObjectRegistrationEvent); i {
+			switch v := v.(*AmendmentEvent); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3083,60 +1115,19 @@ func file_sourcehub_acp_registration_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_registration_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventDetail); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_sourcehub_acp_registration_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*AmendmentEventDetail); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_sourcehub_acp_registration_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*RevealRegistrationDetail); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-	}
-	file_sourcehub_acp_registration_proto_msgTypes[1].OneofWrappers = []interface{}{
-		(*EventDetail_RevealEvent)(nil),
-		(*EventDetail_AmendmentEvent)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_acp_registration_proto_rawDesc,
-			NumEnums:      1,
-			NumMessages:   4,
+			NumEnums:      0,
+			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_sourcehub_acp_registration_proto_goTypes,
 		DependencyIndexes: file_sourcehub_acp_registration_proto_depIdxs,
-		EnumInfos:         file_sourcehub_acp_registration_proto_enumTypes,
 		MessageInfos:      file_sourcehub_acp_registration_proto_msgTypes,
 	}.Build()
 	File_sourcehub_acp_registration_proto = out.File

@@ -8,1250 +8,11 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	reflect "reflect"
 	sync "sync"
 )
-
-var (
-	md_SignedPolicyCmd           protoreflect.MessageDescriptor
-	fd_SignedPolicyCmd_payload   protoreflect.FieldDescriptor
-	fd_SignedPolicyCmd_signature protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_sourcehub_acp_policy_cmd_proto_init()
-	md_SignedPolicyCmd = File_sourcehub_acp_policy_cmd_proto.Messages().ByName("SignedPolicyCmd")
-	fd_SignedPolicyCmd_payload = md_SignedPolicyCmd.Fields().ByName("payload")
-	fd_SignedPolicyCmd_signature = md_SignedPolicyCmd.Fields().ByName("signature")
-}
-
-var _ protoreflect.Message = (*fastReflection_SignedPolicyCmd)(nil)
-
-type fastReflection_SignedPolicyCmd SignedPolicyCmd
-
-func (x *SignedPolicyCmd) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_SignedPolicyCmd)(x)
-}
-
-func (x *SignedPolicyCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_SignedPolicyCmd_messageType fastReflection_SignedPolicyCmd_messageType
-var _ protoreflect.MessageType = fastReflection_SignedPolicyCmd_messageType{}
-
-type fastReflection_SignedPolicyCmd_messageType struct{}
-
-func (x fastReflection_SignedPolicyCmd_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_SignedPolicyCmd)(nil)
-}
-func (x fastReflection_SignedPolicyCmd_messageType) New() protoreflect.Message {
-	return new(fastReflection_SignedPolicyCmd)
-}
-func (x fastReflection_SignedPolicyCmd_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_SignedPolicyCmd
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_SignedPolicyCmd) Descriptor() protoreflect.MessageDescriptor {
-	return md_SignedPolicyCmd
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_SignedPolicyCmd) Type() protoreflect.MessageType {
-	return _fastReflection_SignedPolicyCmd_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_SignedPolicyCmd) New() protoreflect.Message {
-	return new(fastReflection_SignedPolicyCmd)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_SignedPolicyCmd) Interface() protoreflect.ProtoMessage {
-	return (*SignedPolicyCmd)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_SignedPolicyCmd) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Payload != nil {
-		value := protoreflect.ValueOfMessage(x.Payload.ProtoReflect())
-		if !f(fd_SignedPolicyCmd_payload, value) {
-			return
-		}
-	}
-	if len(x.Signature) != 0 {
-		value := protoreflect.ValueOfBytes(x.Signature)
-		if !f(fd_SignedPolicyCmd_signature, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_SignedPolicyCmd) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		return x.Payload != nil
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		return len(x.Signature) != 0
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmd) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		x.Payload = nil
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		x.Signature = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_SignedPolicyCmd) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		value := x.Payload
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		value := x.Signature
-		return protoreflect.ValueOfBytes(value)
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmd) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		x.Payload = value.Message().Interface().(*SignedPolicyCmdPayload)
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		x.Signature = value.Bytes()
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmd) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		if x.Payload == nil {
-			x.Payload = new(SignedPolicyCmdPayload)
-		}
-		return protoreflect.ValueOfMessage(x.Payload.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		panic(fmt.Errorf("field signature of message sourcehub.acp.SignedPolicyCmd is not mutable"))
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_SignedPolicyCmd) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmd.payload":
-		m := new(SignedPolicyCmdPayload)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmd.signature":
-		return protoreflect.ValueOfBytes(nil)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmd"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmd does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_SignedPolicyCmd) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.SignedPolicyCmd", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_SignedPolicyCmd) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmd) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_SignedPolicyCmd) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_SignedPolicyCmd) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*SignedPolicyCmd)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		if x.Payload != nil {
-			l = options.Size(x.Payload)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.Signature)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*SignedPolicyCmd)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Signature) > 0 {
-			i -= len(x.Signature)
-			copy(dAtA[i:], x.Signature)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Signature)))
-			i--
-			dAtA[i] = 0x12
-		}
-		if x.Payload != nil {
-			encoded, err := options.Marshal(x.Payload)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0xa
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*SignedPolicyCmd)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: SignedPolicyCmd: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: SignedPolicyCmd: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Payload == nil {
-					x.Payload = &SignedPolicyCmdPayload{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Payload); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 2:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Signature", wireType)
-				}
-				var byteLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					byteLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if byteLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + byteLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Signature = append(x.Signature[:0], dAtA[iNdEx:postIndex]...)
-				if x.Signature == nil {
-					x.Signature = []byte{}
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
-
-var (
-	md_SignedPolicyCmdPayload                  protoreflect.MessageDescriptor
-	fd_SignedPolicyCmdPayload_actor            protoreflect.FieldDescriptor
-	fd_SignedPolicyCmdPayload_issued_height    protoreflect.FieldDescriptor
-	fd_SignedPolicyCmdPayload_issued_at        protoreflect.FieldDescriptor
-	fd_SignedPolicyCmdPayload_expiration_delta protoreflect.FieldDescriptor
-	fd_SignedPolicyCmdPayload_policy_id        protoreflect.FieldDescriptor
-	fd_SignedPolicyCmdPayload_cmd              protoreflect.FieldDescriptor
-)
-
-func init() {
-	file_sourcehub_acp_policy_cmd_proto_init()
-	md_SignedPolicyCmdPayload = File_sourcehub_acp_policy_cmd_proto.Messages().ByName("SignedPolicyCmdPayload")
-	fd_SignedPolicyCmdPayload_actor = md_SignedPolicyCmdPayload.Fields().ByName("actor")
-	fd_SignedPolicyCmdPayload_issued_height = md_SignedPolicyCmdPayload.Fields().ByName("issued_height")
-	fd_SignedPolicyCmdPayload_issued_at = md_SignedPolicyCmdPayload.Fields().ByName("issued_at")
-	fd_SignedPolicyCmdPayload_expiration_delta = md_SignedPolicyCmdPayload.Fields().ByName("expiration_delta")
-	fd_SignedPolicyCmdPayload_policy_id = md_SignedPolicyCmdPayload.Fields().ByName("policy_id")
-	fd_SignedPolicyCmdPayload_cmd = md_SignedPolicyCmdPayload.Fields().ByName("cmd")
-}
-
-var _ protoreflect.Message = (*fastReflection_SignedPolicyCmdPayload)(nil)
-
-type fastReflection_SignedPolicyCmdPayload SignedPolicyCmdPayload
-
-func (x *SignedPolicyCmdPayload) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_SignedPolicyCmdPayload)(x)
-}
-
-func (x *SignedPolicyCmdPayload) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-var _fastReflection_SignedPolicyCmdPayload_messageType fastReflection_SignedPolicyCmdPayload_messageType
-var _ protoreflect.MessageType = fastReflection_SignedPolicyCmdPayload_messageType{}
-
-type fastReflection_SignedPolicyCmdPayload_messageType struct{}
-
-func (x fastReflection_SignedPolicyCmdPayload_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_SignedPolicyCmdPayload)(nil)
-}
-func (x fastReflection_SignedPolicyCmdPayload_messageType) New() protoreflect.Message {
-	return new(fastReflection_SignedPolicyCmdPayload)
-}
-func (x fastReflection_SignedPolicyCmdPayload_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_SignedPolicyCmdPayload
-}
-
-// Descriptor returns message descriptor, which contains only the protobuf
-// type information for the message.
-func (x *fastReflection_SignedPolicyCmdPayload) Descriptor() protoreflect.MessageDescriptor {
-	return md_SignedPolicyCmdPayload
-}
-
-// Type returns the message type, which encapsulates both Go and protobuf
-// type information. If the Go type information is not needed,
-// it is recommended that the message descriptor be used instead.
-func (x *fastReflection_SignedPolicyCmdPayload) Type() protoreflect.MessageType {
-	return _fastReflection_SignedPolicyCmdPayload_messageType
-}
-
-// New returns a newly allocated and mutable empty message.
-func (x *fastReflection_SignedPolicyCmdPayload) New() protoreflect.Message {
-	return new(fastReflection_SignedPolicyCmdPayload)
-}
-
-// Interface unwraps the message reflection interface and
-// returns the underlying ProtoMessage interface.
-func (x *fastReflection_SignedPolicyCmdPayload) Interface() protoreflect.ProtoMessage {
-	return (*SignedPolicyCmdPayload)(x)
-}
-
-// Range iterates over every populated field in an undefined order,
-// calling f for each field descriptor and value encountered.
-// Range returns immediately if f returns false.
-// While iterating, mutating operations may only be performed
-// on the current field descriptor.
-func (x *fastReflection_SignedPolicyCmdPayload) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
-	if x.Actor != "" {
-		value := protoreflect.ValueOfString(x.Actor)
-		if !f(fd_SignedPolicyCmdPayload_actor, value) {
-			return
-		}
-	}
-	if x.IssuedHeight != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.IssuedHeight)
-		if !f(fd_SignedPolicyCmdPayload_issued_height, value) {
-			return
-		}
-	}
-	if x.IssuedAt != nil {
-		value := protoreflect.ValueOfMessage(x.IssuedAt.ProtoReflect())
-		if !f(fd_SignedPolicyCmdPayload_issued_at, value) {
-			return
-		}
-	}
-	if x.ExpirationDelta != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.ExpirationDelta)
-		if !f(fd_SignedPolicyCmdPayload_expiration_delta, value) {
-			return
-		}
-	}
-	if x.PolicyId != "" {
-		value := protoreflect.ValueOfString(x.PolicyId)
-		if !f(fd_SignedPolicyCmdPayload_policy_id, value) {
-			return
-		}
-	}
-	if x.Cmd != nil {
-		value := protoreflect.ValueOfMessage(x.Cmd.ProtoReflect())
-		if !f(fd_SignedPolicyCmdPayload_cmd, value) {
-			return
-		}
-	}
-}
-
-// Has reports whether a field is populated.
-//
-// Some fields have the property of nullability where it is possible to
-// distinguish between the default value of a field and whether the field
-// was explicitly populated with the default value. Singular message fields,
-// member fields of a oneof, and proto2 scalar fields are nullable. Such
-// fields are populated only if explicitly set.
-//
-// In other cases (aside from the nullable cases above),
-// a proto3 scalar field is populated if it contains a non-zero value, and
-// a repeated field is populated if it is non-empty.
-func (x *fastReflection_SignedPolicyCmdPayload) Has(fd protoreflect.FieldDescriptor) bool {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		return x.Actor != ""
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		return x.IssuedHeight != uint64(0)
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		return x.IssuedAt != nil
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		return x.ExpirationDelta != uint64(0)
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		return x.PolicyId != ""
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		return x.Cmd != nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", fd.FullName()))
-	}
-}
-
-// Clear clears the field such that a subsequent Has call reports false.
-//
-// Clearing an extension field clears both the extension type and value
-// associated with the given field number.
-//
-// Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmdPayload) Clear(fd protoreflect.FieldDescriptor) {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		x.Actor = ""
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		x.IssuedHeight = uint64(0)
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		x.IssuedAt = nil
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		x.ExpirationDelta = uint64(0)
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		x.PolicyId = ""
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		x.Cmd = nil
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", fd.FullName()))
-	}
-}
-
-// Get retrieves the value for a field.
-//
-// For unpopulated scalars, it returns the default value, where
-// the default value of a bytes scalar is guaranteed to be a copy.
-// For unpopulated composite types, it returns an empty, read-only view
-// of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_SignedPolicyCmdPayload) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
-	switch descriptor.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		value := x.Actor
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		value := x.IssuedHeight
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		value := x.IssuedAt
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		value := x.ExpirationDelta
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		value := x.PolicyId
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		value := x.Cmd
-		return protoreflect.ValueOfMessage(value.ProtoReflect())
-	default:
-		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", descriptor.FullName()))
-	}
-}
-
-// Set stores the value for a field.
-//
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType.
-// When setting a composite type, it is unspecified whether the stored value
-// aliases the source's memory in any way. If the composite value is an
-// empty, read-only value, then it panics.
-//
-// Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmdPayload) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		x.Actor = value.Interface().(string)
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		x.IssuedHeight = value.Uint()
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		x.IssuedAt = value.Message().Interface().(*timestamppb.Timestamp)
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		x.ExpirationDelta = value.Uint()
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		x.PolicyId = value.Interface().(string)
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		x.Cmd = value.Message().Interface().(*PolicyCmd)
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", fd.FullName()))
-	}
-}
-
-// Mutable returns a mutable reference to a composite type.
-//
-// If the field is unpopulated, it may allocate a composite value.
-// For a field belonging to a oneof, it implicitly clears any other field
-// that may be currently set within the same oneof.
-// For extension fields, it implicitly stores the provided ExtensionType
-// if not already stored.
-// It panics if the field does not contain a composite type.
-//
-// Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmdPayload) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		if x.IssuedAt == nil {
-			x.IssuedAt = new(timestamppb.Timestamp)
-		}
-		return protoreflect.ValueOfMessage(x.IssuedAt.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		if x.Cmd == nil {
-			x.Cmd = new(PolicyCmd)
-		}
-		return protoreflect.ValueOfMessage(x.Cmd.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		panic(fmt.Errorf("field actor of message sourcehub.acp.SignedPolicyCmdPayload is not mutable"))
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		panic(fmt.Errorf("field issued_height of message sourcehub.acp.SignedPolicyCmdPayload is not mutable"))
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		panic(fmt.Errorf("field expiration_delta of message sourcehub.acp.SignedPolicyCmdPayload is not mutable"))
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		panic(fmt.Errorf("field policy_id of message sourcehub.acp.SignedPolicyCmdPayload is not mutable"))
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", fd.FullName()))
-	}
-}
-
-// NewField returns a new value that is assignable to the field
-// for the given descriptor. For scalars, this returns the default value.
-// For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_SignedPolicyCmdPayload) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
-	switch fd.FullName() {
-	case "sourcehub.acp.SignedPolicyCmdPayload.actor":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_height":
-		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.SignedPolicyCmdPayload.issued_at":
-		m := new(timestamppb.Timestamp)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	case "sourcehub.acp.SignedPolicyCmdPayload.expiration_delta":
-		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.acp.SignedPolicyCmdPayload.policy_id":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.acp.SignedPolicyCmdPayload.cmd":
-		m := new(PolicyCmd)
-		return protoreflect.ValueOfMessage(m.ProtoReflect())
-	default:
-		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.SignedPolicyCmdPayload"))
-		}
-		panic(fmt.Errorf("message sourcehub.acp.SignedPolicyCmdPayload does not contain field %s", fd.FullName()))
-	}
-}
-
-// WhichOneof reports which field within the oneof is populated,
-// returning nil if none are populated.
-// It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_SignedPolicyCmdPayload) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
-	switch d.FullName() {
-	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.acp.SignedPolicyCmdPayload", d.FullName()))
-	}
-	panic("unreachable")
-}
-
-// GetUnknown retrieves the entire list of unknown fields.
-// The caller may only mutate the contents of the RawFields
-// if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_SignedPolicyCmdPayload) GetUnknown() protoreflect.RawFields {
-	return x.unknownFields
-}
-
-// SetUnknown stores an entire list of unknown fields.
-// The raw fields must be syntactically valid according to the wire format.
-// An implementation may panic if this is not the case.
-// Once stored, the caller must not mutate the content of the RawFields.
-// An empty RawFields may be passed to clear the fields.
-//
-// SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_SignedPolicyCmdPayload) SetUnknown(fields protoreflect.RawFields) {
-	x.unknownFields = fields
-}
-
-// IsValid reports whether the message is valid.
-//
-// An invalid message is an empty, read-only value.
-//
-// An invalid message often corresponds to a nil pointer of the concrete
-// message type, but the details are implementation dependent.
-// Validity is not part of the protobuf data model, and may not
-// be preserved in marshaling or other operations.
-func (x *fastReflection_SignedPolicyCmdPayload) IsValid() bool {
-	return x != nil
-}
-
-// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
-// This method may return nil.
-//
-// The returned methods type is identical to
-// "google.golang.org/protobuf/runtime/protoiface".Methods.
-// Consult the protoiface package documentation for details.
-func (x *fastReflection_SignedPolicyCmdPayload) ProtoMethods() *protoiface.Methods {
-	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*SignedPolicyCmdPayload)
-		if x == nil {
-			return protoiface.SizeOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Size:              0,
-			}
-		}
-		options := runtime.SizeInputToOptions(input)
-		_ = options
-		var n int
-		var l int
-		_ = l
-		l = len(x.Actor)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.IssuedHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.IssuedHeight))
-		}
-		if x.IssuedAt != nil {
-			l = options.Size(x.IssuedAt)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.ExpirationDelta != 0 {
-			n += 1 + runtime.Sov(uint64(x.ExpirationDelta))
-		}
-		l = len(x.PolicyId)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.Cmd != nil {
-			l = options.Size(x.Cmd)
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		if x.unknownFields != nil {
-			n += len(x.unknownFields)
-		}
-		return protoiface.SizeOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Size:              n,
-		}
-	}
-
-	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*SignedPolicyCmdPayload)
-		if x == nil {
-			return protoiface.MarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Buf:               input.Buf,
-			}, nil
-		}
-		options := runtime.MarshalInputToOptions(input)
-		_ = options
-		size := options.Size(x)
-		dAtA := make([]byte, size)
-		i := len(dAtA)
-		_ = i
-		var l int
-		_ = l
-		if x.unknownFields != nil {
-			i -= len(x.unknownFields)
-			copy(dAtA[i:], x.unknownFields)
-		}
-		if x.Cmd != nil {
-			encoded, err := options.Marshal(x.Cmd)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x32
-		}
-		if len(x.PolicyId) > 0 {
-			i -= len(x.PolicyId)
-			copy(dAtA[i:], x.PolicyId)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
-			i--
-			dAtA[i] = 0x2a
-		}
-		if x.ExpirationDelta != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.ExpirationDelta))
-			i--
-			dAtA[i] = 0x20
-		}
-		if x.IssuedAt != nil {
-			encoded, err := options.Marshal(x.IssuedAt)
-			if err != nil {
-				return protoiface.MarshalOutput{
-					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-					Buf:               input.Buf,
-				}, err
-			}
-			i -= len(encoded)
-			copy(dAtA[i:], encoded)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
-			i--
-			dAtA[i] = 0x1a
-		}
-		if x.IssuedHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.IssuedHeight))
-			i--
-			dAtA[i] = 0x10
-		}
-		if len(x.Actor) > 0 {
-			i -= len(x.Actor)
-			copy(dAtA[i:], x.Actor)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Actor)))
-			i--
-			dAtA[i] = 0xa
-		}
-		if input.Buf != nil {
-			input.Buf = append(input.Buf, dAtA...)
-		} else {
-			input.Buf = dAtA
-		}
-		return protoiface.MarshalOutput{
-			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-			Buf:               input.Buf,
-		}, nil
-	}
-	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*SignedPolicyCmdPayload)
-		if x == nil {
-			return protoiface.UnmarshalOutput{
-				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
-				Flags:             input.Flags,
-			}, nil
-		}
-		options := runtime.UnmarshalInputToOptions(input)
-		_ = options
-		dAtA := input.Buf
-		l := len(dAtA)
-		iNdEx := 0
-		for iNdEx < l {
-			preIndex := iNdEx
-			var wire uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				wire |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			fieldNum := int32(wire >> 3)
-			wireType := int(wire & 0x7)
-			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: SignedPolicyCmdPayload: wiretype end group for non-group")
-			}
-			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: SignedPolicyCmdPayload: illegal tag %d (wire type %d)", fieldNum, wire)
-			}
-			switch fieldNum {
-			case 1:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Actor = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 2:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IssuedHeight", wireType)
-				}
-				x.IssuedHeight = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.IssuedHeight |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field IssuedAt", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.IssuedAt == nil {
-					x.IssuedAt = &timestamppb.Timestamp{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.IssuedAt); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			case 4:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ExpirationDelta", wireType)
-				}
-				x.ExpirationDelta = 0
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					x.ExpirationDelta |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-			case 5:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.PolicyId = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 6:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
-				}
-				var msglen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					msglen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if msglen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + msglen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if x.Cmd == nil {
-					x.Cmd = &PolicyCmd{}
-				}
-				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Cmd); err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				iNdEx = postIndex
-			default:
-				iNdEx = preIndex
-				skippy, err := runtime.Skip(dAtA[iNdEx:])
-				if err != nil {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
-				}
-				if (skippy < 0) || (iNdEx+skippy) < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if (iNdEx + skippy) > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				if !options.DiscardUnknown {
-					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
-				}
-				iNdEx += skippy
-			}
-		}
-
-		if iNdEx > l {
-			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-		}
-		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
-	}
-	return &protoiface.Methods{
-		NoUnkeyedLiterals: struct{}{},
-		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
-		Size:              size,
-		Marshal:           marshal,
-		Unmarshal:         unmarshal,
-		Merge:             nil,
-		CheckInitialized:  nil,
-	}
-}
 
 var (
 	md_PolicyCmd                          protoreflect.MessageDescriptor
@@ -1287,7 +48,7 @@ func (x *PolicyCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *PolicyCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[2]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2475,7 +1236,7 @@ func (x *SetRelationshipCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *SetRelationshipCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[3]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2910,7 +1671,7 @@ func (x *DeleteRelationshipCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *DeleteRelationshipCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[4]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3345,7 +2106,7 @@ func (x *RegisterObjectCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RegisterObjectCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[5]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3780,7 +2541,7 @@ func (x *CommitRegistrationsCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *CommitRegistrationsCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[6]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4202,7 +2963,7 @@ func (x *CommitRegistrationsCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *CommitRegistrationsCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[7]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4639,7 +3400,7 @@ func (x *RevealRegistrationCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RevealRegistrationCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[8]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5122,7 +3883,7 @@ func (x *RevealRegistrationCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RevealRegistrationCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[9]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5274,7 +4035,7 @@ func (x *fastReflection_RevealRegistrationCmdResult) Set(fd protoreflect.FieldDe
 	case "sourcehub.acp.RevealRegistrationCmdResult.record":
 		x.Record = value.Message().Interface().(*RelationshipRecord)
 	case "sourcehub.acp.RevealRegistrationCmdResult.event":
-		x.Event = value.Message().Interface().(*ObjectRegistrationEvent)
+		x.Event = value.Message().Interface().(*AmendmentEvent)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.RevealRegistrationCmdResult"))
@@ -5302,7 +4063,7 @@ func (x *fastReflection_RevealRegistrationCmdResult) Mutable(fd protoreflect.Fie
 		return protoreflect.ValueOfMessage(x.Record.ProtoReflect())
 	case "sourcehub.acp.RevealRegistrationCmdResult.event":
 		if x.Event == nil {
-			x.Event = new(ObjectRegistrationEvent)
+			x.Event = new(AmendmentEvent)
 		}
 		return protoreflect.ValueOfMessage(x.Event.ProtoReflect())
 	default:
@@ -5322,7 +4083,7 @@ func (x *fastReflection_RevealRegistrationCmdResult) NewField(fd protoreflect.Fi
 		m := new(RelationshipRecord)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.acp.RevealRegistrationCmdResult.event":
-		m := new(ObjectRegistrationEvent)
+		m := new(AmendmentEvent)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -5573,7 +4334,7 @@ func (x *fastReflection_RevealRegistrationCmdResult) ProtoMethods() *protoiface.
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Event == nil {
-					x.Event = &ObjectRegistrationEvent{}
+					x.Event = &AmendmentEvent{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Event); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -5634,7 +4395,7 @@ func (x *FlagHijackAttemptCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *FlagHijackAttemptCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[10]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6038,7 +4799,7 @@ func (x *FlagHijackAttemptCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *FlagHijackAttemptCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[11]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6175,7 +4936,7 @@ func (x *fastReflection_FlagHijackAttemptCmdResult) Get(descriptor protoreflect.
 func (x *fastReflection_FlagHijackAttemptCmdResult) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	case "sourcehub.acp.FlagHijackAttemptCmdResult.event":
-		x.Event = value.Message().Interface().(*ObjectRegistrationEvent)
+		x.Event = value.Message().Interface().(*AmendmentEvent)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.acp.FlagHijackAttemptCmdResult"))
@@ -6198,7 +4959,7 @@ func (x *fastReflection_FlagHijackAttemptCmdResult) Mutable(fd protoreflect.Fiel
 	switch fd.FullName() {
 	case "sourcehub.acp.FlagHijackAttemptCmdResult.event":
 		if x.Event == nil {
-			x.Event = new(ObjectRegistrationEvent)
+			x.Event = new(AmendmentEvent)
 		}
 		return protoreflect.ValueOfMessage(x.Event.ProtoReflect())
 	default:
@@ -6215,7 +4976,7 @@ func (x *fastReflection_FlagHijackAttemptCmdResult) Mutable(fd protoreflect.Fiel
 func (x *fastReflection_FlagHijackAttemptCmdResult) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	case "sourcehub.acp.FlagHijackAttemptCmdResult.event":
-		m := new(ObjectRegistrationEvent)
+		m := new(AmendmentEvent)
 		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
@@ -6412,7 +5173,7 @@ func (x *fastReflection_FlagHijackAttemptCmdResult) ProtoMethods() *protoiface.M
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
 				if x.Event == nil {
-					x.Event = &ObjectRegistrationEvent{}
+					x.Event = &AmendmentEvent{}
 				}
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Event); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
@@ -6473,7 +5234,7 @@ func (x *UnarchiveObjectCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *UnarchiveObjectCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[12]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6910,7 +5671,7 @@ func (x *UnarchiveObjectCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *UnarchiveObjectCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[13]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7397,7 +6158,7 @@ func (x *ArchiveObjectCmd) ProtoReflect() protoreflect.Message {
 }
 
 func (x *ArchiveObjectCmd) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[14]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7834,7 +6595,7 @@ func (x *SetRelationshipCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *SetRelationshipCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[15]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8321,7 +7082,7 @@ func (x *DeleteRelationshipCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *DeleteRelationshipCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[16]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8731,7 +7492,7 @@ func (x *RegisterObjectCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *RegisterObjectCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[17]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9168,7 +7929,7 @@ func (x *ArchiveObjectCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *ArchiveObjectCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[18]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9638,7 +8399,7 @@ func (x *PolicyCmdResult) ProtoReflect() protoreflect.Message {
 }
 
 func (x *PolicyCmdResult) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[19]
+	mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10819,139 +9580,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// SignedPolicyCmd represents a Command issued by an Actor in the context of a Policy
-// The command represents an instruction to be executed
-// The message type contains a signature which is used to authenticate the Command's Actor
-type SignedPolicyCmd struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// payload contains the command context
-	Payload *SignedPolicyCmdPayload `protobuf:"bytes,1,opt,name=payload,proto3" json:"payload,omitempty"`
-	// signature is a signature of the payload.
-	// The signature is generated using the VerificationMethod / Authorization fields
-	// specificied by the DID document of the Actor.
-	Signature []byte `protobuf:"bytes,2,opt,name=signature,proto3" json:"signature,omitempty"`
-}
-
-func (x *SignedPolicyCmd) Reset() {
-	*x = SignedPolicyCmd{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SignedPolicyCmd) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SignedPolicyCmd) ProtoMessage() {}
-
-// Deprecated: Use SignedPolicyCmd.ProtoReflect.Descriptor instead.
-func (*SignedPolicyCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *SignedPolicyCmd) GetPayload() *SignedPolicyCmdPayload {
-	if x != nil {
-		return x.Payload
-	}
-	return nil
-}
-
-func (x *SignedPolicyCmd) GetSignature() []byte {
-	if x != nil {
-		return x.Signature
-	}
-	return nil
-}
-
-// SignedPolicyCmdPayload represents the payload containing the context of the issued command
-type SignedPolicyCmdPayload struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	// actor is a did string representing the actor which issued the command
-	Actor string `protobuf:"bytes,1,opt,name=actor,proto3" json:"actor,omitempty"`
-	// issued_height is the SourceHub block height of when the Payload was created
-	IssuedHeight uint64 `protobuf:"varint,2,opt,name=issued_height,json=issuedHeight,proto3" json:"issued_height,omitempty"`
-	// issued_at contains a client generated timestamp for the creation of the command.
-	// This is used only as metadata and isn't trusted
-	IssuedAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=issued_at,json=issuedAt,proto3" json:"issued_at,omitempty"`
-	// expiration_delta specifies the maximum number of blocks from the issued height during which the Command Payload will be accepted.
-	// This field is mandatory and is used to prevent replay attacks
-	ExpirationDelta uint64 `protobuf:"varint,4,opt,name=expiration_delta,json=expirationDelta,proto3" json:"expiration_delta,omitempty"`
-	// policy_id is the ID of the policy under which the Command will be executed
-	PolicyId string     `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Cmd      *PolicyCmd `protobuf:"bytes,6,opt,name=cmd,proto3" json:"cmd,omitempty"`
-}
-
-func (x *SignedPolicyCmdPayload) Reset() {
-	*x = SignedPolicyCmdPayload{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *SignedPolicyCmdPayload) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*SignedPolicyCmdPayload) ProtoMessage() {}
-
-// Deprecated: Use SignedPolicyCmdPayload.ProtoReflect.Descriptor instead.
-func (*SignedPolicyCmdPayload) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *SignedPolicyCmdPayload) GetActor() string {
-	if x != nil {
-		return x.Actor
-	}
-	return ""
-}
-
-func (x *SignedPolicyCmdPayload) GetIssuedHeight() uint64 {
-	if x != nil {
-		return x.IssuedHeight
-	}
-	return 0
-}
-
-func (x *SignedPolicyCmdPayload) GetIssuedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.IssuedAt
-	}
-	return nil
-}
-
-func (x *SignedPolicyCmdPayload) GetExpirationDelta() uint64 {
-	if x != nil {
-		return x.ExpirationDelta
-	}
-	return 0
-}
-
-func (x *SignedPolicyCmdPayload) GetPolicyId() string {
-	if x != nil {
-		return x.PolicyId
-	}
-	return ""
-}
-
-func (x *SignedPolicyCmdPayload) GetCmd() *PolicyCmd {
-	if x != nil {
-		return x.Cmd
-	}
-	return nil
-}
-
+// PolicyCmd models an operation to be performed against the context of a Policy
 type PolicyCmd struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -10973,7 +9602,7 @@ type PolicyCmd struct {
 func (x *PolicyCmd) Reset() {
 	*x = PolicyCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[2]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10987,7 +9616,7 @@ func (*PolicyCmd) ProtoMessage() {}
 
 // Deprecated: Use PolicyCmd.ProtoReflect.Descriptor instead.
 func (*PolicyCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{2}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *PolicyCmd) GetCmd() isPolicyCmd_Cmd {
@@ -11119,7 +9748,7 @@ type SetRelationshipCmd struct {
 func (x *SetRelationshipCmd) Reset() {
 	*x = SetRelationshipCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[3]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11133,7 +9762,7 @@ func (*SetRelationshipCmd) ProtoMessage() {}
 
 // Deprecated: Use SetRelationshipCmd.ProtoReflect.Descriptor instead.
 func (*SetRelationshipCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{3}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SetRelationshipCmd) GetRelationship() *types.Relationship {
@@ -11156,7 +9785,7 @@ type DeleteRelationshipCmd struct {
 func (x *DeleteRelationshipCmd) Reset() {
 	*x = DeleteRelationshipCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[4]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11170,7 +9799,7 @@ func (*DeleteRelationshipCmd) ProtoMessage() {}
 
 // Deprecated: Use DeleteRelationshipCmd.ProtoReflect.Descriptor instead.
 func (*DeleteRelationshipCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{4}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DeleteRelationshipCmd) GetRelationship() *types.Relationship {
@@ -11199,7 +9828,7 @@ type RegisterObjectCmd struct {
 func (x *RegisterObjectCmd) Reset() {
 	*x = RegisterObjectCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[5]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11213,7 +9842,7 @@ func (*RegisterObjectCmd) ProtoMessage() {}
 
 // Deprecated: Use RegisterObjectCmd.ProtoReflect.Descriptor instead.
 func (*RegisterObjectCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{5}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *RegisterObjectCmd) GetObject() *types.Object {
@@ -11223,6 +9852,7 @@ func (x *RegisterObjectCmd) GetObject() *types.Object {
 	return nil
 }
 
+// CommitRegistrationsCmd creates a new batched commitment to a set of Object registrations
 type CommitRegistrationsCmd struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -11234,7 +9864,7 @@ type CommitRegistrationsCmd struct {
 func (x *CommitRegistrationsCmd) Reset() {
 	*x = CommitRegistrationsCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[6]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11248,7 +9878,7 @@ func (*CommitRegistrationsCmd) ProtoMessage() {}
 
 // Deprecated: Use CommitRegistrationsCmd.ProtoReflect.Descriptor instead.
 func (*CommitRegistrationsCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{6}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CommitRegistrationsCmd) GetCommitment() []byte {
@@ -11269,7 +9899,7 @@ type CommitRegistrationsCmdResult struct {
 func (x *CommitRegistrationsCmdResult) Reset() {
 	*x = CommitRegistrationsCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[7]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11283,7 +9913,7 @@ func (*CommitRegistrationsCmdResult) ProtoMessage() {}
 
 // Deprecated: Use CommitRegistrationsCmdResult.ProtoReflect.Descriptor instead.
 func (*CommitRegistrationsCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{7}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CommitRegistrationsCmdResult) GetRegistrationsCommitment() *RegistrationsCommitment {
@@ -11305,7 +9935,7 @@ type RevealRegistrationCmd struct {
 func (x *RevealRegistrationCmd) Reset() {
 	*x = RevealRegistrationCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[8]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11319,7 +9949,7 @@ func (*RevealRegistrationCmd) ProtoMessage() {}
 
 // Deprecated: Use RevealRegistrationCmd.ProtoReflect.Descriptor instead.
 func (*RevealRegistrationCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{8}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RevealRegistrationCmd) GetRegistrationsCommitmentId() uint64 {
@@ -11341,14 +9971,14 @@ type RevealRegistrationCmdResult struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Record *RelationshipRecord      `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
-	Event  *ObjectRegistrationEvent `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
+	Record *RelationshipRecord `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
+	Event  *AmendmentEvent     `protobuf:"bytes,2,opt,name=event,proto3" json:"event,omitempty"`
 }
 
 func (x *RevealRegistrationCmdResult) Reset() {
 	*x = RevealRegistrationCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[9]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11362,7 +9992,7 @@ func (*RevealRegistrationCmdResult) ProtoMessage() {}
 
 // Deprecated: Use RevealRegistrationCmdResult.ProtoReflect.Descriptor instead.
 func (*RevealRegistrationCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{9}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RevealRegistrationCmdResult) GetRecord() *RelationshipRecord {
@@ -11372,7 +10002,7 @@ func (x *RevealRegistrationCmdResult) GetRecord() *RelationshipRecord {
 	return nil
 }
 
-func (x *RevealRegistrationCmdResult) GetEvent() *ObjectRegistrationEvent {
+func (x *RevealRegistrationCmdResult) GetEvent() *AmendmentEvent {
 	if x != nil {
 		return x.Event
 	}
@@ -11390,7 +10020,7 @@ type FlagHijackAttemptCmd struct {
 func (x *FlagHijackAttemptCmd) Reset() {
 	*x = FlagHijackAttemptCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[10]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11404,7 +10034,7 @@ func (*FlagHijackAttemptCmd) ProtoMessage() {}
 
 // Deprecated: Use FlagHijackAttemptCmd.ProtoReflect.Descriptor instead.
 func (*FlagHijackAttemptCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{10}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *FlagHijackAttemptCmd) GetEventId() uint64 {
@@ -11419,13 +10049,13 @@ type FlagHijackAttemptCmdResult struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Event *ObjectRegistrationEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	Event *AmendmentEvent `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 }
 
 func (x *FlagHijackAttemptCmdResult) Reset() {
 	*x = FlagHijackAttemptCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[11]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11439,10 +10069,10 @@ func (*FlagHijackAttemptCmdResult) ProtoMessage() {}
 
 // Deprecated: Use FlagHijackAttemptCmdResult.ProtoReflect.Descriptor instead.
 func (*FlagHijackAttemptCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{11}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *FlagHijackAttemptCmdResult) GetEvent() *ObjectRegistrationEvent {
+func (x *FlagHijackAttemptCmdResult) GetEvent() *AmendmentEvent {
 	if x != nil {
 		return x.Event
 	}
@@ -11460,7 +10090,7 @@ type UnarchiveObjectCmd struct {
 func (x *UnarchiveObjectCmd) Reset() {
 	*x = UnarchiveObjectCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[12]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11474,7 +10104,7 @@ func (*UnarchiveObjectCmd) ProtoMessage() {}
 
 // Deprecated: Use UnarchiveObjectCmd.ProtoReflect.Descriptor instead.
 func (*UnarchiveObjectCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{12}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UnarchiveObjectCmd) GetObject() *types.Object {
@@ -11496,7 +10126,7 @@ type UnarchiveObjectCmdResult struct {
 func (x *UnarchiveObjectCmdResult) Reset() {
 	*x = UnarchiveObjectCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[13]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11510,7 +10140,7 @@ func (*UnarchiveObjectCmdResult) ProtoMessage() {}
 
 // Deprecated: Use UnarchiveObjectCmdResult.ProtoReflect.Descriptor instead.
 func (*UnarchiveObjectCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{13}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UnarchiveObjectCmdResult) GetRecord() *RelationshipRecord {
@@ -11550,7 +10180,7 @@ type ArchiveObjectCmd struct {
 func (x *ArchiveObjectCmd) Reset() {
 	*x = ArchiveObjectCmd{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[14]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11564,7 +10194,7 @@ func (*ArchiveObjectCmd) ProtoMessage() {}
 
 // Deprecated: Use ArchiveObjectCmd.ProtoReflect.Descriptor instead.
 func (*ArchiveObjectCmd) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{14}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ArchiveObjectCmd) GetObject() *types.Object {
@@ -11588,7 +10218,7 @@ type SetRelationshipCmdResult struct {
 func (x *SetRelationshipCmdResult) Reset() {
 	*x = SetRelationshipCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[15]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11602,7 +10232,7 @@ func (*SetRelationshipCmdResult) ProtoMessage() {}
 
 // Deprecated: Use SetRelationshipCmdResult.ProtoReflect.Descriptor instead.
 func (*SetRelationshipCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{15}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *SetRelationshipCmdResult) GetRecordExisted() bool {
@@ -11631,7 +10261,7 @@ type DeleteRelationshipCmdResult struct {
 func (x *DeleteRelationshipCmdResult) Reset() {
 	*x = DeleteRelationshipCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[16]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11645,7 +10275,7 @@ func (*DeleteRelationshipCmdResult) ProtoMessage() {}
 
 // Deprecated: Use DeleteRelationshipCmdResult.ProtoReflect.Descriptor instead.
 func (*DeleteRelationshipCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{16}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DeleteRelationshipCmdResult) GetRecordFound() bool {
@@ -11667,7 +10297,7 @@ type RegisterObjectCmdResult struct {
 func (x *RegisterObjectCmdResult) Reset() {
 	*x = RegisterObjectCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[17]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11681,7 +10311,7 @@ func (*RegisterObjectCmdResult) ProtoMessage() {}
 
 // Deprecated: Use RegisterObjectCmdResult.ProtoReflect.Descriptor instead.
 func (*RegisterObjectCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{17}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *RegisterObjectCmdResult) GetRecord() *RelationshipRecord {
@@ -11704,7 +10334,7 @@ type ArchiveObjectCmdResult struct {
 func (x *ArchiveObjectCmdResult) Reset() {
 	*x = ArchiveObjectCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[18]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11718,7 +10348,7 @@ func (*ArchiveObjectCmdResult) ProtoMessage() {}
 
 // Deprecated: Use ArchiveObjectCmdResult.ProtoReflect.Descriptor instead.
 func (*ArchiveObjectCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{18}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ArchiveObjectCmdResult) GetFound() bool {
@@ -11756,7 +10386,7 @@ type PolicyCmdResult struct {
 func (x *PolicyCmdResult) Reset() {
 	*x = PolicyCmdResult{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[19]
+		mi := &file_sourcehub_acp_policy_cmd_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11770,7 +10400,7 @@ func (*PolicyCmdResult) ProtoMessage() {}
 
 // Deprecated: Use PolicyCmdResult.ProtoReflect.Descriptor instead.
 func (*PolicyCmdResult) Descriptor() ([]byte, []int) {
-	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{19}
+	return file_sourcehub_acp_policy_cmd_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *PolicyCmdResult) GetResult() isPolicyCmdResult_Result {
@@ -11904,239 +10534,214 @@ var file_sourcehub_acp_policy_cmd_proto_rawDesc = []byte{
 	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x72, 0x65, 0x67, 0x69, 0x73,
 	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1a, 0x73,
 	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0x2f, 0x72, 0x65, 0x63,
-	0x6f, 0x72, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x70, 0x0a, 0x0f, 0x53, 0x69, 0x67,
-	0x6e, 0x65, 0x64, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x12, 0x3f, 0x0a, 0x07,
-	0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e,
-	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x53, 0x69,
-	0x67, 0x6e, 0x65, 0x64, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x50, 0x61, 0x79,
-	0x6c, 0x6f, 0x61, 0x64, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x1c, 0x0a,
-	0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c,
-	0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x22, 0x80, 0x02, 0x0a, 0x16,
-	0x53, 0x69, 0x67, 0x6e, 0x65, 0x64, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x50,
-	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x61, 0x63, 0x74, 0x6f, 0x72, 0x12, 0x23, 0x0a, 0x0d,
-	0x69, 0x73, 0x73, 0x75, 0x65, 0x64, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x0c, 0x69, 0x73, 0x73, 0x75, 0x65, 0x64, 0x48, 0x65, 0x69, 0x67, 0x68,
-	0x74, 0x12, 0x37, 0x0a, 0x09, 0x69, 0x73, 0x73, 0x75, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72,
-	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x52, 0x08, 0x69, 0x73, 0x73, 0x75, 0x65, 0x64, 0x41, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x65, 0x78,
-	0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x64, 0x65, 0x6c, 0x74, 0x61, 0x18, 0x04,
-	0x20, 0x01, 0x28, 0x04, 0x52, 0x0f, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x44, 0x65, 0x6c, 0x74, 0x61, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f,
-	0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
-	0x49, 0x64, 0x12, 0x2a, 0x0a, 0x03, 0x63, 0x6d, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x18, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e,
-	0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x52, 0x03, 0x63, 0x6d, 0x64, 0x22, 0xe6,
-	0x05, 0x0a, 0x09, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x12, 0x55, 0x0a, 0x14,
-	0x73, 0x65, 0x74, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70,
-	0x5f, 0x63, 0x6d, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x53, 0x65, 0x74, 0x52, 0x65,
-	0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52,
-	0x12, 0x73, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70,
-	0x43, 0x6d, 0x64, 0x12, 0x5e, 0x0a, 0x17, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x5f, 0x72, 0x65,
-	0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x61, 0x63, 0x70, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x15, 0x64, 0x65,
-	0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70,
-	0x43, 0x6d, 0x64, 0x12, 0x52, 0x0a, 0x13, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x5f,
-	0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x20, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
-	0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43,
-	0x6d, 0x64, 0x48, 0x00, 0x52, 0x11, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62,
-	0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x4f, 0x0a, 0x12, 0x61, 0x72, 0x63, 0x68, 0x69,
-	0x76, 0x65, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x04, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x1f, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
-	0x61, 0x63, 0x70, 0x2e, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63,
-	0x74, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x10, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f,
-	0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x61, 0x0a, 0x18, 0x63, 0x6f, 0x6d, 0x6d,
-	0x69, 0x74, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x5f, 0x63, 0x6d, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69,
-	0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d,
-	0x64, 0x48, 0x00, 0x52, 0x16, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x12, 0x5e, 0x0a, 0x17, 0x72,
-	0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x76,
-	0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43,
-	0x6d, 0x64, 0x48, 0x00, 0x52, 0x15, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x12, 0x5c, 0x0a, 0x17, 0x66,
-	0x6c, 0x61, 0x67, 0x5f, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f, 0x61, 0x74, 0x74, 0x65, 0x6d,
-	0x70, 0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x46, 0x6c, 0x61,
-	0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d,
-	0x64, 0x48, 0x00, 0x52, 0x14, 0x66, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41,
-	0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x55, 0x0a, 0x14, 0x75, 0x6e, 0x61,
-	0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x63, 0x6d,
-	0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76,
-	0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x12, 0x75, 0x6e,
-	0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64,
-	0x42, 0x05, 0x0a, 0x03, 0x63, 0x6d, 0x64, 0x22, 0x5e, 0x0a, 0x12, 0x53, 0x65, 0x74, 0x52, 0x65,
-	0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x12, 0x48, 0x0a,
-	0x0c, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77,
-	0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x52, 0x65, 0x6c,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x0c, 0x72, 0x65, 0x6c, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x22, 0x61, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74,
-	0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64,
-	0x12, 0x48, 0x0a, 0x0c, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e,
-	0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e,
-	0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x0c, 0x72, 0x65,
-	0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x22, 0x4b, 0x0a, 0x11, 0x52, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12,
-	0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
-	0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e,
-	0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52,
-	0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x22, 0x38, 0x0a, 0x16, 0x43, 0x6f, 0x6d, 0x6d, 0x69,
-	0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d,
-	0x64, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e,
-	0x74, 0x22, 0x81, 0x01, 0x0a, 0x1c, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75,
-	0x6c, 0x74, 0x12, 0x61, 0x0a, 0x18, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x73, 0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x17, 0x72, 0x65,
-	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d, 0x69,
-	0x74, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x8f, 0x01, 0x0a, 0x15, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c,
-	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x12,
-	0x3e, 0x0a, 0x1b, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
-	0x5f, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x04, 0x52, 0x19, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12,
-	0x36, 0x0a, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20,
-	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52,
-	0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x6f, 0x66,
-	0x52, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x22, 0x96, 0x01, 0x0a, 0x1b, 0x52, 0x65, 0x76, 0x65,
-	0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d,
-	0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72,
-	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65, 0x63, 0x6f,
-	0x72, 0x64, 0x12, 0x3c, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
-	0x70, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74,
-	0x22, 0x31, 0x0a, 0x14, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74,
-	0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x19, 0x0a, 0x08, 0x65, 0x76, 0x65, 0x6e,
-	0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x65, 0x76, 0x65, 0x6e,
-	0x74, 0x49, 0x64, 0x22, 0x5a, 0x0a, 0x1a, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63,
-	0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x12, 0x3c, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
-	0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x22,
-	0x4c, 0x0a, 0x12, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65,
-	0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65,
-	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f,
-	0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x22, 0x8a, 0x01,
-	0x0a, 0x18, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63,
-	0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65,
-	0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72,
-	0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x33, 0x0a, 0x15, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x6d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x08, 0x52, 0x14, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
-	0x69, 0x70, 0x4d, 0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x22, 0x4a, 0x0a, 0x10, 0x41, 0x72,
+	0x6f, 0x72, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xe6, 0x05, 0x0a, 0x09, 0x50, 0x6f,
+	0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x12, 0x55, 0x0a, 0x14, 0x73, 0x65, 0x74, 0x5f, 0x72,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x63, 0x6d, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x53, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x12, 0x73, 0x65, 0x74, 0x52,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x12, 0x5e,
+	0x0a, 0x17, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
+	0x69, 0x70, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x15, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x12, 0x52,
+	0x0a, 0x13, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63,
+	0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52,
+	0x11, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43,
+	0x6d, 0x64, 0x12, 0x4f, 0x0a, 0x12, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x5f, 0x6f, 0x62,
+	0x6a, 0x65, 0x63, 0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1f,
+	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x41,
+	0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x48,
+	0x00, 0x52, 0x10, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74,
+	0x43, 0x6d, 0x64, 0x12, 0x61, 0x0a, 0x18, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x5f, 0x72, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x63, 0x6d, 0x64, 0x18,
+	0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x16,
+	0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x12, 0x5e, 0x0a, 0x17, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c,
+	0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x63, 0x6d,
+	0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52,
+	0x15, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x12, 0x5c, 0x0a, 0x17, 0x66, 0x6c, 0x61, 0x67, 0x5f, 0x68,
+	0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f, 0x61, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x5f, 0x63, 0x6d,
+	0x64, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x23, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61,
+	0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x14,
+	0x66, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70,
+	0x74, 0x43, 0x6d, 0x64, 0x12, 0x55, 0x0a, 0x14, 0x75, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76,
+	0x65, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x63, 0x6d, 0x64, 0x18, 0x08, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x2e, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65,
+	0x63, 0x74, 0x43, 0x6d, 0x64, 0x48, 0x00, 0x52, 0x12, 0x75, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69,
+	0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x42, 0x05, 0x0a, 0x03, 0x63,
+	0x6d, 0x64, 0x22, 0x5e, 0x0a, 0x12, 0x53, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x12, 0x48, 0x0a, 0x0c, 0x72, 0x65, 0x6c, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x24,
+	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61,
+	0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x73, 0x68, 0x69, 0x70, 0x52, 0x0c, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
+	0x69, 0x70, 0x22, 0x61, 0x0a, 0x15, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x12, 0x48, 0x0a, 0x0c, 0x72,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x0b, 0x32, 0x24, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72,
+	0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x0c, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x68, 0x69, 0x70, 0x22, 0x4b, 0x0a, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
+	0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62,
+	0x6a, 0x65, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63,
+	0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65,
+	0x63, 0x74, 0x22, 0x38, 0x0a, 0x16, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69,
+	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x12, 0x1e, 0x0a, 0x0a,
+	0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x0a, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x22, 0x81, 0x01, 0x0a,
+	0x1c, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x61, 0x0a,
+	0x18, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x63,
+	0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e,
+	0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d,
+	0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x17, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72,
+	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74,
+	0x22, 0x8f, 0x01, 0x0a, 0x15, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x12, 0x3e, 0x0a, 0x1b, 0x72, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x63, 0x6f, 0x6d, 0x6d,
+	0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x19, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6f,
+	0x6d, 0x6d, 0x69, 0x74, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x36, 0x0a, 0x05, 0x70, 0x72,
+	0x6f, 0x6f, 0x66, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x20, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
+	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x6f, 0x66, 0x52, 0x05, 0x70, 0x72, 0x6f,
+	0x6f, 0x66, 0x22, 0x8d, 0x01, 0x0a, 0x1b, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67,
+	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75,
+	0x6c, 0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x33, 0x0a,
+	0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x41, 0x6d, 0x65,
+	0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x05, 0x65, 0x76, 0x65,
+	0x6e, 0x74, 0x22, 0x31, 0x0a, 0x14, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b,
+	0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x19, 0x0a, 0x08, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x07, 0x65, 0x76,
+	0x65, 0x6e, 0x74, 0x49, 0x64, 0x22, 0x51, 0x0a, 0x1a, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a,
+	0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73,
+	0x75, 0x6c, 0x74, 0x12, 0x33, 0x0a, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x2e, 0x41, 0x6d, 0x65, 0x6e, 0x64, 0x6d, 0x65, 0x6e, 0x74, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x52, 0x05, 0x65, 0x76, 0x65, 0x6e, 0x74, 0x22, 0x4c, 0x0a, 0x12, 0x55, 0x6e, 0x61, 0x72,
 	0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x36,
 	0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e,
 	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61,
 	0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x06,
-	0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x22, 0x7c, 0x0a, 0x18, 0x53, 0x65, 0x74, 0x52, 0x65, 0x6c,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75,
-	0x6c, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x5f, 0x65, 0x78, 0x69,
-	0x73, 0x74, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0d, 0x72, 0x65, 0x63, 0x6f,
-	0x72, 0x64, 0x45, 0x78, 0x69, 0x73, 0x74, 0x65, 0x64, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63,
-	0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65,
-	0x63, 0x6f, 0x72, 0x64, 0x22, 0x40, 0x0a, 0x1b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65,
-	0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73,
-	0x75, 0x6c, 0x74, 0x12, 0x21, 0x0a, 0x0c, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x5f, 0x66, 0x6f,
-	0x75, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0b, 0x72, 0x65, 0x63, 0x6f, 0x72,
-	0x64, 0x46, 0x6f, 0x75, 0x6e, 0x64, 0x22, 0x54, 0x0a, 0x17, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63,
-	0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65,
-	0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x63, 0x0a, 0x16,
-	0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64,
-	0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x14, 0x0a, 0x05, 0x66, 0x6f, 0x75, 0x6e, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x66, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x33, 0x0a, 0x15,
-	0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x73, 0x5f, 0x72, 0x65,
-	0x6d, 0x6f, 0x76, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x14, 0x72, 0x65, 0x6c,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x73, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65,
-	0x64, 0x22, 0xcf, 0x06, 0x0a, 0x0f, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x52,
-	0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x61, 0x0a, 0x17, 0x73, 0x65, 0x74, 0x5f, 0x72, 0x65, 0x6c,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x53, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48,
-	0x00, 0x52, 0x15, 0x73, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
-	0x69, 0x70, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x6a, 0x0a, 0x1a, 0x64, 0x65, 0x6c, 0x65,
-	0x74, 0x65, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f,
-	0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x44, 0x65, 0x6c,
-	0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43,
-	0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x18, 0x64, 0x65, 0x6c, 0x65,
-	0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65,
-	0x73, 0x75, 0x6c, 0x74, 0x12, 0x5e, 0x0a, 0x16, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
-	0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a,
-	0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x14,
-	0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65,
-	0x73, 0x75, 0x6c, 0x74, 0x12, 0x5b, 0x0a, 0x15, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x5f,
-	0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x04, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
-	0x61, 0x63, 0x70, 0x2e, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63,
-	0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x13, 0x61, 0x72,
-	0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x12, 0x6d, 0x0a, 0x1b, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x5f, 0x72, 0x65, 0x67, 0x69,
-	0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2b, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73,
-	0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x19, 0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
-	0x12, 0x6a, 0x0a, 0x1a, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x06,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
-	0x48, 0x00, 0x52, 0x18, 0x72, 0x65, 0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74,
-	0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x68, 0x0a, 0x1a,
-	0x66, 0x6c, 0x61, 0x67, 0x5f, 0x68, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x5f, 0x61, 0x74, 0x74, 0x65,
-	0x6d, 0x70, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
-	0x2e, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d,
-	0x70, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x17, 0x66,
-	0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74,
-	0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x61, 0x0a, 0x17, 0x75, 0x6e, 0x61, 0x72, 0x63, 0x68,
-	0x69, 0x76, 0x65, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76,
-	0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74,
-	0x48, 0x00, 0x52, 0x15, 0x75, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a,
-	0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x72, 0x65, 0x73,
-	0x75, 0x6c, 0x74, 0x42, 0x98, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x42, 0x0e, 0x50, 0x6f, 0x6c, 0x69, 0x63,
-	0x79, 0x43, 0x6d, 0x64, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73,
-	0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x61, 0x63, 0x70, 0xa2, 0x02, 0x03, 0x53, 0x41,
-	0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x41, 0x63,
-	0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63,
-	0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63,
-	0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e,
-	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x41, 0x63, 0x70, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x22, 0x8a, 0x01, 0x0a, 0x18, 0x55, 0x6e, 0x61, 0x72, 0x63,
+	0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73,
+	0x75, 0x6c, 0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70,
+	0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x33,
+	0x0a, 0x15, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x6d,
+	0x6f, 0x64, 0x69, 0x66, 0x69, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x14, 0x72,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x4d, 0x6f, 0x64, 0x69, 0x66,
+	0x69, 0x65, 0x64, 0x22, 0x4a, 0x0a, 0x10, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62,
+	0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x12, 0x36, 0x0a, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63,
+	0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2e, 0x61, 0x63, 0x70, 0x5f, 0x63, 0x6f, 0x72, 0x65,
+	0x2e, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x06, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x22,
+	0x7c, 0x0a, 0x18, 0x53, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
+	0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x25, 0x0a, 0x0e, 0x72,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x5f, 0x65, 0x78, 0x69, 0x73, 0x74, 0x65, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0d, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x45, 0x78, 0x69, 0x73, 0x74,
+	0x65, 0x64, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x40, 0x0a,
+	0x1b, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x21, 0x0a, 0x0c,
+	0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x5f, 0x66, 0x6f, 0x75, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x0b, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x46, 0x6f, 0x75, 0x6e, 0x64, 0x22,
+	0x54, 0x0a, 0x17, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63,
+	0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x39, 0x0a, 0x06, 0x72, 0x65,
+	0x63, 0x6f, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x21, 0x2e, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65, 0x6c, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x52, 0x06, 0x72,
+	0x65, 0x63, 0x6f, 0x72, 0x64, 0x22, 0x63, 0x0a, 0x16, 0x41, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65,
+	0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12,
+	0x14, 0x0a, 0x05, 0x66, 0x6f, 0x75, 0x6e, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05,
+	0x66, 0x6f, 0x75, 0x6e, 0x64, 0x12, 0x33, 0x0a, 0x15, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x68, 0x69, 0x70, 0x73, 0x5f, 0x72, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x64, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x14, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
+	0x69, 0x70, 0x73, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x64, 0x22, 0xcf, 0x06, 0x0a, 0x0f, 0x50,
+	0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x61,
+	0x0a, 0x17, 0x73, 0x65, 0x74, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68,
+	0x69, 0x70, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e,
+	0x53, 0x65, 0x74, 0x52, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43,
+	0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x15, 0x73, 0x65, 0x74, 0x52,
+	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x12, 0x6a, 0x0a, 0x1a, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x5f, 0x72, 0x65, 0x6c, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x48, 0x00, 0x52, 0x18, 0x64, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x52, 0x65, 0x6c, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x73, 0x68, 0x69, 0x70, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x5e, 0x0a,
+	0x16, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74,
+	0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52,
+	0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x14, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
+	0x72, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x5b, 0x0a,
+	0x15, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x5f, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x5f,
+	0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x25, 0x2e, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x41, 0x72, 0x63,
+	0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73,
+	0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x13, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62,
+	0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x6d, 0x0a, 0x1b, 0x63, 0x6f,
+	0x6d, 0x6d, 0x69, 0x74, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x73, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x2b, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e,
+	0x43, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x73, 0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x19,
+	0x63, 0x6f, 0x6d, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x6a, 0x0a, 0x1a, 0x72, 0x65, 0x76,
+	0x65, 0x61, 0x6c, 0x5f, 0x72, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2a, 0x2e,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x52, 0x65,
+	0x76, 0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x18, 0x72, 0x65, 0x76,
+	0x65, 0x61, 0x6c, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x68, 0x0a, 0x1a, 0x66, 0x6c, 0x61, 0x67, 0x5f, 0x68, 0x69,
+	0x6a, 0x61, 0x63, 0x6b, 0x5f, 0x61, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x5f, 0x72, 0x65, 0x73,
+	0x75, 0x6c, 0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70, 0x2e, 0x46, 0x6c, 0x61, 0x67, 0x48, 0x69,
+	0x6a, 0x61, 0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x43, 0x6d, 0x64, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x17, 0x66, 0x6c, 0x61, 0x67, 0x48, 0x69, 0x6a, 0x61,
+	0x63, 0x6b, 0x41, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12,
+	0x61, 0x0a, 0x17, 0x75, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x5f, 0x6f, 0x62, 0x6a,
+	0x65, 0x63, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61, 0x63, 0x70,
+	0x2e, 0x55, 0x6e, 0x61, 0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74,
+	0x43, 0x6d, 0x64, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x48, 0x00, 0x52, 0x15, 0x75, 0x6e, 0x61,
+	0x72, 0x63, 0x68, 0x69, 0x76, 0x65, 0x4f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x52, 0x65, 0x73, 0x75,
+	0x6c, 0x74, 0x42, 0x08, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x42, 0x98, 0x01, 0x0a,
+	0x11, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x61,
+	0x63, 0x70, 0x42, 0x0e, 0x50, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x43, 0x6d, 0x64, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e,
+	0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2f, 0x61, 0x63, 0x70, 0xa2, 0x02, 0x03, 0x53, 0x41, 0x58, 0xaa, 0x02, 0x0d, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x41, 0x63, 0x70, 0xca, 0x02, 0x0d, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0xe2, 0x02, 0x19, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x41, 0x63, 0x70, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
+	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x3a, 0x3a, 0x41, 0x63, 0x70, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -12151,74 +10756,68 @@ func file_sourcehub_acp_policy_cmd_proto_rawDescGZIP() []byte {
 	return file_sourcehub_acp_policy_cmd_proto_rawDescData
 }
 
-var file_sourcehub_acp_policy_cmd_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_sourcehub_acp_policy_cmd_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_sourcehub_acp_policy_cmd_proto_goTypes = []interface{}{
-	(*SignedPolicyCmd)(nil),              // 0: sourcehub.acp.SignedPolicyCmd
-	(*SignedPolicyCmdPayload)(nil),       // 1: sourcehub.acp.SignedPolicyCmdPayload
-	(*PolicyCmd)(nil),                    // 2: sourcehub.acp.PolicyCmd
-	(*SetRelationshipCmd)(nil),           // 3: sourcehub.acp.SetRelationshipCmd
-	(*DeleteRelationshipCmd)(nil),        // 4: sourcehub.acp.DeleteRelationshipCmd
-	(*RegisterObjectCmd)(nil),            // 5: sourcehub.acp.RegisterObjectCmd
-	(*CommitRegistrationsCmd)(nil),       // 6: sourcehub.acp.CommitRegistrationsCmd
-	(*CommitRegistrationsCmdResult)(nil), // 7: sourcehub.acp.CommitRegistrationsCmdResult
-	(*RevealRegistrationCmd)(nil),        // 8: sourcehub.acp.RevealRegistrationCmd
-	(*RevealRegistrationCmdResult)(nil),  // 9: sourcehub.acp.RevealRegistrationCmdResult
-	(*FlagHijackAttemptCmd)(nil),         // 10: sourcehub.acp.FlagHijackAttemptCmd
-	(*FlagHijackAttemptCmdResult)(nil),   // 11: sourcehub.acp.FlagHijackAttemptCmdResult
-	(*UnarchiveObjectCmd)(nil),           // 12: sourcehub.acp.UnarchiveObjectCmd
-	(*UnarchiveObjectCmdResult)(nil),     // 13: sourcehub.acp.UnarchiveObjectCmdResult
-	(*ArchiveObjectCmd)(nil),             // 14: sourcehub.acp.ArchiveObjectCmd
-	(*SetRelationshipCmdResult)(nil),     // 15: sourcehub.acp.SetRelationshipCmdResult
-	(*DeleteRelationshipCmdResult)(nil),  // 16: sourcehub.acp.DeleteRelationshipCmdResult
-	(*RegisterObjectCmdResult)(nil),      // 17: sourcehub.acp.RegisterObjectCmdResult
-	(*ArchiveObjectCmdResult)(nil),       // 18: sourcehub.acp.ArchiveObjectCmdResult
-	(*PolicyCmdResult)(nil),              // 19: sourcehub.acp.PolicyCmdResult
-	(*timestamppb.Timestamp)(nil),        // 20: google.protobuf.Timestamp
-	(*types.Relationship)(nil),           // 21: sourcenetwork.acp_core.Relationship
-	(*types.Object)(nil),                 // 22: sourcenetwork.acp_core.Object
-	(*RegistrationsCommitment)(nil),      // 23: sourcehub.acp.RegistrationsCommitment
-	(*RegistrationProof)(nil),            // 24: sourcehub.acp.RegistrationProof
-	(*RelationshipRecord)(nil),           // 25: sourcehub.acp.RelationshipRecord
-	(*ObjectRegistrationEvent)(nil),      // 26: sourcehub.acp.ObjectRegistrationEvent
+	(*PolicyCmd)(nil),                    // 0: sourcehub.acp.PolicyCmd
+	(*SetRelationshipCmd)(nil),           // 1: sourcehub.acp.SetRelationshipCmd
+	(*DeleteRelationshipCmd)(nil),        // 2: sourcehub.acp.DeleteRelationshipCmd
+	(*RegisterObjectCmd)(nil),            // 3: sourcehub.acp.RegisterObjectCmd
+	(*CommitRegistrationsCmd)(nil),       // 4: sourcehub.acp.CommitRegistrationsCmd
+	(*CommitRegistrationsCmdResult)(nil), // 5: sourcehub.acp.CommitRegistrationsCmdResult
+	(*RevealRegistrationCmd)(nil),        // 6: sourcehub.acp.RevealRegistrationCmd
+	(*RevealRegistrationCmdResult)(nil),  // 7: sourcehub.acp.RevealRegistrationCmdResult
+	(*FlagHijackAttemptCmd)(nil),         // 8: sourcehub.acp.FlagHijackAttemptCmd
+	(*FlagHijackAttemptCmdResult)(nil),   // 9: sourcehub.acp.FlagHijackAttemptCmdResult
+	(*UnarchiveObjectCmd)(nil),           // 10: sourcehub.acp.UnarchiveObjectCmd
+	(*UnarchiveObjectCmdResult)(nil),     // 11: sourcehub.acp.UnarchiveObjectCmdResult
+	(*ArchiveObjectCmd)(nil),             // 12: sourcehub.acp.ArchiveObjectCmd
+	(*SetRelationshipCmdResult)(nil),     // 13: sourcehub.acp.SetRelationshipCmdResult
+	(*DeleteRelationshipCmdResult)(nil),  // 14: sourcehub.acp.DeleteRelationshipCmdResult
+	(*RegisterObjectCmdResult)(nil),      // 15: sourcehub.acp.RegisterObjectCmdResult
+	(*ArchiveObjectCmdResult)(nil),       // 16: sourcehub.acp.ArchiveObjectCmdResult
+	(*PolicyCmdResult)(nil),              // 17: sourcehub.acp.PolicyCmdResult
+	(*types.Relationship)(nil),           // 18: sourcenetwork.acp_core.Relationship
+	(*types.Object)(nil),                 // 19: sourcenetwork.acp_core.Object
+	(*RegistrationsCommitment)(nil),      // 20: sourcehub.acp.RegistrationsCommitment
+	(*RegistrationProof)(nil),            // 21: sourcehub.acp.RegistrationProof
+	(*RelationshipRecord)(nil),           // 22: sourcehub.acp.RelationshipRecord
+	(*AmendmentEvent)(nil),               // 23: sourcehub.acp.AmendmentEvent
 }
 var file_sourcehub_acp_policy_cmd_proto_depIdxs = []int32{
-	1,  // 0: sourcehub.acp.SignedPolicyCmd.payload:type_name -> sourcehub.acp.SignedPolicyCmdPayload
-	20, // 1: sourcehub.acp.SignedPolicyCmdPayload.issued_at:type_name -> google.protobuf.Timestamp
-	2,  // 2: sourcehub.acp.SignedPolicyCmdPayload.cmd:type_name -> sourcehub.acp.PolicyCmd
-	3,  // 3: sourcehub.acp.PolicyCmd.set_relationship_cmd:type_name -> sourcehub.acp.SetRelationshipCmd
-	4,  // 4: sourcehub.acp.PolicyCmd.delete_relationship_cmd:type_name -> sourcehub.acp.DeleteRelationshipCmd
-	5,  // 5: sourcehub.acp.PolicyCmd.register_object_cmd:type_name -> sourcehub.acp.RegisterObjectCmd
-	14, // 6: sourcehub.acp.PolicyCmd.archive_object_cmd:type_name -> sourcehub.acp.ArchiveObjectCmd
-	6,  // 7: sourcehub.acp.PolicyCmd.commit_registrations_cmd:type_name -> sourcehub.acp.CommitRegistrationsCmd
-	8,  // 8: sourcehub.acp.PolicyCmd.reveal_registration_cmd:type_name -> sourcehub.acp.RevealRegistrationCmd
-	10, // 9: sourcehub.acp.PolicyCmd.flag_hijack_attempt_cmd:type_name -> sourcehub.acp.FlagHijackAttemptCmd
-	12, // 10: sourcehub.acp.PolicyCmd.unarchive_object_cmd:type_name -> sourcehub.acp.UnarchiveObjectCmd
-	21, // 11: sourcehub.acp.SetRelationshipCmd.relationship:type_name -> sourcenetwork.acp_core.Relationship
-	21, // 12: sourcehub.acp.DeleteRelationshipCmd.relationship:type_name -> sourcenetwork.acp_core.Relationship
-	22, // 13: sourcehub.acp.RegisterObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
-	23, // 14: sourcehub.acp.CommitRegistrationsCmdResult.registrations_commitment:type_name -> sourcehub.acp.RegistrationsCommitment
-	24, // 15: sourcehub.acp.RevealRegistrationCmd.proof:type_name -> sourcehub.acp.RegistrationProof
-	25, // 16: sourcehub.acp.RevealRegistrationCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
-	26, // 17: sourcehub.acp.RevealRegistrationCmdResult.event:type_name -> sourcehub.acp.ObjectRegistrationEvent
-	26, // 18: sourcehub.acp.FlagHijackAttemptCmdResult.event:type_name -> sourcehub.acp.ObjectRegistrationEvent
-	22, // 19: sourcehub.acp.UnarchiveObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
-	25, // 20: sourcehub.acp.UnarchiveObjectCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
-	22, // 21: sourcehub.acp.ArchiveObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
-	25, // 22: sourcehub.acp.SetRelationshipCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
-	25, // 23: sourcehub.acp.RegisterObjectCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
-	15, // 24: sourcehub.acp.PolicyCmdResult.set_relationship_result:type_name -> sourcehub.acp.SetRelationshipCmdResult
-	16, // 25: sourcehub.acp.PolicyCmdResult.delete_relationship_result:type_name -> sourcehub.acp.DeleteRelationshipCmdResult
-	17, // 26: sourcehub.acp.PolicyCmdResult.register_object_result:type_name -> sourcehub.acp.RegisterObjectCmdResult
-	18, // 27: sourcehub.acp.PolicyCmdResult.archive_object_result:type_name -> sourcehub.acp.ArchiveObjectCmdResult
-	7,  // 28: sourcehub.acp.PolicyCmdResult.commit_registrations_result:type_name -> sourcehub.acp.CommitRegistrationsCmdResult
-	9,  // 29: sourcehub.acp.PolicyCmdResult.reveal_registration_result:type_name -> sourcehub.acp.RevealRegistrationCmdResult
-	11, // 30: sourcehub.acp.PolicyCmdResult.flag_hijack_attempt_result:type_name -> sourcehub.acp.FlagHijackAttemptCmdResult
-	13, // 31: sourcehub.acp.PolicyCmdResult.unarchive_object_result:type_name -> sourcehub.acp.UnarchiveObjectCmdResult
-	32, // [32:32] is the sub-list for method output_type
-	32, // [32:32] is the sub-list for method input_type
-	32, // [32:32] is the sub-list for extension type_name
-	32, // [32:32] is the sub-list for extension extendee
-	0,  // [0:32] is the sub-list for field type_name
+	1,  // 0: sourcehub.acp.PolicyCmd.set_relationship_cmd:type_name -> sourcehub.acp.SetRelationshipCmd
+	2,  // 1: sourcehub.acp.PolicyCmd.delete_relationship_cmd:type_name -> sourcehub.acp.DeleteRelationshipCmd
+	3,  // 2: sourcehub.acp.PolicyCmd.register_object_cmd:type_name -> sourcehub.acp.RegisterObjectCmd
+	12, // 3: sourcehub.acp.PolicyCmd.archive_object_cmd:type_name -> sourcehub.acp.ArchiveObjectCmd
+	4,  // 4: sourcehub.acp.PolicyCmd.commit_registrations_cmd:type_name -> sourcehub.acp.CommitRegistrationsCmd
+	6,  // 5: sourcehub.acp.PolicyCmd.reveal_registration_cmd:type_name -> sourcehub.acp.RevealRegistrationCmd
+	8,  // 6: sourcehub.acp.PolicyCmd.flag_hijack_attempt_cmd:type_name -> sourcehub.acp.FlagHijackAttemptCmd
+	10, // 7: sourcehub.acp.PolicyCmd.unarchive_object_cmd:type_name -> sourcehub.acp.UnarchiveObjectCmd
+	18, // 8: sourcehub.acp.SetRelationshipCmd.relationship:type_name -> sourcenetwork.acp_core.Relationship
+	18, // 9: sourcehub.acp.DeleteRelationshipCmd.relationship:type_name -> sourcenetwork.acp_core.Relationship
+	19, // 10: sourcehub.acp.RegisterObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
+	20, // 11: sourcehub.acp.CommitRegistrationsCmdResult.registrations_commitment:type_name -> sourcehub.acp.RegistrationsCommitment
+	21, // 12: sourcehub.acp.RevealRegistrationCmd.proof:type_name -> sourcehub.acp.RegistrationProof
+	22, // 13: sourcehub.acp.RevealRegistrationCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
+	23, // 14: sourcehub.acp.RevealRegistrationCmdResult.event:type_name -> sourcehub.acp.AmendmentEvent
+	23, // 15: sourcehub.acp.FlagHijackAttemptCmdResult.event:type_name -> sourcehub.acp.AmendmentEvent
+	19, // 16: sourcehub.acp.UnarchiveObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
+	22, // 17: sourcehub.acp.UnarchiveObjectCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
+	19, // 18: sourcehub.acp.ArchiveObjectCmd.object:type_name -> sourcenetwork.acp_core.Object
+	22, // 19: sourcehub.acp.SetRelationshipCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
+	22, // 20: sourcehub.acp.RegisterObjectCmdResult.record:type_name -> sourcehub.acp.RelationshipRecord
+	13, // 21: sourcehub.acp.PolicyCmdResult.set_relationship_result:type_name -> sourcehub.acp.SetRelationshipCmdResult
+	14, // 22: sourcehub.acp.PolicyCmdResult.delete_relationship_result:type_name -> sourcehub.acp.DeleteRelationshipCmdResult
+	15, // 23: sourcehub.acp.PolicyCmdResult.register_object_result:type_name -> sourcehub.acp.RegisterObjectCmdResult
+	16, // 24: sourcehub.acp.PolicyCmdResult.archive_object_result:type_name -> sourcehub.acp.ArchiveObjectCmdResult
+	5,  // 25: sourcehub.acp.PolicyCmdResult.commit_registrations_result:type_name -> sourcehub.acp.CommitRegistrationsCmdResult
+	7,  // 26: sourcehub.acp.PolicyCmdResult.reveal_registration_result:type_name -> sourcehub.acp.RevealRegistrationCmdResult
+	9,  // 27: sourcehub.acp.PolicyCmdResult.flag_hijack_attempt_result:type_name -> sourcehub.acp.FlagHijackAttemptCmdResult
+	11, // 28: sourcehub.acp.PolicyCmdResult.unarchive_object_result:type_name -> sourcehub.acp.UnarchiveObjectCmdResult
+	29, // [29:29] is the sub-list for method output_type
+	29, // [29:29] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_acp_policy_cmd_proto_init() }
@@ -12231,30 +10830,6 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 	file_sourcehub_acp_record_proto_init()
 	if !protoimpl.UnsafeEnabled {
 		file_sourcehub_acp_policy_cmd_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignedPolicyCmd); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*SignedPolicyCmdPayload); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PolicyCmd); i {
 			case 0:
 				return &v.state
@@ -12266,7 +10841,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SetRelationshipCmd); i {
 			case 0:
 				return &v.state
@@ -12278,7 +10853,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteRelationshipCmd); i {
 			case 0:
 				return &v.state
@@ -12290,7 +10865,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegisterObjectCmd); i {
 			case 0:
 				return &v.state
@@ -12302,7 +10877,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CommitRegistrationsCmd); i {
 			case 0:
 				return &v.state
@@ -12314,7 +10889,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CommitRegistrationsCmdResult); i {
 			case 0:
 				return &v.state
@@ -12326,7 +10901,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RevealRegistrationCmd); i {
 			case 0:
 				return &v.state
@@ -12338,7 +10913,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RevealRegistrationCmdResult); i {
 			case 0:
 				return &v.state
@@ -12350,7 +10925,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FlagHijackAttemptCmd); i {
 			case 0:
 				return &v.state
@@ -12362,7 +10937,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FlagHijackAttemptCmdResult); i {
 			case 0:
 				return &v.state
@@ -12374,7 +10949,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UnarchiveObjectCmd); i {
 			case 0:
 				return &v.state
@@ -12386,7 +10961,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UnarchiveObjectCmdResult); i {
 			case 0:
 				return &v.state
@@ -12398,7 +10973,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ArchiveObjectCmd); i {
 			case 0:
 				return &v.state
@@ -12410,7 +10985,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*SetRelationshipCmdResult); i {
 			case 0:
 				return &v.state
@@ -12422,7 +10997,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*DeleteRelationshipCmdResult); i {
 			case 0:
 				return &v.state
@@ -12434,7 +11009,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*RegisterObjectCmdResult); i {
 			case 0:
 				return &v.state
@@ -12446,7 +11021,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ArchiveObjectCmdResult); i {
 			case 0:
 				return &v.state
@@ -12458,7 +11033,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 				return nil
 			}
 		}
-		file_sourcehub_acp_policy_cmd_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+		file_sourcehub_acp_policy_cmd_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*PolicyCmdResult); i {
 			case 0:
 				return &v.state
@@ -12471,7 +11046,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 			}
 		}
 	}
-	file_sourcehub_acp_policy_cmd_proto_msgTypes[2].OneofWrappers = []interface{}{
+	file_sourcehub_acp_policy_cmd_proto_msgTypes[0].OneofWrappers = []interface{}{
 		(*PolicyCmd_SetRelationshipCmd)(nil),
 		(*PolicyCmd_DeleteRelationshipCmd)(nil),
 		(*PolicyCmd_RegisterObjectCmd)(nil),
@@ -12481,7 +11056,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 		(*PolicyCmd_FlagHijackAttemptCmd)(nil),
 		(*PolicyCmd_UnarchiveObjectCmd)(nil),
 	}
-	file_sourcehub_acp_policy_cmd_proto_msgTypes[19].OneofWrappers = []interface{}{
+	file_sourcehub_acp_policy_cmd_proto_msgTypes[17].OneofWrappers = []interface{}{
 		(*PolicyCmdResult_SetRelationshipResult)(nil),
 		(*PolicyCmdResult_DeleteRelationshipResult)(nil),
 		(*PolicyCmdResult_RegisterObjectResult)(nil),
@@ -12497,7 +11072,7 @@ func file_sourcehub_acp_policy_cmd_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_acp_policy_cmd_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

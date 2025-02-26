@@ -1048,7 +1048,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Duration models a time interval expressed either as a protobuf
+// Duration models a time interval expressed either as a wallclock
 // Duration interval or a number of blocks
 type Duration struct {
 	state         protoimpl.MessageState
@@ -1119,7 +1119,7 @@ func (*Duration_ProtoDuration) isDuration_Duration() {}
 
 func (*Duration_BlockCount) isDuration_Duration() {}
 
-// Timestamp models an instant in time expressed as a protobuf
+// Timestamp models an instant in time expressed as a wallclock
 // Timestamp and a block height
 type Timestamp struct {
 	state         protoimpl.MessageState

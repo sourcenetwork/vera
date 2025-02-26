@@ -1918,16 +1918,20 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// RecordMetadata models metadata which is stored alongside acp records
 type RecordMetadata struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// creation_ts contains the timestamp of the moment the msg was processed.
+	// creation_ts is the timestamp of record creation
 	CreationTs *Timestamp `protobuf:"bytes,1,opt,name=creation_ts,json=creationTs,proto3" json:"creation_ts,omitempty"`
-	TxHash     []byte     `protobuf:"bytes,2,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
-	TxSigner   string     `protobuf:"bytes,3,opt,name=tx_signer,json=txSigner,proto3" json:"tx_signer,omitempty"`
-	OwnerDid   string     `protobuf:"bytes,4,opt,name=owner_did,json=ownerDid,proto3" json:"owner_did,omitempty"`
+	// tx_hash is the hash256 of the tx bytes which produced the record
+	TxHash []byte `protobuf:"bytes,2,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
+	// tx_signer is the SourceHub bech32 address of the account that signed the Tx
+	TxSigner string `protobuf:"bytes,3,opt,name=tx_signer,json=txSigner,proto3" json:"tx_signer,omitempty"`
+	// owner_did is the DID of the PolicyCmd actor
+	OwnerDid string `protobuf:"bytes,4,opt,name=owner_did,json=ownerDid,proto3" json:"owner_did,omitempty"`
 }
 
 func (x *RecordMetadata) Reset() {
