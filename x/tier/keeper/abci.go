@@ -26,6 +26,8 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 	}
 
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
+	// Iterate over all active delegations where the tier module account is the delegator
+	// The max number of iterations is the number of validators it has delegated to
 	err := k.GetStakingKeeper().IterateDelegations(ctx, tierModuleAddr, func(index int64, delegation stakingtypes.DelegationI) bool {
 		// Claim rewards for the tier module from this validator
 		valAddr := types.MustValAddressFromBech32(delegation.GetValidatorAddr())
