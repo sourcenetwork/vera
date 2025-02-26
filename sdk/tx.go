@@ -181,18 +181,18 @@ func WithChainID(id string) TxBuilderOpt {
 	}
 }
 
-// WithOpenDenom configures TxBuilder to build Txs paid using open
-func WithOpenDenom() TxBuilderOpt {
+// WithUOpenDenom configures TxBuilder to build Txs paid using open tokens
+func WithMicroOpen() TxBuilderOpt {
 	return func(b *TxBuilder) error {
-		b.feeTokenDenom = params.OpenDenom
+		b.feeTokenDenom = params.MicroOpenDenom
 		return nil
 	}
 }
 
-// WithOpenDenom configures TxBuilder to build Txs paid using credit
-func WithCreditDenom() TxBuilderOpt {
+// WithMicroCredit configures TxBuilder to build Txs paid using credits
+func WithMicroCredit() TxBuilderOpt {
 	return func(b *TxBuilder) error {
-		b.feeTokenDenom = params.CreditDenom
+		b.feeTokenDenom = params.MicroCreditDenom
 		return nil
 	}
 }

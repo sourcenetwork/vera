@@ -13,10 +13,6 @@ import (
 )
 
 func TestSDKBasic(t *testing.T) {
-	// FIXME the new init chainer doesn't work with the network pkg
-	// for now, skip this test until the process manager is in place
-	t.Skip()
-
 	network := e2e.TestNetwork{}
 
 	network.Setup(t)

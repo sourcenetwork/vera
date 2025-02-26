@@ -131,7 +131,7 @@ func (c *TestCtx) GetSignerRecordMetadata() *types.RecordMetadata {
 }
 
 func (c *TestCtx) GetParams() types.Params {
-	return types.NewParams()
+	return c.Params
 }
 
 func (c *TestCtx) Cleanup() {

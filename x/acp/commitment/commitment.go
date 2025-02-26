@@ -105,6 +105,7 @@ type RegistrationCommitmentTree struct {
 	leaves     [][]byte
 }
 
+// genCommitment computes the merkle root
 func (t *RegistrationCommitmentTree) genCommitment() {
 	t.leaves = utils.MapSlice(t.objs, func(o *coretypes.Object) []byte {
 		return GenerateLeafValue(t.policyId, t.actor, o)
@@ -132,6 +133,7 @@ func (t *RegistrationCommitmentTree) GetProofForIdx(i int) (*types.RegistrationP
 	return t.proofForIdx(i)
 }
 
+// proofForIdx returns the RegistrationProof for object at idx
 func (t *RegistrationCommitmentTree) proofForIdx(idx int) (*types.RegistrationProof, error) {
 	if idx >= len(t.objs) || idx < 0 {
 		return nil, errors.Wrap("index out of bounds:", errors.ErrorType_BAD_INPUT)
@@ -146,6 +148,7 @@ func (t *RegistrationCommitmentTree) proofForIdx(idx int) (*types.RegistrationPr
 	}, nil
 }
 
+// finxIdx looks up the idx of obj in the current tree
 func (t *RegistrationCommitmentTree) findIdx(obj *coretypes.Object) (int, error) {
 	i := slices.IndexFunc(t.objs, func(o *coretypes.Object) bool {
 		return objEq(obj, o)

@@ -42,7 +42,7 @@ func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.Poli
 
 	switch c := cmd.Cmd.(type) {
 	case *types.PolicyCmd_SetRelationshipCmd:
-		return h.SetRelationship(ctx, c.SetRelationshipCmd)
+		return h.setRelationship(ctx, c.SetRelationshipCmd)
 	case *types.PolicyCmd_DeleteRelationshipCmd:
 		return h.deleteRelationship(ctx, c.DeleteRelationshipCmd)
 	case *types.PolicyCmd_RegisterObjectCmd:
@@ -62,7 +62,7 @@ func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.Poli
 	}
 }
 
-func (h *Handler) SetRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipCmd) (*types.PolicyCmdResult, error) {
+func (h *Handler) setRelationship(ctx *PolicyCmdCtx, cmd *types.SetRelationshipCmd) (*types.PolicyCmdResult, error) {
 	metadata, err := types.BuildACPSuppliedMetadata(ctx.Ctx, ctx.PrincipalDID, ctx.Signer)
 	if err != nil {
 		return nil, fmt.Errorf("marshaling metadata: %w", err)

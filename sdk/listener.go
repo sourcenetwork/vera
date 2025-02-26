@@ -111,12 +111,14 @@ func (l *TxListener) Close() {
 	l.cleanupFn()
 }
 
-func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (<-chan U, <-chan error, func()) {
+// channelMapper wraps a channel and applies a failable mapper to all incoming items.
+// Returns a value channel, an error channel and a callback to terminate the channel
+func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-chan U, errors <-chan error, closeFn func()) {
 	errCh := make(chan error, 100)
-	newCh := make(chan U, 100)
-	closeFn := func() {
+	valCh := make(chan U, 100)
+	closeFn = func() {
 		close(errCh)
-		close(newCh)
+		close(valCh)
 	}
 	go func() {
 		for {
@@ -125,7 +127,7 @@ func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (<-chan U, 
 				log.Printf("received result")
 				if !ok {
 					close(errCh)
-					close(newCh)
+					close(valCh)
 					return
 				}
 
@@ -133,10 +135,10 @@ func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (<-chan U, 
 				if err != nil {
 					errCh <- err
 				} else {
-					newCh <- u
+					valCh <- u
 				}
 			}
 		}
 	}()
-	return newCh, errCh, closeFn
+	return values, errors, closeFn
 }

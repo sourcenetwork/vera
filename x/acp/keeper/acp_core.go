@@ -14,6 +14,7 @@ var _ runtime.TimeService = (*SourceHubTimeProvider)(nil)
 // in order to syncrhonize the block time with acp_core's engine time.
 type SourceHubTimeProvider struct{}
 
+// GetNow implements TimeService
 func (p *SourceHubTimeProvider) GetNow(goCtx context.Context) (*prototypes.Timestamp, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	time := ctx.BlockTime()

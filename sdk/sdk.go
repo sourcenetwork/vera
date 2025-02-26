@@ -47,16 +47,10 @@ func WithCometRPCAddr(addr string) Opt {
 	}
 }
 
+// WithGRPCOpts specifies the dial options which will be used to dial SourceHub's GRPC (queries) service
 func WithGRPCOpts(opts ...grpc.DialOption) Opt {
 	return func(c *Client) error {
 		c.grpcOpts = opts
-		return nil
-	}
-}
-
-func WithLogger(logger cmtlog.Logger) Opt {
-	return func(c *Client) error {
-		c.logger = logger
 		return nil
 	}
 }
@@ -146,6 +140,7 @@ func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxRe
 	return response, nil
 }
 
+// Close terminates the Client, freeing up resources and connections
 func (b *Client) Close() {
 	b.cometClient.Stop()
 	b.conn.Close()

@@ -35,12 +35,11 @@ func TestEndBlocker(t *testing.T) {
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
 	service := commitment.NewCommitmentService(k.GetACPEngine(ctx), repo)
 	commitment := make([]byte, 32)
-	comm, err := service.SetNewCommitment(ctx, resp.Record.Policy.Id, commitment, &coretypes.Actor{"test"}, params, "source1234")
+	comm, err := service.SetNewCommitment(ctx, resp.Record.Policy.Id, commitment, coretypes.NewActor("test"), params, "source1234")
 	require.NoError(t, err)
 
-	// wait for commitment to expire
-	time.Sleep(time.Nanosecond * 2)
-	ctx = ctx.WithBlockTime(time.Now())
+	// set commitment to expire
+	ctx = ctx.WithBlockTime(time.Now().Add(time.Nanosecond * 2))
 
 	expired, err := k.EndBlocker(ctx)
 	require.NoError(t, err)

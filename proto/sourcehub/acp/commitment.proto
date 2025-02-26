@@ -29,7 +29,6 @@ message RegistrationsCommitment {
     string policy_id = 2;
 
     // commitment is a merkle root of registrations 
-    // TODO reference to doc containing commitment format
     bytes commitment = 3;
 
     bool expired = 4;
