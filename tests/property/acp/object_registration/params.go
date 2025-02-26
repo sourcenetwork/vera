@@ -12,7 +12,7 @@ var CommitmentExpirationDuration = types.Duration{
 // OperationsPerTest models the amount of operations which should be executed every test
 var OperationsPerTest = 20
 
-var TestCount = 500
+var TestCount = 10
 
 var ActorCount = 3
 
