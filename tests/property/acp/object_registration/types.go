@@ -26,6 +26,8 @@ type State struct {
 	LastTs      types.Timestamp
 }
 
+// MustCommitmentById returns one of the commitments created during the test
+// with the given id
 func (s *State) MustCommitmentById(id uint64) *types.RegistrationsCommitment {
 	for _, commitment := range s.Commitments {
 		if commitment.Id == id {
@@ -35,6 +37,7 @@ func (s *State) MustCommitmentById(id uint64) *types.RegistrationsCommitment {
 	panic("commitment not found")
 }
 
+// InitialState returns the initial state for the model state machine
 func InitialState(ctx *test.TestCtx, policyId string) State {
 	actors := make([]*test.TestActor, 0, ActorCount)
 	for i := 0; i < ActorCount; i++ {
@@ -55,6 +58,8 @@ func InitialState(ctx *test.TestCtx, policyId string) State {
 	}
 }
 
+// OperationKind models the set of supported operations which transition the model
+// to a new state
 type OperationKind int
 
 const (
@@ -82,6 +87,20 @@ func (k OperationKind) String() string {
 	}
 }
 
+// GetOperations returns all available OperationKinds
+func ListOperationKinds() []OperationKind {
+	return []OperationKind{
+		Register,
+		Archive,
+		Commit,
+		Reveal,
+		Unarchive,
+	}
+
+}
+
+// Operation models an operation that has been or will be executed against the
+// reference implementation
 type Operation struct {
 	Kind         OperationKind
 	Actor        *test.TestActor
@@ -89,8 +108,4 @@ type Operation struct {
 	Result       types.PolicyCmdResult
 	ResultErr    error
 	ResultRecord types.RelationshipRecord
-}
-
-var Kinds []OperationKind = []OperationKind{
-	Register, Archive, Commit, Reveal, Unarchive,
 }

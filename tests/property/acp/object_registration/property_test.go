@@ -35,8 +35,8 @@ func runPropTest(t *testing.T) {
 
 	ops := make([]Operation, 0, OperationsPerTest)
 	for count, max := 0, 0; count < OperationsPerTest || max < MaxTriesPerTest; max++ {
-		kind := property.PickAny(Kinds)
-		ok := precoditions(state, kind)
+		kind := property.PickAny(ListOperationKinds())
+		ok := Precoditions(state, kind)
 		if !ok {
 			continue
 		}

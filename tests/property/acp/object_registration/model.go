@@ -14,7 +14,7 @@ import (
 )
 
 // preconditions validate whether op should be run given the current state
-func precoditions(state State, kind OperationKind) bool {
+func Precoditions(state State, kind OperationKind) bool {
 	switch kind {
 	case Reveal:
 		// don't reveal unless there's at least one commitment registered

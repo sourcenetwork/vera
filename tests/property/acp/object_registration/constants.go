@@ -1,5 +1,7 @@
 package object_registration
 
+const ResourceName = "file"
+const ObjectId = "readme.txt"
 const Policy string = `
 name: test
 resources:
@@ -9,6 +11,3 @@ resources:
         types:
           - actor
 `
-
-const ResourceName = "file"
-const ObjectId = "readme.txt"
