@@ -58,7 +58,7 @@ func TxPriority() base.TxPriority[string] {
 			}
 			return 0
 		},
-		MinValue: "0:000000000000000000000000000",
+		MinValue: "0:00000000000000000000000000000000",
 	}
 }
 
