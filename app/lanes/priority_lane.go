@@ -54,6 +54,6 @@ func DefaultMatchHandler() base.MatchHandler {
 			}
 		}
 		// Accept the transaction only if all messages belong to the x/acp module
-		return false
+		return true
 	}
 }
