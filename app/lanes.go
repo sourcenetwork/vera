@@ -36,8 +36,11 @@ func CreateLanes(app *App) (priorityLane *base.BaseLane, defaultLane *base.BaseL
 		MaxTxs:          0,
 	}
 
+	// Create the TxPriority for the priority lane
+	priorityLaneTxPriority := lanes.TxPriority()
+
 	// Create the match handler for the priority lane
-	priorityLaneMatchHandler := lanes.DefaultMatchHandler()
+	priorityLaneMatchHandler := lanes.PriorityMatchHandler()
 
 	// Create the match handlers for the default lane
 	defaultLaneMatchHandler := base.DefaultMatchHandler()
@@ -45,7 +48,7 @@ func CreateLanes(app *App) (priorityLane *base.BaseLane, defaultLane *base.BaseL
 	// Create priority lane
 	priorityLane = lanes.NewPriorityLane(
 		priorityLaneConfig,
-		base.DefaultTxPriority(),
+		priorityLaneTxPriority,
 		priorityLaneMatchHandler,
 	)
 
