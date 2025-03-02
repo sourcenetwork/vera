@@ -14,7 +14,7 @@ import (
 func CmdQueryFilterRelationships() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "filter-relationships [policy-id] [object] [relation] [subject]",
-		Short: "filters through relationships in a policy",
+		Short: "Filters through relationships in a policy",
 		Long: `Filters thourgh all relationships in a Policy. 
                 Performs a lookup using the object, relation and subject filters.
                 Uses a mini grammar as describe:
