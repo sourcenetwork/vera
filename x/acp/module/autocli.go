@@ -66,13 +66,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 
 				{
-					RpcMethod:      "ListObjectEvents",
-					Use:            "list-object-events",
-					Short:          "Query ListObjectEvents",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
-				},
-
-				{
 					RpcMethod:      "HijackAttemptsByPolicy",
 					Use:            "hijack-attempts-by-policy",
 					Short:          "Query HijackAttemptsByPolicy",

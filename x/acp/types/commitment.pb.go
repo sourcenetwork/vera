@@ -102,7 +102,6 @@ type RegistrationsCommitment struct {
 	Id       uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	PolicyId string `protobuf:"bytes,2,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	// commitment is a merkle root of registrations
-	// TODO reference to doc containing commitment format
 	Commitment []byte `protobuf:"bytes,3,opt,name=commitment,proto3" json:"commitment,omitempty"`
 	Expired    bool   `protobuf:"varint,4,opt,name=expired,proto3" json:"expired,omitempty"`
 	// validity models the duration for which the commitment is valid for

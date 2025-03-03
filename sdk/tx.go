@@ -181,7 +181,7 @@ func WithChainID(id string) TxBuilderOpt {
 	}
 }
 
-// WithUOpenDenom configures TxBuilder to build Txs paid using open tokens
+// WithMicroOpen configures TxBuilder to build Txs paid using open tokens
 func WithMicroOpen() TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.feeTokenDenom = params.MicroOpenDenom

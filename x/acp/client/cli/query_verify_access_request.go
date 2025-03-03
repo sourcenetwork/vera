@@ -14,7 +14,7 @@ import (
 func CmdQueryVerifyAccessRequest() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "verify-access-request [policyId] [actor] {resource:object#relation}",
-		Short: "verifies an access request against a policy and its relationships",
+		Short: "Verifies an access request against a policy and its relationships",
 		Long: `
 		Builds an AccessRequest for from policyId, actor and the set of Operations
 		(ie. object, relation pairs).
