@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"cosmossdk.io/log"
 
@@ -71,6 +72,35 @@ func NewCustomMintQueryServer(
 	}
 }
 
+func getDelegatorStakeRatio(ctx context.Context, k tierkeeper.Keeper) (math.LegacyDec, error) {
+	// Get the total bonded stake
+	totalStake, err := k.GetStakingKeeper().TotalBondedTokens(ctx)
+	if err != nil {
+		return math.LegacyOneDec(), err
+	}
+
+	// Get developer stake and fees
+	devStake := k.GetTotalLockupsAmount(ctx)
+	params := k.GetParams(ctx)
+	totalFees := params.DeveloperPoolFee + params.InsurancePoolFee
+	devStakeMinusFees := devStake.MulRaw(100 - totalFees).QuoRaw(100)
+
+	// Calculate the delegator stake
+	delStake, err := totalStake.SafeSub(devStakeMinusFees)
+	if err != nil {
+		return math.LegacyOneDec(), err
+	}
+
+	if !totalStake.IsPositive() || !delStake.IsPositive() {
+		return math.LegacyOneDec(), fmt.Errorf("non-positive totalStake/delStake")
+	}
+
+	// Calculate the delegator stake ratio
+	delStakeRatio := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
+
+	return delStakeRatio, nil
+}
+
 // Inflation overrides the default mint module inflation query.
 func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.QueryInflationRequest) (*minttypes.QueryInflationResponse, error) {
 	// Fetch the minter state
@@ -79,31 +109,14 @@ func (q CustomMintQueryServer) Inflation(ctx context.Context, _ *minttypes.Query
 		return nil, err
 	}
 
-	// Get the total bonded stake in the network
-	totalStake, err := q.tierKeeper.GetStakingKeeper().TotalBondedTokens(ctx)
+	// Get the delegator stake ratio
+	delStakeRatio, err := getDelegatorStakeRatio(ctx, q.tierKeeper)
 	if err != nil {
-		return nil, err
-	}
-
-	// Get developer and delegator stake amounts
-	devStake := q.tierKeeper.GetTotalLockupsAmount(ctx)
-	params := q.tierKeeper.GetParams(ctx)
-	totalFees := params.DeveloperPoolFee + params.InsurancePoolFee
-	devStakeMinusFees := devStake.MulRaw(100 - totalFees).QuoRaw(100)
-
-	delStake, err := totalStake.SafeSub(devStakeMinusFees)
-	if err != nil {
-		return nil, err
-	}
-
-	// If inputs are invalid, return default inflation
-	if !delStake.IsPositive() || !totalStake.IsPositive() {
 		q.logger.Info("Returning default inflation", "inflation", minter.Inflation)
 		return &minttypes.QueryInflationResponse{Inflation: minter.Inflation}, nil
 	}
 
-	// Compute the delegator stake rate and adjusted inflation
-	delStakeRatio := delStake.ToLegacyDec().Quo(totalStake.ToLegacyDec())
+	// Calculate the effective inflation
 	effectiveInflation := minter.Inflation.Mul(delStakeRatio)
 	q.logger.Info("Returning effective inflation", "inflation", effectiveInflation)
 
