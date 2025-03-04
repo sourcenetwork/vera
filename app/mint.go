@@ -169,10 +169,6 @@ func (app *App) registerCustomMintModule() CustomMintModule {
 // RegisterMintInterfaces registers interfaces for the mint module and returns mint.AppModule.
 func RegisterMintInterfaces(registry codectypes.InterfaceRegistry) appmodule.AppModule {
 	module := mint.AppModule{}
-	if mod, ok := any(module).(interface {
-		RegisterInterfaces(registry codectypes.InterfaceRegistry)
-	}); ok {
-		mod.RegisterInterfaces(registry)
-	}
+	module.RegisterInterfaces(registry)
 	return module
 }
