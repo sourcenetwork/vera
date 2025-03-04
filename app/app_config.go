@@ -207,7 +207,6 @@ var (
 		minttypes.ModuleName,
 		stakingtypes.BondedPoolName,
 		stakingtypes.NotBondedPoolName,
-		tiertypes.ModuleName,
 		tiertypes.DeveloperPoolName,
 		tiertypes.InsurancePoolName,
 		// We allow the following module accounts to receive funds:
