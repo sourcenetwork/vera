@@ -45,6 +45,7 @@ type StakingKeeper interface {
 	StakingTokenSupply(ctx context.Context) (math.Int, error)
 	GetValidatorDelegations(ctx context.Context, valAddr sdk.ValAddress) ([]stakingtypes.Delegation, error)
 	GetAllValidators(ctx context.Context) ([]stakingtypes.Validator, error)
+	GetDelegation(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (stakingtypes.Delegation, error)
 }
 
 // BankKeeper defines the expected interface for the Bank module.
