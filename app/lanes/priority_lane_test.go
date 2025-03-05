@@ -14,6 +14,7 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
@@ -95,13 +96,31 @@ func TestTxPriority(t *testing.T) {
 	tx2 := mockTx{
 		msgs:     []sdk.Msg{tierMsg},
 		fee:      sdk.NewCoins(sdk.NewInt64Coin(appparams.DefaultBondDenom, 10000)),
-		gasLimit: 20000,
+		gasLimit: 10000,
+	}
+
+	bulletinMsg := &bulletintypes.MsgCreatePost{}
+	tx3 := mockTx{
+		msgs:     []sdk.Msg{bulletinMsg},
+		fee:      sdk.NewCoins(sdk.NewInt64Coin(appparams.DefaultBondDenom, 20000)),
+		gasLimit: 10000,
+	}
+
+	stakingMsg := &stakingtypes.MsgDelegate{}
+	tx4 := mockTx{
+		msgs:     []sdk.Msg{stakingMsg},
+		fee:      sdk.NewCoins(sdk.NewInt64Coin(appparams.DefaultBondDenom, 30000)),
+		gasLimit: 10000,
 	}
 
 	priority1 := TxPriority().GetTxPriority(ctx, tx1)
 	priority2 := TxPriority().GetTxPriority(ctx, tx2)
+	priority3 := TxPriority().GetTxPriority(ctx, tx3)
+	priority4 := TxPriority().GetTxPriority(ctx, tx4)
 
 	require.True(t, priority1 > priority2, "Acp transaction should have higher priority than Tier transaction")
+	require.True(t, priority2 > priority3, "Tier transaction should have higher priority than Bulletin transaction")
+	require.True(t, priority3 > priority4, "Bulletin transaction should have higher priority than any other transaction")
 }
 
 func TestGasPriceSorting(t *testing.T) {

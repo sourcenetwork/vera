@@ -63,18 +63,37 @@ func TxPriority() base.TxPriority[string] {
 }
 
 // getPriorityGroup returns a string that defines the transaction priority.
-// Prioritizes the x/acp module transactions over the x/tier module transactions.
+// Prioritizes transactions based on the modules their messages belong to.
 func getPriorityGroup(tx sdk.Tx) string {
-	// Check message types of all messages in the transaction
-	for _, msg := range tx.GetMsgs() {
+	msgs := tx.GetMsgs()
+	if len(msgs) == 0 {
+		return "0"
+	}
+	// Start with highest possible priority and reduce txPriority based on the found messages,
+	// so that the system can not be abused by sending a mix or high and low priority messages
+	minPriority := "3"
+	for _, msg := range msgs {
 		msgType := sdk.MsgTypeURL(msg)
-		// Set higher priority for messages that belong to the x/acp module
-		if strings.HasPrefix(msgType, "/sourcehub.acp.") {
-			return "2"
+		switch {
+		case strings.HasPrefix(msgType, "/sourcehub.acp."):
+			// Keep minPriority at 3 for acp module messages
+		case strings.HasPrefix(msgType, "/sourcehub.tier."):
+			// Reduce minPriority to 2 if tier module message found
+			if minPriority > "2" {
+				minPriority = "2"
+			}
+		case strings.HasPrefix(msgType, "/sourcehub.bulletin."):
+			// Reduce minPriority to 1 if bulletin module message found
+			if minPriority > "1" {
+				minPriority = "1"
+			}
+		default:
+			// Return lowest priority if found a message from other modules
+			return "0"
 		}
 	}
-	// Set lower priority for messages that belong to the x/tier module
-	return "1"
+	// Return the lowest priority based on the messages found in the tx
+	return minPriority
 }
 
 // getGasPrice extracts the gas price from the transaction.
