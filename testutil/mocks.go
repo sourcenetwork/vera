@@ -522,6 +522,19 @@ func (mr *MockStakingKeeperRecorder) GetAllValidators(ctx interface{}) *gomock.C
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllValidators", reflect.TypeOf((*MockStakingKeeper)(nil).GetAllValidators), ctx)
 }
 
+func (m *MockStakingKeeper) GetDelegation(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (stakingtypes.Delegation, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDelegation", ctx, delAddr, valAddr)
+	ret0, _ := ret[0].(stakingtypes.Delegation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockStakingKeeperRecorder) GetDelegation(ctx, delAddr, valAddr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDelegation", reflect.TypeOf((*MockStakingKeeper)(nil).GetDelegation), ctx, delAddr, valAddr)
+}
+
 // Mock epochs keeper
 type MockEpochsKeeper struct {
 	ctrl     *gomock.Controller
