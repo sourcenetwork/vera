@@ -314,13 +314,13 @@ func New(
 		return nil, err
 	}
 
-	// Create priority and default lanes
-	priorityLane, defaultLane := CreateLanes(app)
+	// Create priority lane
+	priorityLane := CreatePriorityLane(app)
 
 	// Create the laned mempool with priority and default lanes
 	mempool, err := block.NewLanedMempool(
 		app.Logger(),
-		[]block.Lane{priorityLane, defaultLane},
+		[]block.Lane{priorityLane},
 	)
 	if err != nil {
 		panic(err)
@@ -346,9 +346,6 @@ func New(
 		base.WithAnteHandler(anteHandler),
 	}
 	priorityLane.WithOptions(
-		opt...,
-	)
-	defaultLane.WithOptions(
 		opt...,
 	)
 
