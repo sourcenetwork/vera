@@ -211,6 +211,7 @@ var (
 		tiertypes.InsurancePoolName,
 		// We allow the following module accounts to receive funds:
 		// govtypes.ModuleName
+		// tiertypes.ModuleName
 	}
 
 	// appConfig application configuration (used by depinject)
