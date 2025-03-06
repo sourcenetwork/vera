@@ -1,7 +1,7 @@
 #!/usr/bin/sh
 set -e
 
-CHAIN_ID="sourcehub"
+CHAIN_ID="sourcehub-dev"
 VALIDATOR="validator"
 NODE_NAME="node"
 BIN="build/sourcehubd"
