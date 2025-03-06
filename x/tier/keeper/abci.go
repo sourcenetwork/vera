@@ -59,13 +59,13 @@ func (k *Keeper) repaySlashedTierStake(ctx context.Context, validatorAddr string
 	// Make sure that the insurance pool has sufficient balance
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 	insurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
+	repayCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierShareBurned))
 	if insurancePoolBalance.Amount.LT(tierShareBurned) {
-		// TODO: should we try to repay from the developer pool if insurance pool has insufficient balance?
-		return fmt.Errorf("Insurance pool has insufficient balance: %d", insurancePoolBalance.Amount.Int64())
+		// If tierShareBurned exceeds insurancePoolBalance, repay the whole insurance pool balance
+		repayCoins = sdk.NewCoins(insurancePoolBalance)
 	}
 
 	// Send tier module share of the burned (slasned) amount from the insurance pool to the tier module account
-	repayCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierShareBurned))
 	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, repayCoins)
 	if err != nil {
 		return err
