@@ -99,8 +99,8 @@ func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 				}
 			}
 
-			if reason != slashingtypes.AttributeValueDoubleSign {
-				return fmt.Errorf("Slashed tokens are repaid only in case of double signing. Reason was: %s", reason)
+			if reason == slashingtypes.AttributeValueDoubleSign {
+				return fmt.Errorf("Slashed tokens are not repaid in case of double signing")
 			}
 
 			return k.repaySlashedTierStake(ctx, validatorAddr, burnedAmount)
