@@ -13,7 +13,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-func (k *Keeper) repaySlashedTierStake(ctx context.Context, validatorAddr string, burnedAmount string) error {
+// recoverSlashedTierStake recovers the tier module share of the burned (slashed) tokens from the insurance pool.
+func (k *Keeper) recoverSlashedTierStake(ctx context.Context, validatorAddr string, burnedAmount string) error {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	valAddr := types.MustValAddressFromBech32(validatorAddr)
 
@@ -51,7 +52,8 @@ func (k *Keeper) repaySlashedTierStake(ctx context.Context, validatorAddr string
 	}
 
 	// Calculate tier module share of the burned (slashed) amount
-	tierShareBurned := totalBurned.Mul(tierStake.Quo(totalStake)).TruncateInt()
+	// Use Ceil() so the tier module always has sufficient balance to handle all unlocks
+	tierShareBurned := totalBurned.Mul(tierStake.Quo(totalStake)).Ceil().TruncateInt()
 	if tierShareBurned.IsZero() {
 		return fmt.Errorf("Tier module burned (slashed) amount is zero")
 	}
@@ -59,14 +61,14 @@ func (k *Keeper) repaySlashedTierStake(ctx context.Context, validatorAddr string
 	// Make sure that the insurance pool has sufficient balance
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 	insurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-	repayCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierShareBurned))
+	recoverCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierShareBurned))
 	if insurancePoolBalance.Amount.LT(tierShareBurned) {
-		// If tierShareBurned exceeds insurancePoolBalance, repay the whole insurance pool balance
-		repayCoins = sdk.NewCoins(insurancePoolBalance)
+		// If tierShareBurned exceeds insurancePoolBalance, recover the whole insurance pool balance
+		recoverCoins = sdk.NewCoins(insurancePoolBalance)
 	}
 
 	// Send tier module share of the burned (slasned) amount from the insurance pool to the tier module account
-	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, repayCoins)
+	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, recoverCoins)
 	if err != nil {
 		return err
 	}
@@ -80,6 +82,7 @@ func (k *Keeper) repaySlashedTierStake(ctx context.Context, validatorAddr string
 	return nil
 }
 
+// handleSlashingEvents monitors slash events and calls recoverSlashedTierStake if reason was not double_sign.
 func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	events := sdkCtx.EventManager().Events()
@@ -99,11 +102,9 @@ func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 				}
 			}
 
-			if reason == slashingtypes.AttributeValueDoubleSign {
-				return fmt.Errorf("Slashed tokens are not repaid in case of double signing")
+			if reason != slashingtypes.AttributeValueDoubleSign {
+				return k.recoverSlashedTierStake(ctx, validatorAddr, burnedAmount)
 			}
-
-			return k.repaySlashedTierStake(ctx, validatorAddr, burnedAmount)
 		}
 	}
 
