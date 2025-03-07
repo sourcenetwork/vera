@@ -60,28 +60,6 @@ func setupTest(t testing.TB) sdk.Context {
 	return ctx
 }
 
-func TestPriorityMatchHandler(t *testing.T) {
-	ctx := setupTest(t)
-
-	acpMsg := &acptypes.MsgBearerPolicyCmd{}
-	acpTx := mockTx{
-		msgs: []sdk.Msg{acpMsg},
-	}
-	require.True(t, PriorityMatchHandler()(ctx, acpTx), "Acp transaction should match")
-
-	tierMsg := &tiertypes.MsgLock{}
-	tierTx := mockTx{
-		msgs: []sdk.Msg{tierMsg},
-	}
-	require.True(t, PriorityMatchHandler()(ctx, tierTx), "Tier transaction should match")
-
-	bulletinMsg := &bulletintypes.MsgCreatePost{}
-	invalidTx := mockTx{
-		msgs: []sdk.Msg{bulletinMsg},
-	}
-	require.False(t, PriorityMatchHandler()(ctx, invalidTx), "Non-acp/tier transaction should not match")
-}
-
 func TestTxPriority(t *testing.T) {
 	ctx := setupTest(t)
 

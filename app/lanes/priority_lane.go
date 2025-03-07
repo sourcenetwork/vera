@@ -124,25 +124,3 @@ func formatGasPrice(gasPrice math.LegacyDec) string {
 	// Ensure proper zero-padding to 32 characters
 	return fmt.Sprintf("%032s", gasPriceStr)
 }
-
-// PriorityMatchHandler returns the default match handler for the priority lane.
-// The default implementation matches transactions related to the x/acp or x/tier modules.
-func PriorityMatchHandler() base.MatchHandler {
-	return func(_ sdk.Context, tx sdk.Tx) bool {
-		msgs := tx.GetMsgs()
-		// Return false if there are no messages
-		if len(msgs) == 0 {
-			return false
-		}
-		// Check message types of all messages in the transaction
-		for _, msg := range msgs {
-			msgType := sdk.MsgTypeURL(msg)
-			// Reject the transaction if one of the messages is not related to the x/acp or x/tier modules
-			if !strings.HasPrefix(msgType, "/sourcehub.acp.") && !strings.HasPrefix(msgType, "/sourcehub.tier.") {
-				return false
-			}
-		}
-		// Accept the transaction only if all messages belong to the x/acp module
-		return true
-	}
-}
