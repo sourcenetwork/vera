@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// HandlePanicDecorator catches and wraps panics in the transaction that caused them.
 type HandlePanicDecorator struct{}
 
 func NewHandlePanicDecorator() HandlePanicDecorator {

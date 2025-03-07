@@ -20,7 +20,7 @@ func NewAnteHandler(
 	TxEncoder sdk.TxEncoder,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
-		// Catches panics and logs errors with the transaction data.
+		// Wraps panics with the string format of the transaction.
 		NewHandlePanicDecorator(),
 		// Initializes the context with the gas meter. Must run before any gas consumption.
 		ante.NewSetUpContextDecorator(),
@@ -49,7 +49,6 @@ func NewAnteHandler(
 		ante.NewIncrementSequenceDecorator(accountKeeper),
 		// Checks that the tx is not a duplicate IBC packet or update message.
 		ibcante.NewRedundantRelayDecorator(channelKeeper),
-		// auctionante.NewAuctionDecorator(auctionkeeper, TxEncoder, mevLane),
 	)
 }
 
