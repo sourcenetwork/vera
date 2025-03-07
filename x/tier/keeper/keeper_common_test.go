@@ -55,6 +55,18 @@ func initializeDelegator(t *testing.T, k *Keeper, ctx sdk.Context, delAddr sdk.A
 	require.NoError(t, err)
 }
 
+// mintCoinsToModule mints given token amount and sends it to the specified module name.
+func mintCoinsToModule(t *testing.T, k *Keeper, ctx sdk.Context, moduleName string, amount math.Int) {
+	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
+	require.NoError(t, err)
+	// No need to send if the specified moduleName is the tier module itself
+	if moduleName != types.ModuleName {
+		err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, moduleName, coins)
+		require.NoError(t, err)
+	}
+}
+
 func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
