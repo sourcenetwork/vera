@@ -193,7 +193,7 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 	})
 
 	if err != nil {
-		k.Logger().Error("Error iterating over tier module delegations", "error", err)
+		k.Logger().Error("BeginBlocker failed", "error", err)
 		return err
 	}
 
