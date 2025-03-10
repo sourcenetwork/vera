@@ -60,8 +60,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/app/ante"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
-	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	bulletinkeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
@@ -129,8 +129,8 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
-	AcpKeeper      acpmodulekeeper.Keeper
-	BulletinKeeper bulletinmodulekeeper.Keeper
+	AcpKeeper      acpkeeper.Keeper
+	BulletinKeeper bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     tierkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
