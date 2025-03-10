@@ -54,3 +54,18 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 
 	return did.String(), nil
 }
+
+func IssueModuleDID(acc sdk.ModuleAccountI) (string, error) {
+	if acc == nil {
+		return "", fmt.Errorf("cannot generate DID: module account is nil")
+	}
+
+	moduleAddr := acc.GetAddress().String()
+	if moduleAddr == "" {
+		return "", fmt.Errorf("module account %s has no valid address", acc.GetName())
+	}
+
+	did := fmt.Sprintf("did:module:%s", moduleAddr)
+
+	return did, nil
+}
