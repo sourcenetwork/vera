@@ -11,6 +11,8 @@ const (
 	MemStoreKey = "mem_bulletin"
 
 	PostKey = "Post/Value/"
+
+	NamespaceResource = "namespace"
 )
 
 var (
