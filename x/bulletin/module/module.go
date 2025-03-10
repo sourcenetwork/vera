@@ -21,6 +21,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -182,6 +183,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	AcpKeeper     acpkeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -202,6 +204,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.StoreService,
 		in.Logger,
 		authority.String(),
+		in.AccountKeeper,
+		in.AcpKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,
