@@ -83,6 +83,7 @@ genesis:
         developer_pool_fee: 2 # 2%
         insurance_pool_fee: 1 # 1%
         insurance_pool_threshold: 100000000000 # 100k open
+        process_rewards_interval: 1000 # 1000 blocks
         reward_rates:
           - amount: '300'
             rate: 150
