@@ -64,6 +64,7 @@ func addRelationship(goCtx context.Context, k *Keeper, namespaceId string, relat
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, policyId, ownerDID, signer, k.GetAcpKeeper().GetParams(ctx))
 	if err != nil {
 		return err
@@ -85,6 +86,7 @@ func deleteRelationship(goCtx context.Context, k *Keeper, namespaceId string, re
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, policyId, ownerDID, signer, k.GetAcpKeeper().GetParams(ctx))
 	if err != nil {
 		return err
@@ -126,7 +128,6 @@ func hasPermission(goCtx context.Context, k *Keeper, namespaceId string, permiss
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	acpKeeper := k.GetAcpKeeper()
-
 	repository := acpKeeper.GetAccessDecisionRepository(ctx)
 	paramsRepository := access_decision.StaticParamsRepository{}
 	engine := acpKeeper.GetACPEngine(ctx)
