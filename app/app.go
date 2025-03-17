@@ -13,7 +13,7 @@ import (
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-	abci "github.com/cometbft/cometbft/abci/types"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -56,6 +56,9 @@ import (
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	abci "github.com/skip-mev/block-sdk/v2/abci"
+	"github.com/skip-mev/block-sdk/v2/block"
+	"github.com/skip-mev/block-sdk/v2/block/base"
 
 	"github.com/sourcenetwork/sourcehub/app/ante"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
@@ -311,6 +314,20 @@ func New(
 		return nil, err
 	}
 
+	// Create priority lane
+	priorityLane := CreatePriorityLane(app)
+
+	// Create the laned mempool with priority and default lanes
+	mempool, err := block.NewLanedMempool(
+		app.Logger(),
+		[]block.Lane{priorityLane},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	app.App.SetMempool(mempool)
+
 	// AnteHandler performs stateful checks on transactions before internal messages are processed.
 	anteHandler := ante.NewAnteHandler(
 		app.AccountKeeper,
@@ -323,6 +340,25 @@ func New(
 	)
 
 	app.SetAnteHandler(anteHandler)
+
+	// Set the ante handler on the lanes
+	opt := []base.LaneOption{
+		base.WithAnteHandler(anteHandler),
+	}
+	priorityLane.WithOptions(
+		opt...,
+	)
+
+	// Create the default proposal handler with the laned mempool
+	proposalHandler := abci.NewDefaultProposalHandler(
+		app.Logger(),
+		app.txConfig.TxDecoder(),
+		app.txConfig.TxEncoder(),
+		mempool,
+	)
+
+	app.App.SetPrepareProposal(proposalHandler.PrepareProposalHandler())
+	app.App.SetProcessProposal(proposalHandler.ProcessProposalHandler())
 
 	/****  Module Options ****/
 
@@ -348,7 +384,7 @@ func New(
 	// However, when registering a module manually (i.e. that does not support app wiring), the module version map
 	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
 	//
-	initChainer := func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
+	initChainer := func(ctx sdk.Context, req *abcitypes.RequestInitChain) (*abcitypes.ResponseInitChain, error) {
 		if req.InitialHeight == 1 {
 			// Temp workaround to set default IBC params until app wiring is fully supported.
 			app.setDefaultIBCParams(ctx)

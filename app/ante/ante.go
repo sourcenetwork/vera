@@ -20,6 +20,8 @@ func NewAnteHandler(
 	TxEncoder sdk.TxEncoder,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
+		// Wraps panics with the string format of the transaction.
+		NewHandlePanicDecorator(),
 		// Initializes the context with the gas meter. Must run before any gas consumption.
 		ante.NewSetUpContextDecorator(),
 		// Ensures that the transaction has no extension options.
@@ -32,7 +34,8 @@ func NewAnteHandler(
 		ante.NewValidateMemoDecorator(accountKeeper),
 		// Ensures that the gas limit covers the cost for transaction size. Consumes gas from the gas meter.
 		ante.NewConsumeGasForTxSizeDecorator(accountKeeper),
-		// Ensures that the fee payer (fee granter or first signer) has enough funds to pay for the tx and deduct fees.
+		// Ensures that the fee payer (fee granter or first signer) has enough funds to pay for the tx.
+		// Deducts fees from the fee payer and sets the tx priority in context.
 		ante.NewDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, nil),
 		// Sets public keys in the context for the fee payer and signers. Must happen before signature checks.
 		ante.NewSetPubKeyDecorator(accountKeeper),
