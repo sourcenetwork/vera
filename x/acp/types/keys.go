@@ -14,10 +14,10 @@ const (
 	AccessDecisionRepositoryKeyPrefix = "access_decision/"
 
 	// RegistrationsCommitmentKeyPrefix defines a key prefix for RegistrationsCommitments
-	RegistrationsCommitmentKeyPrefix = "commitments/"
+	RegistrationsCommitmentKeyPrefix = "commitment/"
 
-	// ObjectEventsKeyPrefix defines a key prefix for ObjectEvents
-	ObjectEventsKeyPrefix = "object_events/"
+	// AmendmentEventKeyPrefix defines a key prefix for Amendment Events
+	AmendmentEventKeyPrefix = "amendment_event/"
 )
 
 var (

@@ -108,7 +108,7 @@ func (k *Keeper) GetRegistrationsCommitmentRepository(ctx sdk.Context) *commitme
 func (k *Keeper) GetAmendmentEventRepository(ctx sdk.Context) *registration.AmendmentEventRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
-	kv = primitives.NewPrefixedKV(kv, []byte(types.ObjectEventsKeyPrefix))
+	kv = primitives.NewPrefixedKV(kv, []byte(types.AmendmentEventKeyPrefix))
 	repo, err := registration.NewAmendmentEventRepository(kv)
 	if err != nil {
 		panic(err)
