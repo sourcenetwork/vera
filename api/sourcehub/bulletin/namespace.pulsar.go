@@ -4,43 +4,43 @@ package bulletin
 import (
 	fmt "fmt"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	reflect "reflect"
 	sync "sync"
 )
 
 var (
-	md_Post             protoreflect.MessageDescriptor
-	fd_Post_id          protoreflect.FieldDescriptor
-	fd_Post_namespace   protoreflect.FieldDescriptor
-	fd_Post_creator_did protoreflect.FieldDescriptor
-	fd_Post_payload     protoreflect.FieldDescriptor
-	fd_Post_proof       protoreflect.FieldDescriptor
+	md_Namespace            protoreflect.MessageDescriptor
+	fd_Namespace_id         protoreflect.FieldDescriptor
+	fd_Namespace_creator    protoreflect.FieldDescriptor
+	fd_Namespace_owner_did  protoreflect.FieldDescriptor
+	fd_Namespace_created_at protoreflect.FieldDescriptor
 )
 
 func init() {
-	file_sourcehub_bulletin_post_proto_init()
-	md_Post = File_sourcehub_bulletin_post_proto.Messages().ByName("Post")
-	fd_Post_id = md_Post.Fields().ByName("id")
-	fd_Post_namespace = md_Post.Fields().ByName("namespace")
-	fd_Post_creator_did = md_Post.Fields().ByName("creator_did")
-	fd_Post_payload = md_Post.Fields().ByName("payload")
-	fd_Post_proof = md_Post.Fields().ByName("proof")
+	file_sourcehub_bulletin_namespace_proto_init()
+	md_Namespace = File_sourcehub_bulletin_namespace_proto.Messages().ByName("Namespace")
+	fd_Namespace_id = md_Namespace.Fields().ByName("id")
+	fd_Namespace_creator = md_Namespace.Fields().ByName("creator")
+	fd_Namespace_owner_did = md_Namespace.Fields().ByName("owner_did")
+	fd_Namespace_created_at = md_Namespace.Fields().ByName("created_at")
 }
 
-var _ protoreflect.Message = (*fastReflection_Post)(nil)
+var _ protoreflect.Message = (*fastReflection_Namespace)(nil)
 
-type fastReflection_Post Post
+type fastReflection_Namespace Namespace
 
-func (x *Post) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_Post)(x)
+func (x *Namespace) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_Namespace)(x)
 }
 
-func (x *Post) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_post_proto_msgTypes[0]
+func (x *Namespace) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_bulletin_namespace_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -51,43 +51,43 @@ func (x *Post) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_Post_messageType fastReflection_Post_messageType
-var _ protoreflect.MessageType = fastReflection_Post_messageType{}
+var _fastReflection_Namespace_messageType fastReflection_Namespace_messageType
+var _ protoreflect.MessageType = fastReflection_Namespace_messageType{}
 
-type fastReflection_Post_messageType struct{}
+type fastReflection_Namespace_messageType struct{}
 
-func (x fastReflection_Post_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_Post)(nil)
+func (x fastReflection_Namespace_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_Namespace)(nil)
 }
-func (x fastReflection_Post_messageType) New() protoreflect.Message {
-	return new(fastReflection_Post)
+func (x fastReflection_Namespace_messageType) New() protoreflect.Message {
+	return new(fastReflection_Namespace)
 }
-func (x fastReflection_Post_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_Post
+func (x fastReflection_Namespace_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_Namespace
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_Post) Descriptor() protoreflect.MessageDescriptor {
-	return md_Post
+func (x *fastReflection_Namespace) Descriptor() protoreflect.MessageDescriptor {
+	return md_Namespace
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_Post) Type() protoreflect.MessageType {
-	return _fastReflection_Post_messageType
+func (x *fastReflection_Namespace) Type() protoreflect.MessageType {
+	return _fastReflection_Namespace_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_Post) New() protoreflect.Message {
-	return new(fastReflection_Post)
+func (x *fastReflection_Namespace) New() protoreflect.Message {
+	return new(fastReflection_Namespace)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_Post) Interface() protoreflect.ProtoMessage {
-	return (*Post)(x)
+func (x *fastReflection_Namespace) Interface() protoreflect.ProtoMessage {
+	return (*Namespace)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -95,34 +95,28 @@ func (x *fastReflection_Post) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_Post) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_Namespace) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Id != "" {
 		value := protoreflect.ValueOfString(x.Id)
-		if !f(fd_Post_id, value) {
+		if !f(fd_Namespace_id, value) {
 			return
 		}
 	}
-	if x.Namespace != "" {
-		value := protoreflect.ValueOfString(x.Namespace)
-		if !f(fd_Post_namespace, value) {
+	if x.Creator != "" {
+		value := protoreflect.ValueOfString(x.Creator)
+		if !f(fd_Namespace_creator, value) {
 			return
 		}
 	}
-	if x.CreatorDid != "" {
-		value := protoreflect.ValueOfString(x.CreatorDid)
-		if !f(fd_Post_creator_did, value) {
+	if x.OwnerDid != "" {
+		value := protoreflect.ValueOfString(x.OwnerDid)
+		if !f(fd_Namespace_owner_did, value) {
 			return
 		}
 	}
-	if len(x.Payload) != 0 {
-		value := protoreflect.ValueOfBytes(x.Payload)
-		if !f(fd_Post_payload, value) {
-			return
-		}
-	}
-	if len(x.Proof) != 0 {
-		value := protoreflect.ValueOfBytes(x.Proof)
-		if !f(fd_Post_proof, value) {
+	if x.CreatedAt != nil {
+		value := protoreflect.ValueOfMessage(x.CreatedAt.ProtoReflect())
+		if !f(fd_Namespace_created_at, value) {
 			return
 		}
 	}
@@ -139,23 +133,21 @@ func (x *fastReflection_Post) Range(f func(protoreflect.FieldDescriptor, protore
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_Post) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_Namespace) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.Post.id":
+	case "sourcehub.bulletin.Namespace.id":
 		return x.Id != ""
-	case "sourcehub.bulletin.Post.namespace":
-		return x.Namespace != ""
-	case "sourcehub.bulletin.Post.creator_did":
-		return x.CreatorDid != ""
-	case "sourcehub.bulletin.Post.payload":
-		return len(x.Payload) != 0
-	case "sourcehub.bulletin.Post.proof":
-		return len(x.Proof) != 0
+	case "sourcehub.bulletin.Namespace.creator":
+		return x.Creator != ""
+	case "sourcehub.bulletin.Namespace.owner_did":
+		return x.OwnerDid != ""
+	case "sourcehub.bulletin.Namespace.created_at":
+		return x.CreatedAt != nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -165,23 +157,21 @@ func (x *fastReflection_Post) Has(fd protoreflect.FieldDescriptor) bool {
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Post) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_Namespace) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.Post.id":
+	case "sourcehub.bulletin.Namespace.id":
 		x.Id = ""
-	case "sourcehub.bulletin.Post.namespace":
-		x.Namespace = ""
-	case "sourcehub.bulletin.Post.creator_did":
-		x.CreatorDid = ""
-	case "sourcehub.bulletin.Post.payload":
-		x.Payload = nil
-	case "sourcehub.bulletin.Post.proof":
-		x.Proof = nil
+	case "sourcehub.bulletin.Namespace.creator":
+		x.Creator = ""
+	case "sourcehub.bulletin.Namespace.owner_did":
+		x.OwnerDid = ""
+	case "sourcehub.bulletin.Namespace.created_at":
+		x.CreatedAt = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -191,28 +181,25 @@ func (x *fastReflection_Post) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_Post) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_Namespace) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.bulletin.Post.id":
+	case "sourcehub.bulletin.Namespace.id":
 		value := x.Id
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.Post.namespace":
-		value := x.Namespace
+	case "sourcehub.bulletin.Namespace.creator":
+		value := x.Creator
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.Post.creator_did":
-		value := x.CreatorDid
+	case "sourcehub.bulletin.Namespace.owner_did":
+		value := x.OwnerDid
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.Post.payload":
-		value := x.Payload
-		return protoreflect.ValueOfBytes(value)
-	case "sourcehub.bulletin.Post.proof":
-		value := x.Proof
-		return protoreflect.ValueOfBytes(value)
+	case "sourcehub.bulletin.Namespace.created_at":
+		value := x.CreatedAt
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -226,23 +213,21 @@ func (x *fastReflection_Post) Get(descriptor protoreflect.FieldDescriptor) proto
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Post) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_Namespace) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.Post.id":
+	case "sourcehub.bulletin.Namespace.id":
 		x.Id = value.Interface().(string)
-	case "sourcehub.bulletin.Post.namespace":
-		x.Namespace = value.Interface().(string)
-	case "sourcehub.bulletin.Post.creator_did":
-		x.CreatorDid = value.Interface().(string)
-	case "sourcehub.bulletin.Post.payload":
-		x.Payload = value.Bytes()
-	case "sourcehub.bulletin.Post.proof":
-		x.Proof = value.Bytes()
+	case "sourcehub.bulletin.Namespace.creator":
+		x.Creator = value.Interface().(string)
+	case "sourcehub.bulletin.Namespace.owner_did":
+		x.OwnerDid = value.Interface().(string)
+	case "sourcehub.bulletin.Namespace.created_at":
+		x.CreatedAt = value.Message().Interface().(*timestamppb.Timestamp)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -256,56 +241,56 @@ func (x *fastReflection_Post) Set(fd protoreflect.FieldDescriptor, value protore
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Post) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_Namespace) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.Post.id":
-		panic(fmt.Errorf("field id of message sourcehub.bulletin.Post is not mutable"))
-	case "sourcehub.bulletin.Post.namespace":
-		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.Post is not mutable"))
-	case "sourcehub.bulletin.Post.creator_did":
-		panic(fmt.Errorf("field creator_did of message sourcehub.bulletin.Post is not mutable"))
-	case "sourcehub.bulletin.Post.payload":
-		panic(fmt.Errorf("field payload of message sourcehub.bulletin.Post is not mutable"))
-	case "sourcehub.bulletin.Post.proof":
-		panic(fmt.Errorf("field proof of message sourcehub.bulletin.Post is not mutable"))
+	case "sourcehub.bulletin.Namespace.created_at":
+		if x.CreatedAt == nil {
+			x.CreatedAt = new(timestamppb.Timestamp)
+		}
+		return protoreflect.ValueOfMessage(x.CreatedAt.ProtoReflect())
+	case "sourcehub.bulletin.Namespace.id":
+		panic(fmt.Errorf("field id of message sourcehub.bulletin.Namespace is not mutable"))
+	case "sourcehub.bulletin.Namespace.creator":
+		panic(fmt.Errorf("field creator of message sourcehub.bulletin.Namespace is not mutable"))
+	case "sourcehub.bulletin.Namespace.owner_did":
+		panic(fmt.Errorf("field owner_did of message sourcehub.bulletin.Namespace is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_Post) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_Namespace) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.Post.id":
+	case "sourcehub.bulletin.Namespace.id":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.Post.namespace":
+	case "sourcehub.bulletin.Namespace.creator":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.Post.creator_did":
+	case "sourcehub.bulletin.Namespace.owner_did":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.Post.payload":
-		return protoreflect.ValueOfBytes(nil)
-	case "sourcehub.bulletin.Post.proof":
-		return protoreflect.ValueOfBytes(nil)
+	case "sourcehub.bulletin.Namespace.created_at":
+		m := new(timestamppb.Timestamp)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Post"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.Namespace"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.Post does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.Namespace does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_Post) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_Namespace) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.Post", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.Namespace", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -313,7 +298,7 @@ func (x *fastReflection_Post) WhichOneof(d protoreflect.OneofDescriptor) protore
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_Post) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_Namespace) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -324,7 +309,7 @@ func (x *fastReflection_Post) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_Post) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_Namespace) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -336,7 +321,7 @@ func (x *fastReflection_Post) SetUnknown(fields protoreflect.RawFields) {
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_Post) IsValid() bool {
+func (x *fastReflection_Namespace) IsValid() bool {
 	return x != nil
 }
 
@@ -346,9 +331,9 @@ func (x *fastReflection_Post) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_Namespace) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*Post)
+		x := input.Message.Interface().(*Namespace)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -364,20 +349,16 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Namespace)
+		l = len(x.Creator)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.CreatorDid)
+		l = len(x.OwnerDid)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Payload)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.Proof)
-		if l > 0 {
+		if x.CreatedAt != nil {
+			l = options.Size(x.CreatedAt)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -390,7 +371,7 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*Post)
+		x := input.Message.Interface().(*Namespace)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -409,31 +390,31 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.Proof) > 0 {
-			i -= len(x.Proof)
-			copy(dAtA[i:], x.Proof)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Proof)))
-			i--
-			dAtA[i] = 0x2a
-		}
-		if len(x.Payload) > 0 {
-			i -= len(x.Payload)
-			copy(dAtA[i:], x.Payload)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Payload)))
+		if x.CreatedAt != nil {
+			encoded, err := options.Marshal(x.CreatedAt)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
 			dAtA[i] = 0x22
 		}
-		if len(x.CreatorDid) > 0 {
-			i -= len(x.CreatorDid)
-			copy(dAtA[i:], x.CreatorDid)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.CreatorDid)))
+		if len(x.OwnerDid) > 0 {
+			i -= len(x.OwnerDid)
+			copy(dAtA[i:], x.OwnerDid)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.OwnerDid)))
 			i--
 			dAtA[i] = 0x1a
 		}
-		if len(x.Namespace) > 0 {
-			i -= len(x.Namespace)
-			copy(dAtA[i:], x.Namespace)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Namespace)))
+		if len(x.Creator) > 0 {
+			i -= len(x.Creator)
+			copy(dAtA[i:], x.Creator)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Creator)))
 			i--
 			dAtA[i] = 0x12
 		}
@@ -455,7 +436,7 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*Post)
+		x := input.Message.Interface().(*Namespace)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -487,10 +468,10 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Post: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Namespace: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Post: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: Namespace: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -527,7 +508,7 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -555,11 +536,11 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Namespace = string(dAtA[iNdEx:postIndex])
+				x.Creator = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 3:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OwnerDid", wireType)
 				}
 				var stringLen uint64
 				for shift := uint(0); ; shift += 7 {
@@ -587,13 +568,13 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.CreatorDid = string(dAtA[iNdEx:postIndex])
+				x.OwnerDid = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
 			case 4:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CreatedAt", wireType)
 				}
-				var byteLen int
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -603,58 +584,26 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					byteLen |= int(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				if byteLen < 0 {
+				if msglen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + byteLen
+				postIndex := iNdEx + msglen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Payload = append(x.Payload[:0], dAtA[iNdEx:postIndex]...)
-				if x.Payload == nil {
-					x.Payload = []byte{}
+				if x.CreatedAt == nil {
+					x.CreatedAt = &timestamppb.Timestamp{}
 				}
-				iNdEx = postIndex
-			case 5:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Proof", wireType)
-				}
-				var byteLen int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					byteLen |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				if byteLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + byteLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Proof = append(x.Proof[:0], dAtA[iNdEx:postIndex]...)
-				if x.Proof == nil {
-					x.Proof = []byte{}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.CreatedAt); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
 				iNdEx = postIndex
 			default:
@@ -696,7 +645,7 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 // versions:
 // 	protoc-gen-go v1.27.0
 // 	protoc        (unknown)
-// source: sourcehub/bulletin/post.proto
+// source: sourcehub/bulletin/namespace.proto
 
 const (
 	// Verify that this generated code is sufficiently up-to-date.
@@ -705,134 +654,136 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Post struct {
+type Namespace struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	Payload    []byte `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
-	Proof      []byte `protobuf:"bytes,5,opt,name=proof,proto3" json:"proof,omitempty"`
+	Id        string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Creator   string                 `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`
+	OwnerDid  string                 `protobuf:"bytes,3,opt,name=owner_did,json=ownerDid,proto3" json:"owner_did,omitempty"`
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 }
 
-func (x *Post) Reset() {
-	*x = Post{}
+func (x *Namespace) Reset() {
+	*x = Namespace{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_post_proto_msgTypes[0]
+		mi := &file_sourcehub_bulletin_namespace_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
 }
 
-func (x *Post) String() string {
+func (x *Namespace) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*Post) ProtoMessage() {}
+func (*Namespace) ProtoMessage() {}
 
-// Deprecated: Use Post.ProtoReflect.Descriptor instead.
-func (*Post) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_post_proto_rawDescGZIP(), []int{0}
+// Deprecated: Use Namespace.ProtoReflect.Descriptor instead.
+func (*Namespace) Descriptor() ([]byte, []int) {
+	return file_sourcehub_bulletin_namespace_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Post) GetId() string {
+func (x *Namespace) GetId() string {
 	if x != nil {
 		return x.Id
 	}
 	return ""
 }
 
-func (x *Post) GetNamespace() string {
+func (x *Namespace) GetCreator() string {
 	if x != nil {
-		return x.Namespace
+		return x.Creator
 	}
 	return ""
 }
 
-func (x *Post) GetCreatorDid() string {
+func (x *Namespace) GetOwnerDid() string {
 	if x != nil {
-		return x.CreatorDid
+		return x.OwnerDid
 	}
 	return ""
 }
 
-func (x *Post) GetPayload() []byte {
+func (x *Namespace) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Payload
+		return x.CreatedAt
 	}
 	return nil
 }
 
-func (x *Post) GetProof() []byte {
-	if x != nil {
-		return x.Proof
-	}
-	return nil
-}
+var File_sourcehub_bulletin_namespace_proto protoreflect.FileDescriptor
 
-var File_sourcehub_bulletin_post_proto protoreflect.FileDescriptor
-
-var file_sourcehub_bulletin_post_proto_rawDesc = []byte{
-	0x0a, 0x1d, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x2f, 0x70, 0x6f, 0x73, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
-	0x12, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65,
-	0x74, 0x69, 0x6e, 0x22, 0x85, 0x01, 0x0a, 0x04, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02,
-	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c, 0x0a, 0x09,
-	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x72,
-	0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70,
-	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61,
-	0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x18, 0x05,
-	0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x42, 0xb1, 0x01, 0x0a, 0x16,
-	0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x42, 0x09, 0x50, 0x6f, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x74,
-	0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69,
-	0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f,
-	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02,
-	0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65,
-	0x74, 0x69, 0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c,
-	0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50,
-	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+var file_sourcehub_bulletin_namespace_proto_rawDesc = []byte{
+	0x0a, 0x22, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c,
+	0x65, 0x74, 0x69, 0x6e, 0x2f, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x12, 0x12, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f,
+	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f,
+	0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
+	0x1d, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65,
+	0x74, 0x69, 0x6e, 0x2f, 0x70, 0x6f, 0x73, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x97,
+	0x01, 0x0a, 0x09, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07,
+	0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1b, 0x0a, 0x09, 0x6f, 0x77, 0x6e, 0x65, 0x72, 0x5f,
+	0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6f, 0x77, 0x6e, 0x65, 0x72,
+	0x44, 0x69, 0x64, 0x12, 0x43, 0x0a, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61,
+	0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x42, 0x08, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0x52, 0x09, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x42, 0xb6, 0x01, 0x0a, 0x16, 0x63, 0x6f, 0x6d,
+	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65,
+	0x74, 0x69, 0x6e, 0x42, 0x0e, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b,
+	0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58,
+	0xaa, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c,
+	0x6c, 0x65, 0x74, 0x69, 0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c,
+	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
+	0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_sourcehub_bulletin_post_proto_rawDescOnce sync.Once
-	file_sourcehub_bulletin_post_proto_rawDescData = file_sourcehub_bulletin_post_proto_rawDesc
+	file_sourcehub_bulletin_namespace_proto_rawDescOnce sync.Once
+	file_sourcehub_bulletin_namespace_proto_rawDescData = file_sourcehub_bulletin_namespace_proto_rawDesc
 )
 
-func file_sourcehub_bulletin_post_proto_rawDescGZIP() []byte {
-	file_sourcehub_bulletin_post_proto_rawDescOnce.Do(func() {
-		file_sourcehub_bulletin_post_proto_rawDescData = protoimpl.X.CompressGZIP(file_sourcehub_bulletin_post_proto_rawDescData)
+func file_sourcehub_bulletin_namespace_proto_rawDescGZIP() []byte {
+	file_sourcehub_bulletin_namespace_proto_rawDescOnce.Do(func() {
+		file_sourcehub_bulletin_namespace_proto_rawDescData = protoimpl.X.CompressGZIP(file_sourcehub_bulletin_namespace_proto_rawDescData)
 	})
-	return file_sourcehub_bulletin_post_proto_rawDescData
+	return file_sourcehub_bulletin_namespace_proto_rawDescData
 }
 
-var file_sourcehub_bulletin_post_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_sourcehub_bulletin_post_proto_goTypes = []interface{}{
-	(*Post)(nil), // 0: sourcehub.bulletin.Post
+var file_sourcehub_bulletin_namespace_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_sourcehub_bulletin_namespace_proto_goTypes = []interface{}{
+	(*Namespace)(nil),             // 0: sourcehub.bulletin.Namespace
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
-var file_sourcehub_bulletin_post_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+var file_sourcehub_bulletin_namespace_proto_depIdxs = []int32{
+	1, // 0: sourcehub.bulletin.Namespace.created_at:type_name -> google.protobuf.Timestamp
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_sourcehub_bulletin_post_proto_init() }
-func file_sourcehub_bulletin_post_proto_init() {
-	if File_sourcehub_bulletin_post_proto != nil {
+func init() { file_sourcehub_bulletin_namespace_proto_init() }
+func file_sourcehub_bulletin_namespace_proto_init() {
+	if File_sourcehub_bulletin_namespace_proto != nil {
 		return
 	}
+	file_sourcehub_bulletin_post_proto_init()
 	if !protoimpl.UnsafeEnabled {
-		file_sourcehub_bulletin_post_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*Post); i {
+		file_sourcehub_bulletin_namespace_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*Namespace); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -848,18 +799,18 @@ func file_sourcehub_bulletin_post_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_sourcehub_bulletin_post_proto_rawDesc,
+			RawDescriptor: file_sourcehub_bulletin_namespace_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_sourcehub_bulletin_post_proto_goTypes,
-		DependencyIndexes: file_sourcehub_bulletin_post_proto_depIdxs,
-		MessageInfos:      file_sourcehub_bulletin_post_proto_msgTypes,
+		GoTypes:           file_sourcehub_bulletin_namespace_proto_goTypes,
+		DependencyIndexes: file_sourcehub_bulletin_namespace_proto_depIdxs,
+		MessageInfos:      file_sourcehub_bulletin_namespace_proto_msgTypes,
 	}.Build()
-	File_sourcehub_bulletin_post_proto = out.File
-	file_sourcehub_bulletin_post_proto_rawDesc = nil
-	file_sourcehub_bulletin_post_proto_goTypes = nil
-	file_sourcehub_bulletin_post_proto_depIdxs = nil
+	File_sourcehub_bulletin_namespace_proto = out.File
+	file_sourcehub_bulletin_namespace_proto_rawDesc = nil
+	file_sourcehub_bulletin_namespace_proto_goTypes = nil
+	file_sourcehub_bulletin_namespace_proto_depIdxs = nil
 }
