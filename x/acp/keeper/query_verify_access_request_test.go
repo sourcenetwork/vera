@@ -67,7 +67,6 @@ resources:
 
 func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue() {
 	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -87,7 +86,7 @@ func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsT
 			},
 		},
 	}
-	result, err := querier.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: true,
@@ -98,7 +97,6 @@ func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsT
 
 func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid() {
 	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -114,7 +112,7 @@ func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingOperatio
 			},
 		},
 	}
-	result, err := querier.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
@@ -125,7 +123,6 @@ func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingOperatio
 
 func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse() {
 	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -141,7 +138,7 @@ func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectTh
 			},
 		},
 	}
-	result, err := querier.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
