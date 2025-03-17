@@ -32,7 +32,6 @@ type KeeperTestSuite struct {
 	stakingKeeper    *test.MockStakingKeeper
 	encCfg           test.EncodingConfig
 	ctx              sdk.Context
-	msgServer        types.MsgServer
 	key              *storetypes.KVStoreKey
 	authorityAccount sdk.AccAddress
 	valAddr          sdk.ValAddress
@@ -82,8 +81,6 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	err := suite.tierKeeper.SetParams(suite.ctx, types.DefaultParams())
 	suite.Require().NoError(err)
-
-	suite.msgServer = keeper.NewMsgServerImpl(suite.tierKeeper)
 
 	suite.valAddr, _ = sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 }
