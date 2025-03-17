@@ -10,14 +10,14 @@ const (
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_acp"
 
-	// AccessDecisionRepositoryKey defines the namespace for Access Decisions
-	AccessDecisionRepositoryKey = "access_decision"
+	// AccessDecisionRepositoryKeyPrefix defines the namespace for Access Decisions
+	AccessDecisionRepositoryKeyPrefix = "access_decision/"
 
-	// RegistrationsCommitmentPrefix defines a key prefix for RegistrationsCommitments
-	RegistrationsCommitmentPrefix = "commitments"
+	// RegistrationsCommitmentKeyPrefix defines a key prefix for RegistrationsCommitments
+	RegistrationsCommitmentKeyPrefix = "commitments/"
 
-	// ObjectEventsPrefix defines a key prefix for ObjectEvents
-	ObjectEventsPrefix = "object_events"
+	// ObjectEventsKeyPrefix defines a key prefix for ObjectEvents
+	ObjectEventsKeyPrefix = "object_events/"
 )
 
 var (
