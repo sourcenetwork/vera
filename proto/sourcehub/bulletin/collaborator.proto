@@ -1,0 +1,10 @@
+syntax = "proto3";
+package sourcehub.bulletin;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
+
+message Collaborator {
+  string address = 1;
+  string did = 2;
+  string namespace = 3;
+}
