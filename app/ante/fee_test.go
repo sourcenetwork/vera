@@ -238,19 +238,19 @@ func TestCustomDeductFeeDecorator_OpenDenomFees(t *testing.T) {
 	s.ctx = s.ctx.WithIsCheckTx(true)
 
 	_, err = antehandler(s.ctx, tx, false)
-	require.Error(t, err, "Decorator should have errored on too low fee for local gasPrice")
+	require.Error(t, err, "CustomDeductFeeDecorator should have errored on too low fee for local gasPrice")
 
 	// antehandler should not error since we do not check minGasPrice in simulation mode
 	cacheCtx, _ := s.ctx.CacheContext()
 	_, err = antehandler(cacheCtx, tx, true)
-	require.NoError(t, err, "Decorator should not have errored in simulation mode")
+	require.NoError(t, err, "CustomDeductFeeDecorator should not have errored in simulation mode")
 
 	// set IsCheckTx to false
 	s.ctx = s.ctx.WithIsCheckTx(false)
 
 	// antehandler should not error since we do not check minGasPrice in DeliverTx
 	_, err = antehandler(s.ctx, tx, false)
-	require.NoError(t, err, "MempoolFeeDecorator returned error in DeliverTx")
+	require.NoError(t, err, "CustomDeductFeeDecorator returned error in DeliverTx")
 
 	// set IsCheckTx back to true for testing sufficient mempool fee
 	s.ctx = s.ctx.WithIsCheckTx(true)
@@ -261,7 +261,7 @@ func TestCustomDeductFeeDecorator_OpenDenomFees(t *testing.T) {
 	s.ctx = s.ctx.WithMinGasPrices(lowGasPrice)
 
 	newCtx, err := antehandler(s.ctx, tx, false)
-	require.NoError(t, err, "Decorator should not have errored on fee higher than local gasPrice")
+	require.NoError(t, err, "CustomDeductFeeDecorator should not have errored on fee higher than local gasPrice")
 	require.Equal(t, int64(0), newCtx.Priority())
 }
 
@@ -295,7 +295,7 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	tx, err := s.CreateTestTx(s.ctx, privs, accNums, accSeqs, s.ctx.ChainID(), signing.SignMode_SIGN_MODE_DIRECT)
 	require.NoError(t, err)
 
-	// set 10 ucredit as gas price so tx with 100 fee fails (10 * 10 * 10 required due to CreditDenomMultiplier)
+	// set 10 ucredit as gas price so tx with 100 fee fails (10 * 10 * 10 required due to CreditFeeMultiplier)
 	uopenPrice := sdk.NewDecCoinFromDec(appparams.MicroCreditDenom, math.LegacyNewDec(10))
 	highGasPrice := []sdk.DecCoin{uopenPrice}
 	s.ctx = s.ctx.WithMinGasPrices(highGasPrice)
@@ -304,19 +304,19 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	s.ctx = s.ctx.WithIsCheckTx(true)
 
 	_, err = antehandler(s.ctx, tx, false)
-	require.Error(t, err, "Decorator should have errored on too low fee for local gasPrice")
+	require.Error(t, err, "CustomDeductFeeDecorator should have errored on too low fee for local gasPrice")
 
 	// antehandler should not error since we do not check minGasPrice in simulation mode
 	cacheCtx, _ := s.ctx.CacheContext()
 	_, err = antehandler(cacheCtx, tx, true)
-	require.NoError(t, err, "Decorator should not have errored in simulation mode")
+	require.NoError(t, err, "CustomDeductFeeDecorator should not have errored in simulation mode")
 
 	// set IsCheckTx to false
 	s.ctx = s.ctx.WithIsCheckTx(false)
 
 	// antehandler should not error since we do not check minGasPrice in DeliverTx
 	_, err = antehandler(s.ctx, tx, false)
-	require.NoError(t, err, "MempoolFeeDecorator returned error in DeliverTx")
+	require.NoError(t, err, "CustomDeductFeeDecorator returned error in DeliverTx")
 
 	// set IsCheckTx back to true for testing sufficient mempool fee
 	s.ctx = s.ctx.WithIsCheckTx(true)
@@ -327,6 +327,6 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	s.ctx = s.ctx.WithMinGasPrices(lowGasPrice)
 
 	newCtx, err := antehandler(s.ctx, tx, false)
-	require.NoError(t, err, "Decorator should not have errored on fee higher than local gasPrice")
+	require.NoError(t, err, "CustomDeductFeeDecorator should not have errored on fee higher than local gasPrice")
 	require.Equal(t, int64(0), newCtx.Priority())
 }

@@ -32,13 +32,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestAccount represents an account used in app/ante/fee_test.
+// TestAccount represents a test account used in app/ante/fee_test.
 type TestAccount struct {
 	acc  sdk.AccountI
 	priv cryptotypes.PrivKey
 }
 
-// AnteTestSuite is a test suite to be used with ante handler tests.
+// AnteTestSuite is a test suite that is used with ante handler tests.
 type AnteTestSuite struct {
 	anteHandler    sdk.AnteHandler
 	ctx            sdk.Context
@@ -51,7 +51,7 @@ type AnteTestSuite struct {
 	encCfg         moduletestutil.TestEncodingConfig
 }
 
-// SetupTest setups a new test, with new app, context, and anteHandler.
+// SetupTest inits a new test, with new app, context, and anteHandler.
 func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	suite := &AnteTestSuite{}
 	ctrl := gomock.NewController(t)
@@ -106,6 +106,7 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	return suite
 }
 
+// CreateTestAccounts is a helper function to create test accounts.
 func (suite *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 	var accounts []TestAccount
 
@@ -120,14 +121,13 @@ func (suite *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 	return accounts
 }
 
-// CreateTestTx is a helper function to create a tx given multiple inputs.
+// CreateTestTx is a helper function to create a tx for multiple inputs.
 func (suite *AnteTestSuite) CreateTestTx(
 	ctx sdk.Context, privs []cryptotypes.PrivKey,
 	accNums, accSeqs []uint64,
 	chainID string, signMode signing.SignMode,
 ) (xauthsigning.Tx, error) {
-	// First round: we gather all the signer infos. We use the "set empty
-	// signature" hack to do that.
+	// First round: we gather all the signer infos using the "set empty signature" hack
 	var sigsV2 []signing.SignatureV2
 	for i, priv := range privs {
 		sigV2 := signing.SignatureV2{
@@ -146,7 +146,7 @@ func (suite *AnteTestSuite) CreateTestTx(
 		return nil, err
 	}
 
-	// Second round: all signer infos are set, so each signer can sign.
+	// Second round: all signer infos are set, so each signer can sign
 	sigsV2 = []signing.SignatureV2{}
 	for i, priv := range privs {
 		signerData := xauthsigning.SignerData{
