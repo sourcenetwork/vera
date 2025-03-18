@@ -55,13 +55,13 @@ func (cdfd CustomDeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 		return ctx, errorsmod.Wrap(sdkerrors.ErrTxDecode, "tx must be a FeeTx")
 	}
 
-	if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
-		return ctx, errorsmod.Wrap(sdkerrors.ErrInvalidGasLimit, "must provide positive gas")
-	}
-
 	// Skip fee validation and deduction for transactions at genesis
 	if ctx.BlockHeight() == 0 {
 		return next(ctx, tx, simulate)
+	}
+
+	if !simulate && ctx.BlockHeight() > 0 && feeTx.GetGas() == 0 {
+		return ctx, errorsmod.Wrap(sdkerrors.ErrInvalidGasLimit, "must provide positive gas")
 	}
 
 	var (
@@ -114,7 +114,7 @@ func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, e
 		fee := fees[0]
 		minGasPrice := ctx.MinGasPrices().AmountOf(fee.Denom)
 
-		// Denom missing from MinGasPrices() are not supported
+		// Denoms missing from MinGasPrices() are not supported
 		if minGasPrice.IsNil() {
 			return nil, 0, errorsmod.Wrapf(
 				sdkerrors.ErrInvalidCoins,
