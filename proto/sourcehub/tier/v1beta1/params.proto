@@ -10,6 +10,8 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
 
 // Params defines the parameters for the module.
 message Params {
+  option (amino.name) = "sourcehub/x/tier/Params";
+
   google.protobuf.Duration epoch_duration = 1 [(gogoproto.stdduration) = true];
   int64 unlocking_epochs = 2;
   int64 developer_pool_fee = 3;

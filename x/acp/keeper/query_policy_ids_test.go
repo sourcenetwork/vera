@@ -104,12 +104,12 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
 	ctx, k, accKeep := setupKeeper(s.T())
 	msgServer := NewMsgServerImpl(k)
-	querier := NewQuerier(k)
+
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
@@ -118,12 +118,12 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_JSON() {
 	ctx, k, accKeep := setupKeeper(s.T())
 	msgServer := NewMsgServerImpl(k)
-	querier := NewQuerier(k)
+
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_JSON)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
@@ -131,9 +131,8 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_JSON() {
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_NoPoliciesRegistered() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.Empty(s.T(), resp.Ids)
@@ -142,12 +141,12 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_NoPoliciesRegistered() {
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
 	ctx, k, accKeep := setupKeeper(s.T())
 	msgServer := NewMsgServerImpl(k)
-	querier := NewQuerier(k)
+
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	_ = s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.Equal(s.T(), 2, len(resp.Ids))
@@ -156,7 +155,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 	ctx, k, accKeep := setupKeeper(s.T())
 	msgServer := NewMsgServerImpl(k)
-	querier := NewQuerier(k)
+
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	policyNames := []string{}
@@ -165,7 +164,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 	}
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, policyNames, coretypes.PolicyMarshalingType_SHORT_JSON)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
@@ -174,7 +173,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	ctx, k, accKeep := setupKeeper(s.T())
 	msgServer := NewMsgServerImpl(k)
-	querier := NewQuerier(k)
+
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	names := []string{}
@@ -183,7 +182,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	}
 	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
 
-	resp, err := querier.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)

@@ -11,8 +11,8 @@ import (
 
 func CmdQueryOjectOwner() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "object-owner policy-id resource object-id",
-		Short: "queries an object for its owner",
+		Use:   "object-owner [policy-id] [resource] [object-id]",
+		Short: "Queries an object for its owner",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			polId := args[0]

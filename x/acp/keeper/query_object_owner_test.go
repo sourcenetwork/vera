@@ -77,9 +77,8 @@ actor:
 
 func (s *queryObjectOwnerSuite) TestQueryReturnsObjectOwner() {
 	ctx, k, _, _, policyId := s.setup(s.T())
-	querier := NewQuerier(k)
 
-	resp, err := querier.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
+	resp, err := k.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
 		PolicyId: policyId,
 		Object:   s.obj,
 	})
@@ -93,9 +92,8 @@ func (s *queryObjectOwnerSuite) TestQueryReturnsObjectOwner() {
 
 func (s *queryObjectOwnerSuite) TestQueryingForUnregisteredObjectReturnsEmptyOwner() {
 	ctx, k, _, _, policyId := s.setup(s.T())
-	querier := NewQuerier(k)
 
-	resp, err := querier.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
+	resp, err := k.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
 		PolicyId: policyId,
 		Object:   coretypes.NewObject("file", "404"),
 	})
@@ -109,9 +107,8 @@ func (s *queryObjectOwnerSuite) TestQueryingForUnregisteredObjectReturnsEmptyOwn
 
 func (s *queryObjectOwnerSuite) TestQueryingPolicyThatDoesNotExistReturnError() {
 	ctx, k, _, _, _ := s.setup(s.T())
-	querier := NewQuerier(k)
 
-	resp, err := querier.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
+	resp, err := k.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
 		PolicyId: "some-policy",
 		Object:   s.obj,
 	})
@@ -122,9 +119,8 @@ func (s *queryObjectOwnerSuite) TestQueryingPolicyThatDoesNotExistReturnError() 
 
 func (s *queryObjectOwnerSuite) TestQueryingForObjectInNonExistingPolicyReturnsError() {
 	ctx, k, _, _, policyId := s.setup(s.T())
-	querier := NewQuerier(k)
 
-	resp, err := querier.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
+	resp, err := k.ObjectOwner(ctx, &types.QueryObjectOwnerRequest{
 		PolicyId: policyId,
 		Object:   coretypes.NewObject("missing-resource", "abc"),
 	})
