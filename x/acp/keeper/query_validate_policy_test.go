@@ -20,7 +20,6 @@ func TestValidatePolicy(t *testing.T) {
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_ValidPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -44,7 +43,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    true,
@@ -56,7 +55,6 @@ actor:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_ComplexValidPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -86,7 +84,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    true,
@@ -98,7 +96,6 @@ actor:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_InvalidSyntax() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -113,7 +110,7 @@ resources:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
@@ -123,7 +120,6 @@ resources:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_MissingOwner() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -138,7 +134,7 @@ resources:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
@@ -148,14 +144,13 @@ resources:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy:      "",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    false,
@@ -167,7 +162,6 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_BadActor() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -197,7 +191,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)

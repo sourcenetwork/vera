@@ -15,7 +15,7 @@ message Params {
   // policy_command_max_expiration_delta specifies a global thershold for how old a Command will be accepted for.
   uint64 policy_command_max_expiration_delta = 1;
 
-    // registrations_commitment_validity specifies a duration for the lifetime of a commitment.
-    // Performing a RevealRegistration against an expired commitment causes a protocol error.
-    Duration registrations_commitment_validity = 2;
+  // registrations_commitment_validity specifies a duration for the lifetime of a commitment.
+  // Performing a RevealRegistration against an expired commitment causes a protocol error.
+  Duration registrations_commitment_validity = 2;
 }

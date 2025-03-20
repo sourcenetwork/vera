@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package sourcehub.acp;
 
+import "amino/amino.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 
@@ -11,8 +12,8 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 // Duration interval or a number of blocks
 message Duration {
     oneof duration {
-        google.protobuf.Duration proto_duration = 1;
-        uint64 block_count = 2;
+        google.protobuf.Duration proto_duration = 1 [(amino.oneof_name) = "proto_duration"];
+        uint64 block_count = 2 [(amino.oneof_name) = "block_count"];
     }
 }
 

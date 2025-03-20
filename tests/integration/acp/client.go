@@ -194,7 +194,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 	executor := &KeeperACPClient{
 		baseCtx:        ctx,
 		k:              msgServer,
-		querier:        keeper.NewQuerier(k),
+		querier:        k,
 		accountCreator: accKeeper,
 		ts: types.Timestamp{
 			BlockHeight: 1,

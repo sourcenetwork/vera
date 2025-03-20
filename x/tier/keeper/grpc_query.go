@@ -13,29 +13,19 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-type Querier struct {
-	Keeper
-}
+var _ types.QueryServer = Keeper{}
 
-var _ types.QueryServer = Querier{}
-
-func NewQuerier(keeper Keeper) Querier {
-	return Querier{Keeper: keeper}
-}
-
-func (q Querier) Params(ctx context.Context, req *types.QueryParamsRequest) (
-	*types.QueryParamsResponse, error) {
-
+// Params query returns tier module params.
+func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	return &types.QueryParamsResponse{Params: q.GetParams(ctx)}, nil
+	return &types.QueryParamsResponse{Params: k.GetParams(ctx)}, nil
 }
 
-func (q Querier) Lockup(ctx context.Context, req *types.LockupRequest) (
-	*types.LockupResponse, error) {
-
+// Lockup query returns a lockup based on delegator address and validator address.
+func (k Keeper) Lockup(ctx context.Context, req *types.LockupRequest) (*types.LockupResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -50,7 +40,7 @@ func (q Querier) Lockup(ctx context.Context, req *types.LockupRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	lockup := q.GetLockup(ctx, delAddr, valAddr)
+	lockup := k.GetLockup(ctx, delAddr, valAddr)
 	if lockup == nil {
 		return nil, status.Error(codes.NotFound, "unlocking lockup does not exist")
 	}
@@ -58,9 +48,8 @@ func (q Querier) Lockup(ctx context.Context, req *types.LockupRequest) (
 	return &types.LockupResponse{Lockup: *lockup}, nil
 }
 
-func (q Querier) Lockups(ctx context.Context, req *types.LockupsRequest) (
-	*types.LockupsResponse, error) {
-
+// Lockups query returns all delegator lockups with pagination.
+func (k Keeper) Lockups(ctx context.Context, req *types.LockupsRequest) (*types.LockupsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -70,7 +59,7 @@ func (q Querier) Lockups(ctx context.Context, req *types.LockupsRequest) (
 		return nil, status.Error(codes.InvalidArgument, "invalid delegator address")
 	}
 
-	lockups, pageRes, err := q.getLockupsPaginated(ctx, delAddr, req.Pagination)
+	lockups, pageRes, err := k.getLockupsPaginated(ctx, delAddr, req.Pagination)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -78,7 +67,8 @@ func (q Querier) Lockups(ctx context.Context, req *types.LockupsRequest) (
 	return &types.LockupsResponse{Lockups: lockups, Pagination: pageRes}, nil
 }
 
-func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupRequest) (
+// UnlockingLockup query returns an unlocking lockup based on delAddr, valAddr, and creationHeight.
+func (k Keeper) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupRequest) (
 	*types.UnlockingLockupResponse, error) {
 
 	if req == nil {
@@ -95,7 +85,7 @@ func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockup
 		return nil, status.Error(codes.InvalidArgument, "invalid validator address")
 	}
 
-	unlockingLockup := q.GetUnlockingLockup(ctx, delAddr, valAddr, req.CreationHeight)
+	unlockingLockup := k.GetUnlockingLockup(ctx, delAddr, valAddr, req.CreationHeight)
 	if unlockingLockup == nil {
 		return nil, status.Error(codes.NotFound, "unlocking lockup does not exist")
 	}
@@ -103,7 +93,8 @@ func (q Querier) UnlockingLockup(ctx context.Context, req *types.UnlockingLockup
 	return &types.UnlockingLockupResponse{UnlockingLockup: *unlockingLockup}, nil
 }
 
-func (q Querier) UnlockingLockups(ctx context.Context, req *types.UnlockingLockupsRequest) (
+// UnlockingLockup query returns all delegator unlocking lockups with pagination.
+func (k Keeper) UnlockingLockups(ctx context.Context, req *types.UnlockingLockupsRequest) (
 	*types.UnlockingLockupsResponse, error) {
 
 	if req == nil {
@@ -115,7 +106,7 @@ func (q Querier) UnlockingLockups(ctx context.Context, req *types.UnlockingLocku
 		return nil, status.Error(codes.InvalidArgument, "invalid delegator address")
 	}
 
-	lockups, pageRes, err := q.getUnlockingLockupsPaginated(ctx, delAddr, req.Pagination)
+	lockups, pageRes, err := k.getUnlockingLockupsPaginated(ctx, delAddr, req.Pagination)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -123,17 +114,18 @@ func (q Querier) UnlockingLockups(ctx context.Context, req *types.UnlockingLocku
 	return &types.UnlockingLockupsResponse{UnlockingLockups: lockups, Pagination: pageRes}, nil
 }
 
-func (q Querier) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
+// getLockupsPaginated returns delegator lockups with pagination.
+func (k Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.Lockup, *query.PageResponse, error) {
 
 	var lockups []types.Lockup
-	store := q.lockupStore(ctx, false)
+	store := k.lockupStore(ctx, false)
 	onResult := func(key []byte, value []byte) error {
 		if !bytes.HasPrefix(key, delAddr.Bytes()) {
 			return nil
 		}
 		var lockup types.Lockup
-		q.cdc.MustUnmarshal(value, &lockup)
+		k.cdc.MustUnmarshal(value, &lockup)
 		lockups = append(lockups, lockup)
 		return nil
 	}
@@ -146,17 +138,18 @@ func (q Querier) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress
 	return lockups, pageRes, nil
 }
 
-func (q Querier) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
+// getUnlockingLockupsPaginated returns delegator unlocking lockups with pagination.
+func (k Keeper) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.UnlockingLockup, *query.PageResponse, error) {
 
 	var unlockingLockups []types.UnlockingLockup
-	store := q.lockupStore(ctx, true)
+	store := k.lockupStore(ctx, true)
 	onResult := func(key []byte, value []byte) error {
 		if !bytes.HasPrefix(key, delAddr.Bytes()) {
 			return nil
 		}
 		var unlockingLockup types.UnlockingLockup
-		q.cdc.MustUnmarshal(value, &unlockingLockup)
+		k.cdc.MustUnmarshal(value, &unlockingLockup)
 		unlockingLockups = append(unlockingLockups, unlockingLockup)
 		return nil
 	}
