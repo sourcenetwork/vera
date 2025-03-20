@@ -24,9 +24,9 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 		return err
 	}
 
-	// Get the tier delegation shares
-	tierStake := tierDelegation.Shares
-	if tierStake.IsZero() {
+	// Get the tier module delegation shares
+	tierShares := tierDelegation.Shares
+	if tierShares.IsZero() {
 		return fmt.Errorf("No delegation from the tier module")
 	}
 
@@ -53,7 +53,7 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 
 	// Calculate tier module share of the burned (slashed) amount
 	// Use Ceil() so the tier module always has sufficient balance to handle all unlocks
-	tierShareBurned := totalBurned.Mul(tierStake.Quo(totalStake)).Ceil().TruncateInt()
+	tierShareBurned := totalBurned.Mul(tierShares.Quo(totalStake)).Ceil().TruncateInt()
 	if tierShareBurned.IsZero() {
 		return fmt.Errorf("Tier module burned (slashed) amount is zero")
 	}
@@ -67,13 +67,13 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 		recoverCoins = sdk.NewCoins(insurancePoolBalance)
 	}
 
-	// Send tier module share of the burned (slasned) amount from the insurance pool to the tier module account
+	// Send tier module share of the burned (slashed) amount from the insurance pool to the tier module account
 	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, recoverCoins)
 	if err != nil {
 		return err
 	}
 
-	// Delegate the tier module share of the burned (slasned) amount from back to the same validator
+	// Delegate the tier module share of the burned (slashed) amount from back to the same validator
 	_, err = k.GetStakingKeeper().Delegate(ctx, tierModuleAddr, tierShareBurned, stakingtypes.Unbonded, validator, true)
 	if err != nil {
 		return err
