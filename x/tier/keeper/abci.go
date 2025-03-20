@@ -13,8 +13,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// recoverSlashedTierStake recovers the tier module share of the burned (slashed) tokens from the insurance pool.
-func (k *Keeper) recoverSlashedTierStake(ctx context.Context, validatorAddr string, burnedAmount string) error {
+// reimburseSlashedTierStake recovers the tier module share of the burned (slashed) tokens from the insurance pool.
+func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr string, burnedAmount string) error {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	valAddr := types.MustValAddressFromBech32(validatorAddr)
 
@@ -82,7 +82,7 @@ func (k *Keeper) recoverSlashedTierStake(ctx context.Context, validatorAddr stri
 	return nil
 }
 
-// handleSlashingEvents monitors slash events and calls recoverSlashedTierStake if reason was not double_sign.
+// handleSlashingEvents monitors slash events and calls reimburseSlashedTierStake if reason was not double_sign.
 func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	events := sdkCtx.EventManager().Events()
@@ -103,7 +103,7 @@ func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 			}
 
 			if reason != slashingtypes.AttributeValueDoubleSign {
-				return k.recoverSlashedTierStake(ctx, validatorAddr, burnedAmount)
+				return k.reimburseSlashedTierStake(ctx, validatorAddr, burnedAmount)
 			}
 		}
 	}
@@ -194,7 +194,6 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 
 	if err != nil {
 		k.Logger().Error("BeginBlocker failed", "error", err)
-		return err
 	}
 
 	return nil
