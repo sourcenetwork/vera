@@ -13,18 +13,30 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// reimburseSlashedTierStake recovers the tier module share of the burned (slashed) tokens from the insurance pool.
-func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr string, burnedAmount string) error {
+// reimburseSlashedTierStake reimburses tier module share of the slashed tokens from the insurance pool.
+func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr string, slashedAmount string) error {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
-	valAddr := types.MustValAddressFromBech32(validatorAddr)
+	valAddr, err := sdk.ValAddressFromBech32(validatorAddr)
+	if err != nil {
+		return err
+	}
 
-	// Get the tier module delegation
+	// Get total slashed amount
+	totalSlashed, err := math.LegacyNewDecFromStr(slashedAmount)
+	if err != nil {
+		return err
+	}
+	if totalSlashed.IsZero() {
+		return fmt.Errorf("Total slashed amount is zero")
+	}
+
+	// Get tier module delegation
 	tierDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	if err != nil {
 		return err
 	}
 
-	// Get the tier module delegation shares
+	// Get tier module delegation shares
 	tierShares := tierDelegation.Shares
 	if tierShares.IsZero() {
 		return fmt.Errorf("No delegation from the tier module")
@@ -42,39 +54,33 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 		return fmt.Errorf("No stake for the validator: %s", validatorAddr)
 	}
 
-	// Get burned (slashed) amount
-	totalBurned, err := math.LegacyNewDecFromStr(burnedAmount)
-	if err != nil {
-		return err
-	}
-	if totalBurned.IsZero() {
-		return fmt.Errorf("Total burned (slashed) amount is zero")
-	}
+	// Get tier module stake from the delegation shares
+	tierStake := validator.TokensFromSharesTruncated(tierShares)
 
-	// Calculate tier module share of the burned (slashed) amount
+	// Calculate tier module share of the slashed amount
 	// Use Ceil() so the tier module always has sufficient balance to handle all unlocks
-	tierShareBurned := totalBurned.Mul(tierShares.Quo(totalStake)).Ceil().TruncateInt()
-	if tierShareBurned.IsZero() {
-		return fmt.Errorf("Tier module burned (slashed) amount is zero")
+	tierStakeSlashed := totalSlashed.Mul(tierStake.Quo(totalStake)).Ceil().TruncateInt()
+	if tierStakeSlashed.IsZero() {
+		return fmt.Errorf("Tier module slashed amount is zero")
 	}
 
-	// Make sure that the insurance pool has sufficient balance
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 	insurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-	recoverCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierShareBurned))
-	if insurancePoolBalance.Amount.LT(tierShareBurned) {
-		// If tierShareBurned exceeds insurancePoolBalance, recover the whole insurance pool balance
-		recoverCoins = sdk.NewCoins(insurancePoolBalance)
+	reimburseCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierStakeSlashed))
+
+	// If tierStakeSlashed exceeds insurancePoolBalance, reimburse the whole insurance pool balance
+	if insurancePoolBalance.Amount.LT(tierStakeSlashed) {
+		reimburseCoins = sdk.NewCoins(insurancePoolBalance)
 	}
 
-	// Send tier module share of the burned (slashed) amount from the insurance pool to the tier module account
-	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, recoverCoins)
+	// Send slashed tier module stake from the insurance pool to the tier module account
+	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, reimburseCoins)
 	if err != nil {
 		return err
 	}
 
-	// Delegate the tier module share of the burned (slashed) amount from back to the same validator
-	_, err = k.GetStakingKeeper().Delegate(ctx, tierModuleAddr, tierShareBurned, stakingtypes.Unbonded, validator, true)
+	// Delegate slashed tier module stake back to the same validator
+	_, err = k.GetStakingKeeper().Delegate(ctx, tierModuleAddr, tierStakeSlashed, stakingtypes.Unbonded, validator, true)
 	if err != nil {
 		return err
 	}

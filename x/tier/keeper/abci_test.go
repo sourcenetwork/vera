@@ -9,6 +9,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
@@ -21,7 +22,6 @@ func TestBeginBlocker(t *testing.T) {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 
-	lockAmount := math.NewInt(10_000_000_000_000)
 	insurancePoolBalance := math.NewInt(500_000)
 
 	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
@@ -42,19 +42,19 @@ func TestBeginBlocker(t *testing.T) {
 	require.Error(t, err)
 
 	// lock valid amount
-	err = k.Lock(ctx, delAddr, valAddr, lockAmount)
+	err = k.Lock(ctx, delAddr, valAddr, initialDelegatorBalance)
 	require.NoError(t, err)
 
 	tierDelegation, err = k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, math.LegacyNewDecFromInt(initialValidatorBalance), tierDelegation.Shares)
+	require.Equal(t, math.LegacyNewDecFromInt(initialDelegatorBalance), tierDelegation.Shares)
 
 	balance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
 	require.Equal(t, insurancePoolBalance, balance.Amount)
 
 	// verify that lockup was added
 	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, lockAmount, lockedAmt)
+	require.Equal(t, initialDelegatorBalance, lockedAmt)
 
 	// advance to block at height 1000
 	ctx = ctx.WithBlockHeight(1000).WithBlockTime(time.Now().Add(time.Hour))
@@ -71,19 +71,20 @@ func TestHandleSlashingEvents(t *testing.T) {
 
 	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
+	delAddr2, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
+	initialDelegatorBalance2 := math.NewInt(800_000)
 	initialValidatorBalance := math.NewInt(1_000_000)
 	insurancePoolBalance := math.NewInt(500_000)
 	missingSignatureSlashAmount := math.NewInt(100_000)
 	doubleSignSlashAmount := math.NewInt(200_000)
 
-	// slashed tier module amount is 200_000 / 1_200_000 * 100_000 = 16_667
-	tierModuleSlashAmount := math.NewInt(16_667)
-
 	initializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	initializeDelegator(t, &k, ctx, delAddr2, initialDelegatorBalance2)
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 	mintCoinsToModule(t, &k, ctx, types.InsurancePoolName, insurancePoolBalance)
 
@@ -95,18 +96,26 @@ func TestHandleSlashingEvents(t *testing.T) {
 	}
 	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
+	validator, err := k.GetStakingKeeper().GetValidator(ctx, valAddr)
+	require.NoError(t, err)
+	require.Equal(t, initialValidatorBalance, validator.Tokens)
+
+	_, err = k.stakingKeeper.Delegate(ctx, delAddr2, initialDelegatorBalance2, stakingtypes.Unbonded, validator, true)
+
 	err = k.Lock(ctx, delAddr, valAddr, initialDelegatorBalance)
 	require.NoError(t, err)
 
 	balance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
 	require.Equal(t, insurancePoolBalance, balance.Amount)
 
-	expectedTotalStake := initialValidatorBalance.Add(initialDelegatorBalance)
-	validator, err := k.GetStakingKeeper().GetValidator(ctx, valAddr)
+	ctx = ctx.WithBlockHeight(10).WithBlockTime(time.Now().Add(time.Minute))
+
+	expectedTotalStake := initialValidatorBalance.Add(initialDelegatorBalance).Add(initialDelegatorBalance2)
+	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
 	require.Equal(t, expectedTotalStake, validator.Tokens)
 
-	// emit missing_signature slashing event (must trigger recover)
+	// emit missing_signature slashing event
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		"slash",
 		sdk.NewAttribute("address", valAddr.String()),
@@ -121,30 +130,38 @@ func TestHandleSlashingEvents(t *testing.T) {
 
 	tierDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, math.LegacyNewDecFromInt(initialDelegatorBalance), tierDelegation.Shares)
+	tierStake := validator.TokensFromSharesTruncated(tierDelegation.Shares)
+	require.Equal(t, initialDelegatorBalance, tierStake.RoundInt())
 
+	// handle missing_signature event (reimburse slashed tier module stake)
 	err = k.handleSlashingEvents(ctx)
 	require.NoError(t, err)
 
-	// expected remaining insurance pool balance = 500_000 - 16_667 = 483_333
+	// slashed tier module amount is 200_000 / (1_000_000 + 800_000 + 200_000) * 100_000 = 10_000
+	tierModuleSlashAmount := math.NewInt(10_000)
+
 	expectedRemainingInsurancePoolBalance := insurancePoolBalance.Sub(tierModuleSlashAmount)
 	newBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
 	require.Equal(t, expectedRemainingInsurancePoolBalance, newBalance.Amount)
 
-	// expected shares = 200_000 + (16_667 * 200_000 / 1_200_000)
-	expectedNewShares := math.LegacyMustNewDecFromStr("202777.833333333333333333")
+	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
+	require.NoError(t, err)
+	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
+
 	tierDelegation, err = k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, expectedNewShares, tierDelegation.Shares)
+	tierStake = validator.TokensFromSharesTruncated(tierDelegation.Shares)
+	require.Equal(t, initialDelegatorBalance.Add(tierModuleSlashAmount), tierStake.RoundInt())
 
 	// slashed tier module amount is delegated back to the slashed validator
 	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
 	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
 
-	// reset event manager and emit double_sign slashing event (no recover)
+	// reset event manager
 	ctx = ctx.WithBlockHeight(2).WithEventManager(sdk.NewEventManager())
 
+	// and emit double_sign slashing event
 	ctx.EventManager().EmitEvent(sdk.NewEvent(
 		"slash",
 		sdk.NewAttribute("address", valAddr.String()),
@@ -152,6 +169,7 @@ func TestHandleSlashingEvents(t *testing.T) {
 		sdk.NewAttribute("burned", doubleSignSlashAmount.String()),
 	))
 
+	// handle double_sign event (no reimbursement)
 	err = k.handleSlashingEvents(ctx)
 	require.NoError(t, err)
 
@@ -162,7 +180,7 @@ func TestHandleSlashingEvents(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, tierDelegation.Shares, tierDelegationAfter.Shares)
 
-	// total validator stake remains unchanged since the reason was double_sign
+	// total validator stake remains unchanged after the double_sign event
 	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
 	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
