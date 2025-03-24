@@ -20,7 +20,7 @@ import (
 //
 // Callers must Claim the capability, as it is a unique instance which cannot be recreated after dropped.
 // Claiming can be done using the callers capability keeper directly or the policy capability manager provided in the capability package.
-func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marshalType coretypes.PolicyMarshalingType, module string, capability any) (*types.PolicyRecord, *capability.PolicyCapability, error) {
+func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marshalType coretypes.PolicyMarshalingType, module string) (*types.PolicyRecord, *capability.PolicyCapability, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.getACPEngine(ctx)
 
