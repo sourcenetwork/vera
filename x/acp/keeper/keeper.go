@@ -13,8 +13,10 @@ import (
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
+	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	cosmosadapter "github.com/sourcenetwork/sourcehub/x/acp/stores/cosmos"
 
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
@@ -34,6 +36,7 @@ type (
 		authority string
 
 		accountKeeper types.AccountKeeper
+		capKeeper     capabilitykeeper.ScopedKeeper
 	}
 )
 
@@ -140,4 +143,8 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 		k.getRegistrationService(ctx),
 		k.getCommitmentService(ctx),
 	)
+}
+
+func (k *Keeper) getPolicyCapabilityManager(ctx sdk.Context) *capability.PolicyCapabilityManager {
+	return capability.NewPolicyCapabilityManager(k.capKeeper)
 }
