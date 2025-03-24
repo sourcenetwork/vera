@@ -15,6 +15,11 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
 
+// CreateModulePolicy creates a new Policy within the ACP module, bound to some calling module.
+// Returns the created Policy and a Capability, which authorizes the presenter to operate over this policy.
+//
+// Callers must Claim the capability, as it is a unique instance which cannot be recreated after dropped.
+// Claiming can be done using the callers capability keeper directly or the policy capability manager provided in the capability package.
 func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marshalType coretypes.PolicyMarshalingType, module string, capability any) (*types.PolicyRecord, *capability.PolicyCapability, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.getACPEngine(ctx)
@@ -53,6 +58,8 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 	return rec, cap, nil
 }
 
+// ModulePolicyCmdForActorAccount issues a policy command for the policy bound to the provided capability.
+// The command skips authentication and is assumed to be issued by actorAcc, which must be a valid sourcehub account address.
 func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capability.PolicyCapability, cmd *types.PolicyCmd, actorAcc string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -75,6 +82,8 @@ func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capa
 	return k.ModulePolicyCmdForActorDID(goCtx, cap, cmd, actorID)
 }
 
+// ModulePolicyCmdForActorDID issues a policy command for the policy bound to the provided capability.
+// The command skips authentication and is assumed to be issued by the actor given by actorID, which must be a valid DID.
 func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *capability.PolicyCapability, cmd *types.PolicyCmd, actorID string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
