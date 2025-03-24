@@ -22,7 +22,7 @@ const (
 func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.GetACPEngine(ctx)
+	engine := k.getACPEngine(ctx)
 
 	addr, err := hubtypes.AccAddressFromBech32(msg.Creator)
 	if err != nil {

@@ -16,7 +16,7 @@ func (q Querier) RegistrationsCommitmentByCommitment(goCtx context.Context, req 
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	repo := q.GetRegistrationsCommitmentRepository(ctx)
+	repo := q.getRegistrationsCommitmentRepository(ctx)
 
 	iter, err := repo.FilterByCommitment(ctx, req.Commitment)
 	if err != nil {

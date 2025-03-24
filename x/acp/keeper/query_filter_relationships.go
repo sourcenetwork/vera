@@ -18,7 +18,7 @@ func (q Querier) FilterRelationships(goCtx context.Context, req *types.QueryFilt
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := q.GetACPEngine(ctx)
+	engine := q.getACPEngine(ctx)
 
 	records, err := engine.FilterRelationships(goCtx, &coretypes.FilterRelationshipsRequest{
 		PolicyId: req.PolicyId,

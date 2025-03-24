@@ -25,15 +25,15 @@ func TestEndBlocker(t *testing.T) {
 		},
 	}
 
-	engine := k.GetACPEngine(ctx)
+	engine := k.getACPEngine(ctx)
 	resp, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
 		Policy:      `name: test`,
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	})
 	require.NoError(t, err)
 
-	repo := k.GetRegistrationsCommitmentRepository(ctx)
-	service := commitment.NewCommitmentService(k.GetACPEngine(ctx), repo)
+	repo := k.getRegistrationsCommitmentRepository(ctx)
+	service := commitment.NewCommitmentService(k.getACPEngine(ctx), repo)
 	commitment := make([]byte, 32)
 	comm, err := service.SetNewCommitment(ctx, resp.Record.Policy.Id, commitment, coretypes.NewActor("test"), params, "source1234")
 	require.NoError(t, err)

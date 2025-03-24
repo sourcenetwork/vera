@@ -15,7 +15,7 @@ func (q Querier) AccessDecision(goCtx context.Context, req *types.QueryAccessDec
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	repository := q.GetAccessDecisionRepository(ctx)
+	repository := q.getAccessDecisionRepository(ctx)
 
 	decision, err := repository.Get(goCtx, req.Id)
 	if err != nil {

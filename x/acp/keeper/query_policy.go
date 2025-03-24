@@ -18,7 +18,7 @@ func (q Querier) Policy(goCtx context.Context, req *types.QueryPolicyRequest) (*
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := q.GetACPEngine(ctx)
+	engine := q.getACPEngine(ctx)
 
 	response, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{
 		Id: req.Id,

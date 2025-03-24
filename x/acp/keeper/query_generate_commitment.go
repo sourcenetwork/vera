@@ -21,9 +21,9 @@ func (q Querier) GenerateCommitment(goCtx context.Context, req *types.QueryGener
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := q.GetACPEngine(ctx)
+	engine := q.getACPEngine(ctx)
 
-	commitRepo := q.GetRegistrationsCommitmentRepository(ctx)
+	commitRepo := q.getRegistrationsCommitmentRepository(ctx)
 	commitmentService := commitment.NewCommitmentService(engine, commitRepo)
 
 	comm, err := commitmentService.BuildCommitment(ctx, req.PolicyId, req.Actor, req.Objects)
