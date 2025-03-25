@@ -38,12 +38,18 @@ func TestEndBlocker(t *testing.T) {
 	comm, err := service.SetNewCommitment(ctx, resp.Record.Policy.Id, commitment, coretypes.NewActor("test"), params, "source1234")
 	require.NoError(t, err)
 
+	// no expired commitments at this point
+	expired := k.EndBlocker(ctx)
+	require.Nil(t, expired)
+
 	// set commitment to expire
 	ctx = ctx.WithBlockTime(time.Now().Add(time.Nanosecond * 2))
 
-	expired, err := k.EndBlocker(ctx)
-	require.NoError(t, err)
+	// should return exactly one expired commitment
+	expired = k.EndBlocker(ctx)
+	require.NotNil(t, expired)
 	require.Len(t, expired, 1)
+
 	want := comm
 	want.Expired = true
 	require.Equal(t, want, expired[0])
