@@ -8,6 +8,7 @@ package acp
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -25,6 +26,7 @@ const (
 	Msg_SignedPolicyCmd_FullMethodName = "/sourcehub.acp.Msg/SignedPolicyCmd"
 	Msg_BearerPolicyCmd_FullMethodName = "/sourcehub.acp.Msg/BearerPolicyCmd"
 	Msg_DirectPolicyCmd_FullMethodName = "/sourcehub.acp.Msg/DirectPolicyCmd"
+	Msg_MsgEditPolicy_FullMethodName   = "/sourcehub.acp.Msg/MsgEditPolicy"
 )
 
 // MsgClient is the client API for Msg service.
@@ -52,6 +54,7 @@ type MsgClient interface {
 	// Lastly, the Bearer token MUST be bound to some SourceHub account.
 	BearerPolicyCmd(ctx context.Context, in *MsgBearerPolicyCmd, opts ...grpc.CallOption) (*MsgBearerPolicyCmdResponse, error)
 	DirectPolicyCmd(ctx context.Context, in *MsgDirectPolicyCmd, opts ...grpc.CallOption) (*MsgDirectPolicyCmdResponse, error)
+	MsgEditPolicy(ctx context.Context, in *MsgMsgEditPolicy, opts ...grpc.CallOption) (*MsgMsgEditPolicyResponse, error)
 }
 
 type msgClient struct {
@@ -122,6 +125,16 @@ func (c *msgClient) DirectPolicyCmd(ctx context.Context, in *MsgDirectPolicyCmd,
 	return out, nil
 }
 
+func (c *msgClient) MsgEditPolicy(ctx context.Context, in *MsgMsgEditPolicy, opts ...grpc.CallOption) (*MsgMsgEditPolicyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgMsgEditPolicyResponse)
+	err := c.cc.Invoke(ctx, Msg_MsgEditPolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -147,6 +160,7 @@ type MsgServer interface {
 	// Lastly, the Bearer token MUST be bound to some SourceHub account.
 	BearerPolicyCmd(context.Context, *MsgBearerPolicyCmd) (*MsgBearerPolicyCmdResponse, error)
 	DirectPolicyCmd(context.Context, *MsgDirectPolicyCmd) (*MsgDirectPolicyCmdResponse, error)
+	MsgEditPolicy(context.Context, *MsgMsgEditPolicy) (*MsgMsgEditPolicyResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -174,6 +188,9 @@ func (UnimplementedMsgServer) BearerPolicyCmd(context.Context, *MsgBearerPolicyC
 }
 func (UnimplementedMsgServer) DirectPolicyCmd(context.Context, *MsgDirectPolicyCmd) (*MsgDirectPolicyCmdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DirectPolicyCmd not implemented")
+}
+func (UnimplementedMsgServer) MsgEditPolicy(context.Context, *MsgMsgEditPolicy) (*MsgMsgEditPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MsgEditPolicy not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -304,6 +321,24 @@ func _Msg_DirectPolicyCmd_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_MsgEditPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgMsgEditPolicy)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).MsgEditPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_MsgEditPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).MsgEditPolicy(ctx, req.(*MsgMsgEditPolicy))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -334,6 +369,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DirectPolicyCmd",
 			Handler:    _Msg_DirectPolicyCmd_Handler,
+		},
+		{
+			MethodName: "MsgEditPolicy",
+			Handler:    _Msg_MsgEditPolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
