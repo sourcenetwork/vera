@@ -41,7 +41,7 @@ service Msg {
   // - resources cannot be removed
   // - the specification of a policy cannot be mutated
   // Violations of these constraints will return an error.
-  rpc EditPolicy   (MsgEditPolicy) returns (MsgMsgEditPolicyResponse  );
+  rpc EditPolicy   (MsgEditPolicy) returns (MsgEditPolicyResponse  );
   
   // CheckAccess executes an Access Request for an User and stores the result of the evaluation in SourceHub.
   // The resulting evaluation is used to generate a cryptographic proof that the given Access Request
