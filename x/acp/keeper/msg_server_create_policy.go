@@ -14,11 +14,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-const (
-	txHashMapKey  = "tx_hash"
-	creatorMapKey = "creator"
-)
-
 func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
