@@ -45,7 +45,7 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 		return nil, err
 	}
 
-	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
+	coreResult, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
 		Policy:      msg.Policy,
 		MarshalType: msg.MarshalType,
 		Metadata:    metadata,

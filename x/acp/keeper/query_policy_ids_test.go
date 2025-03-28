@@ -68,7 +68,6 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 				Name: "actor-resource",
 				Doc:  "Test actor resource",
 			},
-			Version: "1.0",
 		}
 
 		var policyString string

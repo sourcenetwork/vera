@@ -10,6 +10,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
 
 func TestEndBlocker(t *testing.T) {
@@ -26,6 +27,8 @@ func TestEndBlocker(t *testing.T) {
 	}
 
 	engine := k.GetACPEngine(ctx)
+	ctx, err := utils.InjectPrincipal(ctx, "did:example:bob")
+	require.NoError(t, err)
 	resp, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
 		Policy:      `name: test`,
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
