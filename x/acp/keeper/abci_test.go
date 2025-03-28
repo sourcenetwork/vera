@@ -42,14 +42,16 @@ func TestEndBlocker(t *testing.T) {
 	require.NoError(t, err)
 
 	// no expired commitments at this point
-	expired := k.EndBlocker(ctx)
+	expired, err := k.EndBlocker(ctx)
+	require.NoError(t, err)
 	require.Nil(t, expired)
 
 	// set commitment to expire
 	ctx = ctx.WithBlockTime(time.Now().Add(time.Nanosecond * 2))
 
 	// should return exactly one expired commitment
-	expired = k.EndBlocker(ctx)
+	expired, err = k.EndBlocker(ctx)
+	require.NoError(t, err)
 	require.NotNil(t, expired)
 	require.Len(t, expired, 1)
 

@@ -13,17 +13,16 @@ import (
 //
 // Currently EndBlocker iterates over valid (non-expired) RegistrationCommitments and checks whether
 // they are still valid, otherwise flags them as expired.
-func (k *Keeper) EndBlocker(goCtx context.Context) []*types.RegistrationsCommitment {
+func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommitment, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.GetACPEngine(ctx)
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
 	service := commitment.NewCommitmentService(engine, repo)
 
-	// If an error occurs, return nil commitments and log the error
 	commitments, err := service.FlagExpiredCommitments(ctx)
 	if err != nil {
-		k.Logger().Error("EndBlocker failed", "error", err)
+		return nil, err
 	}
 
-	return commitments
+	return commitments, nil
 }

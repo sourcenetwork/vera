@@ -14,7 +14,7 @@ import (
 func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.getACPEngine(ctx)
+	engine := k.GetACPEngine(ctx)
 
 	_, err := engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
 		Id: msg.PolicyId,

@@ -3,9 +3,9 @@ package sourcehub.acp;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
+import "sourcehub/acp/time.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcenetwork/acp_core/request.proto";
-import "sourcehub/acp/time.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
