@@ -16,13 +16,6 @@ func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (
 
 	engine := k.GetACPEngine(ctx)
 
-	_, err := engine.GetPolicy(ctx, &coretypes.GetPolicyRequest{
-		Id: msg.PolicyId,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("EditPolicy: %w", err)
-	}
-
 	did, err := k.issueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("EditPolicy: %w", err)
@@ -48,7 +41,7 @@ func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (
 	}
 
 	return &types.MsgEditPolicyResponse{
-		RelationshipsRemoved: 0, // FIXME
+		RelationshipsRemoved: response.RelatinshipsRemoved,
 		Record:               rec,
 	}, nil
 }

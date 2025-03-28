@@ -48,4 +48,5 @@ func registerResponses(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSignedPolicyCmdResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgDirectPolicyCmdResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgUpdateParamsResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgEditPolicyResponse{})
 }

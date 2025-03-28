@@ -83,12 +83,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
-				{
-					RpcMethod:      "MsgEditPolicy",
-					Use:            "msg-edit-policy [policy-id]",
-					Short:          "Send a MsgEditPolicy tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "policyId"}},
-				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
