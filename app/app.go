@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
@@ -24,6 +25,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	testdata_pulsar "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -357,8 +359,19 @@ func New(
 		mempool,
 	)
 
-	app.App.SetPrepareProposal(proposalHandler.PrepareProposalHandler())
-	app.App.SetProcessProposal(proposalHandler.ProcessProposalHandler())
+	prepareProposal := proposalHandler.PrepareProposalHandler()
+	wrappedPrepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), "prepare_proposal")
+		return prepareProposal(ctx, req)
+	}
+	app.App.SetPrepareProposal(wrappedPrepareProposal)
+
+	processProposal := proposalHandler.ProcessProposalHandler()
+	wrappedProcessProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), "process_proposal")
+		return processProposal(ctx, req)
+	}
+	app.App.SetProcessProposal(wrappedProcessProposal)
 
 	/****  Module Options ****/
 
