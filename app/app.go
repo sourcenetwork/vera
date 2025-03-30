@@ -58,6 +58,7 @@ import (
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	"github.com/hashicorp/go-metrics"
 	abci "github.com/skip-mev/block-sdk/v2/abci"
 	"github.com/skip-mev/block-sdk/v2/block"
 	"github.com/skip-mev/block-sdk/v2/block/base"
@@ -362,6 +363,11 @@ func New(
 	prepareProposal := proposalHandler.PrepareProposalHandler()
 	wrappedPrepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
 		defer telemetry.MeasureSince(time.Now(), "prepare_proposal")
+		telemetry.IncrCounterWithLabels(
+			[]string{"tx_count"},
+			float32(len(req.Txs)),
+			[]metrics.Label{telemetry.NewLabel("method", "prepare_proposal")},
+		)
 		return prepareProposal(ctx, req)
 	}
 	app.App.SetPrepareProposal(wrappedPrepareProposal)
@@ -369,6 +375,11 @@ func New(
 	processProposal := proposalHandler.ProcessProposalHandler()
 	wrappedProcessProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
 		defer telemetry.MeasureSince(time.Now(), "process_proposal")
+		telemetry.IncrCounterWithLabels(
+			[]string{"tx_count"},
+			float32(len(req.Txs)),
+			[]metrics.Label{telemetry.NewLabel("method", "process_proposal")},
+		)
 		return processProposal(ctx, req)
 	}
 	app.App.SetProcessProposal(wrappedProcessProposal)
