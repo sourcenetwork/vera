@@ -10,10 +10,12 @@ import (
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
@@ -99,6 +101,8 @@ func (k Keeper) Logger() log.Logger {
 // CompleteUnlocking completes the unlocking process for all lockups that have reached their unlock time.
 // It is called at the end of each Epoch.
 func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CompleteUnlocking, metrics.Latency)
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, unlockingLockup types.UnlockingLockup) error {
@@ -147,6 +151,8 @@ func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
 
 // Lock locks the stake of a delegator to a validator.
 func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Lock, metrics.Latency)
+
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
 		return types.ErrInvalidAmount.Wrap("lock non-positive amount")
@@ -201,6 +207,9 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 // The specified lockup amount will be unlocked in CompleteUnlocking after the unlocking period has passed.
 func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
+
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Unlock, metrics.Latency)
+
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
 		return 0, time.Time{}, time.Time{}, types.ErrInvalidAmount.Wrap("unlock non-positive amount")
@@ -257,6 +266,9 @@ func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk
 // The redelegation will be completed after the unbonding period has passed (e.g. at completionTime).
 func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress,
 	amt math.Int) (time.Time, error) {
+
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Redelegate, metrics.Latency)
+
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
 		return time.Time{}, types.ErrInvalidAmount.Wrap("redelegate non-positive amount")
@@ -303,6 +315,9 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 // Reverts the specified amt if a valid value is provided (e.g. 0 < amt < unlocking lockup amount).
 func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 	creationHeight int64, amt math.Int) error {
+
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CancelUnlocking, metrics.Latency)
+
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
 		return types.ErrInvalidAmount.Wrap("cancel unlocking non-positive amount")
