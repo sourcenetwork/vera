@@ -58,12 +58,13 @@ import (
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	"github.com/hashicorp/go-metrics"
+	gometrics "github.com/hashicorp/go-metrics"
 	abci "github.com/skip-mev/block-sdk/v2/abci"
 	"github.com/skip-mev/block-sdk/v2/block"
 	"github.com/skip-mev/block-sdk/v2/block/base"
 
 	"github.com/sourcenetwork/sourcehub/app/ante"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
@@ -362,11 +363,11 @@ func New(
 
 	prepareProposal := proposalHandler.PrepareProposalHandler()
 	wrappedPrepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
-		defer telemetry.MeasureSince(time.Now(), "prepare_proposal")
+		defer telemetry.MeasureSince(time.Now(), metrics.PrepareProposal)
 		telemetry.IncrCounterWithLabels(
-			[]string{"tx_count"},
+			[]string{metrics.PrepareProposal, metrics.Transaction, metrics.Count},
 			float32(len(req.Txs)),
-			[]metrics.Label{telemetry.NewLabel("method", "prepare_proposal")},
+			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
 		)
 		return prepareProposal(ctx, req)
 	}
@@ -374,11 +375,11 @@ func New(
 
 	processProposal := proposalHandler.ProcessProposalHandler()
 	wrappedProcessProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
-		defer telemetry.MeasureSince(time.Now(), "process_proposal")
+		defer telemetry.MeasureSince(time.Now(), metrics.ProcessProposal)
 		telemetry.IncrCounterWithLabels(
-			[]string{"tx_count"},
+			[]string{metrics.ProcessProposal, metrics.Transaction, metrics.Count},
 			float32(len(req.Txs)),
-			[]metrics.Label{telemetry.NewLabel("method", "process_proposal")},
+			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
 		)
 		return processProposal(ctx, req)
 	}
