@@ -2,8 +2,10 @@ package keeper
 
 import (
 	"context"
+	"time"
 
 	"cosmossdk.io/math"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -17,6 +19,8 @@ import (
 // otherwise the InsurancePoolFee (1%) is also sent to the developer pool.
 // Remaining 97% of the rewards is burned.
 func (k *Keeper) BeginBlocker(ctx context.Context) error {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
+
 	params := k.GetParams(ctx)
 
 	// Process rewards every N blocks
