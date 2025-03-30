@@ -2,7 +2,9 @@ package keeper
 
 import (
 	"context"
+	"time"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -14,6 +16,8 @@ import (
 // Currently EndBlocker iterates over valid (non-expired) RegistrationCommitments and checks whether
 // they are still valid, otherwise flags them as expired.
 func (k *Keeper) EndBlocker(goCtx context.Context) []*types.RegistrationsCommitment {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.GetACPEngine(ctx)
 	repo := k.GetRegistrationsCommitmentRepository(ctx)
