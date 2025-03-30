@@ -17,10 +17,16 @@ $BIN genesis gentx $VALIDATOR 100000000000000uopen --chain-id $CHAIN_ID --keyrin
 
 $BIN genesis collect-gentxs
 
+# app.toml
+sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.001uopen,0.001ucredit"/' ~/.sourcehub/config/app.toml
+sed -i 's/^enabled = false/enabled = true/' ~/.sourcehub/config/app.toml
+sed -i 's/^prometheus-retention-time = 0/prometheus-retention-time = 60/' ~/.sourcehub/config/app.toml
+
+# config.toml
 sed -i 's/^timeout_propose = .*/timeout_propose = "500ms"/' ~/.sourcehub/config/config.toml
 sed -i 's/^timeout_prevote = .*/timeout_prevote = "500ms"/' ~/.sourcehub/config/config.toml
 sed -i 's/^timeout_precommit = .*/timeout_precommit = "500ms"/' ~/.sourcehub/config/config.toml
 sed -i 's/^timeout_commit = .*/timeout_commit = "1s"/' ~/.sourcehub/config/config.toml
-sed -i 's/minimum-gas-prices = ""/minimum-gas-prices = "0.001uopen,0.001ucredit"/' ~/.sourcehub/config/app.toml
+sed -i 's/^prometheus = false/prometheus = true/' ~/.sourcehub/config/config.toml
 
 echo "Validator Address $VALIDATOR_ADDR"
