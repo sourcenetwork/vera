@@ -36,6 +36,44 @@ func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	return nil
 }
 
+type EditPolicyAction struct {
+	Id          string
+	Policy      string
+	Creator     *TestActor
+	Expected    *coretypes.Policy
+	ExpectedErr error
+	Response    *types.MsgEditPolicyResponse
+}
+
+func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
+	msg := &types.MsgEditPolicy{
+		PolicyId:    a.Id,
+		Policy:      a.Policy,
+		Creator:     a.Creator.SourceHubAddr,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	response, err := ctx.Executor.EditPolicy(ctx, msg)
+	a.Response = response
+
+	AssertError(ctx, err, a.ExpectedErr)
+	if a.Expected != nil {
+		require.NotNil(ctx.T, response)
+		AssertValue(ctx, response.Record.Policy, a.Expected)
+
+		getResponse, getErr := ctx.Executor.Policy(ctx, &types.QueryPolicyRequest{
+			Id: a.Id,
+		})
+		require.NoError(ctx.T, getErr)
+		require.Equal(ctx.T, a.Expected, getResponse.Record.Policy)
+	}
+	if response != nil {
+		ctx.State.PolicyCreator = a.Creator.SourceHubAddr
+		ctx.State.PolicyId = response.Record.Policy.Id
+		return response.Record.Policy
+	}
+	return nil
+}
+
 type SetRelationshipAction struct {
 	PolicyId     string
 	Relationship *coretypes.Relationship

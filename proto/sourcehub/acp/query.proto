@@ -6,106 +6,96 @@ import "amino/amino.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "sourcehub/acp/params.proto";
-import "sourcenetwork/acp_core/request.proto";
-import "sourcehub/acp/registration.proto";
-import "sourcehub/acp/record.proto";
+import "sourcehub/acp/access_decision.proto";
 import "sourcehub/acp/commitment.proto";
+import "sourcehub/acp/params.proto";
+import "sourcehub/acp/record.proto";
+import "sourcehub/acp/registration.proto";
 import "sourcenetwork/acp_core/policy.proto";
 import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 import "sourcenetwork/acp_core/relationship_selector.proto";
-import "sourcehub/acp/access_decision.proto";
+import "sourcenetwork/acp_core/request.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
 // Query defines the gRPC querier service.
 service Query {
-  
   // Parameters queries the parameters of the module.
-  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/params";
-  
   }
-  
+
   // Policy returns a Policy with the given ID.
-  rpc Policy (QueryPolicyRequest) returns (QueryPolicyResponse) {
+  rpc Policy(QueryPolicyRequest) returns (QueryPolicyResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/policy/{id}";
-  
   }
-  
+
   // PolicyIds returns list of Ids for Policies registered in the system.
-  rpc PolicyIds (QueryPolicyIdsRequest) returns (QueryPolicyIdsResponse) {
+  rpc PolicyIds(QueryPolicyIdsRequest) returns (QueryPolicyIdsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/policy_ids";
-  
   }
-  
+
   // FilterRelationships returns filtered set of Relationships in a Policy.
-  rpc FilterRelationships (QueryFilterRelationshipsRequest) returns (QueryFilterRelationshipsResponse) {
+  rpc FilterRelationships(QueryFilterRelationshipsRequest) returns (QueryFilterRelationshipsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/filter_relationships/{policy_id}";
-  
   }
-  
+
   // VerifyAccessRequest verifies whether an Access Request is accepted with respect to the given Policy's Relation Graph.
-  rpc VerifyAccessRequest (QueryVerifyAccessRequestRequest) returns (QueryVerifyAccessRequestResponse) {
+  rpc VerifyAccessRequest(QueryVerifyAccessRequestRequest) returns (QueryVerifyAccessRequestResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/verify_access_request/{policy_id}";
-  
   }
-  
+
   // ValidatePolicy verifies whether the given Policy definition is properly formatted
-  rpc ValidatePolicy (QueryValidatePolicyRequest) returns (QueryValidatePolicyResponse) {
+  rpc ValidatePolicy(QueryValidatePolicyRequest) returns (QueryValidatePolicyResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/validate_policy/{policy}";
-  
   }
-  
+
   // AccessDecision queries the system for an AccessDecision with the given ID.
-  rpc AccessDecision (QueryAccessDecisionRequest) returns (QueryAccessDecisionResponse) {
+  rpc AccessDecision(QueryAccessDecisionRequest) returns (QueryAccessDecisionResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/access_decision/{id}";
-  
   }
-  
+
   // ObjectOwner returns the Actor ID of the the given Object's owner
-  rpc ObjectOwner (QueryObjectOwnerRequest) returns (QueryObjectOwnerResponse) {
+  rpc ObjectOwner(QueryObjectOwnerRequest) returns (QueryObjectOwnerResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/object_owner/{policy_id}/{object.resource}/{object.id}";
-  
   }
-  
+
   // RegistrationsCommitment returns a specific RegistrationsCommitment record
-  rpc RegistrationsCommitment (QueryRegistrationsCommitmentRequest) returns (QueryRegistrationsCommitmentResponse) {
+  rpc RegistrationsCommitment(QueryRegistrationsCommitmentRequest) returns (QueryRegistrationsCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment";
-  
   }
-  
+
   // RegistrationsCommitmentByCommitment returns all RegistrationCommitment records with a given commitment
-  rpc RegistrationsCommitmentByCommitment (QueryRegistrationsCommitmentByCommitmentRequest) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
+  rpc RegistrationsCommitmentByCommitment(QueryRegistrationsCommitmentByCommitmentRequest) returns (QueryRegistrationsCommitmentByCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/registrations_commitment_by_commitment";
-  
   }
-  
+
   // GenerateCommitment generates a Object registration commitment for the given objects
   //
   // Note: this operation assures the commitment is valid (no object is registered and the policy exists)
   // but exposes the Object Ids to the RPC node.
   // ONLY use this method if the node is trusted
-  rpc GenerateCommitment (QueryGenerateCommitmentRequest) returns (QueryGenerateCommitmentResponse) {
+  rpc GenerateCommitment(QueryGenerateCommitmentRequest) returns (QueryGenerateCommitmentResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/generate_commitment";
-  
   }
-  
+
   // HijackAttemptsByPolicy returns, for a given policy, all AmendmentEvent whose hijack flag is true
-  rpc HijackAttemptsByPolicy (QueryHijackAttemptsByPolicyRequest) returns (QueryHijackAttemptsByPolicyResponse) {
+  rpc HijackAttemptsByPolicy(QueryHijackAttemptsByPolicyRequest) returns (QueryHijackAttemptsByPolicyResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/acp/hijack_attempts_by_policy";
-  
   }
 }
+
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
-  
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }
 
 message QueryPolicyRequest {
@@ -113,7 +103,7 @@ message QueryPolicyRequest {
 }
 
 message QueryPolicyResponse {
- PolicyRecord record = 1;
+  PolicyRecord record = 1;
 }
 
 message QueryPolicyIdsRequest {
@@ -126,8 +116,8 @@ message QueryPolicyIdsResponse {
 }
 
 message QueryFilterRelationshipsRequest {
-  string                                      policy_id = 1;
-  sourcenetwork.acp_core.RelationshipSelector selector  = 2;
+  string policy_id = 1;
+  sourcenetwork.acp_core.RelationshipSelector selector = 2;
 }
 
 message QueryFilterRelationshipsResponse {
@@ -135,7 +125,7 @@ message QueryFilterRelationshipsResponse {
 }
 
 message QueryVerifyAccessRequestRequest {
-  string                               policy_id      = 1;
+  string policy_id = 1;
   sourcenetwork.acp_core.AccessRequest access_request = 2;
 }
 
@@ -144,12 +134,12 @@ message QueryVerifyAccessRequestResponse {
 }
 
 message QueryValidatePolicyRequest {
-  string                                      policy       = 1;
+  string policy = 1;
   sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 3;
 }
 
 message QueryValidatePolicyResponse {
-  bool   valid     = 1;
+  bool valid = 1;
   string error_msg = 2;
 }
 
@@ -162,13 +152,13 @@ message QueryAccessDecisionResponse {
 }
 
 message QueryObjectOwnerRequest {
-  string                        policy_id = 1;
-  sourcenetwork.acp_core.Object object    = 2;
+  string policy_id = 1;
+  sourcenetwork.acp_core.Object object = 2;
 }
 
 message QueryObjectOwnerResponse {
-  bool   is_registered = 1;
-  RelationshipRecord record      = 2;
+  bool is_registered = 1;
+  RelationshipRecord record = 2;
 }
 
 message QueryRegistrationsCommitmentRequest {
@@ -188,16 +178,16 @@ message QueryRegistrationsCommitmentByCommitmentResponse {
 }
 
 message QueryGenerateCommitmentRequest {
-           string                        policy_id = 1;
-  repeated sourcenetwork.acp_core.Object objects   = 2;
-           sourcenetwork.acp_core.Actor  actor     = 3;
+  string policy_id = 1;
+  repeated sourcenetwork.acp_core.Object objects = 2;
+  sourcenetwork.acp_core.Actor actor = 3;
 }
 
 message QueryGenerateCommitmentResponse {
-           bytes             commitment     = 1;
-           string            hex_commitment = 2;
-  repeated RegistrationProof proofs         = 3;
-  repeated string            proofs_json    = 4;
+  bytes commitment = 1;
+  string hex_commitment = 2;
+  repeated RegistrationProof proofs = 3;
+  repeated string proofs_json = 4;
 }
 
 message QueryHijackAttemptsByPolicyRequest {
@@ -207,4 +197,3 @@ message QueryHijackAttemptsByPolicyRequest {
 message QueryHijackAttemptsByPolicyResponse {
   repeated AmendmentEvent events = 1;
 }
-

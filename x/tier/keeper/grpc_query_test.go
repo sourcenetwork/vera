@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
@@ -18,9 +17,7 @@ func TestParamsQuery(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Params(ctx, &types.QueryParamsRequest{})
-
+	response, err := k.Params(ctx, &types.QueryParamsRequest{})
 	require.NoError(t, err)
 	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
 }
@@ -30,9 +27,7 @@ func TestParamsQuery_InvalidRequest(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Params(ctx, nil)
-
+	response, err := k.Params(ctx, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)
@@ -50,8 +45,7 @@ func TestLockupQuery(t *testing.T) {
 	err = k.AddLockup(ctx, delAddr, valAddr, amount)
 	require.NoError(t, err)
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Lockup(ctx, &types.LockupRequest{
+	response, err := k.Lockup(ctx, &types.LockupRequest{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
 	})
@@ -71,9 +65,7 @@ func TestLockupQuery_InvalidRequest(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Lockup(ctx, nil)
-
+	response, err := k.Lockup(ctx, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)
@@ -94,11 +86,9 @@ func TestLockupsQuery(t *testing.T) {
 	err = k.AddLockup(ctx, delAddr, valAddr, amount2)
 	require.NoError(t, err)
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Lockups(ctx, &types.LockupsRequest{
+	response, err := k.Lockups(ctx, &types.LockupsRequest{
 		DelegatorAddress: delAddr.String(),
 	})
-
 	require.NoError(t, err)
 	require.Len(t, response.Lockups, 1)
 	require.Equal(t, amount1.Add(amount2), response.Lockups[0].Amount)
@@ -109,9 +99,7 @@ func TestLockupsQuery_InvalidRequest(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.Lockups(ctx, nil)
-
+	response, err := k.Lockups(ctx, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)
@@ -135,8 +123,7 @@ func TestUnlockingLockupQuery(t *testing.T) {
 
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, int64(1), amount, completionTime, unlockTime)
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.UnlockingLockup(ctx, &types.UnlockingLockupRequest{
+	response, err := k.UnlockingLockup(ctx, &types.UnlockingLockupRequest{
 		DelegatorAddress: delAddr.String(),
 		ValidatorAddress: valAddr.String(),
 		CreationHeight:   1,
@@ -160,9 +147,7 @@ func TestUnlockingLockupQuery_InvalidRequest(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.UnlockingLockup(ctx, nil)
-
+	response, err := k.UnlockingLockup(ctx, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)
@@ -192,11 +177,9 @@ func TestUnlockingLockupsQuery(t *testing.T) {
 	unlockTime2 := ctx.BlockTime().Add(epochDuration * time.Duration(params.UnlockingEpochs))
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, int64(2), amount2, completionTime2, unlockTime2)
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.UnlockingLockups(ctx, &types.UnlockingLockupsRequest{
+	response, err := k.UnlockingLockups(ctx, &types.UnlockingLockupsRequest{
 		DelegatorAddress: delAddr.String(),
 	})
-
 	require.NoError(t, err)
 	require.Len(t, response.UnlockingLockups, 2)
 
@@ -216,9 +199,7 @@ func TestUnlockingLockupsQuery_InvalidRequest(t *testing.T) {
 	params := k.GetParams(ctx)
 	require.NoError(t, k.SetParams(ctx, params))
 
-	querier := tierkeeper.NewQuerier(k)
-	response, err := querier.UnlockingLockups(ctx, nil)
-
+	response, err := k.UnlockingLockups(ctx, nil)
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)

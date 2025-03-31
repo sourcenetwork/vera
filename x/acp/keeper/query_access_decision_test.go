@@ -63,10 +63,9 @@ func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper)
 }
 
 func (s *queryAccessDecisionSuite) TestQueryAccessDecision_ValidRequest() {
-	ctx, keeper := s.setup(s.T())
-	querier := NewQuerier(keeper)
+	ctx, k := s.setup(s.T())
 
-	resp, err := querier.AccessDecision(ctx, &types.QueryAccessDecisionRequest{
+	resp, err := k.AccessDecision(ctx, &types.QueryAccessDecisionRequest{
 		Id: s.testDecision.Id,
 	})
 
@@ -76,10 +75,9 @@ func (s *queryAccessDecisionSuite) TestQueryAccessDecision_ValidRequest() {
 }
 
 func (s *queryAccessDecisionSuite) TestQueryAccessDecision_InvalidRequest() {
-	ctx, keeper := s.setup(s.T())
-	querier := NewQuerier(keeper)
+	ctx, k := s.setup(s.T())
 
-	resp, err := querier.AccessDecision(ctx, nil)
+	resp, err := k.AccessDecision(ctx, nil)
 
 	require.Error(s.T(), err)
 	require.Nil(s.T(), resp)
@@ -87,10 +85,9 @@ func (s *queryAccessDecisionSuite) TestQueryAccessDecision_InvalidRequest() {
 }
 
 func (s *queryAccessDecisionSuite) TestQueryAccessDecision_InvalidId() {
-	ctx, keeper := s.setup(s.T())
-	querier := NewQuerier(keeper)
+	ctx, k := s.setup(s.T())
 
-	resp, err := querier.AccessDecision(ctx, &types.QueryAccessDecisionRequest{
+	resp, err := k.AccessDecision(ctx, &types.QueryAccessDecisionRequest{
 		Id: "",
 	})
 

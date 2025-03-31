@@ -98,7 +98,7 @@ func (k Keeper) Logger() log.Logger {
 
 // CompleteUnlocking completes the unlocking process for all lockups that have reached their unlock time.
 // It is called at the end of each Epoch.
-func (k Keeper) CompleteUnlocking(ctx context.Context) error {
+func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, unlockingLockup types.UnlockingLockup) error {
@@ -146,7 +146,7 @@ func (k Keeper) CompleteUnlocking(ctx context.Context) error {
 }
 
 // Lock locks the stake of a delegator to a validator.
-func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
+func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
 		return types.ErrInvalidAmount.Wrap("lock non-positive amount")
@@ -199,7 +199,7 @@ func (k Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.Va
 
 // Unlock initiates the unlocking of the specified lockup amount of a delegator from a validator.
 // The specified lockup amount will be unlocked in CompleteUnlocking after the unlocking period has passed.
-func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
@@ -245,8 +245,8 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
-			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.String()),
-			sdk.NewAttribute(types.AttributeKeyUnlockTime, unlockTime.String()),
+			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.Format(time.RFC3339)),
+			sdk.NewAttribute(types.AttributeKeyUnlockTime, unlockTime.Format(time.RFC3339)),
 		),
 	)
 
@@ -255,7 +255,7 @@ func (k Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.
 
 // Redelegate redelegates the stake of a delegator from a source validator to a destination validator.
 // The redelegation will be completed after the unbonding period has passed (e.g. at completionTime).
-func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress,
+func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress,
 	amt math.Int) (time.Time, error) {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
@@ -292,7 +292,7 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 			sdk.NewAttribute(types.AttributeKeySourceValidator, srcValAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyDestinationValidator, dstValAddr.String()),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
-			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.String()),
+			sdk.NewAttribute(types.AttributeKeyCompletionTime, completionTime.Format(time.RFC3339)),
 		),
 	)
 
@@ -301,7 +301,7 @@ func (k Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAd
 
 // CancelUnlocking effectively cancels the pending unlocking lockup partially or in full.
 // Reverts the specified amt if a valid value is provided (e.g. 0 < amt < unlocking lockup amount).
-func (k Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
+func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 	creationHeight int64, amt math.Int) error {
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {

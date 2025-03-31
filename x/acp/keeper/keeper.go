@@ -74,7 +74,7 @@ func (k Keeper) Logger() log.Logger {
 // getAccessDecisionRepository returns the module's default access decision repository
 func (k *Keeper) getAccessDecisionRepository(ctx sdk.Context) access_decision.Repository {
 	kv := k.storeService.OpenKVStore(ctx)
-	prefixKey := []byte(types.AccessDecisionRepositoryKey)
+	prefixKey := []byte(types.AccessDecisionRepositoryKeyPrefix)
 	adapted := runtime.KVStoreAdapter(kv)
 	adapted = prefix.NewStore(adapted, prefixKey)
 	return access_decision.NewAccessDecisionRepository(adapted)
@@ -99,7 +99,7 @@ func (k *Keeper) getACPEngine(ctx sdk.Context) *services.EngineService {
 func (k *Keeper) getRegistrationsCommitmentRepository(ctx sdk.Context) *commitment.CommitmentRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
-	kv = primitives.NewPrefixedKV(kv, []byte(types.RegistrationsCommitmentPrefix))
+	kv = primitives.NewPrefixedKV(kv, []byte(types.RegistrationsCommitmentKeyPrefix))
 	repo, err := commitment.NewCommitmentRepository(kv)
 	if err != nil {
 		panic(err)
@@ -111,7 +111,7 @@ func (k *Keeper) getRegistrationsCommitmentRepository(ctx sdk.Context) *commitme
 func (k *Keeper) getAmendmentEventRepository(ctx sdk.Context) *registration.AmendmentEventRepository {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
-	kv = primitives.NewPrefixedKV(kv, []byte(types.ObjectEventsPrefix))
+	kv = primitives.NewPrefixedKV(kv, []byte(types.AmendmentEventKeyPrefix))
 	repo, err := registration.NewAmendmentEventRepository(kv)
 	if err != nil {
 		panic(err)
