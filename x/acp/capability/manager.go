@@ -19,7 +19,7 @@ import (
 //
 // Requires a scoped capability keeper, which authenticates the caller and limits
 // the capabilities they have access to.
-func NewPolicyCapabilityManager(keeper capabilitykeeper.ScopedKeeper) *PolicyCapabilityManager {
+func NewPolicyCapabilityManager(keeper *capabilitykeeper.ScopedKeeper) *PolicyCapabilityManager {
 	return &PolicyCapabilityManager{
 		scopedKeeper: keeper,
 	}
@@ -29,7 +29,7 @@ func NewPolicyCapabilityManager(keeper capabilitykeeper.ScopedKeeper) *PolicyCap
 //
 // The manager provides methods to claim and fetch capabilities returned by the acp keeper.
 type PolicyCapabilityManager struct {
-	scopedKeeper capabilitykeeper.ScopedKeeper
+	scopedKeeper *capabilitykeeper.ScopedKeeper
 }
 
 // Fetch looks up a PolicyCapability based on a policyId.
