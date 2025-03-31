@@ -13,7 +13,7 @@ import (
 )
 
 // mintCredit mints a coin and sends it to the specified address.
-func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
+func (k *Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.Int) error {
 	if _, err := sdk.AccAddressFromBech32(addr.String()); err != nil {
 		return errorsmod.Wrap(err, "invalid address")
 	}
@@ -37,14 +37,17 @@ func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amt math.In
 }
 
 // proratedCredit calculates the credits earned on the lockingAmt.
-func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
+func (k *Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
 	rates := k.GetParams(ctx).RewardRates
-	lockedAmt := k.totalAmountByAddr(ctx, delAddr)
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
+
+	lockedAmt := k.totalLockedAmountByAddr(ctx, delAddr)
+	insuredAmt := k.totalInsuredAmountByAddr(ctx, delAddr)
+	totalAmt := lockedAmt.Add(insuredAmt)
 
 	return calculateProratedCredit(
 		rates,
-		lockedAmt,
+		totalAmt,
 		lockingAmt,
 		epochInfo.CurrentEpochStartTime,
 		sdk.UnwrapSDKContext(ctx).BlockTime(),
@@ -54,7 +57,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 
 // burnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) burnAllCredits(ctx context.Context) error {
+func (k *Keeper) burnAllCredits(ctx context.Context) error {
 	// Note that we can't simply iterate through the lockup records because credits
 	// are transferrable and can be stored in accounts that are not tracked by lockups.
 	// Instead, we iterate through all the balances to find and burn the credits.
@@ -88,7 +91,7 @@ func (k Keeper) burnAllCredits(ctx context.Context) error {
 }
 
 // resetAllCredits resets all the credits in the system.
-func (k Keeper) resetAllCredits(ctx context.Context) error {
+func (k *Keeper) resetAllCredits(ctx context.Context) error {
 	// Reward to a delegator is calculated based on the total locked amount
 	// to all validators. Since each lockup entry only records locked amount
 	// for a single validator, we need to iterate through all the lockups to
@@ -100,7 +103,9 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 		if !ok {
 			amt = math.ZeroInt()
 		}
-		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount)
+		// Include associated insurance lockup amounts to allocate credits correctly
+		insuranceLockupAmount := k.getInsuranceLockupAmount(ctx, delAddr, valAddr)
+		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount).Add(insuranceLockupAmount)
 	}
 
 	k.mustIterateLockups(ctx, cb)
