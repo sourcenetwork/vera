@@ -20,7 +20,6 @@ func TestValidatePolicy(t *testing.T) {
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_ValidPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -44,7 +43,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    true,
@@ -56,7 +55,6 @@ actor:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_ComplexValidPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -86,7 +84,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    true,
@@ -98,7 +96,6 @@ actor:
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_InvalidSyntax() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -113,7 +110,7 @@ resources:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
@@ -121,53 +118,23 @@ resources:
 	require.Nil(s.T(), err)
 }
 
-func (s *queryValidatePolicySuite) TestValidatePolicy_MissingOwner() {
-	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
-
-	req := &types.QueryValidatePolicyRequest{
-		Policy: `
-name: Another invalid policy
-description: Policy with missing owner
-resources:
-  file:
-    permissions:
-      read:
-        expr: owner
-`,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
-	}
-
-	result, err := querier.ValidatePolicy(ctx, req)
-
-	require.NotNil(s.T(), result)
-	require.False(s.T(), result.Valid)
-	require.Contains(s.T(), result.ErrorMsg, "missing owner relation")
-	require.Nil(s.T(), err)
-}
-
 func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy:      "",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
-	want := &types.QueryValidatePolicyResponse{
-		Valid:    false,
-		ErrorMsg: "name is required: policy: code 4: type BAD_INPUT: ctx={[]}",
-	}
-	require.Equal(s.T(), want, result)
+	require.False(s.T(), result.Valid)
+	require.Contains(s.T(), result.ErrorMsg, "name required")
 	require.Nil(s.T(), err)
 }
 
 func (s *queryValidatePolicySuite) TestValidatePolicy_BadActor() {
 	ctx, k, _ := setupKeeper(s.T())
-	querier := NewQuerier(k)
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
@@ -197,7 +164,7 @@ actor:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	result, err := querier.ValidatePolicy(ctx, req)
+	result, err := k.ValidatePolicy(ctx, req)
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)

@@ -85,13 +85,13 @@ type keyBuilder struct{}
 
 // ABCIQueryKey returns the Key part to be used in an ABCIQuery
 func (b *keyBuilder) ABCIQueryKey(decisionId string) []byte {
-	return []byte(types.AccessDecisionRepositoryKey + decisionId)
+	return []byte(types.AccessDecisionRepositoryKeyPrefix + decisionId)
 }
 
 // KVKey returns the actual key used in the Cosmos app store.
 // note this key contains the prefix from the root commit multistore and the IAVL store with prefixes
 func (b *keyBuilder) KVKey(decisionId string) []byte {
-	return []byte("/" + types.ModuleName + "/" + types.AccessDecisionRepositoryKey + decisionId)
+	return []byte("/" + types.ModuleName + "/" + types.AccessDecisionRepositoryKeyPrefix + decisionId)
 }
 
 // ABCIQueryPath returns the Query Path for a query issued to the ACP module

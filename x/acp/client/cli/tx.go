@@ -31,6 +31,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdCreatePolicy())
+	cmd.AddCommand(CmdEditPolicy())
 	cmd.AddCommand(CmdCheckAccess())
 	cmd.AddCommand(CmdBearerPolicyCmd())
 	cmd.AddCommand(CmdDirectPolicyCmd())

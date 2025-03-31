@@ -3,13 +3,12 @@ syntax = "proto3";
 package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
-import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/commitment.proto";
-import "sourcehub/acp/registration.proto";
 import "sourcehub/acp/record.proto";
+import "sourcehub/acp/registration.proto";
+import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
-
 
 // PolicyCmd models an operation to be performed against the context of a Policy
 message PolicyCmd {
@@ -77,11 +76,11 @@ message FlagHijackAttemptCmdResult {
   AmendmentEvent event = 1;
 }
 
-message UnarchiveObjectCmd{
+message UnarchiveObjectCmd {
   sourcenetwork.acp_core.Object object = 1;
 }
 
-message UnarchiveObjectCmdResult{
+message UnarchiveObjectCmdResult {
   RelationshipRecord record = 1;
   bool relationship_modified = 2;
 }
@@ -91,7 +90,7 @@ message UnarchiveObjectCmdResult{
 //
 // A caveat is that after removing the Relationships, a record of the original Object owner
 // is maintained to prevent an "ownership hijack" attack.
-// 
+//
 // Suppose Bob owns object Foo, which is shared with Bob but not Eve.
 // Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Archive Foo,
 // then submitting a RegisterObject Msg, effectively becoming Foo's new owner.

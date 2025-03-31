@@ -10,6 +10,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
 
 func TestEndBlocker(t *testing.T) {
@@ -26,6 +27,8 @@ func TestEndBlocker(t *testing.T) {
 	}
 
 	engine := k.GetACPEngine(ctx)
+	ctx, err := utils.InjectPrincipal(ctx, "did:example:bob")
+	require.NoError(t, err)
 	resp, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
 		Policy:      `name: test`,
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
@@ -38,12 +41,20 @@ func TestEndBlocker(t *testing.T) {
 	comm, err := service.SetNewCommitment(ctx, resp.Record.Policy.Id, commitment, coretypes.NewActor("test"), params, "source1234")
 	require.NoError(t, err)
 
+	// no expired commitments at this point
+	expired, err := k.EndBlocker(ctx)
+	require.NoError(t, err)
+	require.Nil(t, expired)
+
 	// set commitment to expire
 	ctx = ctx.WithBlockTime(time.Now().Add(time.Nanosecond * 2))
 
-	expired, err := k.EndBlocker(ctx)
+	// should return exactly one expired commitment
+	expired, err = k.EndBlocker(ctx)
 	require.NoError(t, err)
+	require.NotNil(t, expired)
 	require.Len(t, expired, 1)
+
 	want := comm
 	want.Expired = true
 	require.Equal(t, want, expired[0])

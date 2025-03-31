@@ -121,7 +121,10 @@ message MsgCancelUnlocking {
   string validator_address = 2 [(cosmos_proto.scalar) = "cosmos.ValidatorAddressString"];
 
   // amount is always less than or equal to unlocking delegation entry balance
-  cosmos.base.v1beta1.Coin stake = 3 [(gogoproto.nullable) = false];
+  cosmos.base.v1beta1.Coin stake = 3 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 
   // creation_height is the height which the unlocking took place.
   int64 creation_height = 4;

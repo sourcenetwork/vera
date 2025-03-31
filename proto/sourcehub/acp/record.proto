@@ -9,35 +9,35 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "sourcehub/acp/access_decision.proto";
 import "sourcehub/acp/time.proto";
-import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/policy.proto";
+import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
 // RecordMetadata models metadata which is stored alongside acp records
 message RecordMetadata {
-    // creation_ts is the timestamp of record creation
-    Timestamp creation_ts  = 1;
-    // tx_hash is the hash256 of the tx bytes which produced the record
-    bytes tx_hash = 2;
-    // tx_signer is the SourceHub bech32 address of the account that signed the Tx
-    string tx_signer = 3;
-    // owner_did is the DID of the PolicyCmd actor
-    string owner_did = 4;
+  // creation_ts is the timestamp of record creation
+  Timestamp creation_ts = 1;
+  // tx_hash is the hash256 of the tx bytes which produced the record
+  bytes tx_hash = 2;
+  // tx_signer is the SourceHub bech32 address of the account that signed the Tx
+  string tx_signer = 3;
+  // owner_did is the DID of the PolicyCmd actor
+  string owner_did = 4;
 }
 
 message PolicyRecord {
-    sourcenetwork.acp_core.Policy policy = 1;
-    RecordMetadata metadata = 2;
-    string raw_policy = 3;
-    // marshal_type flags the format of policy_raw
-    sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 4;
+  sourcenetwork.acp_core.Policy policy = 1;
+  RecordMetadata metadata = 2;
+  string raw_policy = 3;
+  // marshal_type flags the format of policy_raw
+  sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 4;
 }
 
 message RelationshipRecord {
-    string policy_id = 1;
-    sourcenetwork.acp_core.Relationship relationship = 2;
-    bool archived = 3;
-    RecordMetadata metadata = 4;
+  string policy_id = 1;
+  sourcenetwork.acp_core.Relationship relationship = 2;
+  bool archived = 3;
+  RecordMetadata metadata = 4;
 }
