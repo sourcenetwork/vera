@@ -13,8 +13,56 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// reimburseSlashedTierStake reimburses tier module share of the slashed tokens from the insurance pool.
-func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr string, slashedAmount string) error {
+// BeginBlocker handles slashing events and processes tier module staking rewards.
+func (k *Keeper) BeginBlocker(ctx context.Context) error {
+	err := k.handleSlashingEvents(ctx)
+	if err != nil {
+		k.Logger().Error("Failed to handle slashing event", "error", err)
+	}
+
+	err = k.processRewards(ctx)
+	if err != nil {
+		k.Logger().Error("Failed to process rewards", "error", err)
+	}
+
+	return nil
+}
+
+// handleSlashingEvents monitors and handles slashing events.
+// In case of double_sign, existing lockup records are updated to reflect changes after slashing.
+// Otherwise, in addition to updating existing lockup records, slashed tokens are covered via insurance lockups.
+func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	events := sdkCtx.EventManager().Events()
+
+	for _, event := range events {
+		if event.Type == "slash" {
+			var validatorAddr, reason, slashedAmount string
+
+			for _, attr := range event.Attributes {
+				switch string(attr.Key) {
+				case "address":
+					validatorAddr = string(attr.Value)
+				case "reason":
+					reason = string(attr.Value)
+				case "burned":
+					slashedAmount = string(attr.Value)
+				}
+			}
+
+			if reason == slashingtypes.AttributeValueDoubleSign {
+				return k.handleDoubleSign(ctx, validatorAddr, slashedAmount)
+			} else {
+				return k.handleMissingSignature(ctx, validatorAddr, slashedAmount)
+			}
+		}
+	}
+
+	return nil
+}
+
+// handleDoubleSign adjusts existing lockup records based on the tier module share of the slashed amount.
+func (k *Keeper) handleDoubleSign(ctx context.Context, validatorAddr string, slashedAmount string) error {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	valAddr, err := sdk.ValAddressFromBech32(validatorAddr)
 	if err != nil {
@@ -30,6 +78,18 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 		return fmt.Errorf("Total slashed amount is zero")
 	}
 
+	// Get the slashed validator
+	validator, err := k.GetStakingKeeper().GetValidator(ctx, valAddr)
+	if err != nil {
+		return err
+	}
+
+	// Get the total stake of the slashed validator
+	totalStake := validator.Tokens.ToLegacyDec()
+	if totalStake.IsZero() {
+		return fmt.Errorf("No stake for the validator: %s", validatorAddr)
+	}
+
 	// Get tier module delegation
 	tierDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	if err != nil {
@@ -40,6 +100,40 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 	tierShares := tierDelegation.Shares
 	if tierShares.IsZero() {
 		return fmt.Errorf("No delegation from the tier module")
+	}
+
+	// Get tier module stake from the delegation shares
+	tierStake := validator.TokensFromSharesTruncated(tierShares)
+
+	// Calculate the amount slashed from the tier module stake
+	tierStakeSlashed := totalSlashed.Mul(tierStake.Quo(totalStake))
+	if tierStakeSlashed.IsZero() {
+		return fmt.Errorf("Tier module slashed amount is zero")
+	}
+
+	// Get the rate by which every individual lockup record should be adjusted
+	slashingRate := tierStake.Sub(tierStakeSlashed).Quo(tierStake)
+
+	// Adjust affected lockups based on the slashed amount (no insurance lockups created since coverageRate is 0)
+	return k.adjustLockups(ctx, valAddr, slashingRate, math.LegacyZeroDec())
+}
+
+// handleMissingSignature adjusts existing lockup records based on the tier module share of the slashed amount
+// and covers tier module share of the slashed tokens from the insurance pool.
+func (k *Keeper) handleMissingSignature(ctx context.Context, validatorAddr string, slashedAmount string) error {
+	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
+	valAddr, err := sdk.ValAddressFromBech32(validatorAddr)
+	if err != nil {
+		return err
+	}
+
+	// Get total slashed amount
+	totalSlashed, err := math.LegacyNewDecFromStr(slashedAmount)
+	if err != nil {
+		return err
+	}
+	if totalSlashed.IsZero() {
+		return fmt.Errorf("Total slashed amount is zero")
 	}
 
 	// Get the slashed validator
@@ -54,11 +148,22 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 		return fmt.Errorf("No stake for the validator: %s", validatorAddr)
 	}
 
+	// Get tier module delegation
+	tierDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
+	if err != nil {
+		return err
+	}
+
+	// Get tier module delegation shares
+	tierShares := tierDelegation.Shares
+	if tierShares.IsZero() {
+		return fmt.Errorf("No delegation from the tier module")
+	}
+
 	// Get tier module stake from the delegation shares
 	tierStake := validator.TokensFromSharesTruncated(tierShares)
 
 	// Calculate tier module share of the slashed amount
-	// Use Ceil() so the tier module always has sufficient balance to handle all unlocks
 	tierStakeSlashed := totalSlashed.Mul(tierStake.Quo(totalStake)).Ceil().TruncateInt()
 	if tierStakeSlashed.IsZero() {
 		return fmt.Errorf("Tier module slashed amount is zero")
@@ -66,68 +171,42 @@ func (k *Keeper) reimburseSlashedTierStake(ctx context.Context, validatorAddr st
 
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 	insurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-	reimburseCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, tierStakeSlashed))
+	coveredAmount := tierStakeSlashed
 
-	// If tierStakeSlashed exceeds insurancePoolBalance, reimburse the whole insurance pool balance
+	// If tierStakeSlashed exceeds insurancePoolBalance, cover as much as there is on the insurance pool balance
 	if insurancePoolBalance.Amount.LT(tierStakeSlashed) {
-		reimburseCoins = sdk.NewCoins(insurancePoolBalance)
+		coveredAmount = insurancePoolBalance.Amount
 	}
 
-	// Send slashed tier module stake from the insurance pool to the tier module account
-	err = k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.InsurancePoolName, types.ModuleName, reimburseCoins)
+	// Delegate covered amount back to the same validator on behalf of the insurance pool module account
+	_, err = k.GetStakingKeeper().Delegate(
+		ctx,
+		insurancePoolAddr,
+		coveredAmount,
+		stakingtypes.Unbonded,
+		validator,
+		true,
+	)
 	if err != nil {
 		return err
 	}
 
-	// Delegate slashed tier module stake back to the same validator
-	_, err = k.GetStakingKeeper().Delegate(ctx, tierModuleAddr, tierStakeSlashed, stakingtypes.Unbonded, validator, true)
-	if err != nil {
-		return err
-	}
+	// Calculate the proportional rate to reduce each individual lockup after slashing
+	slashingRate := tierStake.Sub(tierStakeSlashed.ToLegacyDec()).Quo(tierStake)
 
-	return nil
+	// Calculate the fraction of the original tier stake that is covered by the insurance pool
+	coverageRate := coveredAmount.ToLegacyDec().Quo(tierStake)
+
+	// Adjust affected lockups based on the slashed amount and create/update associated insurance lockups based on the coverageRate
+	return k.adjustLockups(ctx, valAddr, slashingRate, coverageRate)
 }
 
-// handleSlashingEvents monitors slash events and calls reimburseSlashedTierStake if reason was not double_sign.
-func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	events := sdkCtx.EventManager().Events()
-
-	for _, event := range events {
-		if event.Type == "slash" {
-			var validatorAddr, reason, burnedAmount string
-
-			for _, attr := range event.Attributes {
-				switch string(attr.Key) {
-				case "address":
-					validatorAddr = string(attr.Value)
-				case "reason":
-					reason = string(attr.Value)
-				case "burned":
-					burnedAmount = string(attr.Value)
-				}
-			}
-
-			if reason != slashingtypes.AttributeValueDoubleSign {
-				return k.reimburseSlashedTierStake(ctx, validatorAddr, burnedAmount)
-			}
-		}
-	}
-
-	return nil
-}
-
-// BeginBlocker claims tier module staking rewards every N blocks.
+// processRewards processes block rewards every ProcessRewardsInterval blocks.
 // 2% of the claimed rewards is sent to the developer pool (DeveloperPoolFee).
 // 1% is sent to the insurance pool (InsurancePoolFee) if insurance pool balance is below InsurancePoolThreshold,
 // otherwise the InsurancePoolFee (1%) is also sent to the developer pool.
 // Remaining 97% of the rewards is burned.
-func (k *Keeper) BeginBlocker(ctx context.Context) error {
-	err := k.handleSlashingEvents(ctx)
-	if err != nil {
-		k.Logger().Error("Failed to handle slashing event", "error", err)
-	}
-
+func (k *Keeper) processRewards(ctx context.Context) error {
 	params := k.GetParams(ctx)
 
 	// Process rewards every N blocks
@@ -139,7 +218,7 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	// Iterate over all active delegations where the tier module account is the delegator
 	// The max number of iterations is the number of validators it has delegated to
-	err = k.GetStakingKeeper().IterateDelegations(ctx, tierModuleAddr, func(index int64, delegation stakingtypes.DelegationI) bool {
+	err := k.GetStakingKeeper().IterateDelegations(ctx, tierModuleAddr, func(index int64, delegation stakingtypes.DelegationI) bool {
 		// Claim rewards for the tier module from this validator
 		valAddr := types.MustValAddressFromBech32(delegation.GetValidatorAddr())
 		rewards, err := k.GetDistributionKeeper().WithdrawDelegationRewards(ctx, tierModuleAddr, valAddr)
@@ -198,9 +277,5 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 		return false
 	})
 
-	if err != nil {
-		k.Logger().Error("BeginBlocker failed", "error", err)
-	}
-
-	return nil
+	return err
 }
