@@ -67,32 +67,32 @@ func NewKeeper(
 }
 
 // GetAuthority returns the module's authority.
-func (k Keeper) GetAuthority() string {
+func (k *Keeper) GetAuthority() string {
 	return k.authority
 }
 
 // GetStakingKeeper returns the module's StakingKeeper.
-func (k Keeper) GetStakingKeeper() types.StakingKeeper {
+func (k *Keeper) GetStakingKeeper() types.StakingKeeper {
 	return k.stakingKeeper
 }
 
 // GetBankKeeper returns the module's BankKeeper.
-func (k Keeper) GetBankKeeper() types.BankKeeper {
+func (k *Keeper) GetBankKeeper() types.BankKeeper {
 	return k.bankKeeper
 }
 
 // GetEpochsKeeper returns the module's EpochsKeeper.
-func (k Keeper) GetEpochsKeeper() types.EpochsKeeper {
+func (k *Keeper) GetEpochsKeeper() types.EpochsKeeper {
 	return k.epochsKeeper
 }
 
 // GetDistributionKeeper returns the module's DistributionKeeper.
-func (k Keeper) GetDistributionKeeper() types.DistributionKeeper {
+func (k *Keeper) GetDistributionKeeper() types.DistributionKeeper {
 	return k.distributionKeeper
 }
 
 // Logger returns a module-specific logger.
-func (k Keeper) Logger() log.Logger {
+func (k *Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
@@ -211,6 +211,11 @@ func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk
 		return 0, time.Time{}, time.Time{}, errorsmod.Wrap(err, "subtract lockup")
 	}
 
+	// Remove the associated insurance lockup record if the lockup was fully removed
+	if !k.hasLockup(ctx, delAddr, valAddr) {
+		k.removeInsuranceLockup(ctx, delAddr, valAddr)
+	}
+
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
 	shares, err := k.stakingKeeper.ValidateUnbondAmount(ctx, modAddr, valAddr, amt)
 	if err != nil {
@@ -271,7 +276,16 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 	// Add the lockup to the destination validator
 	err = k.AddLockup(ctx, delAddr, dstValAddr, amt)
 	if err != nil {
-		return time.Time{}, errorsmod.Wrap(err, "add lockup")
+		return time.Time{}, errorsmod.Wrap(err, "add lockup to destination validator")
+	}
+
+	// Redelegate the  associated insurance lockup record if the lockup was fully redelegated
+	if !k.hasLockup(ctx, delAddr, srcValAddr) {
+		insuranceLockupAmount := k.getInsuranceLockupAmount(ctx, delAddr, srcValAddr)
+		if insuranceLockupAmount.IsPositive() {
+			k.removeInsuranceLockup(ctx, delAddr, srcValAddr)
+			k.AddInsuranceLockup(ctx, delAddr, dstValAddr, insuranceLockupAmount)
+		}
 	}
 
 	modAddr := authtypes.NewModuleAddress(types.ModuleName)
