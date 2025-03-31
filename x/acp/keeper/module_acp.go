@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
@@ -24,13 +23,13 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.getACPEngine(ctx)
 
-	modDID := k.deriveModuleDID(ctx, module)
-	metadata, err := types.BuildACPSuppliedMetadata(ctx, modDID, modDID)
+	moduleDID := did.IssuedModuleDID(module)
+	metadata, err := types.BuildACPSuppliedMetadata(ctx, moduleDID, module)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ctx, err = utils.InjectPrincipal(ctx, modDID)
+	ctx, err = utils.InjectPrincipal(ctx, moduleDID)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,7 +49,7 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 	}
 
 	capMananager := k.getPolicyCapabilityManager(ctx)
-	cap, err := capMananager.Register(ctx, rec.Policy.Id)
+	cap, err := capMananager.Issue(ctx, rec.Policy.Id)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -58,33 +57,64 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 	return rec, cap, nil
 }
 
+// EditModulePolicy updates the policy definition attached to the given PolicyCapability
+func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyCapability, policy string, marshalType coretypes.PolicyMarshalingType) (*types.PolicyRecord, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	engine := k.getACPEngine(ctx)
+
+	capManager := k.getPolicyCapabilityManager(ctx)
+
+	err := capManager.Validate(ctx, cap)
+	if err != nil {
+		return nil, err
+	}
+
+	module, err := capManager.GetOwnerModule(ctx, cap)
+	if err != nil {
+		return nil, err
+	}
+
+	moduleDID := did.IssuedModuleDID(module)
+
+	ctx, err = utils.InjectPrincipal(ctx, moduleDID)
+	if err != nil {
+		return nil, err
+	}
+
+	coreResult, err := engine.EditPolicy(goCtx, &coretypes.EditPolicyRequest{
+		PolicyId:    cap.GetPolicyId(),
+		Policy:      policy,
+		MarshalType: marshalType,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("EditModulePolicy: %w", err)
+	}
+
+	rec, err := types.MapPolicy(coreResult.Record)
+	if err != nil {
+		return nil, fmt.Errorf("EditModulePolicy: %w", err)
+	}
+
+	return rec, nil
+}
+
 // ModulePolicyCmdForActorAccount issues a policy command for the policy bound to the provided capability.
 // The command skips authentication and is assumed to be issued by actorAcc, which must be a valid sourcehub account address.
-func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capability.PolicyCapability, cmd *types.PolicyCmd, actorAcc string) (*types.PolicyCmdResult, error) {
+func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capability.PolicyCapability, cmd *types.PolicyCmd, actorAcc string, txSigner string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	addr, err := hubtypes.AccAddressFromBech32(actorAcc)
-	if err != nil {
-		return nil, fmt.Errorf("DirectPolicyCmd: %v: %w", err, types.NewErrInvalidAccAddrErr(err, actorAcc))
-	}
-
-	acc := k.accountKeeper.GetAccount(ctx, addr)
-	if acc == nil {
-		return nil, fmt.Errorf("DirectPolicyCmd: %w", types.NewAccNotFoundErr(actorAcc))
-	}
-
-	actorID, err := did.IssueDID(acc)
+	actorDID, err := k.issueDIDFromAccountAddr(ctx, actorAcc)
 	if err != nil {
 		return nil, errors.Wrap("DirectPolicyCmd: could not issue did to creator",
 			errors.ErrorType_BAD_INPUT, errors.Pair("address", actorAcc))
 	}
 
-	return k.ModulePolicyCmdForActorDID(goCtx, cap, cmd, actorID)
+	return k.ModulePolicyCmdForActorDID(goCtx, cap, cmd, actorDID, txSigner)
 }
 
 // ModulePolicyCmdForActorDID issues a policy command for the policy bound to the provided capability.
 // The command skips authentication and is assumed to be issued by the actor given by actorID, which must be a valid DID.
-func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *capability.PolicyCapability, cmd *types.PolicyCmd, actorID string) (*types.PolicyCmdResult, error) {
+func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *capability.PolicyCapability, cmd *types.PolicyCmd, actorDID string, txSigner string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err := k.getPolicyCapabilityManager(ctx).Validate(ctx, capability)
@@ -92,11 +122,8 @@ func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *c
 		return nil, err
 	}
 
-	mod := capability.GetOwnerModule()
 	polId := capability.GetPolicyId()
-
-	modDID := k.deriveModuleDID(ctx, mod)
-	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, polId, actorID, modDID, k.GetParams(ctx))
+	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, polId, actorDID, txSigner, k.GetParams(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -108,9 +135,4 @@ func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *c
 	}
 
 	return result, nil
-}
-
-func (k *Keeper) deriveModuleDID(ctx context.Context, module string) string {
-	panic("todo")
-	return ""
 }

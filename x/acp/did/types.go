@@ -54,3 +54,10 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 
 	return did.String(), nil
 }
+
+// IssuedModuleDID produces a DID for a SourceHub module, based on its name.
+//
+// The issued did uses a pseudo-method named "module", which simply appends the module name
+func IssuedModuleDID(name string) string {
+	return "did:module:" + name
+}

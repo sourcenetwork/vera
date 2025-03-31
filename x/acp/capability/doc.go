@@ -1,9 +1,9 @@
-// package capability provides types that manage acp policies registered by modules
+// package capability provides types that manage capabilities tied to acp policies.
 //
 // Example usage:
 // Calling modules may create a new Policy using acp keeper's `CreateModulePolicy` method,
 // which returns a capability.
-// The returned capability represents an object which if presented to acp,
+// The returned capability represents an object which, if presented to the keeper,
 // grants the caller unrestricted access to the policy bound to the capability.
 //
 // Callers which receive a capability are required to Claim this capability,

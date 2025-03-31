@@ -46,6 +46,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
+	capKeeper capabilitykeeper.ScopedKeeper,
 
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
@@ -58,6 +59,7 @@ func NewKeeper(
 		authority:     authority,
 		logger:        logger,
 		accountKeeper: accountKeeper,
+		capKeeper:     capabilitykeeper.ScopedKeeper{},
 	}
 }
 

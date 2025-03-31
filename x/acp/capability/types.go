@@ -16,15 +16,12 @@ func (c *PolicyCapability) GetCapabilityName() string {
 	return "/acp/module_policies/" + c.policyId
 }
 
+// GetPolicyId returns the Id of the policy which this capability is bound to
 func (c *PolicyCapability) GetPolicyId() string {
 	return c.policyId
 }
 
-func (c *PolicyCapability) GetOwnerModule() string {
-	panic("todo")
-	return ""
-}
-
+// GetCosmosCapability returns the underlying cosmos Capability
 func (c *PolicyCapability) GetCosmosCapability() *capabilitytypes.Capability {
 	return &c.capability
 }
