@@ -66,6 +66,7 @@ func TestProratedCredit(t *testing.T) {
 	cases := []struct {
 		name        string
 		locked      int64
+		insured     int64
 		locking     int64
 		remainingMs int64
 		totalMs     int64
@@ -303,6 +304,15 @@ func TestProratedCredit(t *testing.T) {
 			totalMs:     300_000,   // 5 minutes
 			want:        6_000_000, // 10,000,000 * 1.5 * 2/5
 		},
+		{
+			name:        "Locking large amount with previously locked and insured amount",
+			locked:      1_000_000,
+			insured:     100_000,
+			locking:     10_000_000,
+			remainingMs: 120_000,   // 2 minutes
+			totalMs:     300_000,   // 5 minutes
+			want:        6_000_000, // 10,000,000 * 1.5 * 2/5
+		},
 	}
 
 	p := types.DefaultParams()
@@ -328,6 +338,9 @@ func TestProratedCredit(t *testing.T) {
 			if tc.locked > 0 {
 				err = k.AddLockup(ctx, delAddr, valAddr, math.NewInt(tc.locked))
 				require.NoError(t, err)
+			}
+			if tc.insured > 0 {
+				k.AddInsuranceLockup(ctx, delAddr, valAddr, math.NewInt(tc.insured))
 			}
 			got := k.proratedCredit(ctx, delAddr, math.NewInt(tc.locking))
 			require.Equal(t, tc.want, got.Int64())
@@ -432,10 +445,11 @@ func TestBurnAllCredits(t *testing.T) {
 
 func TestResetAllCredits(t *testing.T) {
 	tests := []struct {
-		name           string
-		lockups        map[string][]int64
-		expectedCredit map[string]int64
-		wantErr        bool
+		name             string
+		lockups          map[string][]int64
+		insuranceLockups map[string][]int64
+		expectedCredit   map[string]int64
+		wantErr          bool
 	}{
 		{
 			name: "Reset all credits successfully (single address, single lockup)",
@@ -483,6 +497,27 @@ func TestResetAllCredits(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Multiple addresses with multiple lockups (with reward rates) and insurance lockups",
+			lockups: map[string][]int64{
+				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {100, 100},
+				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {100, 200, 300},
+				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {500, 1000},
+				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+			},
+			insuranceLockups: map[string][]int64{
+				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {10},
+				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {20},
+				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {30},
+				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+			},
+			expectedCredit: map[string]int64{
+				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 222,  // 100 + 100 + 10 + (12 rewards)
+				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 810,  // 100 + 200 + 300 + 20 + (190 rewards)
+				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": 2175, // 500 + 1000 + 30 (645 rewards)
+			},
+			wantErr: false,
+		},
 	}
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
@@ -502,6 +537,14 @@ func TestResetAllCredits(t *testing.T) {
 				for _, amt := range lockupAmounts {
 					err = k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
 					require.NoError(t, err)
+				}
+			}
+
+			// Add insurance lockups
+			for addrStr, insuranceLockupAmounts := range tt.insuranceLockups {
+				addr := sdk.MustAccAddressFromBech32(addrStr)
+				for _, amt := range insuranceLockupAmounts {
+					k.AddInsuranceLockup(ctx, addr, valAddr, math.NewInt(amt))
 				}
 			}
 

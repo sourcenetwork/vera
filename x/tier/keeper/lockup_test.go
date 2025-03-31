@@ -281,15 +281,15 @@ func TestTotalAmountByAddr(t *testing.T) {
 	err = k.AddLockup(ctx, delAddr2, valAddr2, math.NewInt(700))
 	require.NoError(t, err)
 
-	totalDel1 := k.totalAmountByAddr(ctx, delAddr1)
+	totalDel1 := k.totalLockedAmountByAddr(ctx, delAddr1)
 	require.Equal(t, math.NewInt(1500), totalDel1, "delAddr1 should have a total of 1500")
 
-	totalDel2 := k.totalAmountByAddr(ctx, delAddr2)
+	totalDel2 := k.totalLockedAmountByAddr(ctx, delAddr2)
 	require.Equal(t, math.NewInt(700), totalDel2, "delAddr2 should have a total of 700")
 
 	delAddr3, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
 	require.NoError(t, err)
-	totalDel3 := k.totalAmountByAddr(ctx, delAddr3)
+	totalDel3 := k.totalLockedAmountByAddr(ctx, delAddr3)
 	require.True(t, totalDel3.IsZero(), "delAddr3 should have no lockups")
 }
 
