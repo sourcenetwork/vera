@@ -123,40 +123,61 @@ func TestHandleSlashingEvents(t *testing.T) {
 		sdk.NewAttribute("burned", missingSignatureSlashAmount.String()),
 	))
 
-	// total validator stake remains unchanged since we just emit the event
+	// total validator stake remains unchanged since we just emit the event without burning tokens
 	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
 	require.Equal(t, expectedTotalStake, validator.Tokens)
 
+	// tier stake should be equal to initial delegator balance
 	tierDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	require.NoError(t, err)
 	tierStake := validator.TokensFromSharesTruncated(tierDelegation.Shares)
 	require.Equal(t, initialDelegatorBalance, tierStake.RoundInt())
 
-	// handle missing_signature event (reimburse slashed tier module stake)
+	// no insurance pool delegation at this point
+	_, err = k.GetStakingKeeper().GetDelegation(ctx, insurancePoolAddr, valAddr)
+	require.Error(t, err)
+
+	// total lockups amount should be equal to initial delegator balance at this point
+	totalLockupsAmount := k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialDelegatorBalance, totalLockupsAmount)
+
+	// handle missing_signature event (cover slashed tier module stake)
 	err = k.handleSlashingEvents(ctx)
 	require.NoError(t, err)
 
 	// slashed tier module amount is 200_000 / (1_000_000 + 800_000 + 200_000) * 100_000 = 10_000
-	tierModuleSlashAmount := math.NewInt(10_000)
+	missingSigTierSlashedAmt := math.NewInt(10_000)
 
-	expectedRemainingInsurancePoolBalance := insurancePoolBalance.Sub(tierModuleSlashAmount)
-	newBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-	require.Equal(t, expectedRemainingInsurancePoolBalance, newBalance.Amount)
-
-	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
-	require.NoError(t, err)
-	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
-
-	tierDelegation, err = k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
-	require.NoError(t, err)
-	tierStake = validator.TokensFromSharesTruncated(tierDelegation.Shares)
-	require.Equal(t, initialDelegatorBalance.Add(tierModuleSlashAmount), tierStake.RoundInt())
+	// verify insurance pool balance
+	expectedRemainingInsurancePoolBalance := insurancePoolBalance.Sub(missingSigTierSlashedAmt)
+	newInsurancePoolBalance := k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
+	require.Equal(t, expectedRemainingInsurancePoolBalance, newInsurancePoolBalance.Amount)
 
 	// slashed tier module amount is delegated back to the slashed validator
 	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
+	require.Equal(t, expectedTotalStake.Add(missingSigTierSlashedAmt), validator.Tokens)
+
+	// tier stake should be equal to initial delegator balance
+	tierDelegation, err = k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
+	require.NoError(t, err)
+	tierStake = validator.TokensFromSharesTruncated(tierDelegation.Shares)
+	require.Equal(t, initialDelegatorBalance, tierStake.RoundInt())
+
+	// insurance pool should have delegation equal to the slashed amount
+	insurancePoolDelegation, err := k.GetStakingKeeper().GetDelegation(ctx, insurancePoolAddr, valAddr)
+	require.NoError(t, err)
+	insurancePoolStake := validator.TokensFromSharesTruncated(insurancePoolDelegation.Shares)
+	require.Equal(t, missingSigTierSlashedAmt, insurancePoolStake.RoundInt())
+
+	// total lockups amount should be reduced by the slashed amount
+	totalLockupsAmount = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialDelegatorBalance.Sub(missingSigTierSlashedAmt), totalLockupsAmount)
+
+	// insured amount should be equal to the slashed amount since it had enough balance
+	insuredAmount := k.getInsuranceLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, missingSigTierSlashedAmt, insuredAmount)
 
 	// reset event manager
 	ctx = ctx.WithBlockHeight(2).WithEventManager(sdk.NewEventManager())
@@ -169,19 +190,33 @@ func TestHandleSlashingEvents(t *testing.T) {
 		sdk.NewAttribute("burned", doubleSignSlashAmount.String()),
 	))
 
-	// handle double_sign event (no reimbursement)
+	// handle double_sign event (no insurance)
 	err = k.handleSlashingEvents(ctx)
 	require.NoError(t, err)
 
-	newBalance = k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
-	require.Equal(t, expectedRemainingInsurancePoolBalance, newBalance.Amount)
+	// slashed tier module amount is 190_000 / (1_000_000 + 800_000 + 200_000 + 10_000) * 200_000 = 18906
+	doubleSignSlashedAmount := math.NewInt(18_906)
 
-	tierDelegationAfter, err := k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
+	// verify insurance pool balance
+	newInsurancePoolBalance = k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom)
+	require.Equal(t, expectedRemainingInsurancePoolBalance, newInsurancePoolBalance.Amount)
+
+	// tier stake should be equal to initial delegator balance
+	tierDelegation, err = k.GetStakingKeeper().GetDelegation(ctx, tierModuleAddr, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, tierDelegation.Shares, tierDelegationAfter.Shares)
+	tierStake = validator.TokensFromSharesTruncated(tierDelegation.Shares)
+	require.Equal(t, initialDelegatorBalance, tierStake.RoundInt())
 
-	// total validator stake remains unchanged after the double_sign event
+	// total validator stake remains the same as it was after missing_signature event
 	validator, err = k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)
-	require.Equal(t, expectedTotalStake.Add(tierModuleSlashAmount), validator.Tokens)
+	require.Equal(t, expectedTotalStake.Add(missingSigTierSlashedAmt), validator.Tokens)
+
+	// total lockups amount should be reduced by the slashed amount
+	totalLockupsAmount = k.GetTotalLockupsAmount(ctx)
+	require.Equal(t, initialDelegatorBalance.Sub(missingSigTierSlashedAmt).Sub(doubleSignSlashedAmount), totalLockupsAmount)
+
+	// insured amount should not change because double_sign events are not covered
+	insuredAmount = k.getInsuranceLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, missingSigTierSlashedAmt, insuredAmount)
 }
