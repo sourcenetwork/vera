@@ -55,6 +55,7 @@ func setupKeeper(t *testing.T) (sdk.Context, Keeper, *testutil.AccountKeeperStub
 		log.NewNopLogger(),
 		authority.String(),
 		accKeeper,
+		nil,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
