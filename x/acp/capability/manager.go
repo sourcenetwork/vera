@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	"github.com/sourcenetwork/acp_core/pkg/errors"
 	"github.com/sourcenetwork/raccoondb/v2/utils"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -46,7 +47,7 @@ func (m *PolicyCapabilityManager) Fetch(ctx sdk.Context, policyId string) (*Poli
 	if !ok {
 		return nil, fmt.Errorf("fetching capability for policy %v", policyId)
 	}
-	cap.capability = *sdkCap
+	cap.capability = sdkCap
 
 	return cap, nil
 }
@@ -58,8 +59,8 @@ func (m *PolicyCapabilityManager) Fetch(ctx sdk.Context, policyId string) (*Poli
 // which binds the capability to the caller module.
 //
 // This step is necessary in order to retrieve the capability in the future.
-func (m *PolicyCapabilityManager) Claim(ctx sdk.Context, capability PolicyCapability) error {
-	return m.scopedKeeper.ClaimCapability(ctx, &capability.capability, capability.GetCapabilityName())
+func (m *PolicyCapabilityManager) Claim(ctx sdk.Context, capability *PolicyCapability) error {
+	return m.scopedKeeper.ClaimCapability(ctx, capability.capability, capability.GetCapabilityName())
 }
 
 // Issue creates a new PolicyCapability from a policyId.
@@ -72,15 +73,15 @@ func (m *PolicyCapabilityManager) Issue(ctx sdk.Context, policyId string) (*Poli
 	if err != nil {
 		return nil, err
 	}
-	polCap.capability = *cap
+	polCap.capability = cap
 	return polCap, nil
 }
 
 // Validate verifies whether the given capability is valid
 func (m *PolicyCapabilityManager) Validate(ctx sdk.Context, capability *PolicyCapability) error {
-	ok := m.scopedKeeper.AuthenticateCapability(ctx, &capability.capability, capability.GetCapabilityName())
+	ok := m.scopedKeeper.AuthenticateCapability(ctx, capability.capability, capability.GetCapabilityName())
 	if !ok {
-		return fmt.Errorf("invalid capability")
+		return errors.Wrap("authentication failed", ErrInvalidCapability)
 	}
 
 	// check if the capability is also owned by acp module.
@@ -98,7 +99,7 @@ func (m *PolicyCapabilityManager) Validate(ctx sdk.Context, capability *PolicyCa
 		return err
 	}
 	if !ownedByAcp {
-		return fmt.Errorf("invalid capability: not registered by acp module")
+		return errors.Wrap("capability not issued by acp module", ErrInvalidCapability)
 	}
 
 	return nil
@@ -109,7 +110,7 @@ func (m *PolicyCapabilityManager) Validate(ctx sdk.Context, capability *PolicyCa
 func (m *PolicyCapabilityManager) GetOwnerModule(ctx sdk.Context, capability *PolicyCapability) (string, error) {
 	mods, _, err := m.scopedKeeper.LookupModules(ctx, capability.GetCapabilityName())
 	if err != nil {
-		return "", fmt.Errorf("looking up capability owner: %v", err)
+		return "", fmt.Errorf("looking up capability owner: %v", err) //TODO
 	}
 
 	mods = utils.FilterSlice(mods, func(name string) bool {
@@ -117,7 +118,7 @@ func (m *PolicyCapabilityManager) GetOwnerModule(ctx sdk.Context, capability *Po
 	})
 
 	if len(mods) == 0 {
-		return "", fmt.Errorf("capability not claimed by any module: capability %v", capability.GetCapabilityName())
+		return "", errors.Wrap("capability not claimed by any module", ErrInvalidCapability)
 	}
 	return mods[0], nil
 }

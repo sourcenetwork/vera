@@ -36,7 +36,7 @@ type (
 		authority string
 
 		accountKeeper types.AccountKeeper
-		capKeeper     *capabilitykeeper.ScopedKeeper
+		capKeeper     capabilitykeeper.ScopedKeeper
 	}
 )
 
@@ -46,7 +46,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
-	capKeeper *capabilitykeeper.ScopedKeeper,
+	capKeeper capabilitykeeper.ScopedKeeper,
 
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
@@ -148,5 +148,5 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 }
 
 func (k *Keeper) getPolicyCapabilityManager(ctx sdk.Context) *capability.PolicyCapabilityManager {
-	return capability.NewPolicyCapabilityManager(k.capKeeper)
+	return capability.NewPolicyCapabilityManager(&k.capKeeper)
 }

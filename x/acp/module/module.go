@@ -190,6 +190,8 @@ func init() {
 	)
 }
 
+type ScopedCapabilityKeeper capabilitykeeper.ScopedKeeper
+
 type ModuleInputs struct {
 	depinject.In
 
@@ -198,9 +200,9 @@ type ModuleInputs struct {
 	Config       *modulev1.Module
 	Logger       log.Logger
 
-	AccountKeeper    types.AccountKeeper
-	BankKeeper       types.BankKeeper
-	CapabilityKeeper *capabilitykeeper.ScopedKeeper
+	AccountKeeper types.AccountKeeper
+	BankKeeper    types.BankKeeper
+	CapKeeper     ScopedCapabilityKeeper
 }
 
 type ModuleOutputs struct {
@@ -222,7 +224,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
-		in.CapabilityKeeper,
+		capabilitykeeper.ScopedKeeper(in.CapKeeper),
 	)
 	m := NewAppModule(
 		in.Cdc,

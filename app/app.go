@@ -64,6 +64,8 @@ import (
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	acpmodule "github.com/sourcenetwork/sourcehub/x/acp/module"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
@@ -186,6 +188,9 @@ func New(
 		// merge the AppConfig and other configuration in one config
 		appConfig = depinject.Configs(
 			AppConfig(),
+			depinject.Provide(
+				app.GetACPCapabilityKeeper,
+			),
 			depinject.Supply(
 				// Supply the application options
 				appOpts,
@@ -487,6 +492,10 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 // GetIBCKeeper returns the IBC keeper.
 func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
+}
+
+func (app *App) GetACPCapabilityKeeper() acpmodule.ScopedCapabilityKeeper {
+	return acpmodule.ScopedCapabilityKeeper(app.CapabilityKeeper.ScopeToModule(acptypes.ModuleName))
 }
 
 // GetCapabilityScopedKeeper returns the capability scoped keeper.

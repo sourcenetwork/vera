@@ -8,7 +8,7 @@ import (
 // unrevokable access to any command within a policy
 type PolicyCapability struct {
 	policyId   string
-	capability capabilitytypes.Capability
+	capability *capabilitytypes.Capability
 }
 
 // GetCapabilityName returns the name of the given PolicyCapability
@@ -23,5 +23,5 @@ func (c *PolicyCapability) GetPolicyId() string {
 
 // GetCosmosCapability returns the underlying cosmos Capability
 func (c *PolicyCapability) GetCosmosCapability() *capabilitytypes.Capability {
-	return &c.capability
+	return c.capability
 }
