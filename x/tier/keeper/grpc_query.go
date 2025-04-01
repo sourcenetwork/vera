@@ -13,10 +13,10 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-var _ types.QueryServer = Keeper{}
+var _ types.QueryServer = &Keeper{}
 
 // Params query returns tier module params.
-func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k *Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -25,7 +25,7 @@ func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*typ
 }
 
 // Lockup query returns a lockup based on delegator address and validator address.
-func (k Keeper) Lockup(ctx context.Context, req *types.LockupRequest) (*types.LockupResponse, error) {
+func (k *Keeper) Lockup(ctx context.Context, req *types.LockupRequest) (*types.LockupResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -49,7 +49,7 @@ func (k Keeper) Lockup(ctx context.Context, req *types.LockupRequest) (*types.Lo
 }
 
 // Lockups query returns all delegator lockups with pagination.
-func (k Keeper) Lockups(ctx context.Context, req *types.LockupsRequest) (*types.LockupsResponse, error) {
+func (k *Keeper) Lockups(ctx context.Context, req *types.LockupsRequest) (*types.LockupsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -68,7 +68,7 @@ func (k Keeper) Lockups(ctx context.Context, req *types.LockupsRequest) (*types.
 }
 
 // UnlockingLockup query returns an unlocking lockup based on delAddr, valAddr, and creationHeight.
-func (k Keeper) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupRequest) (
+func (k *Keeper) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupRequest) (
 	*types.UnlockingLockupResponse, error) {
 
 	if req == nil {
@@ -94,7 +94,7 @@ func (k Keeper) UnlockingLockup(ctx context.Context, req *types.UnlockingLockupR
 }
 
 // UnlockingLockup query returns all delegator unlocking lockups with pagination.
-func (k Keeper) UnlockingLockups(ctx context.Context, req *types.UnlockingLockupsRequest) (
+func (k *Keeper) UnlockingLockups(ctx context.Context, req *types.UnlockingLockupsRequest) (
 	*types.UnlockingLockupsResponse, error) {
 
 	if req == nil {
@@ -115,7 +115,7 @@ func (k Keeper) UnlockingLockups(ctx context.Context, req *types.UnlockingLockup
 }
 
 // getLockupsPaginated returns delegator lockups with pagination.
-func (k Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
+func (k *Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.Lockup, *query.PageResponse, error) {
 
 	var lockups []types.Lockup
@@ -139,7 +139,7 @@ func (k Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress,
 }
 
 // getUnlockingLockupsPaginated returns delegator unlocking lockups with pagination.
-func (k Keeper) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
+func (k *Keeper) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.UnlockingLockup, *query.PageResponse, error) {
 
 	var unlockingLockups []types.UnlockingLockup

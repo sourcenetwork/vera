@@ -10,16 +10,16 @@ import (
 )
 
 type msgServer struct {
-	Keeper
+	*Keeper
 }
 
-var _ types.MsgServer = msgServer{}
+var _ types.MsgServer = &msgServer{}
 
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
+func (m *msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
 	authority := m.Keeper.GetAuthority()
 	if msg.Authority != authority {
 		return nil, types.ErrUnauthorized.Wrapf("invalid authority: %s", msg.Authority)
@@ -38,7 +38,7 @@ func (m msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams)
 	return &types.MsgUpdateParamsResponse{}, nil
 }
 
-func (m msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLockResponse, error) {
+func (m *msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLockResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
@@ -51,7 +51,7 @@ func (m msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLock
 	return &types.MsgLockResponse{}, nil
 }
 
-func (m msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.MsgUnlockResponse, error) {
+func (m *msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.MsgUnlockResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
@@ -64,7 +64,7 @@ func (m msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.Msg
 	return &types.MsgUnlockResponse{CreationHeight: creationHeight, CompletionTime: completionTime, UnlockTime: unlockTime}, nil
 }
 
-func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlocking) (*types.MsgCancelUnlockingResponse, error) {
+func (m *msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlocking) (*types.MsgCancelUnlockingResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	valAddr := types.MustValAddressFromBech32(msg.ValidatorAddress)
@@ -77,7 +77,7 @@ func (m msgServer) CancelUnlocking(ctx context.Context, msg *types.MsgCancelUnlo
 	return &types.MsgCancelUnlockingResponse{}, nil
 }
 
-func (m msgServer) Redelegate(ctx context.Context, msg *types.MsgRedelegate) (*types.MsgRedelegateResponse, error) {
+func (m *msgServer) Redelegate(ctx context.Context, msg *types.MsgRedelegate) (*types.MsgRedelegateResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
 	srcValAddr := types.MustValAddressFromBech32(msg.SrcValidatorAddress)
