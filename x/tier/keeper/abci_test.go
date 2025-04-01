@@ -11,7 +11,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
@@ -87,14 +86,6 @@ func TestHandleSlashingEvents(t *testing.T) {
 	initializeDelegator(t, &k, ctx, delAddr2, initialDelegatorBalance2)
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
 	mintCoinsToModule(t, &k, ctx, types.InsurancePoolName, insurancePoolBalance)
-
-	epoch := epochstypes.EpochInfo{
-		Identifier:            types.EpochIdentifier,
-		CurrentEpoch:          1,
-		CurrentEpochStartTime: ctx.BlockTime().Add(-5 * time.Minute),
-		Duration:              5 * time.Minute,
-	}
-	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
 	validator, err := k.GetStakingKeeper().GetValidator(ctx, valAddr)
 	require.NoError(t, err)

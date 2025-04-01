@@ -198,13 +198,13 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		log.NewNopLogger(),
 	)
 
-	epochInfo := epochstypes.EpochInfo{
+	epoch := epochstypes.EpochInfo{
 		Identifier:            types.EpochIdentifier,
 		CurrentEpoch:          1,
-		CurrentEpochStartTime: ctx.BlockTime(),
-		Duration:              time.Hour * 24 * 30,
+		CurrentEpochStartTime: ctx.BlockTime().Add(-5 * time.Minute),
+		Duration:              5 * time.Minute,
 	}
-	epochsKeeper.SetEpochInfo(ctx, epochInfo)
+	epochsKeeper.SetEpochInfo(ctx, epoch)
 
 	k := NewKeeper(
 		cdc,

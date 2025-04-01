@@ -447,7 +447,7 @@ func (k *Keeper) adjustLockup(
 
 	// Calculate covered amount and update insurance lockup if coverage rate is provided
 	if coverageRate.IsPositive() {
-		coveredAmount := lockup.Amount.ToLegacyDec().Mul(coverageRate).Ceil().TruncateInt()
+		coveredAmount := lockup.Amount.ToLegacyDec().Mul(coverageRate).TruncateInt()
 		insuranceLockup := k.getInsuranceLockup(ctx, delAddr, valAddr)
 		if insuranceLockup != nil {
 			coveredAmount = coveredAmount.Add(insuranceLockup.Amount)
