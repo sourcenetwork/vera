@@ -47,7 +47,7 @@ require (
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
-	github.com/sourcenetwork/acp_core v0.4.1
+	github.com/sourcenetwork/acp_core v0.5.1
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.8.1
@@ -284,7 +284,7 @@ require (
 	github.com/segmentio/encoding v0.4.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/sourcenetwork/zanzi v0.3.1-0.20250117191617-40400ffac5e3 // indirect
+	github.com/sourcenetwork/zanzi v0.3.1-0.20250326181925-74d3e97fb950 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
@@ -323,13 +323,14 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.7.0 // indirect
 	google.golang.org/api v0.186.0 // indirect
 	google.golang.org/genproto v0.0.0-20240701130421-f6361c86f094 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250106144421-5f5ef82da422 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gotest.tools/v3 v3.5.1 // indirect
+	k8s.io/apimachinery v0.32.3 // indirect
 	nhooyr.io/websocket v1.8.6 // indirect
 	pgregory.net/rapid v1.1.0 // indirect
 	pluginrpc.com/pluginrpc v0.5.0 // indirect

@@ -7,13 +7,13 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
-import "sourcenetwork/acp_core/request.proto";
+import "sourcehub/acp/access_decision.proto";
 import "sourcehub/acp/params.proto";
 import "sourcehub/acp/policy_cmd.proto";
 import "sourcehub/acp/record.proto";
-import "sourcehub/acp/access_decision.proto";
-import "sourcenetwork/acp_core/policy_short.proto";
 import "sourcenetwork/acp_core/policy.proto";
+import "sourcenetwork/acp_core/policy_short.proto";
+import "sourcenetwork/acp_core/request.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -29,11 +29,25 @@ service Msg {
   // The Policy models an aplication's high level access control rules.
   rpc CreatePolicy(MsgCreatePolicy) returns (MsgCreatePolicyResponse);
 
+  // EditPolicy mutates the rules defined by a Policy.
+  //
+  // Relations may be added and removed to resources (if they are not required),
+  // new resources may be added, but resources may not be removed.
+  //
+  // Removing a relation removes all relationships that reference the removed relation
+  //
+  // A few other invariants are enforced such as:
+  // - the name of the actor resource may not be mutated
+  // - resources cannot be removed
+  // - the specification of a policy cannot be mutated
+  // Violations of these constraints will return an error.
+  rpc EditPolicy(MsgEditPolicy) returns (MsgEditPolicyResponse);
+
   // CheckAccess executes an Access Request for an User and stores the result of the evaluation in SourceHub.
   // The resulting evaluation is used to generate a cryptographic proof that the given Access Request
   // was valid at a particular block height.
   rpc CheckAccess(MsgCheckAccess) returns (MsgCheckAccessResponse);
-  
+
   // SignedPolicyCmd is a wrapper for a Command which is executed within the Context of a Policy.
   // The Command is signed by the Actor issuing it.
   rpc SignedPolicyCmd(MsgSignedPolicyCmd) returns (MsgSignedPolicyCmdResponse);
@@ -41,13 +55,12 @@ service Msg {
   // BearerPolicyCmd is a Msg containing an instruction which changes the authorization
   // rules in a Policy.
   // This Msg authenticates the actor through the the Bearer authentication protocol.
-  
+
   // The Msg authenticates the actor initiating the command through a Bearer token.
   // This token MUST be issued and signed by some DID Actor, the verification of the signature
   // is used as authentication proof.
   // Lastly, the Bearer token MUST be bound to some SourceHub account.
   rpc BearerPolicyCmd(MsgBearerPolicyCmd) returns (MsgBearerPolicyCmdResponse);
-
   rpc DirectPolicyCmd(MsgDirectPolicyCmd) returns (MsgDirectPolicyCmdResponse);
 }
 
@@ -83,6 +96,19 @@ message MsgCreatePolicyResponse {
   PolicyRecord record = 1;
 }
 
+message MsgEditPolicy {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string policy_id = 2;
+  string policy = 3;
+  sourcenetwork.acp_core.PolicyMarshalingType marshal_type = 4;
+}
+
+message MsgEditPolicyResponse {
+  uint64 relationships_removed = 1;
+  PolicyRecord record = 2;
+}
+
 message MsgCheckAccess {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
@@ -97,12 +123,12 @@ message MsgCheckAccessResponse {
 message MsgSignedPolicyCmd {
   enum ContentType {
     UNKNOWN = 0;
-    JWS     = 1;
+    JWS = 1;
   }
   option (cosmos.msg.v1.signer) = "creator";
-  string      creator = 1;
-  string      payload = 2;
-  ContentType type    = 3;
+  string creator = 1;
+  string payload = 2;
+  ContentType type = 3;
 }
 
 message MsgSignedPolicyCmdResponse {
@@ -111,10 +137,10 @@ message MsgSignedPolicyCmdResponse {
 
 message MsgBearerPolicyCmd {
   option (cosmos.msg.v1.signer) = "creator";
-  string                    creator       = 1;
-  string                    bearer_token  = 2;
-  string                    policy_id     = 3;
-  PolicyCmd                 cmd           = 4;
+  string creator = 1;
+  string bearer_token = 2;
+  string policy_id = 3;
+  PolicyCmd cmd = 4;
 }
 
 message MsgBearerPolicyCmdResponse {
@@ -124,8 +150,8 @@ message MsgBearerPolicyCmdResponse {
 message MsgDirectPolicyCmd {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
-  string                    policy_id     = 2;
-  PolicyCmd                 cmd           = 3;
+  string policy_id = 2;
+  PolicyCmd cmd = 3;
 }
 
 message MsgDirectPolicyCmdResponse {

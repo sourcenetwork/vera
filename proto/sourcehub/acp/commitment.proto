@@ -2,39 +2,38 @@ syntax = "proto3";
 
 package sourcehub.acp;
 
-import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/record.proto";
 import "sourcehub/acp/time.proto";
+import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
-
 // RegistrationProof models an opening proof for a RegistrationCommitment
 message RegistrationProof {
-    sourcenetwork.acp_core.Object object = 1;
-    // Hash of neighbors required to validate proof.
-    // 
-    // Hashes must be ordered as a RFC6962 "merkle audit path"
-    // https://www.rfc-editor.org/rfc/rfc6962#section-2.1.1
-    repeated bytes merkle_proof = 2;
-    uint64 leaf_count = 3;
-    uint64 leaf_index = 4;
+  sourcenetwork.acp_core.Object object = 1;
+  // Hash of neighbors required to validate proof.
+  //
+  // Hashes must be ordered as a RFC6962 "merkle audit path"
+  // https://www.rfc-editor.org/rfc/rfc6962#section-2.1.1
+  repeated bytes merkle_proof = 2;
+  uint64 leaf_count = 3;
+  uint64 leaf_index = 4;
 }
 
 // RegistrationsCommitment models a batched cryptographic commitment
 // of a set of Object registrations issued by an Actor
 message RegistrationsCommitment {
-    uint64 id = 1;
+  uint64 id = 1;
 
-    string policy_id = 2;
+  string policy_id = 2;
 
-    // commitment is a merkle root of registrations 
-    bytes commitment = 3;
+  // commitment is a merkle root of registrations
+  bytes commitment = 3;
 
-    bool expired = 4;
+  bool expired = 4;
 
-    // validity models the duration for which the commitment is valid for 
-    Duration validity = 5;
+  // validity models the duration for which the commitment is valid for
+  Duration validity = 5;
 
-    RecordMetadata metadata = 6;
+  RecordMetadata metadata = 6;
 }

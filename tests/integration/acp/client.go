@@ -103,6 +103,11 @@ func (c *KeeperACPClient) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy)
 	return c.k.CreatePolicy(sdkCtx, msg)
 }
 
+func (c *KeeperACPClient) EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
+	sdkCtx := c.getSDKCtx(ctx)
+	return c.k.EditPolicy(sdkCtx, msg)
+}
+
 func (c *KeeperACPClient) GetOrCreateAccountFromActor(_ *TestCtx, actor *TestActor) (sdk.AccountI, error) {
 	return c.accountCreator.NewAccount(actor.PubKey), nil
 }
@@ -263,6 +268,18 @@ func (e *SDKClientExecutor) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPo
 func (e *SDKClientExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	set := hubsdk.MsgSet{}
 	mapper := set.WithCreatePolicy(msg)
+	result := e.broadcastTx(ctx, &set)
+	if result.Error() != nil {
+		return nil, result.Error()
+	}
+	response, err := mapper.Map(result.TxPayload())
+	require.NoError(ctx.T, err)
+	return response, nil
+}
+
+func (e *SDKClientExecutor) EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
+	set := hubsdk.MsgSet{}
+	mapper := set.WithEditPolicy(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
 		return nil, result.Error()

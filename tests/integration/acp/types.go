@@ -29,6 +29,7 @@ type ACPClient interface {
 	signed_policy_cmd.LogicalClock
 
 	CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error)
+	EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error)
 	BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error)
 	SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error)
 	DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error)

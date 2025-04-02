@@ -3,11 +3,11 @@ syntax = "proto3";
 package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
-import "sourcenetwork/acp_core/relationship.proto";
 import "sourcehub/acp/commitment.proto";
-import "sourcehub/acp/registration.proto";
-import "sourcehub/acp/record.proto";
 import "sourcehub/acp/policy_cmd.proto";
+import "sourcehub/acp/record.proto";
+import "sourcehub/acp/registration.proto";
+import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 

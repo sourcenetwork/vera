@@ -164,7 +164,11 @@ func (am AppModule) BeginBlock(_ context.Context) error {
 // EndBlock contains the logic that is automatically triggered at the end of each block.
 // The end block implementation is optional.
 func (am AppModule) EndBlock(ctx context.Context) error {
-	am.keeper.EndBlocker(ctx)
+	_, err := am.keeper.EndBlocker(ctx)
+	if err != nil {
+		am.keeper.Logger().Error("EndBlocker failed", "error", err)
+	}
+
 	return nil
 }
 
