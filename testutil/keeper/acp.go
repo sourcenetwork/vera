@@ -23,24 +23,33 @@ import (
 )
 
 func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
-	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
+	acpStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
+	capabilityStoreKey := storetypes.NewKVStoreKey("capkeeper")
+	capabilityMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeIAVL, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
+	// mount stores
+	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeIAVL, db)
 
 	registry := codectypes.NewInterfaceRegistry()
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	capKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, capabilityMemStoreKey)
+	acpCapKeeper := capKeeper.ScopeToModule(types.ModuleName)
+
 	k := keeper.NewKeeper(
 		cdc,
-		runtime.NewKVStoreService(storeKey),
+		runtime.NewKVStoreService(acpStoreKey),
 		log.NewNopLogger(),
 		authority.String(),
 		&AccountKeeperStub{},
-		&capabilitykeeper.ScopedKeeper{},
+		&acpCapKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
