@@ -12,10 +12,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ types.QueryServer = Keeper{}
+var _ types.QueryServer = &Keeper{}
 
 // Params query returns bulletin module params.
-func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k *Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -24,7 +24,7 @@ func (k Keeper) Params(ctx context.Context, req *types.QueryParamsRequest) (*typ
 }
 
 // Namespaces query returns all namespaces with pagination.
-func (k Keeper) Namespaces(ctx context.Context, req *types.QueryNamespacesRequest) (*types.QueryNamespacesResponse, error) {
+func (k *Keeper) Namespaces(ctx context.Context, req *types.QueryNamespacesRequest) (*types.QueryNamespacesResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -38,7 +38,7 @@ func (k Keeper) Namespaces(ctx context.Context, req *types.QueryNamespacesReques
 }
 
 // Namespace query returns a namespace based on the specified namespace id.
-func (k Keeper) Namespace(ctx context.Context, req *types.QueryNamespaceRequest) (*types.QueryNamespaceResponse, error) {
+func (k *Keeper) Namespace(ctx context.Context, req *types.QueryNamespaceRequest) (*types.QueryNamespaceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -53,7 +53,7 @@ func (k Keeper) Namespace(ctx context.Context, req *types.QueryNamespaceRequest)
 }
 
 // NamespaceCollaborators query returns all namespace collaborators with pagination.
-func (k Keeper) NamespaceCollaborators(ctx context.Context, req *types.QueryNamespaceCollaboratorsRequest) (
+func (k *Keeper) NamespaceCollaborators(ctx context.Context, req *types.QueryNamespaceCollaboratorsRequest) (
 	*types.QueryNamespaceCollaboratorsResponse, error) {
 
 	if req == nil {
@@ -74,7 +74,7 @@ func (k Keeper) NamespaceCollaborators(ctx context.Context, req *types.QueryName
 }
 
 // NamespacePosts query returns all namespace posts with pagination.
-func (k Keeper) NamespacePosts(ctx context.Context, req *types.QueryNamespacePostsRequest) (
+func (k *Keeper) NamespacePosts(ctx context.Context, req *types.QueryNamespacePostsRequest) (
 	*types.QueryNamespacePostsResponse, error) {
 
 	if req == nil {
@@ -95,7 +95,7 @@ func (k Keeper) NamespacePosts(ctx context.Context, req *types.QueryNamespacePos
 }
 
 // Post query returns a post based on the specified namespace and id.
-func (k Keeper) Post(ctx context.Context, req *types.QueryPostRequest) (*types.QueryPostResponse, error) {
+func (k *Keeper) Post(ctx context.Context, req *types.QueryPostRequest) (*types.QueryPostResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -114,7 +114,7 @@ func (k Keeper) Post(ctx context.Context, req *types.QueryPostRequest) (*types.Q
 }
 
 // Posts query returns all posts with pagination.
-func (k Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*types.QueryPostsResponse, error) {
+func (k *Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*types.QueryPostsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -128,7 +128,7 @@ func (k Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*types
 }
 
 // getNamespacesPaginated returns all namespaces with pagination.
-func (k Keeper) getNamespacesPaginated(ctx context.Context, pageReq *query.PageRequest) (
+func (k *Keeper) getNamespacesPaginated(ctx context.Context, pageReq *query.PageRequest) (
 	[]types.Namespace, *query.PageResponse, error) {
 
 	var namespaces []types.Namespace
@@ -151,7 +151,7 @@ func (k Keeper) getNamespacesPaginated(ctx context.Context, pageReq *query.PageR
 }
 
 // getNamespaceCollaboratorsPaginated returns namespace collaborators with pagination.
-func (k Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespaceId string, pageReq *query.PageRequest) (
+func (k *Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespaceId string, pageReq *query.PageRequest) (
 	[]types.Collaborator, *query.PageResponse, error) {
 
 	var collaborators []types.Collaborator
@@ -177,7 +177,7 @@ func (k Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespac
 }
 
 // getNamespacePostsPaginated returns namespace posts with pagination.
-func (k Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId string, pageReq *query.PageRequest) (
+func (k *Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId string, pageReq *query.PageRequest) (
 	[]types.Post, *query.PageResponse, error) {
 
 	var posts []types.Post
@@ -203,7 +203,7 @@ func (k Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId stri
 }
 
 // getAllPostsPaginated returns all posts with pagination.
-func (k Keeper) getAllPostsPaginated(ctx context.Context, pageReq *query.PageRequest) (
+func (k *Keeper) getAllPostsPaginated(ctx context.Context, pageReq *query.PageRequest) (
 	[]types.Post, *query.PageResponse, error) {
 
 	var posts []types.Post

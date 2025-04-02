@@ -12,7 +12,7 @@ import (
 )
 
 // hasNamespace checks if namespace with specified namespaceId exists.
-func (k Keeper) hasNamespace(ctx context.Context, namespaceId string) bool {
+func (k *Keeper) hasNamespace(ctx context.Context, namespaceId string) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NamespaceKeyPrefix))
 
@@ -22,7 +22,7 @@ func (k Keeper) hasNamespace(ctx context.Context, namespaceId string) bool {
 }
 
 // getPost retrieves a post based on existing namespaceId and postId.
-func (k Keeper) getPost(ctx context.Context, namespaceId string, postId string) *types.Post {
+func (k *Keeper) getPost(ctx context.Context, namespaceId string, postId string) *types.Post {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 
@@ -39,7 +39,7 @@ func (k Keeper) getPost(ctx context.Context, namespaceId string, postId string) 
 }
 
 // getCollaborator retrieves a post based on existing namespaceId and actorDID.
-func (k Keeper) getCollaborator(ctx context.Context, namespaceId string, actorDID string) *types.Collaborator {
+func (k *Keeper) getCollaborator(ctx context.Context, namespaceId string, actorDID string) *types.Collaborator {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
@@ -56,7 +56,7 @@ func (k Keeper) getCollaborator(ctx context.Context, namespaceId string, actorDI
 }
 
 // mustIterateNamespaces iterates over all namespaces and performs the provided callback function.
-func (k Keeper) mustIterateNamespaces(ctx sdk.Context, cb func(namespace types.Namespace)) {
+func (k *Keeper) mustIterateNamespaces(ctx sdk.Context, cb func(namespace types.Namespace)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NamespaceKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
@@ -71,7 +71,7 @@ func (k Keeper) mustIterateNamespaces(ctx sdk.Context, cb func(namespace types.N
 }
 
 // mustIterateCollaborators iterates over all collaborators and performs the provided callback function.
-func (k Keeper) mustIterateCollaborators(ctx context.Context, cb func(collaborator types.Collaborator)) {
+func (k *Keeper) mustIterateCollaborators(ctx context.Context, cb func(collaborator types.Collaborator)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
@@ -86,7 +86,7 @@ func (k Keeper) mustIterateCollaborators(ctx context.Context, cb func(collaborat
 }
 
 // mustIteratePosts iterates over all posts and performs the provided callback function.
-func (k Keeper) mustIteratePosts(ctx context.Context, cb func(post types.Post)) {
+func (k *Keeper) mustIteratePosts(ctx context.Context, cb func(post types.Post)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
@@ -101,7 +101,7 @@ func (k Keeper) mustIteratePosts(ctx context.Context, cb func(post types.Post)) 
 }
 
 // mustIterateNamespacePosts iterates over namespace posts and performs the provided callback function.
-func (k Keeper) mustIterateNamespacePosts(ctx context.Context, namespaceId string, cb func(namespaceId string, post types.Post)) {
+func (k *Keeper) mustIterateNamespacePosts(ctx context.Context, namespaceId string, cb func(namespaceId string, post types.Post)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, []byte(namespaceId+"/"))

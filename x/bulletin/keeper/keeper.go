@@ -53,33 +53,33 @@ func NewKeeper(
 }
 
 // GetAuthority returns the module's authority.
-func (k Keeper) GetAuthority() string {
+func (k *Keeper) GetAuthority() string {
 	return k.authority
 }
 
 // GetAcpKeeper returns the module's AcpKeeper.
-func (k Keeper) GetAcpKeeper() *acpkeeper.Keeper {
+func (k *Keeper) GetAcpKeeper() *acpkeeper.Keeper {
 	return &k.acpKeeper
 }
 
 // GetAccountKeeper returns the module's AccountKeeper.
-func (k Keeper) GetAccountKeeper() types.AccountKeeper {
+func (k *Keeper) GetAccountKeeper() types.AccountKeeper {
 	return k.accountKeeper
 }
 
 // Logger returns a module-specific logger.
-func (k Keeper) Logger() log.Logger {
+func (k *Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // SetPolicyId stores id of the genesis bulletin policy.
-func (k Keeper) SetPolicyId(ctx context.Context, policyId string) {
+func (k *Keeper) SetPolicyId(ctx context.Context, policyId string) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store.Set([]byte(types.PolicyIdKey), []byte(policyId))
 }
 
 // GetPolicyId returns genesis bulletin policy id.
-func (k Keeper) GetPolicyId(ctx context.Context) string {
+func (k *Keeper) GetPolicyId(ctx context.Context) string {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz := store.Get([]byte(types.PolicyIdKey))
 	if bz == nil {
@@ -90,7 +90,7 @@ func (k Keeper) GetPolicyId(ctx context.Context) string {
 }
 
 // SetNamespace adds new namespace to the store.
-func (k Keeper) SetNamespace(ctx context.Context, namespace types.Namespace) {
+func (k *Keeper) SetNamespace(ctx context.Context, namespace types.Namespace) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NamespaceKeyPrefix))
 	bz := k.cdc.MustMarshal(&namespace)
@@ -99,7 +99,7 @@ func (k Keeper) SetNamespace(ctx context.Context, namespace types.Namespace) {
 }
 
 // GetNamespace retrieves existing namespace based on the namespaceId.
-func (k Keeper) GetNamespace(ctx context.Context, namespaceId string) *types.Namespace {
+func (k *Keeper) GetNamespace(ctx context.Context, namespaceId string) *types.Namespace {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NamespaceKeyPrefix))
 
@@ -115,7 +115,7 @@ func (k Keeper) GetNamespace(ctx context.Context, namespaceId string) *types.Nam
 }
 
 // GetAllNamespaces returns all namespaces.
-func (k Keeper) GetAllNamespaces(ctx sdk.Context) []types.Namespace {
+func (k *Keeper) GetAllNamespaces(ctx sdk.Context) []types.Namespace {
 	var namespaces []types.Namespace
 
 	namespacesCallback := func(namespace types.Namespace) {
@@ -128,7 +128,7 @@ func (k Keeper) GetAllNamespaces(ctx sdk.Context) []types.Namespace {
 }
 
 // SetCollaborator adds new collaborator to the store.
-func (k Keeper) SetCollaborator(ctx context.Context, collaborator types.Collaborator) {
+func (k *Keeper) SetCollaborator(ctx context.Context, collaborator types.Collaborator) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
@@ -138,7 +138,7 @@ func (k Keeper) SetCollaborator(ctx context.Context, collaborator types.Collabor
 }
 
 // DeleteCollaborator removes a collaborator from the store.
-func (k Keeper) DeleteCollaborator(ctx context.Context, namespaceId string, collaboratorDID string) {
+func (k *Keeper) DeleteCollaborator(ctx context.Context, namespaceId string, collaboratorDID string) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
@@ -147,7 +147,7 @@ func (k Keeper) DeleteCollaborator(ctx context.Context, namespaceId string, coll
 }
 
 // GetAllCollaborators returns all collaborators.
-func (k Keeper) GetAllCollaborators(ctx context.Context) []types.Collaborator {
+func (k *Keeper) GetAllCollaborators(ctx context.Context) []types.Collaborator {
 	var collaborators []types.Collaborator
 
 	collaboratorsCallback := func(collaborator types.Collaborator) {
@@ -160,7 +160,7 @@ func (k Keeper) GetAllCollaborators(ctx context.Context) []types.Collaborator {
 }
 
 // SetPost adds new post to the store.
-func (k Keeper) SetPost(ctx context.Context, post types.Post) {
+func (k *Keeper) SetPost(ctx context.Context, post types.Post) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 
@@ -170,7 +170,7 @@ func (k Keeper) SetPost(ctx context.Context, post types.Post) {
 }
 
 // GetNamespacePosts returns namespace posts.
-func (k Keeper) GetNamespacePosts(ctx context.Context, namespaceId string) []types.Post {
+func (k *Keeper) GetNamespacePosts(ctx context.Context, namespaceId string) []types.Post {
 	var posts []types.Post
 
 	postsCallback := func(namespaceId string, post types.Post) {
@@ -183,7 +183,7 @@ func (k Keeper) GetNamespacePosts(ctx context.Context, namespaceId string) []typ
 }
 
 // GetAllPosts returns all posts.
-func (k Keeper) GetAllPosts(ctx context.Context) []types.Post {
+func (k *Keeper) GetAllPosts(ctx context.Context) []types.Post {
 	var posts []types.Post
 
 	postsCallback := func(post types.Post) {
