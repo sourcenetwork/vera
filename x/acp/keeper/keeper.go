@@ -36,7 +36,7 @@ type (
 		authority string
 
 		accountKeeper types.AccountKeeper
-		capKeeper     capabilitykeeper.ScopedKeeper
+		capKeeper     *capabilitykeeper.ScopedKeeper
 	}
 )
 
@@ -46,7 +46,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
-	capKeeper capabilitykeeper.ScopedKeeper,
+	capKeeper *capabilitykeeper.ScopedKeeper,
 
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
@@ -148,5 +148,20 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 }
 
 func (k *Keeper) getPolicyCapabilityManager(ctx sdk.Context) *capability.PolicyCapabilityManager {
-	return capability.NewPolicyCapabilityManager(&k.capKeeper)
+	return capability.NewPolicyCapabilityManager(k.capKeeper)
+}
+
+// InitializeCapabilityKeeper allows main app to set the capability
+// keeper after the moment of creation.
+//
+// This is supported since currently the capability module
+// does not integrate with the new module dependency injection system.
+//
+// If the keeper was previously initialized (ie inner point != nil),
+// throws a panic
+func (k *Keeper) InitializeCapabilityKeeper(keeper *capabilitykeeper.ScopedKeeper) {
+	if k.capKeeper != nil {
+		panic("capability keeper already initialized")
+	}
+	k.capKeeper = keeper
 }

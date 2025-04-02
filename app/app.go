@@ -64,7 +64,6 @@ import (
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	acpmodule "github.com/sourcenetwork/sourcehub/x/acp/module"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
@@ -134,7 +133,7 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
-	AcpKeeper      acpmodulekeeper.Keeper
+	AcpKeeper      *acpmodulekeeper.Keeper
 	BulletinKeeper bulletinmodulekeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     tierkeeper.Keeper
@@ -188,9 +187,6 @@ func New(
 		// merge the AppConfig and other configuration in one config
 		appConfig = depinject.Configs(
 			AppConfig(),
-			depinject.Provide(
-				app.GetACPCapabilityKeeper,
-			),
 			depinject.Supply(
 				// Supply the application options
 				appOpts,
@@ -313,6 +309,11 @@ func New(
 	app.registerIBCModules()
 
 	customMintModule := app.registerCustomMintModule()
+
+	// initialize capability keeper in acp module
+	// which is initialized by IBC modules
+	acpKeeper := app.GetCapabilityScopedKeeper(acptypes.ModuleName)
+	app.AcpKeeper.InitializeCapabilityKeeper(&acpKeeper)
 
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
@@ -492,10 +493,6 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 // GetIBCKeeper returns the IBC keeper.
 func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
-}
-
-func (app *App) GetACPCapabilityKeeper() acpmodule.ScopedCapabilityKeeper {
-	return acpmodule.ScopedCapabilityKeeper(app.CapabilityKeeper.ScopeToModule(acptypes.ModuleName))
 }
 
 // GetCapabilityScopedKeeper returns the capability scoped keeper.

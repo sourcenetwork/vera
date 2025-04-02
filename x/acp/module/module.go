@@ -16,7 +16,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -190,8 +189,6 @@ func init() {
 	)
 }
 
-type ScopedCapabilityKeeper capabilitykeeper.ScopedKeeper
-
 type ModuleInputs struct {
 	depinject.In
 
@@ -202,13 +199,12 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	CapKeeper     ScopedCapabilityKeeper
 }
 
 type ModuleOutputs struct {
 	depinject.Out
 
-	AcpKeeper keeper.Keeper
+	AcpKeeper *keeper.Keeper
 	Module    appmodule.AppModule
 }
 
@@ -224,7 +220,9 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
-		capabilitykeeper.ScopedKeeper(in.CapKeeper),
+		// set cap keeper as it is initialized
+		// after depinject is finished executing
+		nil,
 	)
 	m := NewAppModule(
 		in.Cdc,
@@ -233,5 +231,5 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 	)
 
-	return ModuleOutputs{AcpKeeper: k, Module: m}
+	return ModuleOutputs{AcpKeeper: &k, Module: m}
 }

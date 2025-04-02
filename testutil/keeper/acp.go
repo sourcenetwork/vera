@@ -40,7 +40,7 @@ func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		log.NewNopLogger(),
 		authority.String(),
 		&AccountKeeperStub{},
-		capabilitykeeper.ScopedKeeper{},
+		&capabilitykeeper.ScopedKeeper{},
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

@@ -187,7 +187,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 		log.NewNopLogger(),
 		authority.String(),
 		accKeeper,
-		capabilitykeeper.ScopedKeeper{},
+		&capabilitykeeper.ScopedKeeper{},
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
