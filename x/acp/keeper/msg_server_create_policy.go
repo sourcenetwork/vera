@@ -3,10 +3,13 @@ package keeper
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
@@ -20,6 +23,8 @@ const (
 )
 
 func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CreatePolicy, metrics.Latency)
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	engine := k.GetACPEngine(ctx)

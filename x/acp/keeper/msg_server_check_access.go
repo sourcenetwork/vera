@@ -2,16 +2,21 @@ package keeper
 
 import (
 	"context"
+	"time"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
 func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CheckAccess, metrics.Latency)
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	eventManager := ctx.EventManager()
 
