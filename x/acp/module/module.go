@@ -220,7 +220,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
-		// set cap keeper as it is initialized
+		// set cap keeper as nil it is initialized
 		// after depinject is finished executing
 		nil,
 	)

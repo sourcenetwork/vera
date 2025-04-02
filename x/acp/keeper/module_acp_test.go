@@ -23,7 +23,7 @@ func Test_CreateModulePolicy_ModuleCanCreatePolicy(t *testing.T) {
 	require.NotNil(t, capability.GetCosmosCapability())
 }
 
-func Test_EditModulePolicy_ModuleCannotUsePolicyWithoutClaimingCapability(t *testing.T) {
+func Test_EditModulePolicy_CannotEditWithoutClaimingCapability(t *testing.T) {
 	ctx, k, _, _ := setupKeeperWithCapability(t)
 
 	// Given Policy created by module without a claimed capability
@@ -31,7 +31,7 @@ func Test_EditModulePolicy_ModuleCannotUsePolicyWithoutClaimingCapability(t *tes
 	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, "external")
 	require.NoError(t, err)
 
-	// When the module attempts to the policy
+	// When the module attempts to edit the policy
 	pol = "name: new-name"
 	result, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
 
@@ -62,25 +62,6 @@ func Test_EditModulePolicy_ModuleCanEditPolicyTiedToClaimedCapability(t *testing
 	// Then policy record was edited with no error
 	require.NoError(t, err)
 	require.Equal(t, pol, record.RawPolicy)
-}
-
-func Test_EditModulePolicy_ModuleCannotEditPolicyWithUnclaimedCapability(t *testing.T) {
-	ctx, k, _, _ := setupKeeperWithCapability(t)
-
-	moduleName := "test_module"
-
-	// Given policy create by test_module
-	pol := "name: test"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, moduleName)
-	require.NoError(t, err)
-
-	// When the module edits the policy
-	pol = "name: new-name"
-	record, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
-
-	// Then operation was rejected
-	require.Nil(t, record)
-	require.ErrorIs(t, err, capability.ErrInvalidCapability)
 }
 
 func Test_ModulePolicyCmdForActorDID_ModuleCanAddRelationshipsToTheirPolicy(t *testing.T) {
@@ -144,4 +125,23 @@ resources:
 	require.NoError(t, err)
 	require.Equal(t, accDID, resultCmd.Record.Metadata.OwnerDid)
 	require.Equal(t, signer, resultCmd.Record.Metadata.TxSigner)
+}
+
+func Test_ModulePolicyCmdForActorAccount_ModuleCannotUsePolicyWithoutClaimingCapability(t *testing.T) {
+	ctx, k, accKeep, _ := setupKeeperWithCapability(t)
+
+	// Given Policy created by module without a claimed capability
+	pol := "name: test"
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, "external")
+	require.NoError(t, err)
+
+	// When module issues a policy cmd to an actor acc
+	cmd := types.NewRegisterObjectCmd(coretypes.NewObject("file", "foo"))
+	signer := "source1twjwexwrsvflt9nv9xwk27e0f2defa9fdjaeus"
+	accAddr := accKeep.FirstAcc().GetAddress().String()
+	result, err := k.ModulePolicyCmdForActorAccount(ctx, cap, cmd, accAddr, signer)
+
+	// Then cmd is reject due to invalid capability
+	require.Nil(t, result)
+	require.ErrorIs(t, err, capability.ErrInvalidCapability)
 }

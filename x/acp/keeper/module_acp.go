@@ -22,7 +22,7 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.GetACPEngine(ctx)
 
-	moduleDID := did.IssuedModuleDID(module)
+	moduleDID := did.IssueModuleDID(module)
 	metadata, err := types.BuildACPSuppliedMetadata(ctx, moduleDID, module)
 	if err != nil {
 		return nil, nil, errors.Wrap("CreateModulePolicy", err)
@@ -74,7 +74,7 @@ func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyC
 		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
-	moduleDID := did.IssuedModuleDID(module)
+	moduleDID := did.IssueModuleDID(module)
 
 	ctx, err = utils.InjectPrincipal(ctx, moduleDID)
 	if err != nil {
