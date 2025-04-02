@@ -16,7 +16,7 @@ func (k Keeper) RegistrationsCommitmentByCommitment(goCtx context.Context, req *
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	repo := k.GetRegistrationsCommitmentRepository(ctx)
+	repo := k.getRegistrationsCommitmentRepository(ctx)
 
 	iter, err := repo.FilterByCommitment(ctx, req.Commitment)
 	if err != nil {

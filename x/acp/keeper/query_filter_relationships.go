@@ -18,7 +18,7 @@ func (k Keeper) FilterRelationships(goCtx context.Context, req *types.QueryFilte
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.GetACPEngine(ctx)
+	engine := k.getACPEngine(ctx)
 
 	records, err := engine.FilterRelationships(goCtx, &coretypes.FilterRelationshipsRequest{
 		PolicyId: req.PolicyId,

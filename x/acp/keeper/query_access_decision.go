@@ -15,7 +15,7 @@ func (k Keeper) AccessDecision(goCtx context.Context, req *types.QueryAccessDeci
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	repository := k.GetAccessDecisionRepository(ctx)
+	repository := k.getAccessDecisionRepository(ctx)
 
 	decision, err := repository.Get(goCtx, req.Id)
 	if err != nil {
