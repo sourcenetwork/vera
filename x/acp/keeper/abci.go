@@ -15,8 +15,8 @@ import (
 // they are still valid, otherwise flags them as expired.
 func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommitment, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.getACPEngine(ctx)
-	repo := k.getRegistrationsCommitmentRepository(ctx)
+	engine := k.GetACPEngine(ctx)
+	repo := k.GetRegistrationsCommitmentRepository(ctx)
 	service := commitment.NewCommitmentService(engine, repo)
 
 	commitments, err := service.FlagExpiredCommitments(ctx)

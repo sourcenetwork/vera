@@ -20,7 +20,7 @@ import (
 // Claiming can be done using the callers capability keeper directly or the policy capability manager provided in the capability package.
 func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marshalType coretypes.PolicyMarshalingType, module string) (*types.PolicyRecord, *capability.PolicyCapability, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.getACPEngine(ctx)
+	engine := k.GetACPEngine(ctx)
 
 	moduleDID := did.IssuedModuleDID(module)
 	metadata, err := types.BuildACPSuppliedMetadata(ctx, moduleDID, module)
@@ -60,7 +60,7 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 // Returns the new policy record, the number of removed relationships and an error
 func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyCapability, policy string, marshalType coretypes.PolicyMarshalingType) (*types.PolicyRecord, uint64, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.getACPEngine(ctx)
+	engine := k.GetACPEngine(ctx)
 
 	capManager := k.getPolicyCapabilityManager(ctx)
 
@@ -141,7 +141,7 @@ func (k *Keeper) dispatchModulePolicyCmd(goCtx context.Context, capability *capa
 		return nil, err
 	}
 
-	handler := k.getPolicyCmdHandler(ctx)
+	handler := k.GetPolicyCmdHandler(ctx)
 	result, err := handler.Dispatch(&cmdCtx, cmd)
 	if err != nil {
 		return nil, err

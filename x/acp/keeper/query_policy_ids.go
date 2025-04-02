@@ -18,7 +18,7 @@ func (k Keeper) PolicyIds(goCtx context.Context, req *types.QueryPolicyIdsReques
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.getACPEngine(ctx)
+	engine := k.GetACPEngine(ctx)
 
 	resp, err := engine.ListPolicies(ctx, &coretypes.ListPoliciesRequest{})
 	if err != nil {

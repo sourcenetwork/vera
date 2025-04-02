@@ -14,7 +14,7 @@ import (
 func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.getACPEngine(ctx)
+	engine := k.GetACPEngine(ctx)
 
 	actorID, err := k.issueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {

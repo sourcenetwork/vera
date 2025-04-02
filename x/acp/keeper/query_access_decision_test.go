@@ -54,7 +54,7 @@ func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper)
 		IssuedHeight: 100,
 	}
 
-	repo := keeper.getAccessDecisionRepository(ctx)
+	repo := keeper.GetAccessDecisionRepository(ctx)
 	err := repo.Set(ctx, decision)
 	require.NoError(t, err)
 
