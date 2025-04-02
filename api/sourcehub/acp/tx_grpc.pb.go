@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Msg_UpdateParams_FullMethodName    = "/sourcehub.acp.Msg/UpdateParams"
 	Msg_CreatePolicy_FullMethodName    = "/sourcehub.acp.Msg/CreatePolicy"
+	Msg_EditPolicy_FullMethodName      = "/sourcehub.acp.Msg/EditPolicy"
 	Msg_CheckAccess_FullMethodName     = "/sourcehub.acp.Msg/CheckAccess"
 	Msg_SignedPolicyCmd_FullMethodName = "/sourcehub.acp.Msg/SignedPolicyCmd"
 	Msg_BearerPolicyCmd_FullMethodName = "/sourcehub.acp.Msg/BearerPolicyCmd"
@@ -39,6 +40,19 @@ type MsgClient interface {
 	// CreatePolicy adds a new Policy to SourceHub.
 	// The Policy models an aplication's high level access control rules.
 	CreatePolicy(ctx context.Context, in *MsgCreatePolicy, opts ...grpc.CallOption) (*MsgCreatePolicyResponse, error)
+	// EditPolicy mutates the rules defined by a Policy.
+	//
+	// Relations may be added and removed to resources (if they are not required),
+	// new resources may be added, but resources may not be removed.
+	//
+	// # Removing a relation removes all relationships that reference the removed relation
+	//
+	// A few other invariants are enforced such as:
+	// - the name of the actor resource may not be mutated
+	// - resources cannot be removed
+	// - the specification of a policy cannot be mutated
+	// Violations of these constraints will return an error.
+	EditPolicy(ctx context.Context, in *MsgEditPolicy, opts ...grpc.CallOption) (*MsgEditPolicyResponse, error)
 	// CheckAccess executes an Access Request for an User and stores the result of the evaluation in SourceHub.
 	// The resulting evaluation is used to generate a cryptographic proof that the given Access Request
 	// was valid at a particular block height.
@@ -76,6 +90,16 @@ func (c *msgClient) CreatePolicy(ctx context.Context, in *MsgCreatePolicy, opts 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgCreatePolicyResponse)
 	err := c.cc.Invoke(ctx, Msg_CreatePolicy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) EditPolicy(ctx context.Context, in *MsgEditPolicy, opts ...grpc.CallOption) (*MsgEditPolicyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgEditPolicyResponse)
+	err := c.cc.Invoke(ctx, Msg_EditPolicy_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +158,19 @@ type MsgServer interface {
 	// CreatePolicy adds a new Policy to SourceHub.
 	// The Policy models an aplication's high level access control rules.
 	CreatePolicy(context.Context, *MsgCreatePolicy) (*MsgCreatePolicyResponse, error)
+	// EditPolicy mutates the rules defined by a Policy.
+	//
+	// Relations may be added and removed to resources (if they are not required),
+	// new resources may be added, but resources may not be removed.
+	//
+	// # Removing a relation removes all relationships that reference the removed relation
+	//
+	// A few other invariants are enforced such as:
+	// - the name of the actor resource may not be mutated
+	// - resources cannot be removed
+	// - the specification of a policy cannot be mutated
+	// Violations of these constraints will return an error.
+	EditPolicy(context.Context, *MsgEditPolicy) (*MsgEditPolicyResponse, error)
 	// CheckAccess executes an Access Request for an User and stores the result of the evaluation in SourceHub.
 	// The resulting evaluation is used to generate a cryptographic proof that the given Access Request
 	// was valid at a particular block height.
@@ -162,6 +199,9 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 }
 func (UnimplementedMsgServer) CreatePolicy(context.Context, *MsgCreatePolicy) (*MsgCreatePolicyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePolicy not implemented")
+}
+func (UnimplementedMsgServer) EditPolicy(context.Context, *MsgEditPolicy) (*MsgEditPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditPolicy not implemented")
 }
 func (UnimplementedMsgServer) CheckAccess(context.Context, *MsgCheckAccess) (*MsgCheckAccessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckAccess not implemented")
@@ -228,6 +268,24 @@ func _Msg_CreatePolicy_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreatePolicy(ctx, req.(*MsgCreatePolicy))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_EditPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgEditPolicy)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).EditPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_EditPolicy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).EditPolicy(ctx, req.(*MsgEditPolicy))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -318,6 +376,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePolicy",
 			Handler:    _Msg_CreatePolicy_Handler,
+		},
+		{
+			MethodName: "EditPolicy",
+			Handler:    _Msg_EditPolicy_Handler,
 		},
 		{
 			MethodName: "CheckAccess",

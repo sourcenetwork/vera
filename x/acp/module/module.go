@@ -165,7 +165,11 @@ func (am AppModule) BeginBlock(_ context.Context) error {
 // The end block implementation is optional.
 func (am AppModule) EndBlock(ctx context.Context) error {
 	_, err := am.keeper.EndBlocker(ctx)
-	return err
+	if err != nil {
+		am.keeper.Logger().Error("EndBlocker failed", "error", err)
+	}
+
+	return nil
 }
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
