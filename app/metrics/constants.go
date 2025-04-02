@@ -17,6 +17,7 @@ const (
 
 	TotalLocked = "total_locked"
 
-	CreatePolicy = "create_policy"
 	CheckAccess  = "check_access"
+	CreatePolicy = "create_policy"
+	EditPolicy   = "edit_policy"
 )
