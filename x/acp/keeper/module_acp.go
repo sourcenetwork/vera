@@ -57,7 +57,8 @@ func (k *Keeper) CreateModulePolicy(goCtx context.Context, policy string, marsha
 }
 
 // EditModulePolicy updates the policy definition attached to the given PolicyCapability
-func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyCapability, policy string, marshalType coretypes.PolicyMarshalingType) (*types.PolicyRecord, error) {
+// Returns the new policy record, the number of removed relationships and an error
+func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyCapability, policy string, marshalType coretypes.PolicyMarshalingType) (*types.PolicyRecord, uint64, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	engine := k.getACPEngine(ctx)
 
@@ -65,19 +66,19 @@ func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyC
 
 	err := capManager.Validate(ctx, cap)
 	if err != nil {
-		return nil, errors.Wrap("EditModulePolicy", err)
+		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
 	module, err := capManager.GetOwnerModule(ctx, cap)
 	if err != nil {
-		return nil, errors.Wrap("EditModulePolicy", err)
+		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
 	moduleDID := did.IssuedModuleDID(module)
 
 	ctx, err = utils.InjectPrincipal(ctx, moduleDID)
 	if err != nil {
-		return nil, errors.Wrap("EditModulePolicy", err)
+		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
 	coreResult, err := engine.EditPolicy(ctx, &coretypes.EditPolicyRequest{
@@ -86,15 +87,15 @@ func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyC
 		MarshalType: marshalType,
 	})
 	if err != nil {
-		return nil, errors.Wrap("EditModulePolicy", err)
+		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
 	rec, err := types.MapPolicy(coreResult.Record)
 	if err != nil {
-		return nil, errors.Wrap("EditModulePolicy", err)
+		return nil, 0, errors.Wrap("EditModulePolicy", err)
 	}
 
-	return rec, nil
+	return rec, coreResult.RelatinshipsRemoved, nil
 }
 
 // ModulePolicyCmdForActorAccount issues a policy command for the policy bound to the provided capability.

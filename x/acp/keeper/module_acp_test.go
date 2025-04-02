@@ -33,7 +33,7 @@ func Test_EditModulePolicy_ModuleCannotUsePolicyWithoutClaimingCapability(t *tes
 
 	// When the module attempts to the policy
 	pol = "name: new-name"
-	result, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
+	result, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	// Then cmd is reject due to invalid capability
 	require.Nil(t, result)
@@ -57,7 +57,7 @@ func Test_EditModulePolicy_ModuleCanEditPolicyTiedToClaimedCapability(t *testing
 
 	// When the module edits the policy
 	pol = "name: new-name"
-	record, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
+	record, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	// Then policy record was edited with no error
 	require.NoError(t, err)
@@ -76,7 +76,7 @@ func Test_EditModulePolicy_ModuleCannotEditPolicyWithUnclaimedCapability(t *test
 
 	// When the module edits the policy
 	pol = "name: new-name"
-	record, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
+	record, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	// Then operation was rejected
 	require.Nil(t, record)
