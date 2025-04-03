@@ -37,8 +37,8 @@ func (k Keeper) getTotalCreditsAmount(ctx context.Context) (total math.Int) {
 	return total
 }
 
-// setTotalCreditsAmount updates the total credit amount in the store.
-func (k Keeper) setTotalCreditsAmount(ctx context.Context, total math.Int) error {
+// setTotalCreditAmount updates the total credit amount in the store.
+func (k Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz, err := total.Marshal()
 	if err != nil {
@@ -135,7 +135,7 @@ func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) error {
 	k.bankKeeper.IterateAllBalances(ctx, cb)
 
 	totalCredits := k.getTotalCreditsAmount(ctx)
-	if !totalCredits.IsZero() {
+	if totalCredits.IsPositive() {
 		creditUtilization, err := unusedCredits.ToLegacyDec().Quo(totalCredits.ToLegacyDec()).Float64()
 		if err != nil {
 			return errorsmod.Wrap(err, "calculate credit utilization")
@@ -150,7 +150,7 @@ func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) error {
 	}
 
 	// Reset total credit amount to 0 after burning
-	k.setTotalCreditsAmount(ctx, math.ZeroInt())
+	k.setTotalCreditAmount(ctx, math.ZeroInt())
 
 	return err
 }
@@ -189,7 +189,7 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 	}
 
 	// Set total credit amount
-	err := k.setTotalCreditsAmount(ctx, totalCredit)
+	err := k.setTotalCreditAmount(ctx, totalCredit)
 	if err != nil {
 		return errorsmod.Wrap(err, "set total credit amount")
 	}
