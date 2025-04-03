@@ -89,7 +89,7 @@ func (cdfd CustomDeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 }
 
 // checkTxFeeWithMinGasPrices checks if the tx fee with denom fee multiplier >= min gas price of the validator.
-// Enforses the DefaultMinGasPrice to prefent spam if minimum gas price was set to 0 by the validator.
+// Enforces the DefaultMinGasPrice to prefent spam if minimum gas price was set to 0 by the validator.
 // NOTE: Always returns 0 for transaction priority because we handle TxPriority in priority_lane.go.
 func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
