@@ -2,6 +2,7 @@ package metrics
 
 const (
 	Count       = "count"
+	Epoch       = "epoch"
 	Latency     = "latency"
 	Method      = "method"
 	Transaction = "transaction"
@@ -17,8 +18,9 @@ const (
 	ResetAllCredits   = "reset_all_credits"
 	Unlock            = "unlock"
 
-	TotalCredits = "total_credits"
-	TotalLocked  = "total_locked"
+	CreditUtilization = "credit_utilization"
+	TotalLocked       = "total_locked"
+	TotalCredits      = "total_credits"
 
 	CheckAccess  = "check_access"
 	CreatePolicy = "create_policy"

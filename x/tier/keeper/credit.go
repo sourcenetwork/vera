@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
@@ -16,7 +17,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// getTotalCreditsAmount retrieves the total credits amount from the store.
+// getTotalCreditsAmount retrieves the total credit amount from the store.
 func (k Keeper) getTotalCreditsAmount(ctx context.Context) (total math.Int) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz := store.Get(types.TotalCreditsKey)
@@ -36,17 +37,17 @@ func (k Keeper) getTotalCreditsAmount(ctx context.Context) (total math.Int) {
 	return total
 }
 
-// setTotalCreditsAmount updates the total credits amount in the store.
+// setTotalCreditsAmount updates the total credit amount in the store.
 func (k Keeper) setTotalCreditsAmount(ctx context.Context, total math.Int) error {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz, err := total.Marshal()
 	if err != nil {
-		return errorsmod.Wrapf(err, "marshal total credits amount")
+		return errorsmod.Wrapf(err, "marshal total credit amount")
 	}
 
 	store.Set(types.TotalCreditsKey, bz)
 
-	// Update telemetry gauge for total credits amount
+	// Update telemetry gauge for total credit amount
 	telemetry.ModuleSetGauge(
 		types.ModuleName,
 		float32(total.Int64()),
@@ -98,7 +99,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 
 // burnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) burnAllCredits(ctx context.Context) error {
+func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.BurnAllCredits, metrics.Latency)
 
 	// Note that we can't simply iterate through the lockup records because credits
@@ -106,6 +107,7 @@ func (k Keeper) burnAllCredits(ctx context.Context) error {
 	// Instead, we iterate through all the balances to find and burn the credits.
 	var err error
 
+	unusedCredits := math.ZeroInt()
 	cb := func(addr sdk.AccAddress, coin sdk.Coin) (stop bool) {
 		if coin.Denom != appparams.MicroCreditDenom {
 			return false
@@ -125,12 +127,29 @@ func (k Keeper) burnAllCredits(ctx context.Context) error {
 			return true
 		}
 
+		unusedCredits.Add(coin.Amount)
+
 		return false
 	}
 
 	k.bankKeeper.IterateAllBalances(ctx, cb)
 
-	// Reset total credits amount to 0 after burning
+	totalCredits := k.getTotalCreditsAmount(ctx)
+	if !totalCredits.IsZero() {
+		creditUtilization, err := unusedCredits.ToLegacyDec().Quo(totalCredits.ToLegacyDec()).Float64()
+		if err != nil {
+			return errorsmod.Wrap(err, "calculate credit utilization")
+		}
+
+		// Update telemetry gauge for credit utilization
+		telemetry.ModuleSetGauge(
+			types.ModuleName,
+			float32(creditUtilization),
+			metrics.CreditUtilization, fmt.Sprintf("%s_%d", metrics.Epoch, epochNumber),
+		)
+	}
+
+	// Reset total credit amount to 0 after burning
 	k.setTotalCreditsAmount(ctx, math.ZeroInt())
 
 	return err
@@ -169,10 +188,10 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 		totalCredit.Add(credit)
 	}
 
-	// Set total credits amount
+	// Set total credit amount
 	err := k.setTotalCreditsAmount(ctx, totalCredit)
 	if err != nil {
-		return errorsmod.Wrap(err, "set total credits amount")
+		return errorsmod.Wrap(err, "set total credit amount")
 	}
 
 	return nil

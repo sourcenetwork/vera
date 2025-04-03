@@ -402,7 +402,7 @@ func TestBurnAllCredits(t *testing.T) {
 			}
 
 			// Burn all credits
-			err := k.burnAllCredits(ctx)
+			err := k.burnAllCredits(ctx, 1)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("burnAllCredits() error = %v, wantErr %v", err, tt.wantErr)
 			}
