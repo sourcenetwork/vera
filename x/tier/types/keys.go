@@ -39,6 +39,7 @@ const (
 var (
 	ParamsKey       = []byte("p_tier")
 	TotalLockupsKey = []byte("total_lockups")
+	TotalCreditsKey = []byte("total_credits")
 )
 
 func KeyPrefix(unlocking bool) []byte {

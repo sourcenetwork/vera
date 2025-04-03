@@ -9,6 +9,7 @@ const (
 
 	AttributeKeyCompletionTime       = "completion_time"
 	AttributeKeyCreationHeight       = "creation_height"
+	AttributeCreditAmount            = "credit_amount"
 	AttributeKeyDestinationValidator = "destination_validator"
 	AttributeKeySourceValidator      = "source_validator"
 	AttributeKeyUnlockTime           = "unlock_time"

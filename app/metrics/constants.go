@@ -9,13 +9,16 @@ const (
 	PrepareProposal = "prepare_proposal"
 	ProcessProposal = "process_proposal"
 
+	BurnAllCredits    = "burn_all_credits"
 	CancelUnlocking   = "cancel_unlocking"
 	CompleteUnlocking = "complete_unlocking"
 	Lock              = "lock"
 	Redelegate        = "redelegate"
+	ResetAllCredits   = "reset_all_credits"
 	Unlock            = "unlock"
 
-	TotalLocked = "total_locked"
+	TotalCredits = "total_credits"
+	TotalLocked  = "total_locked"
 
 	CheckAccess  = "check_access"
 	CreatePolicy = "create_policy"

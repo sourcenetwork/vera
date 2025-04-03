@@ -191,12 +191,21 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 		return errorsmod.Wrap(err, "add lockup")
 	}
 
+	// Update total credits amount
+	totalCredits := k.getTotalCreditsAmount(ctx)
+	totalCredits = totalCredits.Add(creditAmt)
+	err = k.setTotalCreditsAmount(ctx, totalCredits)
+	if err != nil {
+		return errorsmod.Wrap(err, "set total credits amount")
+	}
+
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeLock,
 			sdk.NewAttribute(stakingtypes.AttributeKeyDelegator, delAddr.String()),
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+			sdk.NewAttribute(types.AttributeCreditAmount, creditAmt.String()),
 		),
 	)
 
