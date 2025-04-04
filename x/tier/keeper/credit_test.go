@@ -13,6 +13,20 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
+func TestSetAndGetTotalCreditAmount(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	total := k.getTotalCreditAmount(ctx)
+	require.True(t, total.IsZero(), "Initial total credit amount should be zero")
+
+	expectedTotal := math.NewInt(1500)
+	err := k.setTotalCreditAmount(ctx, expectedTotal)
+	require.NoError(t, err, "Setting total credit amount should succeed")
+
+	total = k.getTotalCreditAmount(ctx)
+	require.Equal(t, expectedTotal, total, "Total credit amount should be 1500")
+}
+
 func TestMintCredit(t *testing.T) {
 	tests := []struct {
 		name    string

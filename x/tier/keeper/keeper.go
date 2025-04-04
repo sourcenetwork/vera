@@ -192,7 +192,7 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 	}
 
 	// Update total credit amount
-	totalCredits := k.getTotalCreditsAmount(ctx)
+	totalCredits := k.getTotalCreditAmount(ctx)
 	totalCredits = totalCredits.Add(creditAmt)
 	err = k.setTotalCreditAmount(ctx, totalCredits)
 	if err != nil {

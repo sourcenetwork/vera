@@ -17,8 +17,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-// getTotalCreditsAmount retrieves the total credit amount from the store.
-func (k Keeper) getTotalCreditsAmount(ctx context.Context) (total math.Int) {
+// getTotalCreditAmount retrieves the total credit amount from the store.
+func (k Keeper) getTotalCreditAmount(ctx context.Context) (total math.Int) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz := store.Get(types.TotalCreditsKey)
 	if bz == nil {
@@ -134,7 +134,7 @@ func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) error {
 
 	k.bankKeeper.IterateAllBalances(ctx, cb)
 
-	totalCredits := k.getTotalCreditsAmount(ctx)
+	totalCredits := k.getTotalCreditAmount(ctx)
 	if totalCredits.IsPositive() {
 		creditUtilization, err := unusedCredits.ToLegacyDec().Quo(totalCredits.ToLegacyDec()).Float64()
 		if err != nil {
