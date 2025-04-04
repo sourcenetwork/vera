@@ -20,8 +20,10 @@ func (k Keeper) GenerateCommitment(goCtx context.Context, req *types.QueryGenera
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.GetACPEngine(ctx)
-	commitRepo := k.GetRegistrationsCommitmentRepository(ctx)
+
+	engine := k.getACPEngine(ctx)
+
+	commitRepo := k.getRegistrationsCommitmentRepository(ctx)
 	commitmentService := commitment.NewCommitmentService(engine, commitRepo)
 
 	comm, err := commitmentService.BuildCommitment(ctx, req.PolicyId, req.Actor, req.Objects)

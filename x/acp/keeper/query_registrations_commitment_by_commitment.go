@@ -15,7 +15,8 @@ func (k Keeper) RegistrationsCommitmentByCommitment(goCtx context.Context, req *
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	repo := k.GetRegistrationsCommitmentRepository(ctx)
+
+	repo := k.getRegistrationsCommitmentRepository(ctx)
 
 	iter, err := repo.FilterByCommitment(ctx, req.Commitment)
 	if err != nil {
