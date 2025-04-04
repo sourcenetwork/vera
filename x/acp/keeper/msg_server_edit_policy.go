@@ -19,7 +19,7 @@ func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine := k.GetACPEngine(ctx)
+	engine := k.getACPEngine(ctx)
 
 	did, err := k.issueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {

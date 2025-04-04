@@ -19,8 +19,8 @@ func (k *Keeper) EndBlocker(goCtx context.Context) ([]*types.RegistrationsCommit
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine := k.GetACPEngine(ctx)
-	repo := k.GetRegistrationsCommitmentRepository(ctx)
+	engine := k.getACPEngine(ctx)
+	repo := k.getRegistrationsCommitmentRepository(ctx)
 	service := commitment.NewCommitmentService(engine, repo)
 
 	commitments, err := service.FlagExpiredCommitments(ctx)

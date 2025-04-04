@@ -31,7 +31,7 @@ func initAppConfig() (string, interface{}) {
 	// Optionally allow the chain developer to overwrite the SDK's default server config.
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = fmt.Sprintf(
-		"%v%s,%v%s",
+		"%s%s,%s%s",
 		appparams.DefaultMinGasPrice,
 		appparams.MicroOpenDenom,
 		appparams.DefaultMinGasPrice,

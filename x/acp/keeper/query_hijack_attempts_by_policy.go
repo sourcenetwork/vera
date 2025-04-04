@@ -16,7 +16,7 @@ func (k Keeper) HijackAttemptsByPolicy(goCtx context.Context, req *types.QueryHi
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	repo := k.GetAmendmentEventRepository(ctx)
+	repo := k.getAmendmentEventRepository(ctx)
 	iter, err := repo.ListHijackEventsByPolicy(ctx, req.PolicyId)
 	if err != nil {
 		return nil, err

@@ -26,7 +26,7 @@ func (k msgServer) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPo
 		return nil, err
 	}
 
-	handler := k.GetPolicyCmdHandler(ctx)
+	handler := k.getPolicyCmdHandler(ctx)
 	result, err := handler.Dispatch(&cmdCtx, msg.Cmd)
 	if err != nil {
 		return nil, fmt.Errorf("PolicyCmd failed: %w", err)
