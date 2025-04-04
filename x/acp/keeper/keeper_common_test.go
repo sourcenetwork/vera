@@ -44,9 +44,9 @@ func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.Acc
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	// mount stores
-	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeIAVL, db)
-	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
