@@ -34,9 +34,10 @@ func NewAnteHandler(
 		ante.NewValidateMemoDecorator(accountKeeper),
 		// Ensures that the gas limit covers the cost for transaction size. Consumes gas from the gas meter.
 		ante.NewConsumeGasForTxSizeDecorator(accountKeeper),
-		// Ensures that the fee payer (fee granter or first signer) has enough funds to pay for the tx.
-		// Deducts fees from the fee payer and sets the tx priority in context.
-		ante.NewDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, nil),
+		// Ensures that the fee payer has enough funds to pay for the tx, validates tx fees based on denom
+		// (e.g. ucredit fees are higher than uopen fees) and deducts the fees. Does not affect tx priority.
+		// Enforces DefaultMinGasPrice if min gas price was set to 0 by the validator to prevent spam.
+		NewCustomDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, nil),
 		// Sets public keys in the context for the fee payer and signers. Must happen before signature checks.
 		ante.NewSetPubKeyDecorator(accountKeeper),
 		// Ensures that the number of signatures does not exceed the tx's signature limit.
