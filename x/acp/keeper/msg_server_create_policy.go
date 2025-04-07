@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	gometrics "github.com/hashicorp/go-metrics"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
@@ -62,17 +61,14 @@ func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolic
 	if err != nil {
 		return nil, fmt.Errorf("CreatePolicy: %w", err)
 	}
-	// TODO event
 
-	metrics.ModuleIncrCounterWithLabels(
-		types.ModuleName,
-		1,
-		[]string{metrics.App, metrics.Msg, metrics.Count},
-		[]gometrics.Label{
-			telemetry.NewLabel(metrics.Msg, metrics.CreatePolicy),
-			telemetry.NewLabel(metrics.Actor, msg.Creator),
-		},
-	)
+	err = ctx.EventManager().EmitTypedEvent(&coretypes.EventPolicyCreated{
+		PolicyId:   rec.Policy.Id,
+		PolicyName: msg.Policy,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgCreatePolicyResponse{
 		Record: rec,

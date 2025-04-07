@@ -57,6 +57,15 @@ func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (
 		return nil, fmt.Errorf("EditPolicy: %w", err)
 	}
 
+	// err = ctx.EventManager().EmitTypedEvent(&coretypes.EventPolicyEdited{
+	// 	PolicyId:             rec.Policy.Id,
+	// 	PolicyName:           msg.Policy,
+	// 	RelationshipsRemoved: response.RelatinshipsRemoved,
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
+
 	return &types.MsgEditPolicyResponse{
 		RelationshipsRemoved: response.RelatinshipsRemoved,
 		Record:               rec,
