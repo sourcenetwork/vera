@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	gometrics "github.com/hashicorp/go-metrics"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -14,8 +14,20 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CheckAccess, metrics.Latency)
+func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (res *types.MsgCheckAccessResponse, err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.CheckAccess,
+			start,
+			err,
+			[]gometrics.Label{
+				metrics.NewLabel(metrics.Actor, msg.Creator),
+			},
+		)
+	}()
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	eventManager := ctx.EventManager()

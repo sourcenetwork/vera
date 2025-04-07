@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	gometrics "github.com/hashicorp/go-metrics"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
@@ -14,8 +14,20 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.EditPolicy, metrics.Latency)
+func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (res *types.MsgEditPolicyResponse, err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.EditPolicy,
+			start,
+			err,
+			[]gometrics.Label{
+				metrics.NewLabel(metrics.Actor, msg.Creator),
+			},
+		)
+	}()
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
