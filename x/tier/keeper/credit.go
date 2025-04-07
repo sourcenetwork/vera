@@ -47,12 +47,14 @@ func (k Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error 
 
 	store.Set(types.TotalCreditsKey, bz)
 
-	// Update telemetry gauge for total credit amount
-	telemetry.ModuleSetGauge(
-		types.ModuleName,
-		float32(total.Int64()),
-		metrics.TotalCredits,
-	)
+	// Update telemetry gauge for total credit amount if we are not resetting the total
+	if total.IsPositive() {
+		telemetry.ModuleSetGauge(
+			types.ModuleName,
+			float32(total.Int64()),
+			metrics.TotalCredits,
+		)
+	}
 
 	return nil
 }
