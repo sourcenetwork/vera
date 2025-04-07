@@ -15,6 +15,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
@@ -22,23 +23,32 @@ import (
 )
 
 func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
-	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
+	acpStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
+	capabilityStoreKey := storetypes.NewKVStoreKey("capkeeper")
+	capabilityMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	// mount stores
+	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	capKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, capabilityMemStoreKey)
+	acpCapKeeper := capKeeper.ScopeToModule(types.ModuleName)
+
 	k := keeper.NewKeeper(
 		cdc,
-		runtime.NewKVStoreService(storeKey),
+		runtime.NewKVStoreService(acpStoreKey),
 		log.NewNopLogger(),
 		authority.String(),
 		&AccountKeeperStub{},
+		&acpCapKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

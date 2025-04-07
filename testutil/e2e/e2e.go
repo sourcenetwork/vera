@@ -29,7 +29,13 @@ func (n *TestNetwork) Setup(t *testing.T) {
 
 	cfg.NumValidators = 1
 	cfg.BondDenom = appparams.DefaultBondDenom
-	cfg.MinGasPrices = fmt.Sprintf("%v%s", appparams.DefaultMinGasPrice, appparams.DefaultBondDenom)
+	cfg.MinGasPrices = fmt.Sprintf(
+		"%s%s,%s%s",
+		appparams.DefaultMinGasPrice,
+		appparams.MicroOpenDenom,
+		appparams.DefaultMinGasPrice,
+		appparams.MicroCreditDenom,
+	)
 
 	network, err := network.New(t, t.TempDir(), cfg)
 	require.NoError(t, err)

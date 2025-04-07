@@ -5,8 +5,6 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/multiformats/go-multibase"
-	"github.com/multiformats/go-varint"
 
 	"github.com/TBD54566975/ssi-sdk/crypto"
 	"github.com/TBD54566975/ssi-sdk/did"
@@ -57,26 +55,9 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 	return did.String(), nil
 }
 
-// IssueModuleDID produces a DID for a module account.
-func IssueModuleDID(acc sdk.ModuleAccountI) (string, error) {
-	if acc == nil {
-		return "", fmt.Errorf("cannot generate DID: module account is nil")
-	}
-
-	moduleAddr := acc.GetAddress().String()
-	if moduleAddr == "" {
-		return "", fmt.Errorf("module account %s has no valid address", acc.GetName())
-	}
-
-	prefix := varint.ToUvarint(uint64(0x00))
-	codec := append(prefix, moduleAddr...)
-
-	encoded, err := multibase.Encode(multibase.Base58BTC, codec)
-	if err != nil {
-		return "", fmt.Errorf("failed to encode module address: %v", err)
-	}
-
-	did := fmt.Sprintf("%s:%s", "did:module", encoded)
-
-	return did, nil
+// IssueModuleDID produces a DID for a SourceHub module, based on its name.
+//
+// The issued did uses a pseudo-method named "module", which simply appends the module name
+func IssueModuleDID(name string) string {
+	return "did:module:" + name
 }

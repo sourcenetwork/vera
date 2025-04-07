@@ -204,7 +204,7 @@ type ModuleInputs struct {
 type ModuleOutputs struct {
 	depinject.Out
 
-	AcpKeeper keeper.Keeper
+	AcpKeeper *keeper.Keeper
 	Module    appmodule.AppModule
 }
 
@@ -220,6 +220,9 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
+		// set cap keeper as nil it is initialized
+		// after depinject is finished executing
+		nil,
 	)
 	m := NewAppModule(
 		in.Cdc,
@@ -228,5 +231,5 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 	)
 
-	return ModuleOutputs{AcpKeeper: k, Module: m}
+	return ModuleOutputs{AcpKeeper: &k, Module: m}
 }
