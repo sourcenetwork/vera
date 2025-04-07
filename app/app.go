@@ -365,7 +365,7 @@ func New(
 	wrappedPrepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
 		defer telemetry.MeasureSince(time.Now(), metrics.PrepareProposal)
 		telemetry.IncrCounterWithLabels(
-			[]string{metrics.PrepareProposal, metrics.Transaction, metrics.Count},
+			[]string{metrics.App, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
 			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
 		)
@@ -377,7 +377,7 @@ func New(
 	wrappedProcessProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
 		defer telemetry.MeasureSince(time.Now(), metrics.ProcessProposal)
 		telemetry.IncrCounterWithLabels(
-			[]string{metrics.ProcessProposal, metrics.Transaction, metrics.Count},
+			[]string{metrics.App, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
 			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
 		)
