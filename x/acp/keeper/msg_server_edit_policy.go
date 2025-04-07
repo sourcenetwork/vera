@@ -6,7 +6,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gometrics "github.com/hashicorp/go-metrics"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
@@ -23,7 +22,7 @@ func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (
 			metrics.EditPolicy,
 			start,
 			err,
-			[]gometrics.Label{
+			[]metrics.Label{
 				metrics.NewLabel(metrics.Actor, msg.Creator),
 			},
 		)

@@ -7,20 +7,22 @@ import (
 	gometrics "github.com/hashicorp/go-metrics"
 )
 
-// NewLabel creates new gometrics.Label.
-func NewLabel(name, value string) gometrics.Label {
-	return gometrics.Label{Name: name, Value: value}
+type Label = gometrics.Label
+
+// NewLabel creates new Label with given name and value.
+func NewLabel(name, value string) Label {
+	return Label{Name: name, Value: value}
 }
 
 // ModuleMeasureSinceWithLabels emits a time measure metric for a module with a given set of keys and labels.
-func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string, extraLabels []gometrics.Label) {
+func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string, extraLabels []Label) {
 	if !telemetry.IsTelemetryEnabled() {
 		return
 	}
 
 	labels := append(
-		[]gometrics.Label{
-			telemetry.NewLabel(telemetry.MetricLabelNameModule, module),
+		[]Label{
+			NewLabel(telemetry.MetricLabelNameModule, module),
 		},
 		extraLabels...,
 	)
@@ -33,13 +35,13 @@ func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string,
 }
 
 // ModuleIncrCounterWithLabels emits a counter metric for a module with a given set of keys and labels.
-func ModuleIncrCounterWithLabels(module string, value float32, keys []string, extraLabels []gometrics.Label) {
+func ModuleIncrCounterWithLabels(module string, value float32, keys []string, extraLabels []Label) {
 	if !telemetry.IsTelemetryEnabled() {
 		return
 	}
 
 	labels := append(
-		[]gometrics.Label{
+		[]Label{
 			telemetry.NewLabel(telemetry.MetricLabelNameModule, module),
 		},
 		extraLabels...,
@@ -53,8 +55,8 @@ func ModuleIncrCounterWithLabels(module string, value float32, keys []string, ex
 }
 
 // ModuleMeasureWithCounter emits latency and success/error counter metrics for a module message with optional labels.
-func ModuleMeasureWithCounter(module, msgType string, start time.Time, err error, extraLabels []gometrics.Label) {
-	labels := []gometrics.Label{
+func ModuleMeasureWithCounter(module, msgType string, start time.Time, err error, extraLabels []Label) {
+	labels := []Label{
 		telemetry.NewLabel(Msg, msgType),
 	}
 

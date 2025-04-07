@@ -5,7 +5,6 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	gometrics "github.com/hashicorp/go-metrics"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -23,7 +22,7 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 			metrics.CheckAccess,
 			start,
 			err,
-			[]gometrics.Label{
+			[]metrics.Label{
 				metrics.NewLabel(metrics.Actor, msg.Creator),
 			},
 		)

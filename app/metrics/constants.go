@@ -24,10 +24,16 @@ const (
 	EditPolicy   = "edit_policy"
 
 	// tier keys
+	Amount            = "amount"
 	CreditUtilization = "credit_utilization"
+	CreationHeight    = "creation_height"
+	Delegator         = "delegator"
+	DstValidator      = "dst_validator"
 	Epoch             = "epoch"
 	TotalLocked       = "total_locked"
 	TotalCredits      = "total_credits"
+	SrcValidator      = "src_validator"
+	Validator         = "validator"
 
 	// tier methods
 	BurnAllCredits    = "burn_all_credits"

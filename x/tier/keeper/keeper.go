@@ -10,7 +10,6 @@ import (
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -100,8 +99,18 @@ func (k Keeper) Logger() log.Logger {
 
 // CompleteUnlocking completes the unlocking process for all lockups that have reached their unlock time.
 // It is called at the end of each Epoch.
-func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CompleteUnlocking, metrics.Latency)
+func (k *Keeper) CompleteUnlocking(ctx context.Context) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.CompleteUnlocking,
+			start,
+			err,
+			nil,
+		)
+	}()
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
@@ -141,7 +150,7 @@ func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
 		return nil
 	}
 
-	err := k.iterateUnlockingLockups(ctx, cb)
+	err = k.iterateUnlockingLockups(ctx, cb)
 	if err != nil {
 		return errorsmod.Wrap(err, "iterate unlocking lockups")
 	}
@@ -150,8 +159,22 @@ func (k *Keeper) CompleteUnlocking(ctx context.Context) error {
 }
 
 // Lock locks the stake of a delegator to a validator.
-func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) error {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Lock, metrics.Latency)
+func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress, amt math.Int) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.Lock,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Amount, amt.String()),
+				metrics.NewLabel(metrics.Delegator, delAddr.String()),
+				metrics.NewLabel(metrics.Validator, valAddr.String()),
+			},
+		)
+	}()
 
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
@@ -217,7 +240,21 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
 	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
 
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Unlock, metrics.Latency)
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.Unlock,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Amount, amt.String()),
+				metrics.NewLabel(metrics.Delegator, delAddr.String()),
+				metrics.NewLabel(metrics.Validator, valAddr.String()),
+			},
+		)
+	}()
 
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
@@ -274,9 +311,24 @@ func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk
 // Redelegate redelegates the stake of a delegator from a source validator to a destination validator.
 // The redelegation will be completed after the unbonding period has passed (e.g. at completionTime).
 func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValAddr, dstValAddr sdk.ValAddress,
-	amt math.Int) (time.Time, error) {
+	amt math.Int) (completionTime time.Time, err error) {
 
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.Redelegate, metrics.Latency)
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.Redelegate,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Amount, amt.String()),
+				metrics.NewLabel(metrics.Delegator, delAddr.String()),
+				metrics.NewLabel(metrics.SrcValidator, srcValAddr.String()),
+				metrics.NewLabel(metrics.DstValidator, dstValAddr.String()),
+			},
+		)
+	}()
 
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {
@@ -284,7 +336,7 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 	}
 
 	// Subtract the lockup from the source validator
-	err := k.subtractLockup(ctx, delAddr, srcValAddr, amt)
+	err = k.subtractLockup(ctx, delAddr, srcValAddr, amt)
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "subtract lockup from source validator")
 	}
@@ -301,7 +353,7 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 		return time.Time{}, errorsmod.Wrap(err, "validate unbond amount")
 	}
 
-	completionTime, err := k.stakingKeeper.BeginRedelegation(ctx, modAddr, srcValAddr, dstValAddr, shares)
+	completionTime, err = k.stakingKeeper.BeginRedelegation(ctx, modAddr, srcValAddr, dstValAddr, shares)
 	if err != nil {
 		return time.Time{}, errorsmod.Wrap(err, "begin redelegation")
 	}
@@ -323,9 +375,24 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 // CancelUnlocking effectively cancels the pending unlocking lockup partially or in full.
 // Reverts the specified amt if a valid value is provided (e.g. 0 < amt < unlocking lockup amount).
 func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
-	creationHeight int64, amt math.Int) error {
+	creationHeight int64, amt math.Int) (err error) {
 
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.CancelUnlocking, metrics.Latency)
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.CancelUnlocking,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Amount, amt.String()),
+				metrics.NewLabel(metrics.CreationHeight, fmt.Sprintf("%d", creationHeight)),
+				metrics.NewLabel(metrics.Delegator, delAddr.String()),
+				metrics.NewLabel(metrics.Validator, valAddr.String()),
+			},
+		)
+	}()
 
 	// Specified amt must be a positive integer
 	if !amt.IsPositive() {

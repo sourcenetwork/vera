@@ -99,14 +99,23 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 
 // burnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) error {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.BurnAllCredits, metrics.Latency)
+func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err error) {
+	start := time.Now()
 
-	// Note that we can't simply iterate through the lockup records because credits
-	// are transferrable and can be stored in accounts that are not tracked by lockups.
-	// Instead, we iterate through all the balances to find and burn the credits.
-	var err error
+	defer func() {
+		metrics.ModuleMeasureWithCounter(
+			types.ModuleName,
+			metrics.BurnAllCredits,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Epoch, fmt.Sprintf("%d", epochNumber)),
+			},
+		)
+	}()
 
+	// We iterate through all the balances to find and burn the credits. It could be
+	// improved to iterate through the lockup records because credits are NOT transferrable.
 	unusedCredits := math.ZeroInt()
 	cb := func(addr sdk.AccAddress, coin sdk.Coin) (stop bool) {
 		if coin.Denom != appparams.MicroCreditDenom {
