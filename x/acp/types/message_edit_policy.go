@@ -7,7 +7,7 @@ import (
 
 var _ sdk.Msg = &MsgEditPolicy{}
 
-func NewMsgMsgEditPolicy(creator string, policyId string, policy string, marshalType coretypes.PolicyMarshalingType) *MsgEditPolicy {
+func NewMsgEditPolicy(creator string, policyId string, policy string, marshalType coretypes.PolicyMarshalingType) *MsgEditPolicy {
 	return &MsgEditPolicy{
 		Creator:     creator,
 		PolicyId:    policyId,
