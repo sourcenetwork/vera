@@ -17,9 +17,11 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -27,11 +29,15 @@ import (
 func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
+	capabilityStoreKey := storetypes.NewKVStoreKey("capkeeper")
+	capabilityMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(authStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -57,12 +63,17 @@ func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 	)
 
+	capKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, capabilityMemStoreKey)
+	acpCapKeeper := capKeeper.ScopeToModule(acptypes.ModuleName)
+	bulletinCapKeeper := capKeeper.ScopeToModule(types.ModuleName)
+
 	acpKeeper := acpkeeper.NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
-		&AccountKeeperStub{},
+		accountKeeper,
+		&acpCapKeeper,
 	)
 
 	k := keeper.NewKeeper(
@@ -71,7 +82,8 @@ func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		log.NewNopLogger(),
 		authority.String(),
 		accountKeeper,
-		acpKeeper,
+		&acpKeeper,
+		&bulletinCapKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
