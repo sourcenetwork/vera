@@ -46,8 +46,6 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.0
-	github.com/multiformats/go-multibase v0.2.0
-	github.com/multiformats/go-varint v0.0.7
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.5.1
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
@@ -250,7 +248,9 @@ require (
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/multiformats/go-base32 v0.1.0 // indirect
 	github.com/multiformats/go-base36 v0.1.0 // indirect
+	github.com/multiformats/go-multibase v0.2.0 // indirect
 	github.com/multiformats/go-multicodec v0.9.0 // indirect
+	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20230904125328-1f23a7beb09a // indirect
 	github.com/oklog/run v1.1.0 // indirect
