@@ -3,31 +3,15 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (res *types.MsgCreatePolicyResponse, err error) {
-	start := time.Now()
-
-	defer func() {
-		metrics.ModuleMeasureWithCounter(
-			types.ModuleName,
-			metrics.CreatePolicy,
-			start,
-			err,
-			[]metrics.Label{
-				metrics.NewLabel(metrics.Actor, msg.Creator),
-			},
-		)
-	}()
-
+func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	engine := k.getACPEngine(ctx)

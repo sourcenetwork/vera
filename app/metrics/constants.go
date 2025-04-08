@@ -11,6 +11,10 @@ const (
 	Status  = "status"
 	Tx      = "tx"
 
+	// Units
+	SecondsUnit   = "seconds"
+	CounterSuffix = "total"
+
 	// abci methods
 	PrepareProposal = "prepare_proposal"
 	ProcessProposal = "process_proposal"
@@ -44,3 +48,7 @@ const (
 	ResetAllCredits   = "reset_all_credits"
 	Unlock            = "unlock"
 )
+
+var SourcehubMsgSeconds []string = []string{"sourcehub", "msg", SecondsUnit}
+var SourcehubMsgTotal []string = []string{"sourcehub", "msg", CounterSuffix}
+var SourcehubErrorsTotal []string = []string{"sourcehub", "errors", CounterSuffix}

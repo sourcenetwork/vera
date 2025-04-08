@@ -2,32 +2,16 @@ package keeper
 
 import (
 	"context"
-	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (res *types.MsgCheckAccessResponse, err error) {
-	start := time.Now()
-
-	defer func() {
-		metrics.ModuleMeasureWithCounter(
-			types.ModuleName,
-			metrics.CheckAccess,
-			start,
-			err,
-			[]metrics.Label{
-				metrics.NewLabel(metrics.Actor, msg.Creator),
-			},
-		)
-	}()
-
+func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	repository := k.getAccessDecisionRepository(ctx)

@@ -22,6 +22,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/client/cli"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -128,7 +129,11 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	// inject metrics in service descriptor handlers
+	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
+	srv := keeper.NewMsgServerImpl(am.keeper)
+	cfg.MsgServer().RegisterService(&descriptor, srv)
+
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
