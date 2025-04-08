@@ -6,12 +6,10 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
+	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -45,141 +43,109 @@ func getNamespaceId(namespace string) string {
 }
 
 // AddCollaborator adds new namespace collaborator.
-func AddCollaborator(ctx context.Context, k *Keeper, namespaceId string, collaboratorDID string, ownerDID string, signer string) error {
+func AddCollaborator(ctx context.Context, k *Keeper, namespaceId, collaboratorDID, ownerDID, signer string) error {
 	rel := coretypes.NewActorRelationship(types.NamespaceResource, namespaceId, types.CollaboratorRelation, collaboratorDID)
-	return addRelationship(ctx, k, namespaceId, rel, ownerDID, signer)
+	return addRelationship(ctx, k, rel, namespaceId, ownerDID, signer)
 }
 
 // deleteCollaborator deletes existing namespace collaborator.
-func deleteCollaborator(ctx context.Context, k *Keeper, namespaceId string, collaboratorDID string, ownerDID string, signer string) error {
+func deleteCollaborator(ctx context.Context, k *Keeper, namespaceId, collaboratorDID, ownerDID, signer string) error {
 	rel := coretypes.NewActorRelationship(types.NamespaceResource, namespaceId, types.CollaboratorRelation, collaboratorDID)
-	return deleteRelationship(ctx, k, namespaceId, rel, ownerDID, signer)
+	return deleteRelationship(ctx, k, rel, namespaceId, ownerDID, signer)
 }
 
 // addRelationship adds new actor relationship for the specified namespace object.
-func addRelationship(goCtx context.Context, k *Keeper, namespaceId string, relation *coretypes.Relationship, ownerDID string, signer string) error {
+func addRelationship(goCtx context.Context, k *Keeper, relation *coretypes.Relationship, namespaceId, ownerDID, signer string) error {
 	policyId := k.GetPolicyId(goCtx)
 	if policyId == "" {
 		return types.ErrInvalidPolicyId
 	}
 
+	policyCmd := acptypes.NewSetRelationshipCmd(relation)
+
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, policyId, ownerDID, signer, k.GetAcpKeeper().GetParams(ctx))
+	polCap, err := manager.Fetch(ctx, policyId)
 	if err != nil {
 		return err
 	}
 
-	policyCmd := acptypes.NewSetRelationshipCmd(relation)
-	policyCmdHandler := k.GetAcpKeeper().GetPolicyCmdHandler(ctx)
-
-	_, err = policyCmdHandler.Dispatch(&cmdCtx, policyCmd)
+	_, err = k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, policyCmd, ownerDID, signer)
 
 	return err
 }
 
 // deleteRelationship deletes existing actor relationship for the specified namespace object.
-func deleteRelationship(goCtx context.Context, k *Keeper, namespaceId string, relation *coretypes.Relationship, ownerDID string, signer string) error {
+func deleteRelationship(goCtx context.Context, k *Keeper, relation *coretypes.Relationship, namespaceId, ownerDID, signer string) error {
 	policyId := k.GetPolicyId(goCtx)
 	if policyId == "" {
 		return types.ErrInvalidPolicyId
 	}
 
+	policyCmd := acptypes.NewDeleteRelationshipCmd(relation)
+
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, policyId, ownerDID, signer, k.GetAcpKeeper().GetParams(ctx))
+	polCap, err := manager.Fetch(ctx, policyId)
 	if err != nil {
 		return err
 	}
 
-	policyCmd := acptypes.NewDeleteRelationshipCmd(relation)
-	policyCmdHandler := k.GetAcpKeeper().GetPolicyCmdHandler(ctx)
-
-	_, err = policyCmdHandler.Dispatch(&cmdCtx, policyCmd)
+	_, err = k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, policyCmd, ownerDID, signer)
 
 	return err
 }
 
 // RegisterNamespace registers a new namespace object under the namespace resource.
-func RegisterNamespace(ctx sdk.Context, k *Keeper, namespaceId string, ownerDID string, signer string) error {
+func RegisterNamespace(ctx sdk.Context, k *Keeper, namespaceId, ownerDID, signer string) error {
 	policyId := k.GetPolicyId(ctx)
 	if policyId == "" {
 		return types.ErrInvalidPolicyId
 	}
 
-	cmdCtx, err := policy_cmd.NewPolicyCmdCtx(ctx, policyId, ownerDID, signer, k.GetAcpKeeper().GetParams(ctx))
-	if err != nil {
-		return err
-	}
-
 	policyCmd := acptypes.NewRegisterObjectCmd(coretypes.NewObject(types.NamespaceResource, namespaceId))
-	policyCmdHandler := k.GetAcpKeeper().GetPolicyCmdHandler(ctx)
 
-	_, err = policyCmdHandler.Dispatch(&cmdCtx, policyCmd)
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+
+	polCap, err := manager.Fetch(ctx, policyId)
 	if err != nil {
 		return err
 	}
 
-	return nil
+	_, err = k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, policyCmd, ownerDID, signer)
+	return err
 }
 
 // hasPermission checks if an actor has required permission for the specified namespace object.
-func hasPermission(goCtx context.Context, k *Keeper, namespaceId string, permission string, actorDID string, signer string) (bool, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	acpKeeper := k.GetAcpKeeper()
-	repository := acpKeeper.GetAccessDecisionRepository(ctx)
-	paramsRepository := access_decision.StaticParamsRepository{}
-	engine := acpKeeper.GetACPEngine(ctx)
-
+func hasPermission(goCtx context.Context, k *Keeper, namespaceId, permission, actorDID, signer string) (bool, error) {
 	policyId := k.GetPolicyId(goCtx)
 	if policyId == "" {
 		return false, types.ErrInvalidPolicyId
 	}
 
-	record, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{Id: policyId})
-	if err != nil {
-		return false, err
-	}
-	if record == nil {
-		return false, errors.ErrPolicyNotFound(policyId)
-	}
-
-	creatorAddr, err := sdk.AccAddressFromBech32(signer)
-	if err != nil {
-		return false, acptypes.NewErrInvalidAccAddrErr(err, signer)
-	}
-
-	creatorAcc := k.accountKeeper.GetAccount(goCtx, creatorAddr)
-	if creatorAcc == nil {
-		return false, acptypes.NewAccNotFoundErr(signer)
-	}
-
-	ts, err := acptypes.TimestampFromCtx(ctx)
-	if err != nil {
-		return false, err
-	}
-
-	operations := []*coretypes.Operation{
-		{
-			Object:     coretypes.NewObject(types.NamespaceResource, namespaceId),
-			Permission: permission,
+	req := &acptypes.QueryVerifyAccessRequestRequest{
+		PolicyId: policyId,
+		AccessRequest: &coretypes.AccessRequest{
+			Operations: []*coretypes.Operation{
+				{
+					Object:     coretypes.NewObject(types.NamespaceResource, namespaceId),
+					Permission: permission,
+				},
+			},
+			Actor: &coretypes.Actor{
+				Id: actorDID,
+			},
 		},
 	}
-
-	cmd := access_decision.EvaluateAccessRequestsCommand{
-		Policy:        record.Record.Policy,
-		Operations:    operations,
-		Actor:         actorDID,
-		CreationTime:  ts,
-		Creator:       creatorAcc,
-		CurrentHeight: uint64(ctx.BlockHeight()),
-	}
-
-	decision, err := cmd.Execute(goCtx, engine, repository, &paramsRepository)
+	result, err := k.GetAcpKeeper().VerifyAccessRequest(goCtx, req)
 	if err != nil {
 		return false, err
 	}
 
-	return decision != nil, nil
+	return result.Valid, nil
+
 }
