@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -26,7 +27,8 @@ type (
 		authority string
 
 		accountKeeper types.AccountKeeper
-		acpKeeper     acpkeeper.Keeper
+		acpKeeper     *acpkeeper.Keeper
+		capKeeper     *capabilitykeeper.ScopedKeeper
 	}
 )
 
@@ -36,7 +38,8 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
-	acpKeeper acpkeeper.Keeper,
+	acpKeeper *acpkeeper.Keeper,
+	capKeeper *capabilitykeeper.ScopedKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -49,6 +52,7 @@ func NewKeeper(
 		authority:     authority,
 		accountKeeper: accountKeeper,
 		acpKeeper:     acpKeeper,
+		capKeeper:     capKeeper,
 	}
 }
 
@@ -59,7 +63,11 @@ func (k *Keeper) GetAuthority() string {
 
 // GetAcpKeeper returns the module's AcpKeeper.
 func (k *Keeper) GetAcpKeeper() *acpkeeper.Keeper {
-	return &k.acpKeeper
+	return k.acpKeeper
+}
+
+func (k *Keeper) GetScopedKeeper() *capabilitykeeper.ScopedKeeper {
+	return k.capKeeper
 }
 
 // GetAccountKeeper returns the module's AccountKeeper.
@@ -193,4 +201,17 @@ func (k *Keeper) GetAllPosts(ctx context.Context) []types.Post {
 	k.mustIteratePosts(ctx, postsCallback)
 
 	return posts
+}
+
+// InitializeCapabilityKeeper allows app to set the capability keeper after the moment of creation.
+//
+// This is supported since currently the capability module
+// does not integrate with the new module dependency injection system.
+//
+// Panics if the keeper was previously initialized (ie inner pointer != nil).
+func (k *Keeper) InitializeCapabilityKeeper(keeper *capabilitykeeper.ScopedKeeper) {
+	if k.capKeeper != nil {
+		panic("capability keeper already initialized")
+	}
+	k.capKeeper = keeper
 }
