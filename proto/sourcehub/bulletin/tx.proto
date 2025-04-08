@@ -72,7 +72,9 @@ message MsgAddCollaborator {
   string collaborator = 3;
 }
 
-message MsgAddCollaboratorResponse {}
+message MsgAddCollaboratorResponse {
+  string collaborator_did = 1;
+}
 
 message MsgRemoveCollaborator {
   option (cosmos.msg.v1.signer) = "creator";
@@ -81,4 +83,6 @@ message MsgRemoveCollaborator {
   string collaborator = 3;
 }
 
-message MsgRemoveCollaboratorResponse {}
+message MsgRemoveCollaboratorResponse {
+  string collaborator_did = 1;
+}
