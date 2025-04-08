@@ -52,7 +52,7 @@ func (m *PolicyCapabilityManager) Fetch(ctx sdk.Context, policyId string) (*Poli
 	return cap, nil
 }
 
-// Claim register the current module as one of the owners of capability.
+// Claim registers the current module as one of the owners of capability.
 // Callers which have received a capability are responsible for Claiming it.
 //
 // The registration is bound to the module's scoped capability keeper,

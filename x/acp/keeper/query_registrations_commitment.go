@@ -10,7 +10,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) RegistrationsCommitment(goCtx context.Context, req *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error) {
+func (k *Keeper) RegistrationsCommitment(
+	goCtx context.Context,
+	req *types.QueryRegistrationsCommitmentRequest,
+) (*types.QueryRegistrationsCommitmentResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

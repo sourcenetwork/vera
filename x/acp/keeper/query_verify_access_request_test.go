@@ -21,8 +21,7 @@ func TestVerifyAccessRequest(t *testing.T) {
 }
 
 func setupTestVerifyAccessRequest(t *testing.T) (context.Context, Keeper, *coretypes.Policy, string) {
-	ctx, keeper, accKeep := setupKeeper(t)
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(t)
 
 	creatorAcc := accKeep.GenAccount()
 	creator := creatorAcc.GetAddress().String()
@@ -52,17 +51,17 @@ resources:
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	resp, err := msgServer.CreatePolicy(ctx, &msg)
+	resp, err := k.CreatePolicy(ctx, &msg)
 	require.Nil(t, err)
 
-	_, err = msgServer.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
+	_, err = k.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
 		Creator:  creator,
 		PolicyId: resp.Record.Policy.Id,
 		Cmd:      types.NewRegisterObjectCmd(obj),
 	})
 	require.Nil(t, err)
 
-	return ctx, keeper, resp.Record.Policy, creatorDID
+	return ctx, k, resp.Record.Policy, creatorDID
 }
 
 func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue() {

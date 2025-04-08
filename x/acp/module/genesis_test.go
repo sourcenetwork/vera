@@ -18,8 +18,8 @@ func TestGenesis(t *testing.T) {
 	}
 
 	k, ctx := keepertest.AcpKeeper(t)
-	acp.InitGenesis(ctx, k, genesisState)
-	got := acp.ExportGenesis(ctx, k)
+	acp.InitGenesis(ctx, &k, genesisState)
+	got := acp.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
 
 	nullify.Fill(&genesisState)

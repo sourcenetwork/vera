@@ -4,4 +4,4 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-var _ types.QueryServer = Keeper{}
+var _ types.QueryServer = &Keeper{}
