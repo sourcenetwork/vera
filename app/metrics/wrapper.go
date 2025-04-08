@@ -14,7 +14,25 @@ import (
 func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
-		handler := wrapMsgSeverHandler(moduleName, method.MethodName, method.Handler)
+		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
+			SourcehubMsgSeconds, SourcehubMsgTotal, SourcehubMsgErrorsTotal,
+			method.Handler)
+		method.Handler = handler
+		methods = append(methods, method)
+	}
+	desc.Methods = methods
+	return desc
+}
+
+// WrapQueryServiceDescriptor wraps a service descriptor,
+// assume to be of msg servers, and add metric collection
+// to it.
+func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
+	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
+	for _, method := range desc.Methods {
+		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
+			SourcehubQuerySeconds, SourcehubQueryTotal, SourcehubQueryErrorsTotal,
+			method.Handler)
 		method.Handler = handler
 		methods = append(methods, method)
 	}
@@ -26,30 +44,31 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 // with metric collection logic.
 // The wrapped method tracks the number of processed messages,
 // number of errors returned and latecy.
-func wrapMsgSeverHandler(moduleName string, methodName string, handler grpc.MethodHandler) grpc.MethodHandler {
+func wrapMsgSeverHandler(moduleName string, methodName string, latencyMetricName, countMetricName, errMetricName []string, handler grpc.MethodHandler) grpc.MethodHandler {
 	return func(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 		labels := []gometrics.Label{
 			{
-				Name:  "module",
+				Name:  ModuleLabel,
 				Value: moduleName,
 			},
 			{
-				Name:  "endpoint",
+				Name:  EndpointLabel,
 				Value: methodName,
 			},
 		}
+		labels = append(labels, commonLabels...)
 
 		// measure msg handling latency
 		now := time.Now()
-		defer gometrics.MeasureSinceWithLabels(SourcehubMsgSeconds, now, labels)
+		defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
 
 		// total msg count
-		gometrics.IncrCounterWithLabels(SourcehubMsgTotal, 1, labels)
+		gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
 
 		resp, err := handler(srv, ctx, dec, interceptor)
 		if err != nil {
 			// count error if returned
-			gometrics.IncrCounterWithLabels(SourcehubErrorsTotal, 1, labels)
+			gometrics.IncrCounterWithLabels(errMetricName, 1, labels)
 		}
 		return resp, err
 	}

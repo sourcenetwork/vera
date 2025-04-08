@@ -8,6 +8,7 @@ const (
 	Latency = "latency"
 	Method  = "method"
 	Msg     = "msg"
+	Query   = "query"
 	Status  = "status"
 	Tx      = "tx"
 
@@ -15,17 +16,15 @@ const (
 	SecondsUnit   = "seconds"
 	CounterSuffix = "total"
 
+	// Labels
+	HostnameLabel = "host"
+	ChainIDLabel  = "chain_id"
+	ModuleLabel   = "module"
+	EndpointLabel = "endpoint"
+
 	// abci methods
 	PrepareProposal = "prepare_proposal"
 	ProcessProposal = "process_proposal"
-
-	// acp keys
-	Actor = "actor"
-
-	// acp methods
-	CheckAccess  = "check_access"
-	CreatePolicy = "create_policy"
-	EditPolicy   = "edit_policy"
 
 	// tier keys
 	Amount            = "amount"
@@ -47,8 +46,18 @@ const (
 	Redelegate        = "redelegate"
 	ResetAllCredits   = "reset_all_credits"
 	Unlock            = "unlock"
+
+	// ChainIDEnvVar represents the environment variable, which when set,
+	// is used as the chain id value for metric collection
+	ChainIDEnvVar = "CHAIN_ID"
 )
 
-var SourcehubMsgSeconds []string = []string{"sourcehub", "msg", SecondsUnit}
-var SourcehubMsgTotal []string = []string{"sourcehub", "msg", CounterSuffix}
-var SourcehubErrorsTotal []string = []string{"sourcehub", "errors", CounterSuffix}
+var (
+	SourcehubMsgSeconds     []string = []string{"sourcehub", Msg, SecondsUnit}
+	SourcehubMsgTotal       []string = []string{"sourcehub", Msg, CounterSuffix}
+	SourcehubMsgErrorsTotal []string = []string{"sourcehub", Msg, "errors", CounterSuffix}
+
+	SourcehubQuerySeconds     []string = []string{"sourcehub", Query, SecondsUnit}
+	SourcehubQueryTotal       []string = []string{"sourcehub", Query, CounterSuffix}
+	SourcehubQueryErrorsTotal []string = []string{"sourcehub", Query, "errors", CounterSuffix}
+)

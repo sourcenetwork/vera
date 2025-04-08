@@ -129,12 +129,14 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	// inject metrics in service descriptor handlers
+	// inject instrumentation msg service handlers
 	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
 	srv := keeper.NewMsgServerImpl(am.keeper)
 	cfg.MsgServer().RegisterService(&descriptor, srv)
 
-	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	// inject instrumentation into query service handler
+	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
+	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
