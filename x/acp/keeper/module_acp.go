@@ -103,7 +103,7 @@ func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyC
 func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capability.PolicyCapability, cmd *types.PolicyCmd, actorAcc string, txSigner string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	actorDID, err := k.issueDIDFromAccountAddr(ctx, actorAcc)
+	actorDID, err := k.IssueDIDFromAccountAddr(ctx, actorAcc)
 	if err != nil {
 		return nil, errors.Wrap("ModulePolicyCmdForActorAccount: could not issue did to creator",
 			err, errors.Pair("address", actorAcc))

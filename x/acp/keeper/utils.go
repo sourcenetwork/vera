@@ -1,7 +1,9 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"context"
+	"fmt"
+
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
@@ -9,15 +11,16 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k *Keeper) issueDIDFromAccountAddr(ctx sdk.Context, addr string) (string, error) {
+// IssueDIDFromAccountAddr issues a DID based on the specified address string.
+func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (string, error) {
 	sdkAddr, err := hubtypes.AccAddressFromBech32(addr)
 	if err != nil {
-		return "", types.NewErrInvalidAccAddrErr(err, addr)
+		return "", fmt.Errorf("IssueDIDFromAccountAddr: %v: %w", err, types.NewErrInvalidAccAddrErr(err, addr))
 	}
 
 	acc := k.accountKeeper.GetAccount(ctx, sdkAddr)
 	if acc == nil {
-		return "", types.NewAccNotFoundErr(addr)
+		return "", fmt.Errorf("IssueDIDFromAccountAddr: %w", types.NewAccNotFoundErr(addr))
 	}
 
 	did, err := did.IssueDID(acc)

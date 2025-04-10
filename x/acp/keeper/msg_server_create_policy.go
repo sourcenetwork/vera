@@ -16,7 +16,7 @@ func (k *Keeper) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy)
 
 	engine := k.getACPEngine(ctx)
 
-	actorID, err := k.issueDIDFromAccountAddr(ctx, msg.Creator)
+	actorID, err := k.IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("CreatePolicy: %w", err)
 	}
