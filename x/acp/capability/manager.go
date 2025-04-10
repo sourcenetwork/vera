@@ -77,7 +77,7 @@ func (m *PolicyCapabilityManager) Issue(ctx sdk.Context, policyId string) (*Poli
 	return polCap, nil
 }
 
-// Validate verifies whether the given capability is valid
+// Validate verifies whether the given capability is valid.
 func (m *PolicyCapabilityManager) Validate(ctx sdk.Context, capability *PolicyCapability) error {
 	ok := m.scopedKeeper.AuthenticateCapability(ctx, capability.capability, capability.GetCapabilityName())
 	if !ok {
