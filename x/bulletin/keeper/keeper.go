@@ -70,11 +70,6 @@ func (k *Keeper) GetScopedKeeper() *capabilitykeeper.ScopedKeeper {
 	return k.capKeeper
 }
 
-// GetAccountKeeper returns the module's AccountKeeper.
-func (k *Keeper) GetAccountKeeper() types.AccountKeeper {
-	return k.accountKeeper
-}
-
 // Logger returns a module-specific logger.
 func (k *Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))

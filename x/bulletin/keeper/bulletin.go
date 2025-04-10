@@ -38,12 +38,12 @@ func (k *Keeper) getPost(ctx context.Context, namespaceId string, postId string)
 	return &post
 }
 
-// getCollaborator retrieves a post based on existing namespaceId and actorDID.
-func (k *Keeper) getCollaborator(ctx context.Context, namespaceId string, actorDID string) *types.Collaborator {
+// getCollaborator retrieves a post based on existing namespaceId and collaboratorDID.
+func (k *Keeper) getCollaborator(ctx context.Context, namespaceId string, collaboratorDID string) *types.Collaborator {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
-	key := types.CollaboratorKey(namespaceId, actorDID)
+	key := types.CollaboratorKey(namespaceId, collaboratorDID)
 	b := store.Get(key)
 	if b == nil {
 		return nil

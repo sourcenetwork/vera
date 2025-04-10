@@ -79,7 +79,7 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 	}
 
 	for _, namespace := range genState.Namespaces {
-		err = keeper.RegisterNamespace(ctx, k, namespace.Id, namespace.OwnerDid, namespace.Creator)
+		err = keeper.RegisterNamespace(ctx, k, policyId, namespace.Id, namespace.OwnerDid, namespace.Creator)
 		if err != nil {
 			panic(err)
 		}
@@ -88,7 +88,7 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 
 	for _, collaborator := range genState.Collaborators {
 		namespace := k.GetNamespace(ctx, collaborator.Namespace)
-		err = keeper.AddCollaborator(ctx, k, collaborator.Namespace, collaborator.Did, namespace.OwnerDid, collaborator.Address)
+		err = keeper.AddCollaborator(ctx, k, policyId, collaborator.Namespace, collaborator.Did, namespace.OwnerDid, collaborator.Address)
 		if err != nil {
 			panic(err)
 		}
