@@ -29,19 +29,24 @@ func (k *Keeper) UpdateParams(ctx context.Context, req *types.MsgUpdateParams) (
 // RegisterNamespace registers a new namespace resource under the genesis bulletin policy.
 // The namespace must have a unique, non-existent namespaceId.
 func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegisterNamespace) (*types.MsgRegisterNamespaceResponse, error) {
+	policyId := k.GetPolicyId(goCtx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
+
 	namespaceId := getNamespaceId(msg.Namespace)
 	if k.hasNamespace(goCtx, namespaceId) {
 		return nil, types.ErrNamespaceAlreadyExists
 	}
 
-	ownerDID, err := createActorDID(goCtx, k.accountKeeper, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(goCtx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err = RegisterNamespace(ctx, k, namespaceId, ownerDID, msg.Creator)
+	err = RegisterNamespace(ctx, k, policyId, namespaceId, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -69,17 +74,22 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 // CreatePost adds a new post to the specified (existing) namespace.
 // The signer must have permission to create posts in that namespace.
 func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*types.MsgCreatePostResponse, error) {
+	policyId := k.GetPolicyId(goCtx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
+
 	namespaceId := getNamespaceId(msg.Namespace)
 	if !k.hasNamespace(goCtx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	creatorDID, err := createActorDID(goCtx, k.accountKeeper, msg.Creator)
+	creatorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(goCtx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	hasPermission, err := hasPermission(goCtx, k, namespaceId, types.CreatePostPermission, creatorDID, msg.Creator)
+	hasPermission, err := hasPermission(goCtx, k, policyId, namespaceId, types.CreatePostPermission, creatorDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -122,17 +132,22 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 // AddCollaborator adds a new collaborator to the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
 func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollaborator) (*types.MsgAddCollaboratorResponse, error) {
+	policyId := k.GetPolicyId(ctx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
+
 	namespaceId := getNamespaceId(msg.Namespace)
 	if !k.hasNamespace(ctx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	ownerDID, err := createActorDID(ctx, k.accountKeeper, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	hasPermission, err := hasPermission(ctx, k, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
+	hasPermission, err := hasPermission(ctx, k, policyId, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -140,12 +155,12 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 		return nil, types.ErrInvalidNamespaceOwner
 	}
 
-	collaboratorDID, err := createActorDID(ctx, k.accountKeeper, msg.Collaborator)
+	collaboratorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Collaborator)
 	if err != nil {
 		return nil, err
 	}
 
-	err = AddCollaborator(ctx, k, namespaceId, collaboratorDID, ownerDID, msg.Creator)
+	err = AddCollaborator(ctx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -172,17 +187,22 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 // RemoveCollaborator removes existing collaborator from the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
 func (k *Keeper) RemoveCollaborator(ctx context.Context, msg *types.MsgRemoveCollaborator) (*types.MsgRemoveCollaboratorResponse, error) {
+	policyId := k.GetPolicyId(ctx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
+
 	namespaceId := getNamespaceId(msg.Namespace)
 	if !k.hasNamespace(ctx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	ownerDID, err := createActorDID(ctx, k.accountKeeper, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	hasPermission, err := hasPermission(ctx, k, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
+	hasPermission, err := hasPermission(ctx, k, policyId, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -190,12 +210,12 @@ func (k *Keeper) RemoveCollaborator(ctx context.Context, msg *types.MsgRemoveCol
 		return nil, types.ErrInvalidNamespaceOwner
 	}
 
-	collaboratorDID, err := createActorDID(ctx, k.accountKeeper, msg.Collaborator)
+	collaboratorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Collaborator)
 	if err != nil {
 		return nil, err
 	}
 
-	err = deleteCollaborator(ctx, k, namespaceId, collaboratorDID, ownerDID, msg.Creator)
+	err = deleteCollaborator(ctx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
