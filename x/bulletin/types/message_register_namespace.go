@@ -20,5 +20,10 @@ func (msg *MsgRegisterNamespace) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if msg.Namespace == "" {
+		return ErrInvalidNamespaceId
+	}
+
 	return nil
 }

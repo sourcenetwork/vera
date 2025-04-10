@@ -22,6 +22,10 @@ func (msg *MsgRemoveCollaborator) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if msg.Namespace == "" {
+		return ErrInvalidNamespaceId
+	}
+
 	_, err = sdk.AccAddressFromBech32(msg.Collaborator)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid collaborator address (%s)", err)
