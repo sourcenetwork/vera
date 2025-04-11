@@ -6,10 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
 
@@ -150,20 +148,7 @@ func TestMsgRegisterNamespace(t *testing.T) {
 				Namespace: namespace,
 			},
 			setup: func() {
-				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
-					ctx,
-					types.BasePolicy(),
-					coretypes.PolicyMarshalingType_SHORT_YAML,
-					types.ModuleName,
-				)
-				require.NoError(t, err)
-
-				policyId := polCap.GetPolicyId()
-				k.SetPolicyId(ctx, policyId)
-
-				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-				err = manager.Claim(ctx, polCap)
-				require.NoError(t, err)
+				setupTestPolicy(t, ctx, k)
 			},
 			expErr: false,
 		},
@@ -299,22 +284,9 @@ func TestMsgCreatePost(t *testing.T) {
 				Proof:     []byte("proof456"),
 			},
 			setup: func() {
-				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
-					ctx,
-					types.BasePolicy(),
-					coretypes.PolicyMarshalingType_SHORT_YAML,
-					types.ModuleName,
-				)
-				require.NoError(t, err)
+				setupTestPolicy(t, ctx, k)
 
-				policyId := polCap.GetPolicyId()
-				k.SetPolicyId(ctx, policyId)
-
-				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-				err = manager.Claim(ctx, polCap)
-				require.NoError(t, err)
-
-				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+				_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
@@ -444,22 +416,9 @@ func TestMsgAddCollaborator(t *testing.T) {
 				Namespace:    namespace,
 			},
 			setup: func() {
-				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
-					ctx,
-					types.BasePolicy(),
-					coretypes.PolicyMarshalingType_SHORT_YAML,
-					types.ModuleName,
-				)
-				require.NoError(t, err)
+				setupTestPolicy(t, ctx, k)
 
-				policyId := polCap.GetPolicyId()
-				k.SetPolicyId(ctx, policyId)
-
-				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-				err = manager.Claim(ctx, polCap)
-				require.NoError(t, err)
-
-				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+				_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
@@ -588,22 +547,9 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 				Namespace:    namespace,
 			},
 			setup: func() {
-				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
-					ctx,
-					types.BasePolicy(),
-					coretypes.PolicyMarshalingType_SHORT_YAML,
-					types.ModuleName,
-				)
-				require.NoError(t, err)
+				setupTestPolicy(t, ctx, k)
 
-				policyId := polCap.GetPolicyId()
-				k.SetPolicyId(ctx, policyId)
-
-				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-				err = manager.Claim(ctx, polCap)
-				require.NoError(t, err)
-
-				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+				_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
