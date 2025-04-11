@@ -1617,8 +1617,8 @@ github.com/sony/gobreaker v0.4.1/go.mod h1:ZKptC7FHNvhBz7dN2LGjPVBz2sZJmc0/PkyDJ
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
 github.com/sourcegraph/conc v0.3.0/go.mod h1:Sdozi7LEKbFPqYX2/J+iBAM6HpqSLTASQIKqDmF7Mt0=
 github.com/sourcegraph/go-diff v0.6.1/go.mod h1:iBszgVvyxdc8SFZ7gm69go2KDdt3ag071iBaWPF6cjs=
-github.com/sourcenetwork/acp_core v0.5.1 h1:a/CMyt0ey/fthGTrBzMPMSErVtGrVQF92UY4/Rolty0=
-github.com/sourcenetwork/acp_core v0.5.1/go.mod h1:w6zmiGx7z7wRmlu9+ugBPgdoTEF2sLLsWb6Xy2qhWnE=
+github.com/sourcenetwork/acp_core v0.5.2 h1:H3R4aGuwLKmSTKBopHj5mRRf60g+fblTFCRORSnL1dM=
+github.com/sourcenetwork/acp_core v0.5.2/go.mod h1:w6zmiGx7z7wRmlu9+ugBPgdoTEF2sLLsWb6Xy2qhWnE=
 github.com/sourcenetwork/corekv v0.0.0-20250122161438-c4cec0f30dbe h1:xML1pxD5zf14MAqjCkW584ri6yjp6go+ud83wpMzWtM=
 github.com/sourcenetwork/corekv v0.0.0-20250122161438-c4cec0f30dbe/go.mod h1:hap4+bqs9JcHPcAMALLj2Vu+QDxmHwYBlRyv8mlwsw4=
 github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8 h1:d0jNogSYqMt+dC05tnd+x7lmzEcBHpKoIU5woZSSHFM=
