@@ -11,27 +11,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
 
-// basePolicy defines base policy for the bulletin module namespaces.
-func basePolicy() string {
-	policyStr := `
-	name: Bulletin Policy
-	description: Base policy that defines permissions for bulletin namespaces
-	resources:
-		namespace:
-			relations:
-				owner:
-					types:
-						- actor
-				collaborator:
-					types: 
-						- actor
-			permissions:
-				create_post:
-					expr: owner + collaborator
-	`
-	return policyStr
-}
-
 // registerBulletinNamespace registers bulletin namespace with bulletin module DID as the owner.
 func registerBulletinNamespace(
 	ctx sdk.Context,
@@ -60,7 +39,7 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 
 	_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 		ctx,
-		basePolicy(),
+		types.BasePolicy(),
 		coretypes.PolicyMarshalingType_SHORT_YAML,
 		types.ModuleName,
 	)
@@ -72,7 +51,6 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 	k.SetPolicyId(ctx, policyId)
 
 	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-
 	err = manager.Claim(ctx, polCap)
 	if err != nil {
 		panic(err)

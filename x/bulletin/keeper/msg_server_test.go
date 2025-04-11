@@ -73,29 +73,8 @@ func TestMsgUpdateParams(t *testing.T) {
 	}
 }
 
-func basePolicy() string {
-	policyStr := `
-	name: Bulletin Policy
-	description: Base policy that defines permissions for bulletin namespaces
-	resources:
-		namespace:
-			relations:
-				owner:
-					types:
-						- actor
-				collaborator:
-					types: 
-						- actor
-			permissions:
-				create_post:
-					expr: owner + collaborator
-	`
-	return policyStr
-}
-
 func TestMsgRegisterNamespace(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
@@ -103,7 +82,7 @@ func TestMsgRegisterNamespace(t *testing.T) {
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubKey.Address())
 	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc)
+	k.accountKeeper.SetAccount(ctx, baseAcc)
 
 	namespace := "ns1"
 
@@ -173,7 +152,7 @@ func TestMsgRegisterNamespace(t *testing.T) {
 			setup: func() {
 				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 					ctx,
-					basePolicy(),
+					types.BasePolicy(),
 					coretypes.PolicyMarshalingType_SHORT_YAML,
 					types.ModuleName,
 				)
@@ -213,7 +192,7 @@ func TestMsgRegisterNamespace(t *testing.T) {
 
 			tc.setup()
 
-			_, err = k.RegisterNamespace(sdkCtx, tc.input)
+			_, err = k.RegisterNamespace(ctx, tc.input)
 
 			if tc.expErr {
 				require.Error(t, err)
@@ -227,7 +206,6 @@ func TestMsgRegisterNamespace(t *testing.T) {
 
 func TestMsgCreatePost(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
@@ -235,7 +213,7 @@ func TestMsgCreatePost(t *testing.T) {
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubKey.Address())
 	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc)
+	k.accountKeeper.SetAccount(ctx, baseAcc)
 
 	namespace := "ns1"
 
@@ -323,7 +301,7 @@ func TestMsgCreatePost(t *testing.T) {
 			setup: func() {
 				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 					ctx,
-					basePolicy(),
+					types.BasePolicy(),
 					coretypes.PolicyMarshalingType_SHORT_YAML,
 					types.ModuleName,
 				)
@@ -333,11 +311,10 @@ func TestMsgCreatePost(t *testing.T) {
 				k.SetPolicyId(ctx, policyId)
 
 				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-
 				err = manager.Claim(ctx, polCap)
 				require.NoError(t, err)
 
-				_, err = k.RegisterNamespace(sdkCtx, &types.MsgRegisterNamespace{
+				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
@@ -372,7 +349,7 @@ func TestMsgCreatePost(t *testing.T) {
 
 			tc.setup()
 
-			_, err = k.CreatePost(sdkCtx, tc.input)
+			_, err = k.CreatePost(ctx, tc.input)
 
 			if tc.expErr {
 				require.Error(t, err)
@@ -386,7 +363,6 @@ func TestMsgCreatePost(t *testing.T) {
 
 func TestMsgAddCollaborator(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
@@ -394,12 +370,12 @@ func TestMsgAddCollaborator(t *testing.T) {
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubKey.Address())
 	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc)
+	k.accountKeeper.SetAccount(ctx, baseAcc)
 
 	pubKey2 := secp256k1.GenPrivKey().PubKey()
 	addr2 := sdk.AccAddress(pubKey2.Address())
 	baseAcc2 := authtypes.NewBaseAccount(addr2, pubKey2, 2, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc2)
+	k.accountKeeper.SetAccount(ctx, baseAcc2)
 
 	namespace := "ns1"
 
@@ -470,7 +446,7 @@ func TestMsgAddCollaborator(t *testing.T) {
 			setup: func() {
 				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 					ctx,
-					basePolicy(),
+					types.BasePolicy(),
 					coretypes.PolicyMarshalingType_SHORT_YAML,
 					types.ModuleName,
 				)
@@ -480,11 +456,10 @@ func TestMsgAddCollaborator(t *testing.T) {
 				k.SetPolicyId(ctx, policyId)
 
 				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-
 				err = manager.Claim(ctx, polCap)
 				require.NoError(t, err)
 
-				_, err = k.RegisterNamespace(sdkCtx, &types.MsgRegisterNamespace{
+				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
@@ -518,7 +493,7 @@ func TestMsgAddCollaborator(t *testing.T) {
 
 			tc.setup()
 
-			_, err = k.AddCollaborator(sdkCtx, tc.input)
+			_, err = k.AddCollaborator(ctx, tc.input)
 
 			if tc.expErr {
 				require.Error(t, err)
@@ -532,7 +507,6 @@ func TestMsgAddCollaborator(t *testing.T) {
 
 func TestMsgRemoveCollaborator(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
@@ -540,12 +514,12 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 	pubKey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubKey.Address())
 	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc)
+	k.accountKeeper.SetAccount(ctx, baseAcc)
 
 	pubKey2 := secp256k1.GenPrivKey().PubKey()
 	addr2 := sdk.AccAddress(pubKey2.Address())
 	baseAcc2 := authtypes.NewBaseAccount(addr2, pubKey2, 2, 1)
-	k.accountKeeper.SetAccount(sdkCtx, baseAcc2)
+	k.accountKeeper.SetAccount(ctx, baseAcc2)
 
 	namespace := "ns1"
 
@@ -616,7 +590,7 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 			setup: func() {
 				_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 					ctx,
-					basePolicy(),
+					types.BasePolicy(),
 					coretypes.PolicyMarshalingType_SHORT_YAML,
 					types.ModuleName,
 				)
@@ -626,11 +600,10 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 				k.SetPolicyId(ctx, policyId)
 
 				manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
-
 				err = manager.Claim(ctx, polCap)
 				require.NoError(t, err)
 
-				_, err = k.RegisterNamespace(sdkCtx, &types.MsgRegisterNamespace{
+				_, err = k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 					Creator:   baseAcc.Address,
 					Namespace: namespace,
 				})
@@ -671,7 +644,7 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 
 			tc.setup()
 
-			_, err = k.RemoveCollaborator(sdkCtx, tc.input)
+			_, err = k.RemoveCollaborator(ctx, tc.input)
 
 			if tc.expErr {
 				require.Error(t, err)

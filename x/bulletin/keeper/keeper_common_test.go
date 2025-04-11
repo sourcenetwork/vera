@@ -21,6 +21,8 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
@@ -92,4 +94,21 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	k.SetParams(ctx, types.DefaultParams())
 
 	return k, ctx
+}
+
+func setupTestPolicy(t *testing.T, ctx sdk.Context, k Keeper) {
+	_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
+		ctx,
+		types.BasePolicy(),
+		coretypes.PolicyMarshalingType_SHORT_YAML,
+		types.ModuleName,
+	)
+	require.NoError(t, err)
+
+	policyId := polCap.GetPolicyId()
+	k.SetPolicyId(ctx, policyId)
+
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+	err = manager.Claim(ctx, polCap)
+	require.NoError(t, err)
 }
