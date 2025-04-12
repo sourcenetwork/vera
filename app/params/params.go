@@ -14,9 +14,10 @@ const (
 	CreditName            = "Source Credit"
 	CreditSymbol          = "CREDIT"
 	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non transferrable."
+	CreditFeeMultiplier   = 10
 
 	DefaultBondDenom   = MicroOpenDenom
-	DefaultMinGasPrice = 0.001
+	DefaultMinGasPrice = "0.001"
 
 	BlocksPerYear       = 31557600
 	GoalBonded          = "0.67"

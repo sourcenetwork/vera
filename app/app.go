@@ -64,6 +64,7 @@ import (
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
@@ -132,7 +133,7 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
-	AcpKeeper      acpmodulekeeper.Keeper
+	AcpKeeper      *acpmodulekeeper.Keeper
 	BulletinKeeper bulletinmodulekeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     tierkeeper.Keeper
@@ -308,6 +309,11 @@ func New(
 	app.registerIBCModules()
 
 	customMintModule := app.registerCustomMintModule()
+
+	// initialize capability keeper in acp module
+	// which is initialized by IBC modules
+	acpKeeper := app.GetCapabilityScopedKeeper(acptypes.ModuleName)
+	app.AcpKeeper.InitializeCapabilityKeeper(&acpKeeper)
 
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
