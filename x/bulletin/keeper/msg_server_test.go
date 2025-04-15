@@ -200,6 +200,11 @@ func TestMsgCreatePost(t *testing.T) {
 	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
 	k.accountKeeper.SetAccount(ctx, baseAcc)
 
+	pubKey2 := secp256k1.GenPrivKey().PubKey()
+	addr2 := sdk.AccAddress(pubKey2.Address())
+	baseAcc2 := authtypes.NewBaseAccount(addr2, pubKey2, 2, 1)
+	k.accountKeeper.SetAccount(ctx, baseAcc2)
+
 	namespace := "ns1"
 
 	testCases := []struct {
@@ -306,6 +311,36 @@ func TestMsgCreatePost(t *testing.T) {
 			expErr:    true,
 			expErrMsg: "post already exists",
 		},
+		{
+			name: "create post (error: unauthorized)",
+			input: &types.MsgCreatePost{
+				Creator:   baseAcc2.Address,
+				Namespace: namespace,
+				Payload:   []byte("post1234"),
+				Proof:     []byte("proof4567"),
+			},
+			setup:     func() {},
+			expErr:    true,
+			expErrMsg: "expected authorized account as a post creator",
+		},
+		{
+			name: "create post from collaborator (no error)",
+			input: &types.MsgCreatePost{
+				Creator:   baseAcc2.Address,
+				Namespace: namespace,
+				Payload:   []byte("post1234"),
+				Proof:     []byte("proof4567"),
+			},
+			setup: func() {
+				_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
+					Creator:      baseAcc.Address,
+					Collaborator: baseAcc2.Address,
+					Namespace:    namespace,
+				})
+				require.NoError(t, err)
+			},
+			expErr: false,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -348,6 +383,11 @@ func TestMsgAddCollaborator(t *testing.T) {
 	addr2 := sdk.AccAddress(pubKey2.Address())
 	baseAcc2 := authtypes.NewBaseAccount(addr2, pubKey2, 2, 1)
 	k.accountKeeper.SetAccount(ctx, baseAcc2)
+
+	pubKey3 := secp256k1.GenPrivKey().PubKey()
+	addr3 := sdk.AccAddress(pubKey3.Address())
+	baseAcc3 := authtypes.NewBaseAccount(addr3, pubKey3, 3, 1)
+	k.accountKeeper.SetAccount(ctx, baseAcc3)
 
 	namespace := "ns1"
 
@@ -437,6 +477,17 @@ func TestMsgAddCollaborator(t *testing.T) {
 			expErr:    true,
 			expErrMsg: "collaborator already exists",
 		},
+		{
+			name: "add collaborator (error: unauthorized)",
+			input: &types.MsgAddCollaborator{
+				Creator:      baseAcc2.Address,
+				Collaborator: baseAcc3.Address,
+				Namespace:    namespace,
+			},
+			setup:     func() {},
+			expErr:    true,
+			expErrMsg: "actor is not a manager of relation",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -479,6 +530,11 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 	addr2 := sdk.AccAddress(pubKey2.Address())
 	baseAcc2 := authtypes.NewBaseAccount(addr2, pubKey2, 2, 1)
 	k.accountKeeper.SetAccount(ctx, baseAcc2)
+
+	pubKey3 := secp256k1.GenPrivKey().PubKey()
+	addr3 := sdk.AccAddress(pubKey3.Address())
+	baseAcc3 := authtypes.NewBaseAccount(addr3, pubKey3, 3, 1)
+	k.accountKeeper.SetAccount(ctx, baseAcc3)
 
 	namespace := "ns1"
 
@@ -574,6 +630,31 @@ func TestMsgRemoveCollaborator(t *testing.T) {
 			setup:     func() {},
 			expErr:    true,
 			expErrMsg: "collaborator not found",
+		},
+		{
+			name: "remove collaborator (error: unauthorized)",
+			input: &types.MsgRemoveCollaborator{
+				Creator:      baseAcc2.Address,
+				Collaborator: baseAcc3.Address,
+				Namespace:    namespace,
+			},
+			setup: func() {
+				_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
+					Creator:      baseAcc.Address,
+					Collaborator: baseAcc2.Address,
+					Namespace:    namespace,
+				})
+				require.NoError(t, err)
+
+				_, err = k.AddCollaborator(ctx, &types.MsgAddCollaborator{
+					Creator:      baseAcc.Address,
+					Collaborator: baseAcc3.Address,
+					Namespace:    namespace,
+				})
+				require.NoError(t, err)
+			},
+			expErr:    true,
+			expErrMsg: "actor is not a manager of relation",
 		},
 	}
 
