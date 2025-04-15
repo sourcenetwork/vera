@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Post represents a bulletin entry created within a specific namespace.
 type Post struct {
 	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`

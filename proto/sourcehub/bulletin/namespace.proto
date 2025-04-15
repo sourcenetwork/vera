@@ -7,6 +7,7 @@ import "sourcehub/bulletin/post.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 
+// Namespace represents a logical bulletin space used to group posts.
 message Namespace {
   string id = 1;
   string creator = 2;

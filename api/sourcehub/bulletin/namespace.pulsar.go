@@ -654,6 +654,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Namespace represents a logical bulletin space used to group posts.
 type Namespace struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

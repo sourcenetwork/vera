@@ -27,6 +27,7 @@ var _ = time.Kitchen
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Namespace represents a logical bulletin space used to group posts.
 type Namespace struct {
 	Id        string    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Creator   string    `protobuf:"bytes,2,opt,name=creator,proto3" json:"creator,omitempty"`

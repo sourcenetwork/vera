@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Collaborator represents an actor with collaborator permissions in a namespace.
 type Collaborator struct {
 	Address   string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	Did       string `protobuf:"bytes,2,opt,name=did,proto3" json:"did,omitempty"`

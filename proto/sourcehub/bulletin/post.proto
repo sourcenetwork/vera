@@ -3,6 +3,7 @@ package sourcehub.bulletin;
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 
+// Post represents a bulletin entry created within a specific namespace.
 message Post {
   string id = 1;
   string namespace = 2;

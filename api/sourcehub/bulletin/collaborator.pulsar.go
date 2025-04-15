@@ -573,6 +573,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Collaborator represents an actor with collaborator permissions in a namespace.
 type Collaborator struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

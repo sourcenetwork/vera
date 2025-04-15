@@ -705,6 +705,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Post represents a bulletin entry created within a specific namespace.
 type Post struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
