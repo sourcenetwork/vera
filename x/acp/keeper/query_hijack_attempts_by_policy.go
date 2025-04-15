@@ -10,7 +10,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) HijackAttemptsByPolicy(goCtx context.Context, req *types.QueryHijackAttemptsByPolicyRequest) (*types.QueryHijackAttemptsByPolicyResponse, error) {
+func (k *Keeper) HijackAttemptsByPolicy(
+	goCtx context.Context,
+	req *types.QueryHijackAttemptsByPolicyRequest,
+) (*types.QueryHijackAttemptsByPolicyResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

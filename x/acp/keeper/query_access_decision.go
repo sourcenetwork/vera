@@ -10,7 +10,10 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) AccessDecision(goCtx context.Context, req *types.QueryAccessDecisionRequest) (*types.QueryAccessDecisionResponse, error) {
+func (k *Keeper) AccessDecision(
+	goCtx context.Context,
+	req *types.QueryAccessDecisionRequest,
+) (*types.QueryAccessDecisionResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

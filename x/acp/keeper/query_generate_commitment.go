@@ -14,7 +14,10 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) GenerateCommitment(goCtx context.Context, req *types.QueryGenerateCommitmentRequest) (*types.QueryGenerateCommitmentResponse, error) {
+func (k *Keeper) GenerateCommitment(
+	goCtx context.Context,
+	req *types.QueryGenerateCommitmentRequest,
+) (*types.QueryGenerateCommitmentResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

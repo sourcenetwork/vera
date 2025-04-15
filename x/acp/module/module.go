@@ -98,14 +98,14 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
+	keeper        *keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
@@ -131,8 +131,7 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	// inject instrumentation msg service handlers
 	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
-	srv := keeper.NewMsgServerImpl(am.keeper)
-	cfg.MsgServer().RegisterService(&descriptor, srv)
+	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
 
 	// inject instrumentation into query service handler
 	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
@@ -211,7 +210,7 @@ type ModuleInputs struct {
 type ModuleOutputs struct {
 	depinject.Out
 
-	AcpKeeper keeper.Keeper
+	AcpKeeper *keeper.Keeper
 	Module    appmodule.AppModule
 }
 
@@ -227,13 +226,16 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
+		// set cap keeper as nil it is initialized
+		// after depinject is finished executing
+		nil,
 	)
 	m := NewAppModule(
 		in.Cdc,
-		k,
+		&k,
 		in.AccountKeeper,
 		in.BankKeeper,
 	)
 
-	return ModuleOutputs{AcpKeeper: k, Module: m}
+	return ModuleOutputs{AcpKeeper: &k, Module: m}
 }

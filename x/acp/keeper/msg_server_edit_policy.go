@@ -11,12 +11,12 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
+func (k *Keeper) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	engine := k.getACPEngine(ctx)
 
-	did, err := k.issueDIDFromAccountAddr(ctx, msg.Creator)
+	did, err := k.IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("EditPolicy: %w", err)
 	}

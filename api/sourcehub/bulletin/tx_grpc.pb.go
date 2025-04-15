@@ -19,8 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Msg_UpdateParams_FullMethodName = "/sourcehub.bulletin.Msg/UpdateParams"
-	Msg_CreatePost_FullMethodName   = "/sourcehub.bulletin.Msg/CreatePost"
+	Msg_UpdateParams_FullMethodName       = "/sourcehub.bulletin.Msg/UpdateParams"
+	Msg_CreatePost_FullMethodName         = "/sourcehub.bulletin.Msg/CreatePost"
+	Msg_RegisterNamespace_FullMethodName  = "/sourcehub.bulletin.Msg/RegisterNamespace"
+	Msg_AddCollaborator_FullMethodName    = "/sourcehub.bulletin.Msg/AddCollaborator"
+	Msg_RemoveCollaborator_FullMethodName = "/sourcehub.bulletin.Msg/RemoveCollaborator"
 )
 
 // MsgClient is the client API for Msg service.
@@ -33,6 +36,9 @@ type MsgClient interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreatePost(ctx context.Context, in *MsgCreatePost, opts ...grpc.CallOption) (*MsgCreatePostResponse, error)
+	RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error)
+	AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error)
+	RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error)
 }
 
 type msgClient struct {
@@ -63,6 +69,36 @@ func (c *msgClient) CreatePost(ctx context.Context, in *MsgCreatePost, opts ...g
 	return out, nil
 }
 
+func (c *msgClient) RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRegisterNamespaceResponse)
+	err := c.cc.Invoke(ctx, Msg_RegisterNamespace_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgAddCollaboratorResponse)
+	err := c.cc.Invoke(ctx, Msg_AddCollaborator_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRemoveCollaboratorResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveCollaborator_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -73,6 +109,9 @@ type MsgServer interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error)
+	RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error)
+	AddCollaborator(context.Context, *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error)
+	RemoveCollaborator(context.Context, *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -88,6 +127,15 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 }
 func (UnimplementedMsgServer) CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
+}
+func (UnimplementedMsgServer) RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterNamespace not implemented")
+}
+func (UnimplementedMsgServer) AddCollaborator(context.Context, *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollaborator not implemented")
+}
+func (UnimplementedMsgServer) RemoveCollaborator(context.Context, *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveCollaborator not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -146,6 +194,60 @@ func _Msg_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_RegisterNamespace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterNamespace)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterNamespace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RegisterNamespace_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterNamespace(ctx, req.(*MsgRegisterNamespace))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddCollaborator)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_AddCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddCollaborator(ctx, req.(*MsgAddCollaborator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveCollaborator)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemoveCollaborator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveCollaborator(ctx, req.(*MsgRemoveCollaborator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -160,6 +262,18 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePost",
 			Handler:    _Msg_CreatePost_Handler,
+		},
+		{
+			MethodName: "RegisterNamespace",
+			Handler:    _Msg_RegisterNamespace_Handler,
+		},
+		{
+			MethodName: "AddCollaborator",
+			Handler:    _Msg_AddCollaborator_Handler,
+		},
+		{
+			MethodName: "RemoveCollaborator",
+			Handler:    _Msg_RemoveCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

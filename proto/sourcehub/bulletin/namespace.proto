@@ -1,0 +1,19 @@
+syntax = "proto3";
+package sourcehub.bulletin;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "sourcehub/bulletin/post.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
+
+// Namespace represents a logical bulletin space used to group posts.
+message Namespace {
+  string id = 1;
+  string creator = 2;
+  string owner_did = 3;
+  google.protobuf.Timestamp created_at = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
+}

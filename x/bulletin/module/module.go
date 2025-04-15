@@ -21,6 +21,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -95,14 +96,14 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
+	keeper        *keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
@@ -116,7 +117,7 @@ func NewAppModule(
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), am.keeper)
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -182,12 +183,13 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	AcpKeeper     *acpkeeper.Keeper
 }
 
 type ModuleOutputs struct {
 	depinject.Out
 
-	BulletinKeeper keeper.Keeper
+	BulletinKeeper *keeper.Keeper
 	Module         appmodule.AppModule
 }
 
@@ -202,13 +204,16 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.StoreService,
 		in.Logger,
 		authority.String(),
+		in.AccountKeeper,
+		in.AcpKeeper,
+		nil,
 	)
 	m := NewAppModule(
 		in.Cdc,
-		k,
+		&k,
 		in.AccountKeeper,
 		in.BankKeeper,
 	)
 
-	return ModuleOutputs{BulletinKeeper: k, Module: m}
+	return ModuleOutputs{BulletinKeeper: &k, Module: m}
 }

@@ -26,7 +26,7 @@ func TestPolicyIds(t *testing.T) {
 func (s *queryPolicyIdsSuite) setupPolicies(
 	t *testing.T,
 	ctx context.Context,
-	msgServer types.MsgServer,
+	k Keeper,
 	creator string,
 	policyNames []string,
 	marshalingType coretypes.PolicyMarshalingType,
@@ -90,7 +90,7 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 			MarshalType: marshalingType,
 		}
 
-		resp, err := msgServer.CreatePolicy(ctx, &msg)
+		resp, err := k.CreatePolicy(ctx, &msg)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
@@ -102,11 +102,10 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
 	ctx, k, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(k)
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_YAML)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -116,11 +115,10 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_JSON() {
 	ctx, k, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(k)
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_JSON)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_JSON)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -139,11 +137,10 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_NoPoliciesRegistered() {
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
 	ctx, k, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(k)
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	_ = s.setupPolicies(s.T(), ctx, msgServer, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_SHORT_YAML)
+	_ = s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -153,7 +150,6 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 	ctx, k, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(k)
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
@@ -161,7 +157,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 	for i := 0; i < 10_000; i++ {
 		policyNames = append(policyNames, "Policy"+strconv.Itoa(i))
 	}
-	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, policyNames, coretypes.PolicyMarshalingType_SHORT_JSON)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, policyNames, coretypes.PolicyMarshalingType_SHORT_JSON)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -171,7 +167,6 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_JSON() {
 
 func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	ctx, k, accKeep := setupKeeper(s.T())
-	msgServer := NewMsgServerImpl(k)
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
@@ -179,7 +174,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	for i := 0; i < 10_000; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-	policyIds := s.setupPolicies(s.T(), ctx, msgServer, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)

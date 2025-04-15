@@ -12,7 +12,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
+func (k *Keeper) BearerPolicyCmd(goCtx context.Context, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	resolver := &did.KeyResolver{}

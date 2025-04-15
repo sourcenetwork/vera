@@ -21,6 +21,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	prototypes "github.com/cosmos/gogoproto/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
@@ -186,6 +187,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 		log.NewNopLogger(),
 		authority.String(),
 		accKeeper,
+		&capabilitykeeper.ScopedKeeper{},
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
@@ -195,11 +197,10 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 	// Initialize params
 	k.SetParams(ctx, params)
 
-	msgServer := keeper.NewMsgServerImpl(k)
 	executor := &KeeperACPClient{
 		baseCtx:        ctx,
-		k:              msgServer,
-		querier:        k,
+		k:              &k,
+		querier:        &k,
 		accountCreator: accKeeper,
 		ts: types.Timestamp{
 			BlockHeight: 1,

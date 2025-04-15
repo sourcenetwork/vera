@@ -22,5 +22,18 @@ func (msg *MsgCreatePost) ValidateBasic() error {
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if msg.Namespace == "" {
+		return ErrInvalidNamespaceId
+	}
+
+	if len(msg.Payload) == 0 {
+		return ErrInvalidPostPayload
+	}
+
+	if len(msg.Proof) == 0 {
+		return ErrInvalidPostProof
+	}
+
 	return nil
 }

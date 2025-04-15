@@ -7,6 +7,8 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/bulletin/params.proto";
+import "sourcehub/bulletin/namespace.proto";
+import "sourcehub/bulletin/collaborator.proto";
 import "sourcehub/bulletin/post.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
@@ -17,10 +19,29 @@ service Query {
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/params";
   }
-
-  // Queries a list of ReadPost items.
-  rpc ReadPost(QueryReadPostRequest) returns (QueryReadPostResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/read_post/{namespace}";
+  // Queries a namespace based on the specified namespace id.
+  rpc Namespace(QueryNamespaceRequest) returns (QueryNamespaceResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/namespace/{namespace}";
+  }
+  // Queries all namespaces.
+  rpc Namespaces(QueryNamespacesRequest) returns (QueryNamespacesResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/namespaces";
+  }
+  // Queries all namespace collaborators.
+  rpc NamespaceCollaborators(QueryNamespaceCollaboratorsRequest) returns (QueryNamespaceCollaboratorsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/collaborators/{namespace}";
+  }
+  // Queries all namespace posts.
+  rpc NamespacePosts(QueryNamespacePostsRequest) returns (QueryNamespacePostsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/posts/{namespace}";
+  }
+  // Queries a post based on the specified namespace and post id.
+  rpc Post(QueryPostRequest) returns (QueryPostResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/post/{namespace}/{id}";
+  }
+  // Queries all posts.
+  rpc Posts(QueryPostsRequest) returns (QueryPostsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/posts";
   }
 }
 
@@ -36,10 +57,57 @@ message QueryParamsResponse {
   ];
 }
 
-message QueryReadPostRequest {
+message QueryNamespaceRequest {
   string namespace = 1;
 }
 
-message QueryReadPostResponse {
+message QueryNamespaceResponse {
+  Namespace namespace = 1;
+}
+
+message QueryNamespacesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryNamespacesResponse {
+  repeated Namespace namespaces = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryNamespaceCollaboratorsRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryNamespaceCollaboratorsResponse {
+  repeated Collaborator collaborators = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryNamespacePostsRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryNamespacePostsResponse {
+  repeated Post posts = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryPostRequest {
+  string namespace = 1;
+  string id = 2;
+}
+
+message QueryPostResponse {
   Post post = 1;
+}
+
+message QueryPostsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryPostsResponse {
+  repeated Post posts = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
+func (k *Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
