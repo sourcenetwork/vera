@@ -114,7 +114,6 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	k.SetPost(goCtx, post)
 
 	b64Payload := base64.StdEncoding.EncodeToString(post.Payload)
-	// b64Proof := base64.StdEncoding.EncodeToString(post.Proof)
 	sdk.UnwrapSDKContext(goCtx).EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventCreatePost,
@@ -122,7 +121,6 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 			sdk.NewAttribute(types.AttributeKeyPostId, postId),
 			sdk.NewAttribute(types.AttributeKeyCreatorDid, creatorDID),
 			sdk.NewAttribute(types.AttributeKeyPayload, b64Payload),
-			// sdk.NewAttribute(types.AttributeKeyProof, b64Proof),
 		),
 	)
 
@@ -145,14 +143,6 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-
-	hasPermission, err := hasPermission(ctx, k, policyId, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-	if !hasPermission {
-		return nil, types.ErrInvalidNamespaceOwner
 	}
 
 	collaboratorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Collaborator)
@@ -200,14 +190,6 @@ func (k *Keeper) RemoveCollaborator(ctx context.Context, msg *types.MsgRemoveCol
 	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-
-	hasPermission, err := hasPermission(ctx, k, policyId, namespaceId, types.ManageCollaboratorsPermission, ownerDID, msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-	if !hasPermission {
-		return nil, types.ErrInvalidNamespaceOwner
 	}
 
 	collaboratorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Collaborator)
