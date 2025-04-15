@@ -5,31 +5,9 @@ import (
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/capability"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
-
-// registerBulletinNamespace registers bulletin namespace with bulletin module DID as the owner.
-func registerBulletinNamespace(
-	ctx sdk.Context,
-	k *keeper.Keeper,
-	polCap *capability.PolicyCapability,
-	modAcc sdk.ModuleAccountI,
-) error {
-	policyCmd := acptypes.NewRegisterObjectCmd(coretypes.NewObject(types.NamespaceResource, types.ModuleName))
-
-	moduleAddr := modAcc.GetAddress().String()
-	moduleDID := did.IssueModuleDID(types.ModuleName)
-
-	_, err := k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, policyCmd, moduleDID, moduleAddr)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 // InitGenesis initializes the module's state from a provided genesis state.
 func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState) {
