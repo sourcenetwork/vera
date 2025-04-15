@@ -8,9 +8,7 @@ import (
 	grpc "google.golang.org/grpc"
 )
 
-// WrapMsgServerServiceDescriptor wraps a service descriptor,
-// assume to be of msg servers, and add metric collection
-// to it.
+// WrapMsgServerServiceDescriptor wraps a message service descriptor and adds metric instrumentation.
 func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
@@ -24,9 +22,7 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 	return desc
 }
 
-// WrapQueryServiceDescriptor wraps a service descriptor,
-// assume to be of msg servers, and add metric collection
-// to it.
+// WrapQueryServiceDescriptor wraps a query service descriptor and adds metric instrumentation.
 func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
@@ -40,34 +36,35 @@ func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.S
 	return desc
 }
 
-// wrapMsgSeverHandler wraps an individual GRPC server method handler
-// with metric collection logic.
-// The wrapped method tracks the number of processed messages,
-// number of errors returned and latecy.
-func wrapMsgSeverHandler(moduleName string, methodName string, latencyMetricName, countMetricName, errMetricName []string, handler grpc.MethodHandler) grpc.MethodHandler {
-	return func(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-		labels := []gometrics.Label{
-			{
-				Name:  ModuleLabel,
-				Value: moduleName,
-			},
-			{
-				Name:  EndpointLabel,
-				Value: methodName,
-			},
+// wrapMsgSeverHandler wraps an individual GRPC server method handler with metric collection logic.
+// It tracks the number of processed messages, error count, and message handling latency.
+func wrapMsgSeverHandler(
+	moduleName, methodName string,
+	latencyMetricName, countMetricName, errMetricName []string,
+	handler grpc.MethodHandler,
+) grpc.MethodHandler {
+	return func(
+		srv interface{},
+		ctx context.Context,
+		dec func(interface{}) error,
+		interceptor grpc.UnaryServerInterceptor,
+	) (interface{}, error) {
+		labels := []Label{
+			{Name: ModuleLabel, Value: moduleName},
+			{Name: EndpointLabel, Value: methodName},
 		}
 		labels = append(labels, commonLabels...)
 
-		// measure msg handling latency
+		// Track message handling latency
 		now := time.Now()
 		defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
 
-		// total msg count
+		// Increment message count
 		gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
 
 		resp, err := handler(srv, ctx, dec, interceptor)
 		if err != nil {
-			// count error if returned
+			// Increment error count
 			gometrics.IncrCounterWithLabels(errMetricName, 1, labels)
 		}
 		return resp, err

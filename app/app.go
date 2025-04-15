@@ -58,7 +58,6 @@ import (
 	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	gometrics "github.com/hashicorp/go-metrics"
 	abci "github.com/skip-mev/block-sdk/v2/abci"
 	"github.com/skip-mev/block-sdk/v2/block"
 	"github.com/skip-mev/block-sdk/v2/block/base"
@@ -377,7 +376,7 @@ func New(
 		telemetry.IncrCounterWithLabels(
 			[]string{metrics.App, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
-			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
+			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
 		)
 		return prepareProposal(ctx, req)
 	}
@@ -389,7 +388,7 @@ func New(
 		telemetry.IncrCounterWithLabels(
 			[]string{metrics.App, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
-			[]gometrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
+			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
 		)
 		return processProposal(ctx, req)
 	}

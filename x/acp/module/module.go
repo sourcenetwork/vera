@@ -129,11 +129,11 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	// inject instrumentation msg service handlers
+	// Inject instrumentation msg service handlers
 	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
 	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
 
-	// inject instrumentation into query service handler
+	// Inject instrumentation into query service handler
 	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
 	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
 }
