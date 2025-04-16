@@ -228,46 +228,367 @@ func (m *MsgCreatePostResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePostResponse proto.InternalMessageInfo
 
+type MsgRegisterNamespace struct {
+	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+}
+
+func (m *MsgRegisterNamespace) Reset()         { *m = MsgRegisterNamespace{} }
+func (m *MsgRegisterNamespace) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterNamespace) ProtoMessage()    {}
+func (*MsgRegisterNamespace) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{4}
+}
+func (m *MsgRegisterNamespace) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterNamespace) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterNamespace.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterNamespace) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterNamespace.Merge(m, src)
+}
+func (m *MsgRegisterNamespace) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterNamespace) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterNamespace.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterNamespace proto.InternalMessageInfo
+
+func (m *MsgRegisterNamespace) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgRegisterNamespace) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
+type MsgRegisterNamespaceResponse struct {
+	Namespace *Namespace `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+}
+
+func (m *MsgRegisterNamespaceResponse) Reset()         { *m = MsgRegisterNamespaceResponse{} }
+func (m *MsgRegisterNamespaceResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRegisterNamespaceResponse) ProtoMessage()    {}
+func (*MsgRegisterNamespaceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{5}
+}
+func (m *MsgRegisterNamespaceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRegisterNamespaceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRegisterNamespaceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRegisterNamespaceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRegisterNamespaceResponse.Merge(m, src)
+}
+func (m *MsgRegisterNamespaceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRegisterNamespaceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRegisterNamespaceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRegisterNamespaceResponse proto.InternalMessageInfo
+
+func (m *MsgRegisterNamespaceResponse) GetNamespace() *Namespace {
+	if m != nil {
+		return m.Namespace
+	}
+	return nil
+}
+
+type MsgAddCollaborator struct {
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Namespace    string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Collaborator string `protobuf:"bytes,3,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+}
+
+func (m *MsgAddCollaborator) Reset()         { *m = MsgAddCollaborator{} }
+func (m *MsgAddCollaborator) String() string { return proto.CompactTextString(m) }
+func (*MsgAddCollaborator) ProtoMessage()    {}
+func (*MsgAddCollaborator) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{6}
+}
+func (m *MsgAddCollaborator) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddCollaborator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddCollaborator.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddCollaborator) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddCollaborator.Merge(m, src)
+}
+func (m *MsgAddCollaborator) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddCollaborator) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddCollaborator.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddCollaborator proto.InternalMessageInfo
+
+func (m *MsgAddCollaborator) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgAddCollaborator) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
+func (m *MsgAddCollaborator) GetCollaborator() string {
+	if m != nil {
+		return m.Collaborator
+	}
+	return ""
+}
+
+type MsgAddCollaboratorResponse struct {
+	CollaboratorDid string `protobuf:"bytes,1,opt,name=collaborator_did,json=collaboratorDid,proto3" json:"collaborator_did,omitempty"`
+}
+
+func (m *MsgAddCollaboratorResponse) Reset()         { *m = MsgAddCollaboratorResponse{} }
+func (m *MsgAddCollaboratorResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddCollaboratorResponse) ProtoMessage()    {}
+func (*MsgAddCollaboratorResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{7}
+}
+func (m *MsgAddCollaboratorResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddCollaboratorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddCollaboratorResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddCollaboratorResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddCollaboratorResponse.Merge(m, src)
+}
+func (m *MsgAddCollaboratorResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddCollaboratorResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddCollaboratorResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddCollaboratorResponse proto.InternalMessageInfo
+
+func (m *MsgAddCollaboratorResponse) GetCollaboratorDid() string {
+	if m != nil {
+		return m.CollaboratorDid
+	}
+	return ""
+}
+
+type MsgRemoveCollaborator struct {
+	Creator      string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Namespace    string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	Collaborator string `protobuf:"bytes,3,opt,name=collaborator,proto3" json:"collaborator,omitempty"`
+}
+
+func (m *MsgRemoveCollaborator) Reset()         { *m = MsgRemoveCollaborator{} }
+func (m *MsgRemoveCollaborator) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveCollaborator) ProtoMessage()    {}
+func (*MsgRemoveCollaborator) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{8}
+}
+func (m *MsgRemoveCollaborator) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveCollaborator) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveCollaborator.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveCollaborator) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveCollaborator.Merge(m, src)
+}
+func (m *MsgRemoveCollaborator) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveCollaborator) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveCollaborator.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveCollaborator proto.InternalMessageInfo
+
+func (m *MsgRemoveCollaborator) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgRemoveCollaborator) GetNamespace() string {
+	if m != nil {
+		return m.Namespace
+	}
+	return ""
+}
+
+func (m *MsgRemoveCollaborator) GetCollaborator() string {
+	if m != nil {
+		return m.Collaborator
+	}
+	return ""
+}
+
+type MsgRemoveCollaboratorResponse struct {
+	CollaboratorDid string `protobuf:"bytes,1,opt,name=collaborator_did,json=collaboratorDid,proto3" json:"collaborator_did,omitempty"`
+}
+
+func (m *MsgRemoveCollaboratorResponse) Reset()         { *m = MsgRemoveCollaboratorResponse{} }
+func (m *MsgRemoveCollaboratorResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveCollaboratorResponse) ProtoMessage()    {}
+func (*MsgRemoveCollaboratorResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0497d0f203b2b5e8, []int{9}
+}
+func (m *MsgRemoveCollaboratorResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveCollaboratorResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveCollaboratorResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveCollaboratorResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveCollaboratorResponse.Merge(m, src)
+}
+func (m *MsgRemoveCollaboratorResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveCollaboratorResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveCollaboratorResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveCollaboratorResponse proto.InternalMessageInfo
+
+func (m *MsgRemoveCollaboratorResponse) GetCollaboratorDid() string {
+	if m != nil {
+		return m.CollaboratorDid
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "sourcehub.bulletin.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "sourcehub.bulletin.MsgUpdateParamsResponse")
 	proto.RegisterType((*MsgCreatePost)(nil), "sourcehub.bulletin.MsgCreatePost")
 	proto.RegisterType((*MsgCreatePostResponse)(nil), "sourcehub.bulletin.MsgCreatePostResponse")
+	proto.RegisterType((*MsgRegisterNamespace)(nil), "sourcehub.bulletin.MsgRegisterNamespace")
+	proto.RegisterType((*MsgRegisterNamespaceResponse)(nil), "sourcehub.bulletin.MsgRegisterNamespaceResponse")
+	proto.RegisterType((*MsgAddCollaborator)(nil), "sourcehub.bulletin.MsgAddCollaborator")
+	proto.RegisterType((*MsgAddCollaboratorResponse)(nil), "sourcehub.bulletin.MsgAddCollaboratorResponse")
+	proto.RegisterType((*MsgRemoveCollaborator)(nil), "sourcehub.bulletin.MsgRemoveCollaborator")
+	proto.RegisterType((*MsgRemoveCollaboratorResponse)(nil), "sourcehub.bulletin.MsgRemoveCollaboratorResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/bulletin/tx.proto", fileDescriptor_0497d0f203b2b5e8) }
 
 var fileDescriptor_0497d0f203b2b5e8 = []byte{
-	// 459 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x31, 0x6f, 0xd3, 0x40,
-	0x14, 0xce, 0x51, 0x5a, 0xe4, 0x23, 0x08, 0x71, 0x0a, 0x8a, 0x6b, 0x90, 0x1b, 0x02, 0x43, 0x08,
-	0x22, 0x27, 0x5a, 0x09, 0xa4, 0x4a, 0x0c, 0x84, 0x39, 0x12, 0x32, 0x62, 0xe9, 0x02, 0x17, 0xe7,
-	0xb8, 0x5a, 0xc4, 0x7e, 0xa7, 0xbb, 0x0b, 0x34, 0x1b, 0x42, 0x62, 0x61, 0xe2, 0x67, 0x30, 0x66,
-	0xe0, 0x0f, 0xb0, 0x55, 0x4c, 0x15, 0x13, 0x13, 0x42, 0xc9, 0x90, 0xbf, 0x81, 0xce, 0x67, 0x63,
-	0x1a, 0x82, 0xe8, 0x62, 0xfb, 0x7b, 0xdf, 0x7b, 0xdf, 0x7d, 0xdf, 0x3d, 0xe3, 0x6b, 0x1a, 0x26,
-	0x2a, 0xe6, 0x87, 0x93, 0x21, 0x1d, 0x4e, 0xc6, 0x63, 0x6e, 0x92, 0x8c, 0x9a, 0xa3, 0x9e, 0x54,
-	0x60, 0x80, 0x90, 0xdf, 0x64, 0xaf, 0x24, 0x83, 0x2b, 0x2c, 0x4d, 0x32, 0xa0, 0xf9, 0xd3, 0xb5,
-	0x05, 0xcd, 0x18, 0x74, 0x0a, 0x9a, 0xa6, 0x5a, 0xd0, 0xd7, 0xf7, 0xec, 0xab, 0x20, 0xb6, 0x1d,
-	0xf1, 0x3c, 0x47, 0xd4, 0x81, 0x82, 0x6a, 0x08, 0x10, 0xe0, 0xea, 0xf6, 0xab, 0xa8, 0xee, 0xac,
-	0x71, 0x23, 0x99, 0x62, 0x69, 0x31, 0xd6, 0xfe, 0x82, 0xf0, 0xe5, 0x81, 0x16, 0xcf, 0xe4, 0x88,
-	0x19, 0xfe, 0x24, 0x67, 0xc8, 0x7d, 0xec, 0xb1, 0x89, 0x39, 0x04, 0x95, 0x98, 0xa9, 0x8f, 0x5a,
-	0xa8, 0xe3, 0xf5, 0xfd, 0x6f, 0x9f, 0xef, 0x36, 0x8a, 0xf3, 0x1e, 0x8d, 0x46, 0x8a, 0x6b, 0xfd,
-	0xd4, 0xa8, 0x24, 0x13, 0x51, 0xd5, 0x4a, 0x1e, 0xe2, 0x2d, 0xa7, 0xed, 0x9f, 0x6b, 0xa1, 0xce,
-	0xc5, 0xdd, 0xa0, 0xf7, 0x77, 0xdc, 0x9e, 0x3b, 0xa3, 0xef, 0x1d, 0xff, 0xd8, 0xa9, 0x7d, 0x5a,
-	0xce, 0xba, 0x28, 0x2a, 0x86, 0xf6, 0x1f, 0xbc, 0x5b, 0xce, 0xba, 0x95, 0xdc, 0x87, 0xe5, 0xac,
-	0x7b, 0xab, 0xb2, 0x7f, 0x54, 0x05, 0x58, 0xf1, 0xdb, 0xde, 0xc6, 0xcd, 0x95, 0x52, 0xc4, 0xb5,
-	0x84, 0x4c, 0xf3, 0xf6, 0x7b, 0x84, 0x2f, 0x0d, 0xb4, 0x78, 0xac, 0xb8, 0xe5, 0x40, 0x1b, 0xe2,
-	0xe3, 0x0b, 0xb1, 0x45, 0xa0, 0x5c, 0xb4, 0xa8, 0x84, 0xe4, 0x3a, 0xf6, 0x32, 0x96, 0x72, 0x2d,
-	0x59, 0xcc, 0xf3, 0x04, 0x5e, 0x54, 0x15, 0xec, 0x9c, 0x64, 0xd3, 0x31, 0xb0, 0x91, 0xbf, 0xd1,
-	0x42, 0x9d, 0x7a, 0x54, 0x42, 0xd2, 0xc0, 0x9b, 0x52, 0x01, 0xbc, 0xf4, 0xcf, 0xe7, 0x75, 0x07,
-	0xf6, 0xeb, 0x36, 0x4d, 0xa9, 0xdd, 0x6e, 0xe2, 0xab, 0xa7, 0x6c, 0x94, 0x06, 0x77, 0xbf, 0x22,
-	0xbc, 0x31, 0xd0, 0x82, 0xbc, 0xc0, 0xf5, 0x53, 0x3b, 0xb8, 0xb9, 0xee, 0xee, 0x56, 0x52, 0x06,
-	0x77, 0xce, 0xd0, 0x54, 0x9e, 0x44, 0x0e, 0x30, 0xfe, 0xe3, 0x1a, 0x6e, 0xfc, 0x63, 0xb4, 0x6a,
-	0x09, 0x6e, 0xff, 0xb7, 0xa5, 0xd4, 0x0e, 0x36, 0xdf, 0xda, 0x4d, 0xf6, 0x07, 0xc7, 0xf3, 0x10,
-	0x9d, 0xcc, 0x43, 0xf4, 0x73, 0x1e, 0xa2, 0x8f, 0x8b, 0xb0, 0x76, 0xb2, 0x08, 0x6b, 0xdf, 0x17,
-	0x61, 0xed, 0x60, 0x4f, 0x24, 0xc6, 0xea, 0xc4, 0x90, 0x52, 0xa7, 0x9a, 0x71, 0xf3, 0x06, 0xd4,
-	0x2b, 0xba, 0x76, 0xc3, 0x66, 0x2a, 0xb9, 0x1e, 0x6e, 0xe5, 0xbf, 0xe8, 0xde, 0xaf, 0x00, 0x00,
-	0x00, 0xff, 0xff, 0x41, 0xf1, 0xdd, 0x83, 0x53, 0x03, 0x00, 0x00,
+	// 637 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x55, 0x4f, 0x6b, 0xd4, 0x5e,
+	0x14, 0x9d, 0xf7, 0xeb, 0x9f, 0x1f, 0xb9, 0x8e, 0xd4, 0x86, 0x91, 0xa6, 0xb1, 0x4d, 0x6b, 0x14,
+	0x99, 0x56, 0x9c, 0xd8, 0x16, 0x14, 0x2a, 0x2e, 0xda, 0x0a, 0x82, 0x10, 0x91, 0x88, 0x9b, 0x2a,
+	0xd4, 0x4c, 0xf2, 0x4c, 0x83, 0x93, 0xbc, 0xf0, 0xde, 0x9b, 0xda, 0x6e, 0x44, 0x05, 0x37, 0xae,
+	0x5c, 0xfb, 0x09, 0x5c, 0x76, 0xe1, 0x17, 0x70, 0xd7, 0x65, 0x71, 0xe5, 0x4a, 0xa4, 0x5d, 0xcc,
+	0xd7, 0x90, 0xfc, 0xcf, 0x64, 0x32, 0x38, 0xcc, 0xc6, 0xcd, 0xcc, 0xdc, 0x7b, 0xcf, 0xbd, 0xe7,
+	0x9c, 0xf7, 0x72, 0x33, 0x70, 0x85, 0x91, 0x2e, 0xb5, 0xf0, 0x7e, 0xb7, 0xad, 0xb5, 0xbb, 0x9d,
+	0x0e, 0xe6, 0xae, 0xaf, 0xf1, 0xc3, 0x56, 0x40, 0x09, 0x27, 0xa2, 0x98, 0x15, 0x5b, 0x69, 0x51,
+	0x9e, 0x35, 0x3d, 0xd7, 0x27, 0x5a, 0xf4, 0x19, 0xc3, 0xe4, 0x39, 0x8b, 0x30, 0x8f, 0x30, 0xcd,
+	0x63, 0x8e, 0x76, 0xb0, 0x16, 0x7e, 0x25, 0x85, 0xf9, 0xb8, 0xb0, 0x17, 0x45, 0x5a, 0x1c, 0x24,
+	0xa5, 0x86, 0x43, 0x1c, 0x12, 0xe7, 0xc3, 0x5f, 0x49, 0x76, 0xa9, 0x42, 0x4d, 0x60, 0x52, 0xd3,
+	0x4b, 0xdb, 0xd4, 0x0a, 0x80, 0x6f, 0x7a, 0x98, 0x05, 0xa6, 0x85, 0x63, 0x8c, 0xfa, 0x1d, 0xc1,
+	0x8c, 0xce, 0x9c, 0x67, 0x81, 0x6d, 0x72, 0xfc, 0x24, 0xea, 0x16, 0xef, 0x80, 0x60, 0x76, 0xf9,
+	0x3e, 0xa1, 0x2e, 0x3f, 0x92, 0xd0, 0x32, 0x6a, 0x0a, 0xdb, 0xd2, 0x8f, 0x6f, 0xb7, 0x1a, 0x89,
+	0xa6, 0x2d, 0xdb, 0xa6, 0x98, 0xb1, 0xa7, 0x9c, 0xba, 0xbe, 0x63, 0xe4, 0x50, 0xf1, 0x3e, 0x4c,
+	0xc7, 0xfc, 0xd2, 0x7f, 0xcb, 0xa8, 0x79, 0x61, 0x5d, 0x6e, 0x0d, 0x1e, 0x49, 0x2b, 0xe6, 0xd8,
+	0x16, 0x4e, 0x7e, 0x2d, 0xd5, 0xbe, 0xf6, 0x8e, 0x57, 0x91, 0x91, 0x34, 0x6d, 0xde, 0xfd, 0xd0,
+	0x3b, 0x5e, 0xcd, 0xc7, 0x7d, 0xea, 0x1d, 0xaf, 0x5e, 0xcf, 0x1d, 0x1c, 0xe6, 0x1e, 0x4a, 0x7a,
+	0xd5, 0x79, 0x98, 0x2b, 0xa5, 0x0c, 0xcc, 0x02, 0xe2, 0x33, 0xac, 0x7e, 0x44, 0x70, 0x51, 0x67,
+	0xce, 0x0e, 0xc5, 0x61, 0x8d, 0x30, 0x2e, 0x4a, 0xf0, 0xbf, 0x15, 0x46, 0x84, 0xc6, 0xd6, 0x8c,
+	0x34, 0x14, 0x17, 0x40, 0xc8, 0x4e, 0x27, 0x72, 0x20, 0x18, 0x79, 0x22, 0xec, 0x0b, 0xcc, 0xa3,
+	0x0e, 0x31, 0x6d, 0x69, 0x62, 0x19, 0x35, 0xeb, 0x46, 0x1a, 0x8a, 0x0d, 0x98, 0x0a, 0x28, 0x21,
+	0xaf, 0xa4, 0xc9, 0x28, 0x1f, 0x07, 0x9b, 0xf5, 0xd0, 0x4d, 0x3a, 0x5b, 0x9d, 0x83, 0xcb, 0x7d,
+	0x32, 0x32, 0x81, 0x2f, 0xa0, 0xa1, 0x33, 0xc7, 0xc0, 0x8e, 0xcb, 0x38, 0xa6, 0x8f, 0x8b, 0x74,
+	0xe3, 0xc8, 0x2c, 0xd1, 0x3e, 0x87, 0x85, 0xaa, 0xe9, 0x29, 0xbb, 0x78, 0xaf, 0x38, 0x0b, 0x45,
+	0x97, 0xb6, 0x58, 0x75, 0x69, 0x79, 0x67, 0x8e, 0x57, 0xdf, 0x82, 0xa8, 0x33, 0x67, 0xcb, 0xb6,
+	0x77, 0x48, 0xa7, 0x63, 0xb6, 0x09, 0x8d, 0xe4, 0x8d, 0x7b, 0xbe, 0x2a, 0xd4, 0xad, 0xc2, 0x9c,
+	0xe8, 0x90, 0x05, 0xa3, 0x2f, 0x57, 0x32, 0xf7, 0x10, 0xe4, 0x41, 0xfe, 0xcc, 0xda, 0x0a, 0x5c,
+	0x2a, 0xf6, 0xee, 0xd9, 0xae, 0x9d, 0x08, 0x9a, 0x29, 0xe6, 0x1f, 0xb8, 0xb6, 0xfa, 0x1e, 0x45,
+	0xb7, 0x63, 0x60, 0x8f, 0x1c, 0xe0, 0x7f, 0x64, 0xe6, 0x11, 0x2c, 0x56, 0x4a, 0x18, 0xc3, 0xcf,
+	0xfa, 0x97, 0x49, 0x98, 0xd0, 0x99, 0x23, 0xbe, 0x84, 0x7a, 0xdf, 0x5e, 0x5f, 0xab, 0xba, 0xda,
+	0xd2, 0xe6, 0xc8, 0x37, 0x47, 0x00, 0x65, 0xa2, 0x76, 0x01, 0x0a, 0xab, 0x75, 0x75, 0x48, 0x6b,
+	0x0e, 0x91, 0x57, 0xfe, 0x0a, 0xc9, 0x66, 0x13, 0x98, 0x1d, 0x5c, 0x8b, 0xe6, 0x90, 0xfe, 0x01,
+	0xa4, 0x7c, 0x7b, 0x54, 0x64, 0x46, 0xe8, 0xc2, 0x4c, 0xf9, 0x61, 0xbe, 0x31, 0x64, 0x48, 0x09,
+	0x27, 0xb7, 0x46, 0xc3, 0x65, 0x54, 0x14, 0xc4, 0x8a, 0xa7, 0x6d, 0x65, 0xa8, 0xe4, 0x32, 0x54,
+	0x5e, 0x1b, 0x19, 0x9a, 0x72, 0xca, 0x53, 0xef, 0xc2, 0xb7, 0xed, 0xb6, 0x7e, 0x72, 0xa6, 0xa0,
+	0xd3, 0x33, 0x05, 0xfd, 0x3e, 0x53, 0xd0, 0xe7, 0x73, 0xa5, 0x76, 0x7a, 0xae, 0xd4, 0x7e, 0x9e,
+	0x2b, 0xb5, 0xdd, 0x0d, 0xc7, 0xe5, 0xe1, 0x3c, 0x8b, 0x78, 0x5a, 0x3c, 0xdd, 0xc7, 0xfc, 0x0d,
+	0xa1, 0xaf, 0xb5, 0xca, 0xb7, 0x30, 0x3f, 0x0a, 0x30, 0x6b, 0x4f, 0x47, 0x7f, 0x23, 0x1b, 0x7f,
+	0x02, 0x00, 0x00, 0xff, 0xff, 0x83, 0x1b, 0x5d, 0x8a, 0x1b, 0x07, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -286,6 +607,9 @@ type MsgClient interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreatePost(ctx context.Context, in *MsgCreatePost, opts ...grpc.CallOption) (*MsgCreatePostResponse, error)
+	RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error)
+	AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error)
+	RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error)
 }
 
 type msgClient struct {
@@ -314,12 +638,42 @@ func (c *msgClient) CreatePost(ctx context.Context, in *MsgCreatePost, opts ...g
 	return out, nil
 }
 
+func (c *msgClient) RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error) {
+	out := new(MsgRegisterNamespaceResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/RegisterNamespace", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error) {
+	out := new(MsgAddCollaboratorResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/AddCollaborator", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error) {
+	out := new(MsgRemoveCollaboratorResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/RemoveCollaborator", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error)
+	RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error)
+	AddCollaborator(context.Context, *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error)
+	RemoveCollaborator(context.Context, *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -331,6 +685,15 @@ func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateP
 }
 func (*UnimplementedMsgServer) CreatePost(ctx context.Context, req *MsgCreatePost) (*MsgCreatePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
+}
+func (*UnimplementedMsgServer) RegisterNamespace(ctx context.Context, req *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterNamespace not implemented")
+}
+func (*UnimplementedMsgServer) AddCollaborator(ctx context.Context, req *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCollaborator not implemented")
+}
+func (*UnimplementedMsgServer) RemoveCollaborator(ctx context.Context, req *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveCollaborator not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -373,6 +736,60 @@ func _Msg_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_RegisterNamespace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRegisterNamespace)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RegisterNamespace(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.bulletin.Msg/RegisterNamespace",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RegisterNamespace(ctx, req.(*MsgRegisterNamespace))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddCollaborator)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.bulletin.Msg/AddCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddCollaborator(ctx, req.(*MsgAddCollaborator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveCollaborator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveCollaborator)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveCollaborator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.bulletin.Msg/RemoveCollaborator",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveCollaborator(ctx, req.(*MsgRemoveCollaborator))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.bulletin.Msg",
@@ -385,6 +802,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePost",
 			Handler:    _Msg_CreatePost_Handler,
+		},
+		{
+			MethodName: "RegisterNamespace",
+			Handler:    _Msg_RegisterNamespace_Handler,
+		},
+		{
+			MethodName: "AddCollaborator",
+			Handler:    _Msg_AddCollaborator_Handler,
+		},
+		{
+			MethodName: "RemoveCollaborator",
+			Handler:    _Msg_RemoveCollaborator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -528,6 +957,226 @@ func (m *MsgCreatePostResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgRegisterNamespace) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterNamespace) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterNamespace) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Namespace) > 0 {
+		i -= len(m.Namespace)
+		copy(dAtA[i:], m.Namespace)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRegisterNamespaceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRegisterNamespaceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRegisterNamespaceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Namespace != nil {
+		{
+			size, err := m.Namespace.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAddCollaborator) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddCollaborator) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddCollaborator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Collaborator) > 0 {
+		i -= len(m.Collaborator)
+		copy(dAtA[i:], m.Collaborator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Collaborator)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Namespace) > 0 {
+		i -= len(m.Namespace)
+		copy(dAtA[i:], m.Namespace)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAddCollaboratorResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddCollaboratorResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddCollaboratorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CollaboratorDid) > 0 {
+		i -= len(m.CollaboratorDid)
+		copy(dAtA[i:], m.CollaboratorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollaboratorDid)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveCollaborator) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveCollaborator) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveCollaborator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Collaborator) > 0 {
+		i -= len(m.Collaborator)
+		copy(dAtA[i:], m.Collaborator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Collaborator)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Namespace) > 0 {
+		i -= len(m.Namespace)
+		copy(dAtA[i:], m.Namespace)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveCollaboratorResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveCollaboratorResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveCollaboratorResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.CollaboratorDid) > 0 {
+		i -= len(m.CollaboratorDid)
+		copy(dAtA[i:], m.CollaboratorDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollaboratorDid)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -594,6 +1243,104 @@ func (m *MsgCreatePostResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *MsgRegisterNamespace) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Namespace)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRegisterNamespaceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Namespace != nil {
+		l = m.Namespace.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgAddCollaborator) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Namespace)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Collaborator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgAddCollaboratorResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollaboratorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRemoveCollaborator) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Namespace)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.Collaborator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRemoveCollaboratorResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollaboratorDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -979,6 +1726,662 @@ func (m *MsgCreatePostResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgCreatePostResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterNamespace) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterNamespace: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterNamespace: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Namespace = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRegisterNamespaceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRegisterNamespaceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRegisterNamespaceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Namespace == nil {
+				m.Namespace = &Namespace{}
+			}
+			if err := m.Namespace.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddCollaborator) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddCollaborator: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Namespace = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collaborator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddCollaboratorResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddCollaboratorResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddCollaboratorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollaboratorDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollaboratorDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveCollaborator) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveCollaborator: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveCollaborator: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Namespace = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Collaborator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Collaborator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveCollaboratorResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveCollaboratorResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveCollaboratorResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollaboratorDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollaboratorDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

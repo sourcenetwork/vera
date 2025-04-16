@@ -25,7 +25,7 @@ func TestAccessDecision(t *testing.T) {
 }
 
 func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper) {
-	ctx, keeper, _ := setupKeeper(t)
+	ctx, k, _ := setupKeeper(t)
 
 	decision := &types.AccessDecision{
 		Id:                 "decision-1",
@@ -54,12 +54,12 @@ func (s *queryAccessDecisionSuite) setup(t *testing.T) (context.Context, Keeper)
 		IssuedHeight: 100,
 	}
 
-	repo := keeper.getAccessDecisionRepository(ctx)
+	repo := k.getAccessDecisionRepository(ctx)
 	err := repo.Set(ctx, decision)
 	require.NoError(t, err)
 
 	s.testDecision = decision
-	return ctx, keeper
+	return ctx, k
 }
 
 func (s *queryAccessDecisionSuite) TestQueryAccessDecision_ValidRequest() {

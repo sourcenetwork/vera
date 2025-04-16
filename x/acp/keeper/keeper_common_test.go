@@ -31,12 +31,11 @@ import (
 var timestamp, _ = prototypes.TimestampProto(time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
 
 func setupMsgServer(t *testing.T) (sdk.Context, types.MsgServer, *testutil.AccountKeeperStub) {
-	ctx, keeper, accK := setupKeeper(t)
-	return ctx, NewMsgServerImpl(keeper), accK
+	ctx, k, accK := setupKeeper(t)
+	return ctx, &k, accK
 }
 
 func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.AccountKeeperStub, *capabilitykeeper.Keeper) {
-
 	acpStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
 	capabilityStoreKey := storetypes.NewKVStoreKey("capkeeper")
 	capabilityMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
@@ -59,7 +58,7 @@ func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.Acc
 	accKeeper := &testutil.AccountKeeperStub{}
 	accKeeper.GenAccount()
 
-	keeper := NewKeeper(
+	acpKeeper := NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(acpStoreKey),
 		log.NewNopLogger(),
@@ -72,9 +71,9 @@ func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.Acc
 	ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 	// Initialize params
-	keeper.SetParams(ctx, types.DefaultParams())
+	acpKeeper.SetParams(ctx, types.DefaultParams())
 
-	return ctx, keeper, accKeeper, capKeeper
+	return ctx, acpKeeper, accKeeper, capKeeper
 }
 
 func setupKeeper(t *testing.T) (sdk.Context, Keeper, *testutil.AccountKeeperStub) {

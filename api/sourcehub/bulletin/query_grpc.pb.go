@@ -19,8 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Params_FullMethodName   = "/sourcehub.bulletin.Query/Params"
-	Query_ReadPost_FullMethodName = "/sourcehub.bulletin.Query/ReadPost"
+	Query_Params_FullMethodName                 = "/sourcehub.bulletin.Query/Params"
+	Query_Namespace_FullMethodName              = "/sourcehub.bulletin.Query/Namespace"
+	Query_Namespaces_FullMethodName             = "/sourcehub.bulletin.Query/Namespaces"
+	Query_NamespaceCollaborators_FullMethodName = "/sourcehub.bulletin.Query/NamespaceCollaborators"
+	Query_NamespacePosts_FullMethodName         = "/sourcehub.bulletin.Query/NamespacePosts"
+	Query_Post_FullMethodName                   = "/sourcehub.bulletin.Query/Post"
+	Query_Posts_FullMethodName                  = "/sourcehub.bulletin.Query/Posts"
 )
 
 // QueryClient is the client API for Query service.
@@ -31,8 +36,18 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	// Queries a list of ReadPost items.
-	ReadPost(ctx context.Context, in *QueryReadPostRequest, opts ...grpc.CallOption) (*QueryReadPostResponse, error)
+	// Queries a namespace based on the specified namespace id.
+	Namespace(ctx context.Context, in *QueryNamespaceRequest, opts ...grpc.CallOption) (*QueryNamespaceResponse, error)
+	// Queries all namespaces.
+	Namespaces(ctx context.Context, in *QueryNamespacesRequest, opts ...grpc.CallOption) (*QueryNamespacesResponse, error)
+	// Queries all namespace collaborators.
+	NamespaceCollaborators(ctx context.Context, in *QueryNamespaceCollaboratorsRequest, opts ...grpc.CallOption) (*QueryNamespaceCollaboratorsResponse, error)
+	// Queries all namespace posts.
+	NamespacePosts(ctx context.Context, in *QueryNamespacePostsRequest, opts ...grpc.CallOption) (*QueryNamespacePostsResponse, error)
+	// Queries a post based on the specified namespace and post id.
+	Post(ctx context.Context, in *QueryPostRequest, opts ...grpc.CallOption) (*QueryPostResponse, error)
+	// Queries all posts.
+	Posts(ctx context.Context, in *QueryPostsRequest, opts ...grpc.CallOption) (*QueryPostsResponse, error)
 }
 
 type queryClient struct {
@@ -53,10 +68,60 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) ReadPost(ctx context.Context, in *QueryReadPostRequest, opts ...grpc.CallOption) (*QueryReadPostResponse, error) {
+func (c *queryClient) Namespace(ctx context.Context, in *QueryNamespaceRequest, opts ...grpc.CallOption) (*QueryNamespaceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryReadPostResponse)
-	err := c.cc.Invoke(ctx, Query_ReadPost_FullMethodName, in, out, cOpts...)
+	out := new(QueryNamespaceResponse)
+	err := c.cc.Invoke(ctx, Query_Namespace_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Namespaces(ctx context.Context, in *QueryNamespacesRequest, opts ...grpc.CallOption) (*QueryNamespacesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryNamespacesResponse)
+	err := c.cc.Invoke(ctx, Query_Namespaces_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) NamespaceCollaborators(ctx context.Context, in *QueryNamespaceCollaboratorsRequest, opts ...grpc.CallOption) (*QueryNamespaceCollaboratorsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryNamespaceCollaboratorsResponse)
+	err := c.cc.Invoke(ctx, Query_NamespaceCollaborators_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) NamespacePosts(ctx context.Context, in *QueryNamespacePostsRequest, opts ...grpc.CallOption) (*QueryNamespacePostsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryNamespacePostsResponse)
+	err := c.cc.Invoke(ctx, Query_NamespacePosts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Post(ctx context.Context, in *QueryPostRequest, opts ...grpc.CallOption) (*QueryPostResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryPostResponse)
+	err := c.cc.Invoke(ctx, Query_Post_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) Posts(ctx context.Context, in *QueryPostsRequest, opts ...grpc.CallOption) (*QueryPostsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryPostsResponse)
+	err := c.cc.Invoke(ctx, Query_Posts_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,8 +136,18 @@ func (c *queryClient) ReadPost(ctx context.Context, in *QueryReadPostRequest, op
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	// Queries a list of ReadPost items.
-	ReadPost(context.Context, *QueryReadPostRequest) (*QueryReadPostResponse, error)
+	// Queries a namespace based on the specified namespace id.
+	Namespace(context.Context, *QueryNamespaceRequest) (*QueryNamespaceResponse, error)
+	// Queries all namespaces.
+	Namespaces(context.Context, *QueryNamespacesRequest) (*QueryNamespacesResponse, error)
+	// Queries all namespace collaborators.
+	NamespaceCollaborators(context.Context, *QueryNamespaceCollaboratorsRequest) (*QueryNamespaceCollaboratorsResponse, error)
+	// Queries all namespace posts.
+	NamespacePosts(context.Context, *QueryNamespacePostsRequest) (*QueryNamespacePostsResponse, error)
+	// Queries a post based on the specified namespace and post id.
+	Post(context.Context, *QueryPostRequest) (*QueryPostResponse, error)
+	// Queries all posts.
+	Posts(context.Context, *QueryPostsRequest) (*QueryPostsResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -86,8 +161,23 @@ type UnimplementedQueryServer struct{}
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
-func (UnimplementedQueryServer) ReadPost(context.Context, *QueryReadPostRequest) (*QueryReadPostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReadPost not implemented")
+func (UnimplementedQueryServer) Namespace(context.Context, *QueryNamespaceRequest) (*QueryNamespaceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Namespace not implemented")
+}
+func (UnimplementedQueryServer) Namespaces(context.Context, *QueryNamespacesRequest) (*QueryNamespacesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Namespaces not implemented")
+}
+func (UnimplementedQueryServer) NamespaceCollaborators(context.Context, *QueryNamespaceCollaboratorsRequest) (*QueryNamespaceCollaboratorsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NamespaceCollaborators not implemented")
+}
+func (UnimplementedQueryServer) NamespacePosts(context.Context, *QueryNamespacePostsRequest) (*QueryNamespacePostsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NamespacePosts not implemented")
+}
+func (UnimplementedQueryServer) Post(context.Context, *QueryPostRequest) (*QueryPostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Post not implemented")
+}
+func (UnimplementedQueryServer) Posts(context.Context, *QueryPostsRequest) (*QueryPostsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Posts not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -128,20 +218,110 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_ReadPost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryReadPostRequest)
+func _Query_Namespace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNamespaceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).ReadPost(ctx, in)
+		return srv.(QueryServer).Namespace(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Query_ReadPost_FullMethodName,
+		FullMethod: Query_Namespace_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).ReadPost(ctx, req.(*QueryReadPostRequest))
+		return srv.(QueryServer).Namespace(ctx, req.(*QueryNamespaceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Namespaces_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNamespacesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Namespaces(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Namespaces_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Namespaces(ctx, req.(*QueryNamespacesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_NamespaceCollaborators_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNamespaceCollaboratorsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).NamespaceCollaborators(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_NamespaceCollaborators_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).NamespaceCollaborators(ctx, req.(*QueryNamespaceCollaboratorsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_NamespacePosts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNamespacePostsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).NamespacePosts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_NamespacePosts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).NamespacePosts(ctx, req.(*QueryNamespacePostsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Post_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Post(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Post_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Post(ctx, req.(*QueryPostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_Posts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryPostsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Posts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Posts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Posts(ctx, req.(*QueryPostsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -158,8 +338,28 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Query_Params_Handler,
 		},
 		{
-			MethodName: "ReadPost",
-			Handler:    _Query_ReadPost_Handler,
+			MethodName: "Namespace",
+			Handler:    _Query_Namespace_Handler,
+		},
+		{
+			MethodName: "Namespaces",
+			Handler:    _Query_Namespaces_Handler,
+		},
+		{
+			MethodName: "NamespaceCollaborators",
+			Handler:    _Query_NamespaceCollaborators_Handler,
+		},
+		{
+			MethodName: "NamespacePosts",
+			Handler:    _Query_NamespacePosts_Handler,
+		},
+		{
+			MethodName: "Post",
+			Handler:    _Query_Post_Handler,
+		},
+		{
+			MethodName: "Posts",
+			Handler:    _Query_Posts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

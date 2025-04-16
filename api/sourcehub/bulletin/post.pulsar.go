@@ -13,16 +13,20 @@ import (
 )
 
 var (
-	md_Post           protoreflect.MessageDescriptor
-	fd_Post_namespace protoreflect.FieldDescriptor
-	fd_Post_payload   protoreflect.FieldDescriptor
-	fd_Post_proof     protoreflect.FieldDescriptor
+	md_Post             protoreflect.MessageDescriptor
+	fd_Post_id          protoreflect.FieldDescriptor
+	fd_Post_namespace   protoreflect.FieldDescriptor
+	fd_Post_creator_did protoreflect.FieldDescriptor
+	fd_Post_payload     protoreflect.FieldDescriptor
+	fd_Post_proof       protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_bulletin_post_proto_init()
 	md_Post = File_sourcehub_bulletin_post_proto.Messages().ByName("Post")
+	fd_Post_id = md_Post.Fields().ByName("id")
 	fd_Post_namespace = md_Post.Fields().ByName("namespace")
+	fd_Post_creator_did = md_Post.Fields().ByName("creator_did")
 	fd_Post_payload = md_Post.Fields().ByName("payload")
 	fd_Post_proof = md_Post.Fields().ByName("proof")
 }
@@ -92,9 +96,21 @@ func (x *fastReflection_Post) Interface() protoreflect.ProtoMessage {
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
 func (x *fastReflection_Post) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Id != "" {
+		value := protoreflect.ValueOfString(x.Id)
+		if !f(fd_Post_id, value) {
+			return
+		}
+	}
 	if x.Namespace != "" {
 		value := protoreflect.ValueOfString(x.Namespace)
 		if !f(fd_Post_namespace, value) {
+			return
+		}
+	}
+	if x.CreatorDid != "" {
+		value := protoreflect.ValueOfString(x.CreatorDid)
+		if !f(fd_Post_creator_did, value) {
 			return
 		}
 	}
@@ -125,8 +141,12 @@ func (x *fastReflection_Post) Range(f func(protoreflect.FieldDescriptor, protore
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_Post) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		return x.Id != ""
 	case "sourcehub.bulletin.Post.namespace":
 		return x.Namespace != ""
+	case "sourcehub.bulletin.Post.creator_did":
+		return x.CreatorDid != ""
 	case "sourcehub.bulletin.Post.payload":
 		return len(x.Payload) != 0
 	case "sourcehub.bulletin.Post.proof":
@@ -147,8 +167,12 @@ func (x *fastReflection_Post) Has(fd protoreflect.FieldDescriptor) bool {
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Post) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		x.Id = ""
 	case "sourcehub.bulletin.Post.namespace":
 		x.Namespace = ""
+	case "sourcehub.bulletin.Post.creator_did":
+		x.CreatorDid = ""
 	case "sourcehub.bulletin.Post.payload":
 		x.Payload = nil
 	case "sourcehub.bulletin.Post.proof":
@@ -169,8 +193,14 @@ func (x *fastReflection_Post) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_Post) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		value := x.Id
+		return protoreflect.ValueOfString(value)
 	case "sourcehub.bulletin.Post.namespace":
 		value := x.Namespace
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.Post.creator_did":
+		value := x.CreatorDid
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.bulletin.Post.payload":
 		value := x.Payload
@@ -198,8 +228,12 @@ func (x *fastReflection_Post) Get(descriptor protoreflect.FieldDescriptor) proto
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Post) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		x.Id = value.Interface().(string)
 	case "sourcehub.bulletin.Post.namespace":
 		x.Namespace = value.Interface().(string)
+	case "sourcehub.bulletin.Post.creator_did":
+		x.CreatorDid = value.Interface().(string)
 	case "sourcehub.bulletin.Post.payload":
 		x.Payload = value.Bytes()
 	case "sourcehub.bulletin.Post.proof":
@@ -224,8 +258,12 @@ func (x *fastReflection_Post) Set(fd protoreflect.FieldDescriptor, value protore
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Post) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		panic(fmt.Errorf("field id of message sourcehub.bulletin.Post is not mutable"))
 	case "sourcehub.bulletin.Post.namespace":
 		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.Post is not mutable"))
+	case "sourcehub.bulletin.Post.creator_did":
+		panic(fmt.Errorf("field creator_did of message sourcehub.bulletin.Post is not mutable"))
 	case "sourcehub.bulletin.Post.payload":
 		panic(fmt.Errorf("field payload of message sourcehub.bulletin.Post is not mutable"))
 	case "sourcehub.bulletin.Post.proof":
@@ -243,7 +281,11 @@ func (x *fastReflection_Post) Mutable(fd protoreflect.FieldDescriptor) protorefl
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_Post) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.bulletin.Post.id":
+		return protoreflect.ValueOfString("")
 	case "sourcehub.bulletin.Post.namespace":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.Post.creator_did":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.bulletin.Post.payload":
 		return protoreflect.ValueOfBytes(nil)
@@ -318,7 +360,15 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 		var n int
 		var l int
 		_ = l
+		l = len(x.Id)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
 		l = len(x.Namespace)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.CreatorDid)
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
@@ -364,19 +414,33 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 			copy(dAtA[i:], x.Proof)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Proof)))
 			i--
-			dAtA[i] = 0x1a
+			dAtA[i] = 0x2a
 		}
 		if len(x.Payload) > 0 {
 			i -= len(x.Payload)
 			copy(dAtA[i:], x.Payload)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Payload)))
 			i--
-			dAtA[i] = 0x12
+			dAtA[i] = 0x22
+		}
+		if len(x.CreatorDid) > 0 {
+			i -= len(x.CreatorDid)
+			copy(dAtA[i:], x.CreatorDid)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.CreatorDid)))
+			i--
+			dAtA[i] = 0x1a
 		}
 		if len(x.Namespace) > 0 {
 			i -= len(x.Namespace)
 			copy(dAtA[i:], x.Namespace)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Namespace)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Id) > 0 {
+			i -= len(x.Id)
+			copy(dAtA[i:], x.Id)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Id)))
 			i--
 			dAtA[i] = 0xa
 		}
@@ -431,6 +495,38 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 			switch fieldNum {
 			case 1:
 				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Id = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
 				}
 				var stringLen uint64
@@ -461,7 +557,39 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 				}
 				x.Namespace = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 2:
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.CreatorDid = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Payload", wireType)
 				}
@@ -495,7 +623,7 @@ func (x *fastReflection_Post) ProtoMethods() *protoiface.Methods {
 					x.Payload = []byte{}
 				}
 				iNdEx = postIndex
-			case 3:
+			case 5:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Proof", wireType)
 				}
@@ -577,14 +705,17 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Post represents a bulletin entry created within a specific namespace.
 type Post struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	Payload   []byte `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`
-	Proof     []byte `protobuf:"bytes,3,opt,name=proof,proto3" json:"proof,omitempty"`
+	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	Payload    []byte `protobuf:"bytes,4,opt,name=payload,proto3" json:"payload,omitempty"`
+	Proof      []byte `protobuf:"bytes,5,opt,name=proof,proto3" json:"proof,omitempty"`
 }
 
 func (x *Post) Reset() {
@@ -607,9 +738,23 @@ func (*Post) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_post_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *Post) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 func (x *Post) GetNamespace() string {
 	if x != nil {
 		return x.Namespace
+	}
+	return ""
+}
+
+func (x *Post) GetCreatorDid() string {
+	if x != nil {
+		return x.CreatorDid
 	}
 	return ""
 }
@@ -634,24 +779,27 @@ var file_sourcehub_bulletin_post_proto_rawDesc = []byte{
 	0x0a, 0x1d, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c,
 	0x65, 0x74, 0x69, 0x6e, 0x2f, 0x70, 0x6f, 0x73, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
 	0x12, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65,
-	0x74, 0x69, 0x6e, 0x22, 0x54, 0x0a, 0x04, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x6e,
-	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
-	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61, 0x79,
-	0x6c, 0x6f, 0x61, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c,
-	0x6f, 0x61, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0c, 0x52, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x42, 0xb1, 0x01, 0x0a, 0x16, 0x63, 0x6f,
-	0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x42, 0x09, 0x50, 0x6f, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02, 0x12, 0x53,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x74, 0x69, 0x6e, 0x22, 0x85, 0x01, 0x0a, 0x04, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02,
+	0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c, 0x0a, 0x09,
+	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70,
+	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61,
+	0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x14, 0x0a, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x0c, 0x52, 0x05, 0x70, 0x72, 0x6f, 0x6f, 0x66, 0x42, 0xb1, 0x01, 0x0a, 0x16,
+	0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
+	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x42, 0x09, 0x50, 0x6f, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69,
+	0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f,
+	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02,
+	0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65,
+	0x74, 0x69, 0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c,
+	0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

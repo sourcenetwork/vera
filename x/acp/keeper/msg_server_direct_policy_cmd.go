@@ -13,7 +13,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
+func (k *Keeper) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	addr, err := hubtypes.AccAddressFromBech32(msg.Creator)

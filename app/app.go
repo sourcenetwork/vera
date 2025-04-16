@@ -63,9 +63,10 @@ import (
 	"github.com/sourcenetwork/sourcehub/app/ante"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
-	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
+	bulletinkeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
+	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
@@ -133,8 +134,8 @@ type App struct {
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
-	AcpKeeper      *acpmodulekeeper.Keeper
-	BulletinKeeper bulletinmodulekeeper.Keeper
+	AcpKeeper      *acpkeeper.Keeper
+	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     tierkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
@@ -310,10 +311,13 @@ func New(
 
 	customMintModule := app.registerCustomMintModule()
 
-	// initialize capability keeper in acp module
-	// which is initialized by IBC modules
+	// Initialize capability keeper in acp module which is initialized by IBC modules
 	acpKeeper := app.GetCapabilityScopedKeeper(acptypes.ModuleName)
 	app.AcpKeeper.InitializeCapabilityKeeper(&acpKeeper)
+
+	// Initialize capability keeper for the bulletin module
+	bulletinKeeper := app.GetCapabilityScopedKeeper(bulletintypes.ModuleName)
+	app.BulletinKeeper.InitializeCapabilityKeeper(&bulletinKeeper)
 
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {

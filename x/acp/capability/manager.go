@@ -52,7 +52,7 @@ func (m *PolicyCapabilityManager) Fetch(ctx sdk.Context, policyId string) (*Poli
 	return cap, nil
 }
 
-// Claim register the current module as one of the owners of capability.
+// Claim registers the current module as one of the owners of capability.
 // Callers which have received a capability are responsible for Claiming it.
 //
 // The registration is bound to the module's scoped capability keeper,
@@ -77,7 +77,7 @@ func (m *PolicyCapabilityManager) Issue(ctx sdk.Context, policyId string) (*Poli
 	return polCap, nil
 }
 
-// Validate verifies whether the given capability is valid
+// Validate verifies whether the given capability is valid.
 func (m *PolicyCapabilityManager) Validate(ctx sdk.Context, capability *PolicyCapability) error {
 	ok := m.scopedKeeper.AuthenticateCapability(ctx, capability.capability, capability.GetCapabilityName())
 	if !ok {

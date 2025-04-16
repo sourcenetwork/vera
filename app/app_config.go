@@ -3,14 +3,6 @@ package app
 import (
 	"time"
 
-	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
-	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-
-	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
-	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
-
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
@@ -78,12 +70,18 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
+	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
-	acpmoduletypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	_ "github.com/sourcenetwork/sourcehub/x/bulletin/module" // import for side-effects
-	bulletinmoduletypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -121,8 +119,8 @@ var (
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
@@ -149,8 +147,8 @@ var (
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
@@ -171,8 +169,8 @@ var (
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
@@ -197,6 +195,7 @@ var (
 		{Account: tiertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner, authtypes.Staking}},
 		{Account: tiertypes.DeveloperPoolName},
 		{Account: tiertypes.InsurancePoolName},
+		{Account: bulletintypes.ModuleName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -327,11 +326,11 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
-				Name:   acpmoduletypes.ModuleName,
+				Name:   acptypes.ModuleName,
 				Config: appconfig.WrapAny(&acpmodulev1.Module{}),
 			},
 			{
-				Name:   bulletinmoduletypes.ModuleName,
+				Name:   bulletintypes.ModuleName,
 				Config: appconfig.WrapAny(&bulletinmodulev1.Module{}),
 			},
 			{
