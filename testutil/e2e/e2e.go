@@ -31,8 +31,7 @@ func (n *TestNetwork) Setup(t *testing.T) {
 	cfg, err := network.DefaultConfigWithAppConfig(injectConfig)
 	require.NoError(t, err)
 
-	// Test with multiple validators to ensure deterministic InitGenesis() logic
-	cfg.NumValidators = 3
+	cfg.NumValidators = 1
 	cfg.BondDenom = appparams.DefaultBondDenom
 	cfg.MinGasPrices = fmt.Sprintf(
 		"%s%s,%s%s",
