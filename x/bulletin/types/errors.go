@@ -21,4 +21,5 @@ var (
 	ErrInvalidPostProof          = sdkerrors.Register(ModuleName, 1110, "invalid post proof")
 	ErrCollaboratorAlreadyExists = sdkerrors.Register(ModuleName, 1111, "collaborator already exists")
 	ErrCollaboratorNotFound      = sdkerrors.Register(ModuleName, 1112, "collaborator not found")
+	ErrCouldNotEnsurePolicy      = sdkerrors.Register(ModuleName, 1113, "could not ensure policy")
 )
