@@ -19,6 +19,24 @@ func TestGetNamespaceId(t *testing.T) {
 	require.Equal(t, getNamespaceId(id1), getNamespaceId(id3))
 }
 
+func TestHasPolicy(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	require.False(t, k.hasPolicy(ctx))
+
+	k.SetPolicyId(ctx, "policy1")
+	require.True(t, k.hasPolicy(ctx))
+}
+
+func TestEnsurePolicy(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	require.False(t, k.hasPolicy(ctx))
+
+	k.EnsurePolicy(ctx)
+	require.True(t, k.hasPolicy(ctx))
+}
+
 func TestHasNamespace(t *testing.T) {
 	k, ctx := setupKeeper(t)
 

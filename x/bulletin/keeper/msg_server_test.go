@@ -108,16 +108,6 @@ func TestMsgRegisterNamespace(t *testing.T) {
 			expErrMsg: "invalid namespace id",
 		},
 		{
-			name: "register namespace (error: invalid policy id)",
-			input: &types.MsgRegisterNamespace{
-				Creator:   baseAcc.Address,
-				Namespace: namespace,
-			},
-			setup:     func() {},
-			expErr:    true,
-			expErrMsg: "invalid policy id",
-		},
-		{
 			name: "register namespace (error: fetching capability for policy)",
 			input: &types.MsgRegisterNamespace{
 				Creator:   baseAcc.Address,
@@ -130,16 +120,16 @@ func TestMsgRegisterNamespace(t *testing.T) {
 			expErrMsg: "fetching capability for policy",
 		},
 		{
-			name: "register namespace (error: invalid policy id)",
+			name: "register namespace (error: fetching capability for invalid policy)",
 			input: &types.MsgRegisterNamespace{
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 			},
 			setup: func() {
-				k.SetPolicyId(ctx, "")
+				k.SetPolicyId(ctx, "invalidPolicy1")
 			},
 			expErr:    true,
-			expErrMsg: "invalid policy id",
+			expErrMsg: "fetching capability for policy invalidPolicy1",
 		},
 		{
 			name: "register namespace (no error)",
