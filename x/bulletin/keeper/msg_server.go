@@ -29,9 +29,12 @@ func (k *Keeper) UpdateParams(ctx context.Context, req *types.MsgUpdateParams) (
 // RegisterNamespace registers a new namespace resource under the genesis bulletin policy.
 // The namespace must have a unique, non-existent namespaceId.
 func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegisterNamespace) (*types.MsgRegisterNamespaceResponse, error) {
-	policyId := k.GetPolicyId(goCtx)
-	if policyId == "" {
-		return nil, types.ErrInvalidPolicyId
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Create module policy and claim capability if it does not exist yet
+	policyId, err := k.EnsurePolicy(ctx)
+	if err != nil {
+		return nil, types.ErrCouldNotEnsurePolicy
 	}
 
 	namespaceId := getNamespaceId(msg.Namespace)
@@ -43,8 +46,6 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 	if err != nil {
 		return nil, err
 	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	err = RegisterNamespace(ctx, k, policyId, namespaceId, ownerDID, msg.Creator)
 	if err != nil {
