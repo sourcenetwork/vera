@@ -6,12 +6,9 @@ import (
 
 // BeginBlocker handles slashing events and processes tier module staking rewards.
 func (k *Keeper) BeginBlocker(ctx context.Context) error {
-	err := k.handleSlashingEvents(ctx)
-	if err != nil {
-		k.Logger().Error("Failed to handle slashing event", "error", err)
-	}
+	k.handleSlashingEvents(ctx)
 
-	err = k.processRewards(ctx)
+	err := k.processRewards(ctx)
 	if err != nil {
 		k.Logger().Error("Failed to process rewards", "error", err)
 	}

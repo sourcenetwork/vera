@@ -134,8 +134,7 @@ func TestHandleSlashingEvents(t *testing.T) {
 	require.Equal(t, initialDelegatorBalance, totalLockupsAmount)
 
 	// handle missing_signature event (cover slashed tier module stake)
-	err = k.handleSlashingEvents(ctx)
-	require.NoError(t, err)
+	k.handleSlashingEvents(ctx)
 
 	// slashed tier module amount is 200_000 / (1_000_000 + 800_000 + 200_000) * 100_000 = 10_000
 	missingSigTierSlashedAmt := math.NewInt(10_000)
@@ -182,8 +181,7 @@ func TestHandleSlashingEvents(t *testing.T) {
 	))
 
 	// handle double_sign event (no insurance)
-	err = k.handleSlashingEvents(ctx)
-	require.NoError(t, err)
+	k.handleSlashingEvents(ctx)
 
 	// slashed tier module amount is 190_000 / (1_000_000 + 800_000 + 200_000 + 10_000) * 200_000 = 18906
 	doubleSignSlashedAmount := math.NewInt(18_906)

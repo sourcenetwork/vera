@@ -18,8 +18,7 @@ func TestHandleSlashingEvents_NoEvent(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
 	ctx = ctx.WithEventManager(sdk.NewEventManager())
-	err := k.handleSlashingEvents(ctx)
-	require.NoError(t, err)
+	k.handleSlashingEvents(ctx)
 }
 
 func TestHandleSlashingEvents_DoubleSign(t *testing.T) {
@@ -48,8 +47,7 @@ func TestHandleSlashingEvents_DoubleSign(t *testing.T) {
 		sdk.NewAttribute("burned", slashAmount.String()),
 	))
 
-	err = k.handleSlashingEvents(ctx)
-	require.NoError(t, err)
+	k.handleSlashingEvents(ctx)
 
 	// initialDelegatorBalance - slashAmount * initialDelegatorBalance / totalStaked
 	// 100_000 - (10_000 * 100_000 / 200_000) = 95_000
@@ -95,8 +93,7 @@ func TestHandleSlashingEvents_MissingSignature(t *testing.T) {
 		sdk.NewAttribute("burned", slashAmount.String()),
 	))
 
-	err = k.handleSlashingEvents(ctx)
-	require.NoError(t, err)
+	k.handleSlashingEvents(ctx)
 
 	// initialDelegatorBalance - slashAmount * initialDelegatorBalance / totalStaked
 	// 100_000 - (10_000 * 100_000 / 200_000) = 95_000

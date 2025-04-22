@@ -16,7 +16,7 @@ import (
 // handleSlashingEvents monitors and handles slashing events.
 // In case of double_sign, existing lockup records are updated to reflect changes after slashing.
 // Otherwise, in addition to updating existing lockup records, slashed tokens are covered via insurance lockups.
-func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
+func (k *Keeper) handleSlashingEvents(ctx context.Context) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	events := sdkCtx.EventManager().Events()
 
@@ -36,14 +36,18 @@ func (k *Keeper) handleSlashingEvents(ctx context.Context) error {
 			}
 
 			if reason == slashingtypes.AttributeValueDoubleSign {
-				return k.handleDoubleSign(ctx, validatorAddr, slashedAmount)
+				err := k.handleDoubleSign(ctx, validatorAddr, slashedAmount)
+				if err != nil {
+					k.Logger().Error("Failed to handle double sign event", "error", err)
+				}
 			} else {
-				return k.handleMissingSignature(ctx, validatorAddr, slashedAmount)
+				err := k.handleMissingSignature(ctx, validatorAddr, slashedAmount)
+				if err != nil {
+					k.Logger().Error("Failed to handle missing signature event", "error", err)
+				}
 			}
 		}
 	}
-
-	return nil
 }
 
 // handleDoubleSign adjusts existing lockup records based on the tier module share of the slashed amount.
