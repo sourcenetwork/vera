@@ -8,8 +8,44 @@ import (
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/capability"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
+
+// hasPolicy checks if the bulletin module policy exists.
+func (k *Keeper) hasPolicy(ctx context.Context) bool {
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	bz := store.Get([]byte(types.PolicyIdKey))
+	return bz != nil
+}
+
+// EnsurePolicy creates new module policy and claims the related capability if the policy does not exist.
+// Otherwise returns existing policy id.
+func (k Keeper) EnsurePolicy(ctx sdk.Context) (string, error) {
+	if k.hasPolicy(ctx) {
+		return k.GetPolicyId(ctx), nil
+	}
+
+	_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
+		ctx,
+		types.BasePolicy(),
+		coretypes.PolicyMarshalingType_SHORT_YAML,
+		types.ModuleName,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+	if err := manager.Claim(ctx, polCap); err != nil {
+		return "", err
+	}
+
+	policyId := polCap.GetPolicyId()
+	k.SetPolicyId(ctx, policyId)
+	return policyId, nil
+}
 
 // hasNamespace checks if namespace with specified namespaceId exists.
 func (k *Keeper) hasNamespace(ctx context.Context, namespaceId string) bool {
