@@ -21,7 +21,6 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
 
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 
@@ -99,13 +98,13 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper     keeper.Keeper
+	keeper     *keeper.Keeper
 	bankKeeper types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
 	return AppModule{
@@ -117,13 +116,8 @@ func NewAppModule(
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	// Inject instrumentation msg service handlers
-	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
-	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
-
-	// Inject instrumentation into query service handler
-	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
-	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
@@ -195,7 +189,7 @@ type ModuleInputs struct {
 type ModuleOutputs struct {
 	depinject.Out
 
-	TierKeeper keeper.Keeper
+	TierKeeper *keeper.Keeper
 	Module     appmodule.AppModule
 	Hooks      epochstypes.EpochsHooksWrapper
 }
@@ -219,12 +213,12 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 
 	m := NewAppModule(
 		in.Cdc,
-		k,
+		&k,
 		in.BankKeeper,
 	)
 
 	return ModuleOutputs{
-		TierKeeper: k,
+		TierKeeper: &k,
 		Module:     m,
 		Hooks:      epochstypes.EpochsHooksWrapper{EpochHooks: k.EpochHooks()},
 	}
