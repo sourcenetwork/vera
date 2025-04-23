@@ -8,6 +8,10 @@ DEMO_BIN = build/token-protocol-demo
 build:
 	GOOS=linux GOARCH=amd64 go build -o ${BIN} ./cmd/sourcehubd
 
+.PHONY: build-mac
+build-mac:
+	GOOS=darwin GOARCH=arm64 go build -o ${BIN} ./cmd/sourcehubd
+
 .PHONY: install
 install:
 	go install ./cmd/sourcehubd
