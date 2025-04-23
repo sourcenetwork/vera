@@ -1,4 +1,4 @@
-FROM golang:1.22 as builder
+FROM golang:1.23.8 as builder
 
 ARG IGNITE_VERSION="28.1.0"
 
