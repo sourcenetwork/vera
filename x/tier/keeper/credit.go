@@ -108,7 +108,7 @@ func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err err
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasureWithCounter(
+		metrics.ModuleMeasurSinceWithCounter(
 			types.ModuleName,
 			metrics.BurnAllCredits,
 			start,
