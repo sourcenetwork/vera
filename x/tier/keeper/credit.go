@@ -47,7 +47,7 @@ func (k *Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error
 
 	store.Set(types.TotalCreditsKey, bz)
 
-	// Update telemetry gauge for total credit amount if we are not resetting the total
+	// Update total credit amount gauge if we are not resetting the total
 	if total.IsPositive() {
 		telemetry.ModuleSetGauge(
 			types.ModuleName,
@@ -155,7 +155,7 @@ func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err err
 			return errorsmod.Wrap(err, "calculate credit utilization")
 		}
 
-		// Update telemetry gauge for credit utilization
+		// Update credit utilization gauge
 		telemetry.ModuleSetGauge(
 			types.ModuleName,
 			float32(creditUtilization),

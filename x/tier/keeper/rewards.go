@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"cosmossdk.io/math"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -33,12 +35,14 @@ func (k *Keeper) processRewards(ctx context.Context) error {
 		valAddr := types.MustValAddressFromBech32(delegation.GetValidatorAddr())
 		rewards, err := k.GetDistributionKeeper().WithdrawDelegationRewards(ctx, tierModuleAddr, valAddr)
 		if err != nil {
+			metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.ProcessRewards, err)
 			k.Logger().Error("Failed to claim tier module staking rewards", "error", err)
 			return false
 		}
 
 		// Proceed to the next record if there are no rewards
 		if rewards.IsZero() {
+			metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.ProcessRewards, err)
 			k.Logger().Info("No tier module staking rewards in validator", "validator", valAddr)
 			return false
 		}
@@ -56,8 +60,16 @@ func (k *Keeper) processRewards(ctx context.Context) error {
 				insuranceCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToInsurancePool))
 				err := k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.InsurancePoolName, insuranceCoins)
 				if err != nil {
+					metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.ProcessRewards, err)
 					k.Logger().Error("Failed to send rewards to the insurance pool", "error", err)
 					return false
+				} else {
+					// Update insurance pool balance gauge
+					telemetry.ModuleSetGauge(
+						types.ModuleName,
+						float32(k.GetBankKeeper().GetBalance(ctx, insurancePoolAddr, appparams.DefaultBondDenom).Amount.Int64()),
+						metrics.InsurancePoolBalance,
+					)
 				}
 			} else {
 				amountToDevPool = amountToDevPool.Add(amountToInsurancePool)
@@ -69,8 +81,17 @@ func (k *Keeper) processRewards(ctx context.Context) error {
 			devPoolCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToDevPool))
 			err := k.GetBankKeeper().SendCoinsFromModuleToModule(ctx, types.ModuleName, types.DeveloperPoolName, devPoolCoins)
 			if err != nil {
+				metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.ProcessRewards, err)
 				k.Logger().Error("Failed to send rewards to the developer pool", "error", err)
 				return false
+			} else {
+				// Update developer pool balance gauge
+				developerPoolAddr := authtypes.NewModuleAddress(types.DeveloperPoolName)
+				telemetry.ModuleSetGauge(
+					types.ModuleName,
+					float32(k.GetBankKeeper().GetBalance(ctx, developerPoolAddr, appparams.DefaultBondDenom).Amount.Int64()),
+					metrics.DeveloperPoolBalance,
+				)
 			}
 		}
 
@@ -79,6 +100,7 @@ func (k *Keeper) processRewards(ctx context.Context) error {
 			burnCoins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amountToBurn))
 			err := k.GetBankKeeper().BurnCoins(ctx, types.ModuleName, burnCoins)
 			if err != nil {
+				metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.ProcessRewards, err)
 				k.Logger().Error("Failed to burn tier module staking rewards", "error", err)
 				return false
 			}

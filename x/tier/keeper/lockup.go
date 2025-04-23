@@ -375,7 +375,7 @@ func (k *Keeper) setTotalLockupsAmount(ctx context.Context, total math.Int) erro
 
 	store.Set(types.TotalLockupsKey, bz)
 
-	// Update telemetry gauge for total lockups amount
+	// Update total lockups amount gauge
 	telemetry.ModuleSetGauge(
 		types.ModuleName,
 		float32(total.Int64()),
