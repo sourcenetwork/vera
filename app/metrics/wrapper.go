@@ -4,12 +4,17 @@ import (
 	"context"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	gometrics "github.com/hashicorp/go-metrics"
 	grpc "google.golang.org/grpc"
 )
 
 // WrapMsgServerServiceDescriptor wraps a message service descriptor and adds metric instrumentation.
 func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
+	if !telemetry.IsTelemetryEnabled() {
+		return desc
+	}
+
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
@@ -24,6 +29,10 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 
 // WrapQueryServiceDescriptor wraps a query service descriptor and adds metric instrumentation.
 func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
+	if !telemetry.IsTelemetryEnabled() {
+		return desc
+	}
+
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
