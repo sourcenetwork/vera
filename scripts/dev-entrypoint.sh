@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 if [ ! -e "~/INITIALIZED" ]; then
     scripts/genesis-setup.sh
@@ -7,4 +7,4 @@ fi
 
 # Set VALIDATOR_ADDR env var here
 
-exec /app/build/sourcehubd $@
+exec build/sourcehubd $@
