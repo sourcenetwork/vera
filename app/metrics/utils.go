@@ -79,3 +79,45 @@ func ModuleMeasureWithCounter(module, msgType string, start time.Time, err error
 		append(labels, extraLabels...),
 	)
 }
+
+// ModuleMeasurSinceWithCounter emits latency and counter metrics for a module method with common and extra labels.
+func ModuleMeasurSinceWithCounter(moduleName, methodName string, start time.Time, err error, extraLabels []Label) {
+	if !telemetry.IsTelemetryEnabled() {
+		return
+	}
+
+	labels := []Label{
+		{Name: ModuleLabel, Value: moduleName},
+		{Name: EndpointLabel, Value: methodName},
+	}
+	labels = append(labels, commonLabels...)
+	labels = append(labels, extraLabels...)
+
+	// Track message handling latency
+	gometrics.MeasureSinceWithLabels(SourcehubMsgSeconds, start, labels)
+
+	// Increment message count
+	gometrics.IncrCounterWithLabels(SourcehubMsgTotal, 1, labels)
+
+	if err != nil {
+		// Increment error count
+		gometrics.IncrCounterWithLabels(SourcehubMsgErrorsTotal, 1, labels)
+	}
+}
+
+// ModuleIncrInternalErrorCounter tracks internal method errors for a module.
+func ModuleIncrInternalErrorCounter(moduleName, methodName string, err error) {
+	if !telemetry.IsTelemetryEnabled() {
+		return
+	}
+
+	labels := []Label{
+		{Name: ModuleLabel, Value: moduleName},
+		{Name: EndpointLabel, Value: methodName},
+	}
+	labels = append(labels, commonLabels...)
+
+	if err != nil {
+		gometrics.IncrCounterWithLabels(SourcehubInternalErrorsTotal, 1, labels)
+	}
+}
