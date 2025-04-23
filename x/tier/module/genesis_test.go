@@ -73,8 +73,8 @@ func TestGenesis(t *testing.T) {
 	}
 
 	k, ctx := keepertest.TierKeeper(t)
-	tier.InitGenesis(ctx, k, genesisState)
-	got := tier.ExportGenesis(ctx, k)
+	tier.InitGenesis(ctx, &k, genesisState)
+	got := tier.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
 	require.Equal(t, genesisState.Params, got.Params)
 	require.Equal(t, len(genesisState.Lockups), len(got.Lockups))
@@ -121,8 +121,8 @@ func TestInitWithMultipleIdenticalLockups(t *testing.T) {
 	}
 
 	k, ctx := keepertest.TierKeeper(t)
-	tier.InitGenesis(ctx, k, genesisState)
-	got := tier.ExportGenesis(ctx, k)
+	tier.InitGenesis(ctx, &k, genesisState)
+	got := tier.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
 	require.Equal(t, genesisState.Params, got.Params)
 
@@ -173,8 +173,8 @@ func TestInitWithMultipleIdenticalUnlockingLockups(t *testing.T) {
 	}
 
 	k, ctx := keepertest.TierKeeper(t)
-	tier.InitGenesis(ctx, k, genesisState)
-	got := tier.ExportGenesis(ctx, k)
+	tier.InitGenesis(ctx, &k, genesisState)
+	got := tier.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
 	require.Equal(t, genesisState.Params, got.Params)
 

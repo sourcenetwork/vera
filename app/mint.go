@@ -30,7 +30,7 @@ var _ appmodule.AppModule = CustomMintModule{}
 type CustomMintModule struct {
 	*mint.AppModule
 	mintKeeper mintkeeper.Keeper
-	tierKeeper tierkeeper.Keeper
+	tierKeeper *tierkeeper.Keeper
 	cdc        codec.Codec
 }
 
@@ -38,7 +38,7 @@ type CustomMintModule struct {
 func NewCustomMintModule(
 	oldMintModule mint.AppModule,
 	mintKeeper mintkeeper.Keeper,
-	tierKeeper tierkeeper.Keeper,
+	tierKeeper *tierkeeper.Keeper,
 	cdc codec.Codec,
 ) CustomMintModule {
 	return CustomMintModule{
@@ -53,7 +53,7 @@ func NewCustomMintModule(
 type CustomMintQueryServer struct {
 	minttypes.QueryServer
 	mintKeeper mintkeeper.Keeper
-	tierKeeper tierkeeper.Keeper
+	tierKeeper *tierkeeper.Keeper
 	logger     log.Logger
 }
 
@@ -61,7 +61,7 @@ type CustomMintQueryServer struct {
 func NewCustomMintQueryServer(
 	defaultQueryServer minttypes.QueryServer,
 	mintKeeper mintkeeper.Keeper,
-	tierKeeper tierkeeper.Keeper,
+	tierKeeper *tierkeeper.Keeper,
 	logger log.Logger,
 ) minttypes.QueryServer {
 	return &CustomMintQueryServer{
@@ -72,7 +72,7 @@ func NewCustomMintQueryServer(
 	}
 }
 
-func getDelegatorStakeRatio(ctx context.Context, k tierkeeper.Keeper) (math.LegacyDec, error) {
+func getDelegatorStakeRatio(ctx context.Context, k *tierkeeper.Keeper) (math.LegacyDec, error) {
 	// Get the total bonded stake
 	totalStake, err := k.GetStakingKeeper().TotalBondedTokens(ctx)
 	if err != nil {

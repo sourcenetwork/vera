@@ -95,7 +95,7 @@ func (suite *MintTestSuite) SetupTest() {
 	suite.queryClient = minttypes.NewQueryClient(queryHelper)
 
 	defaultQueryServer := mintkeeper.NewQueryServerImpl(suite.mintKeeper)
-	minttypes.RegisterQueryServer(queryHelper, NewCustomMintQueryServer(defaultQueryServer, suite.mintKeeper, suite.tierKeeper, suite.logger))
+	minttypes.RegisterQueryServer(queryHelper, NewCustomMintQueryServer(defaultQueryServer, suite.mintKeeper, &suite.tierKeeper, suite.logger))
 }
 
 func (suite *MintTestSuite) TestGRPCParams() {
@@ -208,7 +208,7 @@ func (suite *MintTestSuite) TestGetDelegatorStakeRatio() {
 			suite.tierKeeper.SetParams(suite.ctx, params)
 			suite.stakingKeeper.EXPECT().TotalBondedTokens(gomock.Any()).Return(tc.totalStake, nil).Times(1)
 
-			delStakeRatio, err := getDelegatorStakeRatio(suite.ctx, suite.tierKeeper)
+			delStakeRatio, err := getDelegatorStakeRatio(suite.ctx, &suite.tierKeeper)
 
 			if tc.expectError {
 				suite.Require().Error(err)

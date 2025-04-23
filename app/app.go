@@ -140,7 +140,7 @@ type App struct {
 	AcpKeeper      *acpkeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
-	TierKeeper     tierkeeper.Keeper
+	TierKeeper     *tierkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
