@@ -49,8 +49,8 @@ func TestAddLockup(t *testing.T) {
 	err = k.AddLockup(ctx, delAddr, valAddr, amount)
 	require.NoError(t, err)
 
-	lockup := k.GetLockupAmount(ctx, delAddr, valAddr)
-	require.Equal(t, amount, lockup)
+	lockedAmt := k.GetLockupAmount(ctx, delAddr, valAddr)
+	require.Equal(t, amount, lockedAmt)
 }
 
 func TestSubtractLockup(t *testing.T) {
@@ -175,8 +175,8 @@ func TestMustIterateLockups(t *testing.T) {
 
 	count := 0
 	k.mustIterateLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
-		require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", delAddr.String())
-		require.Equal(t, "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm", valAddr.String())
+		require.Equal(t, delAddr.String(), lockup.DelegatorAddress)
+		require.Equal(t, valAddr.String(), lockup.ValidatorAddress)
 		require.Equal(t, amount, lockup.Amount)
 		count++
 	})
@@ -281,16 +281,34 @@ func TestTotalAmountByAddr(t *testing.T) {
 	err = k.AddLockup(ctx, delAddr2, valAddr2, math.NewInt(700))
 	require.NoError(t, err)
 
-	totalDel1 := k.totalAmountByAddr(ctx, delAddr1)
+	totalDel1 := k.totalLockedAmountByAddr(ctx, delAddr1)
 	require.Equal(t, math.NewInt(1500), totalDel1, "delAddr1 should have a total of 1500")
 
-	totalDel2 := k.totalAmountByAddr(ctx, delAddr2)
+	totalDel2 := k.totalLockedAmountByAddr(ctx, delAddr2)
 	require.Equal(t, math.NewInt(700), totalDel2, "delAddr2 should have a total of 700")
 
 	delAddr3, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
 	require.NoError(t, err)
-	totalDel3 := k.totalAmountByAddr(ctx, delAddr3)
+	totalDel3 := k.totalLockedAmountByAddr(ctx, delAddr3)
 	require.True(t, totalDel3.IsZero(), "delAddr3 should have no lockups")
+}
+
+func TestHasLockup(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	require.False(t, k.hasLockup(ctx, delAddr, valAddr))
+
+	k.AddLockup(ctx, delAddr, valAddr, math.NewInt(100))
+	require.True(t, k.hasLockup(ctx, delAddr, valAddr))
+
+	err = k.subtractLockup(ctx, delAddr, valAddr, math.NewInt(100))
+	require.NoError(t, err)
+	require.False(t, k.hasLockup(ctx, delAddr, valAddr), "lockup should no longer exist after removing the entire amount")
 }
 
 func TestHasUnlockingLockup(t *testing.T) {

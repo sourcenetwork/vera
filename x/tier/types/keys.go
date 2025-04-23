@@ -34,6 +34,9 @@ const (
 
 	// UnlockingLockupKeyPrefix is the prefix to retrieve all UnlockingLockups
 	UnlockingLockupKeyPrefix = "unlockingLockup/"
+
+	// InsuranceLockupKeyPrefix is the prefix to retrieve all insurance Lockups
+	InsuranceLockupKeyPrefix = "insuranceLockup/"
 )
 
 var (

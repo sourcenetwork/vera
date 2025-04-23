@@ -9,12 +9,12 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-func (k Keeper) EpochHooks() epochstypes.EpochHooks {
+func (k *Keeper) EpochHooks() epochstypes.EpochHooks {
 	return EpochHooks{k}
 }
 
 type EpochHooks struct {
-	keeper Keeper
+	keeper *Keeper
 }
 
 var _ epochstypes.EpochHooks = EpochHooks{}

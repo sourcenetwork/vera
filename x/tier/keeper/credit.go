@@ -18,7 +18,7 @@ import (
 )
 
 // getTotalCreditAmount retrieves the total credit amount from the store.
-func (k Keeper) getTotalCreditAmount(ctx context.Context) (total math.Int) {
+func (k *Keeper) getTotalCreditAmount(ctx context.Context) (total math.Int) {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz := store.Get(types.TotalCreditsKey)
 	if bz == nil {
@@ -38,7 +38,7 @@ func (k Keeper) getTotalCreditAmount(ctx context.Context) (total math.Int) {
 }
 
 // setTotalCreditAmount updates the total credit amount in the store.
-func (k Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error {
+func (k *Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error {
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	bz, err := total.Marshal()
 	if err != nil {
@@ -60,7 +60,7 @@ func (k Keeper) setTotalCreditAmount(ctx context.Context, total math.Int) error 
 }
 
 // mintCredit mints ucredit amount and sends it to the specified address.
-func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amount math.Int) error {
+func (k *Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amount math.Int) error {
 	if _, err := sdk.AccAddressFromBech32(addr.String()); err != nil {
 		return errorsmod.Wrap(err, "invalid address")
 	}
@@ -84,14 +84,17 @@ func (k Keeper) mintCredit(ctx context.Context, addr sdk.AccAddress, amount math
 }
 
 // proratedCredit calculates the credits earned on the lockingAmt.
-func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
+func (k *Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lockingAmt math.Int) math.Int {
 	rates := k.GetParams(ctx).RewardRates
-	lockedAmt := k.totalAmountByAddr(ctx, delAddr)
 	epochInfo := k.epochsKeeper.GetEpochInfo(ctx, types.EpochIdentifier)
+
+	lockedAmt := k.totalLockedAmountByAddr(ctx, delAddr)
+	insuredAmt := k.totalInsuredAmountByAddr(ctx, delAddr)
+	totalAmt := lockedAmt.Add(insuredAmt)
 
 	return calculateProratedCredit(
 		rates,
-		lockedAmt,
+		totalAmt,
 		lockingAmt,
 		epochInfo.CurrentEpochStartTime,
 		sdk.UnwrapSDKContext(ctx).BlockTime(),
@@ -101,7 +104,7 @@ func (k Keeper) proratedCredit(ctx context.Context, delAddr sdk.AccAddress, lock
 
 // burnAllCredits burns all the reward credits in the system.
 // It is called at the end of each epoch.
-func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err error) {
+func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err error) {
 	start := time.Now()
 
 	defer func() {
@@ -167,7 +170,7 @@ func (k Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err erro
 }
 
 // resetAllCredits resets all the credits in the system.
-func (k Keeper) resetAllCredits(ctx context.Context) error {
+func (k *Keeper) resetAllCredits(ctx context.Context) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.ResetAllCredits, metrics.Latency)
 
 	// Reward to a delegator is calculated based on the total locked amount
@@ -181,7 +184,9 @@ func (k Keeper) resetAllCredits(ctx context.Context) error {
 		if !ok {
 			amt = math.ZeroInt()
 		}
-		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount)
+		// Include associated insurance lockup amounts to allocate credits correctly
+		insuranceLockupAmount := k.getInsuranceLockupAmount(ctx, delAddr, valAddr)
+		lockedAmts[delAddr.String()] = amt.Add(lockup.Amount).Add(insuranceLockupAmount)
 	}
 
 	k.mustIterateLockups(ctx, cb)

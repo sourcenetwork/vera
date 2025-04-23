@@ -105,6 +105,7 @@ func TestCalculateProratedCredit(t *testing.T) {
 	tests := []struct {
 		name           string
 		lockedAmt      int64
+		insuredAmt     int64
 		lockingAmt     int64
 		epochStartTime time.Time
 		epochDuration  time.Duration
@@ -347,6 +348,15 @@ func TestCalculateProratedCredit(t *testing.T) {
 		{
 			name:           "Locking large amount with large previously locked amount",
 			lockedAmt:      1_000_000,
+			lockingAmt:     10_000_000,
+			epochStartTime: baseTime.Add(-2 * time.Minute),
+			epochDuration:  time.Minute * 5,
+			expectedCredit: 6_000_000, // 10,000,000 * 1.5 * 2/5
+		},
+		{
+			name:           "Locking large amount with large previously locked and insured amount",
+			lockedAmt:      1_000_000,
+			insuredAmt:     100_000,
 			lockingAmt:     10_000_000,
 			epochStartTime: baseTime.Add(-2 * time.Minute),
 			epochDuration:  time.Minute * 5,

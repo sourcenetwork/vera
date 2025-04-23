@@ -35,6 +35,12 @@ func InitGenesis(ctx context.Context, k keeper.Keeper, genState types.GenesisSta
 			)
 		}
 	}
+
+	for _, insuranceLockup := range genState.InsuranceLockups {
+		delAddr := sdk.MustAccAddressFromBech32(insuranceLockup.DelegatorAddress)
+		valAddr := types.MustValAddressFromBech32(insuranceLockup.ValidatorAddress)
+		k.AddInsuranceLockup(ctx, delAddr, valAddr, insuranceLockup.Amount)
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -44,6 +50,7 @@ func ExportGenesis(ctx context.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.Lockups = k.GetAllLockups(ctx)
 	genesis.UnlockingLockups = k.GetAllUnlockingLockups(ctx)
+	genesis.InsuranceLockups = k.GetAllInsuranceLockups(ctx)
 
 	return genesis
 }
