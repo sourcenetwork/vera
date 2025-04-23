@@ -2,15 +2,17 @@ package metrics
 
 const (
 	// global keys
-	App     = "sourcehub"
-	Count   = "count"
-	Error   = "error"
-	Latency = "latency"
-	Method  = "method"
-	Msg     = "msg"
-	Query   = "query"
-	Status  = "status"
-	Tx      = "tx"
+	App      = "sourcehub"
+	Count    = "count"
+	Error    = "error"
+	Errors   = "errors"
+	Internal = "internal"
+	Latency  = "latency"
+	Method   = "method"
+	Msg      = "msg"
+	Query    = "query"
+	Status   = "status"
+	Tx       = "tx"
 
 	// Units
 	SecondsUnit   = "seconds"
@@ -39,13 +41,15 @@ const (
 	Validator         = "validator"
 
 	// tier methods
-	BurnAllCredits    = "burn_all_credits"
-	CancelUnlocking   = "cancel_unlocking"
-	CompleteUnlocking = "complete_unlocking"
-	Lock              = "lock"
-	Redelegate        = "redelegate"
-	ResetAllCredits   = "reset_all_credits"
-	Unlock            = "unlock"
+	BurnAllCredits         = "burn_all_credits"
+	CancelUnlocking        = "cancel_unlocking"
+	CompleteUnlocking      = "complete_unlocking"
+	HandleDoubleSign       = "handle_double_sign"
+	HandleMissingSignature = "handle_missing_signature"
+	Lock                   = "lock"
+	Redelegate             = "redelegate"
+	ResetAllCredits        = "reset_all_credits"
+	Unlock                 = "unlock"
 
 	// ChainIDEnvVar represents the environment variable, which when set,
 	// is used as the chain id value for metric collection
@@ -53,11 +57,13 @@ const (
 )
 
 var (
-	SourcehubMsgSeconds     []string = []string{"sourcehub", Msg, SecondsUnit}
-	SourcehubMsgTotal       []string = []string{"sourcehub", Msg, CounterSuffix}
-	SourcehubMsgErrorsTotal []string = []string{"sourcehub", Msg, "errors", CounterSuffix}
+	SourcehubMsgSeconds     []string = []string{App, Msg, SecondsUnit}
+	SourcehubMsgTotal       []string = []string{App, Msg, CounterSuffix}
+	SourcehubMsgErrorsTotal []string = []string{App, Msg, Errors, CounterSuffix}
 
-	SourcehubQuerySeconds     []string = []string{"sourcehub", Query, SecondsUnit}
-	SourcehubQueryTotal       []string = []string{"sourcehub", Query, CounterSuffix}
-	SourcehubQueryErrorsTotal []string = []string{"sourcehub", Query, "errors", CounterSuffix}
+	SourcehubQuerySeconds     []string = []string{App, Query, SecondsUnit}
+	SourcehubQueryTotal       []string = []string{App, Query, CounterSuffix}
+	SourcehubQueryErrorsTotal []string = []string{App, Query, Errors, CounterSuffix}
+
+	SourcehubInternalErrorsTotal []string = []string{App, Errors, Internal, CounterSuffix}
 )
