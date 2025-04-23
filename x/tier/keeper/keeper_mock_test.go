@@ -250,16 +250,19 @@ func (suite *KeeperTestSuite) TestBeginBlock() {
 
 	testCases := []struct {
 		name                       string
+		expectedDeveloperPool      math.Int
 		expectedInsurancePool      math.Int
 		expectedTimesSentToInsPool int
 	}{
 		{
 			name:                       "Insurance pool below threshold",
+			expectedDeveloperPool:      math.NewInt(2),
 			expectedInsurancePool:      math.NewInt(1),
 			expectedTimesSentToInsPool: 1,
 		},
 		{
 			name:                       "Insurance pool is full",
+			expectedDeveloperPool:      math.NewInt(3),
 			expectedInsurancePool:      math.NewInt(100_000_000_000),
 			expectedTimesSentToInsPool: 0,
 		},
@@ -294,6 +297,12 @@ func (suite *KeeperTestSuite) TestBeginBlock() {
 				EXPECT().
 				GetBalance(gomock.Any(), authtypes.NewModuleAddress(types.InsurancePoolName), appparams.DefaultBondDenom).
 				Return(sdk.NewCoin(appparams.DefaultBondDenom, tc.expectedInsurancePool)).
+				Times(tc.expectedTimesSentToInsPool + 1)
+
+			suite.bankKeeper.
+				EXPECT().
+				GetBalance(gomock.Any(), authtypes.NewModuleAddress(types.DeveloperPoolName), appparams.DefaultBondDenom).
+				Return(sdk.NewCoin(appparams.DefaultBondDenom, tc.expectedDeveloperPool)).
 				Times(1)
 
 			suite.bankKeeper.
