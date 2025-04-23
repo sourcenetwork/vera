@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
@@ -16,6 +17,7 @@ func (k *Keeper) BeginBlocker(ctx context.Context) error {
 
 	err := k.processRewards(ctx)
 	if err != nil {
+		metrics.ModuleIncrInternalErrorCounter(types.ModuleName, telemetry.MetricKeyBeginBlocker, err)
 		k.Logger().Error("Failed to process rewards", "error", err)
 	}
 

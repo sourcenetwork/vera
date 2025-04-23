@@ -9,6 +9,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -39,11 +40,13 @@ func (k *Keeper) handleSlashingEvents(ctx context.Context) {
 			if reason == slashingtypes.AttributeValueDoubleSign {
 				err := k.handleDoubleSign(ctx, validatorAddr, slashedAmount)
 				if err != nil {
+					metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.HandleDoubleSign, err)
 					k.Logger().Error("Failed to handle double sign event", "error", err)
 				}
 			} else {
 				err := k.handleMissingSignature(ctx, validatorAddr, slashedAmount)
 				if err != nil {
+					metrics.ModuleIncrInternalErrorCounter(types.ModuleName, metrics.HandleMissingSignature, err)
 					k.Logger().Error("Failed to handle missing signature event", "error", err)
 				}
 			}
