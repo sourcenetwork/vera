@@ -1,0 +1,56 @@
+[global]
+log_level = 'info'
+
+[mode]
+[mode.clients]
+enabled = true
+refresh = true
+misbehaviour = true
+[mode.connections]
+enabled = true
+[mode.channels]
+enabled = true
+[mode.packets]
+enabled = true
+clear_interval = 100
+clear_on_start = true
+
+[[chains]]
+id = 'sourcehub-1'
+type = 'CosmosSdk'
+rpc_addr = 'http://127.0.0.1:26667'
+grpc_addr = 'http://127.0.0.1:9091'
+event_source = { mode = 'push', url = 'ws://127.0.0.1:26667/websocket', batch_delay = '500ms' }
+rpc_timeout = '10s'
+trusted_node = false
+account_prefix = 'source'
+key_name = 'source'
+store_prefix = 'ibc'
+default_gas = 100000
+max_gas = 4000000
+gas_price = { price = 0.025, denom = 'uopen' }
+gas_multiplier = 1.2
+clock_drift = '10s'
+trusting_period = '14days'
+trust_threshold = '2/3'
+address_type = { derivation = 'cosmos' }
+
+[[chains]]
+id = 'sourcehub-2'
+type = 'CosmosSdk'
+rpc_addr = 'http://127.0.0.1:26670'
+grpc_addr = 'http://127.0.0.1:9092'
+event_source = { mode = 'push', url = 'ws://127.0.0.1:26670/websocket', batch_delay = '500ms' }
+rpc_timeout = '10s'
+trusted_node = false
+account_prefix = 'source'
+key_name = 'source'
+store_prefix = 'ibc'
+default_gas = 100000
+max_gas = 4000000
+gas_price = { price = 0.025, denom = 'uopen' }
+gas_multiplier = 1.2
+clock_drift = '10s'
+trusting_period = '14days'
+trust_threshold = '2/3'
+address_type = { derivation = 'cosmos' }
