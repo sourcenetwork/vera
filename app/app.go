@@ -370,29 +370,29 @@ func New(
 		mempool,
 	)
 
-	prepareProposal := proposalHandler.PrepareProposalHandler()
-	wrappedPrepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
-		defer telemetry.MeasureSince(time.Now(), metrics.PrepareProposal)
+	prepareProposalHandler := proposalHandler.PrepareProposalHandler()
+	prepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), metrics.App, metrics.PrepareProposal, metrics.SecondsUnit)
 		telemetry.IncrCounterWithLabels(
-			[]string{metrics.App, metrics.Tx, metrics.Count},
+			[]string{metrics.App, metrics.PrepareProposal, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
 			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
 		)
-		return prepareProposal(ctx, req)
+		return prepareProposalHandler(ctx, req)
 	}
-	app.App.SetPrepareProposal(wrappedPrepareProposal)
+	app.App.SetPrepareProposal(prepareProposal)
 
-	processProposal := proposalHandler.ProcessProposalHandler()
-	wrappedProcessProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
-		defer telemetry.MeasureSince(time.Now(), metrics.ProcessProposal)
+	processProposalHandler := proposalHandler.ProcessProposalHandler()
+	processProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), metrics.App, metrics.ProcessProposal, metrics.SecondsUnit)
 		telemetry.IncrCounterWithLabels(
-			[]string{metrics.App, metrics.Tx, metrics.Count},
+			[]string{metrics.App, metrics.ProcessProposal, metrics.Tx, metrics.Count},
 			float32(len(req.Txs)),
 			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
 		)
-		return processProposal(ctx, req)
+		return processProposalHandler(ctx, req)
 	}
-	app.App.SetProcessProposal(wrappedProcessProposal)
+	app.App.SetProcessProposal(processProposal)
 
 	/****  Module Options ****/
 

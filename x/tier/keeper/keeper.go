@@ -103,7 +103,7 @@ func (k *Keeper) CompleteUnlocking(ctx context.Context) (err error) {
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasurSinceWithCounter(
+		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
 			metrics.CompleteUnlocking,
 			start,
@@ -163,7 +163,7 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasurSinceWithCounter(
+		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
 			metrics.Lock,
 			start,
@@ -243,7 +243,7 @@ func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasurSinceWithCounter(
+		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
 			metrics.Unlock,
 			start,
@@ -321,7 +321,7 @@ func (k *Keeper) Redelegate(ctx context.Context, delAddr sdk.AccAddress, srcValA
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasurSinceWithCounter(
+		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
 			metrics.Redelegate,
 			start,
@@ -394,7 +394,7 @@ func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, va
 	start := time.Now()
 
 	defer func() {
-		metrics.ModuleMeasurSinceWithCounter(
+		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
 			metrics.CancelUnlocking,
 			start,

@@ -16,10 +16,6 @@ func NewLabel(name, value string) Label {
 
 // ModuleMeasureSinceWithLabels emits a time measure metric for a module with a given set of keys and labels.
 func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string, extraLabels []Label) {
-	if !telemetry.IsTelemetryEnabled() {
-		return
-	}
-
 	labels := append(
 		[]Label{
 			NewLabel(telemetry.MetricLabelNameModule, module),
@@ -36,10 +32,6 @@ func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string,
 
 // ModuleIncrCounterWithLabels emits a counter metric for a module with a given set of keys and labels.
 func ModuleIncrCounterWithLabels(module string, value float32, keys []string, extraLabels []Label) {
-	if !telemetry.IsTelemetryEnabled() {
-		return
-	}
-
 	labels := append(
 		[]Label{
 			telemetry.NewLabel(telemetry.MetricLabelNameModule, module),
@@ -54,8 +46,12 @@ func ModuleIncrCounterWithLabels(module string, value float32, keys []string, ex
 	)
 }
 
-// ModuleMeasureWithCounter emits latency and success/error counter metrics for a module message with optional labels.
-func ModuleMeasureWithCounter(module, msgType string, start time.Time, err error, extraLabels []Label) {
+// ModuleMeasureMsgWithCounter emits latency and success/error counter metrics for a module message with optional labels.
+func ModuleMeasureMsgWithCounter(module, msgType string, start time.Time, err error, extraLabels []Label) {
+	if !telemetry.IsTelemetryEnabled() {
+		return
+	}
+
 	labels := []Label{
 		telemetry.NewLabel(Msg, msgType),
 	}
@@ -80,8 +76,8 @@ func ModuleMeasureWithCounter(module, msgType string, start time.Time, err error
 	)
 }
 
-// ModuleMeasurSinceWithCounter emits latency and counter metrics for a module method with common and extra labels.
-func ModuleMeasurSinceWithCounter(moduleName, methodName string, start time.Time, err error, extraLabels []Label) {
+// ModuleMeasureSinceWithCounter emits latency and counter metrics for a module method with common and extra labels.
+func ModuleMeasureSinceWithCounter(moduleName, methodName string, start time.Time, err error, extraLabels []Label) {
 	if !telemetry.IsTelemetryEnabled() {
 		return
 	}
