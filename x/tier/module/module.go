@@ -117,10 +117,12 @@ func NewAppModule(
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	// Inject instrumentation into msg service handler
+	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
+	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
 
 	// Inject instrumentation into query service handler
-	descriptor := metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
+	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
 	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
 }
 

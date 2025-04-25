@@ -60,6 +60,10 @@ const (
 )
 
 var (
+	SourcehubMethodSeconds     []string = []string{App, Method, SecondsUnit}
+	SourcehubMethodTotal       []string = []string{App, Method, CounterSuffix}
+	SourcehubMethodErrorsTotal []string = []string{App, Method, Errors, CounterSuffix}
+
 	SourcehubMsgSeconds     []string = []string{App, Msg, SecondsUnit}
 	SourcehubMsgTotal       []string = []string{App, Msg, CounterSuffix}
 	SourcehubMsgErrorsTotal []string = []string{App, Msg, Errors, CounterSuffix}

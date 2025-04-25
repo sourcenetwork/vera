@@ -28,14 +28,14 @@ func ModuleMeasureSinceWithCounter(moduleName, methodName string, start time.Tim
 	labels = append(labels, extraLabels...)
 
 	// Track message handling latency
-	gometrics.MeasureSinceWithLabels(SourcehubMsgSeconds, start, labels)
+	gometrics.MeasureSinceWithLabels(SourcehubMethodSeconds, start, labels)
 
 	// Increment message count
-	gometrics.IncrCounterWithLabels(SourcehubMsgTotal, 1, labels)
+	gometrics.IncrCounterWithLabels(SourcehubMethodTotal, 1, labels)
 
 	if err != nil {
 		// Increment error count
-		gometrics.IncrCounterWithLabels(SourcehubMsgErrorsTotal, 1, labels)
+		gometrics.IncrCounterWithLabels(SourcehubMethodErrorsTotal, 1, labels)
 	}
 }
 
