@@ -65,6 +65,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/app/ante"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -350,6 +351,7 @@ func New(
 		ante.DefaultSigVerificationGasConsumer,
 		app.IBCKeeper,
 		app.txConfig.TxEncoder(),
+		app.GetKey(authtypes.StoreKey),
 	)
 
 	app.SetAnteHandler(anteHandler)
@@ -430,6 +432,21 @@ func New(
 		err := json.Unmarshal(req.AppStateBytes, &genesisState)
 		if err != nil {
 			return nil, err
+		}
+
+		// Parse app_state.app_params.allow_zero_fee_txs and save to auth (acc) store.
+		if raw, ok := genesisState["app_params"]; ok {
+			var appParams struct {
+				AllowZeroFeeTxs bool `json:"allow_zero_fee_txs"`
+			}
+			if err := json.Unmarshal(raw, &appParams); err == nil {
+				store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
+				val := byte(0x00)
+				if appParams.AllowZeroFeeTxs {
+					val = 0x01
+				}
+				store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
+			}
 		}
 
 		req.AppStateBytes, err = json.Marshal(genesisState)

@@ -22,7 +22,7 @@ func TestCustomDeductFeeDecorator_CheckTx_ZeroGas(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -52,7 +52,7 @@ func TestCustomDeductFeeDecorator_CheckTx_InsufficientFee(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -83,7 +83,7 @@ func TestCustomDeductFeeDecorator_CheckTx_ValidFee(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -120,7 +120,7 @@ func TestCustomDeductFeeDecorator_DeliverTx_FeeGranter(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(2)
@@ -159,7 +159,7 @@ func TestCustomDeductFeeDecorator_DeliverTx(t *testing.T) {
 	s := SetupTestSuite(t, false)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, nil, nil)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, nil, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)
@@ -203,7 +203,7 @@ func TestCustomDeductFeeDecorator_OpenDenomFees(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)
@@ -269,7 +269,7 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)

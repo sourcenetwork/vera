@@ -6,6 +6,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -32,10 +33,13 @@ func NewCustomDeductFeeDecorator(
 	bk types.BankKeeper,
 	fk ante.FeegrantKeeper,
 	tfc TxFeeChecker,
+	authStoreKey storetypes.StoreKey,
 ) CustomDeductFeeDecorator {
 
 	if tfc == nil {
-		tfc = checkTxFeeWithMinGasPrices
+		tfc = func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
+			return checkTxFeeWithMinGasPrices(ctx, tx, authStoreKey)
+		}
 	}
 
 	return CustomDeductFeeDecorator{
@@ -88,10 +92,17 @@ func (cdfd CustomDeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	return next(newCtx, tx, simulate)
 }
 
+// zeroFeeTxsAllowed returns true if zero-fee transactions are allowed, false otherwise.
+func zeroFeeTxsAllowed(ctx sdk.Context, authStoreKey storetypes.StoreKey) bool {
+	store := ctx.KVStore(authStoreKey)
+	bz := store.Get([]byte(appparams.AllowZeroFeeTxsKey))
+	return len(bz) > 0 && bz[0] == 0x01
+}
+
 // checkTxFeeWithMinGasPrices checks if the tx fee with denom fee multiplier >= min gas price of the validator.
 // Enforces the DefaultMinGasPrice to prefent spam if minimum gas price was set to 0 by the validator.
 // NOTE: Always returns 0 for transaction priority because we handle TxPriority in priority_lane.go.
-func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
+func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, authStoreKey storetypes.StoreKey) (sdk.Coins, int64, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return nil, 0, errorsmod.Wrap(sdkerrors.ErrTxDecode, "tx must be a FeeTx")
@@ -100,10 +111,14 @@ func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, e
 	fees := feeTx.GetFee()
 	gas := feeTx.GetGas()
 
-	// Ensure exactly one fee denom is provided
-	if fees.Len() == 0 {
-		return nil, 0, errorsmod.Wrap(sdkerrors.ErrInvalidCoins, "transaction must include a fee")
+	// Allow zero-fee transactions if zeroFeeTxsAllowed and the "--fees" flag is omitted
+	if fees.Empty() {
+		if zeroFeeTxsAllowed(ctx, authStoreKey) {
+			return fees, 0, nil
+		}
+		return nil, 0, sdkerrors.ErrInsufficientFee.Wrap("zero fees are not allowed")
 	}
+
 	if fees.Len() > 1 {
 		return nil, 0, errorsmod.Wrapf(sdkerrors.ErrInvalidCoins,
 			"only one fee denomination is allowed, got: %s", fees.String())

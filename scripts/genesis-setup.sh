@@ -27,6 +27,9 @@ $BIN genesis collect-gentxs
 jq '.app_state.transfer.port_id = "transfer"' ~/.sourcehub/config/genesis.json > tmp.json && mv tmp.json ~/.sourcehub/config/genesis.json
 jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": true}}' ~/.sourcehub/config/genesis.json > tmp.json && mv tmp.json ~/.sourcehub/config/genesis.json
 
+# Enable/disable zero-fee transactions
+jq '.app_state.app_params.allow_zero_fee_txs = false' ~/.sourcehub/config/genesis.json > tmp.json && mv tmp.json ~/.sourcehub/config/genesis.json
+
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' ~/.sourcehub/config/app.toml
 sedi 's/^enabled = .*/enabled = true/' ~/.sourcehub/config/app.toml
