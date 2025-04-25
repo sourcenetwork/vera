@@ -14,68 +14,6 @@ func NewLabel(name, value string) Label {
 	return Label{Name: name, Value: value}
 }
 
-// ModuleMeasureSinceWithLabels emits a time measure metric for a module with a given set of keys and labels.
-func ModuleMeasureSinceWithLabels(module string, start time.Time, keys []string, extraLabels []Label) {
-	labels := append(
-		[]Label{
-			NewLabel(telemetry.MetricLabelNameModule, module),
-		},
-		extraLabels...,
-	)
-
-	gometrics.MeasureSinceWithLabels(
-		keys,
-		start.UTC(),
-		labels,
-	)
-}
-
-// ModuleIncrCounterWithLabels emits a counter metric for a module with a given set of keys and labels.
-func ModuleIncrCounterWithLabels(module string, value float32, keys []string, extraLabels []Label) {
-	labels := append(
-		[]Label{
-			telemetry.NewLabel(telemetry.MetricLabelNameModule, module),
-		},
-		extraLabels...,
-	)
-
-	gometrics.IncrCounterWithLabels(
-		keys,
-		value,
-		labels,
-	)
-}
-
-// ModuleMeasureMsgWithCounter emits latency and success/error counter metrics for a module message with optional labels.
-func ModuleMeasureMsgWithCounter(module, msgType string, start time.Time, err error, extraLabels []Label) {
-	if !telemetry.IsTelemetryEnabled() {
-		return
-	}
-
-	labels := []Label{
-		telemetry.NewLabel(Msg, msgType),
-	}
-
-	ModuleMeasureSinceWithLabels(
-		module,
-		start,
-		[]string{App, Msg, Latency},
-		labels,
-	)
-
-	keys := []string{App, Msg, Count}
-	if err != nil {
-		keys = []string{App, Error, Count}
-	}
-
-	ModuleIncrCounterWithLabels(
-		module,
-		1,
-		keys,
-		append(labels, extraLabels...),
-	)
-}
-
 // ModuleMeasureSinceWithCounter emits latency and counter metrics for a module method with common and extra labels.
 func ModuleMeasureSinceWithCounter(moduleName, methodName string, start time.Time, err error, extraLabels []Label) {
 	if !telemetry.IsTelemetryEnabled() {
