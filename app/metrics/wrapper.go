@@ -11,10 +11,6 @@ import (
 
 // WrapMsgServerServiceDescriptor wraps a message service descriptor and adds metric instrumentation.
 func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
-	if !telemetry.IsTelemetryEnabled() {
-		return desc
-	}
-
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
@@ -29,10 +25,6 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 
 // WrapQueryServiceDescriptor wraps a query service descriptor and adds metric instrumentation.
 func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
-	if !telemetry.IsTelemetryEnabled() {
-		return desc
-	}
-
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
@@ -64,15 +56,17 @@ func wrapMsgSeverHandler(
 		}
 		labels = append(labels, commonLabels...)
 
-		// Track message handling latency
-		now := time.Now()
-		defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
+		if telemetry.IsTelemetryEnabled() {
+			// Track message handling latency
+			now := time.Now()
+			defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
 
-		// Increment message count
-		gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
+			// Increment message count
+			gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
+		}
 
 		resp, err := handler(srv, ctx, dec, interceptor)
-		if err != nil {
+		if err != nil && telemetry.IsTelemetryEnabled() {
 			// Increment error count
 			gometrics.IncrCounterWithLabels(errMetricName, 1, labels)
 		}
