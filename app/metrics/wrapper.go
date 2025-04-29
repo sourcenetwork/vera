@@ -50,23 +50,25 @@ func wrapMsgSeverHandler(
 		dec func(interface{}) error,
 		interceptor grpc.UnaryServerInterceptor,
 	) (interface{}, error) {
+		if !telemetry.IsTelemetryEnabled() {
+			return handler(srv, ctx, dec, interceptor)
+		}
+
 		labels := []Label{
 			{Name: ModuleLabel, Value: moduleName},
 			{Name: EndpointLabel, Value: methodName},
 		}
 		labels = append(labels, commonLabels...)
 
-		if telemetry.IsTelemetryEnabled() {
-			// Track message handling latency
-			now := time.Now()
-			defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
+		// Track message handling latency
+		now := time.Now()
+		defer gometrics.MeasureSinceWithLabels(latencyMetricName, now, labels)
 
-			// Increment message count
-			gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
-		}
+		// Increment message count
+		gometrics.IncrCounterWithLabels(countMetricName, 1, labels)
 
 		resp, err := handler(srv, ctx, dec, interceptor)
-		if err != nil && telemetry.IsTelemetryEnabled() {
+		if err != nil {
 			// Increment error count
 			gometrics.IncrCounterWithLabels(errMetricName, 1, labels)
 		}
