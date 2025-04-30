@@ -435,19 +435,15 @@ func New(
 		}
 
 		// Parse app_state.app_params.allow_zero_fee_txs and save to auth (acc) store.
+		val := byte(0x00)
 		if raw, ok := genesisState["app_params"]; ok {
-			var appParams struct {
-				AllowZeroFeeTxs bool `json:"allow_zero_fee_txs"`
-			}
-			if err := json.Unmarshal(raw, &appParams); err == nil {
-				store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
-				val := byte(0x00)
-				if appParams.AllowZeroFeeTxs {
-					val = 0x01
-				}
-				store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
+			var appParams appparams.AppParamsGenesis
+			if err := json.Unmarshal(raw, &appParams); err == nil && appParams.AllowZeroFeeTxs {
+				val = 0x01
 			}
 		}
+		store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
+		store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
 
 		req.AppStateBytes, err = json.Marshal(genesisState)
 		if err != nil {
