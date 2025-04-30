@@ -1,6 +1,6 @@
 FROM golang:1.23.8 as builder
 
-ARG IGNITE_VERSION="28.1.0"
+ARG IGNITE_VERSION="28.10.0"
 
 # Ignite CLI prompts users for tracking info which hangs the tty
 # See https://github.com/ignite/cli/blob/main/ignite/internal/analytics/analytics.go#L71
@@ -25,9 +25,6 @@ WORKDIR /app
 
 # Cache deps
 COPY go.* /app/
-
-# Copy submodules
-# COPY submodules/acp_core /app/submodules/acp_core
 
 RUN go mod download
 
