@@ -53,11 +53,10 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	_ "github.com/cosmos/ibc-go/modules/capability" // import for side-effects
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 	abci "github.com/skip-mev/block-sdk/v2/abci"
 	"github.com/skip-mev/block-sdk/v2/block"
 	"github.com/skip-mev/block-sdk/v2/block/base"
@@ -75,8 +74,6 @@ import (
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
-
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	"github.com/sourcenetwork/sourcehub/docs"
 )
@@ -123,26 +120,18 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
 	CircuitBreakerKeeper  circuitkeeper.Keeper
+	CapabilityKeeper      *capabilitykeeper.Keeper
 
 	// IBC
-	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	CapabilityKeeper    *capabilitykeeper.Keeper
-	IBCFeeKeeper        ibcfeekeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouterV2 on it correctly
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
-
-	// Scoped IBC
-	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
-	ScopedIBCTransferKeeper   capabilitykeeper.ScopedKeeper
-	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 
 	AcpKeeper      *acpkeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     *tierkeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -271,7 +260,6 @@ func New(
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,
 		&app.TierKeeper,
-		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
 	}

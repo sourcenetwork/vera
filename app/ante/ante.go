@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	ibcante "github.com/cosmos/ibc-go/v10/modules/core/ante"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 )
 
 // NewAnteHandler extends the default AnteHandler with custom decorators.
