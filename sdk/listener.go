@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
@@ -12,6 +11,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
 // TxListener is a client which subscribes to Tx events in SourceHub's cometbft socket
@@ -72,6 +73,8 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 
 		registry := cdctypes.NewInterfaceRegistry()
 		acptypes.RegisterInterfaces(registry)
+		bulletintypes.RegisterInterfaces(registry)
+		tiertypes.RegisterInterfaces(registry)
 		responses := make([]sdk.Msg, 0, len(msgData.MsgResponses))
 		for i, resp := range msgData.MsgResponses {
 			var msg sdk.Msg
@@ -114,8 +117,8 @@ func (l *TxListener) Close() {
 // channelMapper wraps a channel and applies a failable mapper to all incoming items.
 // Returns a value channel, an error channel and a callback to terminate the channel
 func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-chan U, errors <-chan error, closeFn func()) {
-	errCh := make(chan error, 100)
-	valCh := make(chan U, 100)
+	errCh := make(chan error)
+	valCh := make(chan U)
 	closeFn = func() {
 		close(errCh)
 		close(valCh)
@@ -124,7 +127,6 @@ func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-c
 		for {
 			select {
 			case result, ok := <-ch:
-				log.Printf("received result")
 				if !ok {
 					close(errCh)
 					close(valCh)
@@ -140,5 +142,5 @@ func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-c
 			}
 		}
 	}()
-	return values, errors, closeFn
+	return valCh, errCh, closeFn
 }
