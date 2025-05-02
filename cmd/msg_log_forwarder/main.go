@@ -30,6 +30,19 @@ const (
 	DefaultRpcAddr           = "localhost:26657"
 )
 
+const (
+	metricNamespace string = "sourcehub"
+	metricSubsystem        = "tx_err_log"
+	hostLabel              = "host"
+	chainIdLabel           = "chain_id"
+)
+
+var labels = []string{hostLabel, chainIdLabel}
+
+var kafkaPartitionKey []byte = nil
+
+// Config models the set of parameters
+// the system uses
 type Config struct {
 	MetricsPort  string
 	CometRPCAddr string
@@ -41,6 +54,7 @@ type Config struct {
 	LogTxs     bool
 }
 
+// configHelp maps an envrionment variable name to its description
 var configHelp map[string]string = map[string]string{
 	EnvMetricsPort:    "Port number from which metrics will be available. Default 9001",
 	EnvCometRpcAddr:   "Address of the SourceHub to connect to. Must contain port to Comet RPC Api. Default: localhost:26657",
@@ -69,6 +83,8 @@ var rootCmd = &cobra.Command{
 	Run:  entrypoint,
 }
 
+// newConfigFromEnv creates a Config object by fetching values from the environment.
+// Returns an error if required variables aren't set
 func newConfigFromEnv() (Config, error) {
 	port := os.Getenv(EnvMetricsPort)
 	if port == "" {
@@ -104,11 +120,16 @@ func newConfigFromEnv() (Config, error) {
 	}, nil
 }
 
+// metrics models set of metrics collected by the application
 type metrics struct {
+	// number of errors encountered while processing msgs
 	errorsCounter *prometheus.CounterVec
-	txCounter     *prometheus.CounterVec
-	msgCounter    *prometheus.CounterVec
-	labels        prometheus.Labels
+	// total number of tx events received
+	txCounter *prometheus.CounterVec
+	// msgCounter is the number of messages written to Kafka
+	msgCounter *prometheus.CounterVec
+	// set of static labels appended to all measurements
+	labels prometheus.Labels
 }
 
 func main() {
@@ -193,7 +214,8 @@ func entrypoint(cmd *cobra.Command, args []string) {
 	}
 }
 
-type event struct {
+// errorLog models an tx error
+type errorLog struct {
 	TxHash    string `json:"tx_hash"`
 	Height    int64  `json:"height"`
 	MsgIndex  uint32 `json:"msg_index"`
@@ -204,12 +226,13 @@ type event struct {
 	GasUsed   int64  `json:"gas_used"`
 }
 
+// writeMsgs converts a tx event into an instance of error log,
+// mrshals it into a Json and writes it to kafka
 func writeMsg(ctx context.Context, m *metrics, w *kafka.Writer, tx sdk.Event) {
-	var key []byte = []byte("") // key define the partition key - not a unique key as in kv stores
 	hasher := sha256.New()
 	hasher.Write(tx.Tx)
 	hash := hex.EncodeToString(hasher.Sum(nil))
-	ev := event{
+	ev := errorLog{
 		TxHash:    hash,
 		Height:    tx.Height,
 		MsgIndex:  tx.Index,
@@ -224,41 +247,37 @@ func writeMsg(ctx context.Context, m *metrics, w *kafka.Writer, tx sdk.Event) {
 		log.Printf("Error marshaling tx %v: %v", hash, err)
 	}
 	msg := kafka.Message{
-		Key:   key,
+		Key:   kafkaPartitionKey,
 		Value: bz,
 	}
 
 	w.WriteMessages(ctx, msg) // no error since async
 }
 
+// newMetrics creates a new instance the instrument set object
 func newMetrics(config Config, reg *prometheus.Registry) (*metrics, error) {
 	host, err := os.Hostname()
 	if err != nil {
 		return nil, err
 	}
 
-	labels := []string{
-		"host",
-		"chain_id",
-	}
-
 	errorsCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "sourcehub",
-		Subsystem: "tx_log_fwd",
+		Namespace: metricNamespace,
+		Subsystem: metricSubsystem,
 		Name:      "errors_total",
 		Help:      "Total number of errors encountered while processing a tx result",
 	}, labels)
 
 	txCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "sourcehub",
-		Subsystem: "tx_log_fwd",
+		Namespace: metricNamespace,
+		Subsystem: metricSubsystem,
 		Name:      "tx_total",
 		Help:      "Total number of txs received",
 	}, labels)
 
 	msgCounter := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "sourcehub",
-		Subsystem: "tx_log_fwd",
+		Namespace: metricNamespace,
+		Subsystem: metricSubsystem,
 		Name:      "msg_total",
 		Help:      "Total number of msgs written to Kafka",
 	}, labels)
@@ -272,8 +291,8 @@ func newMetrics(config Config, reg *prometheus.Registry) (*metrics, error) {
 		txCounter:     txCounter,
 		msgCounter:    msgCounter,
 		labels: prometheus.Labels{
-			"host":     host,
-			"chain_id": config.ChainID,
+			hostLabel:    host,
+			chainIdLabel: config.ChainID,
 		},
 	}
 	return &m, nil

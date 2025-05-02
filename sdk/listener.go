@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
@@ -101,6 +102,35 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 	resultCh, errChn, closeFn := channelMapper(ch, mapper)
 	l.cleanupFn = closeFn
 	return resultCh, errChn, err
+}
+
+// ListenAsync spawns a go routine and listens for txs asyncrhonously,
+// until the comet client closes the connection, the context is cancelled.
+// or the listener is closed.
+// Callback is called each time an event or an error is received
+// Returns an error if connection to commet fails
+func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) error {
+	evs, errs, err := l.ListenTxs(ctx)
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		for {
+			select {
+			case result := <-evs:
+				cb(&result, nil)
+			case err := <-errs:
+				cb(nil, err)
+			case <-l.Done():
+				log.Printf("Listener closed: canceling loop")
+				break
+			case <-ctx.Done():
+				break
+			}
+		}
+	}()
+	return nil
 }
 
 // Done returns a channel which will be closed when the connection fails
