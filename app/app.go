@@ -478,6 +478,10 @@ func (app *App) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
+func (app *App) TxConfig() client.TxConfig {
+	return app.txConfig
+}
+
 // GetKey returns the KVStoreKey for the provided store key.
 func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
 	kvStoreKey, ok := app.UnsafeFindStoreKey(storeKey).(*storetypes.KVStoreKey)
