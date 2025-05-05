@@ -193,7 +193,7 @@ and generate "v" directories, populated with necessary validator configuration f
 (private validator, genesis, config, etc.).
 
 Example:
-	sourcehubd testnet --v 4 --output-dir ./.testnets
+	sourcehubd testnet start --v 4 --output-dir ./.testnets
 	`,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			args := startArgs{}
