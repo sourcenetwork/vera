@@ -10,7 +10,7 @@ RUN go mod download
 # Build
 COPY . /app
 RUN --mount=type=cache,target=/root/.cache make build
-RUN --mount=type=cache,target=/root/.cache go build -o build/tx_err_forwader cmd/tx_err_forwader
+RUN --mount=type=cache,target=/root/.cache go build -o build/tx_err_producer cmd/tx_err_producer/main.go
 
 # Deployment entrypoint
 FROM debian:bookworm-slim
@@ -20,7 +20,7 @@ USER node
 VOLUME ["/sourcehub"]
 
 COPY --from=builder /app/build/sourcehubd /usr/local/bin/sourcehubd
-COPY --from=builder /app/build/tx_err_forwader /usr/local/bin/tx_err_forwader
+COPY --from=builder /app/build/tx_err_producer /usr/local/bin/tx_err_producer
 
 ENTRYPOINT ["sourcehubd"]
 CMD ["start"]
