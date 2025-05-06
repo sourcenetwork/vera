@@ -28,7 +28,7 @@ const (
 	EnvChainID               = "CHAIN_ID"
 	EnvLogIncomingTxs        = "LOG_TXS"
 	DefaultPort              = "9001"
-	DefaultRpcAddr           = "localhost:26657"
+	DefaultRpcAddr           = "tcp://localhost:26657"
 )
 
 const (
@@ -58,7 +58,7 @@ type Config struct {
 // configHelp maps an envrionment variable name to its description
 var configHelp map[string]string = map[string]string{
 	EnvMetricsPort:    "Port number from which metrics will be available. Default 9001",
-	EnvCometRpcAddr:   "Address of the SourceHub to connect to. Must contain port to Comet RPC Api. Default: localhost:26657",
+	EnvCometRpcAddr:   "Address of the SourceHub to connect to. Must contain port to Comet RPC Api. Default: tcp://localhost:26657",
 	EnvKafkaAddr:      "Address of Kafka node",
 	EnvKafkaTopic:     "Name of the target Kafka topic",
 	EnvChainID:        "Chain Identifier",
