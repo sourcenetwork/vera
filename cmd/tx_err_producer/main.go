@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,27 +59,36 @@ type Config struct {
 var configHelp map[string]string = map[string]string{
 	EnvMetricsPort:    "Port number from which metrics will be available. Default 9001",
 	EnvCometRpcAddr:   "Address of the SourceHub to connect to. Must contain port to Comet RPC Api. Default: localhost:26657",
-	EnvKafkaAddr:      "Address of Kafka node to connect to",
+	EnvKafkaAddr:      "Address of Kafka node",
 	EnvKafkaTopic:     "Name of the target Kafka topic",
 	EnvChainID:        "Chain Identifier",
 	EnvLogIncomingTxs: "Boolean flag indicating whether to log incoming txs. If set will log all incoming txs. Default not set",
 }
 
-var rootCmd = &cobra.Command{
-	Use:   "msg-log-forwader",
-	Short: "msg-log-forwader is an utility to forward SourceHub message logs.",
-	Long: fmt.Sprintf(
-		`msg-log-forwarder is a cli utility which connects to SourceHub's cometbft rpc connection
-	and listens for Tx processing events.
-	The received events are expanded and the Tx results are unmarshaled into the correct
-	Msg response types.
-	If a Tx failed, the error log is written to a Source managed kafka queue managed, which is part of
-	the internal logging infrastructure.
-	Additionally, the forwader can print the tx results to stdout.
+func fmtConfigHelp() string {
+	builder := strings.Builder{}
+	for key, value := range configHelp {
+		builder.WriteString(key)
+		builder.WriteString(": ")
+		builder.WriteString(value)
+		builder.WriteString("\n")
+	}
+	return builder.String()
+}
 
-	The following configuration options are available through environment vars:
-	%v
-	`, configHelp),
+var rootCmd = &cobra.Command{
+	Use:   "tx_err_producer",
+	Short: "tx_err_producer listens to SourceHub Tx events and pushes it to Source's event infrastructre.",
+	Long: fmt.Sprintf(
+		`tx_err_producer is a cli utility which connects to SourceHub's cometbft rpc connection and listens for Tx processing events.
+The received events are expanded and the Tx results are unmarshaled into the correct Msg response types.
+If a Tx failed, the error log is written to a Source managed kafka queue managed, which is part of the internal logging infrastructure.
+Additionally, the forwader can print the tx results to stdout.
+
+The following configuration options are available through environment vars:
+
+%v
+	`, fmtConfigHelp()),
 	Args: cobra.ExactArgs(0),
 	Run:  entrypoint,
 }
@@ -96,16 +106,16 @@ func newConfigFromEnv() (Config, error) {
 	}
 	kafkaAddr := os.Getenv(EnvKafkaAddr)
 	if kafkaAddr == "" {
-		return Config{}, fmt.Errorf("missing env var: %w", EnvKafkaAddr)
+		return Config{}, fmt.Errorf("missing env var: %v", EnvKafkaAddr)
 	}
 	topic := os.Getenv(EnvKafkaTopic)
 	if topic == "" {
-		return Config{}, fmt.Errorf("missing env var: %w", EnvKafkaTopic)
+		return Config{}, fmt.Errorf("missing env var: %v", EnvKafkaTopic)
 	}
 
 	chainID := os.Getenv(EnvChainID)
 	if topic == "" {
-		return Config{}, fmt.Errorf("missing env var: %w", EnvChainID)
+		return Config{}, fmt.Errorf("missing env var: %v", EnvChainID)
 	}
 
 	log := os.Getenv(EnvLogIncomingTxs) != ""
@@ -154,6 +164,7 @@ func entrypoint(cmd *cobra.Command, args []string) {
 	go http.ListenAndServe(metricsAddr, nil)
 	log.Printf("served metrics in /metrics: %v", metricsAddr)
 
+	// Writer automatically batches writes by a set timeout
 	w := &kafka.Writer{
 		Addr:         kafka.TCP(config.KafkaAddr),
 		Topic:        config.KafkaTopic,
@@ -214,7 +225,7 @@ func entrypoint(cmd *cobra.Command, args []string) {
 	}
 }
 
-// errorLog models an tx error
+// errorLog models a tx error
 type errorLog struct {
 	TxHash    string `json:"tx_hash"`
 	Height    int64  `json:"height"`

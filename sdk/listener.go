@@ -16,6 +16,8 @@ import (
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
+const mapperBuffSize int = 100
+
 // TxListener is a client which subscribes to Tx events in SourceHub's cometbft socket
 // and parses the received events into version with unmarshaled Msg Responses.
 type TxListener struct {
@@ -54,6 +56,11 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 		return nil, nil, fmt.Errorf("TxListener: subscribing to Tx event: %w", err)
 	}
 
+	registry := cdctypes.NewInterfaceRegistry()
+	acptypes.RegisterInterfaces(registry)
+	bulletintypes.RegisterInterfaces(registry)
+	tiertypes.RegisterInterfaces(registry)
+
 	mapper := func(in rpctypes.ResultEvent) (Event, error) {
 		resultBytes, err := json.Marshal(in.Data)
 		if err != nil {
@@ -72,10 +79,8 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 			return Event{}, fmt.Errorf("unmarshaling TxResult.ExecResultTx.Data into TxMsgData: %v", err)
 		}
 
-		registry := cdctypes.NewInterfaceRegistry()
-		acptypes.RegisterInterfaces(registry)
-		bulletintypes.RegisterInterfaces(registry)
-		tiertypes.RegisterInterfaces(registry)
+		//unmarshals the msg results into their
+		// actual response values using the registered sourcehub types
 		responses := make([]sdk.Msg, 0, len(msgData.MsgResponses))
 		for i, resp := range msgData.MsgResponses {
 			var msg sdk.Msg
@@ -85,6 +90,7 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 			}
 			responses = append(responses, msg)
 		}
+
 		return Event{
 			Height:    txResult.Height,
 			Index:     txResult.Index,
@@ -111,6 +117,7 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 // Returns an error if connection to commet fails
 func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) error {
 	evs, errs, err := l.ListenTxs(ctx)
+	defer l.Close()
 	if err != nil {
 		return err
 	}
@@ -147,8 +154,8 @@ func (l *TxListener) Close() {
 // channelMapper wraps a channel and applies a failable mapper to all incoming items.
 // Returns a value channel, an error channel and a callback to terminate the channel
 func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-chan U, errors <-chan error, closeFn func()) {
-	errCh := make(chan error)
-	valCh := make(chan U)
+	errCh := make(chan error, mapperBuffSize)
+	valCh := make(chan U, mapperBuffSize)
 	closeFn = func() {
 		close(errCh)
 		close(valCh)
