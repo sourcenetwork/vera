@@ -49,6 +49,7 @@ type AnteTestSuite struct {
 	txBankKeeper   *txtestutil.MockBankKeeper
 	feeGrantKeeper *antetestutil.MockFeegrantKeeper
 	encCfg         moduletestutil.TestEncodingConfig
+	authStoreKey   storetypes.StoreKey
 }
 
 // SetupTest inits a new test, with new app, context, and anteHandler.
@@ -60,6 +61,7 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	suite.feeGrantKeeper = antetestutil.NewMockFeegrantKeeper(ctrl)
 
 	key := storetypes.NewKVStoreKey(types.StoreKey)
+	suite.authStoreKey = key
 	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 	suite.ctx = testCtx.Ctx.WithIsCheckTx(isCheckTx).WithBlockHeight(1)
 	suite.encCfg = moduletestutil.MakeTestEncodingConfig(auth.AppModuleBasic{}, bank.AppModuleBasic{})

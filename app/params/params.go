@@ -26,3 +26,12 @@ const (
 	InflationRateChange = "0.13"
 	InitialInflation    = "0.13"
 )
+
+// AllowZeroFeeTxsKey stores a flag that indicates whether zero-fee transactions are allowed.
+// The value is parsed from app_state.app_params.allow_zero_fee_txs in genesis.json on chain init.
+const AllowZeroFeeTxsKey = "appparams/allow_zero_fee_txs"
+
+// AppParamsGenesis defines app-specific params that can be set during genesis.
+type AppParamsGenesis struct {
+	AllowZeroFeeTxs bool `json:"allow_zero_fee_txs"`
+}
