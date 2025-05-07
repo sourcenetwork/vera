@@ -170,16 +170,7 @@ func entrypoint(cmd *cobra.Command, args []string) {
 		Topic:        config.KafkaTopic,
 		MaxAttempts:  5,
 		BatchTimeout: time.Millisecond * 500,
-		Async:        true,
-		Completion: func(messages []kafka.Message, err error) {
-			if err != nil {
-				log.Printf("failed writing messages: %v", err)
-				m.errorsCounter.With(m.labels).Inc()
-			} else {
-				m.msgCounter.With(m.labels).Add(float64(len(messages)))
-				log.Printf("wrriten %v msgs", len(messages))
-			}
-		},
+		Async:        false,
 	}
 
 	opts := []sdk.Opt{sdk.WithCometRPCAddr(config.CometRPCAddr)}
@@ -262,7 +253,13 @@ func writeMsg(ctx context.Context, m *metrics, w *kafka.Writer, tx sdk.Event) {
 		Value: bz,
 	}
 
-	w.WriteMessages(ctx, msg) // no error since async
+	err = w.WriteMessages(ctx, msg)
+	if err != nil {
+		log.Printf("failed writing messages: %v", err)
+		m.errorsCounter.With(m.labels).Inc()
+	} else {
+		m.msgCounter.With(m.labels).Inc()
+	}
 }
 
 // newMetrics creates a new instance the instrument set object
