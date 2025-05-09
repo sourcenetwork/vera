@@ -9,6 +9,7 @@ import (
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
@@ -155,6 +156,9 @@ func init() {
 	}
 
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
+
+	// Require at least 1 million $OPEN for 1 unit of consensus-engine power
+	sdk.DefaultPowerReduction = math.NewInt(1_000_000_000_000)
 }
 
 // AppConfig returns the default app config.
