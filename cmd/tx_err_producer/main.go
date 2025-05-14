@@ -185,7 +185,7 @@ func entrypoint(cmd *cobra.Command, args []string) {
 	ch, errCh, err := listener.ListenTxs(ctx)
 	defer listener.Close()
 	if err != nil {
-		log.Fatalf("initializing listener", err)
+		log.Fatalf("initializing listener: %v", err)
 	}
 
 	for {
