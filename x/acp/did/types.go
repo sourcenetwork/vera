@@ -2,7 +2,6 @@ package did
 
 import (
 	"context"
-	"crypto/ecdh"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"fmt"
@@ -63,11 +62,11 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 	if keyType == crypto.P256 {
 		sdkPubKey := pk.(*secp256r1.PubKey)
 		ecdsaPubKey := &ecdsa.PublicKey{Curve: elliptic.P256(), X: sdkPubKey.Key.X, Y: sdkPubKey.Key.Y}
-		ecdhPub, err := ecdh.P256().NewPublicKey(append(append([]byte{0x04}, ecdsaPubKey.X.Bytes()...), ecdsaPubKey.Y.Bytes()...))
+		ecdhPubKey, err := ecdsaPubKey.ECDH()
 		if err != nil {
 			return "", fmt.Errorf("failed to create ecdh public key: %w", err)
 		}
-		pkBytes = ecdhPub.Bytes()
+		pkBytes = ecdhPubKey.Bytes()
 	}
 
 	did, err := key.CreateDIDKey(keyType, pkBytes)
