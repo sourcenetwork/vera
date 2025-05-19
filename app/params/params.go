@@ -13,7 +13,7 @@ const (
 	CreditDenom           = "credit"
 	CreditName            = "Source Credit"
 	CreditSymbol          = "CREDIT"
-	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non transferrable."
+	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non-transferable."
 	CreditFeeMultiplier   = 10
 
 	DefaultBondDenom   = MicroOpenDenom
