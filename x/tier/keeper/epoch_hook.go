@@ -37,7 +37,7 @@ func (h EpochHooks) BeforeEpochStart(ctx context.Context, epochIdentifier string
 		return errorsmod.Wrapf(err, "burn all credits")
 	}
 
-	err = h.keeper.resetAllCredits(ctx)
+	err = h.keeper.resetAllCredits(ctx, epochNumber)
 	if err != nil {
 		return errorsmod.Wrapf(err, "reset all credits")
 	}

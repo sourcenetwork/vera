@@ -8,6 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
@@ -364,26 +365,28 @@ func TestProratedCredit(t *testing.T) {
 
 func TestBurnAllCredits(t *testing.T) {
 	tests := []struct {
-		name           string
-		creditBalances map[string]int64
-		openBalances   map[string]int64
-		wantErr        bool
+		name         string
+		lockups      map[string]int64
+		openBalances map[string]int64
+		wantErr      bool
 	}{
 		{
-			name:           "Burn all credits successfully (single address)",
-			creditBalances: map[string]int64{"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100},
-			openBalances:   map[string]int64{},
-			wantErr:        false,
+			name: "Burn all credits successfully (single address)",
+			lockups: map[string]int64{
+				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100,
+			},
+			openBalances: map[string]int64{},
+			wantErr:      false,
 		},
 		{
-			name:           "No addresses have credits",
-			creditBalances: map[string]int64{},
-			openBalances:   map[string]int64{},
-			wantErr:        false,
+			name:         "No addresses have credits",
+			lockups:      map[string]int64{},
+			openBalances: map[string]int64{},
+			wantErr:      false,
 		},
 		{
 			name: "Multiple addresses with credits",
-			creditBalances: map[string]int64{
+			lockups: map[string]int64{
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 50,
 				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 150,
 			},
@@ -392,7 +395,7 @@ func TestBurnAllCredits(t *testing.T) {
 		},
 		{
 			name: "Burn credits when addresses also hold uopen",
-			creditBalances: map[string]int64{
+			lockups: map[string]int64{
 				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 80,
 				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 200,
 			},
@@ -404,53 +407,54 @@ func TestBurnAllCredits(t *testing.T) {
 		},
 	}
 
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			k, ctx := setupKeeper(t)
 
-			// Mint and distribute credits
-			for addrStr, balance := range tt.creditBalances {
+			err := k.SetParams(ctx, types.DefaultParams())
+			require.NoError(t, err)
+
+			initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(10_000_000))
+
+			// Add lockups
+			for addrStr, lockupAmount := range tt.lockups {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				coins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(balance)))
-				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
-				require.NoError(t, err, "MintCoins failed")
-				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
-				require.NoError(t, err, "SendCoinsFromModuleToAccount failed")
+				amt := math.NewInt(lockupAmount)
+				initializeDelegator(t, &k, ctx, addr, amt)
+				err = k.Lock(ctx, addr, valAddr, amt)
+				require.NoError(t, err)
 			}
 
 			// Mint and distribute uopen
 			for addrStr, balance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(balance)))
-				err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, coins)
-				require.NoError(t, err, "MintCoins uopen failed")
-				err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, coins)
-				require.NoError(t, err, "SendCoinsFromModuleToAccount uopen failed")
+				initializeDelegator(t, &k, ctx, addr, math.NewInt(balance))
 			}
 
 			// Burn all credits
-			err := k.burnAllCredits(ctx, 1)
+			err = k.burnAllCredits(ctx, 1)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("burnAllCredits() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			// Verify that all credit balances are zero
-			for addrStr, origBalance := range tt.creditBalances {
+			// Verify that all ucredit balances are zero
+			for addrStr := range tt.lockups {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
-				if !bal.IsZero() {
-					t.Errorf("Expected all credit burned for %s, original = %d, still found = %s",
-						addrStr, origBalance, bal.Amount)
+				creditBalance := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
+				if !creditBalance.IsZero() {
+					t.Errorf("Expected all ucredit to be burned for %s, still found = %v", addrStr, creditBalance.Amount)
 				}
 			}
 
 			// Verify that uopen balances are unchanged
 			for addrStr, expectedBalance := range tt.openBalances {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
-				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.DefaultBondDenom)
-				if !bal.Amount.Equal(math.NewInt(expectedBalance)) {
-					t.Errorf("Non-credit denom incorrectly burned. For %s, got = %d, expected = %d",
-						addrStr, bal.Amount.Int64(), expectedBalance)
+				openBalance := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroOpenDenom)
+				if !openBalance.Amount.Equal(math.NewInt(expectedBalance)) {
+					t.Errorf("Should not burn uopen. For %s, got = %v, expected = %v", addrStr, openBalance.Amount, expectedBalance)
 				}
 			}
 		})
@@ -545,11 +549,14 @@ func TestResetAllCredits(t *testing.T) {
 			err := k.SetParams(ctx, types.DefaultParams())
 			require.NoError(t, err)
 
+			initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(10_000_000))
+
 			// Add lockups
 			for addrStr, lockupAmounts := range tt.lockups {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				for _, amt := range lockupAmounts {
-					err = k.AddLockup(ctx, addr, valAddr, math.NewInt(amt))
+					initializeDelegator(t, &k, ctx, addr, math.NewInt(amt))
+					err = k.Lock(ctx, addr, valAddr, math.NewInt(amt))
 					require.NoError(t, err)
 				}
 			}
@@ -562,8 +569,13 @@ func TestResetAllCredits(t *testing.T) {
 				}
 			}
 
+			err = k.burnAllCredits(ctx, 1)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("burnAllCredits() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
 			// Reset all credits
-			err = k.resetAllCredits(ctx)
+			err = k.resetAllCredits(ctx, 1)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("resetAllCredits() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -573,19 +585,17 @@ func TestResetAllCredits(t *testing.T) {
 				addr := sdk.MustAccAddressFromBech32(addrStr)
 				bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
 				if !bal.Amount.Equal(math.NewInt(expected)) {
-					t.Errorf("Incorrect credit balance for %s, got = %v, expected = %v",
-						addrStr, bal.Amount, expected)
+					t.Errorf("Incorrect ucredit balance for %s, got = %v, expected = %v", addrStr, bal.Amount, expected)
 				}
 			}
 
-			// Addresses not in expectedCredit should have zero credit
+			// Addresses not in expectedCredit should have zero ucredit
 			for addrStr := range tt.lockups {
 				if _, ok := tt.expectedCredit[addrStr]; !ok {
 					addr := sdk.MustAccAddressFromBech32(addrStr)
 					bal := k.GetBankKeeper().GetBalance(ctx, addr, appparams.MicroCreditDenom)
 					if !bal.IsZero() {
-						t.Errorf("Address %s was not in expectedCredit, but has credit = %v",
-							addrStr, bal.Amount)
+						t.Errorf("Address %s was not in expectedCredit, but has ucredit = %v", addrStr, bal.Amount)
 					}
 				}
 			}

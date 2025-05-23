@@ -119,34 +119,34 @@ func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err err
 		)
 	}()
 
-	// We iterate through all the balances to find and burn the credits. It could be
-	// improved to iterate through the lockup records because credits are NOT transferrable.
+	// Track unused credits to calculate credit utilization
 	unusedCredits := math.ZeroInt()
-	cb := func(addr sdk.AccAddress, coin sdk.Coin) (stop bool) {
-		if coin.Denom != appparams.MicroCreditDenom {
-			return false
-		}
 
+	// Iterating over the lockup records directly is safe because credits are non-transferable.
+	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
+		coin := k.bankKeeper.GetBalance(ctx, delAddr, appparams.MicroCreditDenom)
+		// Return if ucredit amount is not positive
+		if !coin.Amount.IsPositive() {
+			return
+		}
 		coins := sdk.NewCoins(coin)
-
-		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, coins)
+		// Send ucredits from delegator address to the tier module account
+		err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, delAddr, types.ModuleName, coins)
 		if err != nil {
-			err = errorsmod.Wrapf(err, "send %s ucredit from %s to module", coins, addr)
-			return true
+			err = errorsmod.Wrapf(err, "send %s ucredit from %s to module", coins, delAddr)
+			return
 		}
-
+		// Burn ucredits from the tier module account
 		err = k.bankKeeper.BurnCoins(ctx, types.ModuleName, coins)
 		if err != nil {
 			err = errorsmod.Wrapf(err, "burn %s ucredit", coins)
-			return true
+			return
 		}
-
-		unusedCredits.Add(coin.Amount)
-
-		return false
+		// Update the unused credit amount
+		unusedCredits = unusedCredits.Add(coin.Amount)
 	}
 
-	k.bankKeeper.IterateAllBalances(ctx, cb)
+	k.mustIterateLockups(ctx, cb)
 
 	totalCredits := k.getTotalCreditAmount(ctx)
 	if totalCredits.IsPositive() {
@@ -154,12 +154,12 @@ func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err err
 		if err != nil {
 			return errorsmod.Wrap(err, "calculate credit utilization")
 		}
-
 		// Update credit utilization gauge
 		telemetry.ModuleSetGauge(
 			types.ModuleName,
 			float32(creditUtilization),
-			metrics.CreditUtilization, fmt.Sprintf("%s_%d", metrics.Epoch, epochNumber),
+			metrics.CreditUtilization,
+			fmt.Sprintf("%s_%d", metrics.Epoch, epochNumber),
 		)
 	}
 
@@ -170,13 +170,24 @@ func (k *Keeper) burnAllCredits(ctx context.Context, epochNumber int64) (err err
 }
 
 // resetAllCredits resets all the credits in the system.
-func (k *Keeper) resetAllCredits(ctx context.Context) error {
-	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), metrics.ResetAllCredits, metrics.Latency)
+func (k *Keeper) resetAllCredits(ctx context.Context, epochNumber int64) (err error) {
+	start := time.Now()
 
-	// Reward to a delegator is calculated based on the total locked amount
-	// to all validators. Since each lockup entry only records locked amount
-	// for a single validator, we need to iterate through all the lockups to
-	// calculate the total locked amount for each delegator.
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.ResetAllCredits,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Epoch, fmt.Sprintf("%d", epochNumber)),
+			},
+		)
+	}()
+
+	// Reward to a delegator is calculated based on the total locked amount to all validators.
+	// Since each lockup entry only records locked amount for a single validator,
+	// we need to iterate through all the lockups to calculate the total locked amount for each delegator.
 	lockedAmts := make(map[string]math.Int)
 
 	cb := func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, lockup types.Lockup) {
@@ -197,7 +208,7 @@ func (k *Keeper) resetAllCredits(ctx context.Context) error {
 	for delStrAddr, amount := range lockedAmts {
 		delAddr := sdk.MustAccAddressFromBech32(delStrAddr)
 		credit := calculateCredit(rates, math.ZeroInt(), amount)
-		err := k.mintCredit(ctx, delAddr, credit)
+		err = k.mintCredit(ctx, delAddr, credit)
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s ucredit to %s", credit, delAddr)
 		}
@@ -205,7 +216,7 @@ func (k *Keeper) resetAllCredits(ctx context.Context) error {
 	}
 
 	// Set total credit amount
-	err := k.setTotalCreditAmount(ctx, totalCredit)
+	err = k.setTotalCreditAmount(ctx, totalCredit)
 	if err != nil {
 		return errorsmod.Wrap(err, "set total credit amount")
 	}
