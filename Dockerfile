@@ -8,7 +8,7 @@ RUN go mod download
 
 # Build
 COPY . /app
-RUN --mount=type=cache,target=/root/.cache make build
+RUN --mount=type=cache,target=/root/.cache go build -o /build/sourcehubd ./cmd/sourcehubd
 
 # Deployment entrypoint
 FROM debian:bookworm-slim
