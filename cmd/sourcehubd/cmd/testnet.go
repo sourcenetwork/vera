@@ -89,10 +89,10 @@ type initFilesArgs struct {
 	faucetAmount      int64
 	keyringBackend    string
 	minGasPrices      string
-	openTokens        int64
 	nodeDaemonHome    string
 	nodeDirPrefix     string
 	numValidators     int
+	openTokens        int64
 	outputDir         string
 	stakeTokens       int64
 	startingIPAddress string
@@ -415,8 +415,8 @@ func initTestnetFiles(
 			return err
 		}
 
-		accOpenTokens := sdk.TokensFromConsensusPower(1000, sdk.DefaultPowerReduction)   // 1000 $OPEN
-		accCreditTokens := sdk.TokensFromConsensusPower(2000, sdk.DefaultPowerReduction) // 2000 $CREDIT
+		accOpenTokens := sdk.TokensFromConsensusPower(args.openTokens, sdk.DefaultPowerReduction)     // 1,000 $OPEN
+		accCreditTokens := sdk.TokensFromConsensusPower(args.creditTokens, sdk.DefaultPowerReduction) // 2,000 $CREDIT
 		coins := sdk.Coins{
 			sdk.NewCoin(appparams.DefaultBondDenom, accOpenTokens),
 			sdk.NewCoin(appparams.MicroCreditDenom, accCreditTokens),
@@ -429,7 +429,7 @@ func initTestnetFiles(
 		if err != nil {
 			return err
 		}
-		valTokens := sdk.TokensFromConsensusPower(100, sdk.DefaultPowerReduction) // 100 $OPEN
+		valTokens := sdk.TokensFromConsensusPower(args.stakeTokens, sdk.DefaultPowerReduction) // 100 $OPEN
 		createValMsg, err := stakingtypes.NewMsgCreateValidator(
 			valStr,
 			valPubKeys[i],
