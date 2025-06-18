@@ -34,30 +34,17 @@ var rootCmd = &cobra.Command{
 
 		ctx := context.Background()
 
-		ch, errCh, err := listener.ListenTxs(ctx)
-		defer listener.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		for {
-			select {
-			case result := <-ch:
-				bytes, err := json.MarshalIndent(result, "", "  ")
+		listener.ListenAsync(ctx, func(ev *sdk.Event, err error) {
+			if err != nil {
+				log.Printf("ERROR in Tx: %v", err)
+			} else {
+				bytes, err := json.MarshalIndent(ev, "", "  ")
 				if err != nil {
 					log.Fatalf("failed to marshal result: %v", err)
 				}
 				log.Print(string(bytes))
-			case err := <-errCh:
-				log.Printf("ERROR in Tx: %v", err)
-			case <-listener.Done():
-				log.Printf("Client terminated")
-				return
-			case <-ctx.Done():
-				log.Printf("Ctx terminated")
-				return
 			}
-		}
+		})
 	},
 }
 
