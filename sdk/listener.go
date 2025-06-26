@@ -117,7 +117,6 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 // Returns an error if connection to commet fails
 func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) error {
 	evs, errs, err := l.ListenTxs(ctx)
-	defer l.Close()
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/sourcenetwork/sourcehub/sdk"
 	"github.com/spf13/cobra"
@@ -21,10 +25,12 @@ var rootCmd = &cobra.Command{
 	`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		addr := sdk.DefaultCometRPCAddr
 		var opts []sdk.Opt
 		if len(args) == 1 {
-			opts = append(opts, sdk.WithCometRPCAddr(args[0]))
+			addr = args[0]
 		}
+		opts = append(opts, sdk.WithCometRPCAddr(addr))
 		client, err := sdk.NewClient(opts...)
 		if err != nil {
 			log.Fatal(err)
@@ -45,6 +51,15 @@ var rootCmd = &cobra.Command{
 				log.Print(string(bytes))
 			}
 		})
+		log.Printf("Listening to RPC at %v", addr)
+
+		done := make(chan os.Signal, 1)
+		signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+		fmt.Println("Blocking, press ctrl+c to continue...")
+
+		<-done
+		fmt.Println("Received interrupt: terminating listener")
+		listener.Close()
 	},
 }
 
