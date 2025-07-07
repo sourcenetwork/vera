@@ -130,7 +130,7 @@ func addTestnetFlagsToCmd(cmd *cobra.Command) {
 		"Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.001uopen,0.001ucredit)",
 	)
 	cmd.Flags().String(flags.FlagKeyType, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
-	cmd.Flags().Bool(flagNoFees, false, "If set to true, the chain will accept no fee Txs")
+	cmd.Flags().Bool(flagNoFees, false, "If set the chain will accept no fee Txs")
 
 	// support old flags name for backwards compatibility
 	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
