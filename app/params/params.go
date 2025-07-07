@@ -25,6 +25,9 @@ const (
 	InflationMax        = "0.15"
 	InflationRateChange = "0.13"
 	InitialInflation    = "0.13"
+
+	// AppParamsGenesisKey is the Genesis' file "app_state" key name to set SourceHub app_params
+	AppParamsGenesisKey = "app_params"
 )
 
 // AllowZeroFeeTxsKey stores a flag that indicates whether zero-fee transactions are allowed.
