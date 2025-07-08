@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	stdlog "log"
 	"net"
 	"os"
 	"path/filepath"
@@ -42,6 +43,7 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/sourcenetwork/sourcehub/app"
 
+	"github.com/sourcenetwork/sourcehub/app/params"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
@@ -49,6 +51,7 @@ var (
 	// Common flags
 	flagNumValidators = "v"
 	flagOutputDir     = "output-dir"
+	flagNoFees        = "no-fees"
 
 	// `start` command flags
 	flagRPCAddress    = "rpc.address"
@@ -96,6 +99,7 @@ type initFilesArgs struct {
 	outputDir         string
 	stakeTokens       int64
 	startingIPAddress string
+	noFees            bool
 }
 
 // NewTestnetCmd creates a root testnet command with subcommands to run an in-process testnet or initialize
@@ -126,6 +130,7 @@ func addTestnetFlagsToCmd(cmd *cobra.Command) {
 		"Minimum gas prices to accept for transactions; All fees in a tx must meet this minimum (e.g. 0.001uopen,0.001ucredit)",
 	)
 	cmd.Flags().String(flags.FlagKeyType, string(hd.Secp256k1Type), "Key signing algorithm to generate keys for")
+	cmd.Flags().Bool(flagNoFees, false, "If set the chain will accept no fee Txs")
 
 	// support old flags name for backwards compatibility
 	cmd.Flags().SetNormalizeFunc(func(f *pflag.FlagSet, name string) pflag.NormalizedName {
@@ -293,6 +298,7 @@ Example:
 			args.openTokens, _ = cmd.Flags().GetInt64(flagOpenTokens)
 			args.creditTokens, _ = cmd.Flags().GetInt64(flagCreditTokens)
 			args.stakeTokens, _ = cmd.Flags().GetInt64(flagStakeTokens)
+			args.noFees, _ = cmd.Flags().GetBool(flagNoFees)
 
 			return initTestnetFiles(
 				clientCtx,
@@ -518,7 +524,7 @@ func initTestnetFiles(
 		genAccounts = append(genAccounts, authtypes.NewBaseAccount(addr, nil, 0, 0))
 	}
 
-	if err := initGenFiles(clientCtx, mbm, args.chainID, genAccounts, genBalances, genFiles, args.numValidators); err != nil {
+	if err := initGenFiles(clientCtx, mbm, args.chainID, genAccounts, genBalances, genFiles, args.numValidators, args.noFees); err != nil {
 		return err
 	}
 
@@ -543,6 +549,7 @@ func initGenFiles(
 	genBalances []banktypes.Balance,
 	genFiles []string,
 	numValidators int,
+	noFees bool,
 ) error {
 	appGenState := mbm.DefaultGenesis(clientCtx.Codec)
 
@@ -567,6 +574,15 @@ func initGenFiles(
 		bankGenState.Supply = bankGenState.Supply.Add(bal.Coins...)
 	}
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
+
+	appParamsGenesis := params.AppParamsGenesis{
+		AllowZeroFeeTxs: noFees,
+	}
+	appParamsBytes, err := json.Marshal(&appParamsGenesis)
+	if err != nil {
+		stdlog.Fatalf("could not marshal app_params: %v", err)
+	}
+	appGenState[params.AppParamsGenesisKey] = appParamsBytes
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")
 	if err != nil {
