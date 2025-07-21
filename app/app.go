@@ -433,6 +433,16 @@ func New(
 		store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
 		store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
 
+		// Parse app_state.app_params.enable_faucet and save to auth (acc) store.
+		faucetVal := byte(0x00)
+		if raw, ok := genesisState["app_params"]; ok {
+			var appParams appparams.AppParamsGenesis
+			if err := json.Unmarshal(raw, &appParams); err == nil && appParams.EnableFaucet {
+				faucetVal = 0x01
+			}
+		}
+		store.Set([]byte(appparams.EnableFaucetKey), []byte{faucetVal})
+
 		req.AppStateBytes, err = json.Marshal(genesisState)
 		if err != nil {
 			return nil, err
@@ -521,6 +531,9 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// register app's OpenAPI routes.
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+
+	// register faucet routes
+	app.RegisterFaucetRoutes(apiSvr, apiConfig)
 }
 
 // GetIBCKeeper returns the IBC keeper.
