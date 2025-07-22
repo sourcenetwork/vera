@@ -199,7 +199,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
 			WithAccountRetriever(clientCtx.AccountRetriever).
-			WithChainID("sourcehub-dev").
+			WithChainID(clientCtx.ChainID).
 			WithGas(200000).
 			WithKeybase(kb)
 
@@ -235,7 +235,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		res, err := clientCtx.BroadcastTx(txBytes)
+		res, err := clientCtx.BroadcastTxSync(txBytes)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to broadcast transaction: %v", err), http.StatusInternalServerError)
 			return
@@ -358,7 +358,7 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
 			WithAccountRetriever(clientCtx.AccountRetriever).
-			WithChainID("sourcehub-dev").
+			WithChainID(clientCtx.ChainID).
 			WithGas(200000).
 			WithKeybase(kb)
 
@@ -394,7 +394,7 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		res, err := clientCtx.BroadcastTx(txBytes)
+		res, err := clientCtx.BroadcastTxSync(txBytes)
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to broadcast transaction: %v", err), http.StatusInternalServerError)
 			return
