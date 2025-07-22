@@ -196,10 +196,14 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			coins,
 		)
 
+		chainID := clientCtx.ChainID
+		if chainID == "" {
+			chainID = "sourcehub-dev"
+		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
 			WithAccountRetriever(clientCtx.AccountRetriever).
-			WithChainID(clientCtx.ChainID).
+			WithChainID(chainID).
 			WithGas(200000).
 			WithKeybase(kb)
 
@@ -355,10 +359,14 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 			coins,
 		)
 
+		chainID := clientCtx.ChainID
+		if chainID == "" {
+			chainID = "sourcehub-dev"
+		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
 			WithAccountRetriever(clientCtx.AccountRetriever).
-			WithChainID(clientCtx.ChainID).
+			WithChainID(chainID).
 			WithGas(200000).
 			WithKeybase(kb)
 
