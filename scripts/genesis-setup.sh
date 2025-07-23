@@ -41,7 +41,7 @@ jq '.app_state.transfer.port_id = "transfer"' "$GENESIS" > tmp.json && mv tmp.js
 jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": true}}' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # Enable/disable zero-fee transactions
-jq '.app_state.app_params.allow_zero_fee_txs = true' "$GENESIS" > "$GENESIS.tmp" && mv "$GENESIS.tmp" "$GENESIS"
+jq '.app_state.app_params.allow_zero_fee_txs = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' "$APP_TOML"

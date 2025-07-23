@@ -30,7 +30,7 @@ curl -X POST http://localhost:1317/faucet/request \
   }'
 ```
 
-Sends 1000000000uopen (i.e. 1000 $OPEN) from the faucet to the specified address.
+Sends 1000000000uopen (i.e. 1,000 $OPEN) from the faucet to the specified address.
 
 ### Initialize Account
 ```bash
@@ -60,6 +60,6 @@ The faucet is disabled by default and must be explicitly enabled in configuratio
 ## Security
 
 - For development and testing purposes only.
-- Uses hardcoded mnemonic from `scripts/faucet-key.json`.
-- `/faucet/request` is limited to one request per address (i.e. 1000 $OPEN).
-- `./scripts/faucet.sh` is not limited and can accept arbitrary amounts.
+- Uses mnemonic from `scripts/faucet-key.json` that is copied into node config directory (e.g. `$HOME/.sourcehub/config`).
+- `/faucet/request` is limited to one request of 1,000 $OPEN per address.
+- `./scripts/faucet.sh` is not limited and can be used to request arbitrary token amounts.

@@ -91,11 +91,11 @@ func DefaultConfigWithOptions(options NetworkOptions) network.Config {
 	app.SetConfig(false)
 	cfg, err := network.DefaultConfigWithAppConfig(app.AppConfig())
 	if err != nil {
-		panic(fmt.Sprintf("failed to create default config: %v", err))
+		panic(err)
 	}
 	ports, err := freePorts(3)
 	if err != nil {
-		panic(fmt.Sprintf("failed to get free ports: %v", err))
+		panic(err)
 	}
 	if cfg.APIAddress == "" {
 		cfg.APIAddress = fmt.Sprintf("tcp://0.0.0.0:%s", ports[0])
