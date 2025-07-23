@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package sourcehub.faucet;
+
+option go_package = "github.com/sourcenetwork/sourcehub/app/faucet/types";
+
+// FaucetRequest represents a request to get funds from the faucet.
+message FaucetRequest {
+  string address = 1;
+}
+
+// FaucetResponse represents the response from a faucet request.
+message FaucetResponse {
+  string txhash = 1;
+  uint32 code = 2;
+  string raw_log = 3;
+  string address = 4;
+  string amount = 5;
+}
+
+// InitAccountRequest represents a request to initialize an account.
+message InitAccountRequest {
+  string address = 1;
+}
+
+// InitAccountResponse represents the response from an account initialization request.
+message InitAccountResponse {
+  string message = 1;
+  string txhash = 2;
+  uint32 code = 3;
+  string raw_log = 4;
+  string address = 5;
+  string amount = 6;
+  bool exists = 7;
+}
+
+// FaucetInfoResponse represents the faucet information response.
+message FaucetInfoResponse {
+  string address = 1;
+  string balance_amount = 2;
+  string balance_denom = 3;
+  int32 request_count = 4;
+} 

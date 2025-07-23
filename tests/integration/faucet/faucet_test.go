@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
 	"github.com/sourcenetwork/sourcehub/testutil/network"
 )
 
@@ -28,31 +29,27 @@ func TestFaucetRequest(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var info map[string]interface{}
+		var info faucettypes.FaucetInfoResponse
 		err = json.NewDecoder(resp.Body).Decode(&info)
 		require.NoError(t, err)
 
-		assert.Contains(t, info, "address")
-		assert.Contains(t, info, "balance")
-		assert.Contains(t, info, "request_count")
+		assert.NotEmpty(t, info.Address)
+		assert.NotEmpty(t, info.BalanceAmount)
+		assert.NotEmpty(t, info.BalanceDenom)
+		assert.Equal(t, int32(0), info.RequestCount, "Initial request count should be 0")
 
-		requestCount := info["request_count"].(float64)
-		assert.Equal(t, float64(0), requestCount, "Initial request count should be 0")
-		balance := info["balance"].(map[string]interface{})
-		assert.Contains(t, balance, "amount")
-		balanceAmount := balance["amount"].(string)
-		balanceValue, err := strconv.ParseInt(balanceAmount, 10, 64)
+		balanceValue, err := strconv.ParseInt(info.BalanceAmount, 10, 64)
 		require.NoError(t, err)
-		assert.Equal(t, balanceValue, int64(100000000000000), "Faucet balance should be 100000000000000")
+		assert.Equal(t, int64(100000000000000), balanceValue, "Faucet balance should be 100000000000000")
 	})
 
 	t.Run("FaucetRequest", func(t *testing.T) {
 		testAddress := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
 
-		requestBody := map[string]string{
-			"address": testAddress,
+		request := &faucettypes.FaucetRequest{
+			Address: testAddress,
 		}
-		body, _ := json.Marshal(requestBody)
+		body, _ := json.Marshal(request)
 
 		httpAddr := network.TCPToHTTP(net.Validators[0].AppConfig.API.Address)
 		resp, err := http.Post(
@@ -64,16 +61,15 @@ func TestFaucetRequest(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var response map[string]interface{}
+		var response faucettypes.FaucetResponse
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&response)
 		require.NoError(t, err)
 
-		assert.Contains(t, response, "txhash")
-		assert.Contains(t, response, "code")
-		assert.Contains(t, response, "address")
-		assert.Contains(t, response, "amount")
-		assert.Equal(t, float64(0), response["code"])
+		assert.NotEmpty(t, response.Txhash)
+		assert.Equal(t, uint32(0), response.Code)
+		assert.NotEmpty(t, response.Address)
+		assert.NotEmpty(t, response.Amount)
 
 		_, err = net.WaitForHeight(3)
 		require.NoError(t, err)
@@ -109,23 +105,18 @@ func TestFaucetRequest(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var info map[string]interface{}
+		var info faucettypes.FaucetInfoResponse
 		err = json.NewDecoder(resp.Body).Decode(&info)
 		require.NoError(t, err)
 
-		assert.Contains(t, info, "address")
-		assert.Contains(t, info, "balance")
-		assert.Contains(t, info, "request_count")
+		assert.NotEmpty(t, info.Address)
+		assert.NotEmpty(t, info.BalanceAmount)
+		assert.NotEmpty(t, info.BalanceDenom)
+		assert.Equal(t, int32(1), info.RequestCount, "Request count should be 1")
 
-		requestCount := info["request_count"].(float64)
-		assert.Equal(t, float64(1), requestCount, "Request count should be 1")
-
-		balance := info["balance"].(map[string]interface{})
-		assert.Contains(t, balance, "amount")
-		balanceAmount := balance["amount"].(string)
-		balanceValue, err := strconv.ParseInt(balanceAmount, 10, 64)
+		balanceValue, err := strconv.ParseInt(info.BalanceAmount, 10, 64)
 		require.NoError(t, err)
-		assert.Equal(t, balanceValue, int64(99999000000000), "Faucet balance should be 99999000000000")
+		assert.Equal(t, int64(99999000000000), balanceValue, "Faucet balance should be 99999000000000")
 	})
 }
 
@@ -142,32 +133,27 @@ func TestFaucetInitAccount(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var info map[string]interface{}
+		var info faucettypes.FaucetInfoResponse
 		err = json.NewDecoder(resp.Body).Decode(&info)
 		require.NoError(t, err)
 
-		assert.Contains(t, info, "address")
-		assert.Contains(t, info, "balance")
-		assert.Contains(t, info, "request_count")
+		assert.NotEmpty(t, info.Address)
+		assert.NotEmpty(t, info.BalanceAmount)
+		assert.NotEmpty(t, info.BalanceDenom)
+		assert.Equal(t, int32(0), info.RequestCount, "Initial request count should be 0")
 
-		requestCount := info["request_count"].(float64)
-		assert.Equal(t, float64(0), requestCount, "Initial request count should be 0")
-
-		balance := info["balance"].(map[string]interface{})
-		assert.Contains(t, balance, "amount")
-		balanceAmount := balance["amount"].(string)
-		balanceValue, err := strconv.ParseInt(balanceAmount, 10, 64)
+		balanceValue, err := strconv.ParseInt(info.BalanceAmount, 10, 64)
 		require.NoError(t, err)
-		assert.Equal(t, balanceValue, int64(100000000000000), "Faucet balance should be 100000000000000")
+		assert.Equal(t, int64(100000000000000), balanceValue, "Faucet balance should be 100000000000000")
 	})
 
 	t.Run("FaucetInitAccount", func(t *testing.T) {
 		testAddress := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
 
-		requestBody := map[string]string{
-			"address": testAddress,
+		request := &faucettypes.InitAccountRequest{
+			Address: testAddress,
 		}
-		body, _ := json.Marshal(requestBody)
+		body, _ := json.Marshal(request)
 
 		httpAddr := network.TCPToHTTP(net.Validators[0].AppConfig.API.Address)
 		resp, err := http.Post(
@@ -179,18 +165,17 @@ func TestFaucetInitAccount(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var response map[string]interface{}
+		var response faucettypes.InitAccountResponse
 		bodyBytes, _ := io.ReadAll(resp.Body)
 		err = json.NewDecoder(bytes.NewReader(bodyBytes)).Decode(&response)
 		require.NoError(t, err)
 
-		assert.Contains(t, response, "message")
-		assert.Contains(t, response, "txhash")
-		assert.Contains(t, response, "code")
-		assert.Contains(t, response, "address")
-		assert.Contains(t, response, "amount")
-		assert.Contains(t, response, "exists")
-		assert.Equal(t, float64(0), response["code"])
+		assert.NotEmpty(t, response.Message)
+		assert.NotEmpty(t, response.Txhash)
+		assert.Equal(t, uint32(0), response.Code)
+		assert.NotEmpty(t, response.Address)
+		assert.NotEmpty(t, response.Amount)
+		assert.False(t, response.Exists)
 
 		_, err = net.WaitForHeight(3)
 		require.NoError(t, err)
@@ -226,22 +211,17 @@ func TestFaucetInitAccount(t *testing.T) {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		var info map[string]interface{}
+		var info faucettypes.FaucetInfoResponse
 		err = json.NewDecoder(resp.Body).Decode(&info)
 		require.NoError(t, err)
 
-		assert.Contains(t, info, "address")
-		assert.Contains(t, info, "balance")
-		assert.Contains(t, info, "request_count")
+		assert.NotEmpty(t, info.Address)
+		assert.NotEmpty(t, info.BalanceAmount)
+		assert.NotEmpty(t, info.BalanceDenom)
+		assert.Equal(t, int32(0), info.RequestCount, "Request count should be 0")
 
-		requestCount := info["request_count"].(float64)
-		assert.Equal(t, float64(0), requestCount, "Request count should be 0")
-
-		balance := info["balance"].(map[string]interface{})
-		assert.Contains(t, balance, "amount")
-		balanceAmount := balance["amount"].(string)
-		balanceValue, err := strconv.ParseInt(balanceAmount, 10, 64)
+		balanceValue, err := strconv.ParseInt(info.BalanceAmount, 10, 64)
 		require.NoError(t, err)
-		assert.Equal(t, balanceValue, int64(99999999999999), "Faucet balance should be 99999999999999")
+		assert.Equal(t, int64(99999999999999), balanceValue, "Faucet balance should be 99999999999999")
 	})
 }

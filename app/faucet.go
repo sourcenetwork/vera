@@ -19,6 +19,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
+	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
 	"github.com/sourcenetwork/sourcehub/app/params"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
@@ -29,8 +30,8 @@ const (
 	FaucetRequestAmountString = "1000000000uopen"
 )
 
-// FaucetRequest represents a faucet request record.
-type FaucetRequest struct {
+// FaucetRequestRecord represents a faucet request record stored internally.
+type FaucetRequestRecord struct {
 	Address string `json:"address"`
 	Amount  string `json:"amount"`
 	TxHash  string `json:"tx_hash"`
@@ -100,7 +101,7 @@ func (app *App) recordAddressRequested(address, amount, txHash string) error {
 		return fmt.Errorf("faucet store not found")
 	}
 
-	request := FaucetRequest{
+	request := FaucetRequestRecord{
 		Address: address,
 		Amount:  amount,
 		TxHash:  txHash,
@@ -169,9 +170,7 @@ func (app *App) getFaucetKey() (keyring.Keyring, keyring.Record, error) {
 // handleFaucetRequest handles POST requests to request funds from the faucet.
 func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req struct {
-			Address string `json:"address"`
-		}
+		var req faucettypes.FaucetRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -265,14 +264,16 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			}
 		}
 
+		response := &faucettypes.FaucetResponse{
+			Txhash:  res.TxHash,
+			Code:    res.Code,
+			RawLog:  res.RawLog,
+			Address: req.Address,
+			Amount:  FaucetRequestAmountString,
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"txhash":  res.TxHash,
-			"code":    res.Code,
-			"raw_log": res.RawLog,
-			"address": req.Address,
-			"amount":  FaucetRequestAmountString,
-		})
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
@@ -303,12 +304,15 @@ func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 
 		requestCount := app.getRequestCount()
 
+		response := &faucettypes.FaucetInfoResponse{
+			Address:       faucetAddress.String(),
+			BalanceAmount: balance.Balance.Amount.String(),
+			BalanceDenom:  balance.Balance.Denom,
+			RequestCount:  int32(requestCount),
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"address":       faucetAddress.String(),
-			"balance":       balance.Balance,
-			"request_count": requestCount,
-		})
+		json.NewEncoder(w).Encode(response)
 	}
 }
 
@@ -316,9 +320,7 @@ func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 // Accounts that are not yet registered in the auth module are initialized with 1 uopen.
 func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req struct {
-			Address string `json:"address"`
-		}
+		var req faucettypes.InitAccountRequest
 
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -334,12 +336,14 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 		// Check if account already exists in the auth module
 		existingAccount, err := clientCtx.AccountRetriever.GetAccount(clientCtx, accAddr)
 		if err == nil && existingAccount != nil {
+			response := &faucettypes.InitAccountResponse{
+				Message: "Account already exists",
+				Address: req.Address,
+				Exists:  true,
+			}
+
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"message": "Account already exists",
-				"address": req.Address,
-				"exists":  true,
-			})
+			json.NewEncoder(w).Encode(response)
 			return
 		}
 
@@ -412,15 +416,17 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
+		response := &faucettypes.InitAccountResponse{
+			Message: "Account initialized successfully",
+			Txhash:  res.TxHash,
+			Code:    res.Code,
+			RawLog:  res.RawLog,
+			Address: req.Address,
+			Amount:  "1uopen",
+			Exists:  false,
+		}
+
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"message": "Account initialized successfully",
-			"txhash":  res.TxHash,
-			"code":    res.Code,
-			"raw_log": res.RawLog,
-			"address": req.Address,
-			"amount":  "1uopen",
-			"exists":  false,
-		})
+		json.NewEncoder(w).Encode(response)
 	}
 }
