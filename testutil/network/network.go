@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
-	"github.com/cosmos/cosmos-sdk/testutil/sims"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/app"
@@ -26,14 +26,35 @@ type NetworkOptions struct {
 	EnableFaucet bool
 }
 
+// testAppOptions creates app options for testing with optional faucet configuration.
+type testAppOptions struct {
+	enableFaucet bool
+	v            *viper.Viper
+}
+
+// NewTestAppOptions creates test app options with faucet configuration.
+func NewTestAppOptions(enableFaucet bool) *testAppOptions {
+	v := viper.New()
+	v.Set("faucet.enable_faucet", enableFaucet)
+	return &testAppOptions{
+		enableFaucet: enableFaucet,
+		v:            v,
+	}
+}
+
+// Get implements servertypes.AppOptions interface.
+func (opts *testAppOptions) Get(key string) interface{} {
+	return opts.v.Get(key)
+}
+
 // New creates instance with fully configured cosmos network.
-// Accepts optional config and options, that will be used in place of the DefaultConfig() if provided.
+// Accepts optional config, that will be used in place of the DefaultConfig() if provided.
 func New(t *testing.T, configs ...Config) *Network {
 	return NewWithOptions(t, NetworkOptions{EnableFaucet: false}, configs...)
 }
 
 // NewWithOptions creates instance with fully configured cosmos network and custom options.
-// Accepts optional config, that will be used in place of the DefaultConfig() if provided.
+// Accepts optional config and options, that will be used in place of the DefaultConfig() if provided.
 func NewWithOptions(t *testing.T, options NetworkOptions, configs ...Config) *Network {
 	t.Helper()
 	if len(configs) > 1 {
@@ -87,17 +108,18 @@ func DefaultConfigWithOptions(options NetworkOptions) network.Config {
 	}
 	cfg.BondDenom = params.DefaultBondDenom
 	if options.EnableFaucet {
-		if err := enableFaucetInGenesis(&cfg); err != nil {
-			panic(fmt.Sprintf("failed to enable faucet in genesis: %v", err))
+		if err := setupFaucetInGenesis(&cfg); err != nil {
+			panic(fmt.Sprintf("failed to setup faucet in genesis: %v", err))
 		}
 	}
 	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
+		appOpts := NewTestAppOptions(options.EnableFaucet)
 		appInstance, err := app.New(
 			val.GetCtx().Logger,
 			dbm.NewMemDB(),
 			nil,
 			true,
-			sims.EmptyAppOptions{},
+			appOpts,
 			baseapp.SetChainID(cfg.ChainID),
 		)
 		if err != nil {

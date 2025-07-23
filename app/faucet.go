@@ -14,6 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -29,24 +30,42 @@ type FaucetRequest struct {
 	TxHash  string `json:"tx_hash"`
 }
 
-// RegisterFaucetRoutes registers the faucet API routes.
-func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
-	clientCtx := apiSvr.ClientCtx
-	r := apiSvr.Router
-
-	r.HandleFunc("/faucet/info", app.handleFaucetInfo(clientCtx)).Methods("GET")
-	r.HandleFunc("/faucet/init-account", app.handleInitAccount(clientCtx)).Methods("POST")
-	r.HandleFunc("/faucet/request", app.handleFaucetRequest(clientCtx)).Methods("POST")
+// FaucetConfig defines the configuration for the faucet service.
+type FaucetConfig struct {
+	EnableFaucet bool `mapstructure:"enable_faucet"`
 }
 
-// faucetEnabled returns true if the faucet is enabled, false otherwise.
-func (app *App) faucetEnabled() bool {
-	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(authtypes.StoreKey))
-	if store == nil {
-		return false
+// getFaucetConfig extracts faucet configuration from app options.
+func getFaucetConfig(appOpts servertypes.AppOptions) FaucetConfig {
+	var faucetConfig FaucetConfig
+
+	if enableFaucet := appOpts.Get("faucet.enable_faucet"); enableFaucet != nil {
+		if boolVal, ok := enableFaucet.(bool); ok {
+			faucetConfig.EnableFaucet = boolVal
+		}
 	}
-	bz := store.Get([]byte(appparams.EnableFaucetKey))
-	return len(bz) > 0 && bz[0] == 0x01
+
+	return faucetConfig
+}
+
+// shouldRegisterFaucetRoutes determines if faucet routes should be registered based on configuration.
+func shouldRegisterFaucetRoutes(appOpts servertypes.AppOptions) bool {
+	faucetConfig := getFaucetConfig(appOpts)
+	return faucetConfig.EnableFaucet
+}
+
+// RegisterFaucetRoutes registers the faucet API routes.
+func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APIConfig, appOpts servertypes.AppOptions) {
+	if !shouldRegisterFaucetRoutes(appOpts) {
+		return
+	}
+
+	clientCtx := apiSvr.ClientCtx
+	rtr := apiSvr.Router
+
+	rtr.HandleFunc("/faucet/info", app.handleFaucetInfo(clientCtx)).Methods("GET")
+	rtr.HandleFunc("/faucet/init-account", app.handleInitAccount(clientCtx)).Methods("POST")
+	rtr.HandleFunc("/faucet/request", app.handleFaucetRequest(clientCtx)).Methods("POST")
 }
 
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
@@ -144,11 +163,6 @@ func (app *App) getFaucetKey() (keyring.Keyring, keyring.Record, error) {
 // handleFaucetRequest handles POST requests to request funds from the faucet.
 func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !app.faucetEnabled() {
-			http.Error(w, "Faucet is not enabled", http.StatusServiceUnavailable)
-			return
-		}
-
 		var req struct {
 			Address string `json:"address"`
 		}
@@ -265,11 +279,6 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 // handleFaucetInfo handles GET requests to get faucet information.
 func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !app.faucetEnabled() {
-			http.Error(w, "Faucet is not enabled", http.StatusServiceUnavailable)
-			return
-		}
-
 		_, faucetInfo, err := app.getFaucetKey()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Faucet not configured: %v", err), http.StatusNotFound)
@@ -307,11 +316,6 @@ func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 // Accounts that are not yet registered in the auth module are initialized with 1 uopen.
 func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if !app.faucetEnabled() {
-			http.Error(w, "Faucet is not enabled", http.StatusServiceUnavailable)
-			return
-		}
-
 		var req struct {
 			Address string `json:"address"`
 		}

@@ -43,9 +43,6 @@ jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": 
 # Enable/disable zero-fee transactions
 jq '.app_state.app_params.allow_zero_fee_txs = true' "$GENESIS" > "$GENESIS.tmp" && mv "$GENESIS.tmp" "$GENESIS"
 
-# Enable/disable faucet endpoints
-jq '.app_state.app_params.enable_faucet = true' "$GENESIS" > "$GENESIS.tmp" && mv "$GENESIS.tmp" "$GENESIS"
-
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' "$APP_TOML"
 sedi 's/^enabled = .*/enabled = true/' "$APP_TOML"
@@ -53,6 +50,7 @@ sedi 's/^prometheus-retention-time = .*/prometheus-retention-time = 60/' "$APP_T
 sedi 's/^enabled-unsafe-cors = .*/enabled-unsafe-cors = true/' "$APP_TOML"
 sedi 's/^enable = .*/enable = true/' "$APP_TOML"
 sedi 's/^swagger = .*/swagger = true/' "$APP_TOML"
+sedi 's/^enable_faucet = .*/enable_faucet = true/' "$APP_TOML"
 
 # config.toml
 sedi 's/^timeout_propose = .*/timeout_propose = "500ms"/' "$CONFIG_TOML"

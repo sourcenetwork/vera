@@ -57,11 +57,10 @@ func setupFaucetKeyFiles(val network.ValidatorI) error {
 	return nil
 }
 
-// enableFaucetInGenesis enables the faucet in the genesis state.
-func enableFaucetInGenesis(cfg *network.Config) error {
+// setupFaucetInGenesis sets up the faucet account and balance in the genesis state.
+func setupFaucetInGenesis(cfg *network.Config) error {
 	appParamsGenesis := params.AppParamsGenesis{
 		AllowZeroFeeTxs: true,
-		EnableFaucet:    true,
 	}
 	appParamsBytes, err := json.Marshal(&appParamsGenesis)
 	if err != nil {

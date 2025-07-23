@@ -34,15 +34,10 @@ const (
 // The value is parsed from app_state.app_params.allow_zero_fee_txs in genesis.json on chain init.
 const AllowZeroFeeTxsKey = "appparams/allow_zero_fee_txs"
 
-// EnableFaucetKey stores a flag that indicates whether the faucet is enabled.
-// The value is parsed from app_state.app_params.enable_faucet in genesis.json on chain init.
-const EnableFaucetKey = "appparams/enable_faucet"
-
 // FaucetStoreKey is the store key for faucet data.
 const FaucetStoreKey = "faucet"
 
 // AppParamsGenesis defines app-specific params that can be set during genesis.
 type AppParamsGenesis struct {
 	AllowZeroFeeTxs bool `json:"allow_zero_fee_txs"`
-	EnableFaucet    bool `json:"enable_faucet"`
 }

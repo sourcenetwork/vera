@@ -103,6 +103,8 @@ type App struct {
 	txConfig          client.TxConfig
 	interfaceRegistry codectypes.InterfaceRegistry
 
+	appOpts servertypes.AppOptions
+
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
@@ -175,7 +177,7 @@ func New(
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
 	var (
-		app        = &App{}
+		app        = &App{appOpts: appOpts}
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
@@ -433,16 +435,6 @@ func New(
 		store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
 		store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
 
-		// Parse app_state.app_params.enable_faucet and save to auth (acc) store.
-		faucetVal := byte(0x00)
-		if raw, ok := genesisState["app_params"]; ok {
-			var appParams appparams.AppParamsGenesis
-			if err := json.Unmarshal(raw, &appParams); err == nil && appParams.EnableFaucet {
-				faucetVal = 0x01
-			}
-		}
-		store.Set([]byte(appparams.EnableFaucetKey), []byte{faucetVal})
-
 		req.AppStateBytes, err = json.Marshal(genesisState)
 		if err != nil {
 			return nil, err
@@ -529,11 +521,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 		panic(err)
 	}
 
-	// register app's OpenAPI routes.
+	// register app's OpenAPI routes
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
 
 	// register faucet routes
-	app.RegisterFaucetRoutes(apiSvr, apiConfig)
+	app.RegisterFaucetRoutes(apiSvr, apiConfig, app.appOpts)
 }
 
 // GetIBCKeeper returns the IBC keeper.
