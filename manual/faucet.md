@@ -45,20 +45,17 @@ Initializes an account in the auth module by sending 1 uopen. This ensures the a
 
 ## Configuration
 
-The faucet can be enabled/disabled in genesis.json (i.e. in `./scripts/genesis-setup.sh`):
+The faucet can be enabled/disabled in `app.toml`:
 
-```json
-{
-  "app_state": {
-    "app_params": {
-      "enable_faucet": true
-    }
-  }
-}
+```toml
+[faucet]
+# Defines if the faucet service should be enabled.
+enable_faucet = true
 ```
 
-When disabled, all endpoints return `Faucet is not enabled`.
+When disabled (`enable_faucet = false`), the faucet routes are not registered and endpoints return `Not Implemented`.
 
+The faucet is disabled by default and must be explicitly enabled in configuration (or via `./scripts/genesis-setup.sh`) .
 
 ## Security
 

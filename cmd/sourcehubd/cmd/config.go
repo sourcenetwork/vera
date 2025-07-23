@@ -73,7 +73,7 @@ func initAppConfig() (string, interface{}) {
 
 [faucet]
 
-# Enable defines if the faucet service should be enabled.
+# Defines if the faucet service should be enabled.
 enable_faucet = {{ .Faucet.EnableFaucet }}
 `
 
