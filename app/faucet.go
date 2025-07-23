@@ -23,6 +23,12 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
+// Faucet constants
+const (
+	FaucetRequestAmount       = 1000000000 // 1,000 $OPEN
+	FaucetRequestAmountString = "1000000000uopen"
+)
+
 // FaucetRequest represents a faucet request record.
 type FaucetRequest struct {
 	Address string `json:"address"`
@@ -184,13 +190,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		amount := "1000000000uopen" // 1000 open
-
-		coins, err := sdk.ParseCoinsNormalized(amount)
-		if err != nil {
-			http.Error(w, "Invalid amount", http.StatusBadRequest)
-			return
-		}
+		coins := sdk.NewCoins(sdk.NewInt64Coin("uopen", FaucetRequestAmount))
 
 		kb, faucetInfo, err := app.getFaucetKey()
 		if err != nil {
@@ -260,7 +260,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		if res.Code == 0 {
-			if err := app.recordAddressRequested(req.Address, amount, res.TxHash); err != nil {
+			if err := app.recordAddressRequested(req.Address, FaucetRequestAmountString, res.TxHash); err != nil {
 				fmt.Printf("Failed to record faucet request: %v\n", err)
 			}
 		}
@@ -271,7 +271,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			"code":    res.Code,
 			"raw_log": res.RawLog,
 			"address": req.Address,
-			"amount":  amount,
+			"amount":  FaucetRequestAmountString,
 		})
 	}
 }
