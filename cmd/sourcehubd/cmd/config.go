@@ -8,6 +8,18 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
+// CustomAppConfig extends the default Cosmos SDK app config
+type CustomAppConfig struct {
+	serverconfig.Config `mapstructure:",squash"`
+
+	Faucet FaucetConfig `mapstructure:"faucet"`
+}
+
+// FaucetConfig defines the configuration for the faucet service
+type FaucetConfig struct {
+	EnableFaucet bool `mapstructure:"enable_faucet"`
+}
+
 // initCometBFTConfig helps to override default CometBFT Config values.
 // return cmtcfg.DefaultConfig if no custom configuration is required for the application.
 func initCometBFTConfig() *cmtcfg.Config {
@@ -23,11 +35,6 @@ func initCometBFTConfig() *cmtcfg.Config {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	// The following code snippet is just for reference.
-	type CustomAppConfig struct {
-		serverconfig.Config `mapstructure:",squash"`
-	}
-
 	// Optionally allow the chain developer to overwrite the SDK's default server config.
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = fmt.Sprintf(
@@ -54,18 +61,21 @@ func initAppConfig() (string, interface{}) {
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
+		Faucet: FaucetConfig{
+			EnableFaucet: false,
+		},
 	}
 
-	customAppTemplate := serverconfig.DefaultConfigTemplate
-	// Edit the default template file
-	//
-	// customAppTemplate := serverconfig.DefaultConfigTemplate + `
-	// [wasm]
-	// # This is the maximum sdk gas (wasm and storage) that we allow for any x/wasm "smart" queries
-	// query_gas_limit = 300000
-	// # This is the number of wasm vm instances we keep cached in memory for speed-up
-	// # Warning: this is currently unstable and may lead to crashes, best to keep for 0 unless testing locally
-	// lru_size = 0`
+	customAppTemplate := serverconfig.DefaultConfigTemplate + `
+###############################################################################
+###                           Faucet Configuration                          ###
+###############################################################################
+
+[faucet]
+
+# Defines if the faucet service should be enabled.
+enable_faucet = {{ .Faucet.EnableFaucet }}
+`
 
 	return customAppTemplate, customAppConfig
 }

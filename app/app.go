@@ -103,6 +103,8 @@ type App struct {
 	txConfig          client.TxConfig
 	interfaceRegistry codectypes.InterfaceRegistry
 
+	appOpts servertypes.AppOptions
+
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
@@ -175,7 +177,7 @@ func New(
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
 	var (
-		app        = &App{}
+		app        = &App{appOpts: appOpts}
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
@@ -519,8 +521,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 		panic(err)
 	}
 
-	// register app's OpenAPI routes.
+	// register app's OpenAPI routes
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+
+	// register faucet routes
+	app.RegisterFaucetRoutes(apiSvr, apiConfig, app.appOpts)
 }
 
 // GetIBCKeeper returns the IBC keeper.
