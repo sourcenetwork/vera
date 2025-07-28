@@ -22,13 +22,13 @@ func CmdEditPolicy() *cobra.Command {
 		Use:   "edit-policy policy_id {policy_file | -}",
 		Short: "Broadcast message EditPolicy",
 		Long: `
-                       Broadcast message EditPolicy.
+		Broadcast message EditPolicy.
 
-					   policy_id is the id of the policy that is going to be edited.
+		policy_id is the id of the policy that is going to be edited.
 
-                       policy_file specifies a file whose contents is the policy.
-                       - to read from stdin.
-                       Note: if reading from stdin make sure flag --yes is set.`,
+		policy_file specifies a file whose contents is the policy.
+		- to read from stdin.
+		Note: if reading from stdin make sure flag --yes is set.`,
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			policyId := args[0]
