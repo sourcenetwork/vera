@@ -6,8 +6,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -18,6 +20,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/gogoproto/proto"
 
 	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
 	"github.com/sourcenetwork/sourcehub/app/params"
@@ -26,16 +29,10 @@ import (
 
 // Faucet constants
 const (
-	FaucetRequestAmount       = 1000000000 // 1,000 $OPEN
-	FaucetRequestAmountString = "1000000000uopen"
+	FaucetRequestAmount            = 1000000000  // 1,000 $OPEN
+	DefaultAllowanceAmount         = 10000000000 // 10,000 $OPEN
+	DefaultAllowanceExpirationDays = 30
 )
-
-// FaucetRequestRecord represents a faucet request record stored internally.
-type FaucetRequestRecord struct {
-	Address string `json:"address"`
-	Amount  string `json:"amount"`
-	TxHash  string `json:"tx_hash"`
-}
 
 // FaucetConfig defines the configuration for the faucet service.
 type FaucetConfig struct {
@@ -73,6 +70,7 @@ func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APICon
 	rtr.HandleFunc("/faucet/info", app.handleFaucetInfo(clientCtx)).Methods("GET")
 	rtr.HandleFunc("/faucet/init-account", app.handleInitAccount(clientCtx)).Methods("POST")
 	rtr.HandleFunc("/faucet/request", app.handleFaucetRequest(clientCtx)).Methods("POST")
+	rtr.HandleFunc("/faucet/grant-allowance", app.handleGrantAllowance(clientCtx)).Methods("POST")
 }
 
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
@@ -95,19 +93,19 @@ func (app *App) hasAddressRequested(address string) bool {
 }
 
 // recordAddressRequested records that an address has requested funds.
-func (app *App) recordAddressRequested(address, amount, txHash string) error {
+func (app *App) recordAddressRequested(address string, amount sdk.Coins, txHash string) error {
 	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(params.FaucetStoreKey))
 	if store == nil {
 		return fmt.Errorf("faucet store not found")
 	}
 
-	request := FaucetRequestRecord{
+	request := &faucettypes.FaucetRequestRecord{
 		Address: address,
-		Amount:  amount,
+		Amount:  amount[0],
 		TxHash:  txHash,
 	}
 
-	bz, err := json.Marshal(request)
+	bz, err := proto.Marshal(request)
 	if err != nil {
 		return fmt.Errorf("failed to marshal faucet request: %w", err)
 	}
@@ -189,7 +187,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			return
 		}
 
-		coins := sdk.NewCoins(sdk.NewInt64Coin("uopen", FaucetRequestAmount))
+		coins := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, FaucetRequestAmount))
 
 		kb, faucetInfo, err := app.getFaucetKey()
 		if err != nil {
@@ -259,7 +257,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		if res.Code == 0 {
-			if err := app.recordAddressRequested(req.Address, FaucetRequestAmountString, res.TxHash); err != nil {
+			if err := app.recordAddressRequested(req.Address, coins, res.TxHash); err != nil {
 				fmt.Printf("Failed to record faucet request: %v\n", err)
 			}
 		}
@@ -269,7 +267,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 			Code:    res.Code,
 			RawLog:  res.RawLog,
 			Address: req.Address,
-			Amount:  FaucetRequestAmountString,
+			Amount:  sdk.NewInt64Coin(appparams.MicroOpenDenom, FaucetRequestAmount),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -295,7 +293,7 @@ func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 		bankClient := banktypes.NewQueryClient(clientCtx)
 		balance, err := bankClient.Balance(r.Context(), &banktypes.QueryBalanceRequest{
 			Address: faucetAddress.String(),
-			Denom:   "uopen",
+			Denom:   appparams.MicroOpenDenom,
 		})
 		if err != nil {
 			http.Error(w, fmt.Sprintf("Failed to get faucet balance: %v", err), http.StatusInternalServerError)
@@ -305,10 +303,9 @@ func (app *App) handleFaucetInfo(clientCtx client.Context) http.HandlerFunc {
 		requestCount := app.getRequestCount()
 
 		response := &faucettypes.FaucetInfoResponse{
-			Address:       faucetAddress.String(),
-			BalanceAmount: balance.Balance.Amount.String(),
-			BalanceDenom:  balance.Balance.Denom,
-			RequestCount:  int32(requestCount),
+			Address:      faucetAddress.String(),
+			Balance:      *balance.Balance,
+			RequestCount: int32(requestCount),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -360,7 +357,7 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// Create a bank send message with 1 uopen to initialize the account
-		coins := sdk.NewCoins(sdk.NewInt64Coin("uopen", 1))
+		coins := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 1))
 		msg := banktypes.NewMsgSend(
 			faucetAddress,
 			accAddr,
@@ -422,8 +419,124 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 			Code:    res.Code,
 			RawLog:  res.RawLog,
 			Address: req.Address,
-			Amount:  "1uopen",
+			Amount:  sdk.NewInt64Coin(appparams.MicroOpenDenom, 1),
 			Exists:  false,
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+// handleGrantAllowance handles POST requests to grant fee allowances from the faucet.
+func (app *App) handleGrantAllowance(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req faucettypes.GrantAllowanceRequest
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		granteeAddr, err := sdk.AccAddressFromBech32(req.Address)
+		if err != nil {
+			http.Error(w, "Invalid address", http.StatusBadRequest)
+			return
+		}
+
+		kb, faucetInfo, err := app.getFaucetKey()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Faucet not configured: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		faucetAddress, err := faucetInfo.GetAddress()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to get faucet address: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		amountLimit := sdk.NewInt64Coin(appparams.MicroOpenDenom, DefaultAllowanceAmount)
+		if !req.AmountLimit.Amount.IsNil() && req.AmountLimit.Amount.IsPositive() {
+			amountLimit = req.AmountLimit
+		}
+
+		expiration := time.Now().AddDate(0, 0, DefaultAllowanceExpirationDays)
+		if req.Expiration != 0 {
+			expiration = time.Unix(req.Expiration, 0)
+		}
+
+		// Create basic allowance
+		spendLimit := sdk.NewCoins(amountLimit)
+		allowance := &feegrant.BasicAllowance{
+			SpendLimit: spendLimit,
+			Expiration: &expiration,
+		}
+
+		msg, err := feegrant.NewMsgGrantAllowance(allowance, faucetAddress, granteeAddr)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to create grant allowance message: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		chainID := clientCtx.ChainID
+		if chainID == "" {
+			chainID = "sourcehub-dev"
+		}
+		txf := tx.Factory{}.
+			WithTxConfig(clientCtx.TxConfig).
+			WithAccountRetriever(clientCtx.AccountRetriever).
+			WithChainID(chainID).
+			WithGas(300000).
+			WithKeybase(kb)
+
+		// Only add fees if zero fee transactions are not allowed
+		if !app.zeroFeeTxsAllowed() {
+			txf = txf.WithFees("300uopen")
+		}
+
+		faucetAccount, err := clientCtx.AccountRetriever.GetAccount(clientCtx, faucetAddress)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to get faucet account: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		txf = txf.WithAccountNumber(faucetAccount.GetAccountNumber()).
+			WithSequence(faucetAccount.GetSequence())
+
+		txn, err := txf.BuildUnsignedTx(msg)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to build transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		err = tx.Sign(r.Context(), txf, "faucet", txn, true)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to sign transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		txBytes, err := clientCtx.TxConfig.TxEncoder()(txn.GetTx())
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to encode transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		res, err := clientCtx.BroadcastTxSync(txBytes)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to broadcast transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		response := &faucettypes.GrantAllowanceResponse{
+			Message:     "Fee allowance granted successfully",
+			Txhash:      res.TxHash,
+			Code:        res.Code,
+			RawLog:      res.RawLog,
+			Granter:     faucetAddress.String(),
+			Grantee:     req.Address,
+			AmountLimit: amountLimit,
+			Expiration:  expiration.Unix(),
 		}
 
 		w.Header().Set("Content-Type", "application/json")
