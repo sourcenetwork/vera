@@ -2,8 +2,12 @@
 package faucet
 
 import (
+	_ "cosmossdk.io/api/amino"
+	v1beta1 "cosmossdk.io/api/cosmos/base/v1beta1"
 	fmt "fmt"
+	_ "github.com/cosmos/cosmos-proto"
 	runtime "github.com/cosmos/cosmos-proto/runtime"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoiface "google.golang.org/protobuf/runtime/protoiface"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -11,6 +15,569 @@ import (
 	reflect "reflect"
 	sync "sync"
 )
+
+var (
+	md_FaucetRequestRecord         protoreflect.MessageDescriptor
+	fd_FaucetRequestRecord_address protoreflect.FieldDescriptor
+	fd_FaucetRequestRecord_amount  protoreflect.FieldDescriptor
+	fd_FaucetRequestRecord_tx_hash protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_faucet_faucet_proto_init()
+	md_FaucetRequestRecord = File_sourcehub_faucet_faucet_proto.Messages().ByName("FaucetRequestRecord")
+	fd_FaucetRequestRecord_address = md_FaucetRequestRecord.Fields().ByName("address")
+	fd_FaucetRequestRecord_amount = md_FaucetRequestRecord.Fields().ByName("amount")
+	fd_FaucetRequestRecord_tx_hash = md_FaucetRequestRecord.Fields().ByName("tx_hash")
+}
+
+var _ protoreflect.Message = (*fastReflection_FaucetRequestRecord)(nil)
+
+type fastReflection_FaucetRequestRecord FaucetRequestRecord
+
+func (x *FaucetRequestRecord) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_FaucetRequestRecord)(x)
+}
+
+func (x *FaucetRequestRecord) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[0]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_FaucetRequestRecord_messageType fastReflection_FaucetRequestRecord_messageType
+var _ protoreflect.MessageType = fastReflection_FaucetRequestRecord_messageType{}
+
+type fastReflection_FaucetRequestRecord_messageType struct{}
+
+func (x fastReflection_FaucetRequestRecord_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_FaucetRequestRecord)(nil)
+}
+func (x fastReflection_FaucetRequestRecord_messageType) New() protoreflect.Message {
+	return new(fastReflection_FaucetRequestRecord)
+}
+func (x fastReflection_FaucetRequestRecord_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_FaucetRequestRecord
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_FaucetRequestRecord) Descriptor() protoreflect.MessageDescriptor {
+	return md_FaucetRequestRecord
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_FaucetRequestRecord) Type() protoreflect.MessageType {
+	return _fastReflection_FaucetRequestRecord_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_FaucetRequestRecord) New() protoreflect.Message {
+	return new(fastReflection_FaucetRequestRecord)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_FaucetRequestRecord) Interface() protoreflect.ProtoMessage {
+	return (*FaucetRequestRecord)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_FaucetRequestRecord) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Address != "" {
+		value := protoreflect.ValueOfString(x.Address)
+		if !f(fd_FaucetRequestRecord_address, value) {
+			return
+		}
+	}
+	if x.Amount != nil {
+		value := protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
+		if !f(fd_FaucetRequestRecord_amount, value) {
+			return
+		}
+	}
+	if x.TxHash != "" {
+		value := protoreflect.ValueOfString(x.TxHash)
+		if !f(fd_FaucetRequestRecord_tx_hash, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_FaucetRequestRecord) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		return x.Address != ""
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		return x.Amount != nil
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		return x.TxHash != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_FaucetRequestRecord) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		x.Address = ""
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		x.Amount = nil
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		x.TxHash = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_FaucetRequestRecord) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		value := x.Address
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		value := x.Amount
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		value := x.TxHash
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_FaucetRequestRecord) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		x.Address = value.Interface().(string)
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		x.Amount = value.Message().Interface().(*v1beta1.Coin)
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		x.TxHash = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_FaucetRequestRecord) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		if x.Amount == nil {
+			x.Amount = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		panic(fmt.Errorf("field address of message sourcehub.faucet.FaucetRequestRecord is not mutable"))
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		panic(fmt.Errorf("field tx_hash of message sourcehub.faucet.FaucetRequestRecord is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_FaucetRequestRecord) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetRequestRecord.address":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.FaucetRequestRecord.amount":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "sourcehub.faucet.FaucetRequestRecord.tx_hash":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetRequestRecord"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.FaucetRequestRecord does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_FaucetRequestRecord) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.faucet.FaucetRequestRecord", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_FaucetRequestRecord) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_FaucetRequestRecord) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_FaucetRequestRecord) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_FaucetRequestRecord) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*FaucetRequestRecord)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Address)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Amount != nil {
+			l = options.Size(x.Amount)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.TxHash)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*FaucetRequestRecord)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.TxHash) > 0 {
+			i -= len(x.TxHash)
+			copy(dAtA[i:], x.TxHash)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.TxHash)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if x.Amount != nil {
+			encoded, err := options.Marshal(x.Amount)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Address) > 0 {
+			i -= len(x.Address)
+			copy(dAtA[i:], x.Address)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Address)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*FaucetRequestRecord)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: FaucetRequestRecord: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: FaucetRequestRecord: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Address = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Amount == nil {
+					x.Amount = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Amount); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.TxHash = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
 
 var (
 	md_FaucetRequest         protoreflect.MessageDescriptor
@@ -32,7 +599,7 @@ func (x *FaucetRequest) ProtoReflect() protoreflect.Message {
 }
 
 func (x *FaucetRequest) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[0]
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -460,7 +1027,7 @@ func (x *FaucetResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *FaucetResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[1]
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -540,8 +1107,8 @@ func (x *fastReflection_FaucetResponse) Range(f func(protoreflect.FieldDescripto
 			return
 		}
 	}
-	if x.Amount != "" {
-		value := protoreflect.ValueOfString(x.Amount)
+	if x.Amount != nil {
+		value := protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
 		if !f(fd_FaucetResponse_amount, value) {
 			return
 		}
@@ -570,7 +1137,7 @@ func (x *fastReflection_FaucetResponse) Has(fd protoreflect.FieldDescriptor) boo
 	case "sourcehub.faucet.FaucetResponse.address":
 		return x.Address != ""
 	case "sourcehub.faucet.FaucetResponse.amount":
-		return x.Amount != ""
+		return x.Amount != nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -596,7 +1163,7 @@ func (x *fastReflection_FaucetResponse) Clear(fd protoreflect.FieldDescriptor) {
 	case "sourcehub.faucet.FaucetResponse.address":
 		x.Address = ""
 	case "sourcehub.faucet.FaucetResponse.amount":
-		x.Amount = ""
+		x.Amount = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -627,7 +1194,7 @@ func (x *fastReflection_FaucetResponse) Get(descriptor protoreflect.FieldDescrip
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.faucet.FaucetResponse.amount":
 		value := x.Amount
-		return protoreflect.ValueOfString(value)
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -657,7 +1224,7 @@ func (x *fastReflection_FaucetResponse) Set(fd protoreflect.FieldDescriptor, val
 	case "sourcehub.faucet.FaucetResponse.address":
 		x.Address = value.Interface().(string)
 	case "sourcehub.faucet.FaucetResponse.amount":
-		x.Amount = value.Interface().(string)
+		x.Amount = value.Message().Interface().(*v1beta1.Coin)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -678,6 +1245,11 @@ func (x *fastReflection_FaucetResponse) Set(fd protoreflect.FieldDescriptor, val
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_FaucetResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetResponse.amount":
+		if x.Amount == nil {
+			x.Amount = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
 	case "sourcehub.faucet.FaucetResponse.txhash":
 		panic(fmt.Errorf("field txhash of message sourcehub.faucet.FaucetResponse is not mutable"))
 	case "sourcehub.faucet.FaucetResponse.code":
@@ -686,8 +1258,6 @@ func (x *fastReflection_FaucetResponse) Mutable(fd protoreflect.FieldDescriptor)
 		panic(fmt.Errorf("field raw_log of message sourcehub.faucet.FaucetResponse is not mutable"))
 	case "sourcehub.faucet.FaucetResponse.address":
 		panic(fmt.Errorf("field address of message sourcehub.faucet.FaucetResponse is not mutable"))
-	case "sourcehub.faucet.FaucetResponse.amount":
-		panic(fmt.Errorf("field amount of message sourcehub.faucet.FaucetResponse is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -710,7 +1280,8 @@ func (x *fastReflection_FaucetResponse) NewField(fd protoreflect.FieldDescriptor
 	case "sourcehub.faucet.FaucetResponse.address":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.faucet.FaucetResponse.amount":
-		return protoreflect.ValueOfString("")
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.FaucetResponse"))
@@ -795,8 +1366,8 @@ func (x *fastReflection_FaucetResponse) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Amount)
-		if l > 0 {
+		if x.Amount != nil {
+			l = options.Size(x.Amount)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.unknownFields != nil {
@@ -828,10 +1399,17 @@ func (x *fastReflection_FaucetResponse) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if len(x.Amount) > 0 {
-			i -= len(x.Amount)
-			copy(dAtA[i:], x.Amount)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Amount)))
+		if x.Amount != nil {
+			encoded, err := options.Marshal(x.Amount)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
 			dAtA[i] = 0x2a
 		}
@@ -1029,7 +1607,7 @@ func (x *fastReflection_FaucetResponse) ProtoMethods() *protoiface.Methods {
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 				}
-				var stringLen uint64
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1039,23 +1617,27 @@ func (x *fastReflection_FaucetResponse) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
+				if msglen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + intStringLen
+				postIndex := iNdEx + msglen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Amount = string(dAtA[iNdEx:postIndex])
+				if x.Amount == nil {
+					x.Amount = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Amount); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -1112,7 +1694,7 @@ func (x *InitAccountRequest) ProtoReflect() protoreflect.Message {
 }
 
 func (x *InitAccountRequest) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[2]
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1544,7 +2126,7 @@ func (x *InitAccountResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *InitAccountResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[3]
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1630,8 +2212,8 @@ func (x *fastReflection_InitAccountResponse) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if x.Amount != "" {
-		value := protoreflect.ValueOfString(x.Amount)
+	if x.Amount != nil {
+		value := protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
 		if !f(fd_InitAccountResponse_amount, value) {
 			return
 		}
@@ -1668,7 +2250,7 @@ func (x *fastReflection_InitAccountResponse) Has(fd protoreflect.FieldDescriptor
 	case "sourcehub.faucet.InitAccountResponse.address":
 		return x.Address != ""
 	case "sourcehub.faucet.InitAccountResponse.amount":
-		return x.Amount != ""
+		return x.Amount != nil
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		return x.Exists != false
 	default:
@@ -1698,7 +2280,7 @@ func (x *fastReflection_InitAccountResponse) Clear(fd protoreflect.FieldDescript
 	case "sourcehub.faucet.InitAccountResponse.address":
 		x.Address = ""
 	case "sourcehub.faucet.InitAccountResponse.amount":
-		x.Amount = ""
+		x.Amount = nil
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		x.Exists = false
 	default:
@@ -1734,7 +2316,7 @@ func (x *fastReflection_InitAccountResponse) Get(descriptor protoreflect.FieldDe
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.faucet.InitAccountResponse.amount":
 		value := x.Amount
-		return protoreflect.ValueOfString(value)
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		value := x.Exists
 		return protoreflect.ValueOfBool(value)
@@ -1769,7 +2351,7 @@ func (x *fastReflection_InitAccountResponse) Set(fd protoreflect.FieldDescriptor
 	case "sourcehub.faucet.InitAccountResponse.address":
 		x.Address = value.Interface().(string)
 	case "sourcehub.faucet.InitAccountResponse.amount":
-		x.Amount = value.Interface().(string)
+		x.Amount = value.Message().Interface().(*v1beta1.Coin)
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		x.Exists = value.Bool()
 	default:
@@ -1792,6 +2374,11 @@ func (x *fastReflection_InitAccountResponse) Set(fd protoreflect.FieldDescriptor
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_InitAccountResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.faucet.InitAccountResponse.amount":
+		if x.Amount == nil {
+			x.Amount = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.Amount.ProtoReflect())
 	case "sourcehub.faucet.InitAccountResponse.message":
 		panic(fmt.Errorf("field message of message sourcehub.faucet.InitAccountResponse is not mutable"))
 	case "sourcehub.faucet.InitAccountResponse.txhash":
@@ -1802,8 +2389,6 @@ func (x *fastReflection_InitAccountResponse) Mutable(fd protoreflect.FieldDescri
 		panic(fmt.Errorf("field raw_log of message sourcehub.faucet.InitAccountResponse is not mutable"))
 	case "sourcehub.faucet.InitAccountResponse.address":
 		panic(fmt.Errorf("field address of message sourcehub.faucet.InitAccountResponse is not mutable"))
-	case "sourcehub.faucet.InitAccountResponse.amount":
-		panic(fmt.Errorf("field amount of message sourcehub.faucet.InitAccountResponse is not mutable"))
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		panic(fmt.Errorf("field exists of message sourcehub.faucet.InitAccountResponse is not mutable"))
 	default:
@@ -1830,7 +2415,8 @@ func (x *fastReflection_InitAccountResponse) NewField(fd protoreflect.FieldDescr
 	case "sourcehub.faucet.InitAccountResponse.address":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.faucet.InitAccountResponse.amount":
-		return protoreflect.ValueOfString("")
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.faucet.InitAccountResponse.exists":
 		return protoreflect.ValueOfBool(false)
 	default:
@@ -1921,8 +2507,8 @@ func (x *fastReflection_InitAccountResponse) ProtoMethods() *protoiface.Methods 
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Amount)
-		if l > 0 {
+		if x.Amount != nil {
+			l = options.Size(x.Amount)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.Exists {
@@ -1967,10 +2553,17 @@ func (x *fastReflection_InitAccountResponse) ProtoMethods() *protoiface.Methods 
 			i--
 			dAtA[i] = 0x38
 		}
-		if len(x.Amount) > 0 {
-			i -= len(x.Amount)
-			copy(dAtA[i:], x.Amount)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Amount)))
+		if x.Amount != nil {
+			encoded, err := options.Marshal(x.Amount)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
 			dAtA[i] = 0x32
 		}
@@ -2207,7 +2800,7 @@ func (x *fastReflection_InitAccountResponse) ProtoMethods() *protoiface.Methods 
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 				}
-				var stringLen uint64
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2217,23 +2810,27 @@ func (x *fastReflection_InitAccountResponse) ProtoMethods() *protoiface.Methods 
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
+				if msglen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + intStringLen
+				postIndex := iNdEx + msglen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Amount = string(dAtA[iNdEx:postIndex])
+				if x.Amount == nil {
+					x.Amount = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Amount); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
 				iNdEx = postIndex
 			case 7:
 				if wireType != 0 {
@@ -2291,19 +2888,17 @@ func (x *fastReflection_InitAccountResponse) ProtoMethods() *protoiface.Methods 
 }
 
 var (
-	md_FaucetInfoResponse                protoreflect.MessageDescriptor
-	fd_FaucetInfoResponse_address        protoreflect.FieldDescriptor
-	fd_FaucetInfoResponse_balance_amount protoreflect.FieldDescriptor
-	fd_FaucetInfoResponse_balance_denom  protoreflect.FieldDescriptor
-	fd_FaucetInfoResponse_request_count  protoreflect.FieldDescriptor
+	md_FaucetInfoResponse               protoreflect.MessageDescriptor
+	fd_FaucetInfoResponse_address       protoreflect.FieldDescriptor
+	fd_FaucetInfoResponse_balance       protoreflect.FieldDescriptor
+	fd_FaucetInfoResponse_request_count protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_faucet_faucet_proto_init()
 	md_FaucetInfoResponse = File_sourcehub_faucet_faucet_proto.Messages().ByName("FaucetInfoResponse")
 	fd_FaucetInfoResponse_address = md_FaucetInfoResponse.Fields().ByName("address")
-	fd_FaucetInfoResponse_balance_amount = md_FaucetInfoResponse.Fields().ByName("balance_amount")
-	fd_FaucetInfoResponse_balance_denom = md_FaucetInfoResponse.Fields().ByName("balance_denom")
+	fd_FaucetInfoResponse_balance = md_FaucetInfoResponse.Fields().ByName("balance")
 	fd_FaucetInfoResponse_request_count = md_FaucetInfoResponse.Fields().ByName("request_count")
 }
 
@@ -2316,7 +2911,7 @@ func (x *FaucetInfoResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *FaucetInfoResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[4]
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2378,15 +2973,9 @@ func (x *fastReflection_FaucetInfoResponse) Range(f func(protoreflect.FieldDescr
 			return
 		}
 	}
-	if x.BalanceAmount != "" {
-		value := protoreflect.ValueOfString(x.BalanceAmount)
-		if !f(fd_FaucetInfoResponse_balance_amount, value) {
-			return
-		}
-	}
-	if x.BalanceDenom != "" {
-		value := protoreflect.ValueOfString(x.BalanceDenom)
-		if !f(fd_FaucetInfoResponse_balance_denom, value) {
+	if x.Balance != nil {
+		value := protoreflect.ValueOfMessage(x.Balance.ProtoReflect())
+		if !f(fd_FaucetInfoResponse_balance, value) {
 			return
 		}
 	}
@@ -2413,10 +3002,8 @@ func (x *fastReflection_FaucetInfoResponse) Has(fd protoreflect.FieldDescriptor)
 	switch fd.FullName() {
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		return x.Address != ""
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		return x.BalanceAmount != ""
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		return x.BalanceDenom != ""
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		return x.Balance != nil
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		return x.RequestCount != int32(0)
 	default:
@@ -2437,10 +3024,8 @@ func (x *fastReflection_FaucetInfoResponse) Clear(fd protoreflect.FieldDescripto
 	switch fd.FullName() {
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		x.Address = ""
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		x.BalanceAmount = ""
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		x.BalanceDenom = ""
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		x.Balance = nil
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		x.RequestCount = int32(0)
 	default:
@@ -2462,12 +3047,9 @@ func (x *fastReflection_FaucetInfoResponse) Get(descriptor protoreflect.FieldDes
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		value := x.Address
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		value := x.BalanceAmount
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		value := x.BalanceDenom
-		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		value := x.Balance
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		value := x.RequestCount
 		return protoreflect.ValueOfInt32(value)
@@ -2493,10 +3075,8 @@ func (x *fastReflection_FaucetInfoResponse) Set(fd protoreflect.FieldDescriptor,
 	switch fd.FullName() {
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		x.Address = value.Interface().(string)
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		x.BalanceAmount = value.Interface().(string)
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		x.BalanceDenom = value.Interface().(string)
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		x.Balance = value.Message().Interface().(*v1beta1.Coin)
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		x.RequestCount = int32(value.Int())
 	default:
@@ -2519,12 +3099,13 @@ func (x *fastReflection_FaucetInfoResponse) Set(fd protoreflect.FieldDescriptor,
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_FaucetInfoResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		if x.Balance == nil {
+			x.Balance = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.Balance.ProtoReflect())
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		panic(fmt.Errorf("field address of message sourcehub.faucet.FaucetInfoResponse is not mutable"))
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		panic(fmt.Errorf("field balance_amount of message sourcehub.faucet.FaucetInfoResponse is not mutable"))
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		panic(fmt.Errorf("field balance_denom of message sourcehub.faucet.FaucetInfoResponse is not mutable"))
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		panic(fmt.Errorf("field request_count of message sourcehub.faucet.FaucetInfoResponse is not mutable"))
 	default:
@@ -2542,10 +3123,9 @@ func (x *fastReflection_FaucetInfoResponse) NewField(fd protoreflect.FieldDescri
 	switch fd.FullName() {
 	case "sourcehub.faucet.FaucetInfoResponse.address":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.faucet.FaucetInfoResponse.balance_amount":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.faucet.FaucetInfoResponse.balance_denom":
-		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.FaucetInfoResponse.balance":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
 	case "sourcehub.faucet.FaucetInfoResponse.request_count":
 		return protoreflect.ValueOfInt32(int32(0))
 	default:
@@ -2621,12 +3201,8 @@ func (x *fastReflection_FaucetInfoResponse) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.BalanceAmount)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
-		l = len(x.BalanceDenom)
-		if l > 0 {
+		if x.Balance != nil {
+			l = options.Size(x.Balance)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
 		if x.RequestCount != 0 {
@@ -2664,19 +3240,19 @@ func (x *fastReflection_FaucetInfoResponse) ProtoMethods() *protoiface.Methods {
 		if x.RequestCount != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.RequestCount))
 			i--
-			dAtA[i] = 0x20
+			dAtA[i] = 0x18
 		}
-		if len(x.BalanceDenom) > 0 {
-			i -= len(x.BalanceDenom)
-			copy(dAtA[i:], x.BalanceDenom)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.BalanceDenom)))
-			i--
-			dAtA[i] = 0x1a
-		}
-		if len(x.BalanceAmount) > 0 {
-			i -= len(x.BalanceAmount)
-			copy(dAtA[i:], x.BalanceAmount)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.BalanceAmount)))
+		if x.Balance != nil {
+			encoded, err := options.Marshal(x.Balance)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
 			i--
 			dAtA[i] = 0x12
 		}
@@ -2770,9 +3346,9 @@ func (x *fastReflection_FaucetInfoResponse) ProtoMethods() *protoiface.Methods {
 				iNdEx = postIndex
 			case 2:
 				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BalanceAmount", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
 				}
-				var stringLen uint64
+				var msglen int
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -2782,57 +3358,29 @@ func (x *fastReflection_FaucetInfoResponse) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
+					msglen |= int(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
+				if msglen < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
-				postIndex := iNdEx + intStringLen
+				postIndex := iNdEx + msglen
 				if postIndex < 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
 				}
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.BalanceAmount = string(dAtA[iNdEx:postIndex])
+				if x.Balance == nil {
+					x.Balance = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Balance); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
 				iNdEx = postIndex
 			case 3:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BalanceDenom", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.BalanceDenom = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
-			case 4:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RequestCount", wireType)
 				}
@@ -2886,6 +3434,1404 @@ func (x *fastReflection_FaucetInfoResponse) ProtoMethods() *protoiface.Methods {
 	}
 }
 
+var (
+	md_GrantAllowanceRequest              protoreflect.MessageDescriptor
+	fd_GrantAllowanceRequest_address      protoreflect.FieldDescriptor
+	fd_GrantAllowanceRequest_amount_limit protoreflect.FieldDescriptor
+	fd_GrantAllowanceRequest_expiration   protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_faucet_faucet_proto_init()
+	md_GrantAllowanceRequest = File_sourcehub_faucet_faucet_proto.Messages().ByName("GrantAllowanceRequest")
+	fd_GrantAllowanceRequest_address = md_GrantAllowanceRequest.Fields().ByName("address")
+	fd_GrantAllowanceRequest_amount_limit = md_GrantAllowanceRequest.Fields().ByName("amount_limit")
+	fd_GrantAllowanceRequest_expiration = md_GrantAllowanceRequest.Fields().ByName("expiration")
+}
+
+var _ protoreflect.Message = (*fastReflection_GrantAllowanceRequest)(nil)
+
+type fastReflection_GrantAllowanceRequest GrantAllowanceRequest
+
+func (x *GrantAllowanceRequest) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_GrantAllowanceRequest)(x)
+}
+
+func (x *GrantAllowanceRequest) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_GrantAllowanceRequest_messageType fastReflection_GrantAllowanceRequest_messageType
+var _ protoreflect.MessageType = fastReflection_GrantAllowanceRequest_messageType{}
+
+type fastReflection_GrantAllowanceRequest_messageType struct{}
+
+func (x fastReflection_GrantAllowanceRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_GrantAllowanceRequest)(nil)
+}
+func (x fastReflection_GrantAllowanceRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_GrantAllowanceRequest)
+}
+func (x fastReflection_GrantAllowanceRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_GrantAllowanceRequest
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_GrantAllowanceRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_GrantAllowanceRequest
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_GrantAllowanceRequest) Type() protoreflect.MessageType {
+	return _fastReflection_GrantAllowanceRequest_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_GrantAllowanceRequest) New() protoreflect.Message {
+	return new(fastReflection_GrantAllowanceRequest)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_GrantAllowanceRequest) Interface() protoreflect.ProtoMessage {
+	return (*GrantAllowanceRequest)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_GrantAllowanceRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Address != "" {
+		value := protoreflect.ValueOfString(x.Address)
+		if !f(fd_GrantAllowanceRequest_address, value) {
+			return
+		}
+	}
+	if x.AmountLimit != nil {
+		value := protoreflect.ValueOfMessage(x.AmountLimit.ProtoReflect())
+		if !f(fd_GrantAllowanceRequest_amount_limit, value) {
+			return
+		}
+	}
+	if x.Expiration != int64(0) {
+		value := protoreflect.ValueOfInt64(x.Expiration)
+		if !f(fd_GrantAllowanceRequest_expiration, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_GrantAllowanceRequest) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		return x.Address != ""
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		return x.AmountLimit != nil
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		return x.Expiration != int64(0)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceRequest) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		x.Address = ""
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		x.AmountLimit = nil
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		x.Expiration = int64(0)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_GrantAllowanceRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		value := x.Address
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		value := x.AmountLimit
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		value := x.Expiration
+		return protoreflect.ValueOfInt64(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		x.Address = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		x.AmountLimit = value.Message().Interface().(*v1beta1.Coin)
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		x.Expiration = value.Int()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		if x.AmountLimit == nil {
+			x.AmountLimit = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.AmountLimit.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		panic(fmt.Errorf("field address of message sourcehub.faucet.GrantAllowanceRequest is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		panic(fmt.Errorf("field expiration of message sourcehub.faucet.GrantAllowanceRequest is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_GrantAllowanceRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceRequest.address":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceRequest.amount_limit":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceRequest.expiration":
+		return protoreflect.ValueOfInt64(int64(0))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceRequest"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_GrantAllowanceRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.faucet.GrantAllowanceRequest", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_GrantAllowanceRequest) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceRequest) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_GrantAllowanceRequest) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_GrantAllowanceRequest) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*GrantAllowanceRequest)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Address)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.AmountLimit != nil {
+			l = options.Size(x.AmountLimit)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Expiration != 0 {
+			n += 1 + runtime.Sov(uint64(x.Expiration))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*GrantAllowanceRequest)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Expiration != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Expiration))
+			i--
+			dAtA[i] = 0x18
+		}
+		if x.AmountLimit != nil {
+			encoded, err := options.Marshal(x.AmountLimit)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Address) > 0 {
+			i -= len(x.Address)
+			copy(dAtA[i:], x.Address)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Address)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*GrantAllowanceRequest)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GrantAllowanceRequest: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GrantAllowanceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Address = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.AmountLimit == nil {
+					x.AmountLimit = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.AmountLimit); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 3:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+				}
+				x.Expiration = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.Expiration |= int64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_GrantAllowanceResponse              protoreflect.MessageDescriptor
+	fd_GrantAllowanceResponse_message      protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_txhash       protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_code         protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_raw_log      protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_granter      protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_grantee      protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_amount_limit protoreflect.FieldDescriptor
+	fd_GrantAllowanceResponse_expiration   protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_faucet_faucet_proto_init()
+	md_GrantAllowanceResponse = File_sourcehub_faucet_faucet_proto.Messages().ByName("GrantAllowanceResponse")
+	fd_GrantAllowanceResponse_message = md_GrantAllowanceResponse.Fields().ByName("message")
+	fd_GrantAllowanceResponse_txhash = md_GrantAllowanceResponse.Fields().ByName("txhash")
+	fd_GrantAllowanceResponse_code = md_GrantAllowanceResponse.Fields().ByName("code")
+	fd_GrantAllowanceResponse_raw_log = md_GrantAllowanceResponse.Fields().ByName("raw_log")
+	fd_GrantAllowanceResponse_granter = md_GrantAllowanceResponse.Fields().ByName("granter")
+	fd_GrantAllowanceResponse_grantee = md_GrantAllowanceResponse.Fields().ByName("grantee")
+	fd_GrantAllowanceResponse_amount_limit = md_GrantAllowanceResponse.Fields().ByName("amount_limit")
+	fd_GrantAllowanceResponse_expiration = md_GrantAllowanceResponse.Fields().ByName("expiration")
+}
+
+var _ protoreflect.Message = (*fastReflection_GrantAllowanceResponse)(nil)
+
+type fastReflection_GrantAllowanceResponse GrantAllowanceResponse
+
+func (x *GrantAllowanceResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_GrantAllowanceResponse)(x)
+}
+
+func (x *GrantAllowanceResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_faucet_faucet_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_GrantAllowanceResponse_messageType fastReflection_GrantAllowanceResponse_messageType
+var _ protoreflect.MessageType = fastReflection_GrantAllowanceResponse_messageType{}
+
+type fastReflection_GrantAllowanceResponse_messageType struct{}
+
+func (x fastReflection_GrantAllowanceResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_GrantAllowanceResponse)(nil)
+}
+func (x fastReflection_GrantAllowanceResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_GrantAllowanceResponse)
+}
+func (x fastReflection_GrantAllowanceResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_GrantAllowanceResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_GrantAllowanceResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_GrantAllowanceResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_GrantAllowanceResponse) Type() protoreflect.MessageType {
+	return _fastReflection_GrantAllowanceResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_GrantAllowanceResponse) New() protoreflect.Message {
+	return new(fastReflection_GrantAllowanceResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_GrantAllowanceResponse) Interface() protoreflect.ProtoMessage {
+	return (*GrantAllowanceResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_GrantAllowanceResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Message != "" {
+		value := protoreflect.ValueOfString(x.Message)
+		if !f(fd_GrantAllowanceResponse_message, value) {
+			return
+		}
+	}
+	if x.Txhash != "" {
+		value := protoreflect.ValueOfString(x.Txhash)
+		if !f(fd_GrantAllowanceResponse_txhash, value) {
+			return
+		}
+	}
+	if x.Code != uint32(0) {
+		value := protoreflect.ValueOfUint32(x.Code)
+		if !f(fd_GrantAllowanceResponse_code, value) {
+			return
+		}
+	}
+	if x.RawLog != "" {
+		value := protoreflect.ValueOfString(x.RawLog)
+		if !f(fd_GrantAllowanceResponse_raw_log, value) {
+			return
+		}
+	}
+	if x.Granter != "" {
+		value := protoreflect.ValueOfString(x.Granter)
+		if !f(fd_GrantAllowanceResponse_granter, value) {
+			return
+		}
+	}
+	if x.Grantee != "" {
+		value := protoreflect.ValueOfString(x.Grantee)
+		if !f(fd_GrantAllowanceResponse_grantee, value) {
+			return
+		}
+	}
+	if x.AmountLimit != nil {
+		value := protoreflect.ValueOfMessage(x.AmountLimit.ProtoReflect())
+		if !f(fd_GrantAllowanceResponse_amount_limit, value) {
+			return
+		}
+	}
+	if x.Expiration != int64(0) {
+		value := protoreflect.ValueOfInt64(x.Expiration)
+		if !f(fd_GrantAllowanceResponse_expiration, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_GrantAllowanceResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		return x.Message != ""
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		return x.Txhash != ""
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		return x.Code != uint32(0)
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		return x.RawLog != ""
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		return x.Granter != ""
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		return x.Grantee != ""
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		return x.AmountLimit != nil
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		return x.Expiration != int64(0)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		x.Message = ""
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		x.Txhash = ""
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		x.Code = uint32(0)
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		x.RawLog = ""
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		x.Granter = ""
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		x.Grantee = ""
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		x.AmountLimit = nil
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		x.Expiration = int64(0)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_GrantAllowanceResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		value := x.Message
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		value := x.Txhash
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		value := x.Code
+		return protoreflect.ValueOfUint32(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		value := x.RawLog
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		value := x.Granter
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		value := x.Grantee
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		value := x.AmountLimit
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		value := x.Expiration
+		return protoreflect.ValueOfInt64(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		x.Message = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		x.Txhash = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		x.Code = uint32(value.Uint())
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		x.RawLog = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		x.Granter = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		x.Grantee = value.Interface().(string)
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		x.AmountLimit = value.Message().Interface().(*v1beta1.Coin)
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		x.Expiration = value.Int()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		if x.AmountLimit == nil {
+			x.AmountLimit = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.AmountLimit.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		panic(fmt.Errorf("field message of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		panic(fmt.Errorf("field txhash of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		panic(fmt.Errorf("field code of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		panic(fmt.Errorf("field raw_log of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		panic(fmt.Errorf("field granter of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		panic(fmt.Errorf("field grantee of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		panic(fmt.Errorf("field expiration of message sourcehub.faucet.GrantAllowanceResponse is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_GrantAllowanceResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.faucet.GrantAllowanceResponse.message":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceResponse.txhash":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceResponse.code":
+		return protoreflect.ValueOfUint32(uint32(0))
+	case "sourcehub.faucet.GrantAllowanceResponse.raw_log":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceResponse.granter":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceResponse.grantee":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.faucet.GrantAllowanceResponse.amount_limit":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	case "sourcehub.faucet.GrantAllowanceResponse.expiration":
+		return protoreflect.ValueOfInt64(int64(0))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.faucet.GrantAllowanceResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.faucet.GrantAllowanceResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_GrantAllowanceResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.faucet.GrantAllowanceResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_GrantAllowanceResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_GrantAllowanceResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_GrantAllowanceResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_GrantAllowanceResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*GrantAllowanceResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Message)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Txhash)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Code != 0 {
+			n += 1 + runtime.Sov(uint64(x.Code))
+		}
+		l = len(x.RawLog)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Granter)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Grantee)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.AmountLimit != nil {
+			l = options.Size(x.AmountLimit)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Expiration != 0 {
+			n += 1 + runtime.Sov(uint64(x.Expiration))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*GrantAllowanceResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Expiration != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Expiration))
+			i--
+			dAtA[i] = 0x40
+		}
+		if x.AmountLimit != nil {
+			encoded, err := options.Marshal(x.AmountLimit)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x3a
+		}
+		if len(x.Grantee) > 0 {
+			i -= len(x.Grantee)
+			copy(dAtA[i:], x.Grantee)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Grantee)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if len(x.Granter) > 0 {
+			i -= len(x.Granter)
+			copy(dAtA[i:], x.Granter)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Granter)))
+			i--
+			dAtA[i] = 0x2a
+		}
+		if len(x.RawLog) > 0 {
+			i -= len(x.RawLog)
+			copy(dAtA[i:], x.RawLog)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RawLog)))
+			i--
+			dAtA[i] = 0x22
+		}
+		if x.Code != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.Code))
+			i--
+			dAtA[i] = 0x18
+		}
+		if len(x.Txhash) > 0 {
+			i -= len(x.Txhash)
+			copy(dAtA[i:], x.Txhash)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Txhash)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Message) > 0 {
+			i -= len(x.Message)
+			copy(dAtA[i:], x.Message)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Message)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*GrantAllowanceResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GrantAllowanceResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: GrantAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Message = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Txhash", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Txhash = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				}
+				x.Code = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.Code |= uint32(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RawLog", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.RawLog = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Granter = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Grantee", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Grantee = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 7:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.AmountLimit == nil {
+					x.AmountLimit = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.AmountLimit); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			case 8:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+				}
+				x.Expiration = 0
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					x.Expiration |= int64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -2899,6 +4845,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// FaucetRequestRecord represents a faucet request record stored internally.
+type FaucetRequestRecord struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Address string        `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  *v1beta1.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount,omitempty"`
+	TxHash  string        `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
+}
+
+func (x *FaucetRequestRecord) Reset() {
+	*x = FaucetRequestRecord{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[0]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FaucetRequestRecord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FaucetRequestRecord) ProtoMessage() {}
+
+// Deprecated: Use FaucetRequestRecord.ProtoReflect.Descriptor instead.
+func (*FaucetRequestRecord) Descriptor() ([]byte, []int) {
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *FaucetRequestRecord) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *FaucetRequestRecord) GetAmount() *v1beta1.Coin {
+	if x != nil {
+		return x.Amount
+	}
+	return nil
+}
+
+func (x *FaucetRequestRecord) GetTxHash() string {
+	if x != nil {
+		return x.TxHash
+	}
+	return ""
+}
+
 // FaucetRequest represents a request to get funds from the faucet.
 type FaucetRequest struct {
 	state         protoimpl.MessageState
@@ -2911,7 +4909,7 @@ type FaucetRequest struct {
 func (x *FaucetRequest) Reset() {
 	*x = FaucetRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[0]
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2925,7 +4923,7 @@ func (*FaucetRequest) ProtoMessage() {}
 
 // Deprecated: Use FaucetRequest.ProtoReflect.Descriptor instead.
 func (*FaucetRequest) Descriptor() ([]byte, []int) {
-	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{0}
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *FaucetRequest) GetAddress() string {
@@ -2941,17 +4939,17 @@ type FaucetResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Txhash  string `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
-	Code    uint32 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
-	RawLog  string `protobuf:"bytes,3,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
-	Address string `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
-	Amount  string `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Txhash  string        `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code    uint32        `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog  string        `protobuf:"bytes,3,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Address string        `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  *v1beta1.Coin `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount,omitempty"`
 }
 
 func (x *FaucetResponse) Reset() {
 	*x = FaucetResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[1]
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -2965,7 +4963,7 @@ func (*FaucetResponse) ProtoMessage() {}
 
 // Deprecated: Use FaucetResponse.ProtoReflect.Descriptor instead.
 func (*FaucetResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{1}
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *FaucetResponse) GetTxhash() string {
@@ -2996,11 +4994,11 @@ func (x *FaucetResponse) GetAddress() string {
 	return ""
 }
 
-func (x *FaucetResponse) GetAmount() string {
+func (x *FaucetResponse) GetAmount() *v1beta1.Coin {
 	if x != nil {
 		return x.Amount
 	}
-	return ""
+	return nil
 }
 
 // InitAccountRequest represents a request to initialize an account.
@@ -3015,7 +5013,7 @@ type InitAccountRequest struct {
 func (x *InitAccountRequest) Reset() {
 	*x = InitAccountRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[2]
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3029,7 +5027,7 @@ func (*InitAccountRequest) ProtoMessage() {}
 
 // Deprecated: Use InitAccountRequest.ProtoReflect.Descriptor instead.
 func (*InitAccountRequest) Descriptor() ([]byte, []int) {
-	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{2}
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *InitAccountRequest) GetAddress() string {
@@ -3045,19 +5043,19 @@ type InitAccountResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Txhash  string `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
-	Code    uint32 `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
-	RawLog  string `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
-	Address string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
-	Amount  string `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
-	Exists  bool   `protobuf:"varint,7,opt,name=exists,proto3" json:"exists,omitempty"`
+	Message string        `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Txhash  string        `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code    uint32        `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog  string        `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Address string        `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  *v1beta1.Coin `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	Exists  bool          `protobuf:"varint,7,opt,name=exists,proto3" json:"exists,omitempty"`
 }
 
 func (x *InitAccountResponse) Reset() {
 	*x = InitAccountResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[3]
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3071,7 +5069,7 @@ func (*InitAccountResponse) ProtoMessage() {}
 
 // Deprecated: Use InitAccountResponse.ProtoReflect.Descriptor instead.
 func (*InitAccountResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{3}
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *InitAccountResponse) GetMessage() string {
@@ -3109,11 +5107,11 @@ func (x *InitAccountResponse) GetAddress() string {
 	return ""
 }
 
-func (x *InitAccountResponse) GetAmount() string {
+func (x *InitAccountResponse) GetAmount() *v1beta1.Coin {
 	if x != nil {
 		return x.Amount
 	}
-	return ""
+	return nil
 }
 
 func (x *InitAccountResponse) GetExists() bool {
@@ -3129,16 +5127,15 @@ type FaucetInfoResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Address       string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	BalanceAmount string `protobuf:"bytes,2,opt,name=balance_amount,json=balanceAmount,proto3" json:"balance_amount,omitempty"`
-	BalanceDenom  string `protobuf:"bytes,3,opt,name=balance_denom,json=balanceDenom,proto3" json:"balance_denom,omitempty"`
-	RequestCount  int32  `protobuf:"varint,4,opt,name=request_count,json=requestCount,proto3" json:"request_count,omitempty"`
+	Address      string        `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Balance      *v1beta1.Coin `protobuf:"bytes,2,opt,name=balance,proto3" json:"balance,omitempty"`
+	RequestCount int32         `protobuf:"varint,3,opt,name=request_count,json=requestCount,proto3" json:"request_count,omitempty"`
 }
 
 func (x *FaucetInfoResponse) Reset() {
 	*x = FaucetInfoResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[4]
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3152,7 +5149,7 @@ func (*FaucetInfoResponse) ProtoMessage() {}
 
 // Deprecated: Use FaucetInfoResponse.ProtoReflect.Descriptor instead.
 func (*FaucetInfoResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{4}
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FaucetInfoResponse) GetAddress() string {
@@ -3162,23 +5159,162 @@ func (x *FaucetInfoResponse) GetAddress() string {
 	return ""
 }
 
-func (x *FaucetInfoResponse) GetBalanceAmount() string {
+func (x *FaucetInfoResponse) GetBalance() *v1beta1.Coin {
 	if x != nil {
-		return x.BalanceAmount
+		return x.Balance
 	}
-	return ""
-}
-
-func (x *FaucetInfoResponse) GetBalanceDenom() string {
-	if x != nil {
-		return x.BalanceDenom
-	}
-	return ""
+	return nil
 }
 
 func (x *FaucetInfoResponse) GetRequestCount() int32 {
 	if x != nil {
 		return x.RequestCount
+	}
+	return 0
+}
+
+// GrantAllowanceRequest represents a request to grant fee allowance from the faucet.
+type GrantAllowanceRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	// Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
+	AmountLimit *v1beta1.Coin `protobuf:"bytes,2,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit,omitempty"`
+	// Optional expiration time in unix timestamp. If not provided, defaults to 30 days from now
+	Expiration int64 `protobuf:"varint,3,opt,name=expiration,proto3" json:"expiration,omitempty"`
+}
+
+func (x *GrantAllowanceRequest) Reset() {
+	*x = GrantAllowanceRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GrantAllowanceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantAllowanceRequest) ProtoMessage() {}
+
+// Deprecated: Use GrantAllowanceRequest.ProtoReflect.Descriptor instead.
+func (*GrantAllowanceRequest) Descriptor() ([]byte, []int) {
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GrantAllowanceRequest) GetAddress() string {
+	if x != nil {
+		return x.Address
+	}
+	return ""
+}
+
+func (x *GrantAllowanceRequest) GetAmountLimit() *v1beta1.Coin {
+	if x != nil {
+		return x.AmountLimit
+	}
+	return nil
+}
+
+func (x *GrantAllowanceRequest) GetExpiration() int64 {
+	if x != nil {
+		return x.Expiration
+	}
+	return 0
+}
+
+// GrantAllowanceResponse represents the response from a grant allowance request.
+type GrantAllowanceResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message     string        `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Txhash      string        `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code        uint32        `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog      string        `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Granter     string        `protobuf:"bytes,5,opt,name=granter,proto3" json:"granter,omitempty"`
+	Grantee     string        `protobuf:"bytes,6,opt,name=grantee,proto3" json:"grantee,omitempty"`
+	AmountLimit *v1beta1.Coin `protobuf:"bytes,7,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit,omitempty"`
+	Expiration  int64         `protobuf:"varint,8,opt,name=expiration,proto3" json:"expiration,omitempty"`
+}
+
+func (x *GrantAllowanceResponse) Reset() {
+	*x = GrantAllowanceResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_faucet_faucet_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GrantAllowanceResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GrantAllowanceResponse) ProtoMessage() {}
+
+// Deprecated: Use GrantAllowanceResponse.ProtoReflect.Descriptor instead.
+func (*GrantAllowanceResponse) Descriptor() ([]byte, []int) {
+	return file_sourcehub_faucet_faucet_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *GrantAllowanceResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GrantAllowanceResponse) GetTxhash() string {
+	if x != nil {
+		return x.Txhash
+	}
+	return ""
+}
+
+func (x *GrantAllowanceResponse) GetCode() uint32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GrantAllowanceResponse) GetRawLog() string {
+	if x != nil {
+		return x.RawLog
+	}
+	return ""
+}
+
+func (x *GrantAllowanceResponse) GetGranter() string {
+	if x != nil {
+		return x.Granter
+	}
+	return ""
+}
+
+func (x *GrantAllowanceResponse) GetGrantee() string {
+	if x != nil {
+		return x.Grantee
+	}
+	return ""
+}
+
+func (x *GrantAllowanceResponse) GetAmountLimit() *v1beta1.Coin {
+	if x != nil {
+		return x.AmountLimit
+	}
+	return nil
+}
+
+func (x *GrantAllowanceResponse) GetExpiration() int64 {
+	if x != nil {
+		return x.Expiration
 	}
 	return 0
 }
@@ -3189,54 +5325,100 @@ var file_sourcehub_faucet_faucet_proto_rawDesc = []byte{
 	0x0a, 0x1d, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x66, 0x61, 0x75, 0x63,
 	0x65, 0x74, 0x2f, 0x66, 0x61, 0x75, 0x63, 0x65, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12,
 	0x10, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x66, 0x61, 0x75, 0x63, 0x65,
-	0x74, 0x22, 0x29, 0x0a, 0x0d, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x87, 0x01, 0x0a,
-	0x0e, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x16, 0x0a, 0x06, 0x74, 0x78, 0x68, 0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x06, 0x74, 0x78, 0x68, 0x61, 0x73, 0x68, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72,
-	0x61, 0x77, 0x5f, 0x6c, 0x6f, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x61,
-	0x77, 0x4c, 0x6f, 0x67, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
-	0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x16,
-	0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
-	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x2e, 0x0a, 0x12, 0x49, 0x6e, 0x69, 0x74, 0x41, 0x63,
-	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07,
-	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0xbe, 0x01, 0x0a, 0x13, 0x49, 0x6e, 0x69, 0x74, 0x41,
-	0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18,
+	0x74, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x19, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x5f, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a,
+	0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67, 0x6f, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x62, 0x61,
+	0x73, 0x65, 0x2f, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2f, 0x63, 0x6f, 0x69, 0x6e, 0x2e,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x86, 0x01, 0x0a, 0x13, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x52, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x12, 0x18, 0x0a,
+	0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e,
+	0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
+	0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f,
+	0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x06, 0x61,
+	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x17, 0x0a, 0x07, 0x74, 0x78, 0x5f, 0x68, 0x61, 0x73, 0x68,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x78, 0x48, 0x61, 0x73, 0x68, 0x22, 0x29,
+	0x0a, 0x0d, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0xad, 0x01, 0x0a, 0x0e, 0x46, 0x61,
+	0x75, 0x63, 0x65, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x16, 0x0a, 0x06,
+	0x74, 0x78, 0x68, 0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x78,
+	0x68, 0x61, 0x73, 0x68, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0d, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x61, 0x77, 0x5f,
+	0x6c, 0x6f, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x61, 0x77, 0x4c, 0x6f,
+	0x67, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x61,
+	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a,
+	0x01, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x2e, 0x0a, 0x12, 0x49, 0x6e, 0x69,
+	0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
+	0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0xe4, 0x01, 0x0a, 0x13, 0x49, 0x6e,
+	0x69, 0x74, 0x41, 0x63, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x74,
+	0x78, 0x68, 0x61, 0x73, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x78, 0x68,
+	0x61, 0x73, 0x68, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x0d, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x61, 0x77, 0x5f, 0x6c,
+	0x6f, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x61, 0x77, 0x4c, 0x6f, 0x67,
+	0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3c, 0x0a, 0x06, 0x61, 0x6d,
+	0x6f, 0x75, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31,
+	0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01,
+	0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x65, 0x78, 0x69, 0x73,
+	0x74, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73,
+	0x22, 0x93, 0x01, 0x0a, 0x12, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x12, 0x3e, 0x0a, 0x07, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65,
+	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8,
+	0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x07, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63,
+	0x65, 0x12, 0x23, 0x0a, 0x0d, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f, 0x63, 0x6f, 0x75,
+	0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0c, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x22, 0x9a, 0x01, 0x0a, 0x15, 0x47, 0x72, 0x61, 0x6e, 0x74,
+	0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x18, 0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x47, 0x0a, 0x0c, 0x61, 0x6d,
+	0x6f, 0x75, 0x6e, 0x74, 0x5f, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b,
+	0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76,
+	0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f,
+	0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0b, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x4c, 0x69,
+	0x6d, 0x69, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a, 0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x22, 0x94, 0x02, 0x0a, 0x16, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x41, 0x6c, 0x6c,
+	0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18,
 	0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x74, 0x78, 0x68, 0x61,
 	0x73, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x74, 0x78, 0x68, 0x61, 0x73, 0x68,
 	0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04,
 	0x63, 0x6f, 0x64, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x61, 0x77, 0x5f, 0x6c, 0x6f, 0x67, 0x18,
 	0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x61, 0x77, 0x4c, 0x6f, 0x67, 0x12, 0x18, 0x0a,
-	0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
-	0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e,
-	0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12,
-	0x16, 0x0a, 0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52,
-	0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x22, 0x9f, 0x01, 0x0a, 0x12, 0x46, 0x61, 0x75, 0x63,
-	0x65, 0x74, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x18,
-	0x0a, 0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x25, 0x0a, 0x0e, 0x62, 0x61, 0x6c, 0x61,
-	0x6e, 0x63, 0x65, 0x5f, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x0d, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x41, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12,
-	0x23, 0x0a, 0x0d, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x5f, 0x64, 0x65, 0x6e, 0x6f, 0x6d,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x62, 0x61, 0x6c, 0x61, 0x6e, 0x63, 0x65, 0x44,
-	0x65, 0x6e, 0x6f, 0x6d, 0x12, 0x23, 0x0a, 0x0d, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x5f,
-	0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05, 0x52, 0x0c, 0x72, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x42, 0xa7, 0x01, 0x0a, 0x14, 0x63, 0x6f,
-	0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x66, 0x61, 0x75, 0x63,
-	0x65, 0x74, 0x42, 0x0b, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x21, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x66, 0x61,
-	0x75, 0x63, 0x65, 0x74, 0xa2, 0x02, 0x03, 0x53, 0x46, 0x58, 0xaa, 0x02, 0x10, 0x53, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0xca, 0x02, 0x10,
-	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74,
-	0xe2, 0x02, 0x1c, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x46, 0x61, 0x75,
-	0x63, 0x65, 0x74, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
-	0x02, 0x11, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x46, 0x61, 0x75,
-	0x63, 0x65, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x07, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
+	0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x67, 0x72, 0x61, 0x6e, 0x74,
+	0x65, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65,
+	0x65, 0x12, 0x47, 0x0a, 0x0c, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x5f, 0x6c, 0x69, 0x6d, 0x69,
+	0x74, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
+	0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f,
+	0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0b, 0x61,
+	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x65, 0x78,
+	0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x18, 0x08, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0a,
+	0x65, 0x78, 0x70, 0x69, 0x72, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x42, 0xa7, 0x01, 0x0a, 0x14, 0x63,
+	0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x66, 0x61, 0x75,
+	0x63, 0x65, 0x74, 0x42, 0x0b, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f,
+	0x50, 0x01, 0x5a, 0x21, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,
+	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x66,
+	0x61, 0x75, 0x63, 0x65, 0x74, 0xa2, 0x02, 0x03, 0x53, 0x46, 0x58, 0xaa, 0x02, 0x10, 0x53, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x46, 0x61, 0x75, 0x63, 0x65, 0x74, 0xca, 0x02,
+	0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x46, 0x61, 0x75, 0x63, 0x65,
+	0x74, 0xe2, 0x02, 0x1c, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x46, 0x61,
+	0x75, 0x63, 0x65, 0x74, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61,
+	0xea, 0x02, 0x11, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x46, 0x61,
+	0x75, 0x63, 0x65, 0x74, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -3251,20 +5433,30 @@ func file_sourcehub_faucet_faucet_proto_rawDescGZIP() []byte {
 	return file_sourcehub_faucet_faucet_proto_rawDescData
 }
 
-var file_sourcehub_faucet_faucet_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_sourcehub_faucet_faucet_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_sourcehub_faucet_faucet_proto_goTypes = []interface{}{
-	(*FaucetRequest)(nil),       // 0: sourcehub.faucet.FaucetRequest
-	(*FaucetResponse)(nil),      // 1: sourcehub.faucet.FaucetResponse
-	(*InitAccountRequest)(nil),  // 2: sourcehub.faucet.InitAccountRequest
-	(*InitAccountResponse)(nil), // 3: sourcehub.faucet.InitAccountResponse
-	(*FaucetInfoResponse)(nil),  // 4: sourcehub.faucet.FaucetInfoResponse
+	(*FaucetRequestRecord)(nil),    // 0: sourcehub.faucet.FaucetRequestRecord
+	(*FaucetRequest)(nil),          // 1: sourcehub.faucet.FaucetRequest
+	(*FaucetResponse)(nil),         // 2: sourcehub.faucet.FaucetResponse
+	(*InitAccountRequest)(nil),     // 3: sourcehub.faucet.InitAccountRequest
+	(*InitAccountResponse)(nil),    // 4: sourcehub.faucet.InitAccountResponse
+	(*FaucetInfoResponse)(nil),     // 5: sourcehub.faucet.FaucetInfoResponse
+	(*GrantAllowanceRequest)(nil),  // 6: sourcehub.faucet.GrantAllowanceRequest
+	(*GrantAllowanceResponse)(nil), // 7: sourcehub.faucet.GrantAllowanceResponse
+	(*v1beta1.Coin)(nil),           // 8: cosmos.base.v1beta1.Coin
 }
 var file_sourcehub_faucet_faucet_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	8, // 0: sourcehub.faucet.FaucetRequestRecord.amount:type_name -> cosmos.base.v1beta1.Coin
+	8, // 1: sourcehub.faucet.FaucetResponse.amount:type_name -> cosmos.base.v1beta1.Coin
+	8, // 2: sourcehub.faucet.InitAccountResponse.amount:type_name -> cosmos.base.v1beta1.Coin
+	8, // 3: sourcehub.faucet.FaucetInfoResponse.balance:type_name -> cosmos.base.v1beta1.Coin
+	8, // 4: sourcehub.faucet.GrantAllowanceRequest.amount_limit:type_name -> cosmos.base.v1beta1.Coin
+	8, // 5: sourcehub.faucet.GrantAllowanceResponse.amount_limit:type_name -> cosmos.base.v1beta1.Coin
+	6, // [6:6] is the sub-list for method output_type
+	6, // [6:6] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_faucet_faucet_proto_init() }
@@ -3274,7 +5466,7 @@ func file_sourcehub_faucet_faucet_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_sourcehub_faucet_faucet_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FaucetRequest); i {
+			switch v := v.(*FaucetRequestRecord); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3286,7 +5478,7 @@ func file_sourcehub_faucet_faucet_proto_init() {
 			}
 		}
 		file_sourcehub_faucet_faucet_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*FaucetResponse); i {
+			switch v := v.(*FaucetRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3298,7 +5490,7 @@ func file_sourcehub_faucet_faucet_proto_init() {
 			}
 		}
 		file_sourcehub_faucet_faucet_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InitAccountRequest); i {
+			switch v := v.(*FaucetResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3310,7 +5502,7 @@ func file_sourcehub_faucet_faucet_proto_init() {
 			}
 		}
 		file_sourcehub_faucet_faucet_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*InitAccountResponse); i {
+			switch v := v.(*InitAccountRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3322,7 +5514,43 @@ func file_sourcehub_faucet_faucet_proto_init() {
 			}
 		}
 		file_sourcehub_faucet_faucet_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*InitAccountResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_faucet_faucet_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*FaucetInfoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_faucet_faucet_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GrantAllowanceRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_faucet_faucet_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*GrantAllowanceResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -3340,7 +5568,7 @@ func file_sourcehub_faucet_faucet_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_faucet_faucet_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   5,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

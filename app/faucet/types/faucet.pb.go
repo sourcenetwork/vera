@@ -5,6 +5,10 @@ package types
 
 import (
 	fmt "fmt"
+	_ "github.com/cosmos/cosmos-proto"
+	types "github.com/cosmos/cosmos-sdk/types"
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
@@ -22,6 +26,67 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// FaucetRequestRecord represents a faucet request record stored internally.
+type FaucetRequestRecord struct {
+	Address string     `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  types.Coin `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
+	TxHash  string     `protobuf:"bytes,3,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
+}
+
+func (m *FaucetRequestRecord) Reset()         { *m = FaucetRequestRecord{} }
+func (m *FaucetRequestRecord) String() string { return proto.CompactTextString(m) }
+func (*FaucetRequestRecord) ProtoMessage()    {}
+func (*FaucetRequestRecord) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b854b66c8024df8a, []int{0}
+}
+func (m *FaucetRequestRecord) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *FaucetRequestRecord) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_FaucetRequestRecord.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *FaucetRequestRecord) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FaucetRequestRecord.Merge(m, src)
+}
+func (m *FaucetRequestRecord) XXX_Size() int {
+	return m.Size()
+}
+func (m *FaucetRequestRecord) XXX_DiscardUnknown() {
+	xxx_messageInfo_FaucetRequestRecord.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FaucetRequestRecord proto.InternalMessageInfo
+
+func (m *FaucetRequestRecord) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
+}
+
+func (m *FaucetRequestRecord) GetAmount() types.Coin {
+	if m != nil {
+		return m.Amount
+	}
+	return types.Coin{}
+}
+
+func (m *FaucetRequestRecord) GetTxHash() string {
+	if m != nil {
+		return m.TxHash
+	}
+	return ""
+}
+
 // FaucetRequest represents a request to get funds from the faucet.
 type FaucetRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
@@ -31,7 +96,7 @@ func (m *FaucetRequest) Reset()         { *m = FaucetRequest{} }
 func (m *FaucetRequest) String() string { return proto.CompactTextString(m) }
 func (*FaucetRequest) ProtoMessage()    {}
 func (*FaucetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b854b66c8024df8a, []int{0}
+	return fileDescriptor_b854b66c8024df8a, []int{1}
 }
 func (m *FaucetRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -69,18 +134,18 @@ func (m *FaucetRequest) GetAddress() string {
 
 // FaucetResponse represents the response from a faucet request.
 type FaucetResponse struct {
-	Txhash  string `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
-	Code    uint32 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
-	RawLog  string `protobuf:"bytes,3,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
-	Address string `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
-	Amount  string `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Txhash  string     `protobuf:"bytes,1,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code    uint32     `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog  string     `protobuf:"bytes,3,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Address string     `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  types.Coin `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount"`
 }
 
 func (m *FaucetResponse) Reset()         { *m = FaucetResponse{} }
 func (m *FaucetResponse) String() string { return proto.CompactTextString(m) }
 func (*FaucetResponse) ProtoMessage()    {}
 func (*FaucetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b854b66c8024df8a, []int{1}
+	return fileDescriptor_b854b66c8024df8a, []int{2}
 }
 func (m *FaucetResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -137,11 +202,11 @@ func (m *FaucetResponse) GetAddress() string {
 	return ""
 }
 
-func (m *FaucetResponse) GetAmount() string {
+func (m *FaucetResponse) GetAmount() types.Coin {
 	if m != nil {
 		return m.Amount
 	}
-	return ""
+	return types.Coin{}
 }
 
 // InitAccountRequest represents a request to initialize an account.
@@ -153,7 +218,7 @@ func (m *InitAccountRequest) Reset()         { *m = InitAccountRequest{} }
 func (m *InitAccountRequest) String() string { return proto.CompactTextString(m) }
 func (*InitAccountRequest) ProtoMessage()    {}
 func (*InitAccountRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b854b66c8024df8a, []int{2}
+	return fileDescriptor_b854b66c8024df8a, []int{3}
 }
 func (m *InitAccountRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -191,20 +256,20 @@ func (m *InitAccountRequest) GetAddress() string {
 
 // InitAccountResponse represents the response from an account initialization request.
 type InitAccountResponse struct {
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Txhash  string `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
-	Code    uint32 `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
-	RawLog  string `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
-	Address string `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
-	Amount  string `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
-	Exists  bool   `protobuf:"varint,7,opt,name=exists,proto3" json:"exists,omitempty"`
+	Message string     `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Txhash  string     `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code    uint32     `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog  string     `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Address string     `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
+	Amount  types.Coin `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount"`
+	Exists  bool       `protobuf:"varint,7,opt,name=exists,proto3" json:"exists,omitempty"`
 }
 
 func (m *InitAccountResponse) Reset()         { *m = InitAccountResponse{} }
 func (m *InitAccountResponse) String() string { return proto.CompactTextString(m) }
 func (*InitAccountResponse) ProtoMessage()    {}
 func (*InitAccountResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b854b66c8024df8a, []int{3}
+	return fileDescriptor_b854b66c8024df8a, []int{4}
 }
 func (m *InitAccountResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -268,11 +333,11 @@ func (m *InitAccountResponse) GetAddress() string {
 	return ""
 }
 
-func (m *InitAccountResponse) GetAmount() string {
+func (m *InitAccountResponse) GetAmount() types.Coin {
 	if m != nil {
 		return m.Amount
 	}
-	return ""
+	return types.Coin{}
 }
 
 func (m *InitAccountResponse) GetExists() bool {
@@ -284,17 +349,16 @@ func (m *InitAccountResponse) GetExists() bool {
 
 // FaucetInfoResponse represents the faucet information response.
 type FaucetInfoResponse struct {
-	Address       string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	BalanceAmount string `protobuf:"bytes,2,opt,name=balance_amount,json=balanceAmount,proto3" json:"balance_amount,omitempty"`
-	BalanceDenom  string `protobuf:"bytes,3,opt,name=balance_denom,json=balanceDenom,proto3" json:"balance_denom,omitempty"`
-	RequestCount  int32  `protobuf:"varint,4,opt,name=request_count,json=requestCount,proto3" json:"request_count,omitempty"`
+	Address      string     `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Balance      types.Coin `protobuf:"bytes,2,opt,name=balance,proto3" json:"balance"`
+	RequestCount int32      `protobuf:"varint,3,opt,name=request_count,json=requestCount,proto3" json:"request_count,omitempty"`
 }
 
 func (m *FaucetInfoResponse) Reset()         { *m = FaucetInfoResponse{} }
 func (m *FaucetInfoResponse) String() string { return proto.CompactTextString(m) }
 func (*FaucetInfoResponse) ProtoMessage()    {}
 func (*FaucetInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b854b66c8024df8a, []int{4}
+	return fileDescriptor_b854b66c8024df8a, []int{5}
 }
 func (m *FaucetInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -330,18 +394,11 @@ func (m *FaucetInfoResponse) GetAddress() string {
 	return ""
 }
 
-func (m *FaucetInfoResponse) GetBalanceAmount() string {
+func (m *FaucetInfoResponse) GetBalance() types.Coin {
 	if m != nil {
-		return m.BalanceAmount
+		return m.Balance
 	}
-	return ""
-}
-
-func (m *FaucetInfoResponse) GetBalanceDenom() string {
-	if m != nil {
-		return m.BalanceDenom
-	}
-	return ""
+	return types.Coin{}
 }
 
 func (m *FaucetInfoResponse) GetRequestCount() int32 {
@@ -351,42 +408,268 @@ func (m *FaucetInfoResponse) GetRequestCount() int32 {
 	return 0
 }
 
+// GrantAllowanceRequest represents a request to grant fee allowance from the faucet.
+type GrantAllowanceRequest struct {
+	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	// Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
+	AmountLimit types.Coin `protobuf:"bytes,2,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
+	// Optional expiration time in unix timestamp. If not provided, defaults to 30 days from now
+	Expiration int64 `protobuf:"varint,3,opt,name=expiration,proto3" json:"expiration,omitempty"`
+}
+
+func (m *GrantAllowanceRequest) Reset()         { *m = GrantAllowanceRequest{} }
+func (m *GrantAllowanceRequest) String() string { return proto.CompactTextString(m) }
+func (*GrantAllowanceRequest) ProtoMessage()    {}
+func (*GrantAllowanceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b854b66c8024df8a, []int{6}
+}
+func (m *GrantAllowanceRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GrantAllowanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GrantAllowanceRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GrantAllowanceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GrantAllowanceRequest.Merge(m, src)
+}
+func (m *GrantAllowanceRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GrantAllowanceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GrantAllowanceRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GrantAllowanceRequest proto.InternalMessageInfo
+
+func (m *GrantAllowanceRequest) GetAddress() string {
+	if m != nil {
+		return m.Address
+	}
+	return ""
+}
+
+func (m *GrantAllowanceRequest) GetAmountLimit() types.Coin {
+	if m != nil {
+		return m.AmountLimit
+	}
+	return types.Coin{}
+}
+
+func (m *GrantAllowanceRequest) GetExpiration() int64 {
+	if m != nil {
+		return m.Expiration
+	}
+	return 0
+}
+
+// GrantAllowanceResponse represents the response from a grant allowance request.
+type GrantAllowanceResponse struct {
+	Message     string     `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Txhash      string     `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code        uint32     `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog      string     `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Granter     string     `protobuf:"bytes,5,opt,name=granter,proto3" json:"granter,omitempty"`
+	Grantee     string     `protobuf:"bytes,6,opt,name=grantee,proto3" json:"grantee,omitempty"`
+	AmountLimit types.Coin `protobuf:"bytes,7,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
+	Expiration  int64      `protobuf:"varint,8,opt,name=expiration,proto3" json:"expiration,omitempty"`
+}
+
+func (m *GrantAllowanceResponse) Reset()         { *m = GrantAllowanceResponse{} }
+func (m *GrantAllowanceResponse) String() string { return proto.CompactTextString(m) }
+func (*GrantAllowanceResponse) ProtoMessage()    {}
+func (*GrantAllowanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b854b66c8024df8a, []int{7}
+}
+func (m *GrantAllowanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GrantAllowanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GrantAllowanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GrantAllowanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GrantAllowanceResponse.Merge(m, src)
+}
+func (m *GrantAllowanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *GrantAllowanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GrantAllowanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GrantAllowanceResponse proto.InternalMessageInfo
+
+func (m *GrantAllowanceResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+func (m *GrantAllowanceResponse) GetTxhash() string {
+	if m != nil {
+		return m.Txhash
+	}
+	return ""
+}
+
+func (m *GrantAllowanceResponse) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
+	return 0
+}
+
+func (m *GrantAllowanceResponse) GetRawLog() string {
+	if m != nil {
+		return m.RawLog
+	}
+	return ""
+}
+
+func (m *GrantAllowanceResponse) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *GrantAllowanceResponse) GetGrantee() string {
+	if m != nil {
+		return m.Grantee
+	}
+	return ""
+}
+
+func (m *GrantAllowanceResponse) GetAmountLimit() types.Coin {
+	if m != nil {
+		return m.AmountLimit
+	}
+	return types.Coin{}
+}
+
+func (m *GrantAllowanceResponse) GetExpiration() int64 {
+	if m != nil {
+		return m.Expiration
+	}
+	return 0
+}
+
 func init() {
+	proto.RegisterType((*FaucetRequestRecord)(nil), "sourcehub.faucet.FaucetRequestRecord")
 	proto.RegisterType((*FaucetRequest)(nil), "sourcehub.faucet.FaucetRequest")
 	proto.RegisterType((*FaucetResponse)(nil), "sourcehub.faucet.FaucetResponse")
 	proto.RegisterType((*InitAccountRequest)(nil), "sourcehub.faucet.InitAccountRequest")
 	proto.RegisterType((*InitAccountResponse)(nil), "sourcehub.faucet.InitAccountResponse")
 	proto.RegisterType((*FaucetInfoResponse)(nil), "sourcehub.faucet.FaucetInfoResponse")
+	proto.RegisterType((*GrantAllowanceRequest)(nil), "sourcehub.faucet.GrantAllowanceRequest")
+	proto.RegisterType((*GrantAllowanceResponse)(nil), "sourcehub.faucet.GrantAllowanceResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/faucet/faucet.proto", fileDescriptor_b854b66c8024df8a) }
 
 var fileDescriptor_b854b66c8024df8a = []byte{
-	// 380 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x92, 0xcf, 0x4e, 0xf2, 0x40,
-	0x14, 0xc5, 0x19, 0xfe, 0xf5, 0xfb, 0x26, 0x40, 0xcc, 0x98, 0x68, 0x37, 0x36, 0xa4, 0xc6, 0x04,
-	0x37, 0xb0, 0xe0, 0x09, 0x50, 0x63, 0x42, 0xa2, 0x9b, 0x2e, 0xdd, 0x34, 0x43, 0x7b, 0x29, 0x44,
-	0xda, 0xa9, 0x33, 0xd3, 0x80, 0x4f, 0xe0, 0xd6, 0x37, 0xf0, 0x4d, 0x5c, 0xbb, 0x64, 0xe9, 0xd2,
-	0xc0, 0x8b, 0x98, 0xe9, 0x4c, 0xb5, 0x24, 0x10, 0x57, 0x9d, 0x73, 0x7a, 0xa7, 0xf7, 0xfe, 0x6e,
-	0x0f, 0x3e, 0x13, 0x2c, 0xe3, 0x01, 0xcc, 0xb2, 0xc9, 0x60, 0x4a, 0xb3, 0x00, 0xa4, 0x79, 0xf4,
-	0x53, 0xce, 0x24, 0x23, 0x47, 0x3f, 0xaf, 0xfb, 0xda, 0x77, 0x2f, 0x71, 0xfb, 0x36, 0x3f, 0x79,
-	0xf0, 0x94, 0x81, 0x90, 0xc4, 0xc6, 0x16, 0x0d, 0x43, 0x0e, 0x42, 0xd8, 0xa8, 0x8b, 0x7a, 0xff,
-	0xbd, 0x42, 0xba, 0x2f, 0x08, 0x77, 0x8a, 0x5a, 0x91, 0xb2, 0x44, 0x00, 0x39, 0xc1, 0x4d, 0xb9,
-	0x9a, 0x51, 0x31, 0x33, 0xb5, 0x46, 0x11, 0x82, 0xeb, 0x01, 0x0b, 0xc1, 0xae, 0x76, 0x51, 0xaf,
-	0xed, 0xe5, 0x67, 0x72, 0x8a, 0x2d, 0x4e, 0x97, 0xfe, 0x82, 0x45, 0x76, 0x4d, 0x17, 0x73, 0xba,
-	0xbc, 0x63, 0x51, 0xb9, 0x63, 0x7d, 0xa7, 0xa3, 0xfa, 0x3c, 0x8d, 0x59, 0x96, 0x48, 0xbb, 0xa1,
-	0x6f, 0x68, 0xe5, 0xf6, 0x31, 0x19, 0x27, 0x73, 0x39, 0x0a, 0x02, 0x25, 0xff, 0x9e, 0xfc, 0x1d,
-	0xe1, 0xe3, 0x9d, 0x0b, 0x66, 0x7c, 0x1b, 0x5b, 0x31, 0x08, 0x41, 0x23, 0x28, 0x6e, 0x18, 0x59,
-	0x02, 0xab, 0xee, 0x05, 0xab, 0xed, 0x07, 0xab, 0x1f, 0x02, 0x6b, 0x1c, 0x02, 0x6b, 0x96, 0xc1,
-	0x94, 0x0f, 0xab, 0xb9, 0x90, 0xc2, 0xb6, 0xba, 0xa8, 0xf7, 0xcf, 0x33, 0xca, 0x7d, 0x43, 0x98,
-	0xe8, 0xd5, 0x8f, 0x93, 0x29, 0x2b, 0xcf, 0xbf, 0x9f, 0x98, 0x5c, 0xe0, 0xce, 0x84, 0x2e, 0x68,
-	0x12, 0x80, 0x6f, 0x1a, 0x69, 0x8e, 0xb6, 0x71, 0x47, 0xba, 0xdf, 0x39, 0x2e, 0x0c, 0x3f, 0x84,
-	0x84, 0xc5, 0xe6, 0xcf, 0xb4, 0x8c, 0x79, 0xa3, 0x3c, 0x55, 0xc4, 0xf5, 0x8a, 0xfd, 0x7c, 0x7d,
-	0x39, 0x65, 0xc3, 0x6b, 0x19, 0xf3, 0x5a, 0x79, 0x57, 0xf7, 0x1f, 0x1b, 0x07, 0xad, 0x37, 0x0e,
-	0xfa, 0xda, 0x38, 0xe8, 0x75, 0xeb, 0x54, 0xd6, 0x5b, 0xa7, 0xf2, 0xb9, 0x75, 0x2a, 0x0f, 0xc3,
-	0x68, 0x2e, 0x55, 0xe0, 0x02, 0x16, 0x0f, 0x74, 0xfc, 0x12, 0x90, 0x4b, 0xc6, 0x1f, 0x07, 0xbf,
-	0x59, 0xa5, 0x69, 0x5a, 0xe4, 0x55, 0x3e, 0xa7, 0x20, 0x26, 0xcd, 0x3c, 0xaf, 0xc3, 0xef, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0x60, 0x61, 0x83, 0x65, 0xd0, 0x02, 0x00, 0x00,
+	// 568 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
+	0x10, 0xce, 0xe6, 0xc7, 0x6e, 0xb7, 0x0d, 0x82, 0x2d, 0x04, 0xb7, 0x12, 0x26, 0x32, 0x97, 0xc0,
+	0xc1, 0x56, 0xe9, 0x15, 0x21, 0xb5, 0x95, 0x28, 0x95, 0xca, 0xc5, 0x47, 0x2e, 0xd1, 0xc6, 0xd9,
+	0x3a, 0x16, 0xb1, 0xc7, 0xec, 0x6e, 0x48, 0x78, 0x01, 0xce, 0x48, 0x70, 0xe2, 0x09, 0xb8, 0x20,
+	0xf1, 0x18, 0x3d, 0xf6, 0xc8, 0x09, 0xa1, 0x04, 0x89, 0xd7, 0x40, 0xde, 0x5d, 0xb7, 0x69, 0x69,
+	0x54, 0x05, 0x21, 0x2e, 0xc9, 0x7e, 0x33, 0x3b, 0x3b, 0xdf, 0x37, 0x33, 0x1e, 0x7c, 0x4f, 0xc0,
+	0x88, 0x47, 0x6c, 0x30, 0xea, 0x05, 0xc7, 0x74, 0x14, 0x31, 0x69, 0xfe, 0xfc, 0x9c, 0x83, 0x04,
+	0x72, 0xf3, 0xcc, 0xed, 0x6b, 0xfb, 0xd6, 0x2d, 0x9a, 0x26, 0x19, 0x04, 0xea, 0x57, 0x5f, 0xda,
+	0xda, 0x8c, 0x40, 0xa4, 0x20, 0xba, 0x0a, 0x05, 0x1a, 0x18, 0xd7, 0xed, 0x18, 0x62, 0xd0, 0xf6,
+	0xe2, 0x64, 0xac, 0xae, 0xbe, 0x13, 0xf4, 0xa8, 0x60, 0xc1, 0x9b, 0xed, 0x1e, 0x93, 0x74, 0x3b,
+	0x88, 0x20, 0xc9, 0xb4, 0xdf, 0x7b, 0x87, 0xf0, 0xc6, 0x33, 0x95, 0x2e, 0x64, 0xaf, 0x47, 0x4c,
+	0xc8, 0x90, 0x45, 0xc0, 0xfb, 0xc4, 0xc1, 0x36, 0xed, 0xf7, 0x39, 0x13, 0xc2, 0x41, 0x6d, 0xd4,
+	0x59, 0x0d, 0x4b, 0x48, 0x9e, 0x60, 0x8b, 0xa6, 0x30, 0xca, 0xa4, 0x53, 0x6d, 0xa3, 0xce, 0xda,
+	0xe3, 0x4d, 0xdf, 0xd0, 0x28, 0x52, 0xf8, 0x26, 0x85, 0xbf, 0x0f, 0x49, 0xb6, 0xb7, 0x7a, 0xf2,
+	0xfd, 0x7e, 0xe5, 0xf3, 0xaf, 0xaf, 0x8f, 0x50, 0x68, 0x62, 0xc8, 0x5d, 0x6c, 0xcb, 0x49, 0x77,
+	0x40, 0xc5, 0xc0, 0xa9, 0xa9, 0x77, 0x2d, 0x39, 0x79, 0x4e, 0xc5, 0xc0, 0x7b, 0x88, 0x9b, 0x17,
+	0x78, 0x2c, 0x66, 0xe0, 0x7d, 0x41, 0xf8, 0x46, 0x79, 0x57, 0xe4, 0x90, 0x09, 0x46, 0x5a, 0xd8,
+	0x92, 0x13, 0xf5, 0x2a, 0x2a, 0x5f, 0x2d, 0x10, 0x21, 0xb8, 0x1e, 0x41, 0x9f, 0x29, 0xaa, 0xcd,
+	0x50, 0x9d, 0x0b, 0x0a, 0x9c, 0x8e, 0xbb, 0x43, 0x88, 0x4b, 0x0a, 0x9c, 0x8e, 0x8f, 0x20, 0x9e,
+	0xcf, 0x58, 0x5f, 0xa4, 0xb9, 0xb1, 0xbc, 0x66, 0xcf, 0xc7, 0xe4, 0x30, 0x4b, 0xe4, 0x6e, 0x14,
+	0x15, 0xf0, 0x7a, 0x7d, 0x3f, 0x11, 0xde, 0xb8, 0x10, 0x60, 0x44, 0x3a, 0xd8, 0x4e, 0x99, 0x10,
+	0x34, 0x66, 0x65, 0x84, 0x81, 0x73, 0xf2, 0xab, 0x57, 0xca, 0xaf, 0x5d, 0x2d, 0xbf, 0xbe, 0x48,
+	0x7e, 0x63, 0x91, 0x7c, 0xeb, 0x2f, 0x5a, 0xde, 0xc2, 0x16, 0x9b, 0x24, 0x42, 0x0a, 0xc7, 0x6e,
+	0xa3, 0xce, 0x4a, 0x68, 0x90, 0xf7, 0x01, 0x61, 0xa2, 0xdb, 0x78, 0x98, 0x1d, 0xc3, 0xbc, 0xca,
+	0x05, 0x93, 0xf7, 0x14, 0xdb, 0x3d, 0x3a, 0xa4, 0x59, 0xc4, 0x96, 0x1a, 0xbd, 0x32, 0x88, 0x3c,
+	0xc0, 0x4d, 0xae, 0x8b, 0xdf, 0x55, 0x85, 0x55, 0x65, 0x69, 0x84, 0xeb, 0xc6, 0xb8, 0xaf, 0x9a,
+	0xf5, 0x09, 0xe1, 0x3b, 0x07, 0x9c, 0x66, 0x72, 0x77, 0x38, 0x84, 0x71, 0x11, 0x77, 0x6d, 0xc3,
+	0xc8, 0x01, 0x5e, 0xd7, 0x5a, 0xbb, 0xc3, 0x24, 0x4d, 0x96, 0xfb, 0x30, 0xd6, 0x74, 0xe4, 0x51,
+	0x11, 0x48, 0x5c, 0x8c, 0xd9, 0x24, 0x4f, 0x38, 0x95, 0x09, 0x64, 0x8a, 0x5e, 0x2d, 0x9c, 0xb3,
+	0x78, 0x1f, 0xab, 0xb8, 0x75, 0x99, 0xdc, 0x7f, 0x1b, 0x8e, 0xb8, 0x48, 0xcc, 0x78, 0x39, 0x1c,
+	0x06, 0x9e, 0x7b, 0x98, 0x9a, 0x8e, 0x33, 0x0f, 0xfb, 0xa3, 0x2c, 0xf6, 0xbf, 0x29, 0xcb, 0xca,
+	0xe5, 0xb2, 0xec, 0xbd, 0x38, 0x99, 0xba, 0xe8, 0x74, 0xea, 0xa2, 0x1f, 0x53, 0x17, 0xbd, 0x9f,
+	0xb9, 0x95, 0xd3, 0x99, 0x5b, 0xf9, 0x36, 0x73, 0x2b, 0x2f, 0x77, 0xe2, 0x44, 0x16, 0x1b, 0x35,
+	0x82, 0x34, 0xd0, 0xfb, 0x35, 0x63, 0x72, 0x0c, 0xfc, 0x55, 0x70, 0xbe, 0x8c, 0x69, 0x9e, 0x97,
+	0x0b, 0x59, 0xbe, 0xcd, 0x99, 0xe8, 0x59, 0x6a, 0x35, 0xee, 0xfc, 0x0e, 0x00, 0x00, 0xff, 0xff,
+	0xfd, 0x72, 0x25, 0xba, 0xb1, 0x05, 0x00, 0x00,
+}
+
+func (m *FaucetRequestRecord) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *FaucetRequestRecord) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *FaucetRequestRecord) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.TxHash) > 0 {
+		i -= len(m.TxHash)
+		copy(dAtA[i:], m.TxHash)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.TxHash)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
 }
 
 func (m *FaucetRequest) Marshal() (dAtA []byte, err error) {
@@ -439,13 +722,16 @@ func (m *FaucetResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Amount)))
-		i--
-		dAtA[i] = 0x2a
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x2a
 	if len(m.Address) > 0 {
 		i -= len(m.Address)
 		copy(dAtA[i:], m.Address)
@@ -535,13 +821,16 @@ func (m *InitAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x38
 	}
-	if len(m.Amount) > 0 {
-		i -= len(m.Amount)
-		copy(dAtA[i:], m.Amount)
-		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Amount)))
-		i--
-		dAtA[i] = 0x32
+	{
+		size, err := m.Amount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x32
 	if len(m.Address) > 0 {
 		i -= len(m.Address)
 		copy(dAtA[i:], m.Address)
@@ -601,26 +890,145 @@ func (m *FaucetInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.RequestCount != 0 {
 		i = encodeVarintFaucet(dAtA, i, uint64(m.RequestCount))
 		i--
-		dAtA[i] = 0x20
+		dAtA[i] = 0x18
 	}
-	if len(m.BalanceDenom) > 0 {
-		i -= len(m.BalanceDenom)
-		copy(dAtA[i:], m.BalanceDenom)
-		i = encodeVarintFaucet(dAtA, i, uint64(len(m.BalanceDenom)))
-		i--
-		dAtA[i] = 0x1a
+	{
+		size, err := m.Balance.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
 	}
-	if len(m.BalanceAmount) > 0 {
-		i -= len(m.BalanceAmount)
-		copy(dAtA[i:], m.BalanceAmount)
-		i = encodeVarintFaucet(dAtA, i, uint64(len(m.BalanceAmount)))
-		i--
-		dAtA[i] = 0x12
-	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Address) > 0 {
 		i -= len(m.Address)
 		copy(dAtA[i:], m.Address)
 		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GrantAllowanceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GrantAllowanceRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GrantAllowanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Expiration != 0 {
+		i = encodeVarintFaucet(dAtA, i, uint64(m.Expiration))
+		i--
+		dAtA[i] = 0x18
+	}
+	{
+		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Address) > 0 {
+		i -= len(m.Address)
+		copy(dAtA[i:], m.Address)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Address)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GrantAllowanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GrantAllowanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GrantAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Expiration != 0 {
+		i = encodeVarintFaucet(dAtA, i, uint64(m.Expiration))
+		i--
+		dAtA[i] = 0x40
+	}
+	{
+		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	if len(m.Grantee) > 0 {
+		i -= len(m.Grantee)
+		copy(dAtA[i:], m.Grantee)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Grantee)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.RawLog) > 0 {
+		i -= len(m.RawLog)
+		copy(dAtA[i:], m.RawLog)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.RawLog)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.Code != 0 {
+		i = encodeVarintFaucet(dAtA, i, uint64(m.Code))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Txhash) > 0 {
+		i -= len(m.Txhash)
+		copy(dAtA[i:], m.Txhash)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Txhash)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Message)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -638,6 +1046,25 @@ func encodeVarintFaucet(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *FaucetRequestRecord) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = m.Amount.Size()
+	n += 1 + l + sovFaucet(uint64(l))
+	l = len(m.TxHash)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	return n
+}
+
 func (m *FaucetRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -672,10 +1099,8 @@ func (m *FaucetResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovFaucet(uint64(l))
 	}
-	l = len(m.Amount)
-	if l > 0 {
-		n += 1 + l + sovFaucet(uint64(l))
-	}
+	l = m.Amount.Size()
+	n += 1 + l + sovFaucet(uint64(l))
 	return n
 }
 
@@ -717,10 +1142,8 @@ func (m *InitAccountResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovFaucet(uint64(l))
 	}
-	l = len(m.Amount)
-	if l > 0 {
-		n += 1 + l + sovFaucet(uint64(l))
-	}
+	l = m.Amount.Size()
+	n += 1 + l + sovFaucet(uint64(l))
 	if m.Exists {
 		n += 2
 	}
@@ -737,16 +1160,65 @@ func (m *FaucetInfoResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovFaucet(uint64(l))
 	}
-	l = len(m.BalanceAmount)
-	if l > 0 {
-		n += 1 + l + sovFaucet(uint64(l))
-	}
-	l = len(m.BalanceDenom)
-	if l > 0 {
-		n += 1 + l + sovFaucet(uint64(l))
-	}
+	l = m.Balance.Size()
+	n += 1 + l + sovFaucet(uint64(l))
 	if m.RequestCount != 0 {
 		n += 1 + sovFaucet(uint64(m.RequestCount))
+	}
+	return n
+}
+
+func (m *GrantAllowanceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Address)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = m.AmountLimit.Size()
+	n += 1 + l + sovFaucet(uint64(l))
+	if m.Expiration != 0 {
+		n += 1 + sovFaucet(uint64(m.Expiration))
+	}
+	return n
+}
+
+func (m *GrantAllowanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.Txhash)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	if m.Code != 0 {
+		n += 1 + sovFaucet(uint64(m.Code))
+	}
+	l = len(m.RawLog)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.Grantee)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = m.AmountLimit.Size()
+	n += 1 + l + sovFaucet(uint64(l))
+	if m.Expiration != 0 {
+		n += 1 + sovFaucet(uint64(m.Expiration))
 	}
 	return n
 }
@@ -756,6 +1228,153 @@ func sovFaucet(x uint64) (n int) {
 }
 func sozFaucet(x uint64) (n int) {
 	return sovFaucet(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *FaucetRequestRecord) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFaucet
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: FaucetRequestRecord: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: FaucetRequestRecord: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field TxHash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.TxHash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFaucet(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *FaucetRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -987,7 +1606,7 @@ func (m *FaucetResponse) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFaucet
@@ -997,23 +1616,24 @@ func (m *FaucetResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthFaucet
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthFaucet
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1298,7 +1918,7 @@ func (m *InitAccountResponse) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFaucet
@@ -1308,23 +1928,24 @@ func (m *InitAccountResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthFaucet
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthFaucet
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Amount = string(dAtA[iNdEx:postIndex])
+			if err := m.Amount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 7:
 			if wireType != 0 {
@@ -1430,9 +2051,9 @@ func (m *FaucetInfoResponse) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BalanceAmount", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFaucet
@@ -1442,57 +2063,26 @@ func (m *FaucetInfoResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthFaucet
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthFaucet
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.BalanceAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.Balance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BalanceDenom", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowFaucet
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthFaucet
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthFaucet
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BalanceDenom = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RequestCount", wireType)
 			}
@@ -1507,6 +2097,421 @@ func (m *FaucetInfoResponse) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.RequestCount |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFaucet(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GrantAllowanceRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFaucet
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GrantAllowanceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GrantAllowanceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Address", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Address = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountLimit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+			}
+			m.Expiration = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Expiration |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFaucet(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GrantAllowanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFaucet
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GrantAllowanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GrantAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Txhash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Txhash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+			}
+			m.Code = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Code |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RawLog", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RawLog = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Grantee", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Grantee = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountLimit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+			}
+			m.Expiration = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Expiration |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
