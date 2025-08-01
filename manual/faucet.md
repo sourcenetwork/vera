@@ -43,6 +43,19 @@ curl -X POST http://localhost:1317/faucet/init-account \
 
 Initializes an account in the auth module by sending 1 uopen. This ensures the account exists on-chain.
 
+### Grant Fee Allowance
+```bash
+curl -X POST http://localhost:1317/faucet/grant-allowance \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "source1...",
+    "amount_limit": "10000000000000",
+    "expiration": 1735689600
+  }'
+```
+
+Grants a fee allowance from the faucet account to the specified address. This allows the grantee to pay transaction fees using the granter's (e.g. faucet) account balance.
+
 ## Configuration
 
 The faucet can be enabled/disabled in `app.toml`:
