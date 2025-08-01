@@ -16,12 +16,12 @@ func CmdQueryFilterRelationships() *cobra.Command {
 		Use:   "filter-relationships [policy-id] [object] [relation] [subject]",
 		Short: "Filters through relationships in a policy",
 		Long: `Filters thourgh all relationships in a Policy. 
-                Performs a lookup using the object, relation and subject filters.
-                Uses a mini grammar as describe:
-                object := resource:id | *
-                relation := name | *
-                subject := id | *
-                Returns`,
+		Performs a lookup using the object, relation and subject filters.
+		Uses a mini grammar as describe:
+		object := resource:id | *
+		relation := name | *
+		subject := id | *
+		Returns`,
 		Args:    cobra.ExactArgs(4),
 		Aliases: []string{"relationships"},
 		RunE: func(cmd *cobra.Command, args []string) error {
