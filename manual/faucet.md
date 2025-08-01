@@ -70,6 +70,17 @@ When disabled (`enable_faucet = false`), the faucet routes are not registered an
 
 The faucet is disabled by default and must be explicitly enabled in configuration (or via `./scripts/genesis-setup.sh`) .
 
+## CLI Usage
+
+The CLI faucet script (`./scripts/faucet.sh`) operates independently of the `enable_faucet` setting in `app.toml` and uses the `./scripts/faucet-key.json` directly.
+
+```bash
+# Send 1,000 $OPEN to an address
+./scripts/faucet.sh source1...
+# Send custom amount
+./scripts/faucet.sh source1... 5000000000uopen
+```
+
 ## Security
 
 - For development and testing purposes only.
