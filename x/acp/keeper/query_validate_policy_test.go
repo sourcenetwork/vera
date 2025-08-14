@@ -204,6 +204,6 @@ actor:
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
-	require.Contains(s.T(), result.ErrorMsg, "subject restriction: resource file, relation owner: no resource actor-source")
-	require.Nil(s.T(), err)
+	require.Contains(s.T(), result.ErrorMsg, "resource not found")
+	require.NoError(s.T(), err)
 }

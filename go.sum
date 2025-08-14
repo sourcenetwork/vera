@@ -1631,8 +1631,6 @@ github.com/sony/gobreaker v0.4.1/go.mod h1:ZKptC7FHNvhBz7dN2LGjPVBz2sZJmc0/PkyDJ
 github.com/sourcegraph/conc v0.3.0 h1:OQTbbt6P72L20UqAkXXuLOj79LfEanQ+YQFNpLA9ySo=
 github.com/sourcegraph/conc v0.3.0/go.mod h1:Sdozi7LEKbFPqYX2/J+iBAM6HpqSLTASQIKqDmF7Mt0=
 github.com/sourcegraph/go-diff v0.6.1/go.mod h1:iBszgVvyxdc8SFZ7gm69go2KDdt3ag071iBaWPF6cjs=
-github.com/sourcenetwork/acp_core v0.5.3 h1:LEfLwkFmdTZujP8ltx4tBWl4+B+ZZVzQIyofsHU2u2I=
-github.com/sourcenetwork/acp_core v0.5.3/go.mod h1:h2zsJJ1Qz4fJYHWRHA8PvOJUl9kw8tE7XkvOV9pTQSo=
 github.com/sourcenetwork/acp_core v0.5.4 h1:uRLQvtic6gX9rkPkNZJn3zW7S7s978hdFlyeaa0HLMc=
 github.com/sourcenetwork/acp_core v0.5.4/go.mod h1:4qPncBFNPVAFhZE4vMTypudy5i/YgXPoBKeSglJwdfM=
 github.com/sourcenetwork/corekv v0.0.0-20250122161438-c4cec0f30dbe h1:xML1pxD5zf14MAqjCkW584ri6yjp6go+ud83wpMzWtM=
@@ -1641,8 +1639,7 @@ github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8 h1:d0jNo
 github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8/go.mod h1:/WJdZWouiY199DypsN0xaP5PF0zy3rka3FxH5Y8o9Bc=
 github.com/sourcenetwork/raccoondb/v2 v2.0.0 h1:Gb0SjsZUbrbkHCEg7PyyNs0+2IzPxjE/BkEQnlu1nfA=
 github.com/sourcenetwork/raccoondb/v2 v2.0.0/go.mod h1:tPKAWHUgYcSoXNMt01iWJ+Y51AQYc2knY93IjmmbejY=
-github.com/sourcenetwork/zanzi v0.3.1-0.20250520192824-03101a013e24 h1:7HmRJVTc36d73uJy9A8+hQmu3aIbEPWBS/dAV1A3WJQ=
-github.com/sourcenetwork/zanzi v0.3.1-0.20250520192824-03101a013e24/go.mod h1:XzPxq660MYb5q5EAHvvfqkyZtfJ8jzdmn/5OW5ha89A=
+github.com/sourcenetwork/zanzi v0.3.1-0.20250807201848-ff8322455b4b h1:H0tLqqXqXr7nRDIeYUXoFVsN3CYXqr+oGJ8ltDAXCAk=
 github.com/sourcenetwork/zanzi v0.3.1-0.20250807201848-ff8322455b4b/go.mod h1:XzPxq660MYb5q5EAHvvfqkyZtfJ8jzdmn/5OW5ha89A=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
