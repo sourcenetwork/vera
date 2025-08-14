@@ -25,7 +25,7 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 
 	did, err := did.IssueDID(acc)
 	if err != nil {
-		return "", errors.NewFromCause("could not issue did",
+		return "", errors.NewWithCause("could not issue did",
 			err,
 			errors.ErrorType_BAD_INPUT,
 			errors.Pair("address", addr),

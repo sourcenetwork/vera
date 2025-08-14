@@ -68,7 +68,7 @@ func (r *CommitmentRepository) wrapErr(err error) error {
 	if err == nil {
 		return err
 	}
-	return errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "registration repository")
+	return errors.NewWithCause("registration repository", err, errors.ErrorType_INTERNAL)
 }
 
 // update stores the updated RegistrationCommitment record

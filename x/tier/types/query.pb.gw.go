@@ -635,15 +635,15 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcehub", "tier", "v1beta1", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcehub", "tier", "v1beta1", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Lockup_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"sourcehub", "tier", "v1beta1", "locked", "delegator_address", "validator_address"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Lockup_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"sourcehub", "tier", "v1beta1", "locked", "delegator_address", "validator_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Lockups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcehub", "tier", "v1beta1", "locked", "delegator_address"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Lockups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcehub", "tier", "v1beta1", "locked", "delegator_address"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UnlockingLockup_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"sourcehub", "tier", "v1beta1", "unlocking", "delegator_address", "validator_address", "creation_height"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_UnlockingLockup_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"sourcehub", "tier", "v1beta1", "unlocking", "delegator_address", "validator_address", "creation_height"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_UnlockingLockups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcehub", "tier", "v1beta1", "unlocking", "delegator_address"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_UnlockingLockups_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcehub", "tier", "v1beta1", "unlocking", "delegator_address"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

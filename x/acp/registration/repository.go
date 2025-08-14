@@ -53,7 +53,7 @@ func (r *AmendmentEventRepository) wrapErr(err error) error {
 	if err == nil {
 		return err
 	}
-	return errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "amendment event repository")
+	return errors.NewWithCause("amendment event repository", err, errors.ErrorType_INTERNAL)
 }
 
 // create uses Raccoon's autoincrement to

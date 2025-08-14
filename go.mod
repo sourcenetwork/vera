@@ -47,7 +47,7 @@ require (
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
-	github.com/sourcenetwork/acp_core v0.5.2
+	github.com/sourcenetwork/acp_core v0.5.4
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.8.1
@@ -292,7 +292,7 @@ require (
 	github.com/segmentio/encoding v0.4.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
-	github.com/sourcenetwork/zanzi v0.3.1-0.20250326181925-74d3e97fb950 // indirect
+	github.com/sourcenetwork/zanzi v0.3.1-0.20250807201848-ff8322455b4b // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
 	github.com/stoewer/go-strcase v1.3.0 // indirect
