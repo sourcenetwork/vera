@@ -234,7 +234,7 @@ sed -i '' 's/^timeout_prevote = .*/timeout_prevote = "500ms"/' "$C2V2_HOME/confi
 sed -i '' 's/^timeout_precommit = .*/timeout_precommit = "500ms"/' "$C2V2_HOME/config/config.toml"
 sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C2V2_HOME/config/config.toml"
 
-echo "==> Funding validato 2 account on sourcehub-2..."
+echo "==> Funding validator 2 account on sourcehub-2..."
 $BIN tx bank send source $VAL22_ADDR 10000000000uopen \
   --from source \
   --keyring-backend test \
