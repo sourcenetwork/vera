@@ -3,7 +3,7 @@ package sdk
 import (
 	"context"
 	"fmt"
-	stdmath "math"
+	"math"
 
 	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -157,7 +157,7 @@ func (b *TxBuilder) evaluateTx(ctx context.Context, txBuilder client.TxBuilder) 
 		return nil
 	}
 
-	adjusted := uint64(stdmath.Ceil(float64(gasUsed) * b.gasAdjustment))
+	adjusted := uint64(math.Ceil(float64(gasUsed) * b.gasAdjustment))
 	txBuilder.SetGasLimit(adjusted)
 	b.gasLimit = adjusted
 
