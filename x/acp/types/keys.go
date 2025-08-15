@@ -18,6 +18,9 @@ const (
 
 	// AmendmentEventKeyPrefix defines a key prefix for Amendment Events
 	AmendmentEventKeyPrefix = "amendment_event/"
+
+	// SignedPolicyCmdSeenKeyPrefix defines a key prefix for seen signed policy command payloads
+	SignedPolicyCmdSeenKeyPrefix = "spc_seen/"
 )
 
 var (
