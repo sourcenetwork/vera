@@ -180,7 +180,7 @@ func (b *TxBuilder) evaluateTx(ctx context.Context, txBuilder client.TxBuilder) 
 	return nil
 }
 
-func (b *TxBuilder) finalizeTx(_ context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
+func (b *TxBuilder) finalizeTx(ctx context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
 	signerData := xauthsigning.SignerData{
 		ChainID:       b.chainID,
 		AccountNumber: b.account.GetAccountNumber(),
@@ -189,7 +189,7 @@ func (b *TxBuilder) finalizeTx(_ context.Context, signer TxSigner, txBuilder cli
 	}
 
 	sigV2, err := tx.SignWithPrivKey(
-		context.Background(),
+		ctx,
 		signing.SignMode_SIGN_MODE_DIRECT,
 		signerData,
 		txBuilder,
