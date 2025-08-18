@@ -19,6 +19,7 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
+// TxBuilder is an utility type which is specialized to build and sign SourceHub Txs
 type TxBuilder struct {
 	chainID       string
 	gasLimit      uint64
@@ -27,12 +28,22 @@ type TxBuilder struct {
 	txCfg         client.TxConfig
 	feeTokenDenom string
 	feeAmt        int64
-	account       authtypes.BaseAccount
+	account       *authtypes.BaseAccount
+	txMemo        string
+	offline       bool
 }
 
+// NewTxBuilder returns a new TxBuilder, populated according to the defined options.
+// Several options are optional, with sane default, however some are worth noting.
+// Assure the correct chain-id is specified (see WithChainID).
+// Futher, setting a client is usually required (see WithSDKClient or WithAuthQueryClient).
+//
+// By default, the TxBuilder will fetch the latest account information
+// from the configured client, however the builder can operate in offline mode,
+// by receiving the WithOfflineFlag opt, which receives an accoutn object
+// from the caller each time a Tx is signed.
 func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	registry := cdctypes.NewInterfaceRegistry()
-	//acptypes.RegisterInterfaces(registry)
 	cfg := authtx.NewTxConfig(
 		codec.NewProtoCodec(registry),
 		[]signing.SignMode{
@@ -41,6 +52,7 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	)
 
 	builder := TxBuilder{ // TODO evaluate tx
+		offline:       false,
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
 		feeTokenDenom: appparams.DefaultBondDenom,
@@ -55,7 +67,7 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 		}
 	}
 
-	if builder.authClient == nil {
+	if !builder.offline && builder.authClient == nil {
 		return TxBuilder{}, fmt.Errorf("TxBuilder: Auth GRPC Client is required: use either WithAuthQueryClient or WithSDKClient to set it")
 	}
 
@@ -66,6 +78,13 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 // The returned Tx can then be broadcast.
 func (b *TxBuilder) Build(ctx context.Context, signer TxSigner, set *MsgSet) (xauthsigning.Tx, error) {
 	return b.BuildFromMsgs(ctx, signer, set.GetMsgs()...)
+}
+
+// BuildOfflineFromMessages builds a SourceHub Tx containing msgs.
+// Uses the sequence and account numbers provided in account.
+func (b *TxBuilder) BuildOfflineFromMsgs(ctx context.Context, account *authtypes.BaseAccount, signer TxSigner, msgs ...sdk.Msg) (xauthsigning.Tx, error) {
+	b.account = account
+	return b.BuildFromMsgs(ctx, signer, msgs...)
 }
 
 // BuildFromMsgs builds a SourceHub Tx containing msgs.
@@ -94,12 +113,17 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 	txBuilder.SetGasLimit(b.gasLimit)
 	feeAmt := sdk.NewCoins(sdk.NewInt64Coin(b.feeTokenDenom, b.feeAmt))
 	txBuilder.SetFeeAmount(feeAmt)
-
-	acc, err := b.getAccount(ctx, signer.GetAccAddress())
-	if err != nil {
-		return nil, err
+	if b.txMemo != "" {
+		txBuilder.SetMemo(b.txMemo)
 	}
-	b.account = acc
+
+	if !b.offline {
+		acc, err := b.getAccount(ctx, signer.GetAccAddress())
+		if err != nil {
+			return nil, err
+		}
+		b.account = &acc
+	}
 
 	// NOTE: The following snippet was based on the Cosmos-SDK documentation and codebase
 	// See:
@@ -111,7 +135,7 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 			SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
 			Signature: nil,
 		},
-		Sequence: acc.GetSequence(),
+		Sequence: b.account.GetSequence(),
 	}
 
 	err = txBuilder.SetSignatures(sigV2)
@@ -263,6 +287,26 @@ func WithAuthQueryClient(client authtypes.QueryClient) TxBuilderOpt {
 func WithSDKClient(client *Client) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.authClient = client.AuthQueryClient()
+		return nil
+	}
+}
+
+// WithOfflineFlag configures the builder to *not* fetch account data
+// (sequence number and account number) from a live chain.
+// This is useful when generating fully offline txs such as generating genesis txs.
+//
+// This option will override the WithSDKClient or WithAuthQueryClient opts.
+func WithOfflineFlag() TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.offline = true
+		return nil
+	}
+}
+
+// WithMemo sets a builder-wide memo to attach to every generated tx
+func WithMemo(memo string) TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.txMemo = memo
 		return nil
 	}
 }

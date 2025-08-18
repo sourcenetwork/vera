@@ -10,13 +10,8 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
-// BankModuleBasic defines a wrapper of the x/bank module AppModuleBasic to provide custom default genesis state.
-type BankModuleBasic struct {
-	bank.AppModuleBasic
-}
-
-// DefaultGenesis returns custom x/bank module genesis state.
-func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
+// DefaultBankGenesis overrides the default bank genesis to include SourceHub denoms
+func DefaultBankGenesis() *banktypes.GenesisState {
 	openMetadata := banktypes.Metadata{
 		Description: appparams.OpenDescription,
 		DenomUnits: []*banktypes.DenomUnit{
@@ -65,5 +60,15 @@ func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	genState.DenomMetadata = append(genState.DenomMetadata, creditMetadata)
 	genState.SendEnabled = append(genState.SendEnabled, creditSendEnabled)
 
-	return cdc.MustMarshalJSON(genState)
+	return genState
+}
+
+// BankModuleBasic defines a wrapper of the x/bank module AppModuleBasic to provide custom default genesis state.
+type BankModuleBasic struct {
+	bank.AppModuleBasic
+}
+
+// DefaultGenesis returns custom x/bank module genesis state.
+func (BankModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
+	return cdc.MustMarshalJSON(DefaultBankGenesis())
 }

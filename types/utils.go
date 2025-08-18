@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 )
 
 // IsValidSourceHubAddr verifies whether addr is a valid bech32 prefixed by
@@ -38,4 +39,20 @@ func AccAddressFromBech32(address string) (addr sdk.AccAddress, err error) {
 	}
 
 	return sdk.AccAddress(bz), nil
+}
+
+func AddressToAccountBech32(acc sdk.AccAddress) (string, error) {
+	bech32Addr, err := bech32.ConvertAndEncode(AccountAddrPrefix, acc)
+	if err != nil {
+		return "", err
+	}
+	return bech32Addr, nil
+}
+
+func AddressToValidatorBech32(acc sdk.AccAddress) (string, error) {
+	bech32Addr, err := bech32.ConvertAndEncode(AccountAddrPrefix+"valoper", acc)
+	if err != nil {
+		return "", err
+	}
+	return bech32Addr, nil
 }
