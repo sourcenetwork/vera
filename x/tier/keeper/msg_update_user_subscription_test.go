@@ -1,0 +1,277 @@
+package keeper_test
+
+import (
+	"testing"
+	"time"
+
+	"cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/stretchr/testify/require"
+
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
+	"github.com/sourcenetwork/sourcehub/x/tier/types"
+)
+
+func TestMsgUpdateUserSubscription(t *testing.T) {
+	k, ms, ctx := setupMsgServer(t)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+
+	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
+	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
+
+	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
+	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	keepertest.InitializeDelegator(t, &k, sdkCtx, developerAddr, math.NewInt(10000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, valAddr, math.NewInt(1_000_000))
+	sdkCtx = sdkCtx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
+	require.NoError(t, err)
+
+	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &initialAmount, 30)
+	require.NoError(t, err)
+
+	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
+	zeroAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
+	negativeAmount := sdk.Coin{
+		Denom:  appparams.MicroCreditDenom,
+		Amount: math.NewInt(-100),
+	}
+
+	testCases := []struct {
+		name      string
+		input     *types.MsgUpdateUserSubscription
+		expErr    bool
+		expErrMsg string
+	}{
+		{
+			name: "valid update user subscription - change amount",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      validUserAddr,
+				Amount:    validAmount,
+				Period:    30,
+			},
+			expErr: false,
+		},
+		{
+			name: "valid update user subscription - change period",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      validUserAddr,
+				Amount:    validAmount,
+				Period:    60,
+			},
+			expErr: false,
+		},
+		{
+			name: "valid update user subscription - change both",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      validUserAddr,
+				Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(300)),
+				Period:    90,
+			},
+			expErr: false,
+		},
+		{
+			name: "invalid developer address",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: "invalid-developer-address",
+				User:      validUserAddr,
+				Amount:    validAmount,
+				Period:    30,
+			},
+			expErr:    true,
+			expErrMsg: "delegator address",
+		},
+		{
+			name: "invalid user address",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      "invalid-user-address",
+				Amount:    validAmount,
+				Period:    30,
+			},
+			expErr:    true,
+			expErrMsg: "delegator address",
+		},
+		{
+			name: "zero amount",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      validUserAddr,
+				Amount:    zeroAmount,
+				Period:    30,
+			},
+			expErr:    true,
+			expErrMsg: "invalid amount",
+		},
+		{
+			name: "negative amount",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      validUserAddr,
+				Amount:    negativeAmount,
+				Period:    30,
+			},
+			expErr:    true,
+			expErrMsg: "invalid amount",
+		},
+		{
+			name: "non-existent subscription",
+			input: &types.MsgUpdateUserSubscription{
+				Developer: validDeveloperAddr,
+				User:      "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				Amount:    validAmount,
+				Period:    30,
+			},
+			expErr:    true,
+			expErrMsg: "update user subscription",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := tc.input.ValidateBasic()
+			if err != nil {
+				if tc.expErr {
+					require.Contains(t, err.Error(), tc.expErrMsg)
+					return
+				}
+				t.Fatalf("unexpected error in ValidateBasic: %v", err)
+			}
+
+			resp, err := ms.UpdateUserSubscription(sdkCtx, tc.input)
+
+			if tc.expErr {
+				require.Error(t, err)
+				require.Contains(t, err.Error(), tc.expErrMsg)
+			} else {
+				require.NoError(t, err)
+				require.NotNil(t, resp)
+
+				developerAddr := sdk.MustAccAddressFromBech32(tc.input.Developer)
+				userAddr := sdk.MustAccAddressFromBech32(tc.input.User)
+				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+				require.NotNil(t, subscription, "User subscription should exist after update")
+				require.Equal(t, tc.input.Amount, subscription.CreditAmount, "Amount should match updated value")
+				require.Equal(t, tc.input.Period, subscription.Period, "Period should match updated value")
+			}
+		})
+	}
+}
+
+func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
+	k, ms, ctx := setupMsgServer(t)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+
+	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
+	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
+
+	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
+	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	keepertest.InitializeDelegator(t, &k, sdkCtx, developerAddr, math.NewInt(10000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), sdkCtx, valAddr, math.NewInt(1_000_000))
+	sdkCtx = sdkCtx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
+	require.NoError(t, err)
+
+	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &initialAmount, 30)
+	require.NoError(t, err)
+
+	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	require.NotNil(t, subscription)
+	require.Equal(t, initialAmount, subscription.CreditAmount)
+	require.Equal(t, uint64(30), subscription.Period)
+
+	msg := &types.MsgUpdateUserSubscription{
+		Developer: validDeveloperAddr,
+		User:      validUserAddr,
+		Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)),
+		Period:    30,
+	}
+
+	resp, err := ms.UpdateUserSubscription(sdkCtx, msg)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	require.NotNil(t, subscription)
+	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
+	require.Equal(t, uint64(30), subscription.Period)
+
+	msg.Amount = sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
+	msg.Period = 60
+
+	resp, err = ms.UpdateUserSubscription(sdkCtx, msg)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	require.NotNil(t, subscription)
+	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
+	require.Equal(t, uint64(60), subscription.Period)
+
+	msg.Amount = sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
+	msg.Period = 90
+
+	resp, err = ms.UpdateUserSubscription(sdkCtx, msg)
+	require.NoError(t, err)
+	require.NotNil(t, resp)
+
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	require.NotNil(t, subscription)
+	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500)), subscription.CreditAmount)
+	require.Equal(t, uint64(90), subscription.Period)
+}
+
+func TestMsgUpdateUserSubscription_NonExistentDeveloper(t *testing.T) {
+	k, ms, ctx := setupMsgServer(t)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	p := types.DefaultParams()
+	require.NoError(t, k.SetParams(ctx, p))
+
+	nonExistentDeveloperAddr := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
+	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+
+	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
+
+	msg := &types.MsgUpdateUserSubscription{
+		Developer: nonExistentDeveloperAddr,
+		User:      validUserAddr,
+		Amount:    validAmount,
+		Period:    30,
+	}
+
+	resp, err := ms.UpdateUserSubscription(sdkCtx, msg)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "update user subscription")
+	require.Nil(t, resp)
+}
