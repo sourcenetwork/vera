@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	errorsmod "cosmossdk.io/errors"
@@ -10,7 +11,9 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -121,12 +124,24 @@ func (k *Keeper) mustIterateUserSubscriptionsForDeveloper(ctx context.Context, d
 	}
 }
 
-// checkAndAutoLockDeveloperCredits checks if all developers have enough credits compared to total dev granted.
+// checkDeveloperCredits checks if all developers have enough credits compared to total dev granted.
 // If developer does not have enough credits, we check the auto-lock setting.
 // If auto-lock is on and developer has enough "uopen", we perform auto-lock.
 // If auto-lock is off or developer does not have enough "uopen", we log corresponding event.
-func (k *Keeper) checkAndAutoLockDeveloperCredits(ctx context.Context, epochNumber int64) error {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
+func (k *Keeper) checkDeveloperCredits(ctx context.Context, epochNumber int64) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.CheckDeveloperCredits,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Epoch, fmt.Sprintf("%d", epochNumber)),
+			},
+		)
+	}()
 
 	// Track unique developers to avoid processing the same developer multiple times
 	processedDevelopers := make(map[string]bool)
@@ -150,6 +165,7 @@ func (k *Keeper) checkAndAutoLockDeveloperCredits(ctx context.Context, epochNumb
 		}
 
 		developer := k.GetDeveloper(ctx, developerAddr)
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 		// Auto-lock is off, log event that developer needs to lock
 		if developer == nil || !developer.AutoLockEnabled {
@@ -199,7 +215,12 @@ func (k *Keeper) checkAndAutoLockDeveloperCredits(ctx context.Context, epochNumb
 }
 
 // autoLockDeveloperCredits automatically adds lockups to cover missing credits for a developer.
-func (k *Keeper) autoLockDeveloperCredits(ctx context.Context, developerAddr sdk.AccAddress, developer *types.Developer, lockAmount math.Int) error {
+func (k *Keeper) autoLockDeveloperCredits(
+	ctx context.Context,
+	developerAddr sdk.AccAddress,
+	developer *types.Developer,
+	lockAmount math.Int,
+) error {
 	if lockAmount.LTE(math.ZeroInt()) {
 		return types.ErrInvalidAmount.Wrap("auto-lock amount must be positive")
 	}
@@ -252,9 +273,15 @@ func (k *Keeper) autoLockDeveloperCredits(ctx context.Context, developerAddr sdk
 }
 
 // grantPeriodicAllowance grants a periodic allowance from the developer to the user.
-func (k *Keeper) grantPeriodicAllowance(ctx context.Context, granter, grantee sdk.AccAddress, spendLimit sdk.Coins, period time.Duration) error {
+func (k *Keeper) grantPeriodicAllowance(
+	ctx context.Context,
+	granter, grantee sdk.AccAddress,
+	spendLimit sdk.Coins,
+	period time.Duration,
+) error {
 	now := sdk.UnwrapSDKContext(ctx).BlockTime()
 	expiration := now.Add(period)
+
 	basicAllowance := feegrant.BasicAllowance{
 		SpendLimit: spendLimit,
 		Expiration: &expiration,
@@ -294,13 +321,12 @@ func (k *Keeper) expireAllowance(ctx context.Context, granter, grantee sdk.AccAd
 
 // validateDeveloperCredits checks if a developer has enough credits to grant the requested amount.
 func (k *Keeper) validateDeveloperCredits(ctx context.Context, developerAddr sdk.AccAddress, requestedAmount math.Int) error {
-	creditBalance := k.bankKeeper.GetBalance(ctx, developerAddr, appparams.MicroCreditDenom)
-
 	totalGranted, err := k.getTotalDevGranted(ctx, developerAddr)
 	if err != nil {
 		return err
 	}
 
+	creditBalance := k.bankKeeper.GetBalance(ctx, developerAddr, appparams.MicroCreditDenom)
 	availableCredits := creditBalance.Amount.Sub(totalGranted)
 
 	if availableCredits.LT(requestedAmount) {
@@ -345,6 +371,13 @@ func (k *Keeper) updateDeveloperTotalGranted(ctx context.Context, developerAddr 
 	b := k.cdc.MustMarshal(totalDevGranted)
 	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store.Set(key, b)
+
+	// Update total dev granted amount gauge
+	telemetry.ModuleSetGauge(
+		types.ModuleName,
+		float32(newTotal.Int64()),
+		metrics.TotalDevGranted,
+	)
 
 	return nil
 }

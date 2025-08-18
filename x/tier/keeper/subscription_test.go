@@ -399,7 +399,7 @@ func TestExpireAllowance(t *testing.T) {
 	require.True(t, basicAllowance.Expiration.Equal(sdkCtx.BlockTime()) || basicAllowance.Expiration.Before(sdkCtx.BlockTime()))
 }
 
-func TestCheckAndAutoLockDeveloperCredits(t *testing.T) {
+func TestCheckDeveloperCredits(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
@@ -437,7 +437,7 @@ func TestCheckAndAutoLockDeveloperCredits(t *testing.T) {
 	}
 	k.setDeveloper(ctx, developerAddr, developer)
 
-	err = k.checkAndAutoLockDeveloperCredits(ctx, 1)
+	err = k.checkDeveloperCredits(ctx, 1)
 	require.NoError(t, err)
 
 	// Check that an event was emitted for insufficient credits

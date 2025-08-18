@@ -43,7 +43,7 @@ func (h EpochHooks) BeforeEpochStart(ctx context.Context, epochIdentifier string
 	}
 
 	// Check if all developers have enough lockups to cover credits for all registered users and optionally auto-lock
-	err = h.keeper.checkAndAutoLockDeveloperCredits(ctx, epochNumber)
+	err = h.keeper.checkDeveloperCredits(ctx, epochNumber)
 	if err != nil {
 		return errorsmod.Wrapf(err, "check and lock developer credits")
 	}
