@@ -190,6 +190,7 @@ type ModuleInputs struct {
 	StakingKeeper      types.StakingKeeper
 	EpochsKeeper       types.EpochsKeeper
 	DistributionKeeper types.DistributionKeeper
+	FeegrantKeeper     types.FeegrantKeeper
 }
 
 type ModuleOutputs struct {
@@ -215,6 +216,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.StakingKeeper,
 		in.EpochsKeeper,
 		in.DistributionKeeper,
+		in.FeegrantKeeper,
 	)
 
 	m := NewAppModule(

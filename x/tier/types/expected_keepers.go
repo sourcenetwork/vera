@@ -5,6 +5,7 @@ import (
 	time "time"
 
 	"cosmossdk.io/math"
+	"cosmossdk.io/x/feegrant"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -67,6 +68,13 @@ type DistributionKeeper interface {
 	AllocateTokens(ctx context.Context, totalReward int64, bondedValidators []abcitypes.VoteInfo) error
 	GetValidatorOutstandingRewards(ctx context.Context, valAddr sdk.ValAddress) (distrtypes.ValidatorOutstandingRewards, error)
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
+}
+
+// FeegrantKeeper defines the expected interface for the Feegrant module.
+type FeegrantKeeper interface {
+	GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error)
+	GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error
+	UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error
 }
 
 // ParamSubspace defines the expected Subspace interface for parameters.
