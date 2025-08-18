@@ -749,19 +749,19 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Namespace_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "namespace"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Namespace_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "namespace"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Namespaces_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "namespaces"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Namespaces_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "namespaces"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_NamespaceCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "bulletin", "collaborators", "namespace"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_NamespaceCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "bulletin", "collaborators", "namespace"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_NamespacePosts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "bulletin", "posts", "namespace"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_NamespacePosts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "bulletin", "posts", "namespace"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Post_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"sourcenetwork", "sourcehub", "bulletin", "post", "namespace", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Post_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"sourcenetwork", "sourcehub", "bulletin", "post", "namespace", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Posts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "posts"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Posts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "bulletin", "posts"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

@@ -17,4 +17,3 @@ plugins:
     out: .
     opt:
       - logtostderr=true
-      - allow_colon_final_segments=true

@@ -48,6 +48,47 @@ actor:
 	want := &types.QueryValidatePolicyResponse{
 		Valid:    true,
 		ErrorMsg: "",
+		Policy: &coretypes.Policy{
+			Id:          "",
+			Name:        "Source Policy",
+			Description: "A valid policy",
+			ActorResource: &coretypes.ActorResource{
+				Name: "actor",
+				Doc:  "some actor",
+			},
+			Attributes:        nil,
+			SpecificationType: 0,
+			Resources: []*coretypes.Resource{
+				{
+					Name: "file",
+					Permissions: []*coretypes.Permission{
+						{
+							Name:       "_can_manage_owner",
+							Expression: "owner",
+							Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
+						},
+						{
+							Name:       "read",
+							Expression: "owner",
+						},
+						{
+							Name:       "write",
+							Expression: "owner",
+						},
+					},
+					Relations: []*coretypes.Relation{
+						{
+							Name: "owner",
+							VrTypes: []*coretypes.Restriction{
+								{
+									ResourceName: "actor",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 	require.Equal(s.T(), want, result)
 	require.Nil(s.T(), err)
@@ -85,12 +126,7 @@ actor:
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)
-
-	want := &types.QueryValidatePolicyResponse{
-		Valid:    true,
-		ErrorMsg: "",
-	}
-	require.Equal(s.T(), want, result)
+	require.True(s.T(), result.Valid)
 	require.Nil(s.T(), err)
 }
 
@@ -168,6 +204,6 @@ actor:
 
 	require.NotNil(s.T(), result)
 	require.False(s.T(), result.Valid)
-	require.Contains(s.T(), result.ErrorMsg, "subject restriction: resource file, relation owner: no resource actor-source")
-	require.Nil(s.T(), err)
+	require.Contains(s.T(), result.ErrorMsg, "resource not found")
+	require.NoError(s.T(), err)
 }

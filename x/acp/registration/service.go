@@ -1,6 +1,8 @@
 package registration
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/auth"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
@@ -179,14 +181,14 @@ func (s *RegistrationService) FlagHijackEvent(ctx sdk.Context, eventId uint64, a
 		return nil, err
 	}
 	if opt.Empty() {
-		return nil, errors.Wrap("event not found", errors.ErrorType_NOT_FOUND, errors.Pair("event", eventId))
+		return nil, errors.Wrap("event not found", errors.ErrorType_NOT_FOUND, errors.Pair("event", fmt.Sprintf("%v", eventId)))
 	}
 	event := opt.GetValue()
 
 	if event.Metadata.OwnerDid != actor.Id {
 		return nil, errors.Wrap("event actor missmatch: actor must be event subject",
 			errors.ErrorType_UNAUTHORIZED,
-			errors.Pair("event", eventId),
+			errors.Pair("event", fmt.Sprintf("%v", eventId)),
 			errors.Pair("expected_actor", actor.Id),
 		)
 	}

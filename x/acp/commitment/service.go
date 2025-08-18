@@ -1,6 +1,8 @@
 package commitment
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
@@ -91,7 +93,7 @@ func (s *CommitmentService) FlagExpiredCommitments(ctx sdk.Context) ([]*types.Re
 	for _, commitment := range processed {
 		err := s.repository.update(ctx, commitment)
 		if err != nil {
-			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", commitment.Id))
+			return nil, errors.Wrap("expiring commitment", err, errors.Pair("commitment", fmt.Sprintf("%v", commitment.Id)))
 		}
 	}
 
@@ -145,21 +147,21 @@ func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64
 	}
 	if opt.Empty() {
 		return nil, false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
-			errors.Pair("id", commitmentId))
+			errors.Pair("id", fmt.Sprintf("%v", commitmentId)))
 	}
 
 	commitment := opt.GetValue()
 	now, err := types.TimestampFromCtx(ctx)
 	if err != nil {
-		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "failed determining current timestamp")
+		return commitment, false, errors.NewWithCause("failed determining current timestamp", err, errors.ErrorType_INTERNAL)
 	}
 	after, err := commitment.Metadata.CreationTs.IsAfter(commitment.Validity, now)
 	if err != nil {
-		return commitment, false, errors.NewFromBaseError(err, errors.ErrorType_INTERNAL, "invalid timestmap format")
+		return commitment, false, errors.NewWithCause("invalid timestmap format", err, errors.ErrorType_INTERNAL)
 	}
 	if after {
 		return commitment, false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
-			errors.Pair("commitment", commitmentId))
+			errors.Pair("commitment", fmt.Sprintf("%v", commitmentId)))
 	}
 
 	ok, err := VerifyProof(commitment.Commitment, commitment.PolicyId, actor, proof)
