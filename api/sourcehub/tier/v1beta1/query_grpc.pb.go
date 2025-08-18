@@ -19,11 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Params_FullMethodName           = "/sourcehub.tier.v1beta1.Query/Params"
-	Query_Lockup_FullMethodName           = "/sourcehub.tier.v1beta1.Query/Lockup"
-	Query_Lockups_FullMethodName          = "/sourcehub.tier.v1beta1.Query/Lockups"
-	Query_UnlockingLockup_FullMethodName  = "/sourcehub.tier.v1beta1.Query/UnlockingLockup"
-	Query_UnlockingLockups_FullMethodName = "/sourcehub.tier.v1beta1.Query/UnlockingLockups"
+	Query_Params_FullMethodName            = "/sourcehub.tier.v1beta1.Query/Params"
+	Query_Lockup_FullMethodName            = "/sourcehub.tier.v1beta1.Query/Lockup"
+	Query_Lockups_FullMethodName           = "/sourcehub.tier.v1beta1.Query/Lockups"
+	Query_UnlockingLockup_FullMethodName   = "/sourcehub.tier.v1beta1.Query/UnlockingLockup"
+	Query_UnlockingLockups_FullMethodName  = "/sourcehub.tier.v1beta1.Query/UnlockingLockups"
+	Query_Developers_FullMethodName        = "/sourcehub.tier.v1beta1.Query/Developers"
+	Query_UserSubscriptions_FullMethodName = "/sourcehub.tier.v1beta1.Query/UserSubscriptions"
 )
 
 // QueryClient is the client API for Query service.
@@ -42,6 +44,10 @@ type QueryClient interface {
 	UnlockingLockup(ctx context.Context, in *UnlockingLockupRequest, opts ...grpc.CallOption) (*UnlockingLockupResponse, error)
 	// UnlockingLockups queries all the unlocking lockups of a delegator.
 	UnlockingLockups(ctx context.Context, in *UnlockingLockupsRequest, opts ...grpc.CallOption) (*UnlockingLockupsResponse, error)
+	// Developers queries all registered developers.
+	Developers(ctx context.Context, in *DevelopersRequest, opts ...grpc.CallOption) (*DevelopersResponse, error)
+	// UserSubscriptions queries all user subscriptions for a specific developer.
+	UserSubscriptions(ctx context.Context, in *UserSubscriptionsRequest, opts ...grpc.CallOption) (*UserSubscriptionsResponse, error)
 }
 
 type queryClient struct {
@@ -102,6 +108,26 @@ func (c *queryClient) UnlockingLockups(ctx context.Context, in *UnlockingLockups
 	return out, nil
 }
 
+func (c *queryClient) Developers(ctx context.Context, in *DevelopersRequest, opts ...grpc.CallOption) (*DevelopersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DevelopersResponse)
+	err := c.cc.Invoke(ctx, Query_Developers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) UserSubscriptions(ctx context.Context, in *UserSubscriptionsRequest, opts ...grpc.CallOption) (*UserSubscriptionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserSubscriptionsResponse)
+	err := c.cc.Invoke(ctx, Query_UserSubscriptions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -118,6 +144,10 @@ type QueryServer interface {
 	UnlockingLockup(context.Context, *UnlockingLockupRequest) (*UnlockingLockupResponse, error)
 	// UnlockingLockups queries all the unlocking lockups of a delegator.
 	UnlockingLockups(context.Context, *UnlockingLockupsRequest) (*UnlockingLockupsResponse, error)
+	// Developers queries all registered developers.
+	Developers(context.Context, *DevelopersRequest) (*DevelopersResponse, error)
+	// UserSubscriptions queries all user subscriptions for a specific developer.
+	UserSubscriptions(context.Context, *UserSubscriptionsRequest) (*UserSubscriptionsResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -142,6 +172,12 @@ func (UnimplementedQueryServer) UnlockingLockup(context.Context, *UnlockingLocku
 }
 func (UnimplementedQueryServer) UnlockingLockups(context.Context, *UnlockingLockupsRequest) (*UnlockingLockupsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UnlockingLockups not implemented")
+}
+func (UnimplementedQueryServer) Developers(context.Context, *DevelopersRequest) (*DevelopersResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Developers not implemented")
+}
+func (UnimplementedQueryServer) UserSubscriptions(context.Context, *UserSubscriptionsRequest) (*UserSubscriptionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserSubscriptions not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -254,6 +290,42 @@ func _Query_UnlockingLockups_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Developers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DevelopersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Developers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Developers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Developers(ctx, req.(*DevelopersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_UserSubscriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserSubscriptionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).UserSubscriptions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_UserSubscriptions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).UserSubscriptions(ctx, req.(*UserSubscriptionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -280,6 +352,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UnlockingLockups",
 			Handler:    _Query_UnlockingLockups_Handler,
+		},
+		{
+			MethodName: "Developers",
+			Handler:    _Query_Developers_Handler,
+		},
+		{
+			MethodName: "UserSubscriptions",
+			Handler:    _Query_UserSubscriptions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
