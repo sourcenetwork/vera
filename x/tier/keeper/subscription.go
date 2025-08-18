@@ -376,6 +376,7 @@ func (k *Keeper) updateDeveloperTotalGranted(ctx context.Context, developerAddr 
 	telemetry.ModuleSetGauge(
 		types.ModuleName,
 		float32(newTotal.Int64()),
+		developerAddr.String(),
 		metrics.TotalDevGranted,
 	)
 
