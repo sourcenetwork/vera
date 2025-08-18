@@ -25,8 +25,7 @@ const (
 
 var New = errors.New
 var Wrap = errors.Wrap
-var NewFromBaseError = errors.NewWithCause
-var NewFromCause = errors.NewWithCause
+var NewFromCause = errors.NewFromCause
 
 func NewErrInvalidAccAddrErr(cause error, addr string) error {
 	return errors.NewWithCause("invalid account address", cause, errors.ErrorType_BAD_INPUT, errors.Pair("address", addr))
