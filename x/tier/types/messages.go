@@ -10,6 +10,12 @@ var (
 	_ sdk.Msg = &MsgUnlock{}
 	_ sdk.Msg = &MsgCancelUnlocking{}
 	_ sdk.Msg = &MsgRedelegate{}
+	_ sdk.Msg = &MsgCreateDeveloper{}
+	_ sdk.Msg = &MsgUpdateDeveloper{}
+	_ sdk.Msg = &MsgRemoveDeveloper{}
+	_ sdk.Msg = &MsgAddUserSubscription{}
+	_ sdk.Msg = &MsgUpdateUserSubscription{}
+	_ sdk.Msg = &MsgRemoveUserSubscription{}
 )
 
 // MsgLock
@@ -108,6 +114,117 @@ func (msg *MsgRedelegate) ValidateBasic() error {
 	return nil
 }
 
+// MsgCreateDeveloper
+func NewMsgCreateDeveloper(developerAddr string, autoLockEnabled bool) *MsgCreateDeveloper {
+	return &MsgCreateDeveloper{
+		Developer:       developerAddr,
+		AutoLockEnabled: autoLockEnabled,
+	}
+}
+
+func (msg *MsgCreateDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgUpdateDeveloper
+func NewMsgUpdateDeveloper(developerAddr string, autoLockEnabled bool) *MsgUpdateDeveloper {
+	return &MsgUpdateDeveloper{
+		Developer:       developerAddr,
+		AutoLockEnabled: autoLockEnabled,
+	}
+}
+
+func (msg *MsgUpdateDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgRemoveDeveloper
+func NewMsgRemoveDeveloper(developerAddr string) *MsgRemoveDeveloper {
+	return &MsgRemoveDeveloper{
+		Developer: developerAddr,
+	}
+}
+
+func (msg *MsgRemoveDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgAddUserSubscription
+func NewMsgAddUserSubscription(developerAddr, userAddr string, amount sdk.Coin, period uint64) *MsgAddUserSubscription {
+	return &MsgAddUserSubscription{
+		Developer: developerAddr,
+		User:      userAddr,
+		Amount:    amount,
+		Period:    period,
+	}
+}
+
+func (msg *MsgAddUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if err := validateAccAddr(msg.User); err != nil {
+		return err
+	}
+	if msg.Developer == msg.User {
+		return ErrInvalidAddress.Wrapf("developer and user cannot be the same address")
+	}
+	if err := validateCreditDenom(msg.Amount); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgUpdateUserSubscription
+func NewMsgUpdateUserSubscription(developerAddr, userAddr string, amount sdk.Coin, period uint64) *MsgUpdateUserSubscription {
+	return &MsgUpdateUserSubscription{
+		Developer: developerAddr,
+		User:      userAddr,
+		Amount:    amount,
+		Period:    period,
+	}
+}
+
+func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if err := validateAccAddr(msg.User); err != nil {
+		return err
+	}
+	if err := validateCreditDenom(msg.Amount); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgRemoveUserSubscription
+func NewMsgRemoveUserSubscription(developerAddr, userAddr string) *MsgRemoveUserSubscription {
+	return &MsgRemoveUserSubscription{
+		Developer: developerAddr,
+		User:      userAddr,
+	}
+}
+
+func (msg *MsgRemoveUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if err := validateAccAddr(msg.User); err != nil {
+		return err
+	}
+	return nil
+}
+
 func validateAccAddr(address string) error {
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
@@ -128,9 +245,18 @@ func validateDenom(stake sdk.Coin) error {
 	if !stake.IsValid() || !stake.Amount.IsPositive() || !stake.Amount.IsInt64() {
 		return ErrInvalidDenom.Wrapf("invalid amount %s", stake)
 	}
-
 	if stake.Denom != appparams.DefaultBondDenom {
 		return ErrInvalidDenom.Wrapf("got %s, expected %s", stake.Denom, appparams.DefaultBondDenom)
+	}
+	return nil
+}
+
+func validateCreditDenom(amount sdk.Coin) error {
+	if !amount.IsValid() || !amount.Amount.IsPositive() || !amount.Amount.IsInt64() {
+		return ErrInvalidDenom.Wrapf("invalid amount %s", amount)
+	}
+	if amount.Denom != appparams.MicroCreditDenom {
+		return ErrInvalidDenom.Wrapf("got %s, expected %s", amount.Denom, appparams.MicroCreditDenom)
 	}
 	return nil
 }
