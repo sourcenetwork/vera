@@ -138,7 +138,7 @@ func (k *Keeper) checkAndAutoLockDeveloperCredits(ctx context.Context, epochNumb
 		totalGranted, err := k.getTotalDevGranted(ctx, developerAddr)
 		if err != nil {
 			k.logger.Error("failed to get total granted amount",
-				"developer", developerAddr.String(),
+				types.AttributeKeyDeveloper, developerAddr.String(),
 				"error", err)
 			return
 		}
@@ -244,9 +244,9 @@ func (k *Keeper) autoLockDeveloperCredits(ctx context.Context, developerAddr sdk
 	}
 
 	k.logger.Info("auto-locked developer credits",
-		"developer", developerAddr.String(),
-		"lock_amount", lockAmount.String(),
-		"validator", chosenValAddr.String())
+		types.AttributeKeyDeveloper, developerAddr.String(),
+		types.AttributeKeyLockAmount, lockAmount.String(),
+		types.AttributeKeyDestinationValidator, chosenValAddr.String())
 
 	return nil
 }
@@ -271,16 +271,16 @@ func (k *Keeper) grantPeriodicAllowance(ctx context.Context, granter, grantee sd
 	// Try update first; if no existing grant, fall back to grant
 	if err := k.feegrantKeeper.UpdateAllowance(ctx, granter, grantee, periodicAllowance); err != nil {
 		if err := k.feegrantKeeper.GrantAllowance(ctx, granter, grantee, periodicAllowance); err != nil {
-			return errorsmod.Wrapf(err, "failed to upsert periodic allowance from %s to %s", granter, grantee)
+			return errorsmod.Wrapf(err, "failed to grant periodic allowance from %s to %s", granter, grantee)
 		}
 	}
 
-	k.logger.Info("upserted periodic allowance",
-		"granter", granter,
-		"grantee", grantee,
-		"amount", spendLimit.String(),
-		"period", period.String(),
-		"expiration", expiration.String())
+	k.logger.Info("granted periodic allowance",
+		types.AttributeKeyDeveloper, granter,
+		types.AttributeKeyUser, grantee,
+		types.AttributeKeySubscriptionAmount, spendLimit.String(),
+		types.AttributeKeySubscriptionPeriod, period.String(),
+		types.AttributeKeySubscriptionExpiration, expiration.String())
 
 	return nil
 }

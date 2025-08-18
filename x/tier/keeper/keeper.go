@@ -703,7 +703,7 @@ func (k *Keeper) AddUserSubscription(
 		event.AppendAttributes(sdk.NewAttribute(sdk.AttributeKeyAmount, amount.String()))
 	}
 	if period > 0 {
-		event.AppendAttributes(sdk.NewAttribute(types.AttributeKeyPeriod, fmt.Sprintf("%d", period)))
+		event.AppendAttributes(sdk.NewAttribute(types.AttributeKeySubscriptionPeriod, fmt.Sprintf("%d", period)))
 	}
 	sdkCtx.EventManager().EmitEvent(event)
 
@@ -757,7 +757,7 @@ func (k *Keeper) UpdateUserSubscription(
 			updatePeriod = *params.EpochDuration
 		}
 		if err := k.grantPeriodicAllowance(ctx, developerAddr, userAddr, spendLimit, updatePeriod); err != nil {
-			return errorsmod.Wrap(err, "upsert periodic allowance")
+			return errorsmod.Wrap(err, "grant periodic allowance")
 		}
 	}
 
@@ -771,7 +771,7 @@ func (k *Keeper) UpdateUserSubscription(
 		event.AppendAttributes(sdk.NewAttribute(sdk.AttributeKeyAmount, amount.String()))
 	}
 	if period > 0 {
-		event.AppendAttributes(sdk.NewAttribute(types.AttributeKeyPeriod, fmt.Sprintf("%d", period)))
+		event.AppendAttributes(sdk.NewAttribute(types.AttributeKeySubscriptionPeriod, fmt.Sprintf("%d", period)))
 	}
 	sdkCtx.EventManager().EmitEvent(event)
 
