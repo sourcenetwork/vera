@@ -14,6 +14,8 @@ import (
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
 	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/x/feegrant"
+	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -55,6 +57,22 @@ func initializeDelegator(t *testing.T, k *Keeper, ctx sdk.Context, delAddr sdk.A
 	require.NoError(t, err)
 }
 
+// createAccount creates an account with no balance.
+func createAccount(t *testing.T, k *Keeper, ctx sdk.Context, addr sdk.AccAddress) {
+	tempCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(1))
+	tempCoins := sdk.NewCoins(tempCoin)
+
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, tempCoins)
+	require.NoError(t, err)
+
+	err = k.GetBankKeeper().SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().BurnCoins(ctx, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+}
+
 // mintCoinsToModule mints given token amount and sends it to the specified module name.
 func mintCoinsToModule(t *testing.T, k *Keeper, ctx sdk.Context, moduleName string, amount math.Int) {
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
@@ -75,6 +93,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	distrStoreKey := storetypes.NewKVStoreKey(distrtypes.StoreKey)
 	epochsStoreKey := storetypes.NewKVStoreKey(epochstypes.StoreKey)
 	mintStoreKey := storetypes.NewKVStoreKey(minttypes.StoreKey)
+	feegrantStoreKey := storetypes.NewKVStoreKey(feegrant.StoreKey)
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
@@ -85,6 +104,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	stateStore.MountStoreWithDB(distrStoreKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(epochsStoreKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(mintStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(feegrantStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -94,6 +114,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	stakingtypes.RegisterInterfaces(registry)
 	distrtypes.RegisterInterfaces(registry)
 	minttypes.RegisterInterfaces(registry)
+	feegrant.RegisterInterfaces(registry)
 
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
@@ -206,6 +227,12 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	}
 	epochsKeeper.SetEpochInfo(ctx, epoch)
 
+	feegrantKeeper := feegrantkeeper.NewKeeper(
+		cdc,
+		runtime.NewKVStoreService(feegrantStoreKey),
+		authKeeper,
+	)
+
 	k := NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
@@ -215,6 +242,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		stakingKeeper,
 		epochsKeeper,
 		distributionKeeper,
+		feegrantKeeper,
 	)
 
 	// Initialize params

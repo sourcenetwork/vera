@@ -11,6 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/golang/mock/gomock"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
@@ -25,15 +26,16 @@ import (
 type KeeperTestSuite struct {
 	suite.Suite
 
-	tierKeeper       keeper.Keeper
-	epochsKeeper     *test.MockEpochsKeeper
+	authorityAccount sdk.AccAddress
 	bankKeeper       *test.MockBankKeeper
-	distrKeeper      *test.MockDistributionKeeper
 	stakingKeeper    *test.MockStakingKeeper
+	epochsKeeper     *test.MockEpochsKeeper
+	distrKeeper      *test.MockDistributionKeeper
+	feegrantKeeper   *test.MockFeegrantKeeper
+	tierKeeper       keeper.Keeper
 	encCfg           test.EncodingConfig
 	ctx              sdk.Context
 	key              *storetypes.KVStoreKey
-	authorityAccount sdk.AccAddress
 	valAddr          sdk.ValAddress
 }
 
@@ -62,11 +64,12 @@ func (suite *KeeperTestSuite) SetupTest() {
 
 	ctrl := gomock.NewController(suite.T())
 
+	suite.authorityAccount = authtypes.NewModuleAddress(govtypes.ModuleName)
 	suite.bankKeeper = test.NewMockBankKeeper(ctrl)
-	suite.distrKeeper = test.NewMockDistributionKeeper(ctrl)
 	suite.stakingKeeper = test.NewMockStakingKeeper(ctrl)
 	suite.epochsKeeper = test.NewMockEpochsKeeper(ctrl)
-	suite.authorityAccount = sdk.AccAddress([]byte("authority"))
+	suite.distrKeeper = test.NewMockDistributionKeeper(ctrl)
+	suite.feegrantKeeper = test.NewMockFeegrantKeeper(ctrl)
 
 	suite.tierKeeper = keeper.NewKeeper(
 		suite.encCfg.Codec,
@@ -77,6 +80,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 		suite.stakingKeeper,
 		suite.epochsKeeper,
 		suite.distrKeeper,
+		suite.feegrantKeeper,
 	)
 
 	err := suite.tierKeeper.SetParams(suite.ctx, types.DefaultParams())

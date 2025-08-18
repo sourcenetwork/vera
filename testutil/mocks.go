@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
+	"cosmossdk.io/x/feegrant"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
@@ -579,4 +580,61 @@ func (mr *MockEpochsKeeperMockRecorder) SetEpochInfo(ctx, info interface{}) *gom
 		reflect.TypeOf((*MockEpochsKeeper)(nil).SetEpochInfo),
 		ctx, info,
 	)
+}
+
+// Mock feegrant keeper
+type MockFeegrantKeeper struct {
+	ctrl     *gomock.Controller
+	recorder *MockFeegrantKeeperRecorder
+}
+
+type MockFeegrantKeeperRecorder struct {
+	mock *MockFeegrantKeeper
+}
+
+func NewMockFeegrantKeeper(ctrl *gomock.Controller) *MockFeegrantKeeper {
+	mock := &MockFeegrantKeeper{ctrl: ctrl}
+	mock.recorder = &MockFeegrantKeeperRecorder{mock}
+	return mock
+}
+
+func (m *MockFeegrantKeeper) EXPECT() *MockFeegrantKeeperRecorder {
+	return m.recorder
+}
+
+func (m *MockFeegrantKeeper) GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllowance", ctx, granter, grantee)
+	ret0, _ := ret[0].(feegrant.FeeAllowanceI)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockFeegrantKeeperRecorder) GetAllowance(ctx, granter, grantee interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GetAllowance), ctx, granter, grantee)
+}
+
+func (m *MockFeegrantKeeper) GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GrantAllowance", ctx, granter, grantee, allowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) GrantAllowance(ctx, granter, grantee, allowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GrantAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GrantAllowance), ctx, granter, grantee, allowance)
+}
+
+func (m *MockFeegrantKeeper) UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAllowance", ctx, granter, grantee, feeAllowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) UpdateAllowance(ctx, granter, grantee, feeAllowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).UpdateAllowance), ctx, granter, grantee, feeAllowance)
 }
