@@ -7,6 +7,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/tier/v1beta1/lockup.proto";
 import "sourcehub/tier/v1beta1/params.proto";
+import "sourcehub/tier/v1beta1/subscription.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
 
@@ -35,6 +36,16 @@ service Query {
   // UnlockingLockups queries all the unlocking lockups of a delegator.
   rpc UnlockingLockups(UnlockingLockupsRequest) returns (UnlockingLockupsResponse) {
     option (google.api.http).get = "/sourcehub/tier/v1beta1/unlocking/{delegator_address}";
+  }
+
+  // Developers queries all registered developers.
+  rpc Developers(DevelopersRequest) returns (DevelopersResponse) {
+    option (google.api.http).get = "/sourcehub/tier/v1beta1/developers";
+  }
+
+  // UserSubscriptions queries all user subscriptions for a specific developer.
+  rpc UserSubscriptions(UserSubscriptionsRequest) returns (UserSubscriptionsResponse) {
+    option (google.api.http).get = "/sourcehub/tier/v1beta1/subscriptions/{developer}";
   }
 }
 
@@ -94,5 +105,28 @@ message UnlockingLockupsRequest {
 // UnlockingLockupsResponse is the response type for the Query/UnlockingLockups RPC method.
 message UnlockingLockupsResponse {
   repeated UnlockingLockup unlockingLockups = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// DevelopersRequest is the request type for the Query/Developers RPC method.
+message DevelopersRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// DevelopersResponse is the response type for the Query/Developers RPC method.
+message DevelopersResponse {
+  repeated Developer developers = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// UserSubscriptionsRequest is the request type for the Query/UserSubscriptions RPC method.
+message UserSubscriptionsRequest {
+  string developer = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// UserSubscriptionsResponse is the response type for the Query/UserSubscriptions RPC method.
+message UserSubscriptionsResponse {
+  repeated UserSubscription user_subscriptions = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
