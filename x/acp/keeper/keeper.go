@@ -149,20 +149,25 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 
 // hasSeenSignedPolicyCmd checks the replay cache for the given payload id.
 func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, id string, currentHeight uint64) bool {
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
 	key := []byte(id)
-	bz := pref.Get(key)
-	if len(bz) == 0 {
+	opt, err := kv.Get(ctx, key)
+	if err != nil {
 		return false
 	}
+	if opt.Empty() {
+		return false
+	}
+	bz := opt.GetValue()
 	if len(bz) != 8 {
-		pref.Delete(key)
+		kv.Delete(ctx, key)
 		return false
 	}
 	exp := binary.BigEndian.Uint64(bz)
 	if exp < currentHeight {
-		pref.Delete(key)
+		kv.Delete(ctx, key)
 		return false
 	}
 	return true
@@ -170,15 +175,23 @@ func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, id string, currentHeigh
 
 // markSignedPolicyCmdSeen stores the payload id with its expiration height if not already present.
 func (k *Keeper) markSignedPolicyCmdSeen(ctx sdk.Context, id string, expireHeight uint64) error {
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
 	key := []byte(id)
-	if pref.Has(key) {
+	has, err := kv.Has(ctx, key)
+	if err != nil {
+		return fmt.Errorf("failed to check if signed policy cmd exists: %w", err)
+	}
+	if has {
 		return fmt.Errorf("signed policy cmd already processed")
 	}
 	var bz [8]byte
 	binary.BigEndian.PutUint64(bz[:], expireHeight)
-	pref.Set(key, bz[:])
+	_, err = kv.Set(ctx, key, bz[:])
+	if err != nil {
+		return fmt.Errorf("failed to store signed policy cmd: %w", err)
+	}
 	return nil
 }
 

@@ -4,11 +4,10 @@ import (
 	"encoding/binary"
 	"testing"
 
+	"github.com/sourcenetwork/raccoondb/v2/primitives"
 	"github.com/stretchr/testify/require"
 
-	"cosmossdk.io/store/prefix"
-	"github.com/cosmos/cosmos-sdk/runtime"
-
+	cosmosadapter "github.com/sourcenetwork/sourcehub/x/acp/stores/cosmos"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -19,15 +18,18 @@ func TestHasSeenSignedPolicyCmd_ExpiredKeyIsPruned(t *testing.T) {
 
 	id := "test-id"
 	current := uint64(ctx.BlockHeight())
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
 	var bz [8]byte
 	binary.BigEndian.PutUint64(bz[:], uint64(current-1))
-	pref.Set([]byte(id), bz[:])
+	kv.Set(ctx, []byte(id), bz[:])
 
 	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
-	require.False(t, pref.Has([]byte(id)))
+	has, err := kv.Has(ctx, []byte(id))
+	require.NoError(t, err)
+	require.False(t, has)
 }
 
 // Test that malformed stored values are deleted and treated as unseen.
@@ -35,13 +37,16 @@ func TestHasSeenSignedPolicyCmd_MalformedValueDeleted(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
 
 	id := "bad-id"
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
-	pref.Set([]byte(id), []byte{0x01})
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+	kv.Set(ctx, []byte(id), []byte{0x01})
 
 	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
-	require.False(t, pref.Has([]byte(id)))
+	has, err := kv.Has(ctx, []byte(id))
+	require.NoError(t, err)
+	require.False(t, has)
 }
 
 // Test that markSignedPolicyCmdSeen stores the expiration and prevents duplicate marks.
@@ -58,9 +63,12 @@ func TestMarkSignedPolicyCmdSeen_StoresAndBlocksReplay(t *testing.T) {
 	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
 	require.True(t, seen)
 
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
-	bz := pref.Get([]byte(id))
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+	opt, _ := kv.Get(ctx, []byte(id))
+	require.False(t, opt.Empty())
+	bz := opt.GetValue()
 	require.Len(t, bz, 8)
 	got := binary.BigEndian.Uint64(bz)
 	require.Equal(t, expire, got)
@@ -82,7 +90,10 @@ func TestMarkSignedPolicyCmdSeen_ExpiredImmediatelyPruned(t *testing.T) {
 	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
 
-	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	pref := prefix.NewStore(store, types.KeyPrefix(types.SignedPolicyCmdSeenKeyPrefix))
-	require.False(t, pref.Has([]byte(id)))
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+	has, err := kv.Has(ctx, []byte(id))
+	require.NoError(t, err)
+	require.False(t, has)
 }
