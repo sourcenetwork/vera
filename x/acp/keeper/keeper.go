@@ -148,12 +148,11 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 }
 
 // hasSeenSignedPolicyCmd checks the replay cache for the given payload id.
-func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, id string, currentHeight uint64) bool {
+func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, payloadID []byte, currentHeight uint64) bool {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
-	key := []byte(id)
-	opt, err := kv.Get(ctx, key)
+	opt, err := kv.Get(ctx, payloadID)
 	if err != nil {
 		return false
 	}
@@ -162,24 +161,23 @@ func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, id string, currentHeigh
 	}
 	bz := opt.GetValue()
 	if len(bz) != 8 {
-		kv.Delete(ctx, key)
+		kv.Delete(ctx, payloadID)
 		return false
 	}
 	exp := binary.BigEndian.Uint64(bz)
 	if exp < currentHeight {
-		kv.Delete(ctx, key)
+		kv.Delete(ctx, payloadID)
 		return false
 	}
 	return true
 }
 
 // markSignedPolicyCmdSeen stores the payload id with its expiration height if not already present.
-func (k *Keeper) markSignedPolicyCmdSeen(ctx sdk.Context, id string, expireHeight uint64) error {
+func (k *Keeper) markSignedPolicyCmdSeen(ctx sdk.Context, payloadID []byte, expireHeight uint64) error {
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
-	key := []byte(id)
-	has, err := kv.Has(ctx, key)
+	has, err := kv.Has(ctx, payloadID)
 	if err != nil {
 		return fmt.Errorf("failed to check if signed policy cmd exists: %w", err)
 	}
@@ -188,7 +186,7 @@ func (k *Keeper) markSignedPolicyCmdSeen(ctx sdk.Context, id string, expireHeigh
 	}
 	var bz [8]byte
 	binary.BigEndian.PutUint64(bz[:], expireHeight)
-	_, err = kv.Set(ctx, key, bz[:])
+	_, err = kv.Set(ctx, payloadID, bz[:])
 	if err != nil {
 		return fmt.Errorf("failed to store signed policy cmd: %w", err)
 	}

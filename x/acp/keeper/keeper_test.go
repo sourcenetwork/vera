@@ -16,18 +16,20 @@ func TestHasSeenSignedPolicyCmd_ExpiredKeyIsPruned(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
 	ctx = ctx.WithBlockHeight(10)
 
-	id := "test-id"
+	payloadID := []byte("test-id")
 	current := uint64(ctx.BlockHeight())
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+
 	var bz [8]byte
 	binary.BigEndian.PutUint64(bz[:], uint64(current-1))
-	kv.Set(ctx, []byte(id), bz[:])
+	kv.Set(ctx, payloadID, bz[:])
 
-	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
+	seen := k.hasSeenSignedPolicyCmd(ctx, payloadID, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
-	has, err := kv.Has(ctx, []byte(id))
+
+	has, err := kv.Has(ctx, payloadID)
 	require.NoError(t, err)
 	require.False(t, has)
 }
@@ -36,15 +38,16 @@ func TestHasSeenSignedPolicyCmd_ExpiredKeyIsPruned(t *testing.T) {
 func TestHasSeenSignedPolicyCmd_MalformedValueDeleted(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
 
-	id := "bad-id"
+	payloadID := []byte("test-id")
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
-	kv.Set(ctx, []byte(id), []byte{0x01})
+	kv.Set(ctx, payloadID, []byte{0x01})
 
-	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
+	seen := k.hasSeenSignedPolicyCmd(ctx, payloadID, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
-	has, err := kv.Has(ctx, []byte(id))
+
+	has, err := kv.Has(ctx, payloadID)
 	require.NoError(t, err)
 	require.False(t, has)
 }
@@ -54,26 +57,28 @@ func TestMarkSignedPolicyCmdSeen_StoresAndBlocksReplay(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
 	ctx = ctx.WithBlockHeight(10)
 
-	id := "mark-id"
+	payloadID := []byte("test-id")
 	expire := uint64(25)
 
-	err := k.markSignedPolicyCmdSeen(ctx, id, expire)
+	err := k.markSignedPolicyCmdSeen(ctx, payloadID, expire)
 	require.NoError(t, err)
 
-	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
+	seen := k.hasSeenSignedPolicyCmd(ctx, payloadID, uint64(ctx.BlockHeight()))
 	require.True(t, seen)
 
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
-	opt, _ := kv.Get(ctx, []byte(id))
+	opt, _ := kv.Get(ctx, payloadID)
 	require.False(t, opt.Empty())
+
 	bz := opt.GetValue()
 	require.Len(t, bz, 8)
+
 	got := binary.BigEndian.Uint64(bz)
 	require.Equal(t, expire, got)
 
-	err = k.markSignedPolicyCmdSeen(ctx, id, expire)
+	err = k.markSignedPolicyCmdSeen(ctx, payloadID, expire)
 	require.Error(t, err)
 }
 
@@ -82,18 +87,18 @@ func TestMarkSignedPolicyCmdSeen_ExpiredImmediatelyPruned(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
 	ctx = ctx.WithBlockHeight(10)
 
-	id := "expired-id"
+	payloadID := []byte("test-id")
 	expire := uint64(ctx.BlockHeight() - 1)
-	err := k.markSignedPolicyCmdSeen(ctx, id, expire)
+	err := k.markSignedPolicyCmdSeen(ctx, payloadID, expire)
 	require.NoError(t, err)
 
-	seen := k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight()))
+	seen := k.hasSeenSignedPolicyCmd(ctx, payloadID, uint64(ctx.BlockHeight()))
 	require.False(t, seen)
 
 	cmtkv := k.storeService.OpenKVStore(ctx)
 	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
 	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
-	has, err := kv.Has(ctx, []byte(id))
+	has, err := kv.Has(ctx, payloadID)
 	require.NoError(t, err)
 	require.False(t, has)
 }
