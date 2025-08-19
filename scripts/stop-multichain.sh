@@ -11,6 +11,8 @@ HERMES_HOME="$HOME/.hermes"
 C1V2_JSON="scripts/validator1-2.json"
 C2V2_JSON="scripts/validator2-2.json"
 
+ICA_PACKET_JSON="scripts/ica_packet.json"
+
 ps aux | grep sourcehubd
 
 killall sourcehubd 2>/dev/null || true
@@ -27,5 +29,6 @@ rm -rf chain_*.log
 rm -rf hermes.log
 rm $C1V2_JSON 2>/dev/null || true
 rm $C2V2_JSON 2>/dev/null || true
+rm $ICA_PACKET_JSON 2>/dev/null || true
 
 echo "DONE"

@@ -83,3 +83,10 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 func IssueModuleDID(moduleName string) string {
 	return "did:module:" + moduleName
 }
+
+// IssueInterchainAccountDID produces a DID based on the ICA account address.
+//
+// The issued did uses a pseudo-method named "ica", which appends the ICA address.
+func IssueInterchainAccountDID(icaAddr string) string {
+	return "did:ica:" + icaAddr
+}
