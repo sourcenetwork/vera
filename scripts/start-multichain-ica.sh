@@ -62,7 +62,7 @@ mkdir $HERMES_HOME
 cp scripts/hermes_config.toml "$HERMES_HOME/config.toml"
 
 # Build the binary
-make build-mac # make build-mac
+make build # make build-mac
 
 echo "==> Initializing sourcehub-1..."
 $BIN init $C1V1_NAME --chain-id $CHAIN1_ID --default-denom="uopen" --home="$C1V1_HOME"
