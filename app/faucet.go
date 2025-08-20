@@ -23,7 +23,6 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 
 	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
-	"github.com/sourcenetwork/sourcehub/app/params"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
@@ -34,14 +33,9 @@ const (
 	DefaultAllowanceExpirationDays = 30
 )
 
-// FaucetConfig defines the configuration for the faucet service.
-type FaucetConfig struct {
-	EnableFaucet bool `mapstructure:"enable_faucet"`
-}
-
 // getFaucetConfig extracts faucet configuration from app options.
-func getFaucetConfig(appOpts servertypes.AppOptions) FaucetConfig {
-	var faucetConfig FaucetConfig
+func getFaucetConfig(appOpts servertypes.AppOptions) appparams.FaucetConfig {
+	var faucetConfig appparams.FaucetConfig
 
 	if enableFaucet := appOpts.Get("faucet.enable_faucet"); enableFaucet != nil {
 		if boolVal, ok := enableFaucet.(bool); ok {
@@ -85,7 +79,7 @@ func (app *App) zeroFeeTxsAllowed() bool {
 
 // hasAddressRequested checks if an address has already requested funds.
 func (app *App) hasAddressRequested(address string) bool {
-	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(params.FaucetStoreKey))
+	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(appparams.FaucetStoreKey))
 	if store == nil {
 		return false
 	}
@@ -94,7 +88,7 @@ func (app *App) hasAddressRequested(address string) bool {
 
 // recordAddressRequested records that an address has requested funds.
 func (app *App) recordAddressRequested(address string, amount sdk.Coins, txHash string) error {
-	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(params.FaucetStoreKey))
+	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(appparams.FaucetStoreKey))
 	if store == nil {
 		return fmt.Errorf("faucet store not found")
 	}
@@ -116,7 +110,7 @@ func (app *App) recordAddressRequested(address string, amount sdk.Coins, txHash 
 
 // getRequestCount returns the number of addresses that have requested funds.
 func (app *App) getRequestCount() int {
-	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(params.FaucetStoreKey))
+	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(appparams.FaucetStoreKey))
 	if store == nil {
 		return 0
 	}
