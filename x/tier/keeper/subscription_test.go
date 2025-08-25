@@ -26,7 +26,7 @@ func TestGetAndSetDeveloper(t *testing.T) {
 		Address:         developerAddr.String(),
 		AutoLockEnabled: true,
 	}
-	k.setDeveloper(ctx, developerAddr, expectedDeveloper)
+	k.SetDeveloper(ctx, developerAddr, expectedDeveloper)
 
 	retrievedDeveloper := k.GetDeveloper(ctx, developerAddr)
 	require.NotNil(t, retrievedDeveloper)
@@ -44,7 +44,7 @@ func TestRemoveDeveloper(t *testing.T) {
 		Address:         developerAddr.String(),
 		AutoLockEnabled: false,
 	}
-	k.setDeveloper(ctx, developerAddr, developer)
+	k.SetDeveloper(ctx, developerAddr, developer)
 
 	retrievedDeveloper := k.GetDeveloper(ctx, developerAddr)
 	require.NotNil(t, retrievedDeveloper)
@@ -78,7 +78,7 @@ func TestGetAndSetUserSubscription(t *testing.T) {
 		LastRenewed:  now,
 	}
 
-	k.setUserSubscription(ctx, developerAddr, userAddr, expectedUserSub)
+	k.SetUserSubscription(ctx, developerAddr, userAddr, expectedUserSub)
 
 	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userAddr)
 	require.NotNil(t, retrievedUserSub)
@@ -109,7 +109,7 @@ func TestRemoveUserSubscription(t *testing.T) {
 		StartDate:    now,
 		LastRenewed:  now,
 	}
-	k.setUserSubscription(ctx, developerAddr, userAddr, userSub)
+	k.SetUserSubscription(ctx, developerAddr, userAddr, userSub)
 
 	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userAddr)
 	require.NotNil(t, retrievedUserSub)
@@ -155,8 +155,8 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 		LastRenewed:  now,
 	}
 
-	k.setUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
-	k.setUserSubscription(ctx, dev2Addr, user2Addr, userSub2)
+	k.SetUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
+	k.SetUserSubscription(ctx, dev2Addr, user2Addr, userSub2)
 
 	var foundSubscriptions []types.UserSubscription
 	k.mustIterateUserSubscriptions(ctx, func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
@@ -223,9 +223,9 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 		LastRenewed:  now,
 	}
 
-	k.setUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
-	k.setUserSubscription(ctx, dev1Addr, user2Addr, userSub2)
-	k.setUserSubscription(ctx, dev2Addr, user1Addr, userSub3)
+	k.SetUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
+	k.SetUserSubscription(ctx, dev1Addr, user2Addr, userSub2)
+	k.SetUserSubscription(ctx, dev2Addr, user1Addr, userSub3)
 
 	var foundSubscriptions []types.UserSubscription
 	k.mustIterateUserSubscriptionsForDeveloper(ctx, dev1Addr, func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
@@ -426,7 +426,7 @@ func TestCheckDeveloperCredits(t *testing.T) {
 		StartDate:    now,
 		LastRenewed:  now,
 	}
-	k.setUserSubscription(ctx, developerAddr, userAddr, userSub)
+	k.SetUserSubscription(ctx, developerAddr, userAddr, userSub)
 
 	err = k.updateDeveloperTotalGranted(ctx, developerAddr, creditAmount.Amount, true)
 	require.NoError(t, err)
@@ -435,7 +435,7 @@ func TestCheckDeveloperCredits(t *testing.T) {
 		Address:         developerAddr.String(),
 		AutoLockEnabled: false,
 	}
-	k.setDeveloper(ctx, developerAddr, developer)
+	k.SetDeveloper(ctx, developerAddr, developer)
 
 	err = k.checkDeveloperCredits(ctx, 1)
 	require.NoError(t, err)
