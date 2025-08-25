@@ -27,5 +27,6 @@ func (k *Keeper) ValidatePolicy(
 	return &types.QueryValidatePolicyResponse{
 		Valid:    resp.Valid,
 		ErrorMsg: resp.ErrorMsg,
+		Policy:   resp.Policy,
 	}, nil
 }

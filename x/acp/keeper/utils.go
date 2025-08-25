@@ -23,9 +23,14 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 		return "", fmt.Errorf("IssueDIDFromAccountAddr: %w", types.NewAccNotFoundErr(addr))
 	}
 
+	// Interchain Accounts (ICA) created by the host module have no pubkey set.
+	if acc.GetPubKey() == nil {
+		return did.IssueInterchainAccountDID(sdkAddr.String()), nil
+	}
+
 	did, err := did.IssueDID(acc)
 	if err != nil {
-		return "", errors.NewFromCause("could not issue did",
+		return "", errors.NewWithCause("could not issue did",
 			err,
 			errors.ErrorType_BAD_INPUT,
 			errors.Pair("address", addr),

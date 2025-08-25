@@ -1,7 +1,6 @@
 package object
 
 import (
-	stderrors "errors"
 	"testing"
 
 	"github.com/sourcenetwork/acp_core/pkg/errors"
@@ -207,7 +206,7 @@ func TestRegisterObject_RegisteringObjectInAnUndefinedResourceErrors(t *testing.
 		PolicyId:    pol.Id,
 		Object:      coretypes.NewObject("abc", "foo"),
 		Actor:       ctx.GetActor("bob"),
-		ExpectedErr: stderrors.New("resource not found"), // FIXME update once zanzi errors are sorted
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	a2.Run(ctx)
 }
@@ -239,7 +238,7 @@ func TestRegisterObject_BlankResourceErrors(t *testing.T) {
 		PolicyId:    pol.Id,
 		Object:      coretypes.NewObject("abc", "foo"),
 		Actor:       ctx.GetActor("bob"),
-		ExpectedErr: stderrors.New("resource not found"), //FIXME once zanzi errors are sorted, change this to the correct type
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	a2.Run(ctx)
 }

@@ -58,7 +58,7 @@ func (h *Handler) Dispatch(ctx *PolicyCmdCtx, cmd *types.PolicyCmd) (*types.Poli
 	case *types.PolicyCmd_UnarchiveObjectCmd:
 		return h.unarchiveObject(ctx, c.UnarchiveObjectCmd)
 	default:
-		return nil, errors.Wrap("unsuported command", errors.ErrUnknownVariant, errors.Pair("command", c))
+		return nil, errors.Wrap("unsuported command", errors.ErrUnknownVariant)
 	}
 }
 

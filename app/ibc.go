@@ -174,7 +174,18 @@ func (app *App) setDefaultIBCParams(ctx sdk.Context) {
 	app.IBCKeeper.ClientKeeper.SetParams(ctx, ibcclienttypes.DefaultParams())
 	app.IBCKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 	app.ICAControllerKeeper.SetParams(ctx, icacontrollertypes.DefaultParams())
-	app.ICAHostKeeper.SetParams(ctx, icahosttypes.DefaultParams())
+	// Enable ICA host and allow ACP msgs to be executed from interchain accounts
+	hostParams := icahosttypes.DefaultParams()
+	hostParams.HostEnabled = true
+	hostParams.AllowMessages = []string{
+		"/sourcehub.acp.MsgCreatePolicy",
+		"/sourcehub.acp.MsgEditPolicy",
+		"/sourcehub.acp.MsgCheckAccess",
+		"/sourcehub.acp.MsgSignedPolicyCmd",
+		"/sourcehub.acp.MsgBearerPolicyCmd",
+		"/sourcehub.acp.MsgDirectPolicyCmd",
+	}
+	app.ICAHostKeeper.SetParams(ctx, hostParams)
 	app.TransferKeeper.SetParams(ctx, ibctransfertypes.DefaultParams())
 }
 

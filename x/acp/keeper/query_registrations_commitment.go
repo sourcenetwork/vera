@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
@@ -27,7 +28,8 @@ func (k *Keeper) RegistrationsCommitment(
 	}
 	if opt.Empty() {
 		return nil, errors.Wrap("commitment not found", errors.ErrorType_NOT_FOUND,
-			errors.Pair("commitment", req.Id))
+			errors.Pair("commitment", fmt.Sprintf("%v", req.Id)),
+		)
 	}
 
 	return &types.QueryRegistrationsCommitmentResponse{

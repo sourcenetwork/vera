@@ -1220,29 +1220,29 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "params"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "params"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_Policy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "policy", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Policy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "policy", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_PolicyIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "policy_ids"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_PolicyIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "policy_ids"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_FilterRelationships_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "filter_relationships", "policy_id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_FilterRelationships_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "filter_relationships", "policy_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_VerifyAccessRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "verify_access_request", "policy_id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_VerifyAccessRequest_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "verify_access_request", "policy_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_ValidatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "validate_policy", "policy"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_ValidatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "validate_policy", "policy"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_AccessDecision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "access_decision", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_AccessDecision_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"sourcenetwork", "sourcehub", "acp", "access_decision", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_ObjectOwner_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"sourcenetwork", "sourcehub", "acp", "object_owner", "policy_id", "object.resource", "object.id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_ObjectOwner_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"sourcenetwork", "sourcehub", "acp", "object_owner", "policy_id", "object.resource", "object.id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_RegistrationsCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "registrations_commitment"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_RegistrationsCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "registrations_commitment"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_RegistrationsCommitmentByCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "registrations_commitment_by_commitment"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_RegistrationsCommitmentByCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "registrations_commitment_by_commitment"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_GenerateCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "generate_commitment"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_GenerateCommitment_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "generate_commitment"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_HijackAttemptsByPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "hijack_attempts_by_policy"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_HijackAttemptsByPolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"sourcenetwork", "sourcehub", "acp", "hijack_attempts_by_policy"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (
