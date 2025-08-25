@@ -536,7 +536,7 @@ func (k *Keeper) CreateDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 		AutoLockEnabled: autoLockEnabled,
 	}
 
-	k.setDeveloper(ctx, developerAddr, developer)
+	k.SetDeveloper(ctx, developerAddr, developer)
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -573,7 +573,7 @@ func (k *Keeper) UpdateDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 
 	developer.AutoLockEnabled = autoLockEnabled
 
-	k.setDeveloper(ctx, developerAddr, developer)
+	k.SetDeveloper(ctx, developerAddr, developer)
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -741,7 +741,7 @@ func (k *Keeper) AddUserSubscription(
 		LastRenewed:  now,
 	}
 
-	k.setUserSubscription(ctx, developerAddr, userAddr, userSubscription)
+	k.SetUserSubscription(ctx, developerAddr, userAddr, userSubscription)
 
 	// Grant or update periodic allowance via feegrant to the user from the developer
 	if amount != nil && subscriptionAmount.IsPositive() {
@@ -829,7 +829,7 @@ func (k *Keeper) UpdateUserSubscription(
 	userSubscription.CreditAmount = sdk.NewCoin(appparams.MicroCreditDenom, newAmount)
 	userSubscription.Period = period
 	userSubscription.LastRenewed = sdk.UnwrapSDKContext(ctx).BlockTime()
-	k.setUserSubscription(ctx, developerAddr, userAddr, userSubscription)
+	k.SetUserSubscription(ctx, developerAddr, userAddr, userSubscription)
 
 	if amount != nil && newAmount.IsPositive() {
 		spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, newAmount))

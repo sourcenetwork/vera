@@ -129,7 +129,6 @@ func UnlockingLockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValA
 }
 
 // UserSubscriptionKey builds and returns a key to store user subscription data.
-// Key format: UserSubscriptionKeyPrefix | developer_addr | user_addr
 func UserSubscriptionKey(developerAddr sdk.AccAddress, userAddr sdk.AccAddress) []byte {
 	// Calculate the size of the buffer in advance
 	size := len(developerAddr.Bytes()) + 1 + len(userAddr.Bytes()) + 1
@@ -160,29 +159,39 @@ func UserSubscriptionKeyToAddresses(key []byte) (sdk.AccAddress, sdk.AccAddress)
 }
 
 // DeveloperKey builds and returns a key to store developer configuration.
-// Key format: DeveloperKeyPrefix | developer_addr
 func DeveloperKey(developerAddr sdk.AccAddress) []byte {
 	// Calculate the size of the buffer in advance
-	size := len(DeveloperKeyPrefix) + len(developerAddr.Bytes()) + 1
+	size := len(developerAddr.Bytes()) + 1
 	buf := make([]byte, 0, size)
 
-	// Append prefix and developer address
-	buf = append(buf, []byte(DeveloperKeyPrefix)...)
+	// Append bytes to the buffer
 	buf = append(buf, developerAddr.Bytes()...)
 	buf = append(buf, '/')
 
 	return buf
 }
 
+// DeveloperKeyToAddress retrieves developerAddr from provided DeveloperKey.
+func DeveloperKeyToAddress(key []byte) sdk.AccAddress {
+	// Find the positions of the delimiters
+	parts := bytes.Split(key, []byte{'/'})
+	if len(parts) != 2 {
+		panic("invalid key format: expected format developerAddr/")
+	}
+
+	// Reconstruct the address
+	developerAddr := sdk.AccAddress(parts[0])
+
+	return developerAddr
+}
+
 // TotalDevGrantedKey builds and returns a key to store developer total granted amount.
-// Key format: TotalDevGrantedKeyPrefix | developer_addr
 func TotalDevGrantedKey(developerAddr sdk.AccAddress) []byte {
 	// Calculate the size of the buffer in advance
-	size := len(TotalDevGrantedKeyPrefix) + len(developerAddr.Bytes()) + 1
+	size := len(developerAddr.Bytes()) + 1
 	buf := make([]byte, 0, size)
 
-	// Append prefix and developer address
-	buf = append(buf, []byte(TotalDevGrantedKeyPrefix)...)
+	// Append bytes to the buffer
 	buf = append(buf, developerAddr.Bytes()...)
 	buf = append(buf, '/')
 

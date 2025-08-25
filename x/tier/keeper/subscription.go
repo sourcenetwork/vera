@@ -24,6 +24,19 @@ func (k *Keeper) developerStore(ctx context.Context) prefix.Store {
 	return prefix.NewStore(storeAdapter, []byte(types.DeveloperKeyPrefix))
 }
 
+// GetAllDevelopers returns all developers in the store.
+func (k *Keeper) GetAllDevelopers(ctx context.Context) []types.Developer {
+	var developers []types.Developer
+
+	developersCallback := func(developerAddr sdk.AccAddress, developer types.Developer) {
+		developers = append(developers, developer)
+	}
+
+	k.mustIterateDevelopers(ctx, developersCallback)
+
+	return developers
+}
+
 // GetDeveloper returns a pointer to existing developer configuration, or nil if not found.
 func (k *Keeper) GetDeveloper(ctx context.Context, developerAddr sdk.AccAddress) *types.Developer {
 	key := types.DeveloperKey(developerAddr)
@@ -39,8 +52,8 @@ func (k *Keeper) GetDeveloper(ctx context.Context, developerAddr sdk.AccAddress)
 	return &developer
 }
 
-// setDeveloper sets a developer configuration in the store.
-func (k *Keeper) setDeveloper(ctx context.Context, developerAddr sdk.AccAddress, developer *types.Developer) {
+// SetDeveloper sets a developer configuration in the store.
+func (k *Keeper) SetDeveloper(ctx context.Context, developerAddr sdk.AccAddress, developer *types.Developer) {
 	key := types.DeveloperKey(developerAddr)
 	b := k.cdc.MustMarshal(developer)
 	store := k.developerStore(ctx)
@@ -54,10 +67,40 @@ func (k *Keeper) removeDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 	store.Delete(key)
 }
 
+// mustIterateDevelopers iterates through all developers and calls the callback function.
+func (k *Keeper) mustIterateDevelopers(ctx context.Context,
+	cb func(developerAddr sdk.AccAddress, developer types.Developer)) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, []byte(types.DeveloperKeyPrefix))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var developer types.Developer
+		k.cdc.MustUnmarshal(iterator.Value(), &developer)
+		developerAddr := types.DeveloperKeyToAddress(iterator.Key())
+		cb(developerAddr, developer)
+	}
+}
+
 // userSubscriptionStore returns a prefix store for user subscriptions.
 func (k *Keeper) userSubscriptionStore(ctx context.Context) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	return prefix.NewStore(storeAdapter, []byte(types.UserSubscriptionKeyPrefix))
+}
+
+// GetAllUserSubscriptions returns all user subscriptions in the store.
+func (k *Keeper) GetAllUserSubscriptions(ctx context.Context) []types.UserSubscription {
+	var userSubscriptions []types.UserSubscription
+
+	userSubscriptionsCallback := func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
+		userSubscriptions = append(userSubscriptions, userSubscription)
+	}
+
+	k.mustIterateUserSubscriptions(ctx, userSubscriptionsCallback)
+
+	return userSubscriptions
 }
 
 // GetUserSubscription returns a pointer to existing user subscription, or nil if not found.
@@ -75,8 +118,8 @@ func (k *Keeper) GetUserSubscription(ctx context.Context, developerAddr, userAdd
 	return &userSubscription
 }
 
-// setUserSubscription sets a user subscription in the store based on the UserSubscriptionKey.
-func (k *Keeper) setUserSubscription(ctx context.Context, developerAddr, userAddr sdk.AccAddress, userSubscription *types.UserSubscription) {
+// SetUserSubscription sets a user subscription in the store based on the UserSubscriptionKey.
+func (k *Keeper) SetUserSubscription(ctx context.Context, developerAddr, userAddr sdk.AccAddress, userSubscription *types.UserSubscription) {
 	key := types.UserSubscriptionKey(developerAddr, userAddr)
 	b := k.cdc.MustMarshal(userSubscription)
 	store := k.userSubscriptionStore(ctx)
@@ -154,7 +197,7 @@ func (k *Keeper) checkDeveloperCredits(ctx context.Context, epochNumber int64) (
 		if err != nil {
 			k.logger.Error("failed to get total granted amount",
 				types.AttributeKeyDeveloper, developerAddr.String(),
-				"error", err)
+				types.AttributeKeyError, err.Error())
 			return
 		}
 
