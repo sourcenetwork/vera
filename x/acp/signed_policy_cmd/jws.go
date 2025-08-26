@@ -2,6 +2,7 @@ package signed_policy_cmd
 
 import (
 	"context"
+	"crypto/sha256"
 	"fmt"
 
 	"github.com/TBD54566975/ssi-sdk/crypto"
@@ -79,4 +80,11 @@ func (s *jwsVerifier) Verify(ctx context.Context, jwsStr string) (*types.SignedP
 	}
 
 	return payload, nil
+}
+
+// ComputePayloadID hashes a JWS payload to produce an ID used for replay protection.
+func ComputePayloadID(jwsPayload string) []byte {
+	hasher := sha256.New()
+	hasher.Write([]byte(jwsPayload))
+	return hasher.Sum(nil)
 }

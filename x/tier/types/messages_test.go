@@ -168,7 +168,65 @@ func TestMsgCancelUnlockingStake_ValidateBasic(t *testing.T) {
 		msg  MsgCancelUnlocking
 		err  error
 	}{
-		// TODO:
+		{
+			name: "valid request",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				Stake:            stake,
+				CreationHeight:   1,
+			},
+		},
+		{
+			name: "invalid delegator address",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: invalidAddr,
+				ValidatorAddress: valAddr,
+				Stake:            stake,
+				CreationHeight:   1,
+			},
+			err: ErrInvalidAddress,
+		},
+		{
+			name: "invalid validator address",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: invalidAddr,
+				Stake:            stake,
+				CreationHeight:   1,
+			},
+			err: ErrInvalidAddress,
+		},
+		{
+			name: "invalid denom",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				Stake:            invalidDenomStake,
+				CreationHeight:   1,
+			},
+			err: ErrInvalidDenom,
+		},
+		{
+			name: "invalid denom (non-positive amount)",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				Stake:            nonPositiveStake,
+				CreationHeight:   1,
+			},
+			err: ErrInvalidDenom,
+		},
+		{
+			name: "invalid denom (overflowed int64 amount)",
+			msg: MsgCancelUnlocking{
+				DelegatorAddress: delAddr,
+				ValidatorAddress: valAddr,
+				Stake:            overflowStake,
+				CreationHeight:   1,
+			},
+			err: ErrInvalidDenom,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
