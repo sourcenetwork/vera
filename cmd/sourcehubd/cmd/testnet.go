@@ -64,7 +64,7 @@ var (
 	flagStakeTokens       = "stake-tokens"
 	flagOpenTokens        = "uopen-tokens"
 	flagCreditTokens      = "ucredit-tokens"
-	flagAddFaucet         = "faucet"
+	flagAddFaucet         = "faucet-amount"
 	flagNodeDirPrefix     = "node-dir-prefix"
 	flagNodeDaemonHome    = "node-daemon-home"
 	flagStartingIPAddress = "starting-ip-address"
