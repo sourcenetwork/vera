@@ -28,6 +28,15 @@ func (k *Keeper) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPoli
 		return nil, err
 	}
 
+	id := signed_policy_cmd.ComputePayloadID(msg.Payload)
+	expireHeight := payload.IssuedHeight + payload.ExpirationDelta
+	if k.hasSeenSignedPolicyCmd(ctx, id, uint64(ctx.BlockHeight())) {
+		return nil, fmt.Errorf("PolicyCmd: %w", signed_policy_cmd.ErrPayloadAlreadyProcessed)
+	}
+	if err := k.markSignedPolicyCmdSeen(ctx, id, expireHeight); err != nil {
+		return nil, fmt.Errorf("PolicyCmd: %w", err)
+	}
+
 	handler := k.getPolicyCmdHandler(ctx)
 	result, err := handler.Dispatch(&cmdCtx, payload.Cmd)
 	if err != nil {

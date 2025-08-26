@@ -3,12 +3,15 @@ package sdk
 import (
 	"context"
 	"fmt"
+	"math"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -25,12 +28,14 @@ type TxBuilder struct {
 	gasLimit      uint64
 	feeGranter    sdk.AccAddress
 	authClient    authtypes.QueryClient
+	txClient      txtypes.ServiceClient
 	txCfg         client.TxConfig
 	feeTokenDenom string
 	feeAmt        int64
 	account       *authtypes.BaseAccount
 	txMemo        string
 	offline       bool
+	gasAdjustment float64
 }
 
 // NewTxBuilder returns a new TxBuilder, populated according to the defined options.
@@ -51,13 +56,14 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 		},
 	)
 
-	builder := TxBuilder{ // TODO evaluate tx
+	builder := TxBuilder{
 		offline:       false,
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
 		feeTokenDenom: appparams.DefaultBondDenom,
 		feeAmt:        200,
 		gasLimit:      200000,
+		gasAdjustment: 1.2,
 	}
 
 	for _, opt := range opts {
@@ -95,6 +101,10 @@ func (b *TxBuilder) BuildFromMsgs(ctx context.Context, signer TxSigner, msgs ...
 		return nil, err
 	}
 
+	if err := b.evaluateTx(ctx, builder); err != nil {
+		return nil, err
+	}
+
 	tx, err := b.finalizeTx(ctx, signer, builder)
 	if err != nil {
 		return nil, err
@@ -125,6 +135,10 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 		b.account = &acc
 	}
 
+	if b.feeGranter != nil {
+		txBuilder.SetFeeGranter(b.feeGranter)
+	}
+
 	// NOTE: The following snippet was based on the Cosmos-SDK documentation and codebase
 	// See:
 	// https://docs.cosmos.network/v0.50/user/run-node/txs#signing-a-transaction-1
@@ -146,7 +160,52 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 	return txBuilder, nil
 }
 
-func (b *TxBuilder) finalizeTx(_ context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
+// evaluateTx simulates the tx and adjusts gas and fee amounts accordingly.
+func (b *TxBuilder) evaluateTx(ctx context.Context, txBuilder client.TxBuilder) error {
+	if b.txClient == nil {
+		return nil
+	}
+
+	encoder := b.txCfg.TxEncoder()
+	txBytes, err := encoder(txBuilder.GetTx())
+	if err != nil {
+		return fmt.Errorf("encode tx for simulation: %w", err)
+	}
+
+	simRes, err := b.txClient.Simulate(ctx, &txtypes.SimulateRequest{TxBytes: txBytes})
+	if err != nil {
+		return fmt.Errorf("simulate tx: %w", err)
+	}
+
+	gasUsed := simRes.GetGasInfo().GetGasUsed()
+	if gasUsed == 0 {
+		return nil
+	}
+
+	adjusted := uint64(math.Ceil(float64(gasUsed) * b.gasAdjustment))
+	txBuilder.SetGasLimit(adjusted)
+	b.gasLimit = adjusted
+
+	minGasPrice := sdkmath.LegacyMustNewDecFromStr(appparams.DefaultMinGasPrice)
+	denomMultiplier := sdkmath.LegacyNewDec(1)
+	if b.feeTokenDenom == params.MicroCreditDenom {
+		denomMultiplier = sdkmath.LegacyNewDec(appparams.CreditFeeMultiplier)
+	}
+	gasInt := sdkmath.NewIntFromUint64(adjusted)
+	requiredAmount := minGasPrice.Mul(sdkmath.LegacyNewDecFromInt(gasInt)).Mul(denomMultiplier).Ceil().RoundInt()
+	txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewCoin(b.feeTokenDenom, requiredAmount)))
+	if requiredAmount.IsInt64() {
+		b.feeAmt = requiredAmount.Int64()
+	}
+
+	if b.feeGranter != nil {
+		txBuilder.SetFeeGranter(b.feeGranter)
+	}
+
+	return nil
+}
+
+func (b *TxBuilder) finalizeTx(ctx context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
 	signerData := xauthsigning.SignerData{
 		ChainID:       b.chainID,
 		AccountNumber: b.account.GetAccountNumber(),
@@ -155,7 +214,7 @@ func (b *TxBuilder) finalizeTx(_ context.Context, signer TxSigner, txBuilder cli
 	}
 
 	sigV2, err := tx.SignWithPrivKey(
-		context.Background(),
+		ctx,
 		signing.SignMode_SIGN_MODE_DIRECT,
 		signerData,
 		txBuilder,
@@ -287,6 +346,7 @@ func WithAuthQueryClient(client authtypes.QueryClient) TxBuilderOpt {
 func WithSDKClient(client *Client) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.authClient = client.AuthQueryClient()
+		b.txClient = client.txClient
 		return nil
 	}
 }
