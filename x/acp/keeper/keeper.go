@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/binary"
 	"fmt"
 
 	"cosmossdk.io/core/store"
@@ -144,6 +145,52 @@ func (k *Keeper) getPolicyCmdHandler(ctx sdk.Context) *policy_cmd.Handler {
 		k.getRegistrationService(ctx),
 		k.getCommitmentService(ctx),
 	)
+}
+
+// hasSeenSignedPolicyCmd checks the replay cache for the given payload id.
+func (k *Keeper) hasSeenSignedPolicyCmd(ctx sdk.Context, payloadID []byte, currentHeight uint64) bool {
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+	opt, err := kv.Get(ctx, payloadID)
+	if err != nil {
+		return false
+	}
+	if opt.Empty() {
+		return false
+	}
+	bz := opt.GetValue()
+	if len(bz) != 8 {
+		kv.Delete(ctx, payloadID)
+		return false
+	}
+	exp := binary.BigEndian.Uint64(bz)
+	if exp < currentHeight {
+		kv.Delete(ctx, payloadID)
+		return false
+	}
+	return true
+}
+
+// markSignedPolicyCmdSeen stores the payload id with its expiration height if not already present.
+func (k *Keeper) markSignedPolicyCmdSeen(ctx sdk.Context, payloadID []byte, expireHeight uint64) error {
+	cmtkv := k.storeService.OpenKVStore(ctx)
+	kv := cosmosadapter.NewFromCoreKVStore(cmtkv)
+	kv = primitives.NewPrefixedKV(kv, []byte(types.SignedPolicyCmdSeenKeyPrefix))
+	has, err := kv.Has(ctx, payloadID)
+	if err != nil {
+		return fmt.Errorf("failed to check if signed policy cmd exists: %w", err)
+	}
+	if has {
+		return fmt.Errorf("signed policy cmd already processed")
+	}
+	var bz [8]byte
+	binary.BigEndian.PutUint64(bz[:], expireHeight)
+	_, err = kv.Set(ctx, payloadID, bz[:])
+	if err != nil {
+		return fmt.Errorf("failed to store signed policy cmd: %w", err)
+	}
+	return nil
 }
 
 // getPolicyCapabilityManager returns the module's default Capability Manager instance.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto"
 	"fmt"
+	"strings"
 
 	"github.com/cosmos/gogoproto/jsonpb"
 	prototypes "github.com/cosmos/gogoproto/types"
@@ -88,11 +89,116 @@ func (b *CmdBuilder) Build(ctx context.Context) (types.SignedPolicyCmdPayload, e
 	}
 
 	if b.cmdErr != nil {
-		// TODO validate commands
 		return types.SignedPolicyCmdPayload{}, fmt.Errorf("cmdBuilder: Command invalid: %v", b.cmdErr)
 	}
 
+	if err := validatePolicyCmd(b.cmd.Cmd); err != nil {
+		return types.SignedPolicyCmdPayload{}, fmt.Errorf("cmdBuilder: Command invalid: %v", err)
+	}
+
 	return b.cmd, nil
+}
+
+// validatePolicyCmd performs basic structural validation on the embedded PolicyCmd.
+// It ensures required fields are present and non-empty for each command variant.
+func validatePolicyCmd(cmd *types.PolicyCmd) error {
+	switch c := cmd.GetCmd().(type) {
+	case *types.PolicyCmd_SetRelationshipCmd:
+		rel := c.SetRelationshipCmd.GetRelationship()
+		if rel == nil {
+			return fmt.Errorf("set_relationship: relationship is required")
+		}
+		obj := rel.GetObject()
+		if obj == nil || strings.TrimSpace(obj.GetResource()) == "" || strings.TrimSpace(obj.GetId()) == "" {
+			return fmt.Errorf("set_relationship: object resource and id are required")
+		}
+		if strings.TrimSpace(rel.GetRelation()) == "" {
+			return fmt.Errorf("set_relationship: relation is required")
+		}
+		subj := rel.GetSubject()
+		if subj == nil {
+			return fmt.Errorf("set_relationship: subject is required")
+		}
+		validSubject := false
+		if a := subj.GetActor(); a != nil && strings.TrimSpace(a.GetId()) != "" {
+			validSubject = true
+		}
+		if o := subj.GetObject(); o != nil && strings.TrimSpace(o.GetResource()) != "" && strings.TrimSpace(o.GetId()) != "" {
+			validSubject = true
+		}
+		if as := subj.GetActorSet(); as != nil && strings.TrimSpace(as.GetRelation()) != "" {
+			validSubject = true
+		}
+		if subj.GetAllActors() != nil {
+			validSubject = true
+		}
+		if !validSubject {
+			return fmt.Errorf("set_relationship: invalid subject")
+		}
+		return nil
+
+	case *types.PolicyCmd_DeleteRelationshipCmd:
+		rel := c.DeleteRelationshipCmd.GetRelationship()
+		if rel == nil {
+			return fmt.Errorf("delete_relationship: relationship is required")
+		}
+		obj := rel.GetObject()
+		if obj == nil || strings.TrimSpace(obj.GetResource()) == "" || strings.TrimSpace(obj.GetId()) == "" {
+			return fmt.Errorf("delete_relationship: object resource and id are required")
+		}
+		if strings.TrimSpace(rel.GetRelation()) == "" {
+			return fmt.Errorf("delete_relationship: relation is required")
+		}
+		if rel.GetSubject() == nil {
+			return fmt.Errorf("delete_relationship: subject is required")
+		}
+		return nil
+
+	case *types.PolicyCmd_RegisterObjectCmd:
+		obj := c.RegisterObjectCmd.GetObject()
+		if obj == nil || strings.TrimSpace(obj.GetResource()) == "" || strings.TrimSpace(obj.GetId()) == "" {
+			return fmt.Errorf("register_object: object resource and id are required")
+		}
+		return nil
+
+	case *types.PolicyCmd_ArchiveObjectCmd:
+		obj := c.ArchiveObjectCmd.GetObject()
+		if obj == nil || strings.TrimSpace(obj.GetResource()) == "" || strings.TrimSpace(obj.GetId()) == "" {
+			return fmt.Errorf("archive_object: object resource and id are required")
+		}
+		return nil
+
+	case *types.PolicyCmd_UnarchiveObjectCmd:
+		obj := c.UnarchiveObjectCmd.GetObject()
+		if obj == nil || strings.TrimSpace(obj.GetResource()) == "" || strings.TrimSpace(obj.GetId()) == "" {
+			return fmt.Errorf("unarchive_object: object resource and id are required")
+		}
+		return nil
+
+	case *types.PolicyCmd_CommitRegistrationsCmd:
+		if len(c.CommitRegistrationsCmd.GetCommitment()) == 0 {
+			return fmt.Errorf("commit_registrations: commitment is required")
+		}
+		return nil
+
+	case *types.PolicyCmd_RevealRegistrationCmd:
+		if c.RevealRegistrationCmd.GetProof() == nil {
+			return fmt.Errorf("reveal_registration: proof is required")
+		}
+		if c.RevealRegistrationCmd.GetRegistrationsCommitmentId() == 0 {
+			return fmt.Errorf("reveal_registration: registrations_commitment_id must be > 0")
+		}
+		return nil
+
+	case *types.PolicyCmd_FlagHijackAttemptCmd:
+		if c.FlagHijackAttemptCmd.GetEventId() == 0 {
+			return fmt.Errorf("flag_hijack_attempt: event_id must be > 0")
+		}
+		return nil
+
+	default:
+		return fmt.Errorf("unknown command variant")
+	}
 }
 
 // CreationTimestamp sets the creation timestamp

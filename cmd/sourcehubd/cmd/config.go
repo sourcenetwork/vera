@@ -12,12 +12,7 @@ import (
 type CustomAppConfig struct {
 	serverconfig.Config `mapstructure:",squash"`
 
-	Faucet FaucetConfig `mapstructure:"faucet"`
-}
-
-// FaucetConfig defines the configuration for the faucet service
-type FaucetConfig struct {
-	EnableFaucet bool `mapstructure:"enable_faucet"`
+	Faucet appparams.FaucetConfig `mapstructure:"faucet"`
 }
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -61,7 +56,7 @@ func initAppConfig() (string, interface{}) {
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
-		Faucet: FaucetConfig{
+		Faucet: appparams.FaucetConfig{
 			EnableFaucet: false,
 		},
 	}
