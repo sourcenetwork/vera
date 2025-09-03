@@ -35,10 +35,6 @@ ICA_PACKET_JSON="scripts/ica_packet.json"
 
 POLICY_CONTENT="name: ica test policy"
 
-# Allow only specific controller chain and connection ids to open ICA connections on the host
-# export SOURCEHUB_ICA_ALLOWED_CONTROLLERS="sourcehub-1"
-# export SOURCEHUB_ICA_ALLOWED_CONNECTIONS="connection-0"
-
 # Exit if no hermes binary found
 if ! type "hermes" > /dev/null; then
   echo "Hermes binary not found"
@@ -134,7 +130,7 @@ $BIN start \
   > chain_2_1.log 2>&1 &
 echo "sourcehub-2 running"
 
-sleep 5
+sleep 10
 
 # Add hermes key (same for both chains)
 echo "divert tenant reveal hire thing jar carry lonely magic oak audit fiber earth catalog cheap merry print clown portion speak daring giant weird slight" > /tmp/mnemonic.txt
@@ -142,7 +138,7 @@ hermes keys add --chain $CHAIN1_ID --mnemonic-file /tmp/mnemonic.txt
 hermes keys add --chain $CHAIN2_ID --mnemonic-file /tmp/mnemonic.txt
 rm /tmp/mnemonic.txt
 
-echo "==> Creating IBC connection (no channel)..."
+echo "==> Creating IBC connection..."
 hermes create connection \
   --a-chain $CHAIN1_ID \
   --b-chain $CHAIN2_ID
@@ -154,18 +150,30 @@ hermes start > hermes.log 2>&1 &
 
 sleep 1
 
-# Detect latest connection id on controller if not provided
-if [ -z "$CONNECTION_ID" ]; then
-  CONNECTION_ID=$($BIN q ibc connection connections --node "$C1V1_RPC" -o json | jq -r '.connections | last | .id')
-  echo "Detected CONNECTION_ID=$CONNECTION_ID"
-fi
+# Detect the actual connection IDs assigned by the chains
+CONNECTION_ID=$($BIN q ibc connection connections --node "$C1V1_RPC" -o json | jq -r '.connections | last | .id')
+HOST_CONNECTION_ID=$($BIN q ibc connection connections --node "$C2V1_RPC" -o json | jq -r '.connections | last | .id')
+echo "==> Detected connection IDs:"
+echo "Controller connection: $CONNECTION_ID"
+echo "Host connection: $HOST_CONNECTION_ID"
 
-# ICA testing section
 CTRL_HOME=$C1V1_HOME
 CTRL_RPC=$C1V1_RPC
 CTRL_CHAIN_ID=$CHAIN1_ID
+ICA_VERSION=$(cat <<EOF
+{
+  "version": "ics27-1",
+  "controller_connection_id": "$CONNECTION_ID",
+  "host_connection_id": "$HOST_CONNECTION_ID",
+  "address": "",
+  "encoding": "proto3",
+  "tx_type": "sdk_multi_msg"
+}
+EOF
+)
 
 echo "==> Registering interchain account on $CTRL_CHAIN_ID (controller) via $CONNECTION_ID"
+echo "Using version metadata: $ICA_VERSION"
 $BIN tx interchain-accounts controller register "$CONNECTION_ID" \
   --from $SOURCE_ADDR \
   --keyring-backend test \
@@ -173,7 +181,7 @@ $BIN tx interchain-accounts controller register "$CONNECTION_ID" \
   --home "$CTRL_HOME" \
   --node "$CTRL_RPC" \
   --ordering ORDER_ORDERED \
-  --version "" \
+  --version "$ICA_VERSION" \
   --gas auto \
   --fees 500uopen \
   --yes

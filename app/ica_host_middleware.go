@@ -9,21 +9,21 @@ import (
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 )
 
-type icaHostRoutingMiddleware struct {
+type icaHostMiddleware struct {
 	app       *App
 	acpKeeper *acpkeeper.Keeper
 	next      porttypes.IBCModule
 }
 
-func newICAHostRoutingMiddleware(app *App, acpKeeper *acpkeeper.Keeper, next porttypes.IBCModule) porttypes.IBCModule {
-	return &icaHostRoutingMiddleware{
+func newICAHostMiddleware(app *App, acpKeeper *acpkeeper.Keeper, next porttypes.IBCModule) porttypes.IBCModule {
+	return &icaHostMiddleware{
 		app:       app,
 		acpKeeper: acpKeeper,
 		next:      next,
 	}
 }
 
-func (m *icaHostRoutingMiddleware) OnRecvPacket(
+func (m *icaHostMiddleware) OnRecvPacket(
 	ctx sdk.Context,
 	portID string,
 	packet channeltypes.Packet,
@@ -32,7 +32,7 @@ func (m *icaHostRoutingMiddleware) OnRecvPacket(
 	return m.next.OnRecvPacket(ctx, portID, packet, relayer)
 }
 
-func (m *icaHostRoutingMiddleware) OnAcknowledgementPacket(
+func (m *icaHostMiddleware) OnAcknowledgementPacket(
 	ctx sdk.Context,
 	portID string,
 	packet channeltypes.Packet,
@@ -42,7 +42,7 @@ func (m *icaHostRoutingMiddleware) OnAcknowledgementPacket(
 	return m.next.OnAcknowledgementPacket(ctx, portID, packet, acknowledgement, relayer)
 }
 
-func (m *icaHostRoutingMiddleware) OnTimeoutPacket(
+func (m *icaHostMiddleware) OnTimeoutPacket(
 	ctx sdk.Context,
 	portID string,
 	packet channeltypes.Packet,
@@ -51,7 +51,7 @@ func (m *icaHostRoutingMiddleware) OnTimeoutPacket(
 	return m.next.OnTimeoutPacket(ctx, portID, packet, relayer)
 }
 
-func (m *icaHostRoutingMiddleware) OnChanOpenInit(
+func (m *icaHostMiddleware) OnChanOpenInit(
 	ctx sdk.Context,
 	order channeltypes.Order,
 	connectionHops []string,
@@ -62,7 +62,7 @@ func (m *icaHostRoutingMiddleware) OnChanOpenInit(
 	return m.next.OnChanOpenInit(ctx, order, connectionHops, portID, channelID, counterparty, version)
 }
 
-func (m *icaHostRoutingMiddleware) OnChanOpenTry(
+func (m *icaHostMiddleware) OnChanOpenTry(
 	ctx sdk.Context,
 	order channeltypes.Order,
 	connectionHops []string,
@@ -90,21 +90,21 @@ func (m *icaHostRoutingMiddleware) OnChanOpenTry(
 	return version, nil
 }
 
-func (m *icaHostRoutingMiddleware) OnChanOpenAck(
+func (m *icaHostMiddleware) OnChanOpenAck(
 	ctx sdk.Context,
 	portID, channelID, counterpartyChannelID, counterpartyVersion string,
 ) error {
 	return m.next.OnChanOpenAck(ctx, portID, channelID, counterpartyChannelID, counterpartyVersion)
 }
 
-func (m *icaHostRoutingMiddleware) OnChanOpenConfirm(ctx sdk.Context, portID, channelID string) error {
+func (m *icaHostMiddleware) OnChanOpenConfirm(ctx sdk.Context, portID, channelID string) error {
 	return m.next.OnChanOpenConfirm(ctx, portID, channelID)
 }
 
-func (m *icaHostRoutingMiddleware) OnChanCloseInit(ctx sdk.Context, portID, channelID string) error {
+func (m *icaHostMiddleware) OnChanCloseInit(ctx sdk.Context, portID, channelID string) error {
 	return m.next.OnChanCloseInit(ctx, portID, channelID)
 }
 
-func (m *icaHostRoutingMiddleware) OnChanCloseConfirm(ctx sdk.Context, portID, channelID string) error {
+func (m *icaHostMiddleware) OnChanCloseConfirm(ctx sdk.Context, portID, channelID string) error {
 	return m.next.OnChanCloseConfirm(ctx, portID, channelID)
 }

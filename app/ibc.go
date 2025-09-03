@@ -131,7 +131,7 @@ func (app *App) registerIBCModules() {
 	)
 
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
-	icaHostStack := newICAHostRoutingMiddleware(app, app.AcpKeeper, icaHostIBCModule)
+	icaHostStack := newICAHostMiddleware(app, app.AcpKeeper, icaHostIBCModule)
 	icaControllerStack := icacontroller.NewIBCMiddleware(app.ICAControllerKeeper)
 	transferStack := transfer.NewIBCModule(app.TransferKeeper)
 
