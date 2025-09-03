@@ -1,11 +1,14 @@
 package keeper
 
 import (
+	"strings"
+
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	tmtypes "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -67,9 +70,7 @@ func (k *Keeper) GetAllICAConnections(ctx sdk.Context) []types.ICAConnection {
 }
 
 // mustIterateICAConnections iterates over all ICA connections in the store and performs the provided callback function.
-func (k *Keeper) mustIterateICAConnections(ctx sdk.Context,
-	cb func(icaAddress string, connection types.ICAConnection)) {
-
+func (k *Keeper) mustIterateICAConnections(ctx sdk.Context, cb func(icaAddress string, connection types.ICAConnection)) {
 	store := k.icaConnectionStore(ctx)
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
@@ -80,5 +81,58 @@ func (k *Keeper) mustIterateICAConnections(ctx sdk.Context,
 		k.cdc.MustUnmarshal(iterator.Value(), &connection)
 		icaAddress := string(iterator.Key())
 		cb(icaAddress, connection)
+	}
+}
+
+// HandleICAChannelOpen processes ICA channel opening and stores connection information.
+func (k *Keeper) HandleICAChannelOpen(
+	ctx sdk.Context,
+	connectionID, controllerPortID string,
+	icaHostKeeper types.ICAHostKeeper,
+	connectionKeeper types.ConnectionKeeper,
+	clientKeeper types.ClientKeeper,
+) {
+	// Get ICA address (should exist after OnChanOpenTry)
+	icaAddr, found := icaHostKeeper.GetInterchainAccountAddress(ctx, connectionID, controllerPortID)
+	if !found {
+		return
+	}
+
+	// Check if connection already exists to avoid duplicates
+	if _, exists := k.GetICAConnection(ctx, icaAddr); exists {
+		return
+	}
+
+	// Extract controller address from port ID (icacontroller-{address})
+	if !strings.HasPrefix(controllerPortID, "icacontroller-") {
+		return
+	}
+
+	// Get controller chain ID from connection
+	conn, found := connectionKeeper.GetConnection(ctx, connectionID)
+	if !found {
+		return
+	}
+
+	clientState, ok := clientKeeper.GetClientState(ctx, conn.ClientId)
+	if !ok {
+		return
+	}
+
+	// Extract chain ID from Tendermint client state
+	tmClientState, ok := clientState.(*tmtypes.ClientState)
+	if !ok {
+		return
+	}
+
+	controllerChainID := tmClientState.GetChainID()
+	if controllerChainID == "" {
+		return
+	}
+
+	controllerAddr := strings.TrimPrefix(controllerPortID, "icacontroller-")
+	if err := k.SetICAConnection(ctx, icaAddr, controllerAddr, controllerChainID, connectionID); err != nil {
+		ctx.Logger().Error("Failed to store ICA connection", "error", err, "ica_address", icaAddr)
+		return
 	}
 }

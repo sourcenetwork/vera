@@ -3,9 +3,40 @@ package keeper
 import (
 	"testing"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	connectiontypes "github.com/cosmos/ibc-go/v10/modules/core/03-connection/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	tmtypes "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
+
+type mockICAHostKeeper struct {
+	icaAddress string
+	found      bool
+}
+
+func (m *mockICAHostKeeper) GetInterchainAccountAddress(ctx sdk.Context, connectionID, portID string) (string, bool) {
+	return m.icaAddress, m.found
+}
+
+type mockConnectionKeeper struct {
+	connection connectiontypes.ConnectionEnd
+	found      bool
+}
+
+func (m *mockConnectionKeeper) GetConnection(ctx sdk.Context, connectionID string) (connectiontypes.ConnectionEnd, bool) {
+	return m.connection, m.found
+}
+
+type mockClientKeeper struct {
+	clientState ibcexported.ClientState
+	found       bool
+}
+
+func (m *mockClientKeeper) GetClientState(ctx sdk.Context, clientID string) (ibcexported.ClientState, bool) {
+	return m.clientState, m.found
+}
 
 func TestSetAndGetICAConnection(t *testing.T) {
 	ctx, k, _ := setupKeeper(t)
@@ -57,7 +88,6 @@ func TestGetAllICAConnections(t *testing.T) {
 	connections := k.GetAllICAConnections(ctx)
 	require.Len(t, connections, 2)
 
-	// Find connections by ICA address
 	var connection1, connection2 types.ICAConnection
 	for _, conn := range connections {
 		if conn.IcaAddress == icaAddress1 {
@@ -142,4 +172,39 @@ func TestSetICAConnectionEmptyAddress(t *testing.T) {
 	connection, found := k.GetICAConnection(ctx, "")
 	require.False(t, found)
 	require.Equal(t, types.ICAConnection{}, connection)
+}
+
+func TestHandleICAChannelOpen(t *testing.T) {
+	ctx, k, _ := setupKeeper(t)
+
+	icaHostKeeper := &mockICAHostKeeper{
+		icaAddress: "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+		found:      true,
+	}
+
+	connectionKeeper := &mockConnectionKeeper{
+		connection: connectiontypes.ConnectionEnd{
+			ClientId: "07-tendermint-0",
+		},
+		found: true,
+	}
+
+	clientKeeper := &mockClientKeeper{
+		clientState: &tmtypes.ClientState{
+			ChainId: "shinzo-1",
+		},
+		found: true,
+	}
+
+	connectionID := "connection-0"
+	controllerPortID := "icacontroller-source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme"
+	k.HandleICAChannelOpen(ctx, connectionID, controllerPortID, icaHostKeeper, connectionKeeper, clientKeeper)
+
+	// Verify the connection was stored
+	connection, found := k.GetICAConnection(ctx, icaHostKeeper.icaAddress)
+	require.True(t, found)
+	require.Equal(t, icaHostKeeper.icaAddress, connection.IcaAddress)
+	require.Equal(t, "source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme", connection.ControllerAddress)
+	require.Equal(t, "shinzo-1", connection.ControllerChainId)
+	require.Equal(t, connectionID, connection.ConnectionId)
 }
