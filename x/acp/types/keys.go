@@ -18,12 +18,11 @@ const (
 
 	// AmendmentEventKeyPrefix defines a key prefix for Amendment Events
 	AmendmentEventKeyPrefix = "amendment_event/"
+
+	// ICAConnectionKeyPrefix defines a key prefix for ICA connections
+	ICAConnectionKeyPrefix = "ica_connection/"
 )
 
 var (
 	ParamsKey = []byte("p_acp")
 )
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}
