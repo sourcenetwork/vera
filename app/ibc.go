@@ -130,7 +130,8 @@ func (app *App) registerIBCModules() {
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	icaHostStack := icahost.NewIBCModule(app.ICAHostKeeper)
+	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
+	icaHostStack := newICAHostRoutingMiddleware(app, app.AcpKeeper, icaHostIBCModule)
 	icaControllerStack := icacontroller.NewIBCMiddleware(app.ICAControllerKeeper)
 	transferStack := transfer.NewIBCModule(app.TransferKeeper)
 
