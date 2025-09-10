@@ -26,8 +26,8 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-        
-      - name: Prepare Release Variables 
+
+      - name: Prepare Release Variables
         id: vars
         uses: ignite/cli/actions/release/vars@main
 
@@ -43,7 +43,7 @@ jobs:
           fail_ci_if_error: true
           verbose: true
 
-      - name: Issue Release Assets 
+      - name: Issue Release Assets
         uses: ignite/cli/actions/cli@main
         if: ${{ steps.vars.outputs.should_release == 'true' }}
         env:
@@ -66,6 +66,6 @@ jobs:
         with:
           tag_name: ${{ steps.vars.outputs.tag_name }}
           files: release/*
-          prerelease: true 
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
