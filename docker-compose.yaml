@@ -1,12 +1,13 @@
-version: '3.8'
-
 services:
   sourcehub:
     build:
-      target: builder
-      args:
-        dev: 1
-    ports:
-      - 1317
+      context: .
     volumes:
-      - .:/app
+      - ./secrets:/secrets
+    environment:
+      CHAIN_ID: sourcehuberino
+      MONIKER: yayay
+      GENESIS_PATH: /secrets/genesis.json
+      MNEMONIC_PATH: /secrets/mnemonic
+      CONSENSUS_KEY_PATH: /secrets/priv_validator_key.json
+      COMET_NODE_KEY_PATH: /secrets/node_key.json
