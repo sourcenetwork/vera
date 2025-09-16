@@ -8,6 +8,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	tmtypes "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -104,7 +105,7 @@ func (k *Keeper) HandleICAChannelOpen(
 	}
 
 	// Extract controller address from port ID (icacontroller-{address})
-	if !strings.HasPrefix(controllerPortID, "icacontroller-") {
+	if !strings.HasPrefix(controllerPortID, icatypes.ControllerPortPrefix) {
 		return
 	}
 
@@ -130,7 +131,7 @@ func (k *Keeper) HandleICAChannelOpen(
 		return
 	}
 
-	controllerAddr := strings.TrimPrefix(controllerPortID, "icacontroller-")
+	controllerAddr := strings.TrimPrefix(controllerPortID, icatypes.ControllerPortPrefix)
 	if err := k.SetICAConnection(ctx, icaAddr, controllerAddr, controllerChainID, connectionID); err != nil {
 		ctx.Logger().Error("Failed to store ICA connection", "error", err, "ica_address", icaAddr)
 		return

@@ -2,6 +2,7 @@ package app
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	channeltypes "github.com/cosmos/ibc-go/v10/modules/core/04-channel/types"
 	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
@@ -76,7 +77,7 @@ func (m *icaHostMiddleware) OnChanOpenTry(
 	}
 
 	// Only process ICA host channels during DeliverTx to avoid duplicate processing
-	if portID == "icahost" && len(connectionHops) > 0 && !ctx.IsCheckTx() {
+	if portID == icatypes.HostPortID && len(connectionHops) > 0 && !ctx.IsCheckTx() {
 		m.acpKeeper.HandleICAChannelOpen(
 			ctx,
 			connectionHops[0],
