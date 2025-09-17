@@ -15,48 +15,37 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	icatestutil "github.com/sourcenetwork/sourcehub/x/ica/testutil"
+	"github.com/sourcenetwork/sourcehub/x/ica/keeper"
+	"github.com/sourcenetwork/sourcehub/x/ica/types"
 )
 
-func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
-	acpStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
-	capabilityStoreKey := storetypes.NewKVStoreKey("capkeeper")
-	capabilityMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
+func IcaKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
+	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-	// mount stores
-	stateStore.MountStoreWithDB(acpStoreKey, storetypes.StoreTypeDB, db)
-	stateStore.MountStoreWithDB(capabilityStoreKey, storetypes.StoreTypeDB, db)
-	stateStore.MountStoreWithDB(capabilityMemStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
-	capKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, capabilityMemStoreKey)
-	acpCapKeeper := capKeeper.ScopeToModule(types.ModuleName)
-
 	k := keeper.NewKeeper(
 		cdc,
-		runtime.NewKVStoreService(acpStoreKey),
+		runtime.NewKVStoreService(storeKey),
 		log.NewNopLogger(),
 		authority.String(),
-		&AccountKeeperStub{},
-		&acpCapKeeper,
-		icatestutil.NewICAKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
 
 	// Initialize params
-	k.SetParams(ctx, types.DefaultParams())
+	if err := k.SetParams(ctx, types.DefaultParams()); err != nil {
+		panic(err)
+	}
 
 	return k, ctx
 }
