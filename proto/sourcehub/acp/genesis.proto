@@ -5,7 +5,6 @@ package sourcehub.acp;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "sourcehub/acp/params.proto";
-import "sourcehub/acp/ica_connection.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -16,7 +15,4 @@ message GenesisState {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-
-  // ica_connections defines the list of ICA connections.
-  repeated ICAConnection ica_connections = 2 [(gogoproto.nullable) = false];
 }
