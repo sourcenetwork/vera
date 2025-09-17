@@ -7,19 +7,19 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v10/modules/core/05-port/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	icakeeper "github.com/sourcenetwork/sourcehub/x/ica/keeper"
 )
 
 type icaHostMiddleware struct {
 	app       *App
-	acpKeeper *acpkeeper.Keeper
+	icaKeeper *icakeeper.Keeper
 	next      porttypes.IBCModule
 }
 
-func newICAHostMiddleware(app *App, acpKeeper *acpkeeper.Keeper, next porttypes.IBCModule) porttypes.IBCModule {
+func newICAHostMiddleware(app *App, icaKeeper *icakeeper.Keeper, next porttypes.IBCModule) porttypes.IBCModule {
 	return &icaHostMiddleware{
 		app:       app,
-		acpKeeper: acpKeeper,
+		icaKeeper: icaKeeper,
 		next:      next,
 	}
 }
@@ -78,7 +78,7 @@ func (m *icaHostMiddleware) OnChanOpenTry(
 
 	// Only process ICA host channels during DeliverTx to avoid duplicate processing
 	if portID == icatypes.HostPortID && len(connectionHops) > 0 && !ctx.IsCheckTx() {
-		m.acpKeeper.HandleICAChannelOpen(
+		m.icaKeeper.HandleICAChannelOpen(
 			ctx,
 			connectionHops[0],
 			counterparty.PortId,

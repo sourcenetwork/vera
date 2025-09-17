@@ -71,6 +71,7 @@ import (
 	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
+	icamodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/ica/module"
 	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -78,9 +79,10 @@ import (
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	_ "github.com/sourcenetwork/sourcehub/x/ica/module"
+	icamoduletypes "github.com/sourcenetwork/sourcehub/x/ica/types"
 	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
 var (
@@ -116,11 +118,11 @@ var (
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
+		icamoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -143,11 +145,11 @@ var (
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
+		icamoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
 	endBlockers = []string{
@@ -164,16 +166,15 @@ var (
 		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
+		icamoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/preBlockers
 	}
 
 	// module account permissions
@@ -190,7 +191,6 @@ var (
 		{Account: tiertypes.DeveloperPoolName},
 		{Account: tiertypes.InsurancePoolName},
 		{Account: bulletintypes.ModuleName},
-		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
 	// blocked account addresses
@@ -320,6 +320,10 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
+				Name:   icamoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&icamodulev1.Module{}),
+			},
+			{
 				Name:   acptypes.ModuleName,
 				Config: appconfig.WrapAny(&acpmodulev1.Module{}),
 			},
@@ -335,7 +339,6 @@ var (
 				Name:   tiertypes.ModuleName,
 				Config: appconfig.WrapAny(&tiermodulev1.Module{}),
 			},
-			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
 	})
 )

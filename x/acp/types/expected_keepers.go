@@ -4,8 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	connectiontypes "github.com/cosmos/ibc-go/v10/modules/core/03-connection/types"
-	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	icatypes "github.com/sourcenetwork/sourcehub/x/ica/types"
 )
 
 // AccountKeeper defines the expected interface for the Account module.
@@ -26,17 +25,8 @@ type ParamSubspace interface {
 	Set(context.Context, []byte, interface{})
 }
 
-// ICAHostKeeper defines the expected ICA host keeper interface.
-type ICAHostKeeper interface {
-	GetInterchainAccountAddress(ctx sdk.Context, connectionID, portID string) (string, bool)
-}
-
-// ConnectionKeeper defines the expected connection keeper interface.
-type ConnectionKeeper interface {
-	GetConnection(ctx sdk.Context, connectionID string) (connectiontypes.ConnectionEnd, bool)
-}
-
-// ClientKeeper defines the expected client keeper interface.
-type ClientKeeper interface {
-	GetClientState(ctx sdk.Context, clientID string) (ibcexported.ClientState, bool)
+// ICAKeeper defines the expected interface for the ICA module.
+type ICAKeeper interface {
+	GetICAConnection(ctx sdk.Context, icaAddress string) (icatypes.ICAConnection, bool)
+	SetICAConnection(ctx sdk.Context, icaAddress, controllerAddress, controllerChainID, connectionID string) error
 }
