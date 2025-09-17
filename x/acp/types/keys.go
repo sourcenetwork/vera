@@ -21,9 +21,6 @@ const (
 
 	// SignedPolicyCmdSeenKeyPrefix defines a key prefix for seen signed policy command payloads
 	SignedPolicyCmdSeenKeyPrefix = "spc_seen/"
-
-	// ICAConnectionKeyPrefix defines a key prefix for ICA connections
-	ICAConnectionKeyPrefix = "ica_connection/"
 )
 
 var (
