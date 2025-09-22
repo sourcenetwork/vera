@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
-
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
@@ -23,9 +23,10 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 		return "", fmt.Errorf("IssueDIDFromAccountAddr: %w", types.NewAccNotFoundErr(addr))
 	}
 
-	// Interchain Accounts (ICA) created by the host module have no pubkey set.
-	if acc.GetPubKey() == nil {
-		return did.IssueInterchainAccountDID(sdkAddr.String()), nil
+	// Check if this is an ICA address
+	if _, found := k.icaKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), addr); found {
+		controllerDID := did.IssueInterchainAccountDID(addr)
+		return controllerDID, nil
 	}
 
 	did, err := did.IssueDID(acc)

@@ -20,6 +20,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	icatestutil "github.com/sourcenetwork/sourcehub/x/ica/testutil"
 )
 
 func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -49,6 +50,7 @@ func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		&AccountKeeperStub{},
 		&acpCapKeeper,
+		icatestutil.NewICAKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
