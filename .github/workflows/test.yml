@@ -1,0 +1,26 @@
+# Test workflow runs tests and coverage on all pushes and pull requests.
+on:
+  push:
+    branches: [ "**" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+
+      - name: Run Tests and Generate Coverage
+        run: |
+          go test -coverpkg=all ./... -coverprofile=coverage.txt
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.txt
+          fail_ci_if_error: true
+          verbose: true

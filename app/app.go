@@ -72,6 +72,7 @@ import (
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	icakeeper "github.com/sourcenetwork/sourcehub/x/ica/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
@@ -130,6 +131,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
+	IcaKeeper      *icakeeper.Keeper
 	AcpKeeper      *acpkeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
@@ -258,6 +260,7 @@ func New(
 		&app.GroupKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
+		&app.IcaKeeper,
 		&app.AcpKeeper,
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,

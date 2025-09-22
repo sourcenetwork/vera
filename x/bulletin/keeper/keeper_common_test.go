@@ -26,6 +26,7 @@ import (
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	icatestutil "github.com/sourcenetwork/sourcehub/x/ica/testutil"
 )
 
 func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
@@ -77,6 +78,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
+		icatestutil.NewICAKeeperStub(),
 	)
 
 	k := NewKeeper(
