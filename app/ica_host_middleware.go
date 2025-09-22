@@ -78,14 +78,16 @@ func (m *icaHostMiddleware) OnChanOpenTry(
 
 	// Only process ICA host channels during DeliverTx to avoid duplicate processing
 	if portID == icatypes.HostPortID && len(connectionHops) > 0 && !ctx.IsCheckTx() {
-		m.icaKeeper.HandleICAChannelOpen(
+		if err := m.icaKeeper.HandleICAChannelOpen(
 			ctx,
 			connectionHops[0],
 			counterparty.PortId,
 			m.app.ICAHostKeeper,
 			m.app.IBCKeeper.ConnectionKeeper,
 			m.app.IBCKeeper.ClientKeeper,
-		)
+		); err != nil {
+			ctx.Logger().Error("Failed to handle ICA channel open", "error", err, "connection_id", connectionHops[0], "controller_port_id", counterparty.PortId)
+		}
 	}
 
 	return version, nil

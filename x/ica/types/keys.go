@@ -17,7 +17,3 @@ const (
 var (
 	ParamsKey = []byte("p_ica")
 )
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}

@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"fmt"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
@@ -93,55 +92,63 @@ func (k *Keeper) HandleICAChannelOpen(
 	icaHostKeeper types.ICAHostKeeper,
 	connectionKeeper types.ConnectionKeeper,
 	clientKeeper types.ClientKeeper,
-) {
+) error {
 	// Get ICA address (should exist after OnChanOpenTry)
 	icaAddr, found := icaHostKeeper.GetInterchainAccountAddress(ctx, connectionID, controllerPortID)
 	if !found {
-		ctx.Logger().Error("ICA address not found", "connection_id", connectionID, "controller_port_id", controllerPortID)
-		return
+		return errorsmod.Wrapf(
+			types.ErrInvalidInput,
+			"ICA address not found for connection_id %s and controller_port_id %s",
+			connectionID,
+			controllerPortID,
+		)
 	}
 
 	// Check if connection already exists to avoid duplicates
 	if _, exists := k.GetICAConnection(ctx, icaAddr); exists {
-		ctx.Logger().Error("ICA connection already exists", "ica_address", icaAddr)
-		return
+		return errorsmod.Wrapf(types.ErrInvalidInput, "ICA connection already exists for ica_address %s", icaAddr)
 	}
 
 	// Extract controller address from port ID (icacontroller-{address})
 	if !strings.HasPrefix(controllerPortID, icatypes.ControllerPortPrefix) {
-		ctx.Logger().Error("Invalid controller port ID prefix", "controller_port_id", controllerPortID, "expected_prefix", icatypes.ControllerPortPrefix)
-		return
+		return errorsmod.Wrapf(
+			types.ErrInvalidInput,
+			"invalid controller port ID prefix: %s, expected prefix: %s",
+			controllerPortID, icatypes.ControllerPortPrefix,
+		)
 	}
 
 	// Get controller chain ID from connection
 	conn, found := connectionKeeper.GetConnection(ctx, connectionID)
 	if !found {
-		ctx.Logger().Error("Connection not found", "connection_id", connectionID)
-		return
+		return errorsmod.Wrapf(types.ErrInvalidInput, "connection not found: %s", connectionID)
 	}
 
 	clientState, ok := clientKeeper.GetClientState(ctx, conn.ClientId)
 	if !ok {
-		ctx.Logger().Error("Client state not found", "client_id", conn.ClientId)
-		return
+		return errorsmod.Wrapf(types.ErrInvalidInput, "client state not found: %s", conn.ClientId)
 	}
 
 	// Extract chain ID from Tendermint client state
 	tmClientState, ok := clientState.(*tmtypes.ClientState)
 	if !ok {
-		ctx.Logger().Error("Client state is not Tendermint type", "client_id", conn.ClientId, "type", fmt.Sprintf("%T", clientState))
-		return
+		return errorsmod.Wrapf(
+			types.ErrInvalidInput,
+			"client state is not Tendermint type for client_id %s, got type %T",
+			conn.ClientId,
+			clientState,
+		)
 	}
 
 	controllerChainID := tmClientState.GetChainID()
 	if controllerChainID == "" {
-		ctx.Logger().Error("Controller chain ID is empty", "client_id", conn.ClientId)
-		return
+		return errorsmod.Wrapf(types.ErrInvalidInput, "controller chain ID is empty for client_id %s", conn.ClientId)
 	}
 
 	controllerAddr := strings.TrimPrefix(controllerPortID, icatypes.ControllerPortPrefix)
 	if err := k.SetICAConnection(ctx, icaAddr, controllerAddr, controllerChainID, connectionID); err != nil {
-		ctx.Logger().Error("Failed to store ICA connection", "error", err, "ica_address", icaAddr)
-		return
+		return errorsmod.Wrapf(err, "failed to store ICA connection for ica_address %s", icaAddr)
 	}
+
+	return nil
 }

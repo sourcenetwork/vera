@@ -198,7 +198,8 @@ func TestHandleICAChannelOpen(t *testing.T) {
 
 	connectionID := "connection-0"
 	controllerPortID := "icacontroller-source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme"
-	k.HandleICAChannelOpen(ctx, connectionID, controllerPortID, icaHostKeeper, connectionKeeper, clientKeeper)
+	err := k.HandleICAChannelOpen(ctx, connectionID, controllerPortID, icaHostKeeper, connectionKeeper, clientKeeper)
+	require.NoError(t, err)
 
 	// Verify the connection was stored
 	connection, found := k.GetICAConnection(ctx, icaHostKeeper.icaAddress)
