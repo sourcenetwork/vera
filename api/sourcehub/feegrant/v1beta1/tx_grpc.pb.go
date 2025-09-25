@@ -19,9 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Msg_GrantAllowance_FullMethodName  = "/sourcehub.feegrant.v1beta1.Msg/GrantAllowance"
-	Msg_RevokeAllowance_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/RevokeAllowance"
-	Msg_PruneAllowances_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/PruneAllowances"
+	Msg_GrantAllowance_FullMethodName     = "/sourcehub.feegrant.v1beta1.Msg/GrantAllowance"
+	Msg_RevokeAllowance_FullMethodName    = "/sourcehub.feegrant.v1beta1.Msg/RevokeAllowance"
+	Msg_PruneAllowances_FullMethodName    = "/sourcehub.feegrant.v1beta1.Msg/PruneAllowances"
+	Msg_GrantDIDAllowance_FullMethodName  = "/sourcehub.feegrant.v1beta1.Msg/GrantDIDAllowance"
+	Msg_RevokeDIDAllowance_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/RevokeDIDAllowance"
 )
 
 // MsgClient is the client API for Msg service.
@@ -38,6 +40,10 @@ type MsgClient interface {
 	RevokeAllowance(ctx context.Context, in *MsgRevokeAllowance, opts ...grpc.CallOption) (*MsgRevokeAllowanceResponse, error)
 	// PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
 	PruneAllowances(ctx context.Context, in *MsgPruneAllowances, opts ...grpc.CallOption) (*MsgPruneAllowancesResponse, error)
+	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
+	GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowance, opts ...grpc.CallOption) (*MsgGrantDIDAllowanceResponse, error)
+	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
+	RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error)
 }
 
 type msgClient struct {
@@ -78,6 +84,26 @@ func (c *msgClient) PruneAllowances(ctx context.Context, in *MsgPruneAllowances,
 	return out, nil
 }
 
+func (c *msgClient) GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowance, opts ...grpc.CallOption) (*MsgGrantDIDAllowanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgGrantDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, Msg_GrantDIDAllowance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRevokeDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, Msg_RevokeDIDAllowance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -92,6 +118,10 @@ type MsgServer interface {
 	RevokeAllowance(context.Context, *MsgRevokeAllowance) (*MsgRevokeAllowanceResponse, error)
 	// PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
 	PruneAllowances(context.Context, *MsgPruneAllowances) (*MsgPruneAllowancesResponse, error)
+	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
+	GrantDIDAllowance(context.Context, *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error)
+	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
+	RevokeDIDAllowance(context.Context, *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -110,6 +140,12 @@ func (UnimplementedMsgServer) RevokeAllowance(context.Context, *MsgRevokeAllowan
 }
 func (UnimplementedMsgServer) PruneAllowances(context.Context, *MsgPruneAllowances) (*MsgPruneAllowancesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PruneAllowances not implemented")
+}
+func (UnimplementedMsgServer) GrantDIDAllowance(context.Context, *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GrantDIDAllowance not implemented")
+}
+func (UnimplementedMsgServer) RevokeDIDAllowance(context.Context, *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokeDIDAllowance not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -186,6 +222,42 @@ func _Msg_PruneAllowances_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_GrantDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgGrantDIDAllowance)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).GrantDIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_GrantDIDAllowance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).GrantDIDAllowance(ctx, req.(*MsgGrantDIDAllowance))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RevokeDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRevokeDIDAllowance)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RevokeDIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RevokeDIDAllowance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RevokeDIDAllowance(ctx, req.(*MsgRevokeDIDAllowance))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -204,6 +276,14 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PruneAllowances",
 			Handler:    _Msg_PruneAllowances_Handler,
+		},
+		{
+			MethodName: "GrantDIDAllowance",
+			Handler:    _Msg_GrantDIDAllowance_Handler,
+		},
+		{
+			MethodName: "RevokeDIDAllowance",
+			Handler:    _Msg_RevokeDIDAllowance_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
