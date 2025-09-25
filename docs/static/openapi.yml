@@ -15800,10 +15800,10 @@ paths:
           format: byte
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}:
+  /sourcehub/feegrant/v1beta1/allowance/{granter}/{grantee}:
     get:
       summary: Allowance returns granted allwance to the grantee by the granter.
-      operationId: CosmosFeegrantV1Beta1Query_Allowance
+      operationId: SourcehubFeegrantV1Beta1Query_Allowance
       responses:
         '200':
           description: A successful response.
@@ -16099,10 +16099,10 @@ paths:
           type: string
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/allowances/{grantee}:
+  /sourcehub/feegrant/v1beta1/allowances/{grantee}:
     get:
       summary: Allowances returns all the grants for the given grantee address.
-      operationId: CosmosFeegrantV1Beta1Query_Allowances
+      operationId: SourcehubFeegrantV1Beta1Query_Allowances
       responses:
         '200':
           description: A successful response.
@@ -16465,11 +16465,11 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos/feegrant/v1beta1/issued/{granter}:
+  /sourcehub/feegrant/v1beta1/issued/{granter}:
     get:
       summary: AllowancesByGranter returns all the grants given by an address
       description: 'Since: cosmos-sdk 0.46'
-      operationId: CosmosFeegrantV1Beta1Query_AllowancesByGranter
+      operationId: SourcehubFeegrantV1Beta1Query_AllowancesByGranter
       responses:
         '200':
           description: A successful response.
@@ -16835,12 +16835,193 @@ paths:
           type: boolean
       tags:
         - Query
-  /cosmos.feegrant.v1beta1.Msg/GrantAllowance:
+  /sourcehub/feegrant/v1beta1/did_allowance/{granter}/{grantee_did}:
+    get:
+      summary: DIDAllowance returns granted allowance to the DID by the granter.
+      operationId: SourcehubFeegrantV1Beta1Query_DIDAllowance
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              allowance:
+                type: object
+                properties:
+                  granter:
+                    type: string
+                    description: granter is the address of the user granting an allowance of their funds.
+                  grantee:
+                    type: string
+                    description: grantee is the DID being granted an allowance of another user's funds.
+                  allowance:
+                    description: allowance can be any of basic, periodic, allowed fee allowance.
+                    type: object
+                    properties:
+                      '@type':
+                        type: string
+                    additionalProperties: {}
+                title: Grant is stored in the KVStore to record a grant with full context
+            description: QueryDIDAllowanceResponse is the response type for the Query/DIDAllowance RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: granter
+          description: granter is the address of the user granting an allowance of their funds.
+          in: path
+          required: true
+          type: string
+        - name: grantee_did
+          description: grantee_did is the DID being granted an allowance of another user's funds.
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /sourcehub/feegrant/v1beta1/did_issued/{granter}:
+    get:
+      summary: DIDAllowancesByGranter returns all the DID grants given by an address.
+      operationId: SourcehubFeegrantV1Beta1Query_DIDAllowancesByGranter
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              allowances:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    granter:
+                      type: string
+                      description: granter is the address of the user granting an allowance of their funds.
+                    grantee:
+                      type: string
+                      description: grantee is the DID being granted an allowance of another user's funds.
+                    allowance:
+                      description: allowance can be any of basic, periodic, allowed fee allowance.
+                      type: object
+                      properties:
+                        '@type':
+                          type: string
+                      additionalProperties: {}
+                  title: Grant is stored in the KVStore to record a grant with full context
+                description: allowances that have been issued by the granter to DIDs.
+              pagination:
+                description: pagination defines a pagination for the response.
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                  total:
+                    type: string
+                    format: uint64
+            description: QueryDIDAllowancesByGranterResponse is the response type for the Query/DIDAllowancesByGranter RPC method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: granter
+          in: path
+          required: true
+          type: string
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /sourcehub.feegrant.v1beta1.Msg/GrantAllowance:
     post:
       summary: |-
         GrantAllowance grants fee allowance to the grantee on the granter's
         account with the provided expiration time.
-      operationId: CosmosFeegrantV1Beta1Msg_GrantAllowance
+      operationId: SourcehubFeegrantV1Beta1Msg_GrantAllowance
       responses:
         '200':
           description: A successful response.
@@ -17129,13 +17310,13 @@ paths:
               of fees from the account of Granter.
       tags:
         - Msg
-  /cosmos.feegrant.v1beta1.Msg/PruneAllowances:
+  /sourcehub.feegrant.v1beta1.Msg/PruneAllowances:
     post:
       summary: >-
         PruneAllowances prunes expired fee allowances, currently up to 75 at a
         time.
       description: Since cosmos-sdk 0.50
-      operationId: CosmosFeegrantV1Beta1Msg_PruneAllowances
+      operationId: SourcehubFeegrantV1Beta1Msg_PruneAllowances
       responses:
         '200':
           description: A successful response.
@@ -17354,12 +17535,12 @@ paths:
               Since cosmos-sdk 0.50
       tags:
         - Msg
-  /cosmos.feegrant.v1beta1.Msg/RevokeAllowance:
+  /sourcehub.feegrant.v1beta1.Msg/RevokeAllowance:
     post:
       summary: |-
         RevokeAllowance revokes any fee allowance of granter's account that
         has been granted to the grantee.
-      operationId: CosmosFeegrantV1Beta1Msg_RevokeAllowance
+      operationId: SourcehubFeegrantV1Beta1Msg_RevokeAllowance
       responses:
         '200':
           description: A successful response.
@@ -86327,7 +86508,7 @@ definitions:
     description: >-
       QueryEvidenceResponse is the response type for the Query/Evidence RPC
       method.
-  cosmos.feegrant.v1beta1.Grant:
+  sourcehub.feegrant.v1beta1.Grant:
     type: object
     properties:
       granter:
@@ -86398,7 +86579,7 @@ definitions:
               used with implementation specific semantics.
         additionalProperties: {}
     title: Grant is stored in the KVStore to record a grant with full context
-  cosmos.feegrant.v1beta1.QueryAllowanceResponse:
+  sourcehub.feegrant.v1beta1.QueryAllowanceResponse:
     type: object
     properties:
       allowance:
@@ -86479,7 +86660,7 @@ definitions:
     description: >-
       QueryAllowanceResponse is the response type for the Query/Allowance RPC
       method.
-  cosmos.feegrant.v1beta1.QueryAllowancesByGranterResponse:
+  sourcehub.feegrant.v1beta1.QueryAllowancesByGranterResponse:
     type: object
     properties:
       allowances:
@@ -86586,7 +86767,7 @@ definitions:
 
 
       Since: cosmos-sdk 0.46
-  cosmos.feegrant.v1beta1.QueryAllowancesResponse:
+  sourcehub.feegrant.v1beta1.QueryAllowancesResponse:
     type: object
     properties:
       allowances:
@@ -86690,7 +86871,75 @@ definitions:
     description: >-
       QueryAllowancesResponse is the response type for the Query/Allowances RPC
       method.
-  cosmos.feegrant.v1beta1.MsgGrantAllowance:
+  sourcehub.feegrant.v1beta1.QueryDIDAllowanceResponse:
+    type: object
+    properties:
+      allowance:
+        description: allowance is a allowance granted for DID by granter.
+        type: object
+        properties:
+          granter:
+            type: string
+            description: >-
+              granter is the address of the user granting an allowance of their
+              funds.
+          grantee:
+            type: string
+            description: >-
+              grantee is the DID being granted an allowance of
+              another user's funds.
+          allowance:
+            description: allowance can be any of basic, periodic, allowed fee allowance.
+            type: object
+            properties:
+              '@type':
+                type: string
+            additionalProperties: {}
+        title: Grant is stored in the KVStore to record a grant with full context
+    description: >-
+      QueryDIDAllowanceResponse is the response type for the Query/DIDAllowance RPC
+      method.
+  sourcehub.feegrant.v1beta1.QueryDIDAllowancesByGranterResponse:
+    type: object
+    properties:
+      allowances:
+        type: array
+        items:
+          type: object
+          properties:
+            granter:
+              type: string
+              description: >-
+                granter is the address of the user granting an allowance of their
+                funds.
+            grantee:
+              type: string
+              description: >-
+                grantee is the DID being granted an allowance of
+                another user's funds.
+            allowance:
+              description: allowance can be any of basic, periodic, allowed fee allowance.
+              type: object
+              properties:
+                '@type':
+                  type: string
+              additionalProperties: {}
+          title: Grant is stored in the KVStore to record a grant with full context
+        description: allowances that have been issued by the granter to DIDs.
+      pagination:
+        description: pagination defines an pagination for the response.
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+          total:
+            type: string
+            format: uint64
+    description: >-
+      QueryDIDAllowancesByGranterResponse is the response type for the Query/DIDAllowancesByGranter RPC
+      method.
+  sourcehub.feegrant.v1beta1.MsgGrantAllowance:
     type: object
     properties:
       granter:
@@ -86763,12 +87012,12 @@ definitions:
     description: |-
       MsgGrantAllowance adds permission for Grantee to spend up to Allowance
       of fees from the account of Granter.
-  cosmos.feegrant.v1beta1.MsgGrantAllowanceResponse:
+  sourcehub.feegrant.v1beta1.MsgGrantAllowanceResponse:
     type: object
     description: >-
       MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response
       type.
-  cosmos.feegrant.v1beta1.MsgPruneAllowances:
+  sourcehub.feegrant.v1beta1.MsgPruneAllowances:
     type: object
     properties:
       pruner:
@@ -86778,7 +87027,7 @@ definitions:
       MsgPruneAllowances prunes expired fee allowances.
 
       Since cosmos-sdk 0.50
-  cosmos.feegrant.v1beta1.MsgPruneAllowancesResponse:
+  sourcehub.feegrant.v1beta1.MsgPruneAllowancesResponse:
     type: object
     description: >-
       MsgPruneAllowancesResponse defines the Msg/PruneAllowancesResponse
@@ -86786,7 +87035,7 @@ definitions:
 
 
       Since cosmos-sdk 0.50
-  cosmos.feegrant.v1beta1.MsgRevokeAllowance:
+  sourcehub.feegrant.v1beta1.MsgRevokeAllowance:
     type: object
     properties:
       granter:
@@ -86800,7 +87049,7 @@ definitions:
           grantee is the address of the user being granted an allowance of
           another user's funds.
     description: MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
-  cosmos.feegrant.v1beta1.MsgRevokeAllowanceResponse:
+  sourcehub.feegrant.v1beta1.MsgRevokeAllowanceResponse:
     type: object
     description: >-
       MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse
