@@ -29,6 +29,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/golang/mock/gomock"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -86,6 +87,9 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	suite.encCfg.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 	testdata.RegisterInterfaces(suite.encCfg.InterfaceRegistry)
 
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(suite.encCfg.InterfaceRegistry)
+
 	suite.clientCtx = client.Context{}.
 		WithTxConfig(suite.encCfg.TxConfig).
 		WithClient(clitestutil.NewMockCometRPC(abci.ResponseQuery{}))
@@ -125,9 +129,11 @@ func (suite *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 
 // CreateTestTx is a helper function to create a tx for multiple inputs.
 func (suite *AnteTestSuite) CreateTestTx(
-	ctx sdk.Context, privs []cryptotypes.PrivKey,
+	ctx sdk.Context,
+	privs []cryptotypes.PrivKey,
 	accNums, accSeqs []uint64,
-	chainID string, signMode signing.SignMode,
+	chainID string,
+	signMode signing.SignMode,
 ) (xauthsigning.Tx, error) {
 	// First round: we gather all the signer infos using the "set empty signature" hack
 	var sigsV2 []signing.SignatureV2

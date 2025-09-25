@@ -4,7 +4,7 @@ import "cosmossdk.io/errors"
 
 // Codes for governance errors
 const (
-	DefaultCodespace = "cosmos-feegrant"
+	DefaultCodespace = ModuleName
 )
 
 var (
