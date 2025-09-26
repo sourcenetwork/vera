@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	"cosmossdk.io/store/prefix"
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -96,7 +96,7 @@ func (q Keeper) Allowances(c context.Context, req *feegrant.QueryAllowancesReque
 	return &feegrant.QueryAllowancesResponse{Allowances: grants, Pagination: pageRes}, nil
 }
 
-// AllowancesByGranter queries all the allowances granted by the given granter
+// AllowancesByGranter queries all the allowances granted by the given granter.
 func (q Keeper) AllowancesByGranter(c context.Context, req *feegrant.QueryAllowancesByGranterRequest) (*feegrant.QueryAllowancesByGranterResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -127,4 +127,92 @@ func (q Keeper) AllowancesByGranter(c context.Context, req *feegrant.QueryAllowa
 	}
 
 	return &feegrant.QueryAllowancesByGranterResponse{Allowances: grants, Pagination: pageRes}, nil
+}
+
+// DIDAllowance returns granted allowance to the DID by the granter.
+func (q Keeper) DIDAllowance(c context.Context, req *feegrant.QueryDIDAllowanceRequest) (*feegrant.QueryDIDAllowanceResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	granterAddr, err := q.authKeeper.AddressCodec().StringToBytes(req.Granter)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.GranteeDid == "" {
+		return nil, status.Error(codes.InvalidArgument, "grantee DID cannot be empty")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	feeAllowance, err := q.GetDIDAllowance(ctx, granterAddr, req.GranteeDid)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get allowance: %v", err)
+	}
+
+	msg, ok := feeAllowance.(proto.Message)
+	if !ok {
+		return nil, status.Errorf(codes.Internal, "can't proto marshal %T", msg)
+	}
+
+	feeAllowanceAny, err := codectypes.NewAnyWithValue(msg)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to get allowance: %v", err)
+	}
+
+	return &feegrant.QueryDIDAllowanceResponse{
+		Allowance: &feegrant.Grant{
+			Granter:   req.Granter,
+			Grantee:   req.GranteeDid,
+			Allowance: feeAllowanceAny,
+		},
+	}, nil
+}
+
+// DIDAllowancesByGranter queries all the DID allowances granted by the given granter.
+func (q Keeper) DIDAllowancesByGranter(c context.Context, req *feegrant.QueryDIDAllowancesByGranterRequest) (*feegrant.QueryDIDAllowancesByGranterResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	granterAddr, err := q.authKeeper.AddressCodec().StringToBytes(req.Granter)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	store := q.storeService.OpenKVStore(ctx)
+	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(store), feegrant.DIDFeeAllowanceKeyPrefix)
+
+	var grants []*feegrant.Grant
+
+	pageRes, err := query.Paginate(prefixStore, req.Pagination, func(key, value []byte) error {
+		var didGrant feegrant.DIDGrant
+		if err := q.cdc.Unmarshal(value, &didGrant); err != nil {
+			return err
+		}
+
+		// ParseGranterDIDFromFeeAllowanceKey expects the full key including the prefix.
+		granter, _ := feegrant.ParseGranterDIDFromFeeAllowanceKey(append(feegrant.DIDFeeAllowanceKeyPrefix, key...))
+		if !bytes.Equal(granter, granterAddr) {
+			return nil
+		}
+
+		grant := &feegrant.Grant{
+			Granter:   didGrant.Granter,
+			Grantee:   didGrant.GranteeDid,
+			Allowance: didGrant.Allowance,
+		}
+		grants = append(grants, grant)
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &feegrant.QueryDIDAllowancesByGranterResponse{Allowances: grants, Pagination: pageRes}, nil
 }
