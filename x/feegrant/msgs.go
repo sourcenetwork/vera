@@ -88,7 +88,36 @@ func (msg MsgGrantDIDAllowance) UnpackInterfaces(unpacker types.AnyUnpacker) err
 	return unpacker.UnpackAny(msg.Allowance, &allowance)
 }
 
+func (msg MsgGrantDIDAllowance) ValidateBasic() error {
+	if msg.Granter == "" {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing granter address")
+	}
+	if len(msg.GranteeDid) <= 4 || msg.GranteeDid[:4] != "did:" {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid DID format")
+	}
+	if msg.Allowance == nil {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "missing allowance")
+	}
+
+	allowance, err := msg.GetFeeAllowanceI()
+	if err != nil {
+		return err
+	}
+
+	return allowance.ValidateBasic()
+}
+
 // NewMsgRevokeDIDAllowance returns a message to revoke a fee allowance for a given granter and DID.
 func NewMsgRevokeDIDAllowance(granter sdk.AccAddress, granteeDID string) MsgRevokeDIDAllowance {
 	return MsgRevokeDIDAllowance{Granter: granter.String(), GranteeDid: granteeDID}
+}
+
+func (msg MsgRevokeDIDAllowance) ValidateBasic() error {
+	if msg.Granter == "" {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing granter address")
+	}
+	if len(msg.GranteeDid) <= 4 || msg.GranteeDid[:4] != "did:" {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid DID format")
+	}
+	return nil
 }
