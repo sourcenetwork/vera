@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -236,7 +236,174 @@ func (suite *KeeperTestSuite) TestFeeAllowancesByGranter() {
 func (suite *KeeperTestSuite) grantFeeAllowance(granter, grantee sdk.AccAddress) {
 	exp := suite.ctx.BlockTime().AddDate(1, 0, 0)
 	err := suite.feegrantKeeper.GrantAllowance(suite.ctx, granter, grantee, &feegrant.BasicAllowance{
-		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("atom", 555)),
+		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 555)),
+		Expiration: &exp,
+	})
+	suite.Require().NoError(err)
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowance() {
+	invalidGranter := "invalid_granter"
+	testDID := "did:example:alice"
+
+	testCases := []struct {
+		name      string
+		req       *feegrant.QueryDIDAllowanceRequest
+		expectErr bool
+		preRun    func()
+		postRun   func(_ *feegrant.QueryDIDAllowanceResponse)
+	}{
+		{
+			"nil request",
+			nil,
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowanceResponse) {},
+		},
+		{
+			"fail: invalid granter",
+			&feegrant.QueryDIDAllowanceRequest{
+				Granter:    invalidGranter,
+				GranteeDid: testDID,
+			},
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowanceResponse) {},
+		},
+		{
+			"fail: empty DID",
+			&feegrant.QueryDIDAllowanceRequest{
+				Granter:    suite.addrs[0].String(),
+				GranteeDid: "",
+			},
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowanceResponse) {},
+		},
+		{
+			"fail: non-existent DID allowance",
+			&feegrant.QueryDIDAllowanceRequest{
+				Granter:    suite.addrs[0].String(),
+				GranteeDid: "did:example:nonexistent",
+			},
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowanceResponse) {},
+		},
+		{
+			"valid query: single DID grant",
+			&feegrant.QueryDIDAllowanceRequest{
+				Granter:    suite.addrs[0].String(),
+				GranteeDid: testDID,
+			},
+			false,
+			func() {
+				suite.grantDIDFeeAllowance(suite.addrs[0], testDID)
+			},
+			func(resp *feegrant.QueryDIDAllowanceResponse) {
+				suite.Require().NotNil(resp.Allowance)
+				suite.Require().Equal(resp.Allowance.Granter, suite.addrs[0].String())
+				suite.Require().Equal(resp.Allowance.Grantee, testDID)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			tc.preRun()
+			resp, err := suite.feegrantKeeper.DIDAllowance(suite.ctx, tc.req)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+				tc.postRun(resp)
+			}
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowancesByGranter() {
+	invalidGranter := "invalid_granter"
+
+	testCases := []struct {
+		name      string
+		req       *feegrant.QueryDIDAllowancesByGranterRequest
+		expectErr bool
+		preRun    func()
+		postRun   func(_ *feegrant.QueryDIDAllowancesByGranterResponse)
+	}{
+		{
+			"nil request",
+			nil,
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowancesByGranterResponse) {},
+		},
+		{
+			"fail: invalid granter",
+			&feegrant.QueryDIDAllowancesByGranterRequest{
+				Granter: invalidGranter,
+			},
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowancesByGranterResponse) {},
+		},
+		{
+			"no DID grants",
+			&feegrant.QueryDIDAllowancesByGranterRequest{
+				Granter: suite.addrs[0].String(),
+			},
+			false,
+			func() {
+				// Grant regular allowance (not DID) to ensure it's not returned
+				suite.grantFeeAllowance(suite.addrs[0], suite.addrs[1])
+			},
+			func(resp *feegrant.QueryDIDAllowancesByGranterResponse) {
+				suite.Require().Equal(len(resp.Allowances), 0)
+			},
+		},
+		{
+			"valid query: expect DID grants only",
+			&feegrant.QueryDIDAllowancesByGranterRequest{
+				Granter: suite.addrs[2].String(),
+			},
+			false,
+			func() {
+				// Grant regular allowance (should not appear in DID query)
+				suite.grantFeeAllowance(suite.addrs[2], suite.addrs[3])
+
+				// Grant DID allowances (should appear in DID query)
+				suite.grantDIDFeeAllowance(suite.addrs[2], "did:example:bob")
+				suite.grantDIDFeeAllowance(suite.addrs[2], "did:example:alice")
+			},
+			func(resp *feegrant.QueryDIDAllowancesByGranterResponse) {
+				suite.Require().Equal(len(resp.Allowances), 2)
+				for _, allowance := range resp.Allowances {
+					suite.Require().Equal(allowance.Granter, suite.addrs[2].String())
+					suite.Require().True(allowance.Grantee == "did:example:bob" || allowance.Grantee == "did:example:alice")
+				}
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			tc.preRun()
+			resp, err := suite.feegrantKeeper.DIDAllowancesByGranter(suite.ctx, tc.req)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+				tc.postRun(resp)
+			}
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) grantDIDFeeAllowance(granter sdk.AccAddress, granteeDID string) {
+	exp := suite.ctx.BlockTime().AddDate(1, 0, 0)
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, granteeDID, &feegrant.BasicAllowance{
+		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 777)),
 		Expiration: &exp,
 	})
 	suite.Require().NoError(err)
