@@ -8,7 +8,8 @@ const (
 	EventTypeUpdateFeeGrant = "update_feegrant"
 	EventTypePruneFeeGrant  = "prune_feegrant"
 
-	AttributeKeyGranter = "granter"
-	AttributeKeyGrantee = "grantee"
-	AttributeKeyPruner  = "pruner"
+	AttributeKeyGranter    = "granter"
+	AttributeKeyGrantee    = "grantee"
+	AttributeKeyGranteeDid = "grantee_did"
+	AttributeKeyPruner     = "pruner"
 )
