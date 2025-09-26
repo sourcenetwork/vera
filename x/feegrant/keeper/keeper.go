@@ -494,7 +494,7 @@ func (k Keeper) GrantDIDAllowance(
 
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			feegrant.EventTypeSetFeeGrant,
+			feegrant.EventTypeSetDIDFeeGrant,
 			sdk.NewAttribute(feegrant.AttributeKeyGranter, didGrant.Granter),
 			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, didGrant.GranteeDid),
 		),
@@ -562,7 +562,7 @@ func (k Keeper) RevokeDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
-			feegrant.EventTypeRevokeFeeGrant,
+			feegrant.EventTypeRevokeDIDFeeGrant,
 			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
 			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
 		),
@@ -604,7 +604,7 @@ func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress,
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
-			feegrant.EventTypeUseFeeGrant,
+			feegrant.EventTypeUseDIDFeeGrant,
 			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
 			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
 		),
@@ -640,7 +640,7 @@ func (k Keeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 
 	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
 		sdk.NewEvent(
-			feegrant.EventTypeUpdateFeeGrant,
+			feegrant.EventTypeUpdateDIDFeeGrant,
 			sdk.NewAttribute(feegrant.AttributeKeyGranter, didGrant.Granter),
 			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, didGrant.GranteeDid),
 		),

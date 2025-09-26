@@ -162,3 +162,22 @@ func (k msgServer) RevokeDIDAllowance(
 
 	return &feegrant.MsgRevokeDIDAllowanceResponse{}, nil
 }
+
+// PruneDIDAllowances removes expired DID allowances from the store.
+func (k msgServer) PruneDIDAllowances(ctx context.Context, req *feegrant.MsgPruneDIDAllowances) (*feegrant.MsgPruneDIDAllowancesResponse, error) {
+	// 75 is an arbitrary value, we can change it later if needed
+	err := k.RemoveExpiredDIDAllowances(ctx, 75)
+	if err != nil {
+		return nil, err
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypePruneDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyPruner, req.Pruner),
+		),
+	)
+
+	return &feegrant.MsgPruneDIDAllowancesResponse{}, nil
+}
