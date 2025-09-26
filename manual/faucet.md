@@ -56,6 +56,45 @@ curl -X POST http://localhost:1317/faucet/grant-allowance \
 
 Grants a fee allowance from the faucet account to the specified address. This allows the grantee to pay transaction fees using the granter's (e.g. faucet) account balance.
 
+### Grant DID Fee Allowance
+```bash
+curl -X POST http://localhost:1317/faucet/grant-did-allowance \
+  -H "Content-Type: application/json" \
+  -d '{
+    "did": "did:key:alice",
+    "amount_limit": {
+      "denom": "uopen",
+      "amount": "10000000000"
+    }
+  }'
+```
+
+Grants a fee allowance from the faucet account to the specified DID. This allows transactions with JWS extensions containing the DID to pay transaction fees using the faucet's account balance.
+
+**Response:**
+```json
+{
+  "message": "DID fee allowance granted successfully",
+  "txhash": "A1B2C3...",
+  "granter": "source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt",
+  "grantee_did": "did:key:alice",
+  "amount_limit": {
+    "denom": "uopen",
+    "amount": "10000000000"
+  },
+  "expiration": 1761262259
+}
+```
+
+**Query DID allowance via CLI:**
+```bash
+# Query specific DID allowance
+build/sourcehubd q feegrant did-grant $(curl -s http://localhost:1317/faucet/info | jq -r '.address') did:key:alice
+
+# List all DID allowances by granter
+build/sourcehubd q feegrant did-grants-by-granter $(curl -s http://localhost:1317/faucet/info | jq -r '.address')
+```
+
 ## Configuration
 
 The faucet can be enabled/disabled in `app.toml`:
