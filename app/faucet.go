@@ -9,7 +9,6 @@ import (
 	"time"
 
 	storetypes "cosmossdk.io/store/types"
-	"cosmossdk.io/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -21,6 +20,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/gogoproto/proto"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
@@ -65,6 +65,7 @@ func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APICon
 	rtr.HandleFunc("/faucet/init-account", app.handleInitAccount(clientCtx)).Methods("POST")
 	rtr.HandleFunc("/faucet/request", app.handleFaucetRequest(clientCtx)).Methods("POST")
 	rtr.HandleFunc("/faucet/grant-allowance", app.handleGrantAllowance(clientCtx)).Methods("POST")
+	rtr.HandleFunc("/faucet/grant-did-allowance", app.handleGrantDIDAllowance(clientCtx)).Methods("POST")
 }
 
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
@@ -529,6 +530,121 @@ func (app *App) handleGrantAllowance(clientCtx client.Context) http.HandlerFunc 
 			RawLog:      res.RawLog,
 			Granter:     faucetAddress.String(),
 			Grantee:     req.Address,
+			AmountLimit: amountLimit,
+			Expiration:  expiration.Unix(),
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	}
+}
+
+// handleGrantDIDAllowance handles POST requests to grant fee allowances to a DID from the faucet.
+func (app *App) handleGrantDIDAllowance(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req faucettypes.GrantDIDAllowanceRequest
+
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		if req.Did == "" || len(req.Did) < 4 || req.Did[:4] != "did:" {
+			http.Error(w, "Invalid DID", http.StatusBadRequest)
+			return
+		}
+
+		kb, faucetInfo, err := app.getFaucetKey()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Faucet not configured: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		faucetAddress, err := faucetInfo.GetAddress()
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to get faucet address: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		amountLimit := sdk.NewInt64Coin(appparams.MicroOpenDenom, DefaultAllowanceAmount)
+		if !req.AmountLimit.Amount.IsNil() && req.AmountLimit.Amount.IsPositive() {
+			amountLimit = req.AmountLimit
+		}
+
+		expiration := time.Now().AddDate(0, 0, DefaultAllowanceExpirationDays)
+		if req.Expiration != 0 {
+			expiration = time.Unix(req.Expiration, 0)
+		}
+
+		// Create basic allowance
+		spendLimit := sdk.NewCoins(amountLimit)
+		allowance := &feegrant.BasicAllowance{
+			SpendLimit: spendLimit,
+			Expiration: &expiration,
+		}
+
+		msg, err := feegrant.NewMsgGrantDIDAllowance(allowance, faucetAddress, req.Did)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to create grant DID allowance message: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		chainID := clientCtx.ChainID
+		if chainID == "" {
+			chainID = "sourcehub-dev"
+		}
+		txf := tx.Factory{}.
+			WithTxConfig(clientCtx.TxConfig).
+			WithAccountRetriever(clientCtx.AccountRetriever).
+			WithChainID(chainID).
+			WithGas(300000).
+			WithKeybase(kb)
+
+		// Only add fees if zero fee transactions are not allowed
+		if !app.zeroFeeTxsAllowed() {
+			txf = txf.WithFees("300uopen")
+		}
+
+		faucetAccount, err := clientCtx.AccountRetriever.GetAccount(clientCtx, faucetAddress)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to get faucet account: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		txf = txf.WithAccountNumber(faucetAccount.GetAccountNumber()).
+			WithSequence(faucetAccount.GetSequence())
+
+		txn, err := txf.BuildUnsignedTx(msg)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to build transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		err = tx.Sign(r.Context(), txf, "faucet", txn, true)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to sign transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		txBytes, err := clientCtx.TxConfig.TxEncoder()(txn.GetTx())
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to encode transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		res, err := clientCtx.BroadcastTxSync(txBytes)
+		if err != nil {
+			http.Error(w, fmt.Sprintf("Failed to broadcast transaction: %v", err), http.StatusInternalServerError)
+			return
+		}
+
+		response := &faucettypes.GrantDIDAllowanceResponse{
+			Message:     "DID fee allowance granted successfully",
+			Txhash:      res.TxHash,
+			Code:        res.Code,
+			RawLog:      res.RawLog,
+			Granter:     faucetAddress.String(),
+			GranteeDid:  req.Did,
 			AmountLimit: amountLimit,
 			Expiration:  expiration.Unix(),
 		}
