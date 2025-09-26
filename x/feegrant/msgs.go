@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	_, _, _, _ sdk.Msg                       = &MsgGrantAllowance{}, &MsgRevokeAllowance{}, &MsgGrantDIDAllowance{}, &MsgRevokeDIDAllowance{}
-	_, _       types.UnpackInterfacesMessage = &MsgGrantAllowance{}, &MsgGrantDIDAllowance{}
+	_, _, _, _, _, _ sdk.Msg                       = &MsgGrantAllowance{}, &MsgRevokeAllowance{}, &MsgPruneAllowances{}, &MsgGrantDIDAllowance{}, &MsgRevokeDIDAllowance{}, &MsgPruneDIDAllowances{}
+	_, _           types.UnpackInterfacesMessage = &MsgGrantAllowance{}, &MsgGrantDIDAllowance{}
 )
 
 // NewMsgGrantAllowance creates a new MsgGrantAllowance.
@@ -110,6 +110,19 @@ func (msg MsgGrantDIDAllowance) ValidateBasic() error {
 // NewMsgRevokeDIDAllowance returns a message to revoke a fee allowance for a given granter and DID.
 func NewMsgRevokeDIDAllowance(granter sdk.AccAddress, granteeDID string) MsgRevokeDIDAllowance {
 	return MsgRevokeDIDAllowance{Granter: granter.String(), GranteeDid: granteeDID}
+}
+
+// NewMsgPruneDIDAllowances returns a message to prune expired DID allowances.
+func NewMsgPruneDIDAllowances(pruner sdk.AccAddress) MsgPruneDIDAllowances {
+	return MsgPruneDIDAllowances{Pruner: pruner.String()}
+}
+
+// ValidateBasic implements sdk.Msg
+func (msg MsgPruneDIDAllowances) ValidateBasic() error {
+	if msg.Pruner == "" {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing pruner address")
+	}
+	return nil
 }
 
 func (msg MsgRevokeDIDAllowance) ValidateBasic() error {
