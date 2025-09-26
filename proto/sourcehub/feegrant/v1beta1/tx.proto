@@ -31,6 +31,9 @@ service Msg {
 
   // RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
   rpc RevokeDIDAllowance(MsgRevokeDIDAllowance) returns (MsgRevokeDIDAllowanceResponse);
+
+  // PruneDIDAllowances prunes expired DID fee allowances, currently up to 75 at a time.
+  rpc PruneDIDAllowances(MsgPruneDIDAllowances) returns (MsgPruneDIDAllowancesResponse);
 }
 
 // MsgGrantAllowance adds permission for Grantee to spend up to Allowance
@@ -130,3 +133,14 @@ message EventRevokeDIDAllowance {
   // grantee_did is the DID whose allowance is being revoked.
   string grantee_did = 2;
 }
+
+// MsgPruneDIDAllowances prunes expired DID fee allowances.
+message MsgPruneDIDAllowances {
+  option (cosmos.msg.v1.signer) = "pruner";
+
+  // pruner is the address of the user pruning expired DID allowances.
+  string pruner = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgPruneDIDAllowancesResponse defines the Msg/PruneDIDAllowancesResponse response type.
+message MsgPruneDIDAllowancesResponse {}
