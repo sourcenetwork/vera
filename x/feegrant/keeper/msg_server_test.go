@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang/mock/gomock"
@@ -632,4 +633,63 @@ func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
 			}
 		})
 	}
+}
+func (suite *KeeperTestSuite) TestPruneDIDAllowances() {
+	ctx := suite.ctx.WithBlockTime(time.Now())
+	oneYear := ctx.BlockTime().AddDate(1, 0, 0)
+
+	// We create 100 DID allowances, all expiring in one year
+	count := 0
+	for i := 0; i < len(suite.addrs) && count < 100; i++ {
+		did := fmt.Sprintf("did:example:test%d", i)
+
+		any, err := codectypes.NewAnyWithValue(&feegrant.BasicAllowance{
+			SpendLimit: suite.coins,
+			Expiration: &oneYear,
+		})
+		suite.Require().NoError(err)
+		req := &feegrant.MsgGrantDIDAllowance{
+			Granter:    suite.addrs[i].String(),
+			GranteeDid: did,
+			Allowance:  any,
+		}
+
+		_, err = suite.msgSrvr.GrantDIDAllowance(ctx, req)
+		if err != nil {
+			// do not fail, just try with another address
+			continue
+		}
+
+		count++
+	}
+
+	// we have some DID allowances
+	countBefore := 0
+	err := suite.feegrantKeeper.IterateAllDIDAllowances(ctx, func(grant feegrant.DIDGrant) bool {
+		countBefore++
+		return false
+	})
+	suite.Require().NoError(err)
+	suite.Require().True(countBefore >= count)
+
+	// after a year and one day passes, they are all expired
+	oneYearAndADay := ctx.BlockTime().AddDate(1, 0, 1)
+	ctx = suite.ctx.WithBlockTime(oneYearAndADay)
+
+	// we prune them, currently up to 75 will be pruned (same as regular allowances)
+	_, err = suite.msgSrvr.PruneDIDAllowances(ctx, &feegrant.MsgPruneDIDAllowances{
+		Pruner: suite.addrs[0].String(),
+	})
+	suite.Require().NoError(err)
+
+	// count remaining DID allowances after pruning
+	countAfter := 0
+	err = suite.feegrantKeeper.IterateAllDIDAllowances(ctx, func(grant feegrant.DIDGrant) bool {
+		countAfter++
+		return false
+	})
+	suite.Require().NoError(err)
+
+	// Verify that some allowances were pruned (should be fewer than before)
+	suite.Require().True(countAfter < countBefore, "some DID allowances should have been pruned")
 }
