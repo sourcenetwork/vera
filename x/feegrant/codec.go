@@ -27,6 +27,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgRevokeAllowance{},
 		&MsgGrantDIDAllowance{},
 		&MsgRevokeDIDAllowance{},
+		&MsgPruneDIDAllowances{},
 	)
 
 	registry.RegisterInterface(

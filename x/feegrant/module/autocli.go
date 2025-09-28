@@ -6,12 +6,13 @@ import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
 	"github.com/cosmos/cosmos-sdk/version"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 )
 
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: &autocliv1.ServiceCommandDescriptor{
-			Service: "sourcehub.feegrant.v1beta1.Query",
+			Service: feegrant.Query_serviceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "Allowance",
@@ -67,7 +68,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
-			Service: "sourcehub.feegrant.v1beta1.Msg",
+			Service: feegrant.Msg_serviceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "RevokeAllowance",
@@ -97,6 +98,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "granter"},
 						{ProtoField: "grantee_did"},
 					},
+				},
+				{
+					RpcMethod: "PruneDIDAllowances",
+					Use:       "prune-did",
+					Short:     "Prune expired DID allowances",
+					Long:      "Prune expired DID allowances in order to reduce the size of the store when the number of expired DID allowances is large.",
+					Example:   fmt.Sprintf(`$ %s tx feegrant prune-did --from [mykey]`, version.AppName),
 				},
 			},
 			EnhanceCustomCommand: true,
