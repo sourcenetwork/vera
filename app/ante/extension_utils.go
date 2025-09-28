@@ -15,6 +15,7 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	jwxjws "github.com/lestrrat-go/jwx/v2/jws"
 
+	"github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 )
 
@@ -134,7 +135,7 @@ func validateBearerTokenValues(token *BearerToken) error {
 		return fmt.Errorf("invalid issuer DID: %v", err)
 	}
 
-	if err := isValidSourceHubAddr(token.AuthorizedAccount); err != nil {
+	if err := types.IsValidSourceHubAddr(token.AuthorizedAccount); err != nil {
 		return fmt.Errorf("invalid authorized account: %v", err)
 	}
 
@@ -158,18 +159,6 @@ func validateBearerToken(token *BearerToken, currentTime *time.Time) error {
 		return fmt.Errorf("token expired: current time %d > expiration time %d", token.ExpirationTime, now)
 	}
 
-	return nil
-}
-
-// isValidSourceHubAddr validates a SourceHub address format
-func isValidSourceHubAddr(addr string) error {
-	if len(addr) == 0 {
-		return fmt.Errorf("address cannot be empty")
-	}
-	// Accept both "source" and "cosmos" prefixes for compatibility with different environments
-	if !strings.HasPrefix(addr, "source") && !strings.HasPrefix(addr, "cosmos") {
-		return fmt.Errorf("invalid SourceHub address format: %s", addr)
-	}
 	return nil
 }
 

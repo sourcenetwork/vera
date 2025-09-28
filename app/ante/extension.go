@@ -74,7 +74,12 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 					}
 
 					if msgSigner != authorizedAccount {
-						return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "authorized account mismatch: bearer token authorizes %s but transaction is signed by %s", authorizedAccount, msgSigner)
+						return ctx, errorsmod.Wrapf(
+							sdkerrors.ErrInvalidRequest,
+							"authorized account mismatch: bearer token authorizes %s but transaction is signed by %s",
+							authorizedAccount,
+							msgSigner,
+						)
 					}
 
 					extractedDID = did
