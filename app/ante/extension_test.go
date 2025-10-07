@@ -9,14 +9,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	test "github.com/sourcenetwork/sourcehub/testutil"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
 func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
@@ -28,7 +29,11 @@ func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create a valid JWS extension option with properly signed JWS using the test account address
@@ -70,7 +75,11 @@ func TestExtensionOptionsDecorator_InvalidJWSExtension(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create an invalid JWS extension option
@@ -107,7 +116,11 @@ func TestExtensionOptionsDecorator_InvalidJWSFormat(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create an invalid JWS extension option
@@ -144,7 +157,11 @@ func TestExtensionOptionsDecorator_InvalidJWSSignature(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create an invalid JWS extension option
@@ -181,11 +198,19 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create an unknown extension option
-	unknownOpt := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	unknownOpt := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 
 	// Pack the extension option
 	any, err := codectypes.NewAnyWithValue(unknownOpt)
@@ -216,7 +241,11 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// No extension options set
@@ -242,7 +271,11 @@ func TestExtensionOptionsDecorator_JWSOptionWithInvalidSignature(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create a JWS extension option without DID in payload
@@ -279,7 +312,11 @@ func TestExtensionOptionsDecorator_ExtractDIDFromJWSPayload(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create a JWS with DID in payload using the test account address
@@ -321,7 +358,11 @@ func TestExtensionOptionsDecorator_ValidJWSWithDIDInPayload(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create a JWS with DID in payload using the test account address
@@ -363,7 +404,11 @@ func TestExtensionOptionsDecorator_SecurityTamperedJWS(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create JWS with valid signature using the test account address
@@ -404,7 +449,11 @@ func TestExtensionOptionsDecorator_SecurityNoDIDInPayload(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create JWS with no DID in payload (e.g. {"sub":"1234567890","name":"John Doe","iat":1516239022})
@@ -452,7 +501,11 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	feePayer := accs[0].acc.GetAddress()
 	feeGranter := accs[1].acc.GetAddress()
 
-	msg := testdata.NewTestMsg(feePayer)
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create valid JWS extension option using the fee payer address
@@ -511,7 +564,11 @@ func TestExtensionAndFeeDecorators_NoDID(t *testing.T) {
 	feePayer := accs[0].acc.GetAddress()
 	feeGranter := accs[1].acc.GetAddress()
 
-	msg := testdata.NewTestMsg(feePayer)
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Set fee granter and amount
@@ -547,7 +604,11 @@ func TestExtensionOptionsDecorator_CorrectAuthorizedAccount(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create JWS token with authorized account matching the transaction signer
@@ -589,7 +650,11 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 
 	accs := s.CreateTestAccounts(1)
 
-	msg := testdata.NewTestMsg(accs[0].acc.GetAddress())
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create JWS token with authorized account NOT matching the transaction signer
@@ -616,5 +681,112 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 
 	_, err = antehandler(s.ctx, tx, false)
 	require.Error(t, err, "ExtensionOptionsDecorator should reject JWS with mismatched authorized account")
-	require.Contains(t, err.Error(), "authorized account mismatch")
+	require.Contains(t, err.Error(), "signer mismatch")
+}
+
+func TestExtensionOptionsDecorator_MultipleMessagesAllAuthorized(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+	decorator := NewExtensionOptionsDecorator()
+	antehandler := sdk.ChainAnteDecorators(decorator)
+
+	accs := s.CreateTestAccounts(1)
+
+	// Multiple ACP messages from same creator
+	msg1 := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "policy 1",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	msg2 := &acptypes.MsgEditPolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		PolicyId:    "policy-id-1",
+		Policy:      "updated policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	msg3 := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "policy 2",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	require.NoError(t, s.txBuilder.SetMsgs(msg1, msg2, msg3))
+
+	authorizedAccount := accs[0].acc.GetAddress().String()
+	bearerToken, userDID := test.GenerateSignedJWSWithMatchingDID(t, authorizedAccount)
+	jwsOpt := &antetypes.JWSExtensionOption{
+		BearerToken: bearerToken,
+	}
+
+	any, err := codectypes.NewAnyWithValue(jwsOpt)
+	require.NoError(t, err)
+
+	if extBuilder, ok := s.txBuilder.(client.ExtendedTxBuilder); ok {
+		extBuilder.SetExtensionOptions(any)
+	} else {
+		t.Fatal("TxBuilder does not implement ExtendedTxBuilder")
+	}
+
+	privs, accNums, accSeqs := []cryptotypes.PrivKey{accs[0].priv}, []uint64{0}, []uint64{0}
+	tx, err := s.CreateTestTx(s.ctx, privs, accNums, accSeqs, s.ctx.ChainID(), signing.SignMode_SIGN_MODE_DIRECT)
+	require.NoError(t, err)
+
+	newCtx, err := antehandler(s.ctx, tx, false)
+	require.NoError(t, err, "ExtensionOptionsDecorator should accept transaction with multiple ACP messages all from authorized account")
+
+	extractedDID := GetExtractedDIDFromContext(newCtx)
+	require.Equal(t, userDID, extractedDID, "DID should be extracted and stored in context")
+}
+
+func TestExtensionOptionsDecorator_MultipleMessagesOneUnauthorized(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+	decorator := NewExtensionOptionsDecorator()
+	antehandler := sdk.ChainAnteDecorators(decorator)
+
+	accs := s.CreateTestAccounts(2)
+
+	// Mix of ACP messages from different creators - should be rejected
+	msg1 := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "policy 1",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	msg2 := &acptypes.MsgEditPolicy{
+		Creator:     accs[1].acc.GetAddress().String(), // Different creator - unauthorized
+		PolicyId:    "policy-id-1",
+		Policy:      "malicious update",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	msg3 := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "policy 2",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	require.NoError(t, s.txBuilder.SetMsgs(msg1, msg2, msg3))
+
+	// JWS token authorized only for accs[0]
+	authorizedAccount := accs[0].acc.GetAddress().String()
+	bearerToken, _ := test.GenerateSignedJWSWithMatchingDID(t, authorizedAccount)
+	jwsOpt := &antetypes.JWSExtensionOption{
+		BearerToken: bearerToken,
+	}
+
+	any, err := codectypes.NewAnyWithValue(jwsOpt)
+	require.NoError(t, err)
+
+	if extBuilder, ok := s.txBuilder.(client.ExtendedTxBuilder); ok {
+		extBuilder.SetExtensionOptions(any)
+	} else {
+		t.Fatal("TxBuilder does not implement ExtendedTxBuilder")
+	}
+
+	privs, accNums, accSeqs := []cryptotypes.PrivKey{accs[0].priv, accs[1].priv}, []uint64{0, 0}, []uint64{0, 0}
+	tx, err := s.CreateTestTx(s.ctx, privs, accNums, accSeqs, s.ctx.ChainID(), signing.SignMode_SIGN_MODE_DIRECT)
+	require.NoError(t, err)
+
+	_, err = antehandler(s.ctx, tx, false)
+	require.Error(t, err, "ExtensionOptionsDecorator should reject transaction with ACP message from unauthorized account")
+	require.Contains(t, err.Error(), "message 1 signer mismatch", "Error should indicate which message failed")
 }

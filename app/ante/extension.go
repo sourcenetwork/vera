@@ -49,37 +49,33 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 						return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "bearer token validation failed: %v", err)
 					}
 
-					// Verify authorized account matches the first message creator/signer
+					// Get transaction messages
 					msgs := tx.GetMsgs()
 					if len(msgs) == 0 {
 						return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "transaction has no messages")
 					}
 
-					firstMsg := msgs[0]
-					var msgSigner string
+					// Check that all messages are signed by the same authorized account
+					for i, msg := range msgs {
+						var msgSigner string
 
-					// Try GetCreator for modern messages
-					if msgWithCreator, ok := firstMsg.(interface{ GetCreator() string }); ok {
-						msgSigner = msgWithCreator.GetCreator()
-					} else if legacyMsg, ok := firstMsg.(sdk.LegacyMsg); ok {
-						// Fallback to GetSigners for legacy messages
-						signers := legacyMsg.GetSigners()
-						if len(signers) > 0 {
-							msgSigner = signers[0].String()
+						if msgWithCreator, ok := msg.(interface{ GetCreator() string }); ok {
+							msgSigner = msgWithCreator.GetCreator()
 						}
-					}
 
-					if msgSigner == "" {
-						return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "cannot determine message signer")
-					}
+						if msgSigner == "" {
+							return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "cannot determine signer for message %d", i)
+						}
 
-					if msgSigner != authorizedAccount {
-						return ctx, errorsmod.Wrapf(
-							sdkerrors.ErrInvalidRequest,
-							"authorized account mismatch: bearer token authorizes %s but transaction is signed by %s",
-							authorizedAccount,
-							msgSigner,
-						)
+						if msgSigner != authorizedAccount {
+							return ctx, errorsmod.Wrapf(
+								sdkerrors.ErrUnauthorized,
+								"message %d signer mismatch: bearer token authorizes %s but message is signed by %s",
+								i,
+								authorizedAccount,
+								msgSigner,
+							)
+						}
 					}
 
 					extractedDID = did
