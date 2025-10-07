@@ -18,6 +18,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	"github.com/sourcenetwork/sourcehub/app/params"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
@@ -33,6 +34,7 @@ type TxBuilder struct {
 	feeAmt        int64
 	account       authtypes.BaseAccount
 	gasAdjustment float64
+	bearerToken   string // JWS bearer token for DID-based authorization
 }
 
 func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
@@ -99,6 +101,22 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 	err := txBuilder.SetMsgs(msgs...)
 	if err != nil {
 		return nil, fmt.Errorf("failed to set msgs: %v", err)
+	}
+
+	// Set JWS bearer token extension option if provided
+	if b.bearerToken != "" {
+		jwsOpt := &antetypes.JWSExtensionOption{
+			BearerToken: b.bearerToken,
+		}
+		any, err := cdctypes.NewAnyWithValue(jwsOpt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to pack JWS extension option: %v", err)
+		}
+		if extBuilder, ok := txBuilder.(client.ExtendedTxBuilder); ok {
+			extBuilder.SetExtensionOptions(any)
+		} else {
+			return nil, fmt.Errorf("txBuilder does not support extension options")
+		}
 	}
 
 	txBuilder.SetGasLimit(b.gasLimit)
@@ -322,6 +340,15 @@ func WithSDKClient(client *Client) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.authClient = client.AuthQueryClient()
 		b.txClient = client.txClient
+		return nil
+	}
+}
+
+// WithBearerToken sets a JWS bearer token for DID-based authorization.
+// The bearer token will be added as an extension option to the transaction.
+func WithBearerToken(token string) TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.bearerToken = token
 		return nil
 	}
 }

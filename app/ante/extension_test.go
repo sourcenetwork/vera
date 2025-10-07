@@ -31,7 +31,7 @@ func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -77,7 +77,7 @@ func TestExtensionOptionsDecorator_InvalidJWSExtension(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -118,7 +118,7 @@ func TestExtensionOptionsDecorator_InvalidJWSFormat(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -159,7 +159,7 @@ func TestExtensionOptionsDecorator_InvalidJWSSignature(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -200,7 +200,7 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -208,7 +208,7 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 	// Create an unknown extension option
 	unknownOpt := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
@@ -243,7 +243,7 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -273,7 +273,7 @@ func TestExtensionOptionsDecorator_JWSOptionWithInvalidSignature(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -314,7 +314,7 @@ func TestExtensionOptionsDecorator_ExtractDIDFromJWSPayload(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -360,7 +360,7 @@ func TestExtensionOptionsDecorator_ValidJWSWithDIDInPayload(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -406,7 +406,7 @@ func TestExtensionOptionsDecorator_SecurityTamperedJWS(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -451,7 +451,7 @@ func TestExtensionOptionsDecorator_SecurityNoDIDInPayload(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -503,7 +503,7 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -566,7 +566,7 @@ func TestExtensionAndFeeDecorators_NoDID(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -606,7 +606,7 @@ func TestExtensionOptionsDecorator_CorrectAuthorizedAccount(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
@@ -652,7 +652,7 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
-		Policy:      "test policy",
+		Policy:      "name: test policy",
 		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
