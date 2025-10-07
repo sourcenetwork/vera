@@ -11,29 +11,16 @@ import (
 	"github.com/TBD54566975/ssi-sdk/did/key"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/stretchr/testify/require"
+
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 )
 
-// DefaultExpirationTime is the default expiration time for bearer tokens
-const DefaultExpirationTime = time.Minute * 10
-
-// BearerToken contains the structured fields included in the JWS Bearer Token
-type BearerToken struct {
-	// IssuerID is the Actor ID for the Token signer
-	IssuerID string `json:"iss,omitempty"`
-	// AuthorizedAccount is the SourceHub account address which is allowed to use this token
-	AuthorizedAccount string `json:"authorized_account,omitempty"`
-	// IssuedTime is the timestamp at which the token was generated
-	IssuedTime int64 `json:"iat,omitempty"`
-	// ExpirationTime is the timestamp at which the token will expire
-	ExpirationTime int64 `json:"exp,omitempty"`
-}
-
 // NewBearerTokenNow creates a new BearerToken with current time and default expiration
-func NewBearerTokenNow(actorID string, authorizedAccount string) BearerToken {
+func NewBearerTokenNow(actorID string, authorizedAccount string) antetypes.BearerToken {
 	now := time.Now()
-	expires := now.Add(DefaultExpirationTime)
+	expires := now.Add(antetypes.DefaultExpirationTime)
 
-	return BearerToken{
+	return antetypes.BearerToken{
 		IssuerID:          actorID,
 		AuthorizedAccount: authorizedAccount,
 		IssuedTime:        now.Unix(),

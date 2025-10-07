@@ -18,6 +18,7 @@ func TestSDKBasic(t *testing.T) {
 	network := e2e.TestNetwork{}
 
 	network.Setup(t)
+	t.Cleanup(network.TearDown)
 
 	client := network.GetSDKClient()
 
@@ -62,6 +63,7 @@ func TestSDKWithBearerToken(t *testing.T) {
 	network := e2e.TestNetwork{}
 
 	network.Setup(t)
+	t.Cleanup(network.TearDown)
 
 	client := network.GetSDKClient()
 

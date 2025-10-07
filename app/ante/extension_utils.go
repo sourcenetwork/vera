@@ -15,62 +15,32 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	jwxjws "github.com/lestrrat-go/jwx/v2/jws"
 
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	"github.com/sourcenetwork/sourcehub/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 )
 
-// JWT claim constants
-const (
-	IssuedAtClaim          = "iat"
-	ExpiresClaim           = "exp"
-	IssuerClaim            = "iss"
-	AuthorizedAccountClaim = "authorized_account"
-)
-
-// DefaultExpirationTime is the default expiration time for bearer tokens
-const DefaultExpirationTime = time.Minute * 10
-
-// Required claims for JWS payload validation
-var requiredClaims = []string{
-	IssuedAtClaim,
-	IssuerClaim,
-	AuthorizedAccountClaim,
-	ExpiresClaim,
-}
-
-// BearerToken contains the structured fields included in the JWS Bearer Token
-type BearerToken struct {
-	// IssuerID is the Actor ID for the Token signer
-	IssuerID string `json:"iss,omitempty"`
-	// AuthorizedAccount is the SourceHub account address which is allowed to use this token
-	AuthorizedAccount string `json:"authorized_account,omitempty"`
-	// IssuedTime is the timestamp at which the token was generated
-	IssuedTime int64 `json:"iat,omitempty"`
-	// ExpirationTime is the timestamp at which the token will expire
-	ExpirationTime int64 `json:"exp,omitempty"`
-}
-
 // parseValidateJWS processes a JWS Bearer token by unmarshaling it and verifying its signature.
-func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS string) (BearerToken, error) {
+func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS string) (antetypes.BearerToken, error) {
 	bearerJWS = strings.TrimLeft(bearerJWS, " \n\t\r")
 	if strings.HasPrefix(bearerJWS, "{") {
-		return BearerToken{}, fmt.Errorf("JSON serialization is not supported for security reasons")
+		return antetypes.BearerToken{}, fmt.Errorf("JSON serialization is not supported for security reasons")
 	}
 
 	jws, err := jose.ParseSigned(bearerJWS)
 	if err != nil {
-		return BearerToken{}, fmt.Errorf("failed parsing jws: %v", err)
+		return antetypes.BearerToken{}, fmt.Errorf("failed parsing jws: %v", err)
 	}
 
 	payloadBytes := jws.UnsafePayloadWithoutVerification()
 	bearer, err := unmarshalJWSPayload(payloadBytes)
 	if err != nil {
-		return BearerToken{}, err
+		return antetypes.BearerToken{}, err
 	}
 
 	err = validateBearerTokenValues(&bearer)
 	if err != nil {
-		return BearerToken{}, err
+		return antetypes.BearerToken{}, err
 	}
 
 	// Verify signature against the issuer DID
@@ -78,12 +48,12 @@ func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS stri
 	didKey := key.DIDKey(did)
 	pubBytes, _, keytype, err := didKey.Decode()
 	if err != nil {
-		return BearerToken{}, fmt.Errorf("failed to resolve actor did: %v", err)
+		return antetypes.BearerToken{}, fmt.Errorf("failed to resolve actor did: %v", err)
 	}
 
 	pubKey, err := crypto.BytesToPubKey(pubBytes, keytype)
 	if err != nil {
-		return BearerToken{}, fmt.Errorf("failed to retrieve pub key: %v", err)
+		return antetypes.BearerToken{}, fmt.Errorf("failed to retrieve pub key: %v", err)
 	}
 
 	var algs []jwa.SignatureAlgorithm
@@ -94,43 +64,43 @@ func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS stri
 	} else {
 		algs, err = jwxjws.AlgorithmsForKey(pubKey)
 		if err != nil {
-			return BearerToken{}, fmt.Errorf("failed to retrieve algs for pub key: %v", err)
+			return antetypes.BearerToken{}, fmt.Errorf("failed to retrieve algs for pub key: %v", err)
 		}
 	}
 
 	_, err = jwxjws.Verify([]byte(bearerJWS), jwxjws.WithKey(algs[0], pubKey))
 	if err != nil {
-		return BearerToken{}, fmt.Errorf("could not verify actor signature for jwk: %v", err)
+		return antetypes.BearerToken{}, fmt.Errorf("could not verify actor signature for jwk: %v", err)
 	}
 
 	return bearer, nil
 }
 
 // unmarshalJWSPayload unmarshals the JWS bytes into a BearerToken.
-func unmarshalJWSPayload(payload []byte) (BearerToken, error) {
+func unmarshalJWSPayload(payload []byte) (antetypes.BearerToken, error) {
 	obj := make(map[string]any)
 	err := json.Unmarshal(payload, &obj)
 	if err != nil {
-		return BearerToken{}, err
+		return antetypes.BearerToken{}, err
 	}
 
-	for _, claim := range requiredClaims {
+	for _, claim := range antetypes.RequiredClaims() {
 		_, ok := obj[claim]
 		if !ok {
-			return BearerToken{}, fmt.Errorf("missing required claim: %s", claim)
+			return antetypes.BearerToken{}, fmt.Errorf("missing required claim: %s", claim)
 		}
 	}
 
-	token := BearerToken{}
+	token := antetypes.BearerToken{}
 	err = json.Unmarshal(payload, &token)
 	if err != nil {
-		return BearerToken{}, fmt.Errorf("could not unmarshal payload: %v", err)
+		return antetypes.BearerToken{}, fmt.Errorf("could not unmarshal payload: %v", err)
 	}
 	return token, nil
 }
 
 // validateBearerTokenValues validates the bearer token values
-func validateBearerTokenValues(token *BearerToken) error {
+func validateBearerTokenValues(token *antetypes.BearerToken) error {
 	if err := did.IsValidDID(token.IssuerID); err != nil {
 		return fmt.Errorf("invalid issuer DID: %v", err)
 	}
@@ -147,7 +117,7 @@ func validateBearerTokenValues(token *BearerToken) error {
 }
 
 // validateBearerToken validates the bearer token including timing
-func validateBearerToken(token *BearerToken, currentTime *time.Time) error {
+func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time) error {
 	err := validateBearerTokenValues(token)
 	if err != nil {
 		return err
