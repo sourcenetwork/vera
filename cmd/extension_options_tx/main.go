@@ -28,8 +28,8 @@ import (
 	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/app/ante"
 	jwstypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	acp "github.com/sourcenetwork/sourcehub/x/acp/module"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 )
@@ -133,14 +133,14 @@ func main() {
 	}
 
 	// Create bearer token with the matching DID
-	bearerToken := ante.NewBearerTokenNow(didKey.String(), senderAddr)
+	bearerToken := testutil.NewBearerTokenNow(didKey.String(), senderAddr)
 	payloadBytes, err := json.Marshal(bearerToken)
 	if err != nil {
 		log.Fatal("Failed to marshal payload:", err)
 	}
 
 	// Create and sign the JWS
-	header := ante.CreateJWSHeader()
+	header := testutil.CreateJWSHeader()
 	headerBytes, err := json.Marshal(header)
 	if err != nil {
 		log.Fatal("Failed to marshal header:", err)

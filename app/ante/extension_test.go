@@ -62,7 +62,7 @@ func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 	require.NoError(t, err, "ExtensionOptionsDecorator should accept valid JWS extension option")
 
 	// Verify DID was extracted and stored in context
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "DID should be extracted and stored in context")
 }
 
@@ -258,7 +258,7 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 	require.NoError(t, err, "ExtensionOptionsDecorator should allow transactions with no extension options")
 
 	// Verify no DID was extracted
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Empty(t, extractedDID, "No DID should be extracted when no extension options are present")
 }
 
@@ -345,7 +345,7 @@ func TestExtensionOptionsDecorator_ExtractDIDFromJWSPayload(t *testing.T) {
 	require.NoError(t, err, "ExtensionOptionsDecorator should accept JWS extension option with DID in payload")
 
 	// Verify DID was extracted from payload
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "DID should be extracted from JWS payload")
 }
 
@@ -391,7 +391,7 @@ func TestExtensionOptionsDecorator_ValidJWSWithDIDInPayload(t *testing.T) {
 	require.NoError(t, err, "ExtensionOptionsDecorator should accept JWS extension option")
 
 	// Verify that payload DID is extracted and used
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "Payload DID should be extracted and used")
 }
 
@@ -545,7 +545,7 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	require.NoError(t, err, "Ante handler chain should succeed with DID-based feegrant")
 
 	// Verify DID was passed through context
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "DID should be preserved in context after ante chain")
 }
 
@@ -591,7 +591,7 @@ func TestExtensionAndFeeDecorators_NoDID(t *testing.T) {
 	require.NoError(t, err, "Ante handler chain should succeed with standard feegrant")
 
 	// Verify no DID was extracted
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Empty(t, extractedDID, "No DID should be in context when no extension options provided")
 }
 
@@ -637,7 +637,7 @@ func TestExtensionOptionsDecorator_CorrectAuthorizedAccount(t *testing.T) {
 	require.NoError(t, err, "ExtensionOptionsDecorator should accept JWS with matching authorized account")
 
 	// Verify DID was extracted and stored in context
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "DID should be extracted and stored in context")
 }
 
@@ -734,7 +734,7 @@ func TestExtensionOptionsDecorator_MultipleMessagesAllAuthorized(t *testing.T) {
 	newCtx, err := antehandler(s.ctx, tx, false)
 	require.NoError(t, err, "ExtensionOptionsDecorator should accept transaction with multiple ACP messages all from authorized account")
 
-	extractedDID := GetExtractedDIDFromContext(newCtx)
+	extractedDID := getExtractedDIDFromContext(newCtx)
 	require.Equal(t, userDID, extractedDID, "DID should be extracted and stored in context")
 }
 

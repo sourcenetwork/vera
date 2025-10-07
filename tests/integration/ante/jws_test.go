@@ -22,8 +22,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/app/ante"
 	jwstypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	"github.com/sourcenetwork/sourcehub/testutil/network"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/feegrant"
@@ -164,12 +164,12 @@ resources:
 	}
 
 	// Create bearer token payload
-	bearerToken := ante.NewBearerTokenNow(did, faucetAddr.String())
+	bearerToken := testutil.NewBearerTokenNow(did, faucetAddr.String())
 	payloadBytes, err := json.Marshal(bearerToken)
 	require.NoError(t, err)
 
 	// Create and sign JWS
-	header := ante.CreateJWSHeader()
+	header := testutil.CreateJWSHeader()
 	headerBytes, err := json.Marshal(header)
 	require.NoError(t, err)
 

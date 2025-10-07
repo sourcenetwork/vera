@@ -227,7 +227,7 @@ func (cdfd CustomDeductFeeDecorator) handleFeegrant(
 	msgs []sdk.Msg,
 ) error {
 	// Check if DID was extracted from verified JWS extension
-	extractedDID := GetExtractedDIDFromContext(ctx)
+	extractedDID := getExtractedDIDFromContext(ctx)
 	if extractedDID != "" {
 		// User provided verified DID via JWS extension - use DID-based feegrant
 		if didKeeper, ok := cdfd.feegrantKeeper.(interface {

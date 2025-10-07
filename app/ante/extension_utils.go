@@ -180,31 +180,10 @@ func validateJWSExtension(ctx context.Context, bearerToken string, currentTime t
 	return token.IssuerID, token.AuthorizedAccount, nil
 }
 
-// GetExtractedDIDFromContext retrieves the extracted DID from context.
-func GetExtractedDIDFromContext(ctx sdk.Context) string {
+// getExtractedDIDFromContext retrieves the extracted DID from context.
+func getExtractedDIDFromContext(ctx sdk.Context) string {
 	if did, ok := ctx.Value(ExtractedDIDContextKey).(string); ok {
 		return did
 	}
 	return ""
-}
-
-// NewBearerTokenNow creates a new BearerToken with current time and default expiration
-func NewBearerTokenNow(actorID string, authorizedAccount string) BearerToken {
-	now := time.Now()
-	expires := now.Add(DefaultExpirationTime)
-
-	return BearerToken{
-		IssuerID:          actorID,
-		AuthorizedAccount: authorizedAccount,
-		IssuedTime:        now.Unix(),
-		ExpirationTime:    expires.Unix(),
-	}
-}
-
-// CreateJWSHeader creates the standard JWS header for EdDSA JWT tokens
-func CreateJWSHeader() map[string]any {
-	return map[string]any{
-		"alg": "EdDSA",
-		"typ": "JWT",
-	}
 }

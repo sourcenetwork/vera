@@ -358,7 +358,7 @@ func TestCustomDeductFeeDecorator_HandleFeegrant_WithDID(t *testing.T) {
 	ctx := s.ctx.WithValue(ExtractedDIDContextKey, testDID)
 
 	// Verify DID was properly set in context
-	extractedDID := GetExtractedDIDFromContext(ctx)
+	extractedDID := getExtractedDIDFromContext(ctx)
 	require.Equal(t, testDID, extractedDID, "DID should be properly set in context")
 
 	// Expect DID-based feegrant to be called
