@@ -457,8 +457,8 @@ func (app *App) handleGrantAllowance(clientCtx client.Context) http.HandlerFunc 
 		}
 
 		expiration := time.Now().AddDate(0, 0, DefaultAllowanceExpirationDays)
-		if req.Expiration != 0 {
-			expiration = time.Unix(req.Expiration, 0)
+		if req.Expiration != nil {
+			expiration = *req.Expiration
 		}
 
 		// Create basic allowance
@@ -531,7 +531,7 @@ func (app *App) handleGrantAllowance(clientCtx client.Context) http.HandlerFunc 
 			Granter:     faucetAddress.String(),
 			Grantee:     req.Address,
 			AmountLimit: amountLimit,
-			Expiration:  expiration.Unix(),
+			Expiration:  &expiration,
 		}
 
 		w.Header().Set("Content-Type", "application/json")
@@ -572,8 +572,8 @@ func (app *App) handleGrantDIDAllowance(clientCtx client.Context) http.HandlerFu
 		}
 
 		expiration := time.Now().AddDate(0, 0, DefaultAllowanceExpirationDays)
-		if req.Expiration != 0 {
-			expiration = time.Unix(req.Expiration, 0)
+		if req.Expiration != nil {
+			expiration = *req.Expiration
 		}
 
 		// Create basic allowance
@@ -646,7 +646,7 @@ func (app *App) handleGrantDIDAllowance(clientCtx client.Context) http.HandlerFu
 			Granter:     faucetAddress.String(),
 			GranteeDid:  req.Did,
 			AmountLimit: amountLimit,
-			Expiration:  expiration.Unix(),
+			Expiration:  &expiration,
 		}
 
 		w.Header().Set("Content-Type", "application/json")

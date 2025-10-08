@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -272,6 +273,11 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		assert.NotEmpty(t, response.Granter)
 		assert.NotEmpty(t, response.Grantee)
 		assert.NotEmpty(t, response.AmountLimit.Amount)
+		assert.NotNil(t, response.Expiration, "Expiration should be set")
+		assert.Equal(t, "10000000000", response.AmountLimit.Amount.String(), "Default amount should be 10,000 $OPEN")
+
+		expectedExpiration := time.Now().AddDate(0, 0, 30)
+		assert.WithinDuration(t, expectedExpiration, *response.Expiration, time.Minute, "Expiration should be 30 days from now")
 
 		_, err = net.WaitForHeight(3)
 		require.NoError(t, err)
@@ -298,6 +304,7 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		allowanceData := allowance["allowance"].(map[string]any)
 		assert.Contains(t, allowanceData, "@type")
 		assert.Contains(t, allowanceData, "spend_limit")
+		assert.Contains(t, allowanceData, "expiration", "Allowance should have expiration")
 
 		spendLimit := allowanceData["spend_limit"].([]any)
 		assert.NotEmpty(t, spendLimit, "Should have spend limit")
@@ -374,6 +381,11 @@ func TestFaucetGrantDIDAllowance(t *testing.T) {
 	assert.Equal(t, info.Address, response.Granter)
 	assert.Equal(t, testDID, response.GranteeDid)
 	assert.NotEmpty(t, response.AmountLimit.Amount)
+	assert.NotNil(t, response.Expiration, "Expiration should be set")
+	assert.Equal(t, "1000", response.AmountLimit.Amount.String(), "Amount should be 1000 uopen")
+
+	expectedExpiration := time.Now().AddDate(0, 0, 30)
+	assert.WithinDuration(t, expectedExpiration, *response.Expiration, time.Minute, "Expiration should be 30 days from now")
 
 	_, err = net.WaitForHeight(3)
 	require.NoError(t, err)
@@ -409,4 +421,8 @@ func TestFaucetGrantDIDAllowance(t *testing.T) {
 	// Verify the spend limit
 	expectedCoin := sdk.NewCoin(appparams.MicroOpenDenom, math.NewInt(1000))
 	assert.Equal(t, sdk.NewCoins(expectedCoin), basicAllowance.SpendLimit)
+
+	require.NotNil(t, basicAllowance.Expiration, "Stored allowance should have expiration")
+	expectedStoredExpiration := time.Now().AddDate(0, 0, 30)
+	assert.WithinDuration(t, expectedStoredExpiration, *basicAllowance.Expiration, time.Minute, "Stored expiration should be 30 days from now")
 }
