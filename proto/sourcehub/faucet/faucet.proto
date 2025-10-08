@@ -6,6 +6,7 @@ import "amino/amino.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/app/faucet/types";
 
@@ -73,8 +74,8 @@ message GrantAllowanceRequest {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-  // Optional expiration time in unix timestamp. If not provided, defaults to 30 days from now
-  int64 expiration = 3;
+  // Optional expiration time. If not provided, defaults to 30 days from now
+  google.protobuf.Timestamp expiration = 3 [(gogoproto.stdtime) = true];
 }
 
 // GrantAllowanceResponse represents the response from a grant allowance request.
@@ -89,7 +90,7 @@ message GrantAllowanceResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-  int64 expiration = 8;
+  google.protobuf.Timestamp expiration = 8 [(gogoproto.stdtime) = true];
 } 
 
 // GrantDIDAllowanceRequest represents a request to grant fee allowance to a DID from the faucet.
@@ -100,8 +101,8 @@ message GrantDIDAllowanceRequest {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-  // Optional expiration time in unix timestamp. If not provided, defaults to 30 days from now
-  int64 expiration = 3;
+  // Optional expiration time. If not provided, defaults to 30 days from now
+  google.protobuf.Timestamp expiration = 3 [(gogoproto.stdtime) = true];
 }
 
 // GrantDIDAllowanceResponse represents the response from a DID grant allowance request.
@@ -116,5 +117,5 @@ message GrantDIDAllowanceResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-  int64 expiration = 8;
+  google.protobuf.Timestamp expiration = 8 [(gogoproto.stdtime) = true];
 }
