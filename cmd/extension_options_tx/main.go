@@ -207,11 +207,8 @@ func main() {
 		WithKeybase(kr).
 		WithSignMode(signing.SignMode_SIGN_MODE_DIRECT).
 		WithAccountRetriever(clientCtx.AccountRetriever).
-		WithGas(200000).
 		WithAccountNumber(accNum).
-		WithSequence(seq).
-		WithGasAdjustment(1.2).
-		WithFees("5000uopen")
+		WithSequence(seq)
 
 	// Sign transaction
 	err = clienttx.Sign(context.Background(), txf, info.Name, txBuilder, true)
