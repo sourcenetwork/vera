@@ -308,6 +308,393 @@ func (m *MsgPruneAllowancesResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgPruneAllowancesResponse proto.InternalMessageInfo
 
+// MsgGrantDIDAllowance adds permission for a DID to spend up to Allowance
+// of fees from the account of Granter.
+type MsgGrantDIDAllowance struct {
+	// granter is the address of the user granting an allowance of their funds.
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// grantee_did is the DID being granted an allowance of another user's funds.
+	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+	// allowance can be any of basic, periodic, allowed fee allowance.
+	Allowance *types.Any `protobuf:"bytes,3,opt,name=allowance,proto3" json:"allowance,omitempty"`
+}
+
+func (m *MsgGrantDIDAllowance) Reset()         { *m = MsgGrantDIDAllowance{} }
+func (m *MsgGrantDIDAllowance) String() string { return proto.CompactTextString(m) }
+func (*MsgGrantDIDAllowance) ProtoMessage()    {}
+func (*MsgGrantDIDAllowance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{6}
+}
+func (m *MsgGrantDIDAllowance) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgGrantDIDAllowance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgGrantDIDAllowance.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgGrantDIDAllowance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgGrantDIDAllowance.Merge(m, src)
+}
+func (m *MsgGrantDIDAllowance) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgGrantDIDAllowance) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgGrantDIDAllowance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgGrantDIDAllowance proto.InternalMessageInfo
+
+func (m *MsgGrantDIDAllowance) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *MsgGrantDIDAllowance) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+func (m *MsgGrantDIDAllowance) GetAllowance() *types.Any {
+	if m != nil {
+		return m.Allowance
+	}
+	return nil
+}
+
+// MsgGrantDIDAllowanceResponse defines the Msg/GrantDIDAllowanceResponse response type.
+type MsgGrantDIDAllowanceResponse struct {
+}
+
+func (m *MsgGrantDIDAllowanceResponse) Reset()         { *m = MsgGrantDIDAllowanceResponse{} }
+func (m *MsgGrantDIDAllowanceResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgGrantDIDAllowanceResponse) ProtoMessage()    {}
+func (*MsgGrantDIDAllowanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{7}
+}
+func (m *MsgGrantDIDAllowanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgGrantDIDAllowanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgGrantDIDAllowanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgGrantDIDAllowanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgGrantDIDAllowanceResponse.Merge(m, src)
+}
+func (m *MsgGrantDIDAllowanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgGrantDIDAllowanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgGrantDIDAllowanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgGrantDIDAllowanceResponse proto.InternalMessageInfo
+
+// MsgRevokeDIDAllowance removes any existing Allowance from Granter to a DID.
+type MsgRevokeDIDAllowance struct {
+	// granter is the address of the user granting an allowance of their funds.
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// grantee_did is the DID being granted an allowance of another user's funds.
+	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+}
+
+func (m *MsgRevokeDIDAllowance) Reset()         { *m = MsgRevokeDIDAllowance{} }
+func (m *MsgRevokeDIDAllowance) String() string { return proto.CompactTextString(m) }
+func (*MsgRevokeDIDAllowance) ProtoMessage()    {}
+func (*MsgRevokeDIDAllowance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{8}
+}
+func (m *MsgRevokeDIDAllowance) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRevokeDIDAllowance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRevokeDIDAllowance.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRevokeDIDAllowance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRevokeDIDAllowance.Merge(m, src)
+}
+func (m *MsgRevokeDIDAllowance) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRevokeDIDAllowance) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRevokeDIDAllowance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRevokeDIDAllowance proto.InternalMessageInfo
+
+func (m *MsgRevokeDIDAllowance) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *MsgRevokeDIDAllowance) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+// MsgRevokeDIDAllowanceResponse defines the Msg/RevokeDIDAllowanceResponse response type.
+type MsgRevokeDIDAllowanceResponse struct {
+}
+
+func (m *MsgRevokeDIDAllowanceResponse) Reset()         { *m = MsgRevokeDIDAllowanceResponse{} }
+func (m *MsgRevokeDIDAllowanceResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRevokeDIDAllowanceResponse) ProtoMessage()    {}
+func (*MsgRevokeDIDAllowanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{9}
+}
+func (m *MsgRevokeDIDAllowanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRevokeDIDAllowanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRevokeDIDAllowanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRevokeDIDAllowanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRevokeDIDAllowanceResponse.Merge(m, src)
+}
+func (m *MsgRevokeDIDAllowanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRevokeDIDAllowanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRevokeDIDAllowanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRevokeDIDAllowanceResponse proto.InternalMessageInfo
+
+// EventGrantDIDAllowance is emitted when a DID allowance is granted.
+type EventGrantDIDAllowance struct {
+	// granter is the address of the user granting an allowance of their funds.
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// grantee_did is the DID being granted an allowance of another user's funds.
+	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+}
+
+func (m *EventGrantDIDAllowance) Reset()         { *m = EventGrantDIDAllowance{} }
+func (m *EventGrantDIDAllowance) String() string { return proto.CompactTextString(m) }
+func (*EventGrantDIDAllowance) ProtoMessage()    {}
+func (*EventGrantDIDAllowance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{10}
+}
+func (m *EventGrantDIDAllowance) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EventGrantDIDAllowance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EventGrantDIDAllowance.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EventGrantDIDAllowance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EventGrantDIDAllowance.Merge(m, src)
+}
+func (m *EventGrantDIDAllowance) XXX_Size() int {
+	return m.Size()
+}
+func (m *EventGrantDIDAllowance) XXX_DiscardUnknown() {
+	xxx_messageInfo_EventGrantDIDAllowance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EventGrantDIDAllowance proto.InternalMessageInfo
+
+func (m *EventGrantDIDAllowance) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *EventGrantDIDAllowance) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+// EventRevokeDIDAllowance is emitted when a DID allowance is revoked.
+type EventRevokeDIDAllowance struct {
+	// granter is the address of the user revoking an allowance of their funds.
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// grantee_did is the DID whose allowance is being revoked.
+	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+}
+
+func (m *EventRevokeDIDAllowance) Reset()         { *m = EventRevokeDIDAllowance{} }
+func (m *EventRevokeDIDAllowance) String() string { return proto.CompactTextString(m) }
+func (*EventRevokeDIDAllowance) ProtoMessage()    {}
+func (*EventRevokeDIDAllowance) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{11}
+}
+func (m *EventRevokeDIDAllowance) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *EventRevokeDIDAllowance) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_EventRevokeDIDAllowance.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *EventRevokeDIDAllowance) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EventRevokeDIDAllowance.Merge(m, src)
+}
+func (m *EventRevokeDIDAllowance) XXX_Size() int {
+	return m.Size()
+}
+func (m *EventRevokeDIDAllowance) XXX_DiscardUnknown() {
+	xxx_messageInfo_EventRevokeDIDAllowance.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EventRevokeDIDAllowance proto.InternalMessageInfo
+
+func (m *EventRevokeDIDAllowance) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *EventRevokeDIDAllowance) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+// MsgPruneDIDAllowances prunes expired DID fee allowances.
+type MsgPruneDIDAllowances struct {
+	// pruner is the address of the user pruning expired DID allowances.
+	Pruner string `protobuf:"bytes,1,opt,name=pruner,proto3" json:"pruner,omitempty"`
+}
+
+func (m *MsgPruneDIDAllowances) Reset()         { *m = MsgPruneDIDAllowances{} }
+func (m *MsgPruneDIDAllowances) String() string { return proto.CompactTextString(m) }
+func (*MsgPruneDIDAllowances) ProtoMessage()    {}
+func (*MsgPruneDIDAllowances) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{12}
+}
+func (m *MsgPruneDIDAllowances) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgPruneDIDAllowances) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgPruneDIDAllowances.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgPruneDIDAllowances) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgPruneDIDAllowances.Merge(m, src)
+}
+func (m *MsgPruneDIDAllowances) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgPruneDIDAllowances) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgPruneDIDAllowances.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgPruneDIDAllowances proto.InternalMessageInfo
+
+func (m *MsgPruneDIDAllowances) GetPruner() string {
+	if m != nil {
+		return m.Pruner
+	}
+	return ""
+}
+
+// MsgPruneDIDAllowancesResponse defines the Msg/PruneDIDAllowancesResponse response type.
+type MsgPruneDIDAllowancesResponse struct {
+}
+
+func (m *MsgPruneDIDAllowancesResponse) Reset()         { *m = MsgPruneDIDAllowancesResponse{} }
+func (m *MsgPruneDIDAllowancesResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgPruneDIDAllowancesResponse) ProtoMessage()    {}
+func (*MsgPruneDIDAllowancesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26a0653b3586ef57, []int{13}
+}
+func (m *MsgPruneDIDAllowancesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgPruneDIDAllowancesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgPruneDIDAllowancesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgPruneDIDAllowancesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgPruneDIDAllowancesResponse.Merge(m, src)
+}
+func (m *MsgPruneDIDAllowancesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgPruneDIDAllowancesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgPruneDIDAllowancesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgPruneDIDAllowancesResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgGrantAllowance)(nil), "sourcehub.feegrant.v1beta1.MsgGrantAllowance")
 	proto.RegisterType((*MsgGrantAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.MsgGrantAllowanceResponse")
@@ -315,6 +702,14 @@ func init() {
 	proto.RegisterType((*MsgRevokeAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.MsgRevokeAllowanceResponse")
 	proto.RegisterType((*MsgPruneAllowances)(nil), "sourcehub.feegrant.v1beta1.MsgPruneAllowances")
 	proto.RegisterType((*MsgPruneAllowancesResponse)(nil), "sourcehub.feegrant.v1beta1.MsgPruneAllowancesResponse")
+	proto.RegisterType((*MsgGrantDIDAllowance)(nil), "sourcehub.feegrant.v1beta1.MsgGrantDIDAllowance")
+	proto.RegisterType((*MsgGrantDIDAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.MsgGrantDIDAllowanceResponse")
+	proto.RegisterType((*MsgRevokeDIDAllowance)(nil), "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance")
+	proto.RegisterType((*MsgRevokeDIDAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse")
+	proto.RegisterType((*EventGrantDIDAllowance)(nil), "sourcehub.feegrant.v1beta1.EventGrantDIDAllowance")
+	proto.RegisterType((*EventRevokeDIDAllowance)(nil), "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance")
+	proto.RegisterType((*MsgPruneDIDAllowances)(nil), "sourcehub.feegrant.v1beta1.MsgPruneDIDAllowances")
+	proto.RegisterType((*MsgPruneDIDAllowancesResponse)(nil), "sourcehub.feegrant.v1beta1.MsgPruneDIDAllowancesResponse")
 }
 
 func init() {
@@ -322,39 +717,50 @@ func init() {
 }
 
 var fileDescriptor_26a0653b3586ef57 = []byte{
-	// 505 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0xbf, 0x8f, 0x12, 0x41,
-	0x14, 0x66, 0x8e, 0x78, 0xe6, 0xc6, 0xc4, 0xf3, 0x36, 0x44, 0x61, 0x3d, 0x57, 0xb2, 0x36, 0x84,
-	0xb8, 0x33, 0x80, 0x39, 0x0b, 0x3a, 0x28, 0xbc, 0x58, 0x90, 0x18, 0xec, 0x6c, 0x74, 0x81, 0x77,
-	0x23, 0x01, 0x66, 0xc8, 0xce, 0xb2, 0x77, 0x74, 0xc6, 0xd2, 0x58, 0x68, 0xfc, 0x37, 0x2c, 0x28,
-	0xf8, 0x23, 0xcc, 0x55, 0x97, 0xab, 0x2c, 0x0d, 0x14, 0xfc, 0x1b, 0x66, 0x7f, 0xc7, 0xc1, 0x73,
-	0xbd, 0xe6, 0x9a, 0xdd, 0xbc, 0xf7, 0xbe, 0x37, 0xdf, 0xf7, 0xcd, 0x9b, 0x19, 0xfc, 0x44, 0x8a,
-	0x99, 0xd3, 0x87, 0xf7, 0xb3, 0x1e, 0x3d, 0x01, 0x60, 0x8e, 0xcd, 0x5d, 0xea, 0xd5, 0x7b, 0xe0,
-	0xda, 0x75, 0xea, 0x9e, 0x91, 0xa9, 0x23, 0x5c, 0xa1, 0xe9, 0x09, 0x88, 0xc4, 0x20, 0x12, 0x81,
-	0xf4, 0x12, 0x13, 0x82, 0x8d, 0x81, 0x06, 0xc8, 0xde, 0xec, 0x84, 0xda, 0x7c, 0x1e, 0xb6, 0xe9,
-	0xa5, 0xbe, 0x90, 0x13, 0x21, 0xdf, 0x06, 0x11, 0x0d, 0x83, 0xa8, 0xf4, 0x20, 0x8c, 0xe8, 0x44,
-	0x32, 0xea, 0xd5, 0xfd, 0x5f, 0x54, 0x38, 0xb0, 0x27, 0x43, 0x2e, 0x68, 0xf0, 0x0d, 0x53, 0xe6,
-	0xe7, 0x1d, 0x7c, 0xd0, 0x91, 0xec, 0xd8, 0xa7, 0x6d, 0x8d, 0xc7, 0xe2, 0xd4, 0xe6, 0x7d, 0xd0,
-	0x1a, 0xf8, 0x76, 0x20, 0x04, 0x9c, 0x22, 0x2a, 0xa3, 0xca, 0x5e, 0xbb, 0x78, 0xb9, 0xb4, 0x0a,
-	0x11, 0x49, 0x6b, 0x30, 0x70, 0x40, 0xca, 0xd7, 0xae, 0x33, 0xe4, 0xac, 0x1b, 0x03, 0xd3, 0x1e,
-	0x28, 0xee, 0xfc, 0x5f, 0x0f, 0x68, 0xef, 0xf0, 0x9e, 0x1d, 0x93, 0x16, 0xf3, 0x65, 0x54, 0xb9,
-	0xd3, 0x28, 0x90, 0xd0, 0x33, 0x89, 0x3d, 0x93, 0x16, 0x9f, 0xb7, 0x9f, 0x9e, 0x2f, 0xad, 0xca,
-	0xd5, 0x1b, 0x45, 0x5e, 0x00, 0x24, 0xea, 0x5f, 0x76, 0xd3, 0x45, 0x9b, 0xd6, 0xc7, 0xcd, 0xa2,
-	0x1a, 0x6b, 0xfc, 0xb4, 0x59, 0x54, 0x0f, 0x43, 0x45, 0x96, 0x1c, 0x8c, 0xe8, 0x96, 0x71, 0xf3,
-	0x21, 0x2e, 0x6d, 0x25, 0xbb, 0x20, 0xa7, 0x82, 0x4b, 0x30, 0xbf, 0x23, 0xac, 0x75, 0x24, 0xeb,
-	0x82, 0x27, 0x46, 0x70, 0xe3, 0x9b, 0xd5, 0x24, 0xaa, 0x95, 0x47, 0x7f, 0x5a, 0x51, 0x74, 0x99,
-	0x87, 0x58, 0xdf, 0xce, 0x26, 0x66, 0x58, 0xe0, 0xe5, 0x95, 0x33, 0xe3, 0x69, 0x51, 0x6a, 0x35,
-	0xbc, 0x3b, 0xf5, 0x53, 0xd9, 0x56, 0x22, 0x5c, 0xf3, 0xf1, 0xe5, 0xd2, 0xba, 0x97, 0x0a, 0x29,
-	0x7b, 0x35, 0x72, 0x54, 0xf3, 0x95, 0x46, 0x00, 0xb3, 0x11, 0xc8, 0x50, 0x88, 0x62, 0x19, 0xcd,
-	0xc2, 0xdf, 0xda, 0x1b, 0xdf, 0xf2, 0x38, 0xdf, 0x91, 0x4c, 0xf3, 0xf0, 0x5d, 0xe5, 0x64, 0x5a,
-	0xe4, 0x1f, 0xa7, 0x60, 0x6b, 0x74, 0xfa, 0xd1, 0xb5, 0xe0, 0xb1, 0x2a, 0x6d, 0x8e, 0xf7, 0xd5,
-	0x29, 0x93, 0x8c, 0x95, 0x14, 0xbc, 0xfe, 0xfc, 0x7a, 0xf8, 0x84, 0xfa, 0x2b, 0xc2, 0xfb, 0xea,
-	0x54, 0xb2, 0xb8, 0x15, 0x7c, 0x26, 0xf7, 0x15, 0xc3, 0x30, 0xef, 0x9f, 0x2f, 0x2d, 0x4d, 0x1d,
-	0x06, 0xa9, 0xe9, 0xb7, 0x3e, 0x6c, 0x16, 0x55, 0xd4, 0x3e, 0xfe, 0xb1, 0x32, 0xd0, 0xc5, 0xca,
-	0x40, 0xbf, 0x56, 0x06, 0xfa, 0xb2, 0x36, 0x72, 0x17, 0x6b, 0x23, 0xf7, 0x73, 0x6d, 0xe4, 0xde,
-	0x58, 0x6c, 0xe8, 0xfa, 0x64, 0x7d, 0x31, 0xa1, 0x21, 0x35, 0x07, 0xf7, 0x54, 0x38, 0x23, 0x9a,
-	0xbe, 0x80, 0x67, 0xc9, 0x1b, 0xd8, 0xdb, 0x0d, 0xee, 0xf6, 0xb3, 0xdf, 0x01, 0x00, 0x00, 0xff,
-	0xff, 0x46, 0x0f, 0xe0, 0x5d, 0x20, 0x05, 0x00, 0x00,
+	// 682 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x4f, 0x4f, 0x13, 0x4f,
+	0x18, 0x66, 0x20, 0x3f, 0x7e, 0x61, 0x48, 0x44, 0x36, 0x15, 0xca, 0x0a, 0x5b, 0xb2, 0x5e, 0x08,
+	0x71, 0x67, 0xb6, 0x35, 0x18, 0xed, 0x0d, 0x82, 0x12, 0x0e, 0x24, 0xa6, 0x18, 0x0f, 0x5e, 0x70,
+	0xdb, 0x1d, 0xd6, 0xa6, 0xed, 0x4e, 0xb3, 0xb3, 0x5d, 0xe8, 0x49, 0xc3, 0xd1, 0x78, 0xd0, 0x2f,
+	0xc0, 0x27, 0xf0, 0xd0, 0x43, 0x3f, 0x84, 0xe1, 0x44, 0x38, 0x79, 0x34, 0xed, 0xa1, 0xdf, 0xc2,
+	0x98, 0xee, 0xdf, 0x76, 0x76, 0x6b, 0x5b, 0x89, 0x5c, 0xda, 0xcc, 0x3b, 0xcf, 0xfb, 0xbe, 0xcf,
+	0xf3, 0xcc, 0xcc, 0x9b, 0x85, 0x8f, 0x18, 0x6d, 0x58, 0x25, 0xf2, 0xbe, 0x51, 0xc4, 0xa7, 0x84,
+	0x18, 0x96, 0x66, 0xda, 0xd8, 0xc9, 0x16, 0x89, 0xad, 0x65, 0xb1, 0x7d, 0x8e, 0xea, 0x16, 0xb5,
+	0xa9, 0x20, 0x86, 0x20, 0x14, 0x80, 0x90, 0x0f, 0x12, 0xd7, 0x0c, 0x4a, 0x8d, 0x2a, 0xc1, 0x2e,
+	0xb2, 0xd8, 0x38, 0xc5, 0x9a, 0xd9, 0xf4, 0xd2, 0xc4, 0xb5, 0x12, 0x65, 0x35, 0xca, 0x4e, 0xdc,
+	0x15, 0xf6, 0x16, 0xfe, 0xd6, 0xaa, 0xb7, 0xc2, 0x35, 0x66, 0x60, 0x27, 0xdb, 0xff, 0xf3, 0x37,
+	0x96, 0xb5, 0x5a, 0xd9, 0xa4, 0xd8, 0xfd, 0xf5, 0x42, 0xf2, 0xe7, 0x59, 0xb8, 0x7c, 0xc4, 0x8c,
+	0x83, 0x7e, 0xdb, 0xdd, 0x6a, 0x95, 0x9e, 0x69, 0x66, 0x89, 0x08, 0x39, 0xf8, 0xbf, 0x4b, 0x84,
+	0x58, 0x69, 0xb0, 0x09, 0xb6, 0x16, 0xf6, 0xd2, 0x37, 0x6d, 0x25, 0xe5, 0x37, 0xd9, 0xd5, 0x75,
+	0x8b, 0x30, 0x76, 0x6c, 0x5b, 0x65, 0xd3, 0x28, 0x04, 0xc0, 0x28, 0x87, 0xa4, 0x67, 0x27, 0xcb,
+	0x21, 0xc2, 0x3b, 0xb8, 0xa0, 0x05, 0x4d, 0xd3, 0x73, 0x9b, 0x60, 0x6b, 0x31, 0x97, 0x42, 0x9e,
+	0x66, 0x14, 0x68, 0x46, 0xbb, 0x66, 0x73, 0xef, 0xf1, 0x55, 0x5b, 0xd9, 0x1a, 0x6d, 0x14, 0x7a,
+	0x49, 0x48, 0xc8, 0xfe, 0xb0, 0x10, 0x15, 0xcd, 0x2b, 0x17, 0xbd, 0xd6, 0x76, 0xc0, 0xf1, 0x53,
+	0xaf, 0xb5, 0xbd, 0xee, 0x31, 0x52, 0x98, 0x5e, 0xc1, 0x31, 0xe1, 0xf2, 0x43, 0xb8, 0x16, 0x0b,
+	0x16, 0x08, 0xab, 0x53, 0x93, 0x11, 0xf9, 0x1b, 0x80, 0xc2, 0x11, 0x33, 0x0a, 0xc4, 0xa1, 0x15,
+	0x72, 0xe7, 0x66, 0xe5, 0x11, 0x2f, 0x65, 0x63, 0x58, 0x0a, 0xc7, 0x4b, 0x5e, 0x87, 0x62, 0x3c,
+	0x1a, 0x8a, 0x31, 0x5c, 0x2d, 0xaf, 0xac, 0x86, 0x19, 0x6d, 0x32, 0x41, 0x85, 0xf3, 0xf5, 0x7e,
+	0x68, 0xbc, 0x14, 0x1f, 0x97, 0xcf, 0xdc, 0xb4, 0x95, 0xfb, 0x11, 0x91, 0x4d, 0x47, 0x45, 0x3b,
+	0x6a, 0x9f, 0xa9, 0x0f, 0x90, 0x73, 0x2e, 0x0d, 0xae, 0x51, 0x40, 0x23, 0x9f, 0x4a, 0x4a, 0x97,
+	0x7f, 0x01, 0x98, 0x0a, 0xce, 0x61, 0xff, 0x70, 0xff, 0x76, 0x5e, 0x67, 0xe0, 0xa2, 0x6f, 0xe1,
+	0x89, 0x5e, 0xd6, 0x3d, 0xbf, 0x0b, 0xd0, 0x0f, 0xed, 0x97, 0xf5, 0x3b, 0xb8, 0x85, 0x98, 0x3f,
+	0x3a, 0x29, 0x9a, 0x0c, 0x49, 0x3a, 0x65, 0x09, 0xae, 0x27, 0xc5, 0xc3, 0xd3, 0xbb, 0x04, 0xf0,
+	0x41, 0x78, 0xb8, 0xff, 0xdc, 0xa1, 0xbc, 0xca, 0xf3, 0xcf, 0x0c, 0xf1, 0x8f, 0xd3, 0x90, 0x33,
+	0x70, 0x23, 0x71, 0x23, 0x54, 0x70, 0x0c, 0x57, 0x5e, 0x38, 0xc4, 0xb4, 0xe3, 0x67, 0x9c, 0xe6,
+	0x14, 0x4c, 0xce, 0x53, 0x7e, 0x0d, 0x57, 0xdd, 0xa2, 0x09, 0xbe, 0xdc, 0xa2, 0xea, 0x1b, 0xd7,
+	0x6b, 0xf7, 0x06, 0x0f, 0x96, 0xfc, 0x9b, 0xd7, 0xb2, 0x38, 0xf8, 0x32, 0x3c, 0x8f, 0xe2, 0x75,
+	0x03, 0x8f, 0x72, 0x97, 0xf3, 0x70, 0xee, 0x88, 0x19, 0x82, 0x03, 0xef, 0x71, 0x03, 0x5a, 0x41,
+	0x7f, 0xb8, 0x86, 0xb1, 0x09, 0x26, 0xee, 0x4c, 0x05, 0x0f, 0xfa, 0x0b, 0x4d, 0xb8, 0xc4, 0x0f,
+	0x3b, 0x34, 0xa6, 0x12, 0x87, 0x17, 0x9f, 0x4e, 0x87, 0x0f, 0x5b, 0x7f, 0x05, 0x70, 0x89, 0x1f,
+	0x4e, 0xe3, 0x7a, 0x73, 0xf8, 0xb1, 0xbd, 0x47, 0xcc, 0x24, 0x79, 0xe5, 0xaa, 0xad, 0x08, 0xfc,
+	0x4c, 0x42, 0xaa, 0xf0, 0x01, 0x2e, 0xc7, 0x6f, 0xab, 0x3a, 0x89, 0xb5, 0x83, 0x19, 0xe2, 0xb3,
+	0x69, 0x33, 0x42, 0x53, 0x2e, 0x00, 0x14, 0x12, 0xae, 0x76, 0x76, 0x22, 0x8f, 0x87, 0x38, 0x3c,
+	0x9f, 0x3a, 0x65, 0x88, 0x44, 0xc2, 0x5b, 0xc8, 0x4e, 0x62, 0xf6, 0x50, 0xca, 0x58, 0x12, 0xa3,
+	0x5f, 0x86, 0xf8, 0xdf, 0xc7, 0x5e, 0x6b, 0x1b, 0xec, 0x1d, 0x7c, 0xef, 0x48, 0xe0, 0xba, 0x23,
+	0x81, 0x9f, 0x1d, 0x09, 0x7c, 0xe9, 0x4a, 0x33, 0xd7, 0x5d, 0x69, 0xe6, 0x47, 0x57, 0x9a, 0x79,
+	0xab, 0x18, 0x65, 0xbb, 0x5f, 0xb7, 0x44, 0x6b, 0xd8, 0xeb, 0x62, 0x12, 0xfb, 0x8c, 0x5a, 0x15,
+	0x1c, 0x4d, 0xae, 0xf3, 0xf0, 0xab, 0xac, 0x38, 0xef, 0xce, 0xf9, 0x27, 0xbf, 0x03, 0x00, 0x00,
+	0xff, 0xff, 0x53, 0x60, 0x78, 0xc7, 0xb2, 0x09, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -377,6 +783,12 @@ type MsgClient interface {
 	RevokeAllowance(ctx context.Context, in *MsgRevokeAllowance, opts ...grpc.CallOption) (*MsgRevokeAllowanceResponse, error)
 	// PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
 	PruneAllowances(ctx context.Context, in *MsgPruneAllowances, opts ...grpc.CallOption) (*MsgPruneAllowancesResponse, error)
+	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
+	GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowance, opts ...grpc.CallOption) (*MsgGrantDIDAllowanceResponse, error)
+	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
+	RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error)
+	// PruneDIDAllowances prunes expired DID fee allowances, currently up to 75 at a time.
+	PruneDIDAllowances(ctx context.Context, in *MsgPruneDIDAllowances, opts ...grpc.CallOption) (*MsgPruneDIDAllowancesResponse, error)
 }
 
 type msgClient struct {
@@ -414,6 +826,33 @@ func (c *msgClient) PruneAllowances(ctx context.Context, in *MsgPruneAllowances,
 	return out, nil
 }
 
+func (c *msgClient) GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowance, opts ...grpc.CallOption) (*MsgGrantDIDAllowanceResponse, error) {
+	out := new(MsgGrantDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.feegrant.v1beta1.Msg/GrantDIDAllowance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error) {
+	out := new(MsgRevokeDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.feegrant.v1beta1.Msg/RevokeDIDAllowance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) PruneDIDAllowances(ctx context.Context, in *MsgPruneDIDAllowances, opts ...grpc.CallOption) (*MsgPruneDIDAllowancesResponse, error) {
+	out := new(MsgPruneDIDAllowancesResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.feegrant.v1beta1.Msg/PruneDIDAllowances", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// GrantAllowance grants fee allowance to the grantee on the granter's
@@ -424,6 +863,12 @@ type MsgServer interface {
 	RevokeAllowance(context.Context, *MsgRevokeAllowance) (*MsgRevokeAllowanceResponse, error)
 	// PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
 	PruneAllowances(context.Context, *MsgPruneAllowances) (*MsgPruneAllowancesResponse, error)
+	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
+	GrantDIDAllowance(context.Context, *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error)
+	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
+	RevokeDIDAllowance(context.Context, *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error)
+	// PruneDIDAllowances prunes expired DID fee allowances, currently up to 75 at a time.
+	PruneDIDAllowances(context.Context, *MsgPruneDIDAllowances) (*MsgPruneDIDAllowancesResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -438,6 +883,15 @@ func (*UnimplementedMsgServer) RevokeAllowance(ctx context.Context, req *MsgRevo
 }
 func (*UnimplementedMsgServer) PruneAllowances(ctx context.Context, req *MsgPruneAllowances) (*MsgPruneAllowancesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PruneAllowances not implemented")
+}
+func (*UnimplementedMsgServer) GrantDIDAllowance(ctx context.Context, req *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GrantDIDAllowance not implemented")
+}
+func (*UnimplementedMsgServer) RevokeDIDAllowance(ctx context.Context, req *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RevokeDIDAllowance not implemented")
+}
+func (*UnimplementedMsgServer) PruneDIDAllowances(ctx context.Context, req *MsgPruneDIDAllowances) (*MsgPruneDIDAllowancesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PruneDIDAllowances not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -498,6 +952,60 @@ func _Msg_PruneAllowances_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_GrantDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgGrantDIDAllowance)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).GrantDIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.feegrant.v1beta1.Msg/GrantDIDAllowance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).GrantDIDAllowance(ctx, req.(*MsgGrantDIDAllowance))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RevokeDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRevokeDIDAllowance)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RevokeDIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.feegrant.v1beta1.Msg/RevokeDIDAllowance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RevokeDIDAllowance(ctx, req.(*MsgRevokeDIDAllowance))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_PruneDIDAllowances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgPruneDIDAllowances)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).PruneDIDAllowances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.feegrant.v1beta1.Msg/PruneDIDAllowances",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).PruneDIDAllowances(ctx, req.(*MsgPruneDIDAllowances))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.feegrant.v1beta1.Msg",
@@ -514,6 +1022,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PruneAllowances",
 			Handler:    _Msg_PruneAllowances_Handler,
+		},
+		{
+			MethodName: "GrantDIDAllowance",
+			Handler:    _Msg_GrantDIDAllowance_Handler,
+		},
+		{
+			MethodName: "RevokeDIDAllowance",
+			Handler:    _Msg_RevokeDIDAllowance_Handler,
+		},
+		{
+			MethodName: "PruneDIDAllowances",
+			Handler:    _Msg_PruneDIDAllowances_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -705,6 +1225,265 @@ func (m *MsgPruneAllowancesResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgGrantDIDAllowance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgGrantDIDAllowance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgGrantDIDAllowance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Allowance != nil {
+		{
+			size, err := m.Allowance.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.GranteeDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgGrantDIDAllowanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgGrantDIDAllowanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgGrantDIDAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRevokeDIDAllowance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRevokeDIDAllowance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRevokeDIDAllowance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.GranteeDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRevokeDIDAllowanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRevokeDIDAllowanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRevokeDIDAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *EventGrantDIDAllowance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EventGrantDIDAllowance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EventGrantDIDAllowance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.GranteeDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *EventRevokeDIDAllowance) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *EventRevokeDIDAllowance) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *EventRevokeDIDAllowance) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.GranteeDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgPruneDIDAllowances) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgPruneDIDAllowances) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgPruneDIDAllowances) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Pruner) > 0 {
+		i -= len(m.Pruner)
+		copy(dAtA[i:], m.Pruner)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Pruner)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgPruneDIDAllowancesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgPruneDIDAllowancesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgPruneDIDAllowancesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -786,6 +1565,118 @@ func (m *MsgPruneAllowances) Size() (n int) {
 }
 
 func (m *MsgPruneAllowancesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgGrantDIDAllowance) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Allowance != nil {
+		l = m.Allowance.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgGrantDIDAllowanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgRevokeDIDAllowance) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRevokeDIDAllowanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *EventGrantDIDAllowance) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *EventRevokeDIDAllowance) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgPruneDIDAllowances) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Pruner)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgPruneDIDAllowancesResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1273,6 +2164,730 @@ func (m *MsgPruneAllowancesResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgPruneAllowancesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgGrantDIDAllowance) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgGrantDIDAllowance: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgGrantDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Allowance", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Allowance == nil {
+				m.Allowance = &types.Any{}
+			}
+			if err := m.Allowance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgGrantDIDAllowanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgGrantDIDAllowanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgGrantDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRevokeDIDAllowance) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRevokeDIDAllowance: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRevokeDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRevokeDIDAllowanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRevokeDIDAllowanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRevokeDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EventGrantDIDAllowance) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EventGrantDIDAllowance: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EventGrantDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *EventRevokeDIDAllowance) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: EventRevokeDIDAllowance: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: EventRevokeDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgPruneDIDAllowances) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgPruneDIDAllowances: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgPruneDIDAllowances: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pruner", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pruner = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgPruneDIDAllowancesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgPruneDIDAllowancesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgPruneDIDAllowancesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

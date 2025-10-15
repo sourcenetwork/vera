@@ -10,4 +10,5 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/feegrant";
 // GenesisState contains a set of fee allowances, persisted from the store.
 message GenesisState {
   repeated Grant allowances = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+  repeated DIDGrant did_allowances = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
 }

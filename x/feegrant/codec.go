@@ -25,10 +25,13 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgGrantAllowance{},
 		&MsgRevokeAllowance{},
+		&MsgGrantDIDAllowance{},
+		&MsgRevokeDIDAllowance{},
+		&MsgPruneDIDAllowances{},
 	)
 
 	registry.RegisterInterface(
-		"cosmos.feegrant.v1beta1.FeeAllowanceI",
+		"sourcehub.feegrant.v1beta1.FeeAllowanceI",
 		(*FeeAllowanceI)(nil),
 		&BasicAllowance{},
 		&PeriodicAllowance{},

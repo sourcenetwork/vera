@@ -349,6 +349,216 @@ func (m *QueryAllowancesByGranterResponse) GetPagination() *query.PageResponse {
 	return nil
 }
 
+// QueryDIDAllowanceRequest is the request type for the Query/DIDAllowance RPC method.
+type QueryDIDAllowanceRequest struct {
+	// granter is the address of the user granting an allowance of their funds.
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// grantee_did is the DID being granted an allowance of another user's funds.
+	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+}
+
+func (m *QueryDIDAllowanceRequest) Reset()         { *m = QueryDIDAllowanceRequest{} }
+func (m *QueryDIDAllowanceRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDIDAllowanceRequest) ProtoMessage()    {}
+func (*QueryDIDAllowanceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e33dbb16840460c, []int{6}
+}
+func (m *QueryDIDAllowanceRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDIDAllowanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDIDAllowanceRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDIDAllowanceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDIDAllowanceRequest.Merge(m, src)
+}
+func (m *QueryDIDAllowanceRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDIDAllowanceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDIDAllowanceRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDIDAllowanceRequest proto.InternalMessageInfo
+
+func (m *QueryDIDAllowanceRequest) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *QueryDIDAllowanceRequest) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+// QueryDIDAllowanceResponse is the response type for the Query/DIDAllowance RPC method.
+type QueryDIDAllowanceResponse struct {
+	// allowance is an allowance granted for DID by granter.
+	Allowance *Grant `protobuf:"bytes,1,opt,name=allowance,proto3" json:"allowance,omitempty"`
+}
+
+func (m *QueryDIDAllowanceResponse) Reset()         { *m = QueryDIDAllowanceResponse{} }
+func (m *QueryDIDAllowanceResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDIDAllowanceResponse) ProtoMessage()    {}
+func (*QueryDIDAllowanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e33dbb16840460c, []int{7}
+}
+func (m *QueryDIDAllowanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDIDAllowanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDIDAllowanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDIDAllowanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDIDAllowanceResponse.Merge(m, src)
+}
+func (m *QueryDIDAllowanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDIDAllowanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDIDAllowanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDIDAllowanceResponse proto.InternalMessageInfo
+
+func (m *QueryDIDAllowanceResponse) GetAllowance() *Grant {
+	if m != nil {
+		return m.Allowance
+	}
+	return nil
+}
+
+// QueryDIDAllowancesByGranterRequest is the request type for the Query/DIDAllowancesByGranter RPC method.
+type QueryDIDAllowancesByGranterRequest struct {
+	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
+	// pagination defines a pagination for the request.
+	Pagination *query.PageRequest `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) Reset()         { *m = QueryDIDAllowancesByGranterRequest{} }
+func (m *QueryDIDAllowancesByGranterRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryDIDAllowancesByGranterRequest) ProtoMessage()    {}
+func (*QueryDIDAllowancesByGranterRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e33dbb16840460c, []int{8}
+}
+func (m *QueryDIDAllowancesByGranterRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDIDAllowancesByGranterRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDIDAllowancesByGranterRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDIDAllowancesByGranterRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDIDAllowancesByGranterRequest.Merge(m, src)
+}
+func (m *QueryDIDAllowancesByGranterRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDIDAllowancesByGranterRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDIDAllowancesByGranterRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDIDAllowancesByGranterRequest proto.InternalMessageInfo
+
+func (m *QueryDIDAllowancesByGranterRequest) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// QueryDIDAllowancesByGranterResponse is the response type for the Query/DIDAllowancesByGranter RPC method.
+type QueryDIDAllowancesByGranterResponse struct {
+	// allowances that have been issued by the granter to DIDs.
+	Allowances []*Grant `protobuf:"bytes,1,rep,name=allowances,proto3" json:"allowances,omitempty"`
+	// pagination defines a pagination for the response.
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) Reset()         { *m = QueryDIDAllowancesByGranterResponse{} }
+func (m *QueryDIDAllowancesByGranterResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryDIDAllowancesByGranterResponse) ProtoMessage()    {}
+func (*QueryDIDAllowancesByGranterResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_5e33dbb16840460c, []int{9}
+}
+func (m *QueryDIDAllowancesByGranterResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryDIDAllowancesByGranterResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryDIDAllowancesByGranterResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryDIDAllowancesByGranterResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryDIDAllowancesByGranterResponse.Merge(m, src)
+}
+func (m *QueryDIDAllowancesByGranterResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryDIDAllowancesByGranterResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryDIDAllowancesByGranterResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryDIDAllowancesByGranterResponse proto.InternalMessageInfo
+
+func (m *QueryDIDAllowancesByGranterResponse) GetAllowances() []*Grant {
+	if m != nil {
+		return m.Allowances
+	}
+	return nil
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*QueryAllowanceRequest)(nil), "sourcehub.feegrant.v1beta1.QueryAllowanceRequest")
 	proto.RegisterType((*QueryAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.QueryAllowanceResponse")
@@ -356,6 +566,10 @@ func init() {
 	proto.RegisterType((*QueryAllowancesResponse)(nil), "sourcehub.feegrant.v1beta1.QueryAllowancesResponse")
 	proto.RegisterType((*QueryAllowancesByGranterRequest)(nil), "sourcehub.feegrant.v1beta1.QueryAllowancesByGranterRequest")
 	proto.RegisterType((*QueryAllowancesByGranterResponse)(nil), "sourcehub.feegrant.v1beta1.QueryAllowancesByGranterResponse")
+	proto.RegisterType((*QueryDIDAllowanceRequest)(nil), "sourcehub.feegrant.v1beta1.QueryDIDAllowanceRequest")
+	proto.RegisterType((*QueryDIDAllowanceResponse)(nil), "sourcehub.feegrant.v1beta1.QueryDIDAllowanceResponse")
+	proto.RegisterType((*QueryDIDAllowancesByGranterRequest)(nil), "sourcehub.feegrant.v1beta1.QueryDIDAllowancesByGranterRequest")
+	proto.RegisterType((*QueryDIDAllowancesByGranterResponse)(nil), "sourcehub.feegrant.v1beta1.QueryDIDAllowancesByGranterResponse")
 }
 
 func init() {
@@ -363,43 +577,50 @@ func init() {
 }
 
 var fileDescriptor_5e33dbb16840460c = []byte{
-	// 561 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x95, 0xcd, 0x6e, 0x13, 0x3f,
-	0x14, 0xc5, 0xe3, 0xfe, 0xff, 0x80, 0xe2, 0x2e, 0x90, 0x5c, 0x3e, 0xc2, 0x08, 0x0d, 0x61, 0x16,
-	0xe5, 0x43, 0x64, 0xa6, 0x99, 0x22, 0x04, 0x14, 0x09, 0x25, 0x0b, 0x66, 0x0b, 0x61, 0x05, 0x1b,
-	0xe4, 0x24, 0x97, 0x61, 0xd4, 0xd4, 0x4e, 0xc7, 0x1e, 0x4a, 0x85, 0x2a, 0x24, 0x9e, 0x00, 0x09,
-	0x5e, 0x81, 0x35, 0x12, 0x2a, 0x4f, 0xc0, 0x06, 0x21, 0x21, 0x55, 0x65, 0x03, 0x3b, 0x94, 0xf0,
-	0x20, 0x28, 0xb6, 0x67, 0x26, 0x24, 0x69, 0x48, 0x80, 0x05, 0xbb, 0x38, 0xbe, 0xe7, 0xf8, 0x77,
-	0xee, 0xb5, 0x13, 0xbc, 0x2c, 0x78, 0x12, 0xb7, 0xe0, 0x51, 0xd2, 0xf4, 0x1e, 0x02, 0x84, 0x31,
-	0x65, 0xd2, 0x7b, 0x5c, 0x6d, 0x82, 0xa4, 0x55, 0x6f, 0x33, 0x81, 0x78, 0xdb, 0xed, 0xc6, 0x5c,
-	0x72, 0x62, 0x65, 0x75, 0x6e, 0x5a, 0xe7, 0x9a, 0x3a, 0xeb, 0xc2, 0x14, 0x8f, 0xac, 0x58, 0xd9,
-	0x58, 0x17, 0x5b, 0x5c, 0x6c, 0x70, 0xe1, 0x35, 0xa9, 0x00, 0xed, 0x9f, 0x55, 0x76, 0x69, 0x18,
-	0x31, 0x2a, 0x23, 0xce, 0x4c, 0xed, 0xe9, 0x90, 0xf3, 0xb0, 0x03, 0x1e, 0xed, 0x46, 0x1e, 0x65,
-	0x8c, 0x4b, 0xb5, 0x29, 0xcc, 0xee, 0x29, 0xed, 0xf4, 0x40, 0xad, 0x3c, 0xbd, 0xd0, 0x5b, 0xce,
-	0x33, 0x7c, 0xfc, 0xce, 0xc0, 0xba, 0xd6, 0xe9, 0xf0, 0x2d, 0xca, 0x5a, 0xd0, 0x80, 0xcd, 0x04,
-	0x84, 0x24, 0x3e, 0x3e, 0xa2, 0x60, 0x20, 0x2e, 0xa1, 0x32, 0x3a, 0x5f, 0xac, 0x97, 0xf6, 0x77,
-	0x2b, 0xc7, 0x8c, 0xb6, 0xd6, 0x6e, 0xc7, 0x20, 0xc4, 0x5d, 0x19, 0x47, 0x2c, 0x6c, 0xa4, 0x85,
-	0xb9, 0x06, 0x4a, 0x0b, 0xb3, 0x69, 0xc0, 0xb9, 0x87, 0x4f, 0x8c, 0x02, 0x88, 0x2e, 0x67, 0x02,
-	0xc8, 0x4d, 0x5c, 0xa4, 0xe9, 0x97, 0x8a, 0x61, 0xd1, 0x3f, 0xeb, 0x1e, 0xdc, 0x5a, 0x37, 0x18,
-	0xac, 0x1a, 0xb9, 0xc6, 0x79, 0x85, 0x46, 0xbd, 0xc5, 0x58, 0x3a, 0x98, 0x35, 0x1d, 0x90, 0x5b,
-	0x18, 0xe7, 0x7d, 0x57, 0x01, 0x17, 0xfd, 0x65, 0xd7, 0x68, 0x06, 0x43, 0x72, 0xf5, 0x25, 0x48,
-	0x79, 0x6e, 0xd3, 0x30, 0xed, 0x66, 0x63, 0x48, 0xe9, 0xbc, 0x46, 0xf8, 0xe4, 0x18, 0x96, 0xc9,
-	0x5c, 0xc3, 0x38, 0xe3, 0x17, 0x25, 0x54, 0xfe, 0x6f, 0xb6, 0xd0, 0x43, 0x22, 0x12, 0x4c, 0xc0,
-	0x3c, 0xf7, 0x4b, 0x4c, 0x7d, 0xfe, 0x4f, 0x9c, 0x6f, 0x11, 0x3e, 0x33, 0xc2, 0x59, 0xdf, 0x0e,
-	0xf4, 0xa8, 0xff, 0xe4, 0x96, 0xfc, 0xa5, 0x3e, 0x5e, 0x5f, 0xda, 0xdf, 0xad, 0x1c, 0xd5, 0xb2,
-	0x8a, 0x68, 0xaf, 0x97, 0x57, 0xdc, 0xcb, 0x57, 0x9c, 0xf7, 0x08, 0x97, 0x0f, 0x86, 0xfe, 0xf7,
-	0xba, 0x3c, 0x31, 0x85, 0xff, 0xe9, 0x7f, 0x7c, 0x48, 0xa5, 0x20, 0xef, 0x10, 0x2e, 0x66, 0x51,
-	0x48, 0x75, 0x1a, 0xe4, 0xc4, 0x77, 0x6c, 0xf9, 0xf3, 0x48, 0x34, 0x9f, 0x53, 0x7b, 0xfe, 0xf9,
-	0xfb, 0xcb, 0x85, 0x35, 0x72, 0xcd, 0x9b, 0xf2, 0x6b, 0x95, 0x35, 0xc3, 0x7b, 0x6a, 0x26, 0xbb,
-	0x93, 0x7e, 0x82, 0x1d, 0xf2, 0x06, 0x61, 0x9c, 0x8f, 0x80, 0xcc, 0x41, 0x91, 0xbe, 0x51, 0x6b,
-	0x75, 0x2e, 0x8d, 0x41, 0xbf, 0xaa, 0xd0, 0x7d, 0xb2, 0x32, 0x13, 0xba, 0x18, 0x22, 0xfe, 0x8a,
-	0xf0, 0xd2, 0x84, 0x4b, 0x43, 0xd6, 0xe6, 0xc0, 0x18, 0x7d, 0x1f, 0xd6, 0x8d, 0xdf, 0x13, 0x9b,
-	0x30, 0xc1, 0xc7, 0xf1, 0xbb, 0xa1, 0xf2, 0xb9, 0xe4, 0xd2, 0xb4, 0x7c, 0x91, 0x10, 0x09, 0xb4,
-	0xf3, 0xb9, 0xd4, 0x83, 0x0f, 0x3d, 0x1b, 0xed, 0xf5, 0x6c, 0xf4, 0xad, 0x67, 0xa3, 0x17, 0x7d,
-	0xbb, 0xb0, 0xd7, 0xb7, 0x0b, 0x5f, 0xfa, 0x76, 0xe1, 0x7e, 0x25, 0x8c, 0xe4, 0x00, 0xae, 0xc5,
-	0x37, 0x8c, 0x23, 0x03, 0xb9, 0xc5, 0xe3, 0xf5, 0x21, 0xff, 0x27, 0xd9, 0x09, 0xcd, 0xc3, 0xea,
-	0x5f, 0x63, 0xf5, 0x47, 0x00, 0x00, 0x00, 0xff, 0xff, 0xdb, 0x46, 0x74, 0x54, 0x0b, 0x07, 0x00,
-	0x00,
+	// 679 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x96, 0x4f, 0x6b, 0x13, 0x4f,
+	0x18, 0xc7, 0x3b, 0xfd, 0xf1, 0xb3, 0xf4, 0xa9, 0x20, 0x4c, 0xb5, 0xa6, 0x8b, 0x6c, 0xe3, 0x0a,
+	0xf5, 0x0f, 0x66, 0xb7, 0xdd, 0x56, 0x51, 0x2b, 0x96, 0xd4, 0x62, 0xe8, 0x4d, 0xe3, 0x49, 0x11,
+	0xc2, 0x26, 0x3b, 0xae, 0x4b, 0xd3, 0x9d, 0x74, 0x67, 0x63, 0x2d, 0x12, 0x04, 0x5f, 0x81, 0xa0,
+	0x2f, 0xc0, 0x8b, 0x67, 0x51, 0xea, 0x2b, 0x10, 0x44, 0x3c, 0x95, 0xf6, 0xa2, 0x37, 0x49, 0x3c,
+	0xfa, 0x22, 0x64, 0x67, 0x67, 0x37, 0x31, 0xd9, 0x6e, 0xb3, 0x35, 0x87, 0xdc, 0x3a, 0x3b, 0xcf,
+	0xf7, 0x99, 0xcf, 0xf7, 0x79, 0x9e, 0x99, 0x06, 0x66, 0x19, 0xad, 0xbb, 0x15, 0xf2, 0xa4, 0x5e,
+	0xd6, 0x1e, 0x13, 0x62, 0xb9, 0x86, 0xe3, 0x69, 0x4f, 0xe7, 0xcb, 0xc4, 0x33, 0xe6, 0xb5, 0xcd,
+	0x3a, 0x71, 0xb7, 0xd5, 0x9a, 0x4b, 0x3d, 0x8a, 0xa5, 0x28, 0x4e, 0x0d, 0xe3, 0x54, 0x11, 0x27,
+	0x5d, 0x4c, 0xc8, 0x11, 0x05, 0xf3, 0x34, 0xd2, 0xa5, 0x0a, 0x65, 0x1b, 0x94, 0x69, 0x65, 0x83,
+	0x91, 0x20, 0x7f, 0x14, 0x59, 0x33, 0x2c, 0xdb, 0x31, 0x3c, 0x9b, 0x3a, 0x22, 0xf6, 0x8c, 0x45,
+	0xa9, 0x55, 0x25, 0x9a, 0x51, 0xb3, 0x35, 0xc3, 0x71, 0xa8, 0xc7, 0x37, 0x99, 0xd8, 0x9d, 0x0e,
+	0x32, 0x95, 0xf8, 0x4a, 0x0b, 0x16, 0xc1, 0x96, 0xf2, 0x02, 0x4e, 0xdd, 0xf3, 0x53, 0xe7, 0xab,
+	0x55, 0xba, 0x65, 0x38, 0x15, 0x52, 0x24, 0x9b, 0x75, 0xc2, 0x3c, 0xac, 0xc3, 0x18, 0x87, 0x21,
+	0x6e, 0x06, 0x65, 0xd1, 0x85, 0xf1, 0x95, 0xcc, 0xde, 0x4e, 0xee, 0xa4, 0xd0, 0xe6, 0x4d, 0xd3,
+	0x25, 0x8c, 0xdd, 0xf7, 0x5c, 0xdb, 0xb1, 0x8a, 0x61, 0x60, 0x5b, 0x43, 0x32, 0xa3, 0xfd, 0x69,
+	0x88, 0xf2, 0x00, 0xa6, 0xba, 0x01, 0x58, 0x8d, 0x3a, 0x8c, 0xe0, 0x65, 0x18, 0x37, 0xc2, 0x8f,
+	0x9c, 0x61, 0x42, 0x3f, 0xab, 0x1e, 0x5c, 0x5a, 0xb5, 0xe0, 0xaf, 0x8a, 0x6d, 0x8d, 0xf2, 0x06,
+	0x75, 0xe7, 0x66, 0x3d, 0xee, 0x48, 0xbf, 0xee, 0x08, 0xbe, 0x03, 0xd0, 0xae, 0x3b, 0x37, 0x38,
+	0xa1, 0xcf, 0xaa, 0x42, 0xe3, 0x37, 0x49, 0x0d, 0x86, 0x20, 0xe4, 0xb9, 0x6b, 0x58, 0x61, 0x35,
+	0x8b, 0x1d, 0x4a, 0xe5, 0x1d, 0x82, 0xd3, 0x3d, 0x58, 0xc2, 0x73, 0x1e, 0x20, 0xe2, 0x67, 0x19,
+	0x94, 0xfd, 0xaf, 0x3f, 0xd3, 0x1d, 0x22, 0x5c, 0x88, 0xc1, 0x3c, 0x7f, 0x28, 0x66, 0x70, 0xfe,
+	0x5f, 0x9c, 0x1f, 0x11, 0xcc, 0x74, 0x71, 0xae, 0x6c, 0x17, 0x82, 0x56, 0xff, 0xcb, 0x94, 0x0c,
+	0xa8, 0x8e, 0x37, 0x26, 0xf7, 0x76, 0x72, 0x27, 0x02, 0x59, 0x8e, 0x99, 0xeb, 0xd9, 0x39, 0x75,
+	0xf1, 0xaa, 0xf2, 0x19, 0x41, 0xf6, 0x60, 0xe8, 0xe1, 0xab, 0x72, 0xbc, 0x0b, 0x0a, 0x19, 0x6e,
+	0x62, 0x75, 0x6d, 0x75, 0x20, 0x17, 0x73, 0x06, 0x26, 0xc4, 0x14, 0x97, 0x4c, 0xdb, 0x0c, 0x2e,
+	0x67, 0x11, 0xc4, 0xa7, 0x55, 0xdb, 0x54, 0x1e, 0xc1, 0x74, 0xcc, 0x81, 0x83, 0xba, 0x88, 0x6f,
+	0x11, 0x28, 0x3d, 0xe9, 0x87, 0x6a, 0x98, 0x94, 0x0f, 0x08, 0xce, 0x25, 0x22, 0x0e, 0xdf, 0xe8,
+	0xe8, 0xbf, 0xc7, 0xe0, 0x7f, 0xce, 0x8c, 0x3f, 0x21, 0x18, 0x8f, 0xa8, 0xf1, 0x7c, 0x12, 0x4f,
+	0xec, 0x6b, 0x2f, 0xe9, 0x69, 0x24, 0x01, 0x8a, 0x92, 0x7f, 0xb9, 0xff, 0xeb, 0xf5, 0xe8, 0x12,
+	0xbe, 0xae, 0x25, 0xfc, 0x4f, 0x8b, 0x7c, 0x6b, 0xcf, 0x45, 0xcb, 0x1a, 0xe1, 0x5f, 0xa4, 0x81,
+	0xdf, 0x23, 0x80, 0x76, 0xb5, 0x71, 0x0a, 0x8a, 0xf0, 0x25, 0x97, 0x16, 0x52, 0x69, 0x04, 0xfa,
+	0x35, 0x8e, 0xae, 0xe3, 0xb9, 0xbe, 0xd0, 0x59, 0x07, 0xf1, 0x0f, 0x04, 0x93, 0x31, 0xf3, 0x81,
+	0x97, 0x52, 0x60, 0x74, 0x0f, 0xbe, 0x74, 0xf3, 0x68, 0x62, 0x61, 0xa6, 0xf0, 0xad, 0xf7, 0x05,
+	0xe1, 0xfe, 0x54, 0x7c, 0x39, 0xc9, 0x9f, 0xcd, 0x58, 0x9d, 0x98, 0xed, 0xbe, 0xe0, 0x2f, 0x08,
+	0x8e, 0x77, 0x8e, 0x3f, 0x5e, 0x3c, 0x94, 0x2b, 0xe6, 0x81, 0x92, 0xae, 0xa4, 0x54, 0x09, 0x1b,
+	0x6b, 0x9c, 0xf9, 0x36, 0xce, 0x27, 0x31, 0x9b, 0xb6, 0x59, 0x4a, 0x1a, 0x29, 0xff, 0x79, 0x6b,
+	0xe0, 0x7d, 0x04, 0x53, 0xf1, 0xf7, 0x18, 0xdf, 0x4a, 0x05, 0xd7, 0xdb, 0xaa, 0xe5, 0x23, 0xeb,
+	0xd3, 0x8c, 0x9e, 0x6f, 0xb3, 0xbb, 0x3d, 0x2b, 0x85, 0xaf, 0x4d, 0x19, 0xed, 0x36, 0x65, 0xf4,
+	0xb3, 0x29, 0xa3, 0x57, 0x2d, 0x79, 0x64, 0xb7, 0x25, 0x8f, 0x7c, 0x6f, 0xc9, 0x23, 0x0f, 0x73,
+	0x96, 0xed, 0xf9, 0x40, 0x15, 0xba, 0x21, 0xb2, 0x3a, 0xc4, 0xdb, 0xa2, 0xee, 0x7a, 0xc7, 0x19,
+	0xcf, 0xa2, 0x53, 0xca, 0xc7, 0xf8, 0x4f, 0xbf, 0x85, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x74,
+	0x65, 0x70, 0x06, 0xd0, 0x0a, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -420,6 +641,10 @@ type QueryClient interface {
 	Allowances(ctx context.Context, in *QueryAllowancesRequest, opts ...grpc.CallOption) (*QueryAllowancesResponse, error)
 	// AllowancesByGranter returns all the grants given by an address.
 	AllowancesByGranter(ctx context.Context, in *QueryAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryAllowancesByGranterResponse, error)
+	// DIDAllowance returns granted allowance to the DID by the granter.
+	DIDAllowance(ctx context.Context, in *QueryDIDAllowanceRequest, opts ...grpc.CallOption) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowancesByGranter returns all the DID grants given by an address.
+	DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error)
 }
 
 type queryClient struct {
@@ -457,6 +682,24 @@ func (c *queryClient) AllowancesByGranter(ctx context.Context, in *QueryAllowanc
 	return out, nil
 }
 
+func (c *queryClient) DIDAllowance(ctx context.Context, in *QueryDIDAllowanceRequest, opts ...grpc.CallOption) (*QueryDIDAllowanceResponse, error) {
+	out := new(QueryDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.feegrant.v1beta1.Query/DIDAllowance", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error) {
+	out := new(QueryDIDAllowancesByGranterResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.feegrant.v1beta1.Query/DIDAllowancesByGranter", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Allowance returns granted allowance to the grantee by the granter.
@@ -465,6 +708,10 @@ type QueryServer interface {
 	Allowances(context.Context, *QueryAllowancesRequest) (*QueryAllowancesResponse, error)
 	// AllowancesByGranter returns all the grants given by an address.
 	AllowancesByGranter(context.Context, *QueryAllowancesByGranterRequest) (*QueryAllowancesByGranterResponse, error)
+	// DIDAllowance returns granted allowance to the DID by the granter.
+	DIDAllowance(context.Context, *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowancesByGranter returns all the DID grants given by an address.
+	DIDAllowancesByGranter(context.Context, *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -479,6 +726,12 @@ func (*UnimplementedQueryServer) Allowances(ctx context.Context, req *QueryAllow
 }
 func (*UnimplementedQueryServer) AllowancesByGranter(ctx context.Context, req *QueryAllowancesByGranterRequest) (*QueryAllowancesByGranterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AllowancesByGranter not implemented")
+}
+func (*UnimplementedQueryServer) DIDAllowance(ctx context.Context, req *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowance not implemented")
+}
+func (*UnimplementedQueryServer) DIDAllowancesByGranter(ctx context.Context, req *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowancesByGranter not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -539,6 +792,42 @@ func _Query_AllowancesByGranter_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDIDAllowanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.feegrant.v1beta1.Query/DIDAllowance",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DIDAllowance(ctx, req.(*QueryDIDAllowanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_DIDAllowancesByGranter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDIDAllowancesByGranterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DIDAllowancesByGranter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.feegrant.v1beta1.Query/DIDAllowancesByGranter",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DIDAllowancesByGranter(ctx, req.(*QueryDIDAllowancesByGranterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Query_serviceDesc = _Query_serviceDesc
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.feegrant.v1beta1.Query",
@@ -555,6 +844,14 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AllowancesByGranter",
 			Handler:    _Query_AllowancesByGranter_Handler,
+		},
+		{
+			MethodName: "DIDAllowance",
+			Handler:    _Query_DIDAllowance_Handler,
+		},
+		{
+			MethodName: "DIDAllowancesByGranter",
+			Handler:    _Query_DIDAllowancesByGranter_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -815,6 +1112,169 @@ func (m *QueryAllowancesByGranterResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
+func (m *QueryDIDAllowanceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDIDAllowanceRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDIDAllowanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.GranteeDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDIDAllowanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDIDAllowanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDIDAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Allowance != nil {
+		{
+			size, err := m.Allowance.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Allowances) > 0 {
+		for iNdEx := len(m.Allowances) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Allowances[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -910,6 +1370,72 @@ func (m *QueryAllowancesByGranterRequest) Size() (n int) {
 }
 
 func (m *QueryAllowancesByGranterResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Allowances) > 0 {
+		for _, e := range m.Allowances {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDIDAllowanceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDIDAllowanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Allowance != nil {
+		l = m.Allowance.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDIDAllowancesByGranterRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryDIDAllowancesByGranterResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1517,6 +2043,444 @@ func (m *QueryAllowancesByGranterResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: QueryAllowancesByGranterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Allowances", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Allowances = append(m.Allowances, &Grant{})
+			if err := m.Allowances[len(m.Allowances)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDIDAllowanceRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDIDAllowanceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDIDAllowanceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDIDAllowanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDIDAllowanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Allowance", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Allowance == nil {
+				m.Allowance = &Grant{}
+			}
+			if err := m.Allowance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDIDAllowancesByGranterRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDIDAllowancesByGranterRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDIDAllowancesByGranterRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryDIDAllowancesByGranterResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryDIDAllowancesByGranterResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryDIDAllowancesByGranterResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:

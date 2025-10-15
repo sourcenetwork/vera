@@ -16,7 +16,16 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	test "github.com/sourcenetwork/sourcehub/testutil"
 )
+
+// createCustomDecoratorWithMockDIDKeeper creates a custom decorator with DID-based mock keeper
+func createCustomDecoratorWithMockDIDKeeper(t *testing.T, s *AnteTestSuite) (*CustomDeductFeeDecorator, *test.MockDIDFeegrantKeeper) {
+	ctrl := gomock.NewController(t)
+	mockKeeper := test.NewMockDIDFeegrantKeeper(ctrl)
+	decorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockKeeper, nil, s.authStoreKey)
+	return &decorator, mockKeeper
+}
 
 func TestCustomDeductFeeDecorator_CheckTx_ZeroGas(t *testing.T) {
 	s := SetupTestSuite(t, true)
@@ -329,4 +338,101 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	newCtx, err := antehandler(s.ctx, tx, false)
 	require.NoError(t, err, "CustomDeductFeeDecorator should not have errored on fee higher than local gasPrice")
 	require.Equal(t, int64(0), newCtx.Priority())
+}
+
+func TestCustomDeductFeeDecorator_HandleFeegrant_WithDID(t *testing.T) {
+	s := SetupTestSuite(t, true)
+
+	// Create decorator with mock DID keeper
+	customDecorator, mockFeegrantKeeper := createCustomDecoratorWithMockDIDKeeper(t, s)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	grantee := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	testDID := "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"
+
+	// Set DID in context to simulate extraction from JWS extension
+	// Use the helper function to ensure proper context key usage
+	ctx := s.ctx.WithValue(ExtractedDIDContextKey, testDID)
+
+	// Verify DID was properly set in context
+	extractedDID := getExtractedDIDFromContext(ctx)
+	require.Equal(t, testDID, extractedDID, "DID should be properly set in context")
+
+	// Expect DID-based feegrant to be called
+	mockFeegrantKeeper.EXPECT().UseGrantedFeesByDID(ctx, granter, testDID, fees, msgs).Return(nil)
+
+	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	require.NoError(t, err, "handleFeegrant should succeed with DID-based feegrant")
+}
+
+func TestCustomDeductFeeDecorator_HandleFeegrant_WithoutDID(t *testing.T) {
+	s := SetupTestSuite(t, true)
+
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	grantee := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+
+	// No DID in context - should use standard feegrant
+	ctx := s.ctx
+
+	// Expect standard feegrant to be called
+	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, grantee, fees, msgs).Return(nil)
+
+	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	require.NoError(t, err, "handleFeegrant should succeed with standard feegrant")
+}
+
+func TestCustomDeductFeeDecorator_HandleFeegrant_DIDBasedError(t *testing.T) {
+	s := SetupTestSuite(t, true)
+
+	// Create decorator with mock DID keeper
+	customDecorator, mockFeegrantKeeper := createCustomDecoratorWithMockDIDKeeper(t, s)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	grantee := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	testDID := "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"
+
+	// Set DID in context
+	ctx := s.ctx.WithValue(contextKey("extracted_did"), testDID)
+
+	// Expect DID-based feegrant to return error
+	expectedErr := sdkerrors.ErrUnauthorized.Wrap("insufficient allowance")
+	mockFeegrantKeeper.EXPECT().UseGrantedFeesByDID(ctx, granter, testDID, fees, msgs).Return(expectedErr)
+
+	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	require.Error(t, err, "handleFeegrant should return error from DID-based feegrant")
+	require.Equal(t, expectedErr, err)
+}
+
+func TestCustomDeductFeeDecorator_HandleFeegrant_StandardError(t *testing.T) {
+	s := SetupTestSuite(t, true)
+
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	grantee := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+
+	// No DID in context
+	ctx := s.ctx
+
+	// Expect standard feegrant to return error
+	expectedErr := sdkerrors.ErrUnauthorized.Wrap("fee allowance not found")
+	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, grantee, fees, msgs).Return(expectedErr)
+
+	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	require.Error(t, err, "handleFeegrant should return error from standard feegrant")
+	require.Equal(t, expectedErr, err)
 }

@@ -12,10 +12,14 @@ import (
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
-	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/feegrant/keeper"
-	_ "cosmossdk.io/x/feegrant/module"
-	"cosmossdk.io/x/feegrant/simulation"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
+	_ "github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/simulation"
+
+	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
+	"cosmossdk.io/core/appconfig"
+	feegrantmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/feegrant/module/v1"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -53,6 +57,15 @@ type SimTestSuite struct {
 	legacyAmino       *codec.LegacyAmino
 }
 
+var FeegrantModule = func() configurator.ModuleOption {
+	return func(config *configurator.Config) {
+		config.ModuleConfigs[feegrant.ModuleName] = &appv1alpha1.ModuleConfig{
+			Name:   feegrant.ModuleName,
+			Config: appconfig.WrapAny(&feegrantmodulev1.Module{}),
+		}
+	}
+}
+
 func (suite *SimTestSuite) SetupTest() {
 	var err error
 	suite.app, err = simtestutil.Setup(
@@ -65,7 +78,7 @@ func (suite *SimTestSuite) SetupTest() {
 				configurator.ConsensusModule(),
 				configurator.ParamsModule(),
 				configurator.GenutilModule(),
-				configurator.FeegrantModule(),
+				FeegrantModule(),
 			),
 			depinject.Supply(log.NewNopLogger()),
 		),

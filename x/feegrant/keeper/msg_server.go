@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -107,4 +107,77 @@ func (k msgServer) PruneAllowances(ctx context.Context, req *feegrant.MsgPruneAl
 	)
 
 	return &feegrant.MsgPruneAllowancesResponse{}, nil
+}
+
+// GrantDIDAllowance grants an allowance from the granter's funds to be used by a DID.
+func (k msgServer) GrantDIDAllowance(
+	goCtx context.Context,
+	msg *feegrant.MsgGrantDIDAllowance,
+) (*feegrant.MsgGrantDIDAllowanceResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	granter, err := k.authKeeper.AddressCodec().StringToBytes(msg.Granter)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if DID allowance already exists
+	if existingAllowance, _ := k.GetDIDAllowance(ctx, granter, msg.GranteeDid); existingAllowance != nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "DID allowance already exists")
+	}
+
+	allowance, err := msg.GetFeeAllowanceI()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := allowance.ValidateBasic(); err != nil {
+		return nil, err
+	}
+
+	err = k.Keeper.GrantDIDAllowance(ctx, granter, msg.GranteeDid, allowance)
+	if err != nil {
+		return nil, err
+	}
+
+	return &feegrant.MsgGrantDIDAllowanceResponse{}, nil
+}
+
+// RevokeDIDAllowance revokes a fee allowance between a granter and a DID.
+func (k msgServer) RevokeDIDAllowance(
+	goCtx context.Context,
+	msg *feegrant.MsgRevokeDIDAllowance,
+) (*feegrant.MsgRevokeDIDAllowanceResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	granter, err := k.authKeeper.AddressCodec().StringToBytes(msg.Granter)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.Keeper.RevokeDIDAllowance(ctx, granter, msg.GranteeDid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &feegrant.MsgRevokeDIDAllowanceResponse{}, nil
+}
+
+// PruneDIDAllowances removes expired DID allowances from the store.
+func (k msgServer) PruneDIDAllowances(ctx context.Context, req *feegrant.MsgPruneDIDAllowances) (*feegrant.MsgPruneDIDAllowancesResponse, error) {
+	// 75 is an arbitrary value, we can change it later if needed
+	err := k.RemoveExpiredDIDAllowances(ctx, 75)
+	if err != nil {
+		return nil, err
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypePruneDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyPruner, req.Pruner),
+		),
+	)
+
+	return &feegrant.MsgPruneDIDAllowancesResponse{}, nil
 }

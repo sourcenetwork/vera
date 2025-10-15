@@ -12,12 +12,12 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/suite"
 
-	_ "cosmossdk.io/api/cosmos/feegrant/v1beta1"
 	_ "cosmossdk.io/api/cosmos/gov/v1beta1"
 	sdkmath "cosmossdk.io/math"
-	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/feegrant/client/cli"
-	"cosmossdk.io/x/feegrant/module"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	_ "github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/client/cli"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"

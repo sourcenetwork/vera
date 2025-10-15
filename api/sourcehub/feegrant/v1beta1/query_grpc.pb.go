@@ -19,9 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Allowance_FullMethodName           = "/sourcehub.feegrant.v1beta1.Query/Allowance"
-	Query_Allowances_FullMethodName          = "/sourcehub.feegrant.v1beta1.Query/Allowances"
-	Query_AllowancesByGranter_FullMethodName = "/sourcehub.feegrant.v1beta1.Query/AllowancesByGranter"
+	Query_Allowance_FullMethodName              = "/sourcehub.feegrant.v1beta1.Query/Allowance"
+	Query_Allowances_FullMethodName             = "/sourcehub.feegrant.v1beta1.Query/Allowances"
+	Query_AllowancesByGranter_FullMethodName    = "/sourcehub.feegrant.v1beta1.Query/AllowancesByGranter"
+	Query_DIDAllowance_FullMethodName           = "/sourcehub.feegrant.v1beta1.Query/DIDAllowance"
+	Query_DIDAllowancesByGranter_FullMethodName = "/sourcehub.feegrant.v1beta1.Query/DIDAllowancesByGranter"
 )
 
 // QueryClient is the client API for Query service.
@@ -36,6 +38,10 @@ type QueryClient interface {
 	Allowances(ctx context.Context, in *QueryAllowancesRequest, opts ...grpc.CallOption) (*QueryAllowancesResponse, error)
 	// AllowancesByGranter returns all the grants given by an address.
 	AllowancesByGranter(ctx context.Context, in *QueryAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryAllowancesByGranterResponse, error)
+	// DIDAllowance returns granted allowance to the DID by the granter.
+	DIDAllowance(ctx context.Context, in *QueryDIDAllowanceRequest, opts ...grpc.CallOption) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowancesByGranter returns all the DID grants given by an address.
+	DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error)
 }
 
 type queryClient struct {
@@ -76,6 +82,26 @@ func (c *queryClient) AllowancesByGranter(ctx context.Context, in *QueryAllowanc
 	return out, nil
 }
 
+func (c *queryClient) DIDAllowance(ctx context.Context, in *QueryDIDAllowanceRequest, opts ...grpc.CallOption) (*QueryDIDAllowanceResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, Query_DIDAllowance_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryDIDAllowancesByGranterResponse)
+	err := c.cc.Invoke(ctx, Query_DIDAllowancesByGranter_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -88,6 +114,10 @@ type QueryServer interface {
 	Allowances(context.Context, *QueryAllowancesRequest) (*QueryAllowancesResponse, error)
 	// AllowancesByGranter returns all the grants given by an address.
 	AllowancesByGranter(context.Context, *QueryAllowancesByGranterRequest) (*QueryAllowancesByGranterResponse, error)
+	// DIDAllowance returns granted allowance to the DID by the granter.
+	DIDAllowance(context.Context, *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowancesByGranter returns all the DID grants given by an address.
+	DIDAllowancesByGranter(context.Context, *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -106,6 +136,12 @@ func (UnimplementedQueryServer) Allowances(context.Context, *QueryAllowancesRequ
 }
 func (UnimplementedQueryServer) AllowancesByGranter(context.Context, *QueryAllowancesByGranterRequest) (*QueryAllowancesByGranterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AllowancesByGranter not implemented")
+}
+func (UnimplementedQueryServer) DIDAllowance(context.Context, *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowance not implemented")
+}
+func (UnimplementedQueryServer) DIDAllowancesByGranter(context.Context, *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowancesByGranter not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -182,6 +218,42 @@ func _Query_AllowancesByGranter_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDIDAllowanceRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DIDAllowance(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_DIDAllowance_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DIDAllowance(ctx, req.(*QueryDIDAllowanceRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_DIDAllowancesByGranter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDIDAllowancesByGranterRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DIDAllowancesByGranter(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_DIDAllowancesByGranter_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DIDAllowancesByGranter(ctx, req.(*QueryDIDAllowancesByGranterRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -200,6 +272,14 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AllowancesByGranter",
 			Handler:    _Query_AllowancesByGranter_Handler,
+		},
+		{
+			MethodName: "DIDAllowance",
+			Handler:    _Query_DIDAllowance_Handler,
+		},
+		{
+			MethodName: "DIDAllowancesByGranter",
+			Handler:    _Query_DIDAllowancesByGranter_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

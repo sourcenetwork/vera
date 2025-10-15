@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	sdkmath "cosmossdk.io/math"
-	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/feegrant/module"
-	"cosmossdk.io/x/feegrant/simulation"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/simulation"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	sdk "github.com/cosmos/cosmos-sdk/types"

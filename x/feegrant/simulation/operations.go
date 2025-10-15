@@ -4,8 +4,8 @@ import (
 	"math/rand"
 
 	"cosmossdk.io/core/address"
-	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/feegrant/keeper"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"

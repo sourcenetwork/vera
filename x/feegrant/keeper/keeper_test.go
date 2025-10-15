@@ -2,16 +2,17 @@ package keeper_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
-	"cosmossdk.io/x/feegrant"
-	"cosmossdk.io/x/feegrant/keeper"
-	"cosmossdk.io/x/feegrant/module"
-	feegranttestutil "cosmossdk.io/x/feegrant/testutil"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
+	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	feegranttestutil "github.com/sourcenetwork/sourcehub/x/feegrant/testutil"
 
 	codecaddress "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -28,7 +29,7 @@ type KeeperTestSuite struct {
 	ctx            sdk.Context
 	addrs          []sdk.AccAddress
 	msgSrvr        feegrant.MsgServer
-	atom           sdk.Coins
+	coins          sdk.Coins
 	feegrantKeeper keeper.Keeper
 	accountKeeper  *feegranttestutil.MockAccountKeeper
 	bankKeeper     *feegranttestutil.MockBankKeeper
@@ -57,7 +58,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	suite.feegrantKeeper = keeper.NewKeeper(encCfg.Codec, runtime.NewKVStoreService(key), suite.accountKeeper).SetBankKeeper(suite.bankKeeper)
 	suite.ctx = testCtx.Ctx
 	suite.msgSrvr = keeper.NewMsgServerImpl(suite.feegrantKeeper)
-	suite.atom = sdk.NewCoins(sdk.NewCoin("atom", sdkmath.NewInt(555)))
+	suite.coins = sdk.NewCoins(sdk.NewCoin("uopen", sdkmath.NewInt(555)))
 }
 
 func (suite *KeeperTestSuite) TestKeeperCrud() {
@@ -66,7 +67,7 @@ func (suite *KeeperTestSuite) TestKeeperCrud() {
 	exp := suite.ctx.BlockTime().AddDate(1, 0, 0)
 	exp2 := suite.ctx.BlockTime().AddDate(2, 0, 0)
 	basic := &feegrant.BasicAllowance{
-		SpendLimit: suite.atom,
+		SpendLimit: suite.coins,
 		Expiration: &exp,
 	}
 
@@ -193,15 +194,15 @@ func (suite *KeeperTestSuite) TestUseGrantedFee() {
 	oneYear := blockTime.AddDate(1, 0, 0)
 
 	future := &feegrant.BasicAllowance{
-		SpendLimit: suite.atom,
+		SpendLimit: suite.coins,
 		Expiration: &oneYear,
 	}
 
 	// for testing limits of the contract
-	hugeAtom := sdk.NewCoins(sdk.NewInt64Coin("atom", 9999))
-	smallAtom := sdk.NewCoins(sdk.NewInt64Coin("atom", 1))
+	hugeAmount := sdk.NewCoins(sdk.NewInt64Coin("uopen", 9999))
+	smallAmount := sdk.NewCoins(sdk.NewInt64Coin("uopen", 1))
 	futureAfterSmall := &feegrant.BasicAllowance{
-		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("atom", 554)),
+		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 554)),
 		Expiration: &oneYear,
 	}
 
@@ -217,7 +218,7 @@ func (suite *KeeperTestSuite) TestUseGrantedFee() {
 		"use entire pot": {
 			granter: suite.addrs[0],
 			grantee: suite.addrs[1],
-			fee:     suite.atom,
+			fee:     suite.coins,
 			allowed: true,
 			final:   nil,
 			postRun: func() {},
@@ -225,7 +226,7 @@ func (suite *KeeperTestSuite) TestUseGrantedFee() {
 		"too high": {
 			granter: suite.addrs[0],
 			grantee: suite.addrs[1],
-			fee:     hugeAtom,
+			fee:     hugeAmount,
 			allowed: false,
 			final:   future,
 			postRun: func() {
@@ -239,7 +240,7 @@ func (suite *KeeperTestSuite) TestUseGrantedFee() {
 		"use a little": {
 			granter: suite.addrs[0],
 			grantee: suite.addrs[1],
-			fee:     smallAtom,
+			fee:     smallAmount,
 			allowed: true,
 			final:   futureAfterSmall,
 			postRun: func() {
@@ -300,7 +301,7 @@ func (suite *KeeperTestSuite) TestIterateGrants() {
 	exp := suite.ctx.BlockTime().AddDate(1, 0, 0)
 
 	allowance := &feegrant.BasicAllowance{
-		SpendLimit: suite.atom,
+		SpendLimit: suite.coins,
 		Expiration: &exp,
 	}
 
@@ -340,7 +341,7 @@ func (suite *KeeperTestSuite) TestPruneGrants() {
 			granter: suite.addrs[0],
 			grantee: suite.addrs[1],
 			allowance: &feegrant.BasicAllowance{
-				SpendLimit: suite.atom,
+				SpendLimit: suite.coins,
 				Expiration: &now,
 			},
 		},
@@ -411,4 +412,371 @@ func (suite *KeeperTestSuite) TestPruneGrants() {
 			}
 		})
 	}
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowanceGrant() {
+	testDID := "did:example:bob"
+
+	testCases := []struct {
+		name          string
+		granter       sdk.AccAddress
+		granteeDID    string
+		allowance     feegrant.FeeAllowanceI
+		expectedError string
+		preRun        func()
+	}{
+		{
+			name:       "valid DID grant",
+			granter:    suite.addrs[0],
+			granteeDID: testDID,
+			allowance: &feegrant.BasicAllowance{
+				SpendLimit: suite.coins,
+			},
+		},
+		{
+			name:       "duplicate DID grant",
+			granter:    suite.addrs[1],
+			granteeDID: testDID,
+			allowance:  &feegrant.BasicAllowance{SpendLimit: suite.coins},
+			preRun: func() {
+				// Grant first time
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, suite.addrs[1], testDID, &feegrant.BasicAllowance{SpendLimit: suite.coins})
+				suite.NoError(err)
+			},
+			expectedError: "already exists",
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		suite.Run(tc.name, func() {
+			if tc.preRun != nil {
+				tc.preRun()
+			}
+
+			err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, tc.granter, tc.granteeDID, tc.allowance)
+
+			if tc.expectedError != "" {
+				suite.Error(err)
+				suite.Contains(err.Error(), tc.expectedError)
+				return
+			}
+
+			suite.NoError(err)
+
+			// Verify the grant was created
+			allowance, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, tc.granter, tc.granteeDID)
+			suite.NoError(err)
+			suite.NotNil(allowance)
+		})
+	}
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowanceRevoke() {
+	testDID := "did:example:alice"
+	granter := suite.addrs[2]
+
+	// First grant an allowance
+	allowance := &feegrant.BasicAllowance{SpendLimit: suite.coins}
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+	suite.NoError(err)
+
+	// Verify it exists
+	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	suite.NoError(err)
+
+	// Now revoke it
+	err = suite.feegrantKeeper.RevokeDIDAllowance(suite.ctx, granter, testDID)
+	suite.NoError(err)
+
+	// Verify it no longer exists
+	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	suite.Error(err)
+	suite.Contains(err.Error(), "not found")
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowanceUsage() {
+	testDID := "did:example:bob"
+	granter := suite.addrs[3]
+
+	// Create allowance with specific spend limit
+	spendLimit := sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000))
+	allowance := &feegrant.BasicAllowance{SpendLimit: spendLimit}
+
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+	suite.NoError(err)
+
+	// Test fee usage
+	fee := sdk.NewCoins(sdk.NewInt64Coin("uopen", 100))
+	msgs := []sdk.Msg{}
+
+	// Mock bank operations
+	suite.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), granter, "fee_collector", fee).Return(nil)
+
+	err = suite.feegrantKeeper.UseGrantedFeesByDID(suite.ctx, granter, testDID, fee, msgs)
+	suite.NoError(err)
+
+	// Check remaining allowance
+	remainingAllowance, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	suite.NoError(err)
+
+	basic, ok := remainingAllowance.(*feegrant.BasicAllowance)
+	suite.True(ok)
+	expected := sdk.NewCoins(sdk.NewInt64Coin("uopen", 900))
+	suite.Equal(expected, basic.SpendLimit)
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowanceWithFallback() {
+	testDID := "did:example:alice"
+	granter := suite.addrs[4]
+
+	// Create DID allowance
+	didAllowance := &feegrant.BasicAllowance{
+		SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 500)),
+	}
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, didAllowance)
+	suite.NoError(err)
+
+	fee := sdk.NewCoins(sdk.NewInt64Coin("uopen", 100))
+	msgs := []sdk.Msg{} // Mock messages with DID
+
+	// Mock DID extraction (this would normally be done by the DID extractor)
+	suite.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), granter, "fee_collector", fee).Return(nil)
+
+	err = suite.feegrantKeeper.UseGrantedFeesByDID(suite.ctx, granter, testDID, fee, msgs)
+	suite.NoError(err)
+}
+
+func (suite *KeeperTestSuite) TestDIDAllowanceExpiry() {
+	testDID := "did:example:bob"
+	granter := suite.addrs[6]
+
+	// Create allowance that expires in future
+	now := suite.ctx.BlockTime()
+	expiry := now.Add(time.Hour) // Expires in 1 hour
+
+	allowance := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &expiry,
+	}
+
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+	suite.NoError(err)
+
+	// Advance time to make allowance expire
+	expiredCtx := suite.ctx.WithBlockTime(now.Add(2 * time.Hour))
+	suite.ctx = expiredCtx
+
+	// Try to use expired allowance
+	fee := sdk.NewCoins(sdk.NewInt64Coin("uopen", 10))
+	msgs := []sdk.Msg{}
+
+	err = suite.feegrantKeeper.UseGrantedFeesByDID(suite.ctx, granter, testDID, fee, msgs)
+	suite.Error(err)
+	suite.Contains(err.Error(), "expired")
+
+	// Verify allowance was removed due to expiry
+	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	suite.Error(err)
+	suite.Contains(err.Error(), "not found")
+}
+
+// TestSeparateQueueSystems verifies that DID grants and regular grants use completely separate expiration queue systems
+func (suite *KeeperTestSuite) TestSeparateQueueSystems() {
+	now := suite.ctx.BlockTime()
+	expiry := now.Add(time.Hour) // Both types expire in 1 hour
+
+	// Create regular grant (uses 0x01 queue prefix)
+	regularGranter := suite.addrs[0]
+	regularGrantee := suite.addrs[1]
+	regularAllowance := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &expiry,
+	}
+	err := suite.feegrantKeeper.GrantAllowance(suite.ctx, regularGranter, regularGrantee, regularAllowance)
+	suite.NoError(err)
+
+	// Create DID grant (uses 0x03 queue prefix)
+	didGranter := suite.addrs[2]
+	testDID := "did:example:alice"
+	didAllowance := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &expiry,
+	}
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, didGranter, testDID, didAllowance)
+	suite.NoError(err)
+
+	// Verify both grants exist before expiry
+	_, err = suite.feegrantKeeper.GetAllowance(suite.ctx, regularGranter, regularGrantee)
+	suite.NoError(err)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, didGranter, testDID)
+	suite.NoError(err)
+
+	// Advance time to expire both grants
+	expiredCtx := suite.ctx.WithBlockTime(now.Add(2 * time.Hour))
+
+	// Remove expired regular grants only - this should NOT affect DID grants
+	err = suite.feegrantKeeper.RemoveExpiredAllowances(expiredCtx, 10)
+	suite.NoError(err)
+
+	// Regular grant should be removed
+	_, err = suite.feegrantKeeper.GetAllowance(expiredCtx, regularGranter, regularGrantee)
+	suite.Error(err)
+	suite.Contains(err.Error(), "not found")
+
+	// DID grant should still exist (not removed by regular grant cleanup)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(expiredCtx, didGranter, testDID)
+	suite.NoError(err)
+
+	// Now remove expired DID grants only
+	err = suite.feegrantKeeper.RemoveExpiredDIDAllowances(expiredCtx, 10)
+	suite.NoError(err)
+
+	// Now DID grant should be removed
+	_, err = suite.feegrantKeeper.GetDIDAllowance(expiredCtx, didGranter, testDID)
+	suite.Error(err)
+	suite.Contains(err.Error(), "not found")
+}
+
+// TestQueueKeyPrefixSeparation tests that regular and DID grants use different key prefixes in their queues
+func (suite *KeeperTestSuite) TestQueueKeyPrefixSeparation() {
+	// Test the key prefixes are different
+	suite.NotEqual(feegrant.FeeAllowanceQueueKeyPrefix, feegrant.DIDFeeAllowanceQueueKeyPrefix)
+
+	// Regular grants use 0x01 prefix
+	suite.Equal([]byte{0x01}, feegrant.FeeAllowanceQueueKeyPrefix)
+
+	// DID grants use 0x03 prefix
+	suite.Equal([]byte{0x03}, feegrant.DIDFeeAllowanceQueueKeyPrefix)
+
+	// Test storage key prefixes are also different
+	suite.NotEqual(feegrant.FeeAllowanceKeyPrefix, feegrant.DIDFeeAllowanceKeyPrefix)
+
+	// Regular grants use 0x00 prefix
+	suite.Equal([]byte{0x00}, feegrant.FeeAllowanceKeyPrefix)
+
+	// DID grants use 0x02 prefix
+	suite.Equal([]byte{0x02}, feegrant.DIDFeeAllowanceKeyPrefix)
+}
+
+// TestMixedExpirationHandling tests that mixed regular and DID grants with different expiration times are handled correctly
+func (suite *KeeperTestSuite) TestMixedExpirationHandling() {
+	now := suite.ctx.BlockTime()
+	shortExpiry := now.Add(time.Hour)
+	longExpiry := now.Add(24 * time.Hour)
+
+	// Create regular grants with different expiry times
+	regularGranter1 := suite.addrs[0]
+	regularGrantee1 := suite.addrs[1]
+	regularAllowanceShort := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &shortExpiry,
+	}
+	err := suite.feegrantKeeper.GrantAllowance(suite.ctx, regularGranter1, regularGrantee1, regularAllowanceShort)
+	suite.NoError(err)
+
+	regularGranter2 := suite.addrs[2]
+	regularGrantee2 := suite.addrs[3]
+	regularAllowanceLong := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &longExpiry,
+	}
+	err = suite.feegrantKeeper.GrantAllowance(suite.ctx, regularGranter2, regularGrantee2, regularAllowanceLong)
+	suite.NoError(err)
+
+	// Create DID grants with different expiry times
+	didGranter1 := suite.addrs[4]
+	testDID1 := "did:example:alice"
+	didAllowanceShort := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &shortExpiry,
+	}
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, didGranter1, testDID1, didAllowanceShort)
+	suite.NoError(err)
+
+	didGranter2 := suite.addrs[5]
+	testDID2 := "did:example:bob"
+	didAllowanceLong := &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &longExpiry,
+	}
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, didGranter2, testDID2, didAllowanceLong)
+	suite.NoError(err)
+
+	// Advance time to expire short-term grants but not long-term
+	midCtx := suite.ctx.WithBlockTime(now.Add(2 * time.Hour))
+
+	// Remove expired regular grants
+	err = suite.feegrantKeeper.RemoveExpiredAllowances(midCtx, 10)
+	suite.NoError(err)
+
+	// Short-term regular grant should be removed
+	_, err = suite.feegrantKeeper.GetAllowance(midCtx, regularGranter1, regularGrantee1)
+	suite.Error(err)
+
+	// Long-term regular grant should still exist
+	_, err = suite.feegrantKeeper.GetAllowance(midCtx, regularGranter2, regularGrantee2)
+	suite.NoError(err)
+
+	// DID grants should not be affected by regular grant cleanup
+	_, err = suite.feegrantKeeper.GetDIDAllowance(midCtx, didGranter1, testDID1)
+	suite.NoError(err)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(midCtx, didGranter2, testDID2)
+	suite.NoError(err)
+
+	// Now remove expired DID grants
+	err = suite.feegrantKeeper.RemoveExpiredDIDAllowances(midCtx, 10)
+	suite.NoError(err)
+
+	// Short-term DID grant should be removed
+	_, err = suite.feegrantKeeper.GetDIDAllowance(midCtx, didGranter1, testDID1)
+	suite.Error(err)
+
+	// Long-term DID grant should still exist
+	_, err = suite.feegrantKeeper.GetDIDAllowance(midCtx, didGranter2, testDID2)
+	suite.NoError(err)
+
+	// Regular grants should not be affected by DID grant cleanup
+	_, err = suite.feegrantKeeper.GetAllowance(midCtx, regularGranter2, regularGrantee2)
+	suite.NoError(err)
+}
+
+// TestIterationSeparation tests that iteration functions only return their respective grant types
+func (suite *KeeperTestSuite) TestIterationSeparation() {
+	// Create mixed grants
+	regularGranter := suite.addrs[0]
+	regularGrantee := suite.addrs[1]
+	regularAllowance := &feegrant.BasicAllowance{SpendLimit: suite.coins}
+	err := suite.feegrantKeeper.GrantAllowance(suite.ctx, regularGranter, regularGrantee, regularAllowance)
+	suite.NoError(err)
+
+	didGranter := suite.addrs[2]
+	testDID := "did:example:alice"
+	didAllowance := &feegrant.BasicAllowance{SpendLimit: suite.coins}
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, didGranter, testDID, didAllowance)
+	suite.NoError(err)
+
+	// Test regular grant iteration only finds regular grants
+	regularCount := 0
+	err = suite.feegrantKeeper.IterateAllFeeAllowances(suite.ctx, func(grant feegrant.Grant) bool {
+		regularCount++
+		// Should be regular grant format - grantee is an address
+		suite.Equal(regularGrantee.String(), grant.Grantee)
+		suite.Equal(regularGranter.String(), grant.Granter)
+		return true
+	})
+	suite.NoError(err)
+	suite.Equal(1, regularCount)
+
+	// Test DID grant iteration only finds DID grants
+	didCount := 0
+	err = suite.feegrantKeeper.IterateAllDIDAllowances(suite.ctx, func(grant feegrant.DIDGrant) bool {
+		didCount++
+		// Should be DID grant format - grantee is a DID
+		suite.Equal(testDID, grant.GranteeDid)
+		suite.Equal(didGranter.String(), grant.Granter)
+		return true
+	})
+	suite.NoError(err)
+	suite.Equal(1, didCount)
 }

@@ -26,8 +26,8 @@ func NewAnteHandler(
 		NewHandlePanicDecorator(),
 		// Initializes the context with the gas meter. Must run before any gas consumption.
 		ante.NewSetUpContextDecorator(),
-		// Ensures that the transaction has no extension options.
-		ante.NewExtensionOptionsDecorator(nil),
+		// Validates extension options and extracts DID for feegrant usage.
+		NewExtensionOptionsDecorator(),
 		// Performs basic validation on the transaction.
 		ante.NewValidateBasicDecorator(),
 		// Ensures that the tx has not exceeded the height timeout.

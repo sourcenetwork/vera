@@ -93,3 +93,15 @@ message Grant {
   // allowance can be any of basic, periodic, allowed fee allowance.
   google.protobuf.Any allowance = 3 [(cosmos_proto.accepts_interface) = "sourcehub.feegrant.v1beta1.FeeAllowanceI"];
 }
+
+// DIDGrant is stored in the KVStore to record a grant with DID as grantee
+message DIDGrant {
+  // granter is the address of the user granting an allowance of their funds.
+  string granter = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // grantee_did is the DID of the user being granted an allowance of another user's funds.
+  string grantee_did = 2;
+
+  // allowance can be any of basic, periodic, allowed fee allowance.
+  google.protobuf.Any allowance = 3 [(cosmos_proto.accepts_interface) = "sourcehub.feegrant.v1beta1.FeeAllowanceI"];
+}

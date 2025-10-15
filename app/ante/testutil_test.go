@@ -16,9 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	_ "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	antetestutil "github.com/cosmos/cosmos-sdk/x/auth/ante/testutil"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
@@ -27,8 +25,10 @@ import (
 	authtestutil "github.com/cosmos/cosmos-sdk/x/auth/testutil"
 	txtestutil "github.com/cosmos/cosmos-sdk/x/auth/tx/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/golang/mock/gomock"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	test "github.com/sourcenetwork/sourcehub/testutil"
+	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,12 +48,17 @@ type AnteTestSuite struct {
 	bankKeeper     *authtestutil.MockBankKeeper
 	txBankKeeper   *txtestutil.MockBankKeeper
 	feeGrantKeeper *antetestutil.MockFeegrantKeeper
-	encCfg         moduletestutil.TestEncodingConfig
+	encCfg         test.EncodingConfig
 	authStoreKey   storetypes.StoreKey
 }
 
 // SetupTest inits a new test, with new app, context, and anteHandler.
 func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
+	sdkConfig := sdk.GetConfig()
+	sdkConfig.SetBech32PrefixForAccount("source", "sourcepub")
+	sdkConfig.SetBech32PrefixForValidator("sourcevaloper", "sourcevaloperpub")
+	sdkConfig.SetBech32PrefixForConsensusNode("sourcevalcons", "sourcevalconspub")
+
 	suite := &AnteTestSuite{}
 	ctrl := gomock.NewController(t)
 	suite.bankKeeper = authtestutil.NewMockBankKeeper(ctrl)
@@ -64,7 +69,7 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	suite.authStoreKey = key
 	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 	suite.ctx = testCtx.Ctx.WithIsCheckTx(isCheckTx).WithBlockHeight(1)
-	suite.encCfg = moduletestutil.MakeTestEncodingConfig(auth.AppModuleBasic{}, bank.AppModuleBasic{})
+	suite.encCfg = test.CreateTestEncodingConfig()
 
 	maccPerms := map[string][]string{
 		"fee_collector":          nil,
@@ -76,8 +81,13 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	}
 
 	suite.accountKeeper = keeper.NewAccountKeeper(
-		suite.encCfg.Codec, runtime.NewKVStoreService(key), types.ProtoBaseAccount, maccPerms, authcodec.NewBech32Codec("cosmos"),
-		sdk.Bech32MainPrefix, types.NewModuleAddress("gov").String(),
+		suite.encCfg.Codec,
+		runtime.NewKVStoreService(key),
+		types.ProtoBaseAccount,
+		maccPerms,
+		authcodec.NewBech32Codec(hubtypes.AccountAddrPrefix),
+		hubtypes.AccountAddrPrefix,
+		types.NewModuleAddress("gov").String(),
 	)
 	suite.accountKeeper.GetModuleAccount(suite.ctx, types.FeeCollectorName)
 	err := suite.accountKeeper.Params.Set(suite.ctx, types.DefaultParams())
@@ -85,6 +95,9 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 
 	suite.encCfg.Amino.RegisterConcrete(&testdata.TestMsg{}, "testdata.TestMsg", nil)
 	testdata.RegisterInterfaces(suite.encCfg.InterfaceRegistry)
+
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(suite.encCfg.InterfaceRegistry)
 
 	suite.clientCtx = client.Context{}.
 		WithTxConfig(suite.encCfg.TxConfig).
@@ -125,9 +138,11 @@ func (suite *AnteTestSuite) CreateTestAccounts(numAccs int) []TestAccount {
 
 // CreateTestTx is a helper function to create a tx for multiple inputs.
 func (suite *AnteTestSuite) CreateTestTx(
-	ctx sdk.Context, privs []cryptotypes.PrivKey,
+	ctx sdk.Context,
+	privs []cryptotypes.PrivKey,
 	accNums, accSeqs []uint64,
-	chainID string, signMode signing.SignMode,
+	chainID string,
+	signMode signing.SignMode,
 ) (xauthsigning.Tx, error) {
 	// First round: we gather all the signer infos using the "set empty signature" hack
 	var sigsV2 []signing.SignatureV2

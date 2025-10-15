@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 	cmtlog "github.com/cometbft/cometbft/libs/log"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
 	"github.com/cometbft/cometbft/rpc/client/http"

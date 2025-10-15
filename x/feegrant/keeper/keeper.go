@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -9,13 +10,14 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // Keeper manages state of all fee grants, as well as calculating approval.
@@ -306,21 +308,46 @@ func (k Keeper) InitGenesis(ctx context.Context, data *feegrant.GenesisState) er
 			return err
 		}
 	}
+
+	for _, f := range data.DidAllowances {
+		granter, err := k.authKeeper.AddressCodec().StringToBytes(f.Granter)
+		if err != nil {
+			return err
+		}
+
+		didGrant, err := f.GetDIDGrant()
+		if err != nil {
+			return err
+		}
+
+		err = k.GrantDIDAllowance(ctx, granter, f.GranteeDid, didGrant)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
 // ExportGenesis will dump the contents of the keeper into a serializable GenesisState.
 func (k Keeper) ExportGenesis(ctx context.Context) (*feegrant.GenesisState, error) {
 	var grants []feegrant.Grant
+	var didGrants []feegrant.DIDGrant
 
-	err := k.IterateAllFeeAllowances(ctx, func(grant feegrant.Grant) bool {
+	grantErr := k.IterateAllFeeAllowances(ctx, func(grant feegrant.Grant) bool {
 		grants = append(grants, grant)
 		return false
 	})
 
+	didGrantErr := k.IterateAllDIDAllowances(ctx, func(grant feegrant.DIDGrant) bool {
+		didGrants = append(didGrants, grant)
+		return false
+	})
+
 	return &feegrant.GenesisState{
-		Allowances: grants,
-	}, err
+		Allowances:    grants,
+		DidAllowances: didGrants,
+	}, errors.Join(grantErr, didGrantErr)
 }
 
 func (k Keeper) addToFeeAllowanceQueue(ctx context.Context, grantKey []byte, exp *time.Time) error {
@@ -358,4 +385,272 @@ func (k Keeper) RemoveExpiredAllowances(ctx context.Context, limit int32) error 
 		}
 	}
 	return nil
+}
+
+// RemoveExpiredDIDAllowances iterates DID grantsByExpiryQueue and deletes the expired DID grants.
+func (k Keeper) RemoveExpiredDIDAllowances(ctx context.Context, limit int32) error {
+	exp := sdk.UnwrapSDKContext(ctx).BlockTime()
+	store := k.storeService.OpenKVStore(ctx)
+	iterator, err := store.Iterator(feegrant.DIDFeeAllowanceQueueKeyPrefix, storetypes.InclusiveEndBytes(feegrant.DIDAllowanceByExpTimeKey(&exp)))
+	var count int32
+	if err != nil {
+		return err
+	}
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		err = store.Delete(iterator.Key())
+		if err != nil {
+			return err
+		}
+
+		granter, granteeDID := feegrant.ParseGranterDIDFromDIDAllowanceQueueKey(iterator.Key())
+		granterAddr := sdk.AccAddress(granter)
+		err = store.Delete(feegrant.FeeAllowanceByDIDKey(granterAddr, granteeDID))
+		if err != nil {
+			return err
+		}
+
+		// limit the amount of iterations to avoid taking too much time
+		count++
+		if count == limit {
+			return nil
+		}
+	}
+	return nil
+}
+
+// IterateAllDIDAllowances iterates over all the DID grants in the store.
+// Callback to get all data, returns true to stop, false to keep reading.
+// Calling this without pagination is very expensive and only designed for export genesis.
+func (k Keeper) IterateAllDIDAllowances(ctx context.Context, cb func(grant feegrant.DIDGrant) bool) error {
+	store := k.storeService.OpenKVStore(ctx)
+	iter := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), feegrant.DIDFeeAllowanceKeyPrefix)
+	defer iter.Close()
+
+	stop := false
+	for ; iter.Valid() && !stop; iter.Next() {
+		bz := iter.Value()
+		var didGrant feegrant.DIDGrant
+		if err := k.cdc.Unmarshal(bz, &didGrant); err != nil {
+			return err
+		}
+		stop = cb(didGrant)
+	}
+
+	return nil
+}
+
+// GrantDIDAllowance creates a new DID-based grant.
+func (k Keeper) GrantDIDAllowance(
+	ctx context.Context,
+	granter sdk.AccAddress,
+	granteeDID string,
+	feeAllowance feegrant.FeeAllowanceI,
+) error {
+	// Check for duplicate entry
+	if f, _ := k.GetDIDAllowance(ctx, granter, granteeDID); f != nil {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "fee allowance already exists for this DID")
+	}
+
+	store := k.storeService.OpenKVStore(ctx)
+	key := feegrant.FeeAllowanceByDIDKey(granter, granteeDID)
+
+	exp, err := feeAllowance.ExpiresAt()
+	if err != nil {
+		return err
+	}
+
+	// expiration shouldn't be in the past.
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	if exp != nil && exp.Before(sdkCtx.BlockTime()) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "expiration is before current block time")
+	}
+
+	// if expiry is not nil, add the new key to pruning queue.
+	if exp != nil {
+		// `key` formed here with the prefix of `DIDFeeAllowanceKeyPrefix` (which is `0x02`)
+		// remove the 1st byte and reuse the remaining key as it is
+		err = k.addToDIDFeeAllowanceQueue(ctx, key[1:], exp)
+		if err != nil {
+			return err
+		}
+	}
+
+	didGrant, err := feegrant.NewDIDGrant(granter, granteeDID, feeAllowance)
+	if err != nil {
+		return err
+	}
+
+	bz, err := k.cdc.Marshal(&didGrant)
+	if err != nil {
+		return err
+	}
+
+	err = store.Set(key, bz)
+	if err != nil {
+		return err
+	}
+
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeSetDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, didGrant.Granter),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, didGrant.GranteeDid),
+		),
+	)
+
+	return nil
+}
+
+// GetDIDAllowance returns the allowance between the granter and DID.
+// If there is none, it returns nil, nil. Returns an error on parsing issues.
+func (k Keeper) GetDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) (feegrant.FeeAllowanceI, error) {
+	didGrant, err := k.getDIDGrant(ctx, granter, granteeDID)
+	if err != nil {
+		return nil, err
+	}
+
+	return didGrant.GetDIDGrant()
+}
+
+// getDIDGrant returns entire grant between granter and DID.
+func (k Keeper) getDIDGrant(ctx context.Context, granter sdk.AccAddress, granteeDID string) (*feegrant.DIDGrant, error) {
+	store := k.storeService.OpenKVStore(ctx)
+	key := feegrant.FeeAllowanceByDIDKey(granter, granteeDID)
+	bz, err := store.Get(key)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(bz) == 0 {
+		return nil, sdkerrors.ErrNotFound.Wrap("fee-grant not found for DID")
+	}
+
+	var didGrant feegrant.DIDGrant
+	if err := k.cdc.Unmarshal(bz, &didGrant); err != nil {
+		return nil, err
+	}
+
+	return &didGrant, nil
+}
+
+// RevokeDIDAllowance removes an existing DID-based grant.
+func (k Keeper) RevokeDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error {
+	didGrant, err := k.GetDIDAllowance(ctx, granter, granteeDID)
+	if err != nil {
+		return err
+	}
+
+	store := k.storeService.OpenKVStore(ctx)
+	key := feegrant.FeeAllowanceByDIDKey(granter, granteeDID)
+	err = store.Delete(key)
+	if err != nil {
+		return err
+	}
+
+	exp, err := didGrant.ExpiresAt()
+	if err != nil {
+		return err
+	}
+
+	if exp != nil {
+		if err := store.Delete(feegrant.DIDFeeAllowancePrefixQueue(exp, key[1:])); err != nil {
+			return err
+		}
+	}
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeRevokeDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
+		),
+	)
+
+	return nil
+}
+
+// UseGrantedFeesByDID will try to pay the given fee from the granter's account for a DID.
+func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) error {
+	didGrant, err := k.GetDIDAllowance(ctx, granter, granteeDID)
+	if err != nil {
+		return errorsmod.Wrapf(err, "fee-grant not found for DID %s", granteeDID)
+	}
+
+	remove, err := didGrant.Accept(ctx, fee, msgs)
+	if remove {
+		k.RevokeDIDAllowance(ctx, granter, granteeDID)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	// if fee allowance is accepted, deduct the fees from the granter
+	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, granter, authtypes.FeeCollectorName, fee)
+	if err != nil {
+		return err
+	}
+
+	// if fee allowance is accepted, update the existing grant
+	err = k.UpdateDIDAllowance(ctx, granter, granteeDID, didGrant)
+	if err != nil {
+		return err
+	}
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeUseDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
+		),
+	)
+
+	return nil
+}
+
+// UpdateDIDAllowance updates the existing DID-based grant.
+func (k Keeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, feeAllowance feegrant.FeeAllowanceI) error {
+	store := k.storeService.OpenKVStore(ctx)
+	key := feegrant.FeeAllowanceByDIDKey(granter, granteeDID)
+
+	_, err := k.getDIDGrant(ctx, granter, granteeDID)
+	if err != nil {
+		return err
+	}
+
+	didGrant, err := feegrant.NewDIDGrant(granter, granteeDID, feeAllowance)
+	if err != nil {
+		return err
+	}
+
+	bz, err := k.cdc.Marshal(&didGrant)
+	if err != nil {
+		return err
+	}
+
+	err = store.Set(key, bz)
+	if err != nil {
+		return err
+	}
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeUpdateDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, didGrant.Granter),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, didGrant.GranteeDid),
+		),
+	)
+
+	return nil
+}
+
+// addToDIDFeeAllowanceQueue adds DID grant to the expiration queue.
+func (k Keeper) addToDIDFeeAllowanceQueue(ctx context.Context, grantKey []byte, exp *time.Time) error {
+	store := k.storeService.OpenKVStore(ctx)
+	return store.Set(feegrant.DIDFeeAllowancePrefixQueue(exp, grantKey), []byte{})
 }
