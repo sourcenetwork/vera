@@ -10,7 +10,6 @@ func newTxExecResult(result *rpctypes.ResultTx) *TxExecResult {
 	var err error
 	if result.TxResult.Code != 0 {
 		err = fmt.Errorf("%v: %v", ErrTxFailed, result.TxResult.Log)
-		result = nil
 	}
 
 	return &TxExecResult{

@@ -53,7 +53,7 @@ fi
 
 if [ -n "$APP_CONFIG_PATH" ]; then 
     echo "APP_CONFIG_PATH set: updating app config with $APP_CONFIG_PATH"
-    cp $APP_CONFIG_PATH /sourcehub/app.toml
+    cp $APP_CONFIG_PATH /sourcehub/config/app.toml
 fi
 
 exec $@

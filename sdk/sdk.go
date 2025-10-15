@@ -71,7 +71,7 @@ func NewClient(opts ...Opt) (*Client, error) {
 	dialOpts := make([]grpc.DialOption, 0, len(client.grpcOpts)+1)
 	dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	dialOpts = append(dialOpts, client.grpcOpts...)
-	conn, err := grpc.Dial(client.grpcAddr, dialOpts...)
+	conn, err := grpc.NewClient(client.grpcAddr, dialOpts...)
 	if err != nil {
 		return nil, fmt.Errorf("sourcehub grpc dial: %w", err)
 	}
@@ -109,20 +109,12 @@ type Client struct {
 	listener    TxListener
 }
 
-// BroadcastTx broadcasts a signed Tx to a SourceHub node and returns the node's response.
-// Callers can use TxResponse.TxHash to await or listen until the Tx is accepted and executed.
-func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxResponse, error) {
-	encoder := authtx.DefaultTxEncoder()
-	txBytes, err := encoder(tx)
-	if err != nil {
-		return nil, fmt.Errorf("marshaling tx: %w", err)
-	}
-
+func (b *Client) BroadcastTxBytes(ctx context.Context, tx []byte) (*sdk.TxResponse, error) {
 	grpcRes, err := b.txClient.BroadcastTx(
 		ctx,
 		&txtypes.BroadcastTxRequest{
 			Mode:    txtypes.BroadcastMode_BROADCAST_MODE_SYNC,
-			TxBytes: txBytes,
+			TxBytes: tx,
 		},
 	)
 	if err != nil {
@@ -138,6 +130,17 @@ func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxRe
 	}
 
 	return response, nil
+}
+
+// BroadcastTx broadcasts a signed Tx to a SourceHub node and returns the node's response.
+// Callers can use TxResponse.TxHash to await or listen until the Tx is accepted and executed.
+func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxResponse, error) {
+	encoder := authtx.DefaultTxEncoder()
+	txBytes, err := encoder(tx)
+	if err != nil {
+		return nil, fmt.Errorf("marshaling tx: %w", err)
+	}
+	return b.BroadcastTxBytes(ctx, txBytes)
 }
 
 // Close terminates the Client, freeing up resources and connections

@@ -43,6 +43,7 @@ func initRootCmd(
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
 		NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
+		NewProbeCmd(),
 	)
 
 	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
