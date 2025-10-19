@@ -9,12 +9,12 @@ import (
 	"cosmossdk.io/math"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
-	"cosmossdk.io/x/feegrant"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 

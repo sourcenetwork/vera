@@ -5,12 +5,12 @@ import (
 	time "time"
 
 	"cosmossdk.io/math"
-	"cosmossdk.io/x/feegrant"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 )
 
 // EpochsKeeper defines the expected interface for the Epochs module.

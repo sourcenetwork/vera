@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
-	"cosmossdk.io/x/feegrant"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
