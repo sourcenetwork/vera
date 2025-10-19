@@ -49,12 +49,63 @@ curl -X POST http://localhost:1317/faucet/grant-allowance \
   -H "Content-Type: application/json" \
   -d '{
     "address": "source1...",
-    "amount_limit": "10000000000000",
-    "expiration": 1735689600
+    "amount_limit": {
+      "denom": "uopen",
+      "amount": "10000000000000"
+    },
+    "expiration": "2025-12-31T23:59:59Z"
   }'
 ```
 
 Grants a fee allowance from the faucet account to the specified address. This allows the grantee to pay transaction fees using the granter's (e.g. faucet) account balance.
+
+**Notes:**
+- `amount_limit` is optional. If not provided, defaults to 10,000 OPEN (10000000000 uopen)
+- `expiration` is optional. If not provided, defaults to 30 days from now
+
+### Grant DID Fee Allowance
+```bash
+curl -X POST http://localhost:1317/faucet/grant-did-allowance \
+  -H "Content-Type: application/json" \
+  -d '{
+    "did": "did:key:alice",
+    "amount_limit": {
+      "denom": "uopen",
+      "amount": "10000000000"
+    },
+    "expiration": "2025-12-31T23:59:59Z"
+  }'
+```
+
+Grants a fee allowance from the faucet account to the specified DID. This allows transactions with JWS extensions containing the DID to pay transaction fees using the faucet's account balance.
+
+**Notes:**
+- `amount_limit` is optional. If not provided, defaults to 10,000 OPEN (10000000000 uopen)
+- `expiration` is optional. If not provided, defaults to 30 days from now
+
+**Response:**
+```json
+{
+  "message": "DID fee allowance granted successfully",
+  "txhash": "A1B2C3...",
+  "granter": "source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt",
+  "grantee_did": "did:key:alice",
+  "amount_limit": {
+    "denom": "uopen",
+    "amount": "10000000000"
+  },
+  "expiration": "2025-12-31T23:59:59Z"
+}
+```
+
+**Query DID allowance via CLI:**
+```bash
+# Query specific DID allowance
+build/sourcehubd q feegrant did-grant $(curl -s http://localhost:1317/faucet/info | jq -r '.address') did:key:alice
+
+# List all DID allowances by granter
+build/sourcehubd q feegrant did-grants-by-granter $(curl -s http://localhost:1317/faucet/info | jq -r '.address')
+```
 
 ## Configuration
 

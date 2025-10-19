@@ -12,7 +12,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
-	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
@@ -62,6 +61,7 @@ import (
 	"github.com/skip-mev/block-sdk/v2/block/base"
 
 	"github.com/sourcenetwork/sourcehub/app/ante"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
@@ -72,6 +72,8 @@ import (
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
+	icakeeper "github.com/sourcenetwork/sourcehub/x/ica/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
@@ -130,6 +132,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
+	IcaKeeper      *icakeeper.Keeper
 	AcpKeeper      *acpkeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
@@ -258,6 +261,7 @@ func New(
 		&app.GroupKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
+		&app.IcaKeeper,
 		&app.AcpKeeper,
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,
@@ -299,6 +303,9 @@ func New(
 	// }
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(app.interfaceRegistry)
 
 	// Register legacy modules
 	app.registerIBCModules()

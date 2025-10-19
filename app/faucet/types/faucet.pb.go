@@ -10,15 +10,19 @@ import (
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
+	_ "github.com/cosmos/gogoproto/types"
+	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -413,8 +417,8 @@ type GrantAllowanceRequest struct {
 	Address string `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
 	// Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
 	AmountLimit types.Coin `protobuf:"bytes,2,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
-	// Optional expiration time in unix timestamp. If not provided, defaults to 30 days from now
-	Expiration int64 `protobuf:"varint,3,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	// Optional expiration time. If not provided, defaults to 30 days from now
+	Expiration *time.Time `protobuf:"bytes,3,opt,name=expiration,proto3,stdtime" json:"expiration,omitempty"`
 }
 
 func (m *GrantAllowanceRequest) Reset()         { *m = GrantAllowanceRequest{} }
@@ -464,11 +468,11 @@ func (m *GrantAllowanceRequest) GetAmountLimit() types.Coin {
 	return types.Coin{}
 }
 
-func (m *GrantAllowanceRequest) GetExpiration() int64 {
+func (m *GrantAllowanceRequest) GetExpiration() *time.Time {
 	if m != nil {
 		return m.Expiration
 	}
-	return 0
+	return nil
 }
 
 // GrantAllowanceResponse represents the response from a grant allowance request.
@@ -480,7 +484,7 @@ type GrantAllowanceResponse struct {
 	Granter     string     `protobuf:"bytes,5,opt,name=granter,proto3" json:"granter,omitempty"`
 	Grantee     string     `protobuf:"bytes,6,opt,name=grantee,proto3" json:"grantee,omitempty"`
 	AmountLimit types.Coin `protobuf:"bytes,7,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
-	Expiration  int64      `protobuf:"varint,8,opt,name=expiration,proto3" json:"expiration,omitempty"`
+	Expiration  *time.Time `protobuf:"bytes,8,opt,name=expiration,proto3,stdtime" json:"expiration,omitempty"`
 }
 
 func (m *GrantAllowanceResponse) Reset()         { *m = GrantAllowanceResponse{} }
@@ -565,11 +569,175 @@ func (m *GrantAllowanceResponse) GetAmountLimit() types.Coin {
 	return types.Coin{}
 }
 
-func (m *GrantAllowanceResponse) GetExpiration() int64 {
+func (m *GrantAllowanceResponse) GetExpiration() *time.Time {
 	if m != nil {
 		return m.Expiration
 	}
+	return nil
+}
+
+// GrantDIDAllowanceRequest represents a request to grant fee allowance to a DID from the faucet.
+type GrantDIDAllowanceRequest struct {
+	Did string `protobuf:"bytes,1,opt,name=did,proto3" json:"did,omitempty"`
+	// Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
+	AmountLimit types.Coin `protobuf:"bytes,2,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
+	// Optional expiration time. If not provided, defaults to 30 days from now
+	Expiration *time.Time `protobuf:"bytes,3,opt,name=expiration,proto3,stdtime" json:"expiration,omitempty"`
+}
+
+func (m *GrantDIDAllowanceRequest) Reset()         { *m = GrantDIDAllowanceRequest{} }
+func (m *GrantDIDAllowanceRequest) String() string { return proto.CompactTextString(m) }
+func (*GrantDIDAllowanceRequest) ProtoMessage()    {}
+func (*GrantDIDAllowanceRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b854b66c8024df8a, []int{8}
+}
+func (m *GrantDIDAllowanceRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GrantDIDAllowanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GrantDIDAllowanceRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GrantDIDAllowanceRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GrantDIDAllowanceRequest.Merge(m, src)
+}
+func (m *GrantDIDAllowanceRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *GrantDIDAllowanceRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GrantDIDAllowanceRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GrantDIDAllowanceRequest proto.InternalMessageInfo
+
+func (m *GrantDIDAllowanceRequest) GetDid() string {
+	if m != nil {
+		return m.Did
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceRequest) GetAmountLimit() types.Coin {
+	if m != nil {
+		return m.AmountLimit
+	}
+	return types.Coin{}
+}
+
+func (m *GrantDIDAllowanceRequest) GetExpiration() *time.Time {
+	if m != nil {
+		return m.Expiration
+	}
+	return nil
+}
+
+// GrantDIDAllowanceResponse represents the response from a DID grant allowance request.
+type GrantDIDAllowanceResponse struct {
+	Message     string     `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Txhash      string     `protobuf:"bytes,2,opt,name=txhash,proto3" json:"txhash,omitempty"`
+	Code        uint32     `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`
+	RawLog      string     `protobuf:"bytes,4,opt,name=raw_log,json=rawLog,proto3" json:"raw_log,omitempty"`
+	Granter     string     `protobuf:"bytes,5,opt,name=granter,proto3" json:"granter,omitempty"`
+	GranteeDid  string     `protobuf:"bytes,6,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
+	AmountLimit types.Coin `protobuf:"bytes,7,opt,name=amount_limit,json=amountLimit,proto3" json:"amount_limit"`
+	Expiration  *time.Time `protobuf:"bytes,8,opt,name=expiration,proto3,stdtime" json:"expiration,omitempty"`
+}
+
+func (m *GrantDIDAllowanceResponse) Reset()         { *m = GrantDIDAllowanceResponse{} }
+func (m *GrantDIDAllowanceResponse) String() string { return proto.CompactTextString(m) }
+func (*GrantDIDAllowanceResponse) ProtoMessage()    {}
+func (*GrantDIDAllowanceResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b854b66c8024df8a, []int{9}
+}
+func (m *GrantDIDAllowanceResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GrantDIDAllowanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GrantDIDAllowanceResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GrantDIDAllowanceResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GrantDIDAllowanceResponse.Merge(m, src)
+}
+func (m *GrantDIDAllowanceResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *GrantDIDAllowanceResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GrantDIDAllowanceResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GrantDIDAllowanceResponse proto.InternalMessageInfo
+
+func (m *GrantDIDAllowanceResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceResponse) GetTxhash() string {
+	if m != nil {
+		return m.Txhash
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceResponse) GetCode() uint32 {
+	if m != nil {
+		return m.Code
+	}
 	return 0
+}
+
+func (m *GrantDIDAllowanceResponse) GetRawLog() string {
+	if m != nil {
+		return m.RawLog
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceResponse) GetGranter() string {
+	if m != nil {
+		return m.Granter
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceResponse) GetGranteeDid() string {
+	if m != nil {
+		return m.GranteeDid
+	}
+	return ""
+}
+
+func (m *GrantDIDAllowanceResponse) GetAmountLimit() types.Coin {
+	if m != nil {
+		return m.AmountLimit
+	}
+	return types.Coin{}
+}
+
+func (m *GrantDIDAllowanceResponse) GetExpiration() *time.Time {
+	if m != nil {
+		return m.Expiration
+	}
+	return nil
 }
 
 func init() {
@@ -581,48 +749,56 @@ func init() {
 	proto.RegisterType((*FaucetInfoResponse)(nil), "sourcehub.faucet.FaucetInfoResponse")
 	proto.RegisterType((*GrantAllowanceRequest)(nil), "sourcehub.faucet.GrantAllowanceRequest")
 	proto.RegisterType((*GrantAllowanceResponse)(nil), "sourcehub.faucet.GrantAllowanceResponse")
+	proto.RegisterType((*GrantDIDAllowanceRequest)(nil), "sourcehub.faucet.GrantDIDAllowanceRequest")
+	proto.RegisterType((*GrantDIDAllowanceResponse)(nil), "sourcehub.faucet.GrantDIDAllowanceResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/faucet/faucet.proto", fileDescriptor_b854b66c8024df8a) }
 
 var fileDescriptor_b854b66c8024df8a = []byte{
-	// 568 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xce, 0xe6, 0xc7, 0x6e, 0xb7, 0x0d, 0x82, 0x2d, 0x04, 0xb7, 0x12, 0x26, 0x32, 0x97, 0xc0,
-	0xc1, 0x56, 0xe9, 0x15, 0x21, 0xb5, 0x95, 0x28, 0x95, 0xca, 0xc5, 0x47, 0x2e, 0xd1, 0xc6, 0xd9,
-	0x3a, 0x16, 0xb1, 0xc7, 0xec, 0x6e, 0x48, 0x78, 0x01, 0xce, 0x48, 0x70, 0xe2, 0x09, 0xb8, 0x20,
-	0xf1, 0x18, 0x3d, 0xf6, 0xc8, 0x09, 0xa1, 0x04, 0x89, 0xd7, 0x40, 0xde, 0x5d, 0xb7, 0x69, 0x69,
-	0x54, 0x05, 0x21, 0x2e, 0xc9, 0x7e, 0x33, 0x3b, 0x3b, 0xdf, 0x37, 0x33, 0x1e, 0x7c, 0x4f, 0xc0,
-	0x88, 0x47, 0x6c, 0x30, 0xea, 0x05, 0xc7, 0x74, 0x14, 0x31, 0x69, 0xfe, 0xfc, 0x9c, 0x83, 0x04,
-	0x72, 0xf3, 0xcc, 0xed, 0x6b, 0xfb, 0xd6, 0x2d, 0x9a, 0x26, 0x19, 0x04, 0xea, 0x57, 0x5f, 0xda,
-	0xda, 0x8c, 0x40, 0xa4, 0x20, 0xba, 0x0a, 0x05, 0x1a, 0x18, 0xd7, 0xed, 0x18, 0x62, 0xd0, 0xf6,
-	0xe2, 0x64, 0xac, 0xae, 0xbe, 0x13, 0xf4, 0xa8, 0x60, 0xc1, 0x9b, 0xed, 0x1e, 0x93, 0x74, 0x3b,
-	0x88, 0x20, 0xc9, 0xb4, 0xdf, 0x7b, 0x87, 0xf0, 0xc6, 0x33, 0x95, 0x2e, 0x64, 0xaf, 0x47, 0x4c,
-	0xc8, 0x90, 0x45, 0xc0, 0xfb, 0xc4, 0xc1, 0x36, 0xed, 0xf7, 0x39, 0x13, 0xc2, 0x41, 0x6d, 0xd4,
-	0x59, 0x0d, 0x4b, 0x48, 0x9e, 0x60, 0x8b, 0xa6, 0x30, 0xca, 0xa4, 0x53, 0x6d, 0xa3, 0xce, 0xda,
-	0xe3, 0x4d, 0xdf, 0xd0, 0x28, 0x52, 0xf8, 0x26, 0x85, 0xbf, 0x0f, 0x49, 0xb6, 0xb7, 0x7a, 0xf2,
-	0xfd, 0x7e, 0xe5, 0xf3, 0xaf, 0xaf, 0x8f, 0x50, 0x68, 0x62, 0xc8, 0x5d, 0x6c, 0xcb, 0x49, 0x77,
-	0x40, 0xc5, 0xc0, 0xa9, 0xa9, 0x77, 0x2d, 0x39, 0x79, 0x4e, 0xc5, 0xc0, 0x7b, 0x88, 0x9b, 0x17,
-	0x78, 0x2c, 0x66, 0xe0, 0x7d, 0x41, 0xf8, 0x46, 0x79, 0x57, 0xe4, 0x90, 0x09, 0x46, 0x5a, 0xd8,
-	0x92, 0x13, 0xf5, 0x2a, 0x2a, 0x5f, 0x2d, 0x10, 0x21, 0xb8, 0x1e, 0x41, 0x9f, 0x29, 0xaa, 0xcd,
-	0x50, 0x9d, 0x0b, 0x0a, 0x9c, 0x8e, 0xbb, 0x43, 0x88, 0x4b, 0x0a, 0x9c, 0x8e, 0x8f, 0x20, 0x9e,
-	0xcf, 0x58, 0x5f, 0xa4, 0xb9, 0xb1, 0xbc, 0x66, 0xcf, 0xc7, 0xe4, 0x30, 0x4b, 0xe4, 0x6e, 0x14,
-	0x15, 0xf0, 0x7a, 0x7d, 0x3f, 0x11, 0xde, 0xb8, 0x10, 0x60, 0x44, 0x3a, 0xd8, 0x4e, 0x99, 0x10,
-	0x34, 0x66, 0x65, 0x84, 0x81, 0x73, 0xf2, 0xab, 0x57, 0xca, 0xaf, 0x5d, 0x2d, 0xbf, 0xbe, 0x48,
-	0x7e, 0x63, 0x91, 0x7c, 0xeb, 0x2f, 0x5a, 0xde, 0xc2, 0x16, 0x9b, 0x24, 0x42, 0x0a, 0xc7, 0x6e,
-	0xa3, 0xce, 0x4a, 0x68, 0x90, 0xf7, 0x01, 0x61, 0xa2, 0xdb, 0x78, 0x98, 0x1d, 0xc3, 0xbc, 0xca,
-	0x05, 0x93, 0xf7, 0x14, 0xdb, 0x3d, 0x3a, 0xa4, 0x59, 0xc4, 0x96, 0x1a, 0xbd, 0x32, 0x88, 0x3c,
-	0xc0, 0x4d, 0xae, 0x8b, 0xdf, 0x55, 0x85, 0x55, 0x65, 0x69, 0x84, 0xeb, 0xc6, 0xb8, 0xaf, 0x9a,
-	0xf5, 0x09, 0xe1, 0x3b, 0x07, 0x9c, 0x66, 0x72, 0x77, 0x38, 0x84, 0x71, 0x11, 0x77, 0x6d, 0xc3,
-	0xc8, 0x01, 0x5e, 0xd7, 0x5a, 0xbb, 0xc3, 0x24, 0x4d, 0x96, 0xfb, 0x30, 0xd6, 0x74, 0xe4, 0x51,
-	0x11, 0x48, 0x5c, 0x8c, 0xd9, 0x24, 0x4f, 0x38, 0x95, 0x09, 0x64, 0x8a, 0x5e, 0x2d, 0x9c, 0xb3,
-	0x78, 0x1f, 0xab, 0xb8, 0x75, 0x99, 0xdc, 0x7f, 0x1b, 0x8e, 0xb8, 0x48, 0xcc, 0x78, 0x39, 0x1c,
-	0x06, 0x9e, 0x7b, 0x98, 0x9a, 0x8e, 0x33, 0x0f, 0xfb, 0xa3, 0x2c, 0xf6, 0xbf, 0x29, 0xcb, 0xca,
-	0xe5, 0xb2, 0xec, 0xbd, 0x38, 0x99, 0xba, 0xe8, 0x74, 0xea, 0xa2, 0x1f, 0x53, 0x17, 0xbd, 0x9f,
-	0xb9, 0x95, 0xd3, 0x99, 0x5b, 0xf9, 0x36, 0x73, 0x2b, 0x2f, 0x77, 0xe2, 0x44, 0x16, 0x1b, 0x35,
-	0x82, 0x34, 0xd0, 0xfb, 0x35, 0x63, 0x72, 0x0c, 0xfc, 0x55, 0x70, 0xbe, 0x8c, 0x69, 0x9e, 0x97,
-	0x0b, 0x59, 0xbe, 0xcd, 0x99, 0xe8, 0x59, 0x6a, 0x35, 0xee, 0xfc, 0x0e, 0x00, 0x00, 0xff, 0xff,
-	0xfd, 0x72, 0x25, 0xba, 0xb1, 0x05, 0x00, 0x00,
+	// 659 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x55, 0xcf, 0x4f, 0x13, 0x4f,
+	0x14, 0xef, 0x94, 0xd2, 0xc2, 0x2b, 0x7c, 0xc3, 0x77, 0x50, 0x5c, 0x48, 0xdc, 0x92, 0x7a, 0x41,
+	0x0f, 0xbb, 0x01, 0xae, 0xc6, 0xc8, 0x8f, 0x88, 0x24, 0x78, 0xd9, 0x78, 0xf2, 0xd2, 0x4c, 0xb7,
+	0xc3, 0x76, 0xe2, 0xee, 0xce, 0xba, 0x33, 0x6b, 0xeb, 0x3f, 0xe0, 0x99, 0xc4, 0x7f, 0xc2, 0x8b,
+	0x89, 0x27, 0xbd, 0x78, 0xf0, 0xc8, 0x91, 0xa3, 0x27, 0x35, 0x60, 0xe2, 0xbf, 0x61, 0x76, 0x66,
+	0x16, 0x8a, 0xb4, 0x21, 0x25, 0x46, 0xbc, 0xb4, 0xfb, 0xde, 0x9b, 0x37, 0xf3, 0xf9, 0xf1, 0x26,
+	0x03, 0xb7, 0x05, 0xcf, 0x52, 0x9f, 0x76, 0xb3, 0xb6, 0xbb, 0x4f, 0x32, 0x9f, 0x4a, 0xf3, 0xe7,
+	0x24, 0x29, 0x97, 0x1c, 0xcf, 0x9d, 0x96, 0x1d, 0x9d, 0x5f, 0xfa, 0x9f, 0x44, 0x2c, 0xe6, 0xae,
+	0xfa, 0xd5, 0x8b, 0x96, 0x16, 0x7d, 0x2e, 0x22, 0x2e, 0x5a, 0x2a, 0x72, 0x75, 0x60, 0x4a, 0x37,
+	0x02, 0x1e, 0x70, 0x9d, 0xcf, 0xbf, 0x4c, 0xd6, 0xd6, 0x6b, 0xdc, 0x36, 0x11, 0xd4, 0x7d, 0xb9,
+	0xda, 0xa6, 0x92, 0xac, 0xba, 0x3e, 0x67, 0xb1, 0xa9, 0x37, 0x02, 0xce, 0x83, 0x90, 0xba, 0x2a,
+	0x6a, 0x67, 0xfb, 0xae, 0x64, 0x11, 0x15, 0x92, 0x44, 0x89, 0x5e, 0xd0, 0x7c, 0x8d, 0x60, 0xfe,
+	0x91, 0xc2, 0xe3, 0xd1, 0x17, 0x19, 0x15, 0xd2, 0xa3, 0x3e, 0x4f, 0x3b, 0xd8, 0x82, 0x1a, 0xe9,
+	0x74, 0x52, 0x2a, 0x84, 0x85, 0x96, 0xd1, 0xca, 0xb4, 0x57, 0x84, 0xf8, 0x3e, 0x54, 0x49, 0xc4,
+	0xb3, 0x58, 0x5a, 0xe5, 0x65, 0xb4, 0x52, 0x5f, 0x5b, 0x74, 0x0c, 0xce, 0x1c, 0x83, 0x63, 0x30,
+	0x38, 0x5b, 0x9c, 0xc5, 0x9b, 0xd3, 0x87, 0x5f, 0x1b, 0xa5, 0xb7, 0x3f, 0xdf, 0xdf, 0x43, 0x9e,
+	0xe9, 0xc1, 0xb7, 0xa0, 0x26, 0xfb, 0xad, 0x2e, 0x11, 0x5d, 0x6b, 0x42, 0xed, 0x5b, 0x95, 0xfd,
+	0xc7, 0x44, 0x74, 0x9b, 0x77, 0x61, 0xf6, 0x1c, 0x8e, 0xd1, 0x08, 0x9a, 0xef, 0x10, 0xfc, 0x57,
+	0xac, 0x15, 0x09, 0x8f, 0x05, 0xc5, 0x0b, 0x50, 0x95, 0x7d, 0xb5, 0x2b, 0x2a, 0x76, 0xcd, 0x23,
+	0x8c, 0xa1, 0xe2, 0xf3, 0x0e, 0x55, 0x50, 0x67, 0x3d, 0xf5, 0x9d, 0x43, 0x48, 0x49, 0xaf, 0x15,
+	0xf2, 0xa0, 0x80, 0x90, 0x92, 0xde, 0x1e, 0x0f, 0x06, 0x4f, 0xac, 0x8c, 0xe2, 0x3c, 0x39, 0x3e,
+	0xe7, 0xa6, 0x03, 0x78, 0x37, 0x66, 0x72, 0xc3, 0xf7, 0xf3, 0xf0, 0x72, 0x7e, 0x3f, 0x10, 0xcc,
+	0x9f, 0x6b, 0x30, 0x24, 0x2d, 0xa8, 0x45, 0x54, 0x08, 0x12, 0xd0, 0xa2, 0xc3, 0x84, 0x03, 0xf4,
+	0xcb, 0x43, 0xe9, 0x4f, 0x0c, 0xa7, 0x5f, 0x19, 0x45, 0x7f, 0x72, 0x14, 0xfd, 0xea, 0x15, 0x2c,
+	0x5f, 0x80, 0x2a, 0xed, 0x33, 0x21, 0x85, 0x55, 0x5b, 0x46, 0x2b, 0x53, 0x9e, 0x89, 0x9a, 0x6f,
+	0x10, 0x60, 0x6d, 0xe3, 0x6e, 0xbc, 0xcf, 0x07, 0x59, 0x8e, 0x98, 0xbc, 0x07, 0x50, 0x6b, 0x93,
+	0x90, 0xc4, 0x3e, 0x1d, 0x6b, 0xf4, 0x8a, 0x26, 0x7c, 0x07, 0x66, 0x53, 0x2d, 0x7e, 0x4b, 0x09,
+	0xab, 0x64, 0x99, 0xf4, 0x66, 0x4c, 0x72, 0x4b, 0x99, 0xf5, 0x09, 0xc1, 0xcd, 0x9d, 0x94, 0xc4,
+	0x72, 0x23, 0x0c, 0x79, 0x2f, 0xef, 0xbb, 0xd4, 0x30, 0xbc, 0x03, 0x33, 0x9a, 0x6b, 0x2b, 0x64,
+	0x11, 0x1b, 0xef, 0x62, 0xd4, 0x75, 0xe7, 0x5e, 0xde, 0x88, 0x1f, 0x02, 0xd0, 0x7e, 0xc2, 0x52,
+	0x22, 0x19, 0x8f, 0x15, 0xbc, 0xfa, 0xda, 0x92, 0xa3, 0xef, 0xb0, 0x53, 0xdc, 0x61, 0xe7, 0x69,
+	0x71, 0x87, 0x37, 0x2b, 0x07, 0xdf, 0x1a, 0xc8, 0x1b, 0xe8, 0x69, 0x7e, 0x28, 0xc3, 0xc2, 0xef,
+	0xf0, 0xff, 0xda, 0xf8, 0x04, 0xf9, 0xc1, 0x34, 0x2d, 0xc6, 0xc7, 0x84, 0x67, 0x15, 0xaa, 0xe6,
+	0xe7, 0xb4, 0x42, 0x2f, 0x08, 0x57, 0xfb, 0x33, 0xc2, 0x4d, 0x5d, 0x41, 0xb8, 0x8f, 0x08, 0x2c,
+	0x25, 0xdc, 0xf6, 0xee, 0xf6, 0x05, 0xeb, 0xe7, 0x60, 0xa2, 0xc3, 0x3a, 0x46, 0xb6, 0xfc, 0xf3,
+	0x5f, 0xb2, 0xfc, 0x73, 0x19, 0x16, 0x87, 0x20, 0xbf, 0x6e, 0xd7, 0x1b, 0x50, 0x37, 0x36, 0xb7,
+	0x72, 0xed, 0xb4, 0xf3, 0x60, 0x52, 0xdb, 0x43, 0x24, 0xbc, 0x3e, 0xf3, 0x37, 0x9f, 0x1c, 0x1e,
+	0xdb, 0xe8, 0xe8, 0xd8, 0x46, 0xdf, 0x8f, 0x6d, 0x74, 0x70, 0x62, 0x97, 0x8e, 0x4e, 0xec, 0xd2,
+	0x97, 0x13, 0xbb, 0xf4, 0x6c, 0x3d, 0x60, 0x32, 0x7f, 0xb3, 0x7d, 0x1e, 0xb9, 0xfa, 0x05, 0x8f,
+	0xa9, 0xec, 0xf1, 0xf4, 0xb9, 0x7b, 0xf6, 0xdc, 0x93, 0x24, 0x29, 0x9e, 0x7c, 0xf9, 0x2a, 0xa1,
+	0xa2, 0x5d, 0x55, 0x87, 0xae, 0xff, 0x0a, 0x00, 0x00, 0xff, 0xff, 0x9f, 0x36, 0x16, 0x94, 0x13,
+	0x08, 0x00, 0x00,
 }
 
 func (m *FaucetRequestRecord) Marshal() (dAtA []byte, err error) {
@@ -932,10 +1108,15 @@ func (m *GrantAllowanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Expiration != 0 {
-		i = encodeVarintFaucet(dAtA, i, uint64(m.Expiration))
+	if m.Expiration != nil {
+		n5, err5 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Expiration, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration):])
+		if err5 != nil {
+			return 0, err5
+		}
+		i -= n5
+		i = encodeVarintFaucet(dAtA, i, uint64(n5))
 		i--
-		dAtA[i] = 0x18
+		dAtA[i] = 0x1a
 	}
 	{
 		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
@@ -977,10 +1158,15 @@ func (m *GrantAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
-	if m.Expiration != 0 {
-		i = encodeVarintFaucet(dAtA, i, uint64(m.Expiration))
+	if m.Expiration != nil {
+		n7, err7 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Expiration, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration):])
+		if err7 != nil {
+			return 0, err7
+		}
+		i -= n7
+		i = encodeVarintFaucet(dAtA, i, uint64(n7))
 		i--
-		dAtA[i] = 0x40
+		dAtA[i] = 0x42
 	}
 	{
 		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
@@ -996,6 +1182,139 @@ func (m *GrantAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i -= len(m.Grantee)
 		copy(dAtA[i:], m.Grantee)
 		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Grantee)))
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Granter) > 0 {
+		i -= len(m.Granter)
+		copy(dAtA[i:], m.Granter)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Granter)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if len(m.RawLog) > 0 {
+		i -= len(m.RawLog)
+		copy(dAtA[i:], m.RawLog)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.RawLog)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.Code != 0 {
+		i = encodeVarintFaucet(dAtA, i, uint64(m.Code))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.Txhash) > 0 {
+		i -= len(m.Txhash)
+		copy(dAtA[i:], m.Txhash)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Txhash)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GrantDIDAllowanceRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GrantDIDAllowanceRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GrantDIDAllowanceRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Expiration != nil {
+		n9, err9 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Expiration, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration):])
+		if err9 != nil {
+			return 0, err9
+		}
+		i -= n9
+		i = encodeVarintFaucet(dAtA, i, uint64(n9))
+		i--
+		dAtA[i] = 0x1a
+	}
+	{
+		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
+	if len(m.Did) > 0 {
+		i -= len(m.Did)
+		copy(dAtA[i:], m.Did)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.Did)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *GrantDIDAllowanceResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GrantDIDAllowanceResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GrantDIDAllowanceResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Expiration != nil {
+		n11, err11 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Expiration, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration):])
+		if err11 != nil {
+			return 0, err11
+		}
+		i -= n11
+		i = encodeVarintFaucet(dAtA, i, uint64(n11))
+		i--
+		dAtA[i] = 0x42
+	}
+	{
+		size, err := m.AmountLimit.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintFaucet(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	if len(m.GranteeDid) > 0 {
+		i -= len(m.GranteeDid)
+		copy(dAtA[i:], m.GranteeDid)
+		i = encodeVarintFaucet(dAtA, i, uint64(len(m.GranteeDid)))
 		i--
 		dAtA[i] = 0x32
 	}
@@ -1180,8 +1499,9 @@ func (m *GrantAllowanceRequest) Size() (n int) {
 	}
 	l = m.AmountLimit.Size()
 	n += 1 + l + sovFaucet(uint64(l))
-	if m.Expiration != 0 {
-		n += 1 + sovFaucet(uint64(m.Expiration))
+	if m.Expiration != nil {
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration)
+		n += 1 + l + sovFaucet(uint64(l))
 	}
 	return n
 }
@@ -1217,8 +1537,66 @@ func (m *GrantAllowanceResponse) Size() (n int) {
 	}
 	l = m.AmountLimit.Size()
 	n += 1 + l + sovFaucet(uint64(l))
-	if m.Expiration != 0 {
-		n += 1 + sovFaucet(uint64(m.Expiration))
+	if m.Expiration != nil {
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration)
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	return n
+}
+
+func (m *GrantDIDAllowanceRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Did)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = m.AmountLimit.Size()
+	n += 1 + l + sovFaucet(uint64(l))
+	if m.Expiration != nil {
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration)
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	return n
+}
+
+func (m *GrantDIDAllowanceResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.Txhash)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	if m.Code != 0 {
+		n += 1 + sovFaucet(uint64(m.Code))
+	}
+	l = len(m.RawLog)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.Granter)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = len(m.GranteeDid)
+	if l > 0 {
+		n += 1 + l + sovFaucet(uint64(l))
+	}
+	l = m.AmountLimit.Size()
+	n += 1 + l + sovFaucet(uint64(l))
+	if m.Expiration != nil {
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Expiration)
+		n += 1 + l + sovFaucet(uint64(l))
 	}
 	return n
 }
@@ -2217,10 +2595,10 @@ func (m *GrantAllowanceRequest) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
 			}
-			m.Expiration = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFaucet
@@ -2230,11 +2608,28 @@ func (m *GrantAllowanceRequest) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Expiration |= int64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Expiration == nil {
+				m.Expiration = new(time.Time)
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Expiration, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipFaucet(dAtA[iNdEx:])
@@ -2498,10 +2893,10 @@ func (m *GrantAllowanceResponse) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 8:
-			if wireType != 0 {
+			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
 			}
-			m.Expiration = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowFaucet
@@ -2511,11 +2906,477 @@ func (m *GrantAllowanceResponse) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Expiration |= int64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Expiration == nil {
+				m.Expiration = new(time.Time)
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Expiration, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFaucet(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GrantDIDAllowanceRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFaucet
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GrantDIDAllowanceRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GrantDIDAllowanceRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Did", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Did = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountLimit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Expiration == nil {
+				m.Expiration = new(time.Time)
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Expiration, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipFaucet(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GrantDIDAllowanceResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowFaucet
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GrantDIDAllowanceResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GrantDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Txhash", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Txhash = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+			}
+			m.Code = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Code |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RawLog", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RawLog = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Granter", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Granter = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GranteeDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.GranteeDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AmountLimit", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AmountLimit.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Expiration", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowFaucet
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthFaucet
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Expiration == nil {
+				m.Expiration = new(time.Time)
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Expiration, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipFaucet(dAtA[iNdEx:])

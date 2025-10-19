@@ -20,7 +20,6 @@ func payloadSpec(params types.Params, currentHeight uint64, payload *types.Signe
 		return fmt.Errorf("%v: current %v limit %v", ErrCommandExpired, currentHeight, maxHeight)
 	}
 
-	// TODO check payload id is in cache
 	return nil
 }
 

@@ -2,6 +2,7 @@ package ante
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
@@ -185,7 +186,8 @@ func (cdfd CustomDeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.T
 		if cdfd.feegrantKeeper == nil {
 			return sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
 		} else if !bytes.Equal(feeGranterAddr, feePayer) {
-			err := cdfd.feegrantKeeper.UseGrantedFees(ctx, feeGranterAddr, feePayer, fees, sdkTx.GetMsgs())
+			// Use DID-based feegrant if JWS extension provided, use standard feegrant otherwise
+			err := cdfd.handleFeegrant(ctx, feeGranterAddr, feePayer, fees, sdkTx.GetMsgs())
 			if err != nil {
 				return errorsmod.Wrapf(err, "%s does not allow to pay fees for %s", feeGranter, feePayer)
 			}
@@ -215,6 +217,29 @@ func (cdfd CustomDeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.T
 	return nil
 }
 
+// handleFeegrant routes to the appropriate feegrant method based on DID availability.
+// If a verified DID was extracted from JWS extension, uses DID-based feegrant.
+// Otherwise, uses standard address-based feegrant.
+func (cdfd CustomDeductFeeDecorator) handleFeegrant(
+	ctx sdk.Context,
+	granter, grantee sdk.AccAddress,
+	fees sdk.Coins,
+	msgs []sdk.Msg,
+) error {
+	// Check if DID was extracted from verified JWS extension
+	extractedDID := getExtractedDIDFromContext(ctx)
+	if extractedDID != "" {
+		// User provided verified DID via JWS extension - use DID-based feegrant
+		if didKeeper, ok := cdfd.feegrantKeeper.(interface {
+			UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) error
+		}); ok {
+			return didKeeper.UseGrantedFeesByDID(ctx, granter, extractedDID, fees, msgs)
+		}
+	}
+	// No DID available or DID-based feegrant not supported - use standard feegrant
+	return cdfd.feegrantKeeper.UseGrantedFees(ctx, granter, grantee, fees, msgs)
+}
+
 // deductFees deducts fees from the given account.
 func deductFees(bankKeeper types.BankKeeper, ctx sdk.Context, acc sdk.AccountI, fees sdk.Coins) error {
 	if !fees.IsValid() {
@@ -223,7 +248,7 @@ func deductFees(bankKeeper types.BankKeeper, ctx sdk.Context, acc sdk.AccountI, 
 
 	err := bankKeeper.SendCoinsFromAccountToModule(ctx, acc.GetAddress(), types.FeeCollectorName, fees)
 	if err != nil {
-		return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, err.Error())
+		return errorsmod.Wrap(sdkerrors.ErrInsufficientFunds, err.Error())
 	}
 
 	return nil

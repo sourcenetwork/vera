@@ -19,8 +19,6 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	// this line is used by starport scaffolding # 1
-
 	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/client/cli"
@@ -205,6 +203,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	IcaKeeper     types.ICAKeeper
 }
 
 type ModuleOutputs struct {
@@ -229,6 +228,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		// set cap keeper as nil it is initialized
 		// after depinject is finished executing
 		nil,
+		in.IcaKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,

@@ -9,4 +9,5 @@ var (
 	ErrCommandExpired          = errors.New("PolicyCmdPayload expiration height is stale")
 	ErrBuilderMissingArgument  = errors.New("missing argument")
 	ErrSignerRequired          = errors.New("no signer set for builder")
+	ErrPayloadAlreadyProcessed = errors.New("PolicyCmdPayload already processed")
 )

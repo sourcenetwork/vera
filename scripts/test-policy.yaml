@@ -1,0 +1,14 @@
+name: Bulletin Policy
+description: Base policy that defines permissions for bulletin namespaces
+resources:
+  namespace:
+    relations:
+      owner:
+        types:
+          - actor
+      collaborator:
+        types: 
+          - actor
+    permissions:
+      create_post:
+        expr: owner + collaborator

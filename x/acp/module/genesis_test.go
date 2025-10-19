@@ -19,6 +19,7 @@ func TestGenesis(t *testing.T) {
 	acp.InitGenesis(ctx, &k, genesisState)
 	got := acp.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
+	require.Equal(t, genesisState.Params, got.Params)
 
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)

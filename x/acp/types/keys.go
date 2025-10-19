@@ -18,12 +18,11 @@ const (
 
 	// AmendmentEventKeyPrefix defines a key prefix for Amendment Events
 	AmendmentEventKeyPrefix = "amendment_event/"
+
+	// SignedPolicyCmdSeenKeyPrefix defines a key prefix for seen signed policy command payloads
+	SignedPolicyCmdSeenKeyPrefix = "spc_seen/"
 )
 
 var (
 	ParamsKey = []byte("p_acp")
 )
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}

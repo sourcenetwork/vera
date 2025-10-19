@@ -41,3 +41,8 @@ const FaucetStoreKey = "faucet"
 type AppParamsGenesis struct {
 	AllowZeroFeeTxs bool `json:"allow_zero_fee_txs"`
 }
+
+// FaucetConfig defines the configuration for the faucet service.
+type FaucetConfig struct {
+	EnableFaucet bool `mapstructure:"enable_faucet"`
+}

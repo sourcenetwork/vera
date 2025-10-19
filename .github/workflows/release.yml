@@ -12,7 +12,10 @@
 #
 # The workflow will not run if there is no tag pushed with a "v" prefix and no change pushed to your 
 # default branch.
-on: push
+on:
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   might_release:
@@ -23,24 +26,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-        
-      - name: Prepare Release Variables 
+
+      - name: Prepare Release Variables
         id: vars
         uses: ignite/cli/actions/release/vars@main
 
-      - name: Run Tests and Generate Coverage
-        run: |
-          go test -coverpkg=all ./... -coverprofile=coverage.txt
-
-      - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.txt
-          fail_ci_if_error: true
-          verbose: true
-
-      - name: Issue Release Assets 
+      - name: Issue Release Assets
         uses: ignite/cli/actions/cli@main
         if: ${{ steps.vars.outputs.should_release == 'true' }}
         env:
@@ -63,6 +54,6 @@ jobs:
         with:
           tag_name: ${{ steps.vars.outputs.tag_name }}
           files: release/*
-          prerelease: true 
+          prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
