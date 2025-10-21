@@ -23,7 +23,7 @@ import (
 func createCustomDecoratorWithMockDIDKeeper(t *testing.T, s *AnteTestSuite) (*CustomDeductFeeDecorator, *test.MockDIDFeegrantKeeper) {
 	ctrl := gomock.NewController(t)
 	mockKeeper := test.NewMockDIDFeegrantKeeper(ctrl)
-	decorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockKeeper, nil, s.authStoreKey)
+	decorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockKeeper, nil, nil)
 	return &decorator, mockKeeper
 }
 
@@ -31,7 +31,7 @@ func TestCustomDeductFeeDecorator_CheckTx_ZeroGas(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -61,7 +61,7 @@ func TestCustomDeductFeeDecorator_CheckTx_InsufficientFee(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -92,7 +92,7 @@ func TestCustomDeductFeeDecorator_CheckTx_ValidFee(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -129,7 +129,7 @@ func TestCustomDeductFeeDecorator_DeliverTx_FeeGranter(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(customDecorator)
 
 	accs := s.CreateTestAccounts(2)
@@ -168,7 +168,7 @@ func TestCustomDeductFeeDecorator_DeliverTx(t *testing.T) {
 	s := SetupTestSuite(t, false)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, nil, nil, s.authStoreKey)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, nil, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)
@@ -212,7 +212,7 @@ func TestCustomDeductFeeDecorator_OpenDenomFees(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)
@@ -278,7 +278,7 @@ func TestCustomDeductFeeDecorator_CreditDenomFees(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	cdfd := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 	antehandler := sdk.ChainAnteDecorators(cdfd)
 
 	accs := s.CreateTestAccounts(1)
@@ -348,91 +348,91 @@ func TestCustomDeductFeeDecorator_HandleFeegrant_WithDID(t *testing.T) {
 
 	accs := s.CreateTestAccounts(2)
 	granter := accs[0].acc.GetAddress()
-	grantee := accs[1].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
 	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
-	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
 	testDID := "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"
 
 	// Set DID in context to simulate extraction from JWS extension
-	// Use the helper function to ensure proper context key usage
-	ctx := s.ctx.WithValue(ExtractedDIDContextKey, testDID)
+	ctx := s.ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	// Verify DID was properly set in context
 	extractedDID := getExtractedDIDFromContext(ctx)
 	require.Equal(t, testDID, extractedDID, "DID should be properly set in context")
 
 	// Expect DID-based feegrant to be called
-	mockFeegrantKeeper.EXPECT().UseGrantedFeesByDID(ctx, granter, testDID, fees, msgs).Return(nil)
+	mockFeegrantKeeper.EXPECT().UseFirstAvailableDIDGrant(ctx, testDID, fees, msgs).Return(granter, nil)
 
-	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	deductFrom, err := customDecorator.handleFeegrant(ctx, granter.Bytes(), feePayer, fees, msgs)
 	require.NoError(t, err, "handleFeegrant should succeed with DID-based feegrant")
+	require.Equal(t, granter, deductFrom, "should return the granter address from UseFirstAvailableDIDGrant")
 }
 
 func TestCustomDeductFeeDecorator_HandleFeegrant_WithoutDID(t *testing.T) {
 	s := SetupTestSuite(t, true)
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 
 	accs := s.CreateTestAccounts(2)
 	granter := accs[0].acc.GetAddress()
-	grantee := accs[1].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
 	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
-	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
 
 	// No DID in context - should use standard feegrant
 	ctx := s.ctx
 
 	// Expect standard feegrant to be called
-	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, grantee, fees, msgs).Return(nil)
+	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, feePayer, fees, msgs).Return(nil)
 
-	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	deductFrom, err := customDecorator.handleFeegrant(ctx, granter.Bytes(), feePayer, fees, msgs)
 	require.NoError(t, err, "handleFeegrant should succeed with standard feegrant")
+	require.Equal(t, granter, deductFrom, "should return the granter address")
 }
 
-func TestCustomDeductFeeDecorator_HandleFeegrant_DIDBasedError(t *testing.T) {
+func TestCustomDeductFeeDecorator_HandleFeegrant_DIDBasedFallback(t *testing.T) {
 	s := SetupTestSuite(t, true)
 
 	// Create decorator with mock DID keeper
 	customDecorator, mockFeegrantKeeper := createCustomDecoratorWithMockDIDKeeper(t, s)
 
 	accs := s.CreateTestAccounts(2)
-	granter := accs[0].acc.GetAddress()
-	grantee := accs[1].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
 	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
-	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
 	testDID := "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"
 
 	// Set DID in context
-	ctx := s.ctx.WithValue(contextKey("extracted_did"), testDID)
+	ctx := s.ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	// Expect DID-based feegrant to return error
-	expectedErr := sdkerrors.ErrUnauthorized.Wrap("insufficient allowance")
-	mockFeegrantKeeper.EXPECT().UseGrantedFeesByDID(ctx, granter, testDID, fees, msgs).Return(expectedErr)
+	// When DID-based feegrant fails (e.g., no grant found), it should fall back to feePayer
+	expectedErr := sdkerrors.ErrNotFound.Wrap("no usable fee-grant found for DID")
+	mockFeegrantKeeper.EXPECT().UseFirstAvailableDIDGrant(ctx, testDID, fees, msgs).Return(nil, expectedErr)
 
-	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
-	require.Error(t, err, "handleFeegrant should return error from DID-based feegrant")
-	require.Equal(t, expectedErr, err)
+	deductFrom, err := customDecorator.handleFeegrant(ctx, nil, feePayer, fees, msgs)
+	require.NoError(t, err, "handleFeegrant should fall back to feePayer when DID grant not found")
+	require.Equal(t, feePayer, deductFrom, "should return feePayer when DID grant fails and no feeGranter specified")
 }
 
 func TestCustomDeductFeeDecorator_HandleFeegrant_StandardError(t *testing.T) {
 	s := SetupTestSuite(t, true)
 
-	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	customDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 
 	accs := s.CreateTestAccounts(2)
 	granter := accs[0].acc.GetAddress()
-	grantee := accs[1].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
 	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
-	msgs := []sdk.Msg{testdata.NewTestMsg(grantee)}
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
 
 	// No DID in context
 	ctx := s.ctx
 
 	// Expect standard feegrant to return error
 	expectedErr := sdkerrors.ErrUnauthorized.Wrap("fee allowance not found")
-	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, grantee, fees, msgs).Return(expectedErr)
+	s.feeGrantKeeper.EXPECT().UseGrantedFees(ctx, granter, feePayer, fees, msgs).Return(expectedErr)
 
-	err := customDecorator.handleFeegrant(ctx, granter, grantee, fees, msgs)
+	_, err := customDecorator.handleFeegrant(ctx, granter.Bytes(), feePayer, fees, msgs)
 	require.Error(t, err, "handleFeegrant should return error from standard feegrant")
-	require.Equal(t, expectedErr, err)
+	require.Contains(t, err.Error(), "fee allowance not found")
 }
