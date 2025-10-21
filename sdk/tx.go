@@ -53,7 +53,7 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 		feeTokenDenom: appparams.DefaultBondDenom,
 		feeAmt:        200,
 		gasLimit:      200000,
-		gasAdjustment: 1.2,
+		gasAdjustment: 1.5,
 	}
 
 	for _, opt := range opts {

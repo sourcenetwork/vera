@@ -71,7 +71,7 @@ import (
 	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
-	icamodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/ica/module"
+	hubmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
 	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -79,8 +79,8 @@ import (
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	_ "github.com/sourcenetwork/sourcehub/x/ica/module"
-	icamoduletypes "github.com/sourcenetwork/sourcehub/x/ica/types"
+	_ "github.com/sourcenetwork/sourcehub/x/hub/module"
+	hubmoduletypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -118,7 +118,7 @@ var (
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
-		icamoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
@@ -145,7 +145,7 @@ var (
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
-		icamoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
@@ -166,7 +166,7 @@ var (
 		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
-		icamoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
@@ -320,8 +320,8 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
-				Name:   icamoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&icamodulev1.Module{}),
+				Name:   hubmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&hubmodulev1.Module{}),
 			},
 			{
 				Name:   acptypes.ModuleName,
