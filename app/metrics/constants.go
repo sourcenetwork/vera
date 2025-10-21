@@ -46,7 +46,7 @@ const (
 	SubscriptionAmount     = "subscription_amount"
 	SubscriptionExpiration = "subscription_expiration"
 	SubscriptionPeriod     = "subscription_period"
-	User                   = "user"
+	UserDid                = "user_did"
 	Validator              = "validator"
 
 	// tier methods
