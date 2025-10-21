@@ -167,7 +167,8 @@ func (suite *TierIntegrationTestSuite) TestRemoveDeveloper() {
 
 func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 	suite.T().Run("Valid user subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -189,7 +190,7 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -198,16 +199,17 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, developer.String(), sub.Developer)
-		require.Equal(t, user.String(), sub.User)
+		require.Equal(t, userDid, sub.UserDid)
 		require.Equal(t, amount, sub.CreditAmount)
 		require.Equal(t, uint64(3600), sub.Period)
 	})
 
 	suite.T().Run("Zero amount should be rejected by validation", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -219,7 +221,7 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -230,7 +232,8 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 	})
 
 	suite.T().Run("Cannot add duplicate subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -252,7 +255,7 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -265,37 +268,14 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		require.ErrorContains(t, err, "already subscribed")
 	})
 
-	suite.T().Run("Developer and user cannot be the same", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			User:      developer.String(),
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "cannot be the same address")
-	})
-
 	suite.T().Run("Non-existent developer", func(t *testing.T) {
 		developer := NextDeveloper(suite.T(), &suite.keeper, suite.ctx)
-		user := NextUser(suite.T(), &suite.keeper, suite.ctx)
+		userDid := NextUserDid()
 
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -306,7 +286,8 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 	})
 
 	suite.T().Run("Invalid credit denomination", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -318,7 +299,7 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 		amount := sdk.NewCoin("invalid_denom", math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -331,7 +312,8 @@ func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
 
 func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
 	suite.T().Run("Update existing subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -353,7 +335,7 @@ func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -363,7 +345,7 @@ func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
 		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
 		updateMsg := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    newAmount,
 			Period:    7200,
 		}
@@ -372,19 +354,20 @@ func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, newAmount, sub.CreditAmount)
 		require.Equal(t, uint64(7200), sub.Period)
 	})
 
 	suite.T().Run("Update non-existent subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		updateMsg := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -397,7 +380,8 @@ func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
 
 func (suite *TierIntegrationTestSuite) TestRemoveUserSubscription() {
 	suite.T().Run("Remove existing subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -419,7 +403,7 @@ func (suite *TierIntegrationTestSuite) TestRemoveUserSubscription() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -428,23 +412,24 @@ func (suite *TierIntegrationTestSuite) TestRemoveUserSubscription() {
 
 		removeMsg := &tiertypes.MsgRemoveUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 		}
 
 		resp, err := suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.Nil(t, sub)
 	})
 
 	suite.T().Run("Remove non-existent subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		removeMsg := &tiertypes.MsgRemoveUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 		}
 
 		_, err := suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
@@ -455,8 +440,9 @@ func (suite *TierIntegrationTestSuite) TestRemoveUserSubscription() {
 
 func (suite *TierIntegrationTestSuite) TestRemoveDeveloperWithSubscriptions() {
 	suite.T().Run("Remove developer should remove all subscriptions", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
-		user2 := NextUser(suite.T(), &suite.keeper, suite.ctx)
+		developer, _ := suite.createTestAddresses()
+		user1Did := "did:key:alice"
+		user2Did := "did:key:bob"
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -478,7 +464,7 @@ func (suite *TierIntegrationTestSuite) TestRemoveDeveloperWithSubscriptions() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg1 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   user1Did,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -487,16 +473,16 @@ func (suite *TierIntegrationTestSuite) TestRemoveDeveloperWithSubscriptions() {
 
 		addMsg2 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user2.String(),
+			UserDid:   user2Did,
 			Amount:    amount,
 			Period:    3600,
 		}
 		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg2)
 		require.NoError(t, err)
 
-		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, user1Did)
 		require.NotNil(t, sub1)
-		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2)
+		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
 		require.NotNil(t, sub2)
 
 		removeMsg := &tiertypes.MsgRemoveDeveloper{
@@ -507,9 +493,9 @@ func (suite *TierIntegrationTestSuite) TestRemoveDeveloperWithSubscriptions() {
 
 		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
 		require.Nil(t, dev)
-		sub1 = suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub1 = suite.keeper.GetUserSubscription(suite.ctx, developer, user1Did)
 		require.Nil(t, sub1)
-		sub2 = suite.keeper.GetUserSubscription(suite.ctx, developer, user2)
+		sub2 = suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
 		require.Nil(t, sub2)
 	})
 }

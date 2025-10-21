@@ -47,7 +47,8 @@ func TestFeegrantIntegrationTestSuite(t *testing.T) {
 
 func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
 	suite.T().Run("Periodic allowance should be created with subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -69,7 +70,7 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -78,10 +79,10 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetAllowance(suite.ctx, developer, user)
+		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
 		require.NoError(t, err)
 		require.NotNil(t, allowance)
 		_, ok := allowance.(*feegrant.PeriodicAllowance)
@@ -91,7 +92,8 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
 
 func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod() {
 	suite.T().Run("Zero period should use default epoch duration", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -113,7 +115,7 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod()
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    0,
 		}
@@ -122,11 +124,11 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod()
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, uint64(0), sub.Period)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetAllowance(suite.ctx, developer, user)
+		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
 		require.NoError(t, err)
 		periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
 		require.True(t, ok, "Expected PeriodicAllowance type")
@@ -138,7 +140,8 @@ func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod()
 
 func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpdate() {
 	suite.T().Run("Allowance should be updated when subscription is updated", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -160,7 +163,7 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpda
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -170,7 +173,7 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpda
 		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
 		updateMsg := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    newAmount,
 			Period:    7200,
 		}
@@ -179,12 +182,12 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpda
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, newAmount, sub.CreditAmount)
 		require.Equal(t, uint64(7200), sub.Period)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetAllowance(suite.ctx, developer, user)
+		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
 		require.NoError(t, err)
 		periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
 		require.True(t, ok, "Expected PeriodicAllowance type")
@@ -197,7 +200,8 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpda
 
 func (suite *FeegrantIntegrationTestSuite) TestAllowanceRemovalOnSubscriptionRemoval() {
 	suite.T().Run("Allowance should be removed when subscription is removed", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -219,32 +223,33 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceRemovalOnSubscriptionRem
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
 		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
 		require.NoError(t, err)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetAllowance(suite.ctx, developer, user)
+		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
 		require.NoError(t, err)
 		require.NotNil(t, allowance)
 
 		removeMsg := &tiertypes.MsgRemoveUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 		}
 		_, err = suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
 		require.NoError(t, err)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.Nil(t, sub)
 	})
 }
 
 func (suite *FeegrantIntegrationTestSuite) TestZeroAmountValidation() {
 	suite.T().Run("Zero amount should be rejected by validation", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -256,7 +261,7 @@ func (suite *FeegrantIntegrationTestSuite) TestZeroAmountValidation() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -269,8 +274,9 @@ func (suite *FeegrantIntegrationTestSuite) TestZeroAmountValidation() {
 
 func (suite *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemoval() {
 	suite.T().Run("All allowances should be cleaned up when developer is removed", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
-		user2 := NextUser(suite.T(), &suite.keeper, suite.ctx)
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
+		user2Did := "did:key:bob"
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -293,7 +299,7 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemova
 
 		addMsg1 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -302,7 +308,7 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemova
 
 		addMsg2 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user2.String(),
+			UserDid:   user2Did,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -315,9 +321,9 @@ func (suite *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemova
 		_, err = suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
 		require.NoError(t, err)
 
-		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.Nil(t, sub1)
-		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2)
+		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
 		require.Nil(t, sub2)
 	})
 }

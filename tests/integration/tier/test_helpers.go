@@ -1,6 +1,7 @@
 package tier
 
 import (
+	"fmt"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -47,6 +48,12 @@ var testDevIdx, testUserIdx int
 func ResetTestAddrIndices() {
 	testDevIdx = 0
 	testUserIdx = 0
+}
+
+func NextUserDid() string {
+	did := fmt.Sprintf("did:key:user%d", testUserIdx)
+	testUserIdx++
+	return did
 }
 
 func NextDeveloper(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) sdk.AccAddress {

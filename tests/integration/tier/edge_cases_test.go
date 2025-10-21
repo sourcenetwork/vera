@@ -44,7 +44,7 @@ func TestEdgeCasesTestSuite(t *testing.T) {
 	suite.Run(t, new(EdgeCasesTestSuite))
 }
 
-func (suite *EdgeCasesTestSuite) TestInvalidAddresses() {
+func (suite *EdgeCasesTestSuite) TestInvalidInputs() {
 	suite.T().Run("Invalid developer address in CreateDeveloper", func(t *testing.T) {
 		msg := &tiertypes.MsgCreateDeveloper{
 			Developer:       "source1invalidaddress123456789012345678901234567890",
@@ -65,7 +65,7 @@ func (suite *EdgeCasesTestSuite) TestInvalidAddresses() {
 		require.Error(t, err)
 	})
 
-	suite.T().Run("Invalid user address in AddUserSubscription", func(t *testing.T) {
+	suite.T().Run("Empty user did", func(t *testing.T) {
 		developer, _ := suite.createTestAddresses()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
@@ -78,29 +78,7 @@ func (suite *EdgeCasesTestSuite) TestInvalidAddresses() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      "source1invaliduser123456789012345678901234567890",
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		err = addMsg.ValidateBasic()
-		require.Error(t, err)
-	})
-
-	suite.T().Run("Empty user address", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			User:      "",
+			UserDid:   "",
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -112,7 +90,8 @@ func (suite *EdgeCasesTestSuite) TestInvalidAddresses() {
 
 func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 	suite.T().Run("Maximum amount subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -136,7 +115,7 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, maxBalance)
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -145,13 +124,14 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, amount, sub.CreditAmount)
 	})
 
 	suite.T().Run("Maximum period value", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -174,7 +154,7 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 		maxPeriod := uint64(365 * 24 * 3600)
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    maxPeriod,
 		}
@@ -183,13 +163,14 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, maxPeriod, sub.Period)
 	})
 
 	suite.T().Run("Negative amount should be prevented by validation", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -201,7 +182,7 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 		amount := sdk.Coin{Denom: appparams.MicroCreditDenom, Amount: math.NewInt(-1000)}
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -213,7 +194,8 @@ func (suite *EdgeCasesTestSuite) TestBoundaryValues() {
 
 func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 	suite.T().Run("Multiple subscriptions for same user", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -235,7 +217,7 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 		amount1 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg1 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount1,
 			Period:    3600,
 		}
@@ -245,7 +227,7 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 		amount2 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
 		addMsg2 := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount2,
 			Period:    7200,
 		}
@@ -255,7 +237,8 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 	})
 
 	suite.T().Run("Update then remove subscription", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -277,7 +260,7 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -287,7 +270,7 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
 		updateMsg := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    newAmount,
 			Period:    7200,
 		}
@@ -296,12 +279,12 @@ func (suite *EdgeCasesTestSuite) TestConcurrentOperations() {
 
 		removeMsg := &tiertypes.MsgRemoveUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 		}
 		_, err = suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
 		require.NoError(t, err)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.Nil(t, sub)
 	})
 }
@@ -334,10 +317,15 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 			NextUser(suite.T(), &suite.keeper, suite.ctx),
 		}
 
-		for _, u := range users {
+		userDids := []string{
+			NextUserDid(),
+			NextUserDid(),
+		}
+
+		for i, _ := range users {
 			addMsg := &tiertypes.MsgAddUserSubscription{
 				Developer: developer.String(),
-				User:      u.String(),
+				UserDid:   userDids[i],
 				Amount:    amount,
 				Period:    3600,
 			}
@@ -345,8 +333,8 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 			require.NoError(t, err)
 		}
 
-		for _, u := range users {
-			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, u)
+		for _, did := range userDids {
+			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, did)
 			require.NotNil(t, sub)
 		}
 
@@ -359,14 +347,15 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
 		require.Nil(t, dev)
 
-		for _, u := range users {
-			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, u)
+		for _, did := range userDids {
+			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, did)
 			require.Nil(t, sub)
 		}
 	})
 
 	suite.T().Run("Subscription amounts and totals are consistent", func(t *testing.T) {
-		developer, user := suite.createTestAddresses()
+		developer, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -389,14 +378,14 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, subscriptionAmount)
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
 		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
 		require.NoError(t, err)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, subscriptionAmount, sub.CreditAmount.Amount)
 
@@ -404,14 +393,14 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, newSubscriptionAmount)
 		updateMsg := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    newAmount,
 			Period:    3600,
 		}
 		_, err = suite.msgServer.UpdateUserSubscription(suite.ctx, updateMsg)
 		require.NoError(t, err)
 
-		sub = suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub = suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, newSubscriptionAmount, sub.CreditAmount.Amount)
 
@@ -419,14 +408,14 @@ func (suite *EdgeCasesTestSuite) TestStateConsistency() {
 		smallerCoin := sdk.NewCoin(appparams.MicroCreditDenom, smallerAmount)
 		updateMsg2 := &tiertypes.MsgUpdateUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    smallerCoin,
 			Period:    3600,
 		}
 		_, err = suite.msgServer.UpdateUserSubscription(suite.ctx, updateMsg2)
 		require.NoError(t, err)
 
-		sub = suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub = suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, smallerAmount, sub.CreditAmount.Amount)
 	})
@@ -455,14 +444,16 @@ func (suite *EdgeCasesTestSuite) TestResourceLimits() {
 
 		numUsers := 2
 		users := make([]sdk.AccAddress, numUsers)
+		userDids := make([]string, numUsers)
 		for i := 0; i < numUsers; i++ {
 			userAddr := NextUser(suite.T(), &suite.keeper, suite.ctx)
 			users[i] = userAddr
+			userDids[i] = NextUserDid()
 
 			amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
 			addMsg := &tiertypes.MsgAddUserSubscription{
 				Developer: developer.String(),
-				User:      userAddr.String(),
+				UserDid:   userDids[i],
 				Amount:    amount,
 				Period:    3600,
 			}
@@ -470,8 +461,8 @@ func (suite *EdgeCasesTestSuite) TestResourceLimits() {
 			require.NoError(t, err)
 		}
 
-		for _, userAddr := range users {
-			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userAddr)
+		for _, did := range userDids {
+			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, did)
 			require.NotNil(t, sub)
 		}
 
@@ -481,8 +472,8 @@ func (suite *EdgeCasesTestSuite) TestResourceLimits() {
 		_, err = suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
 		require.NoError(t, err)
 
-		for _, userAddr := range users {
-			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userAddr)
+		for _, did := range userDids {
+			sub := suite.keeper.GetUserSubscription(suite.ctx, developer, did)
 			require.Nil(t, sub)
 		}
 	})

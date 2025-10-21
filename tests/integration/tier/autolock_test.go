@@ -49,7 +49,8 @@ func TestAutoLockIntegrationTestSuite(t *testing.T) {
 
 func (suite *AutoLockIntegrationTestSuite) TestAutoLockDisabled() {
 	suite.T().Run("Auto-lock disabled - insufficient credits should fail", func(t *testing.T) {
-		developer, user, _ := suite.createTestAddresses()
+		developer, _, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -70,7 +71,7 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockDisabled() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -83,7 +84,8 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockDisabled() {
 
 func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabled() {
 	suite.T().Run("Auto-lock enabled - should succeed with lockup", func(t *testing.T) {
-		developer, user, _ := suite.createTestAddresses()
+		developer, _, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		createMsg := &tiertypes.MsgCreateDeveloper{
 			Developer:       developer.String(),
@@ -102,7 +104,7 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabled() {
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -111,7 +113,7 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabled() {
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, amount, sub.CreditAmount)
 	})
@@ -119,7 +121,8 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabled() {
 
 func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabledWithSufficientCredits() {
 	suite.T().Run("Auto-lock enabled but sufficient credits - should not trigger auto-lock", func(t *testing.T) {
-		developer, user, _ := suite.createTestAddresses()
+		developer, _, _ := suite.createTestAddresses()
+		userDid := NextUserDid()
 
 		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2000))
 
@@ -141,7 +144,7 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabledWithSufficientCred
 		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 		addMsg := &tiertypes.MsgAddUserSubscription{
 			Developer: developer.String(),
-			User:      user.String(),
+			UserDid:   userDid,
 			Amount:    amount,
 			Period:    3600,
 		}
@@ -150,7 +153,7 @@ func (suite *AutoLockIntegrationTestSuite) TestAutoLockEnabledWithSufficientCred
 		require.NoError(t, err)
 		require.NotNil(t, resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, user)
+		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
 		require.NotNil(t, sub)
 		require.Equal(t, amount, sub.CreditAmount)
 	})
