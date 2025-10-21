@@ -582,7 +582,114 @@ func (mr *MockEpochsKeeperMockRecorder) SetEpochInfo(ctx, info interface{}) *gom
 	)
 }
 
-// Mock DID feegrant keeper that implements both standard and DID-based feegrant functionality
+// Mock feegrant keeper
+type MockFeegrantKeeper struct {
+	ctrl     *gomock.Controller
+	recorder *MockFeegrantKeeperRecorder
+}
+
+type MockFeegrantKeeperRecorder struct {
+	mock *MockFeegrantKeeper
+}
+
+func NewMockFeegrantKeeper(ctrl *gomock.Controller) *MockFeegrantKeeper {
+	mock := &MockFeegrantKeeper{ctrl: ctrl}
+	mock.recorder = &MockFeegrantKeeperRecorder{mock}
+	return mock
+}
+
+func (m *MockFeegrantKeeper) EXPECT() *MockFeegrantKeeperRecorder {
+	return m.recorder
+}
+
+func (m *MockFeegrantKeeper) GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllowance", ctx, granter, grantee)
+	ret0, _ := ret[0].(feegrant.FeeAllowanceI)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockFeegrantKeeperRecorder) GetAllowance(ctx, granter, grantee interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GetAllowance), ctx, granter, grantee)
+}
+
+func (m *MockFeegrantKeeper) GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GrantAllowance", ctx, granter, grantee, allowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) GrantAllowance(ctx, granter, grantee, allowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GrantAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GrantAllowance), ctx, granter, grantee, allowance)
+}
+
+func (m *MockFeegrantKeeper) UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateAllowance", ctx, granter, grantee, feeAllowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) UpdateAllowance(ctx, granter, grantee, feeAllowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).UpdateAllowance), ctx, granter, grantee, feeAllowance)
+}
+
+// DID-based feegrant methods
+func (m *MockFeegrantKeeper) GrantDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, allowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GrantDIDAllowance", ctx, granter, granteeDID, allowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) GrantDIDAllowance(ctx, granter, granteeDID, allowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GrantDIDAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GrantDIDAllowance), ctx, granter, granteeDID, allowance)
+}
+
+func (m *MockFeegrantKeeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, feeAllowance feegrant.FeeAllowanceI) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDIDAllowance", ctx, granter, granteeDID, feeAllowance)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) UpdateDIDAllowance(ctx, granter, granteeDID, feeAllowance interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDIDAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).UpdateDIDAllowance), ctx, granter, granteeDID, feeAllowance)
+}
+
+func (m *MockFeegrantKeeper) ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExpireDIDAllowance", ctx, granter, granteeDID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (mr *MockFeegrantKeeperRecorder) ExpireDIDAllowance(ctx, granter, granteeDID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExpireDIDAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).ExpireDIDAllowance), ctx, granter, granteeDID)
+}
+
+func (m *MockFeegrantKeeper) GetDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) (feegrant.FeeAllowanceI, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDIDAllowance", ctx, granter, granteeDID)
+	ret0, _ := ret[0].(feegrant.FeeAllowanceI)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockFeegrantKeeperRecorder) GetDIDAllowance(ctx, granter, granteeDID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDIDAllowance", reflect.TypeOf((*MockFeegrantKeeper)(nil).GetDIDAllowance), ctx, granter, granteeDID)
+}
+
+// Mock DID feegrant keeper
 type MockDIDFeegrantKeeper struct {
 	ctrl     *gomock.Controller
 	recorder *MockDIDFeegrantKeeperMockRecorder
@@ -626,6 +733,20 @@ func (m *MockDIDFeegrantKeeper) UseGrantedFeesByDID(ctx context.Context, granter
 func (mr *MockDIDFeegrantKeeperMockRecorder) UseGrantedFeesByDID(ctx, granter, granteeDID, fee, msgs interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseGrantedFeesByDID", reflect.TypeOf((*MockDIDFeegrantKeeper)(nil).UseGrantedFeesByDID), ctx, granter, granteeDID, fee, msgs)
+}
+
+// UseFirstAvailableDIDGrant implements DID-based feegrant functionality to find and use the first available grant
+func (m *MockDIDFeegrantKeeper) UseFirstAvailableDIDGrant(ctx context.Context, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) (sdk.AccAddress, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UseFirstAvailableDIDGrant", ctx, granteeDID, fee, msgs)
+	ret0, _ := ret[0].(sdk.AccAddress)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+func (mr *MockDIDFeegrantKeeperMockRecorder) UseFirstAvailableDIDGrant(ctx, granteeDID, fee, msgs interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseFirstAvailableDIDGrant", reflect.TypeOf((*MockDIDFeegrantKeeper)(nil).UseFirstAvailableDIDGrant), ctx, granteeDID, fee, msgs)
 }
 
 // GetDIDAllowance implements DID-based feegrant functionality
