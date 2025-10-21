@@ -17,8 +17,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/ica/keeper"
-	"github.com/sourcenetwork/sourcehub/x/ica/types"
+	"github.com/sourcenetwork/sourcehub/x/hub/keeper"
+	"github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
 func IcaKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
