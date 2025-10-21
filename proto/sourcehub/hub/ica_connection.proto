@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package sourcehub.ica;
+package sourcehub.hub;
 
-option go_package = "github.com/sourcenetwork/sourcehub/x/ica/types";
+option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
 
 // ICAConnection represents an interchain account connection between a controller and host chain.
 message ICAConnection {
