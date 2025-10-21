@@ -127,12 +127,14 @@ func (m *msgServer) RemoveDeveloper(ctx context.Context, msg *types.MsgRemoveDev
 	return &types.MsgRemoveDeveloperResponse{}, nil
 }
 
-func (m *msgServer) AddUserSubscription(ctx context.Context, msg *types.MsgAddUserSubscription) (*types.MsgAddUserSubscriptionResponse, error) {
+func (m *msgServer) AddUserSubscription(
+	ctx context.Context,
+	msg *types.MsgAddUserSubscription,
+) (*types.MsgAddUserSubscriptionResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
-	userAddr := sdk.MustAccAddressFromBech32(msg.User)
 
-	err := m.Keeper.AddUserSubscription(ctx, developerAddr, userAddr, &msg.Amount, msg.Period)
+	err := m.Keeper.AddUserSubscription(ctx, developerAddr, msg.UserDid, &msg.Amount, msg.Period)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "add subscription")
 	}
@@ -140,12 +142,14 @@ func (m *msgServer) AddUserSubscription(ctx context.Context, msg *types.MsgAddUs
 	return &types.MsgAddUserSubscriptionResponse{}, nil
 }
 
-func (m *msgServer) UpdateUserSubscription(ctx context.Context, msg *types.MsgUpdateUserSubscription) (*types.MsgUpdateUserSubscriptionResponse, error) {
+func (m *msgServer) UpdateUserSubscription(
+	ctx context.Context,
+	msg *types.MsgUpdateUserSubscription,
+) (*types.MsgUpdateUserSubscriptionResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
-	userAddr := sdk.MustAccAddressFromBech32(msg.User)
 
-	err := m.Keeper.UpdateUserSubscription(ctx, developerAddr, userAddr, &msg.Amount, msg.Period)
+	err := m.Keeper.UpdateUserSubscription(ctx, developerAddr, msg.UserDid, &msg.Amount, msg.Period)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "update user subscription")
 	}
@@ -153,12 +157,14 @@ func (m *msgServer) UpdateUserSubscription(ctx context.Context, msg *types.MsgUp
 	return &types.MsgUpdateUserSubscriptionResponse{}, nil
 }
 
-func (m *msgServer) RemoveUserSubscription(ctx context.Context, msg *types.MsgRemoveUserSubscription) (*types.MsgRemoveUserSubscriptionResponse, error) {
+func (m *msgServer) RemoveUserSubscription(
+	ctx context.Context,
+	msg *types.MsgRemoveUserSubscription,
+) (*types.MsgRemoveUserSubscriptionResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
-	userAddr := sdk.MustAccAddressFromBech32(msg.User)
 
-	err := m.Keeper.RemoveUserSubscription(ctx, developerAddr, userAddr)
+	err := m.Keeper.RemoveUserSubscription(ctx, developerAddr, msg.UserDid)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "remove user subscription")
 	}
