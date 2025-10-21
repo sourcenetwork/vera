@@ -32,7 +32,7 @@ FAUCET_ADDR=$($BIN keys show $FAUCET -a --keyring-backend test)
 $BIN keys add $VALIDATOR --keyring-backend test
 VALIDATOR_ADDR=$($BIN keys show $VALIDATOR -a --keyring-backend test)
 $BIN genesis add-genesis-account $VALIDATOR_ADDR 1000000000000000uopen # 1b open
-$BIN genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen # 100m open
+$BIN genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen,1000000000000000ucredit # 100m open and 1b ucredit
 $BIN genesis gentx $VALIDATOR 100000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 100m open
 $BIN genesis collect-gentxs
 
@@ -42,6 +42,7 @@ jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": 
 
 # Enable/disable zero-fee transactions
 jq '.app_state.app_params.allow_zero_fee_txs = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
+jq '.app_state.app_params.ignore_bearer_auth = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' "$APP_TOML"
