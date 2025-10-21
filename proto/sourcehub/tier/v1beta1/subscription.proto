@@ -21,8 +21,8 @@ message Developer {
 message UserSubscription {
   // developer is the address of the developer who registered this user
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  // user is the address of the registered user
-  string user = 2 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // user_did is the DID of the registered user
+  string user_did = 2;
   // credit_amount is the credit amount allocated to this user
   cosmos.base.v1beta1.Coin credit_amount = 3 [
     (gogoproto.nullable) = false,

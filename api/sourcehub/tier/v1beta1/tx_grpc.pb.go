@@ -60,6 +60,7 @@ type MsgClient interface {
 	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
 	UpdateUserSubscription(ctx context.Context, in *MsgUpdateUserSubscription, opts ...grpc.CallOption) (*MsgUpdateUserSubscriptionResponse, error)
 	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
 	RemoveUserSubscription(ctx context.Context, in *MsgRemoveUserSubscription, opts ...grpc.CallOption) (*MsgRemoveUserSubscriptionResponse, error)
 }
 
@@ -209,6 +210,7 @@ type MsgServer interface {
 	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
 	UpdateUserSubscription(context.Context, *MsgUpdateUserSubscription) (*MsgUpdateUserSubscriptionResponse, error)
 	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
 	RemoveUserSubscription(context.Context, *MsgRemoveUserSubscription) (*MsgRemoveUserSubscriptionResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
