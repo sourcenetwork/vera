@@ -38,7 +38,7 @@ type (
 
 		accountKeeper types.AccountKeeper
 		capKeeper     *capabilitykeeper.ScopedKeeper
-		icaKeeper     types.ICAKeeper
+		hubKeeper     types.ICAKeeper
 	}
 )
 
@@ -49,7 +49,7 @@ func NewKeeper(
 	authority string,
 	accountKeeper types.AccountKeeper,
 	capKeeper *capabilitykeeper.ScopedKeeper,
-	icaKeeper types.ICAKeeper,
+	hubKeeper types.ICAKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -62,7 +62,7 @@ func NewKeeper(
 		logger:        logger,
 		accountKeeper: accountKeeper,
 		capKeeper:     capKeeper,
-		icaKeeper:     icaKeeper,
+		hubKeeper:     hubKeeper,
 	}
 }
 

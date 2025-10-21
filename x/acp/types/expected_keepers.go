@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	icatypes "github.com/sourcenetwork/sourcehub/x/ica/types"
+	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
 // AccountKeeper defines the expected interface for the Account module.
@@ -27,6 +27,6 @@ type ParamSubspace interface {
 
 // ICAKeeper defines the expected interface for the ICA module.
 type ICAKeeper interface {
-	GetICAConnection(ctx sdk.Context, icaAddress string) (icatypes.ICAConnection, bool)
+	GetICAConnection(ctx sdk.Context, icaAddress string) (hubtypes.ICAConnection, bool)
 	SetICAConnection(ctx sdk.Context, icaAddress, controllerAddress, controllerChainID, connectionID string) error
 }
