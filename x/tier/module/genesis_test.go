@@ -88,7 +88,7 @@ func TestGenesis(t *testing.T) {
 		UserSubscriptions: []types.UserSubscription{
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				User:         "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				UserDid:      "did:key:alice",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(1000)),
 				Period:       30,
 				StartDate:    timestamp1,
@@ -96,7 +96,7 @@ func TestGenesis(t *testing.T) {
 			},
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				User:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				UserDid:      "did:key:bob",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(500)),
 				Period:       60,
 				StartDate:    timestamp3,
@@ -104,7 +104,7 @@ func TestGenesis(t *testing.T) {
 			},
 			{
 				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
-				User:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				UserDid:      "did:key:charlie",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(2000)),
 				Period:       90,
 				StartDate:    timestamp5,
@@ -144,7 +144,7 @@ func TestGenesis(t *testing.T) {
 	require.Equal(t, len(genesisState.UserSubscriptions), len(got.UserSubscriptions))
 	for i, userSubscription := range genesisState.UserSubscriptions {
 		require.Equal(t, userSubscription.Developer, got.UserSubscriptions[i].Developer)
-		require.Equal(t, userSubscription.User, got.UserSubscriptions[i].User)
+		require.Equal(t, userSubscription.UserDid, got.UserSubscriptions[i].UserDid)
 		require.Equal(t, userSubscription.CreditAmount, got.UserSubscriptions[i].CreditAmount)
 		require.Equal(t, userSubscription.Period, got.UserSubscriptions[i].Period)
 		require.Equal(t, userSubscription.StartDate.UTC(), got.UserSubscriptions[i].StartDate.UTC())
@@ -293,7 +293,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 		UserSubscriptions: []types.UserSubscription{
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				User:         "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				UserDid:      "did:key:alice",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(1000)),
 				Period:       30,
 				StartDate:    timestamp1,
@@ -301,7 +301,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 			},
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				User:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				UserDid:      "did:key:bob",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(500)),
 				Period:       60,
 				StartDate:    timestamp2,
@@ -309,7 +309,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 			},
 			{
 				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
-				User:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				UserDid:      "did:key:charlie",
 				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(2000)),
 				Period:       90,
 				StartDate:    timestamp3,
@@ -327,15 +327,15 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 	// All user subscriptions should be exported correctly
 	require.Equal(t, 3, len(got.UserSubscriptions))
 	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[0].Developer)
-	require.Equal(t, "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy", got.UserSubscriptions[0].User)
+	require.Equal(t, "did:key:alice", got.UserSubscriptions[0].UserDid)
 	require.Equal(t, int64(1000), got.UserSubscriptions[0].CreditAmount.Amount.Int64())
 	require.Equal(t, uint64(30), got.UserSubscriptions[0].Period)
 	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[1].Developer)
-	require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", got.UserSubscriptions[1].User)
+	require.Equal(t, "did:key:bob", got.UserSubscriptions[1].UserDid)
 	require.Equal(t, int64(500), got.UserSubscriptions[1].CreditAmount.Amount.Int64())
 	require.Equal(t, uint64(60), got.UserSubscriptions[1].Period)
 	require.Equal(t, "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy", got.UserSubscriptions[2].Developer)
-	require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", got.UserSubscriptions[2].User)
+	require.Equal(t, "did:key:charlie", got.UserSubscriptions[2].UserDid)
 	require.Equal(t, int64(2000), got.UserSubscriptions[2].CreditAmount.Amount.Int64())
 	require.Equal(t, uint64(90), got.UserSubscriptions[2].Period)
 

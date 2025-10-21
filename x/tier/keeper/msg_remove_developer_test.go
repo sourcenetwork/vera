@@ -109,14 +109,10 @@ func TestMsgRemoveDeveloper_WithSubscriptions(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	userDid := "did:key:alice"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -130,10 +126,10 @@ func TestMsgRemoveDeveloper_WithSubscriptions(t *testing.T) {
 	require.NoError(t, err)
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &amount, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 
 	msg := &types.MsgRemoveDeveloper{
@@ -147,7 +143,7 @@ func TestMsgRemoveDeveloper_WithSubscriptions(t *testing.T) {
 	developer := k.GetDeveloper(sdkCtx, developerAddr)
 	require.Nil(t, developer, "Developer should not exist after removal")
 
-	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.Nil(t, subscription, "User subscriptions should be removed when developer is removed")
 }
 

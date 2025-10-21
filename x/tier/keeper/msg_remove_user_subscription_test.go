@@ -21,14 +21,10 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	userDid := "did:key:alice"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -42,7 +38,7 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 	require.NoError(t, err)
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &amount, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -55,7 +51,7 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 			name: "valid remove user subscription",
 			input: &types.MsgRemoveUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 			},
 			expErr: false,
 		},
@@ -63,16 +59,7 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 			name: "invalid developer address",
 			input: &types.MsgRemoveUserSubscription{
 				Developer: "invalid-developer-address",
-				User:      validUserAddr,
-			},
-			expErr:    true,
-			expErrMsg: "delegator address",
-		},
-		{
-			name: "invalid user address",
-			input: &types.MsgRemoveUserSubscription{
-				Developer: validDeveloperAddr,
-				User:      "invalid-user-address",
+				UserDid:   userDid,
 			},
 			expErr:    true,
 			expErrMsg: "delegator address",
@@ -81,25 +68,25 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 			name: "empty developer address",
 			input: &types.MsgRemoveUserSubscription{
 				Developer: "",
-				User:      validUserAddr,
+				UserDid:   userDid,
 			},
 			expErr:    true,
 			expErrMsg: "delegator address",
 		},
 		{
-			name: "empty user address",
+			name: "empty user did",
 			input: &types.MsgRemoveUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      "",
+				UserDid:   "",
 			},
 			expErr:    true,
-			expErrMsg: "delegator address",
+			expErrMsg: "invalid DID",
 		},
 		{
 			name: "non-existent subscription",
 			input: &types.MsgRemoveUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				UserDid:   userDid,
 			},
 			expErr:    true,
 			expErrMsg: "remove user subscription",
@@ -109,9 +96,9 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.name == "valid remove user subscription" {
-				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 				if subscription == nil {
-					err := k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, 30)
+					err := k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 30)
 					require.NoError(t, err)
 				}
 			}
@@ -135,8 +122,7 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 				require.NotNil(t, resp)
 
 				developerAddr := sdk.MustAccAddressFromBech32(tc.input.Developer)
-				userAddr := sdk.MustAccAddressFromBech32(tc.input.User)
-				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 				require.Nil(t, subscription, "User subscription should not exist after removal")
 			}
 		})
@@ -150,17 +136,11 @@ func TestMsgRemoveUserSubscription_MultipleSubscriptions(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	user1Addr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-	user2Addr := "source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	user1Address := sdk.MustAccAddressFromBech32(user1Addr)
-	user2Address := sdk.MustAccAddressFromBech32(user2Addr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, user1Address)
-	keepertest.CreateAccount(t, &k, sdkCtx, user2Address)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -175,38 +155,38 @@ func TestMsgRemoveUserSubscription_MultipleSubscriptions(t *testing.T) {
 
 	amount1 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
 	amount2 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, user1Address, &amount1, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, user1Did, &amount1, 30)
 	require.NoError(t, err)
-	err = k.AddUserSubscription(sdkCtx, developerAddr, user2Address, &amount2, 60)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, user2Did, &amount2, 60)
 	require.NoError(t, err)
 
-	subscription1 := k.GetUserSubscription(sdkCtx, developerAddr, user1Address)
+	subscription1 := k.GetUserSubscription(sdkCtx, developerAddr, user1Did)
 	require.NotNil(t, subscription1)
-	subscription2 := k.GetUserSubscription(sdkCtx, developerAddr, user2Address)
+	subscription2 := k.GetUserSubscription(sdkCtx, developerAddr, user2Did)
 	require.NotNil(t, subscription2)
 
 	msg := &types.MsgRemoveUserSubscription{
 		Developer: validDeveloperAddr,
-		User:      user1Addr,
+		UserDid:   user1Did,
 	}
 
 	resp, err := ms.RemoveUserSubscription(sdkCtx, msg)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	subscription1 = k.GetUserSubscription(sdkCtx, developerAddr, user1Address)
+	subscription1 = k.GetUserSubscription(sdkCtx, developerAddr, user1Did)
 	require.Nil(t, subscription1, "User1's subscription should be removed")
-	subscription2 = k.GetUserSubscription(sdkCtx, developerAddr, user2Address)
+	subscription2 = k.GetUserSubscription(sdkCtx, developerAddr, user2Did)
 	require.NotNil(t, subscription2, "User2's subscription should still exist")
 
-	msg.User = user2Addr
+	msg.UserDid = user2Did
 	resp, err = ms.RemoveUserSubscription(sdkCtx, msg)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	subscription1 = k.GetUserSubscription(sdkCtx, developerAddr, user1Address)
+	subscription1 = k.GetUserSubscription(sdkCtx, developerAddr, user1Did)
 	require.Nil(t, subscription1, "User1's subscription should be removed")
-	subscription2 = k.GetUserSubscription(sdkCtx, developerAddr, user2Address)
+	subscription2 = k.GetUserSubscription(sdkCtx, developerAddr, user2Did)
 	require.Nil(t, subscription2, "User2's subscription should be removed")
 }
 
@@ -217,14 +197,10 @@ func TestMsgRemoveUserSubscription_AlreadyRemoved(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	userDid := "did:key:alice"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -238,15 +214,15 @@ func TestMsgRemoveUserSubscription_AlreadyRemoved(t *testing.T) {
 	require.NoError(t, err)
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &amount, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
 	require.NoError(t, err)
 
-	err = k.RemoveUserSubscription(sdkCtx, developerAddr, userAddr)
+	err = k.RemoveUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NoError(t, err)
 
 	msg := &types.MsgRemoveUserSubscription{
 		Developer: validDeveloperAddr,
-		User:      validUserAddr,
+		UserDid:   userDid,
 	}
 
 	resp, err := ms.RemoveUserSubscription(sdkCtx, msg)
@@ -263,11 +239,11 @@ func TestMsgRemoveUserSubscription_NonExistentDeveloper(t *testing.T) {
 	require.NoError(t, k.SetParams(ctx, p))
 
 	nonExistentDeveloperAddr := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+	userDid := "did:key:alice"
 
 	msg := &types.MsgRemoveUserSubscription{
 		Developer: nonExistentDeveloperAddr,
-		User:      validUserAddr,
+		UserDid:   userDid,
 	}
 
 	resp, err := ms.RemoveUserSubscription(sdkCtx, msg)

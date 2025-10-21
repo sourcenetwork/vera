@@ -426,15 +426,13 @@ func TestRemoveDeveloper(t *testing.T) {
 func TestAddUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
-	keepertest.InitializeDelegator(t, &k, ctx, userAddr, math.NewInt(5000))
 	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -446,39 +444,36 @@ func TestAddUserSubscription(t *testing.T) {
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 	period := uint64(3600)
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, period)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, developerAddr.String(), subscription.Developer)
-	require.Equal(t, userAddr.String(), subscription.User)
+	require.Equal(t, userDid, subscription.UserDid)
 	require.Equal(t, amount, subscription.CreditAmount)
 	require.Equal(t, period, subscription.Period)
 
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, period)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "already subscribed")
 
 	emptyAddr := sdk.AccAddress{}
-	err = k.AddUserSubscription(ctx, emptyAddr, userAddr, &amount, period)
+	err = k.AddUserSubscription(ctx, emptyAddr, userDid, &amount, period)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "developer address cannot be empty")
 
-	err = k.AddUserSubscription(ctx, developerAddr, emptyAddr, &amount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, "", &amount, period)
 	require.Error(t, err)
-	require.ErrorContains(t, err, "user address cannot be empty")
-
-	err = k.AddUserSubscription(ctx, developerAddr, developerAddr, &amount, period)
-	require.Error(t, err)
-	require.ErrorContains(t, err, "developer and user cannot be the same address")
+	require.ErrorContains(t, err, "user did cannot be empty")
 
 	invalidAmount := sdk.NewCoin("invalid", math.NewInt(1000))
 	newUserAddr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
 	require.NoError(t, err)
 	keepertest.CreateAccount(t, &k, ctx, newUserAddr)
+	newUserDid := "did:key:bob"
 
-	err = k.AddUserSubscription(ctx, developerAddr, newUserAddr, &invalidAmount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, newUserDid, &invalidAmount, period)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "invalid amount denomination")
 
@@ -486,8 +481,9 @@ func TestAddUserSubscription(t *testing.T) {
 	anotherUserAddr, err := sdk.AccAddressFromBech32("source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4")
 	require.NoError(t, err)
 	keepertest.CreateAccount(t, &k, ctx, anotherUserAddr)
+	anotherUserDid := "did:key:charlie"
 
-	err = k.AddUserSubscription(ctx, developerAddr, anotherUserAddr, &zeroAmount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, anotherUserDid, &zeroAmount, period)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "amount must be positive")
 }
@@ -496,15 +492,13 @@ func TestAddUserSubscription(t *testing.T) {
 func TestUpdateUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
-	keepertest.InitializeDelegator(t, &k, ctx, userAddr, math.NewInt(5000))
 	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -515,27 +509,27 @@ func TestUpdateUserSubscription(t *testing.T) {
 	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
 
 	newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
-	err = k.UpdateUserSubscription(ctx, developerAddr, userAddr, &newAmount, 7200)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &newAmount, 7200)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "is not subscribed")
 
 	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &initialAmount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &initialAmount, 3600)
 	require.NoError(t, err)
 
-	err = k.UpdateUserSubscription(ctx, developerAddr, userAddr, &newAmount, 7200)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &newAmount, 7200)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, newAmount, subscription.CreditAmount)
 	require.Equal(t, uint64(7200), subscription.Period)
 
 	lowerAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
-	err = k.UpdateUserSubscription(ctx, developerAddr, userAddr, &lowerAmount, 1800)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &lowerAmount, 1800)
 	require.NoError(t, err)
 
-	subscription = k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, lowerAmount, subscription.CreditAmount)
 	require.Equal(t, uint64(1800), subscription.Period)
@@ -545,20 +539,18 @@ func TestUpdateUserSubscription(t *testing.T) {
 func TestRemoveUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
-	keepertest.InitializeDelegator(t, &k, ctx, userAddr, math.NewInt(5000))
 	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-	err = k.RemoveUserSubscription(ctx, developerAddr, userAddr)
+	err = k.RemoveUserSubscription(ctx, developerAddr, userDid)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "is not subscribed")
 
@@ -568,16 +560,16 @@ func TestRemoveUserSubscription(t *testing.T) {
 	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 
-	err = k.RemoveUserSubscription(ctx, developerAddr, userAddr)
+	err = k.RemoveUserSubscription(ctx, developerAddr, userDid)
 	require.NoError(t, err)
 
-	subscription = k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.Nil(t, subscription)
 }
 
@@ -585,18 +577,13 @@ func TestRemoveUserSubscription(t *testing.T) {
 func TestAddUserSubscriptionAutoLock(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
-
-	keepertest.CreateAccount(t, &k, ctx, developerAddr)
-	keepertest.CreateAccount(t, &k, ctx, userAddr)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
-
 	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
 
 	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -605,20 +592,20 @@ func TestAddUserSubscriptionAutoLock(t *testing.T) {
 	require.NoError(t, err)
 
 	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "insufficient credits and auto-lock disabled")
 
 	err = k.UpdateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, &amount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, developerAddr.String(), subscription.Developer)
-	require.Equal(t, userAddr.String(), subscription.User)
+	require.Equal(t, userDid, subscription.UserDid)
 	require.Equal(t, amount, subscription.CreditAmount)
 	require.Equal(t, uint64(3600), subscription.Period)
 }
@@ -629,23 +616,21 @@ func TestAddUserSubscriptionWithoutAmount(t *testing.T) {
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	keepertest.CreateAccount(t, &k, ctx, developerAddr)
-	keepertest.CreateAccount(t, &k, ctx, userAddr)
 
 	err = k.CreateDeveloper(ctx, developerAddr, false)
 	require.NoError(t, err)
 
 	period := uint64(3600)
-	err = k.AddUserSubscription(ctx, developerAddr, userAddr, nil, period)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, nil, period)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, developerAddr.String(), subscription.Developer)
-	require.Equal(t, userAddr.String(), subscription.User)
+	require.Equal(t, userDid, subscription.UserDid)
 	require.True(t, subscription.CreditAmount.Amount.IsZero())
 	require.Equal(t, period, subscription.Period)
 }

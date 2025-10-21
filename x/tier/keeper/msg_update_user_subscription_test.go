@@ -21,14 +21,10 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	userDid := "did:key:alice"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -41,7 +37,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 	require.NoError(t, err)
 
 	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &initialAmount, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &initialAmount, 30)
 	require.NoError(t, err)
 
 	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
@@ -61,7 +57,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "valid update user subscription - change amount",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    validAmount,
 				Period:    30,
 			},
@@ -71,7 +67,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "valid update user subscription - change period",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    validAmount,
 				Period:    60,
 			},
@@ -81,7 +77,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "valid update user subscription - change both",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(300)),
 				Period:    90,
 			},
@@ -91,7 +87,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "invalid developer address",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: "invalid-developer-address",
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    validAmount,
 				Period:    30,
 			},
@@ -99,21 +95,21 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			expErrMsg: "delegator address",
 		},
 		{
-			name: "invalid user address",
+			name: "invalid user did",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      "invalid-user-address",
+				UserDid:   "",
 				Amount:    validAmount,
 				Period:    30,
 			},
 			expErr:    true,
-			expErrMsg: "delegator address",
+			expErrMsg: "invalid DID",
 		},
 		{
 			name: "zero amount",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    zeroAmount,
 				Period:    30,
 			},
@@ -124,7 +120,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "negative amount",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      validUserAddr,
+				UserDid:   userDid,
 				Amount:    negativeAmount,
 				Period:    30,
 			},
@@ -135,7 +131,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			name: "non-existent subscription",
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
-				User:      "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				UserDid:   "did:key:nonexistent",
 				Amount:    validAmount,
 				Period:    30,
 			},
@@ -165,8 +161,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 				require.NotNil(t, resp)
 
 				developerAddr := sdk.MustAccAddressFromBech32(tc.input.Developer)
-				userAddr := sdk.MustAccAddressFromBech32(tc.input.User)
-				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 				require.NotNil(t, subscription, "User subscription should exist after update")
 				require.Equal(t, tc.input.Amount, subscription.CreditAmount, "Amount should match updated value")
 				require.Equal(t, tc.input.Period, subscription.Period, "Period should match updated value")
@@ -182,14 +177,10 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
+	userDid := "did:key:alice"
+
 	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
-
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
-	userAddr := sdk.MustAccAddressFromBech32(validUserAddr)
-
-	keepertest.CreateAccount(t, &k, sdkCtx, developerAddr)
-	keepertest.CreateAccount(t, &k, sdkCtx, userAddr)
 
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
@@ -202,17 +193,17 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	require.NoError(t, err)
 
 	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userAddr, &initialAmount, 30)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &initialAmount, 30)
 	require.NoError(t, err)
 
-	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, initialAmount, subscription.CreditAmount)
 	require.Equal(t, uint64(30), subscription.Period)
 
 	msg := &types.MsgUpdateUserSubscription{
 		Developer: validDeveloperAddr,
-		User:      validUserAddr,
+		UserDid:   userDid,
 		Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)),
 		Period:    30,
 	}
@@ -221,7 +212,7 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
 	require.Equal(t, uint64(30), subscription.Period)
@@ -233,7 +224,7 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
 	require.Equal(t, uint64(60), subscription.Period)
@@ -245,7 +236,7 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 
-	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userAddr)
+	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
 	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500)), subscription.CreditAmount)
 	require.Equal(t, uint64(90), subscription.Period)
@@ -259,13 +250,13 @@ func TestMsgUpdateUserSubscription_NonExistentDeveloper(t *testing.T) {
 	require.NoError(t, k.SetParams(ctx, p))
 
 	nonExistentDeveloperAddr := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
-	validUserAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+	userDid := "did:key:alice"
 
 	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
 
 	msg := &types.MsgUpdateUserSubscription{
 		Developer: nonExistentDeveloperAddr,
-		User:      validUserAddr,
+		UserDid:   userDid,
 		Amount:    validAmount,
 		Period:    30,
 	}

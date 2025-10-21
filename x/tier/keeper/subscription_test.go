@@ -60,10 +60,9 @@ func TestGetAndSetUserSubscription(t *testing.T) {
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
+	userDid := "did:key:alice"
 
-	userSub := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	userSub := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.Nil(t, userSub)
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -71,19 +70,19 @@ func TestGetAndSetUserSubscription(t *testing.T) {
 	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 	expectedUserSub := &types.UserSubscription{
 		Developer:    developerAddr.String(),
-		User:         userAddr.String(),
+		UserDid:      userDid,
 		CreditAmount: creditAmount,
 		Period:       3600,
 		StartDate:    now,
 		LastRenewed:  now,
 	}
 
-	k.SetUserSubscription(ctx, developerAddr, userAddr, expectedUserSub)
+	k.SetUserSubscription(ctx, developerAddr, userDid, expectedUserSub)
 
-	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, retrievedUserSub)
 	require.Equal(t, expectedUserSub.Developer, retrievedUserSub.Developer)
-	require.Equal(t, expectedUserSub.User, retrievedUserSub.User)
+	require.Equal(t, expectedUserSub.UserDid, retrievedUserSub.UserDid)
 	require.Equal(t, expectedUserSub.CreditAmount, retrievedUserSub.CreditAmount)
 	require.Equal(t, expectedUserSub.Period, retrievedUserSub.Period)
 	require.True(t, expectedUserSub.StartDate.Equal(retrievedUserSub.StartDate))
@@ -95,28 +94,27 @@ func TestRemoveUserSubscription(t *testing.T) {
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
 	userSub := &types.UserSubscription{
 		Developer:    developerAddr.String(),
-		User:         userAddr.String(),
+		UserDid:      userDid,
 		CreditAmount: creditAmount,
 		Period:       7200,
 		StartDate:    now,
 		LastRenewed:  now,
 	}
-	k.SetUserSubscription(ctx, developerAddr, userAddr, userSub)
+	k.SetUserSubscription(ctx, developerAddr, userDid, userSub)
 
-	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userAddr)
+	retrievedUserSub := k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.NotNil(t, retrievedUserSub)
 
-	k.removeUserSubscription(ctx, developerAddr, userAddr)
+	k.removeUserSubscription(ctx, developerAddr, userDid)
 
-	retrievedUserSub = k.GetUserSubscription(ctx, developerAddr, userAddr)
+	retrievedUserSub = k.GetUserSubscription(ctx, developerAddr, userDid)
 	require.Nil(t, retrievedUserSub)
 }
 
@@ -127,10 +125,8 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 	require.NoError(t, err)
 	dev2Addr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
-	user1Addr, err := sdk.AccAddressFromBech32("source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4")
-	require.NoError(t, err)
-	user2Addr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
-	require.NoError(t, err)
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
 
 	creditAmount1 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 	creditAmount2 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
@@ -139,7 +135,7 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 
 	userSub1 := &types.UserSubscription{
 		Developer:    dev1Addr.String(),
-		User:         user1Addr.String(),
+		UserDid:      user1Did,
 		CreditAmount: creditAmount1,
 		Period:       3600,
 		StartDate:    now,
@@ -148,18 +144,18 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 
 	userSub2 := &types.UserSubscription{
 		Developer:    dev2Addr.String(),
-		User:         user2Addr.String(),
+		UserDid:      user2Did,
 		CreditAmount: creditAmount2,
 		Period:       7200,
 		StartDate:    now,
 		LastRenewed:  now,
 	}
 
-	k.SetUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
-	k.SetUserSubscription(ctx, dev2Addr, user2Addr, userSub2)
+	k.SetUserSubscription(ctx, dev1Addr, user1Did, userSub1)
+	k.SetUserSubscription(ctx, dev2Addr, user2Did, userSub2)
 
 	var foundSubscriptions []types.UserSubscription
-	k.mustIterateUserSubscriptions(ctx, func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
+	k.mustIterateUserSubscriptions(ctx, func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription) {
 		foundSubscriptions = append(foundSubscriptions, userSubscription)
 	})
 
@@ -167,11 +163,11 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 
 	found1, found2 := false, false
 	for _, sub := range foundSubscriptions {
-		if sub.Developer == dev1Addr.String() && sub.User == user1Addr.String() {
+		if sub.Developer == dev1Addr.String() && sub.UserDid == user1Did {
 			found1 = true
 			require.Equal(t, creditAmount1, sub.CreditAmount)
 		}
-		if sub.Developer == dev2Addr.String() && sub.User == user2Addr.String() {
+		if sub.Developer == dev2Addr.String() && sub.UserDid == user2Did {
 			found2 = true
 			require.Equal(t, creditAmount2, sub.CreditAmount)
 		}
@@ -187,10 +183,8 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 	require.NoError(t, err)
 	dev2Addr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
 	require.NoError(t, err)
-	user1Addr, err := sdk.AccAddressFromBech32("source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4")
-	require.NoError(t, err)
-	user2Addr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
-	require.NoError(t, err)
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
 
 	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -198,7 +192,7 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 
 	userSub1 := &types.UserSubscription{
 		Developer:    dev1Addr.String(),
-		User:         user1Addr.String(),
+		UserDid:      user1Did,
 		CreditAmount: creditAmount,
 		Period:       3600,
 		StartDate:    now,
@@ -207,7 +201,7 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 
 	userSub2 := &types.UserSubscription{
 		Developer:    dev1Addr.String(),
-		User:         user2Addr.String(),
+		UserDid:      user2Did,
 		CreditAmount: creditAmount,
 		Period:       3600,
 		StartDate:    now,
@@ -216,19 +210,19 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 
 	userSub3 := &types.UserSubscription{
 		Developer:    dev2Addr.String(),
-		User:         user1Addr.String(),
+		UserDid:      user1Did,
 		CreditAmount: creditAmount,
 		Period:       3600,
 		StartDate:    now,
 		LastRenewed:  now,
 	}
 
-	k.SetUserSubscription(ctx, dev1Addr, user1Addr, userSub1)
-	k.SetUserSubscription(ctx, dev1Addr, user2Addr, userSub2)
-	k.SetUserSubscription(ctx, dev2Addr, user1Addr, userSub3)
+	k.SetUserSubscription(ctx, dev1Addr, user1Did, userSub1)
+	k.SetUserSubscription(ctx, dev1Addr, user2Did, userSub2)
+	k.SetUserSubscription(ctx, dev2Addr, user1Did, userSub3)
 
 	var foundSubscriptions []types.UserSubscription
-	k.mustIterateUserSubscriptionsForDeveloper(ctx, dev1Addr, func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
+	k.mustIterateUserSubscriptionsForDeveloper(ctx, dev1Addr, func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription) {
 		foundSubscriptions = append(foundSubscriptions, userSubscription)
 	})
 
@@ -328,13 +322,11 @@ func TestGrantPeriodicAllowance(t *testing.T) {
 
 	granterAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	granteeAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	createAccount(t, &k, ctx, granterAddr)
-	createAccount(t, &k, ctx, granteeAddr)
 
 	initializeDelegator(t, &k, ctx, granterAddr, math.NewInt(1000))
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
@@ -344,10 +336,10 @@ func TestGrantPeriodicAllowance(t *testing.T) {
 	spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100)))
 	period := time.Hour
 
-	err = k.grantPeriodicAllowance(ctx, granterAddr, granteeAddr, spendLimit, period)
+	err = k.grantPeriodicDIDAllowance(ctx, granterAddr, userDid, spendLimit, period)
 	require.NoError(t, err)
 
-	allowance, err := k.feegrantKeeper.GetAllowance(ctx, granterAddr, granteeAddr)
+	allowance, err := k.feegrantKeeper.GetDIDAllowance(ctx, granterAddr, userDid)
 	require.NoError(t, err)
 	require.NotNil(t, allowance)
 
@@ -362,52 +354,73 @@ func TestExpireAllowance(t *testing.T) {
 
 	granterAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	granteeAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	createAccount(t, &k, ctx, granterAddr)
-	createAccount(t, &k, ctx, granteeAddr)
 
 	initializeDelegator(t, &k, ctx, granterAddr, math.NewInt(1000))
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
 
-	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	now := time.Now()
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(now)
 
 	spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100)))
 	period := time.Hour
-	err = k.grantPeriodicAllowance(ctx, granterAddr, granteeAddr, spendLimit, period)
+
+	// Grant periodic allowance
+	err = k.grantPeriodicDIDAllowance(ctx, granterAddr, userDid, spendLimit, period)
 	require.NoError(t, err)
 
-	allowance, err := k.feegrantKeeper.GetAllowance(ctx, granterAddr, granteeAddr)
+	ctx = ctx.WithBlockHeight(2).WithBlockTime(now.Add(time.Minute))
+
+	// Verify it's a periodic allowance before expiration
+	allowance, err := k.feegrantKeeper.GetDIDAllowance(ctx, granterAddr, userDid)
 	require.NoError(t, err)
 	require.NotNil(t, allowance)
 
-	err = k.expireAllowance(ctx, granterAddr, granteeAddr)
+	periodic, ok := allowance.(*feegrant.PeriodicAllowance)
+	require.True(t, ok, "Expected PeriodicAllowance before expiration")
+	require.NotNil(t, periodic.PeriodReset)
+
+	oldPeriodReset := periodic.PeriodReset
+
+	// Call ExpireDIDAllowance
+	err = k.feegrantKeeper.ExpireDIDAllowance(ctx, granterAddr, userDid)
 	require.NoError(t, err)
 
-	expiredAllowance, err := k.feegrantKeeper.GetAllowance(ctx, granterAddr, granteeAddr)
+	// Fetch updated allowance
+	updatedAllowance, err := k.feegrantKeeper.GetDIDAllowance(ctx, granterAddr, userDid)
 	require.NoError(t, err)
-	require.NotNil(t, expiredAllowance)
+	require.NotNil(t, updatedAllowance)
 
-	basicAllowance, ok := expiredAllowance.(*feegrant.BasicAllowance)
-	require.True(t, ok, "Expected BasicAllowance after expiration")
-	require.NotNil(t, basicAllowance.Expiration)
+	updatedPeriodic, ok := updatedAllowance.(*feegrant.PeriodicAllowance)
+	require.True(t, ok, "Expected PeriodicAllowance after expiration")
 
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	require.True(t, basicAllowance.Expiration.Equal(sdkCtx.BlockTime()) || basicAllowance.Expiration.Before(sdkCtx.BlockTime()))
+	require.NotNil(t, updatedPeriodic.Basic.Expiration, "Expected expiration to be set in BasicAllowance")
+
+	// The expiration should match the old period reset
+	require.True(t, updatedPeriodic.Basic.Expiration.Equal(oldPeriodReset),
+		"Expected expiration to equal previous PeriodReset")
+
+	// Sanity check: expiration should be after current block time (not immediate)
+	require.True(t, updatedPeriodic.Basic.Expiration.After(ctx.BlockTime()),
+		"Expiration should be after current block time")
+
+	// Also, period and spend limits should remain unchanged
+	require.Equal(t, period, updatedPeriodic.Period)
+	require.Equal(t, spendLimit, updatedPeriodic.PeriodSpendLimit)
 }
 
 func TestCheckDeveloperCredits(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
 	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
 	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
 
 	initializeDelegator(t, &k, ctx, developerAddr, math.NewInt(1000))
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
@@ -420,13 +433,13 @@ func TestCheckDeveloperCredits(t *testing.T) {
 	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
 	userSub := &types.UserSubscription{
 		Developer:    developerAddr.String(),
-		User:         userAddr.String(),
+		UserDid:      userDid,
 		CreditAmount: creditAmount,
 		Period:       3600,
 		StartDate:    now,
 		LastRenewed:  now,
 	}
-	k.SetUserSubscription(ctx, developerAddr, userAddr, userSub)
+	k.SetUserSubscription(ctx, developerAddr, userDid, userSub)
 
 	err = k.updateDeveloperTotalGranted(ctx, developerAddr, creditAmount.Amount, true)
 	require.NoError(t, err)

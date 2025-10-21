@@ -248,15 +248,13 @@ func TestUserSubscriptionsQuery(t *testing.T) {
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
-	user1Addr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
-	require.NoError(t, err)
-	user2Addr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
-	require.NoError(t, err)
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
 
 	require.NoError(t, k.CreateDeveloper(ctx, developerAddr, true))
 
-	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user1Addr, nil, 0))
-	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user2Addr, nil, 0))
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user1Did, nil, 0))
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user2Did, nil, 0))
 
 	resp, err := k.UserSubscriptions(ctx, &types.UserSubscriptionsRequest{Developer: developerAddr.String()})
 	require.NoError(t, err)
