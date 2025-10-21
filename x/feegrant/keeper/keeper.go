@@ -535,8 +535,8 @@ func (k Keeper) getDIDGrant(ctx context.Context, granter sdk.AccAddress, grantee
 	return &didGrant, nil
 }
 
-// RevokeDIDAllowance removes an existing DID-based grant.
-func (k Keeper) RevokeDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error {
+// revokeDIDAllowance removes an existing DID-based grant.
+func (k Keeper) revokeDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error {
 	didGrant, err := k.GetDIDAllowance(ctx, granter, granteeDID)
 	if err != nil {
 		return err
@@ -571,6 +571,48 @@ func (k Keeper) RevokeDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 	return nil
 }
 
+// ExpireDIDAllowance expires existing allowance by setting the expiration date.
+func (k Keeper) ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	existingAllowance, err := k.GetDIDAllowance(ctx, granter, granteeDID)
+	if err != nil {
+		return err
+	}
+
+	var newExpiration time.Time
+
+	switch allowance := existingAllowance.(type) {
+	case *feegrant.PeriodicAllowance:
+		// expire at the end of the current period
+		newExpiration = allowance.PeriodReset
+		allowance.Basic.Expiration = &newExpiration
+
+	case *feegrant.BasicAllowance:
+		// expire immediately
+		newExpiration = sdkCtx.BlockTime()
+		allowance.Expiration = &newExpiration
+
+	default:
+		return fmt.Errorf("unsupported allowance type: %T", existingAllowance)
+	}
+
+	if err := k.UpdateDIDAllowance(ctx, granter, granteeDID, existingAllowance); err != nil {
+		return err
+	}
+
+	sdkCtx.EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeExpireDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
+			sdk.NewAttribute(feegrant.AttributeKeyExpirationTime, newExpiration.String()),
+		),
+	)
+
+	return nil
+}
+
 // UseGrantedFeesByDID will try to pay the given fee from the granter's account for a DID.
 func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) error {
 	didGrant, err := k.GetDIDAllowance(ctx, granter, granteeDID)
@@ -580,7 +622,7 @@ func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress,
 
 	remove, err := didGrant.Accept(ctx, fee, msgs)
 	if remove {
-		k.RevokeDIDAllowance(ctx, granter, granteeDID)
+		k.revokeDIDAllowance(ctx, granter, granteeDID)
 		if err != nil {
 			return err
 		}
