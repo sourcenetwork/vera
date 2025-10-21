@@ -16,12 +16,12 @@ func (k *Keeper) EditPolicy(goCtx context.Context, msg *types.MsgEditPolicy) (*t
 
 	engine := k.getACPEngine(ctx)
 
-	did, err := k.IssueDIDFromAccountAddr(ctx, msg.Creator)
+	actorID, err := k.GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("EditPolicy: %w", err)
 	}
 
-	ctx, err = utils.InjectPrincipal(ctx, did)
+	ctx, err = utils.InjectPrincipal(ctx, actorID)
 	if err != nil {
 		return nil, fmt.Errorf("EditPolicy: %w", err)
 	}

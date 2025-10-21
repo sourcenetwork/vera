@@ -12,7 +12,7 @@ import (
 func (k *Keeper) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	actorID, err := k.IssueDIDFromAccountAddr(goCtx, msg.Creator)
+	actorID, err := k.GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, fmt.Errorf("DirectPolicyCmd: %w", err)
 	}
