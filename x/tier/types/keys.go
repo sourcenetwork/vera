@@ -129,33 +129,33 @@ func UnlockingLockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValA
 }
 
 // UserSubscriptionKey builds and returns a key to store user subscription data.
-func UserSubscriptionKey(developerAddr sdk.AccAddress, userAddr sdk.AccAddress) []byte {
+func UserSubscriptionKey(developerAddr sdk.AccAddress, userDid string) []byte {
 	// Calculate the size of the buffer in advance
-	size := len(developerAddr.Bytes()) + 1 + len(userAddr.Bytes()) + 1
+	size := len(developerAddr.Bytes()) + 1 + len([]byte(userDid)) + 1
 	buf := make([]byte, 0, size)
 
 	// Append bytes to the buffer
 	buf = append(buf, developerAddr.Bytes()...)
 	buf = append(buf, '/')
-	buf = append(buf, userAddr.Bytes()...)
+	buf = append(buf, []byte(userDid)...)
 	buf = append(buf, '/')
 
 	return buf
 }
 
-// UserSubscriptionKeyToAddresses retrieves developerAddr and userAddr from provided UserSubscriptionKey.
-func UserSubscriptionKeyToAddresses(key []byte) (sdk.AccAddress, sdk.AccAddress) {
+// UserSubscriptionKeyToAddresses retrieves developerAddr and userDid from provided UserSubscriptionKey.
+func UserSubscriptionKeyToAddresses(key []byte) (sdk.AccAddress, string) {
 	// Find the positions of the delimiters
 	parts := bytes.Split(key, []byte{'/'})
 	if len(parts) != 3 {
-		panic("invalid key format: expected format developerAddr/userAddr/")
+		panic("invalid key format: expected format developerAddr/userDid/")
 	}
 
-	// Reconstruct the addresses
+	// Reconstruct the developer address and user DID
 	developerAddr := sdk.AccAddress(parts[0])
-	userAddr := sdk.AccAddress(parts[1])
+	userDid := string(parts[1])
 
-	return developerAddr, userAddr
+	return developerAddr, userDid
 }
 
 // DeveloperKey builds and returns a key to store developer configuration.
