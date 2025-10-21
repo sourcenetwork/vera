@@ -94,7 +94,7 @@ func (k *Keeper) userSubscriptionStore(ctx context.Context) prefix.Store {
 func (k *Keeper) GetAllUserSubscriptions(ctx context.Context) []types.UserSubscription {
 	var userSubscriptions []types.UserSubscription
 
-	userSubscriptionsCallback := func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
+	userSubscriptionsCallback := func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription) {
 		userSubscriptions = append(userSubscriptions, userSubscription)
 	}
 
@@ -104,8 +104,8 @@ func (k *Keeper) GetAllUserSubscriptions(ctx context.Context) []types.UserSubscr
 }
 
 // GetUserSubscription returns a pointer to existing user subscription, or nil if not found.
-func (k *Keeper) GetUserSubscription(ctx context.Context, developerAddr, userAddr sdk.AccAddress) *types.UserSubscription {
-	key := types.UserSubscriptionKey(developerAddr, userAddr)
+func (k *Keeper) GetUserSubscription(ctx context.Context, developerAddr sdk.AccAddress, userDid string) *types.UserSubscription {
+	key := types.UserSubscriptionKey(developerAddr, userDid)
 	store := k.userSubscriptionStore(ctx)
 	b := store.Get(key)
 	if b == nil {
@@ -119,23 +119,23 @@ func (k *Keeper) GetUserSubscription(ctx context.Context, developerAddr, userAdd
 }
 
 // SetUserSubscription sets a user subscription in the store based on the UserSubscriptionKey.
-func (k *Keeper) SetUserSubscription(ctx context.Context, developerAddr, userAddr sdk.AccAddress, userSubscription *types.UserSubscription) {
-	key := types.UserSubscriptionKey(developerAddr, userAddr)
+func (k *Keeper) SetUserSubscription(ctx context.Context, developerAddr sdk.AccAddress, userDid string, userSubscription *types.UserSubscription) {
+	key := types.UserSubscriptionKey(developerAddr, userDid)
 	b := k.cdc.MustMarshal(userSubscription)
 	store := k.userSubscriptionStore(ctx)
 	store.Set(key, b)
 }
 
-// removeUserSubscription removes existing UserSubscription (developerAddr/userAddr/).
-func (k *Keeper) removeUserSubscription(ctx context.Context, developerAddr, userAddr sdk.AccAddress) {
-	key := types.UserSubscriptionKey(developerAddr, userAddr)
+// removeUserSubscription removes existing UserSubscription (developerAddr/userDid/).
+func (k *Keeper) removeUserSubscription(ctx context.Context, developerAddr sdk.AccAddress, userDid string) {
+	key := types.UserSubscriptionKey(developerAddr, userDid)
 	store := k.userSubscriptionStore(ctx)
 	store.Delete(key)
 }
 
 // mustIterateUserSubscriptions iterates through all user subscriptions and calls the callback function.
 func (k *Keeper) mustIterateUserSubscriptions(ctx context.Context,
-	cb func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription)) {
+	cb func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte(types.UserSubscriptionKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
@@ -145,14 +145,14 @@ func (k *Keeper) mustIterateUserSubscriptions(ctx context.Context,
 	for ; iterator.Valid(); iterator.Next() {
 		var userSubscription types.UserSubscription
 		k.cdc.MustUnmarshal(iterator.Value(), &userSubscription)
-		developerAddr, userAddr := types.UserSubscriptionKeyToAddresses(iterator.Key())
-		cb(developerAddr, userAddr, userSubscription)
+		developerAddr, userDid := types.UserSubscriptionKeyToAddresses(iterator.Key())
+		cb(developerAddr, userDid, userSubscription)
 	}
 }
 
 // mustIterateUserSubscriptionsForDeveloper iterates through user subscriptions for a specific developer and calls the callback function.
 func (k *Keeper) mustIterateUserSubscriptionsForDeveloper(ctx context.Context, developerAddr sdk.AccAddress,
-	cb func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription)) {
+	cb func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, []byte(types.UserSubscriptionKeyPrefix))
 	iterator := storetypes.KVStorePrefixIterator(store, developerAddr.Bytes())
@@ -162,8 +162,8 @@ func (k *Keeper) mustIterateUserSubscriptionsForDeveloper(ctx context.Context, d
 	for ; iterator.Valid(); iterator.Next() {
 		var userSubscription types.UserSubscription
 		k.cdc.MustUnmarshal(iterator.Value(), &userSubscription)
-		developerAddr, userAddr := types.UserSubscriptionKeyToAddresses(iterator.Key())
-		cb(developerAddr, userAddr, userSubscription)
+		developerAddr, userDid := types.UserSubscriptionKeyToAddresses(iterator.Key())
+		cb(developerAddr, userDid, userSubscription)
 	}
 }
 
@@ -188,7 +188,7 @@ func (k *Keeper) checkDeveloperCredits(ctx context.Context, epochNumber int64) (
 
 	// Track unique developers to avoid processing the same developer multiple times
 	processedDevelopers := make(map[string]bool)
-	k.mustIterateUserSubscriptions(ctx, func(developerAddr sdk.AccAddress, userAddr sdk.AccAddress, userSubscription types.UserSubscription) {
+	k.mustIterateUserSubscriptions(ctx, func(developerAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription) {
 		if processedDevelopers[developerAddr.String()] {
 			return
 		}
@@ -315,19 +315,18 @@ func (k *Keeper) autoLockDeveloperCredits(
 	return nil
 }
 
-// grantPeriodicAllowance grants a periodic allowance from the developer to the user.
-func (k *Keeper) grantPeriodicAllowance(
+// grantPeriodicDIDAllowance grants a periodic allowance from the developer to the user DID.
+func (k *Keeper) grantPeriodicDIDAllowance(
 	ctx context.Context,
-	granter, grantee sdk.AccAddress,
+	granter sdk.AccAddress,
+	granteeDID string,
 	spendLimit sdk.Coins,
 	period time.Duration,
 ) error {
 	now := sdk.UnwrapSDKContext(ctx).BlockTime()
-	expiration := now.Add(period)
 
 	basicAllowance := feegrant.BasicAllowance{
 		SpendLimit: spendLimit,
-		Expiration: &expiration,
 	}
 
 	periodicAllowance := &feegrant.PeriodicAllowance{
@@ -339,27 +338,20 @@ func (k *Keeper) grantPeriodicAllowance(
 	}
 
 	// Try update first; if no existing grant, fall back to grant
-	if err := k.feegrantKeeper.UpdateAllowance(ctx, granter, grantee, periodicAllowance); err != nil {
-		if err := k.feegrantKeeper.GrantAllowance(ctx, granter, grantee, periodicAllowance); err != nil {
-			return errorsmod.Wrapf(err, "failed to grant periodic allowance from %s to %s", granter, grantee)
+	if err := k.feegrantKeeper.UpdateDIDAllowance(ctx, granter, granteeDID, periodicAllowance); err != nil {
+		if err := k.feegrantKeeper.GrantDIDAllowance(ctx, granter, granteeDID, periodicAllowance); err != nil {
+			return errorsmod.Wrapf(err, "failed to grant periodic DID allowance from %s to %s", granter, granteeDID)
 		}
 	}
 
-	k.logger.Info("granted periodic allowance",
+	k.logger.Info("granted periodic DID allowance",
 		types.AttributeKeyDeveloper, granter,
-		types.AttributeKeyUser, grantee,
+		types.AttributeKeyUserDid, granteeDID,
 		types.AttributeKeySubscriptionAmount, spendLimit.String(),
 		types.AttributeKeySubscriptionPeriod, period.String(),
-		types.AttributeKeySubscriptionExpiration, expiration.String())
+	)
 
 	return nil
-}
-
-// expireAllowance updates the existing allowance to immediately expire.
-func (k *Keeper) expireAllowance(ctx context.Context, granter, grantee sdk.AccAddress) error {
-	now := sdk.UnwrapSDKContext(ctx).BlockTime()
-	basic := &feegrant.BasicAllowance{Expiration: &now}
-	return k.feegrantKeeper.UpdateAllowance(ctx, granter, grantee, basic)
 }
 
 // validateDeveloperCredits checks if a developer has enough credits to grant the requested amount.

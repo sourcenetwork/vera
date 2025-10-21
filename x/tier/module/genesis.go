@@ -49,8 +49,7 @@ func InitGenesis(ctx context.Context, k *keeper.Keeper, genState types.GenesisSt
 
 	for _, userSubscription := range genState.UserSubscriptions {
 		developerAddr := sdk.MustAccAddressFromBech32(userSubscription.Developer)
-		userAddr := sdk.MustAccAddressFromBech32(userSubscription.User)
-		k.SetUserSubscription(ctx, developerAddr, userAddr, &userSubscription)
+		k.SetUserSubscription(ctx, developerAddr, userSubscription.UserDid, &userSubscription)
 	}
 }
 
