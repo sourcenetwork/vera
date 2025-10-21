@@ -14,4 +14,5 @@ var (
 	ErrInvalidAddress = sdkerrors.Register(ModuleName, 1104, "invalid address")
 	ErrInvalidDenom   = sdkerrors.Register(ModuleName, 1105, "invalid denom")
 	ErrInvalidAmount  = sdkerrors.Register(ModuleName, 1106, "invalid amount")
+	ErrInvalidDID     = sdkerrors.Register(ModuleName, 1107, "invalid DID")
 )

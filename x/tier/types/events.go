@@ -24,7 +24,7 @@ const (
 	AttributeKeySourceValidator        = "source_validator"
 	AttributeKeyUnlockTime             = "unlock_time"
 	AttributeKeyDeveloper              = "developer"
-	AttributeKeyUser                   = "user"
+	AttributeKeyUserDid                = "user_did"
 	AttributeKeySubscriptionPeriod     = "subscription_period"
 	AttributeKeySubscriptionAmount     = "subscription_amount"
 	AttributeKeySubscriptionExpiration = "subscription_expiration"
