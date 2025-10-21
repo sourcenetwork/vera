@@ -159,10 +159,10 @@ func (msg *MsgRemoveDeveloper) ValidateBasic() error {
 }
 
 // MsgAddUserSubscription
-func NewMsgAddUserSubscription(developerAddr, userAddr string, amount sdk.Coin, period uint64) *MsgAddUserSubscription {
+func NewMsgAddUserSubscription(developerAddr, userAddr, userDid string, amount sdk.Coin, period uint64) *MsgAddUserSubscription {
 	return &MsgAddUserSubscription{
 		Developer: developerAddr,
-		User:      userAddr,
+		UserDid:   userDid,
 		Amount:    amount,
 		Period:    period,
 	}
@@ -172,11 +172,8 @@ func (msg *MsgAddUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if err := validateAccAddr(msg.User); err != nil {
-		return err
-	}
-	if msg.Developer == msg.User {
-		return ErrInvalidAddress.Wrapf("developer and user cannot be the same address")
+	if msg.UserDid == "" {
+		return ErrInvalidDID.Wrapf("user DID cannot be empty")
 	}
 	if err := validateCreditDenom(msg.Amount); err != nil {
 		return err
@@ -185,10 +182,10 @@ func (msg *MsgAddUserSubscription) ValidateBasic() error {
 }
 
 // MsgUpdateUserSubscription
-func NewMsgUpdateUserSubscription(developerAddr, userAddr string, amount sdk.Coin, period uint64) *MsgUpdateUserSubscription {
+func NewMsgUpdateUserSubscription(developerAddr, userAddr, userDid string, amount sdk.Coin, period uint64) *MsgUpdateUserSubscription {
 	return &MsgUpdateUserSubscription{
 		Developer: developerAddr,
-		User:      userAddr,
+		UserDid:   userDid,
 		Amount:    amount,
 		Period:    period,
 	}
@@ -198,8 +195,8 @@ func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if err := validateAccAddr(msg.User); err != nil {
-		return err
+	if msg.UserDid == "" {
+		return ErrInvalidDID.Wrapf("user DID cannot be empty")
 	}
 	if err := validateCreditDenom(msg.Amount); err != nil {
 		return err
@@ -208,10 +205,10 @@ func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
 }
 
 // MsgRemoveUserSubscription
-func NewMsgRemoveUserSubscription(developerAddr, userAddr string) *MsgRemoveUserSubscription {
+func NewMsgRemoveUserSubscription(developerAddr, userAddr, userDid string) *MsgRemoveUserSubscription {
 	return &MsgRemoveUserSubscription{
 		Developer: developerAddr,
-		User:      userAddr,
+		UserDid:   userDid,
 	}
 }
 
@@ -219,8 +216,8 @@ func (msg *MsgRemoveUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if err := validateAccAddr(msg.User); err != nil {
-		return err
+	if msg.UserDid == "" {
+		return ErrInvalidDID.Wrapf("user DID cannot be empty")
 	}
 	return nil
 }
