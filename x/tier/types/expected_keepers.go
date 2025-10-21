@@ -75,6 +75,11 @@ type FeegrantKeeper interface {
 	GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error)
 	GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error
 	UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error
+	// DID-based feegrant methods
+	GrantDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, allowance feegrant.FeeAllowanceI) error
+	UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, feeAllowance feegrant.FeeAllowanceI) error
+	ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error
+	GetDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) (feegrant.FeeAllowanceI, error)
 }
 
 // ParamSubspace defines the expected Subspace interface for parameters.
