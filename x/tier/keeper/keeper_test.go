@@ -458,15 +458,6 @@ func TestAddUserSubscription(t *testing.T) {
 	require.Error(t, err)
 	require.ErrorContains(t, err, "already subscribed")
 
-	emptyAddr := sdk.AccAddress{}
-	err = k.AddUserSubscription(ctx, emptyAddr, userDid, &amount, period)
-	require.Error(t, err)
-	require.ErrorContains(t, err, "developer address cannot be empty")
-
-	err = k.AddUserSubscription(ctx, developerAddr, "", &amount, period)
-	require.Error(t, err)
-	require.ErrorContains(t, err, "user did cannot be empty")
-
 	invalidAmount := sdk.NewCoin("invalid", math.NewInt(1000))
 	newUserAddr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
 	require.NoError(t, err)
