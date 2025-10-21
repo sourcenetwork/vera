@@ -143,11 +143,11 @@ func (k msgServer) GrantDIDAllowance(
 	return &feegrant.MsgGrantDIDAllowanceResponse{}, nil
 }
 
-// RevokeDIDAllowance revokes a fee allowance between a granter and a DID.
-func (k msgServer) RevokeDIDAllowance(
+// ExpireDIDAllowance expires a periodic allowance by setting the expiration to current PeriodReset.
+func (k msgServer) ExpireDIDAllowance(
 	goCtx context.Context,
-	msg *feegrant.MsgRevokeDIDAllowance,
-) (*feegrant.MsgRevokeDIDAllowanceResponse, error) {
+	msg *feegrant.MsgExpireDIDAllowance,
+) (*feegrant.MsgExpireDIDAllowanceResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	granter, err := k.authKeeper.AddressCodec().StringToBytes(msg.Granter)
@@ -155,12 +155,12 @@ func (k msgServer) RevokeDIDAllowance(
 		return nil, err
 	}
 
-	err = k.Keeper.RevokeDIDAllowance(ctx, granter, msg.GranteeDid)
+	err = k.Keeper.ExpireDIDAllowance(ctx, granter, msg.GranteeDid)
 	if err != nil {
 		return nil, err
 	}
 
-	return &feegrant.MsgRevokeDIDAllowanceResponse{}, nil
+	return &feegrant.MsgExpireDIDAllowanceResponse{}, nil
 }
 
 // PruneDIDAllowances removes expired DID allowances from the store.

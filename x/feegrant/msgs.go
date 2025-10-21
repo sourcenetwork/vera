@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	_, _, _, _, _, _ sdk.Msg                       = &MsgGrantAllowance{}, &MsgRevokeAllowance{}, &MsgPruneAllowances{}, &MsgGrantDIDAllowance{}, &MsgRevokeDIDAllowance{}, &MsgPruneDIDAllowances{}
-	_, _           types.UnpackInterfacesMessage = &MsgGrantAllowance{}, &MsgGrantDIDAllowance{}
+	_, _, _, _, _, _ sdk.Msg = &MsgGrantAllowance{}, &MsgRevokeAllowance{}, &MsgPruneAllowances{},
+		&MsgGrantDIDAllowance{}, &MsgExpireDIDAllowance{}, &MsgPruneDIDAllowances{}
+	_, _ types.UnpackInterfacesMessage = &MsgGrantAllowance{}, &MsgGrantDIDAllowance{}
 )
 
 // NewMsgGrantAllowance creates a new MsgGrantAllowance.
@@ -93,7 +94,7 @@ func (msg MsgGrantDIDAllowance) ValidateBasic() error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing granter address")
 	}
 	if len(msg.GranteeDid) <= 4 || msg.GranteeDid[:4] != "did:" {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid DID format")
+		return ErrInvalidDID
 	}
 	if msg.Allowance == nil {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "missing allowance")
@@ -107,9 +108,9 @@ func (msg MsgGrantDIDAllowance) ValidateBasic() error {
 	return allowance.ValidateBasic()
 }
 
-// NewMsgRevokeDIDAllowance returns a message to revoke a fee allowance for a given granter and DID.
-func NewMsgRevokeDIDAllowance(granter sdk.AccAddress, granteeDID string) MsgRevokeDIDAllowance {
-	return MsgRevokeDIDAllowance{Granter: granter.String(), GranteeDid: granteeDID}
+// NewMsgExpireDIDAllowance returns a message to expire a fee allowance for a given granter and DID.
+func NewMsgExpireDIDAllowance(granter sdk.AccAddress, granteeDID string) MsgExpireDIDAllowance {
+	return MsgExpireDIDAllowance{Granter: granter.String(), GranteeDid: granteeDID}
 }
 
 // NewMsgPruneDIDAllowances returns a message to prune expired DID allowances.
@@ -125,12 +126,12 @@ func (msg MsgPruneDIDAllowances) ValidateBasic() error {
 	return nil
 }
 
-func (msg MsgRevokeDIDAllowance) ValidateBasic() error {
+func (msg MsgExpireDIDAllowance) ValidateBasic() error {
 	if msg.Granter == "" {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing granter address")
 	}
 	if len(msg.GranteeDid) <= 4 || msg.GranteeDid[:4] != "did:" {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid DID format")
+		return ErrInvalidDID
 	}
 	return nil
 }
