@@ -667,13 +667,6 @@ func (k *Keeper) AddUserSubscription(
 		)
 	}()
 
-	if developerAddr.Empty() {
-		return types.ErrInvalidAddress.Wrap("developer address cannot be empty")
-	}
-	if userDid == "" {
-		return types.ErrInvalidAddress.Wrap("user did cannot be empty")
-	}
-
 	existingSub := k.GetUserSubscription(ctx, developerAddr, userDid)
 	if existingSub != nil {
 		return types.ErrInvalidAddress.Wrapf("user %s is already subscribed to developer %s", userDid, developerAddr.String())

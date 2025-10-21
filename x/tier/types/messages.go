@@ -172,8 +172,8 @@ func (msg *MsgAddUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if msg.UserDid == "" {
-		return ErrInvalidDID.Wrapf("user DID cannot be empty")
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
 	}
 	if err := validateCreditDenom(msg.Amount); err != nil {
 		return err
@@ -195,8 +195,8 @@ func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if msg.UserDid == "" {
-		return ErrInvalidDID.Wrapf("user DID cannot be empty")
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
 	}
 	if err := validateCreditDenom(msg.Amount); err != nil {
 		return err
@@ -216,8 +216,8 @@ func (msg *MsgRemoveUserSubscription) ValidateBasic() error {
 	if err := validateAccAddr(msg.Developer); err != nil {
 		return err
 	}
-	if msg.UserDid == "" {
-		return ErrInvalidDID.Wrapf("user DID cannot be empty")
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
 	}
 	return nil
 }
