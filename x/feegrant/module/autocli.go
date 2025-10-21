@@ -89,11 +89,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Example:   fmt.Sprintf(`$ %s tx feegrant prune --from [mykey]`, version.AppName),
 				},
 				{
-					RpcMethod: "RevokeDIDAllowance",
-					Use:       "revoke-did [granter] [grantee-did]",
-					Short:     "Revoke a DID fee grant",
-					Long:      "Revoke fee grant from a granter to a grantee DID. Note, the '--from' flag is ignored as it is implied from [granter]",
-					Example:   fmt.Sprintf(`$ %s tx feegrant revoke-did [granter] [grantee-did]`, version.AppName),
+					RpcMethod: "ExpireDIDAllowance",
+					Use:       "expire-did [granter] [grantee-did]",
+					Short:     "Expire a DID fee grant",
+					Long:      "Expire fee grant from a granter to a grantee DID. Note, the '--from' flag is ignored as it is implied from [granter]",
+					Example:   fmt.Sprintf(`$ %s tx feegrant expire-did [granter] [grantee-did]`, version.AppName),
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "granter"},
 						{ProtoField: "grantee_did"},
