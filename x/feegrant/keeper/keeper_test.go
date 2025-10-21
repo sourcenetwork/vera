@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
+	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/sourcenetwork/sourcehub/x/feegrant"
@@ -21,6 +22,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
 type KeeperTestSuite struct {
@@ -476,23 +478,45 @@ func (suite *KeeperTestSuite) TestDIDAllowanceRevoke() {
 	testDID := "did:example:alice"
 	granter := suite.addrs[2]
 
-	// First grant an allowance
-	allowance := &feegrant.BasicAllowance{SpendLimit: suite.coins}
-	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+	now := sdk.UnwrapSDKContext(suite.ctx).BlockTime()
+	spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100)))
+	period := time.Hour
+
+	periodicAllowance := &feegrant.PeriodicAllowance{
+		Basic: feegrant.BasicAllowance{
+			SpendLimit: suite.coins,
+		},
+		Period:           period,
+		PeriodSpendLimit: spendLimit,
+		PeriodCanSpend:   spendLimit,
+		PeriodReset:      now.Add(period),
+	}
+
+	// First grant a periodic allowance
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, periodicAllowance)
 	suite.NoError(err)
 
 	// Verify it exists
-	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	existingAllowance, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
+	suite.NoError(err)
+	suite.NotNil(existingAllowance)
+
+	// Verify there was no expiration
+	existingExpiration, err := existingAllowance.ExpiresAt()
+	suite.NoError(err)
+	suite.Nil(existingExpiration)
+
+	// Now expire it
+	err = suite.feegrantKeeper.ExpireDIDAllowance(suite.ctx, granter, testDID)
 	suite.NoError(err)
 
-	// Now revoke it
-	err = suite.feegrantKeeper.RevokeDIDAllowance(suite.ctx, granter, testDID)
+	// Verify that allowance exists and has expiration set
+	expiredAllowance, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
 	suite.NoError(err)
+	suite.NotNil(expiredAllowance)
 
-	// Verify it no longer exists
-	_, err = suite.feegrantKeeper.GetDIDAllowance(suite.ctx, granter, testDID)
-	suite.Error(err)
-	suite.Contains(err.Error(), "not found")
+	expiredExpiration, err := expiredAllowance.ExpiresAt()
+	suite.NotNil(expiredExpiration)
 }
 
 func (suite *KeeperTestSuite) TestDIDAllowanceUsage() {

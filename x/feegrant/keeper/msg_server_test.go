@@ -409,7 +409,7 @@ func (suite *KeeperTestSuite) TestGrantDIDAllowance() {
 				}
 			},
 			true,
-			"invalid DID format",
+			"invalid DID",
 			func() {},
 		},
 		{
@@ -442,7 +442,7 @@ func (suite *KeeperTestSuite) TestGrantDIDAllowance() {
 			},
 		},
 		{
-			"invalid DID format - no colon",
+			"invalid DID - no colon",
 			func() *feegrant.MsgGrantDIDAllowance {
 				any, err := codectypes.NewAnyWithValue(&feegrant.BasicAllowance{
 					SpendLimit: suite.coins,
@@ -455,11 +455,11 @@ func (suite *KeeperTestSuite) TestGrantDIDAllowance() {
 				}
 			},
 			true,
-			"invalid DID format",
+			"invalid DID",
 			func() {},
 		},
 		{
-			"invalid DID format - wrong prefix",
+			"invalid DID - wrong prefix",
 			func() *feegrant.MsgGrantDIDAllowance {
 				any, err := codectypes.NewAnyWithValue(&feegrant.BasicAllowance{
 					SpendLimit: suite.coins,
@@ -472,7 +472,7 @@ func (suite *KeeperTestSuite) TestGrantDIDAllowance() {
 				}
 			},
 			true,
-			"invalid DID format",
+			"invalid DID",
 			func() {},
 		},
 		{
@@ -523,21 +523,21 @@ func (suite *KeeperTestSuite) TestGrantDIDAllowance() {
 	}
 }
 
-func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
+func (suite *KeeperTestSuite) TestExpireDIDAllowance() {
 	ctx := suite.ctx.WithBlockTime(time.Now())
 	oneYear := ctx.BlockTime().AddDate(1, 0, 0)
 
 	testCases := []struct {
 		name      string
-		req       func() *feegrant.MsgRevokeDIDAllowance
+		req       func() *feegrant.MsgExpireDIDAllowance
 		preRun    func()
 		expectErr bool
 		errMsg    string
 	}{
 		{
 			"invalid granter address",
-			func() *feegrant.MsgRevokeDIDAllowance {
-				return &feegrant.MsgRevokeDIDAllowance{
+			func() *feegrant.MsgExpireDIDAllowance {
+				return &feegrant.MsgExpireDIDAllowance{
 					Granter:    "invalid",
 					GranteeDid: "did:example:alice",
 				}
@@ -548,20 +548,20 @@ func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
 		},
 		{
 			"empty DID",
-			func() *feegrant.MsgRevokeDIDAllowance {
-				return &feegrant.MsgRevokeDIDAllowance{
+			func() *feegrant.MsgExpireDIDAllowance {
+				return &feegrant.MsgExpireDIDAllowance{
 					Granter:    suite.addrs[0].String(),
 					GranteeDid: "",
 				}
 			},
 			func() {},
 			true,
-			"invalid DID format",
+			"invalid DID",
 		},
 		{
 			"DID allowance not found",
-			func() *feegrant.MsgRevokeDIDAllowance {
-				return &feegrant.MsgRevokeDIDAllowance{
+			func() *feegrant.MsgExpireDIDAllowance {
+				return &feegrant.MsgExpireDIDAllowance{
 					Granter:    suite.addrs[0].String(),
 					GranteeDid: "did:example:bob",
 				}
@@ -571,9 +571,9 @@ func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
 			"not found",
 		},
 		{
-			"success: revoke DID allowance",
-			func() *feegrant.MsgRevokeDIDAllowance {
-				return &feegrant.MsgRevokeDIDAllowance{
+			"success: expire DID allowance",
+			func() *feegrant.MsgExpireDIDAllowance {
+				return &feegrant.MsgExpireDIDAllowance{
 					Granter:    suite.addrs[2].String(),
 					GranteeDid: "did:example:bob",
 				}
@@ -596,16 +596,16 @@ func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
 			"",
 		},
 		{
-			"error: check DID allowance revoked",
-			func() *feegrant.MsgRevokeDIDAllowance {
-				return &feegrant.MsgRevokeDIDAllowance{
+			"error: check DID allowance expired",
+			func() *feegrant.MsgExpireDIDAllowance {
+				return &feegrant.MsgExpireDIDAllowance{
 					Granter:    suite.addrs[2].String(),
 					GranteeDid: "did:example:bob",
 				}
 			},
 			func() {},
-			true,
-			"not found",
+			false,
+			"",
 		},
 	}
 
@@ -624,7 +624,7 @@ func (suite *KeeperTestSuite) TestRevokeDIDAllowance() {
 				suite.Require().NoError(err)
 			}
 
-			_, err := suite.msgSrvr.RevokeDIDAllowance(ctx, req)
+			_, err := suite.msgSrvr.ExpireDIDAllowance(ctx, req)
 			if tc.expectErr {
 				suite.Require().Error(err)
 				suite.Require().Contains(err.Error(), tc.errMsg)
