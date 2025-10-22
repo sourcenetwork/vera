@@ -17,7 +17,7 @@ import (
 // icaConnectionStore returns a prefix store for ICA connections.
 func (k *Keeper) icaConnectionStore(ctx sdk.Context) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	return prefix.NewStore(storeAdapter, []byte(types.ICAConnectionKeyPrefix))
+	return prefix.NewStore(storeAdapter, types.ICAConnectionKeyPrefix)
 }
 
 // SetICAConnection stores an ICA connection.

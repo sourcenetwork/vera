@@ -37,13 +37,32 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 		return fmt.Errorf("JWS token record cannot be nil")
 	}
 
-	// Marshal the record
+	if record.TokenHash == "" {
+		return fmt.Errorf("token hash cannot be empty")
+	}
+
+	if record.IssuerDid == "" {
+		return fmt.Errorf("issuer DID cannot be empty")
+	}
+
+	if record.AuthorizedAccount == "" {
+		return fmt.Errorf("authorized account cannot be empty")
+	}
+
+	if _, err := sdk.AccAddressFromBech32(record.AuthorizedAccount); err != nil {
+		return fmt.Errorf("invalid authorized account address: %w", err)
+	}
+
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	if !record.ExpiresAt.IsZero() && record.ExpiresAt.Before(sdkCtx.BlockTime()) {
+		return fmt.Errorf("expiration time cannot be in the past")
+	}
+
 	bz, err := k.cdc.Marshal(record)
 	if err != nil {
 		return fmt.Errorf("failed to marshal JWS token record: %w", err)
 	}
 
-	// Store in primary index (by token hash)
 	store := k.jwsTokenStore(ctx)
 	store.Set([]byte(record.TokenHash), bz)
 
@@ -65,6 +84,7 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 }
 
 // GetJWSToken retrieves a JWS token record by its hash.
+// Returns the record and true if found, or nil and false if not found or unmarshal fails.
 func (k *Keeper) GetJWSToken(ctx context.Context, tokenHash string) (*types.JWSTokenRecord, bool) {
 	store := k.jwsTokenStore(ctx)
 	bz := store.Get([]byte(tokenHash))
@@ -134,30 +154,18 @@ func (k *Keeper) GetJWSTokensByDID(ctx context.Context, did string) ([]*types.JW
 
 	didStore := k.jwsTokenByDIDStore(ctx)
 	prefix := types.JWSTokenDIDPrefix(did)
-	// Remove the main prefix since we're already in the DID prefix store
 	prefixWithoutMain := prefix[len(types.JWSTokenByDIDKeyPrefix):]
 
 	iterator := storetypes.KVStorePrefixIterator(didStore, prefixWithoutMain)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		// Extract token hash from the key
-		// Key format: "did/tokenHash"
-		key := string(iterator.Key())
-		// Find the last '/' to extract token hash
-		lastSlash := -1
-		for i := len(key) - 1; i >= 0; i-- {
-			if key[i] == '/' {
-				lastSlash = i
-				break
-			}
-		}
-		if lastSlash == -1 {
+		_, tokenHash, err := types.ParseJWSTokenByDIDKey(iterator.Key())
+		if err != nil {
+			k.Logger().Error("failed to parse JWS token by DID key", "error", err)
 			continue
 		}
-		tokenHash := key[lastSlash+1:]
 
-		// Get the actual record from primary store
 		record, found := k.GetJWSToken(ctx, tokenHash)
 		if found {
 			records = append(records, record)
@@ -173,30 +181,18 @@ func (k *Keeper) GetJWSTokensByAccount(ctx context.Context, account string) ([]*
 
 	accountStore := k.jwsTokenByAccountStore(ctx)
 	prefix := types.JWSTokenAccountPrefix(account)
-	// Remove the main prefix since we're already in the account prefix store
 	prefixWithoutMain := prefix[len(types.JWSTokenByAccountKeyPrefix):]
 
 	iterator := storetypes.KVStorePrefixIterator(accountStore, prefixWithoutMain)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
-		// Extract token hash from the key
-		// Key format: "account/tokenHash"
-		key := string(iterator.Key())
-		// Find the last '/' to extract token hash
-		lastSlash := -1
-		for i := len(key) - 1; i >= 0; i-- {
-			if key[i] == '/' {
-				lastSlash = i
-				break
-			}
-		}
-		if lastSlash == -1 {
+		_, tokenHash, err := types.ParseJWSTokenByAccountKey(iterator.Key())
+		if err != nil {
+			k.Logger().Error("failed to parse JWS token by account key", "error", err)
 			continue
 		}
-		tokenHash := key[lastSlash+1:]
 
-		// Get the actual record from primary store
 		record, found := k.GetJWSToken(ctx, tokenHash)
 		if found {
 			records = append(records, record)
@@ -220,6 +216,10 @@ func (k *Keeper) GetAllJWSTokens(ctx context.Context) ([]*types.JWSTokenRecord, 
 
 // UpdateJWSTokenStatus updates the status of a JWS token.
 func (k *Keeper) UpdateJWSTokenStatus(ctx context.Context, tokenHash string, status types.JWSTokenStatus, invalidatedBy string) error {
+	if tokenHash == "" {
+		return fmt.Errorf("token hash cannot be empty")
+	}
+
 	record, found := k.GetJWSToken(ctx, tokenHash)
 	if !found {
 		return fmt.Errorf("JWS token not found: %s", tokenHash)
@@ -240,6 +240,10 @@ func (k *Keeper) UpdateJWSTokenStatus(ctx context.Context, tokenHash string, sta
 
 // RecordJWSTokenUsage updates the last used timestamp for a JWS token.
 func (k *Keeper) RecordJWSTokenUsage(ctx context.Context, tokenHash string) error {
+	if tokenHash == "" {
+		return fmt.Errorf("token hash cannot be empty")
+	}
+
 	record, found := k.GetJWSToken(ctx, tokenHash)
 	if !found {
 		return fmt.Errorf("JWS token not found: %s", tokenHash)

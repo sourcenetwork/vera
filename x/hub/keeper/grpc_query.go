@@ -73,24 +73,14 @@ func (k *Keeper) JWSTokensByDID(goCtx context.Context, req *hubtypes.QueryJWSTok
 
 	var tokenInfos []*hubtypes.JWSTokenInfo
 	pageRes, err := query.Paginate(didStore, req.Pagination, func(key []byte, value []byte) error {
-		// Extract token hash from the key
-		keyStr := string(key)
-		lastSlash := -1
-		for i := len(keyStr) - 1; i >= 0; i-- {
-			if keyStr[i] == '/' {
-				lastSlash = i
-				break
-			}
-		}
-		if lastSlash == -1 {
+		_, tokenHash, err := hubtypes.ParseJWSTokenByDIDKey(key)
+		if err != nil {
+			k.Logger().Error("failed to parse JWS token by DID key", "error", err)
 			return nil
 		}
-		tokenHash := keyStr[lastSlash+1:]
 
-		// Get the actual record from primary store
 		record, found := k.GetJWSToken(goCtx, tokenHash)
 		if found {
-			// Convert to JWSTokenInfo (removes bearer_token)
 			tokenInfos = append(tokenInfos, recordToInfo(record))
 		}
 		return nil
@@ -123,24 +113,14 @@ func (k *Keeper) JWSTokensByAccount(goCtx context.Context, req *hubtypes.QueryJW
 
 	var tokenInfos []*hubtypes.JWSTokenInfo
 	pageRes, err := query.Paginate(accountStore, req.Pagination, func(key []byte, value []byte) error {
-		// Extract token hash from the key
-		keyStr := string(key)
-		lastSlash := -1
-		for i := len(keyStr) - 1; i >= 0; i-- {
-			if keyStr[i] == '/' {
-				lastSlash = i
-				break
-			}
-		}
-		if lastSlash == -1 {
+		_, tokenHash, err := hubtypes.ParseJWSTokenByAccountKey(key)
+		if err != nil {
+			k.Logger().Error("failed to parse JWS token by account key", "error", err)
 			return nil
 		}
-		tokenHash := keyStr[lastSlash+1:]
 
-		// Get the actual record from primary store
 		record, found := k.GetJWSToken(goCtx, tokenHash)
 		if found {
-			// Convert to JWSTokenInfo (removes bearer_token)
 			tokenInfos = append(tokenInfos, recordToInfo(record))
 		}
 		return nil
