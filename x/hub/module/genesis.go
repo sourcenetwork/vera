@@ -27,9 +27,8 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 	}
 
 	// Initialize JWS tokens
-	for _, jwsToken := range genState.JwsTokens {
-		token := jwsToken // Create a copy to avoid pointer issues
-		if err := k.SetJWSToken(ctx, &token); err != nil {
+	for i := range genState.JwsTokens {
+		if err := k.SetJWSToken(ctx, &genState.JwsTokens[i]); err != nil {
 			panic(err)
 		}
 	}
@@ -48,7 +47,8 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper) *types.GenesisState {
 	if err != nil {
 		panic(err)
 	}
-	// Convert pointers to values for proto
+
+	genesis.JwsTokens = make([]types.JWSTokenRecord, 0, len(jwsTokens))
 	for _, token := range jwsTokens {
 		if token != nil {
 			genesis.JwsTokens = append(genesis.JwsTokens, *token)

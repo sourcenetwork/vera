@@ -33,6 +33,9 @@ func IcaKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	sdkConfig := sdk.GetConfig()
+	sdkConfig.SetBech32PrefixForAccount("source", "sourcepub")
+
 	k := keeper.NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),

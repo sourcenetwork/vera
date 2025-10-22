@@ -32,6 +32,9 @@ func setupKeeper(t testing.TB) (sdk.Context, Keeper, types.MsgServer) {
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
 
+	sdkConfig := sdk.GetConfig()
+	sdkConfig.SetBech32PrefixForAccount("source", "sourcepub")
+
 	k := NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
