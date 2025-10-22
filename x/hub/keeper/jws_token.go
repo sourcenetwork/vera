@@ -16,19 +16,19 @@ import (
 // jwsTokenStore returns the prefix store for JWS tokens.
 func (k *Keeper) jwsTokenStore(ctx context.Context) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	return prefix.NewStore(storeAdapter, []byte(types.JWSTokenKeyPrefix))
+	return prefix.NewStore(storeAdapter, types.JWSTokenKeyPrefix)
 }
 
 // jwsTokenByDIDStore returns the prefix store for JWS tokens indexed by DID.
 func (k *Keeper) jwsTokenByDIDStore(ctx context.Context) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	return prefix.NewStore(storeAdapter, []byte(types.JWSTokenByDIDKeyPrefix))
+	return prefix.NewStore(storeAdapter, types.JWSTokenByDIDKeyPrefix)
 }
 
 // jwsTokenByAccountStore returns the prefix store for JWS tokens indexed by account.
 func (k *Keeper) jwsTokenByAccountStore(ctx context.Context) prefix.Store {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	return prefix.NewStore(storeAdapter, []byte(types.JWSTokenByAccountKeyPrefix))
+	return prefix.NewStore(storeAdapter, types.JWSTokenByAccountKeyPrefix)
 }
 
 // SetJWSToken stores a JWS token record and updates secondary indices.

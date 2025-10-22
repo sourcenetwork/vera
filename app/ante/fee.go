@@ -237,6 +237,7 @@ func (cdfd CustomDeductFeeDecorator) handleFeegrant(
 				return nil, errorsmod.Wrapf(err, "%s does not allow to pay fees for %s", feeGranter, feePayer)
 			}
 		}
+
 		return feeGranterAddr, nil
 	}
 
