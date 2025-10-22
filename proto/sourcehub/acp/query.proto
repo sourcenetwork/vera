@@ -107,12 +107,12 @@ message QueryPolicyResponse {
 }
 
 message QueryPolicyIdsRequest {
-  //cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryPolicyIdsResponse {
-  //cosmos.base.query.v1beta1.PageResponse pagination = 1;
   repeated string ids = 1;
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 message QueryFilterRelationshipsRequest {
