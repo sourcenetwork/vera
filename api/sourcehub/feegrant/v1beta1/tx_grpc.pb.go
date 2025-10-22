@@ -23,7 +23,7 @@ const (
 	Msg_RevokeAllowance_FullMethodName    = "/sourcehub.feegrant.v1beta1.Msg/RevokeAllowance"
 	Msg_PruneAllowances_FullMethodName    = "/sourcehub.feegrant.v1beta1.Msg/PruneAllowances"
 	Msg_GrantDIDAllowance_FullMethodName  = "/sourcehub.feegrant.v1beta1.Msg/GrantDIDAllowance"
-	Msg_RevokeDIDAllowance_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/RevokeDIDAllowance"
+	Msg_ExpireDIDAllowance_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/ExpireDIDAllowance"
 	Msg_PruneDIDAllowances_FullMethodName = "/sourcehub.feegrant.v1beta1.Msg/PruneDIDAllowances"
 )
 
@@ -43,8 +43,9 @@ type MsgClient interface {
 	PruneAllowances(ctx context.Context, in *MsgPruneAllowances, opts ...grpc.CallOption) (*MsgPruneAllowancesResponse, error)
 	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
 	GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowance, opts ...grpc.CallOption) (*MsgGrantDIDAllowanceResponse, error)
-	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
-	RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error)
+	// ExpireDIDAllowance expires a fee allowance by setting the expiration to current PeriodReset.
+	// This allows the allowance to be automatically pruned when the current period expires.
+	ExpireDIDAllowance(ctx context.Context, in *MsgExpireDIDAllowance, opts ...grpc.CallOption) (*MsgExpireDIDAllowanceResponse, error)
 	// PruneDIDAllowances prunes expired DID fee allowances, currently up to 75 at a time.
 	PruneDIDAllowances(ctx context.Context, in *MsgPruneDIDAllowances, opts ...grpc.CallOption) (*MsgPruneDIDAllowancesResponse, error)
 }
@@ -97,10 +98,10 @@ func (c *msgClient) GrantDIDAllowance(ctx context.Context, in *MsgGrantDIDAllowa
 	return out, nil
 }
 
-func (c *msgClient) RevokeDIDAllowance(ctx context.Context, in *MsgRevokeDIDAllowance, opts ...grpc.CallOption) (*MsgRevokeDIDAllowanceResponse, error) {
+func (c *msgClient) ExpireDIDAllowance(ctx context.Context, in *MsgExpireDIDAllowance, opts ...grpc.CallOption) (*MsgExpireDIDAllowanceResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MsgRevokeDIDAllowanceResponse)
-	err := c.cc.Invoke(ctx, Msg_RevokeDIDAllowance_FullMethodName, in, out, cOpts...)
+	out := new(MsgExpireDIDAllowanceResponse)
+	err := c.cc.Invoke(ctx, Msg_ExpireDIDAllowance_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -133,8 +134,9 @@ type MsgServer interface {
 	PruneAllowances(context.Context, *MsgPruneAllowances) (*MsgPruneAllowancesResponse, error)
 	// GrantDIDAllowance grants fee allowance to a DID on the granter's account.
 	GrantDIDAllowance(context.Context, *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error)
-	// RevokeDIDAllowance revokes any fee allowance from granter's account that has been granted to a DID.
-	RevokeDIDAllowance(context.Context, *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error)
+	// ExpireDIDAllowance expires a fee allowance by setting the expiration to current PeriodReset.
+	// This allows the allowance to be automatically pruned when the current period expires.
+	ExpireDIDAllowance(context.Context, *MsgExpireDIDAllowance) (*MsgExpireDIDAllowanceResponse, error)
 	// PruneDIDAllowances prunes expired DID fee allowances, currently up to 75 at a time.
 	PruneDIDAllowances(context.Context, *MsgPruneDIDAllowances) (*MsgPruneDIDAllowancesResponse, error)
 	mustEmbedUnimplementedMsgServer()
@@ -159,8 +161,8 @@ func (UnimplementedMsgServer) PruneAllowances(context.Context, *MsgPruneAllowanc
 func (UnimplementedMsgServer) GrantDIDAllowance(context.Context, *MsgGrantDIDAllowance) (*MsgGrantDIDAllowanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GrantDIDAllowance not implemented")
 }
-func (UnimplementedMsgServer) RevokeDIDAllowance(context.Context, *MsgRevokeDIDAllowance) (*MsgRevokeDIDAllowanceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RevokeDIDAllowance not implemented")
+func (UnimplementedMsgServer) ExpireDIDAllowance(context.Context, *MsgExpireDIDAllowance) (*MsgExpireDIDAllowanceResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ExpireDIDAllowance not implemented")
 }
 func (UnimplementedMsgServer) PruneDIDAllowances(context.Context, *MsgPruneDIDAllowances) (*MsgPruneDIDAllowancesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PruneDIDAllowances not implemented")
@@ -258,20 +260,20 @@ func _Msg_GrantDIDAllowance_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_RevokeDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgRevokeDIDAllowance)
+func _Msg_ExpireDIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgExpireDIDAllowance)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).RevokeDIDAllowance(ctx, in)
+		return srv.(MsgServer).ExpireDIDAllowance(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_RevokeDIDAllowance_FullMethodName,
+		FullMethod: Msg_ExpireDIDAllowance_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).RevokeDIDAllowance(ctx, req.(*MsgRevokeDIDAllowance))
+		return srv.(MsgServer).ExpireDIDAllowance(ctx, req.(*MsgExpireDIDAllowance))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -318,8 +320,8 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_GrantDIDAllowance_Handler,
 		},
 		{
-			MethodName: "RevokeDIDAllowance",
-			Handler:    _Msg_RevokeDIDAllowance_Handler,
+			MethodName: "ExpireDIDAllowance",
+			Handler:    _Msg_ExpireDIDAllowance_Handler,
 		},
 		{
 			MethodName: "PruneDIDAllowances",

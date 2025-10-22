@@ -3471,27 +3471,27 @@ func (x *fastReflection_MsgGrantDIDAllowanceResponse) ProtoMethods() *protoiface
 }
 
 var (
-	md_MsgRevokeDIDAllowance             protoreflect.MessageDescriptor
-	fd_MsgRevokeDIDAllowance_granter     protoreflect.FieldDescriptor
-	fd_MsgRevokeDIDAllowance_grantee_did protoreflect.FieldDescriptor
+	md_MsgExpireDIDAllowance             protoreflect.MessageDescriptor
+	fd_MsgExpireDIDAllowance_granter     protoreflect.FieldDescriptor
+	fd_MsgExpireDIDAllowance_grantee_did protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_feegrant_v1beta1_tx_proto_init()
-	md_MsgRevokeDIDAllowance = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("MsgRevokeDIDAllowance")
-	fd_MsgRevokeDIDAllowance_granter = md_MsgRevokeDIDAllowance.Fields().ByName("granter")
-	fd_MsgRevokeDIDAllowance_grantee_did = md_MsgRevokeDIDAllowance.Fields().ByName("grantee_did")
+	md_MsgExpireDIDAllowance = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("MsgExpireDIDAllowance")
+	fd_MsgExpireDIDAllowance_granter = md_MsgExpireDIDAllowance.Fields().ByName("granter")
+	fd_MsgExpireDIDAllowance_grantee_did = md_MsgExpireDIDAllowance.Fields().ByName("grantee_did")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRevokeDIDAllowance)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgExpireDIDAllowance)(nil)
 
-type fastReflection_MsgRevokeDIDAllowance MsgRevokeDIDAllowance
+type fastReflection_MsgExpireDIDAllowance MsgExpireDIDAllowance
 
-func (x *MsgRevokeDIDAllowance) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRevokeDIDAllowance)(x)
+func (x *MsgExpireDIDAllowance) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgExpireDIDAllowance)(x)
 }
 
-func (x *MsgRevokeDIDAllowance) slowProtoReflect() protoreflect.Message {
+func (x *MsgExpireDIDAllowance) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3503,43 +3503,43 @@ func (x *MsgRevokeDIDAllowance) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRevokeDIDAllowance_messageType fastReflection_MsgRevokeDIDAllowance_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRevokeDIDAllowance_messageType{}
+var _fastReflection_MsgExpireDIDAllowance_messageType fastReflection_MsgExpireDIDAllowance_messageType
+var _ protoreflect.MessageType = fastReflection_MsgExpireDIDAllowance_messageType{}
 
-type fastReflection_MsgRevokeDIDAllowance_messageType struct{}
+type fastReflection_MsgExpireDIDAllowance_messageType struct{}
 
-func (x fastReflection_MsgRevokeDIDAllowance_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRevokeDIDAllowance)(nil)
+func (x fastReflection_MsgExpireDIDAllowance_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgExpireDIDAllowance)(nil)
 }
-func (x fastReflection_MsgRevokeDIDAllowance_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRevokeDIDAllowance)
+func (x fastReflection_MsgExpireDIDAllowance_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgExpireDIDAllowance)
 }
-func (x fastReflection_MsgRevokeDIDAllowance_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRevokeDIDAllowance
+func (x fastReflection_MsgExpireDIDAllowance_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgExpireDIDAllowance
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRevokeDIDAllowance) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRevokeDIDAllowance
+func (x *fastReflection_MsgExpireDIDAllowance) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgExpireDIDAllowance
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRevokeDIDAllowance) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRevokeDIDAllowance_messageType
+func (x *fastReflection_MsgExpireDIDAllowance) Type() protoreflect.MessageType {
+	return _fastReflection_MsgExpireDIDAllowance_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRevokeDIDAllowance) New() protoreflect.Message {
-	return new(fastReflection_MsgRevokeDIDAllowance)
+func (x *fastReflection_MsgExpireDIDAllowance) New() protoreflect.Message {
+	return new(fastReflection_MsgExpireDIDAllowance)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRevokeDIDAllowance) Interface() protoreflect.ProtoMessage {
-	return (*MsgRevokeDIDAllowance)(x)
+func (x *fastReflection_MsgExpireDIDAllowance) Interface() protoreflect.ProtoMessage {
+	return (*MsgExpireDIDAllowance)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -3547,16 +3547,16 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Interface() protoreflect.ProtoMes
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRevokeDIDAllowance) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgExpireDIDAllowance) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Granter != "" {
 		value := protoreflect.ValueOfString(x.Granter)
-		if !f(fd_MsgRevokeDIDAllowance_granter, value) {
+		if !f(fd_MsgExpireDIDAllowance_granter, value) {
 			return
 		}
 	}
 	if x.GranteeDid != "" {
 		value := protoreflect.ValueOfString(x.GranteeDid)
-		if !f(fd_MsgRevokeDIDAllowance_grantee_did, value) {
+		if !f(fd_MsgExpireDIDAllowance_grantee_did, value) {
 			return
 		}
 	}
@@ -3573,17 +3573,17 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Range(f func(protoreflect.FieldDe
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRevokeDIDAllowance) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgExpireDIDAllowance) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
 		return x.Granter != ""
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
 		return x.GranteeDid != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3593,17 +3593,17 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Has(fd protoreflect.FieldDescript
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowance) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgExpireDIDAllowance) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
 		x.Granter = ""
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
 		x.GranteeDid = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3613,19 +3613,19 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Clear(fd protoreflect.FieldDescri
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRevokeDIDAllowance) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowance) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
 		value := x.Granter
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
 		value := x.GranteeDid
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3639,17 +3639,17 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Get(descriptor protoreflect.Field
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowance) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgExpireDIDAllowance) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
 		x.Granter = value.Interface().(string)
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
 		x.GranteeDid = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3663,44 +3663,44 @@ func (x *fastReflection_MsgRevokeDIDAllowance) Set(fd protoreflect.FieldDescript
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowance) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowance) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
-		panic(fmt.Errorf("field granter of message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance is not mutable"))
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
-		panic(fmt.Errorf("field grantee_did of message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance is not mutable"))
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
+		panic(fmt.Errorf("field granter of message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance is not mutable"))
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
+		panic(fmt.Errorf("field grantee_did of message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRevokeDIDAllowance) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowance) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.granter":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance.grantee_did":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRevokeDIDAllowance) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgExpireDIDAllowance) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3708,7 +3708,7 @@ func (x *fastReflection_MsgRevokeDIDAllowance) WhichOneof(d protoreflect.OneofDe
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRevokeDIDAllowance) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgExpireDIDAllowance) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3719,7 +3719,7 @@ func (x *fastReflection_MsgRevokeDIDAllowance) GetUnknown() protoreflect.RawFiel
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowance) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgExpireDIDAllowance) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3731,7 +3731,7 @@ func (x *fastReflection_MsgRevokeDIDAllowance) SetUnknown(fields protoreflect.Ra
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRevokeDIDAllowance) IsValid() bool {
+func (x *fastReflection_MsgExpireDIDAllowance) IsValid() bool {
 	return x != nil
 }
 
@@ -3741,9 +3741,9 @@ func (x *fastReflection_MsgRevokeDIDAllowance) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRevokeDIDAllowance) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgExpireDIDAllowance) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowance)
+		x := input.Message.Interface().(*MsgExpireDIDAllowance)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3773,7 +3773,7 @@ func (x *fastReflection_MsgRevokeDIDAllowance) ProtoMethods() *protoiface.Method
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowance)
+		x := input.Message.Interface().(*MsgExpireDIDAllowance)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3817,7 +3817,7 @@ func (x *fastReflection_MsgRevokeDIDAllowance) ProtoMethods() *protoiface.Method
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowance)
+		x := input.Message.Interface().(*MsgExpireDIDAllowance)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3849,10 +3849,10 @@ func (x *fastReflection_MsgRevokeDIDAllowance) ProtoMethods() *protoiface.Method
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRevokeDIDAllowance: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgExpireDIDAllowance: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRevokeDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgExpireDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -3955,23 +3955,23 @@ func (x *fastReflection_MsgRevokeDIDAllowance) ProtoMethods() *protoiface.Method
 }
 
 var (
-	md_MsgRevokeDIDAllowanceResponse protoreflect.MessageDescriptor
+	md_MsgExpireDIDAllowanceResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_sourcehub_feegrant_v1beta1_tx_proto_init()
-	md_MsgRevokeDIDAllowanceResponse = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("MsgRevokeDIDAllowanceResponse")
+	md_MsgExpireDIDAllowanceResponse = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("MsgExpireDIDAllowanceResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgRevokeDIDAllowanceResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgExpireDIDAllowanceResponse)(nil)
 
-type fastReflection_MsgRevokeDIDAllowanceResponse MsgRevokeDIDAllowanceResponse
+type fastReflection_MsgExpireDIDAllowanceResponse MsgExpireDIDAllowanceResponse
 
-func (x *MsgRevokeDIDAllowanceResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgRevokeDIDAllowanceResponse)(x)
+func (x *MsgExpireDIDAllowanceResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgExpireDIDAllowanceResponse)(x)
 }
 
-func (x *MsgRevokeDIDAllowanceResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgExpireDIDAllowanceResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3983,43 +3983,43 @@ func (x *MsgRevokeDIDAllowanceResponse) slowProtoReflect() protoreflect.Message 
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgRevokeDIDAllowanceResponse_messageType fastReflection_MsgRevokeDIDAllowanceResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgRevokeDIDAllowanceResponse_messageType{}
+var _fastReflection_MsgExpireDIDAllowanceResponse_messageType fastReflection_MsgExpireDIDAllowanceResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgExpireDIDAllowanceResponse_messageType{}
 
-type fastReflection_MsgRevokeDIDAllowanceResponse_messageType struct{}
+type fastReflection_MsgExpireDIDAllowanceResponse_messageType struct{}
 
-func (x fastReflection_MsgRevokeDIDAllowanceResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgRevokeDIDAllowanceResponse)(nil)
+func (x fastReflection_MsgExpireDIDAllowanceResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgExpireDIDAllowanceResponse)(nil)
 }
-func (x fastReflection_MsgRevokeDIDAllowanceResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgRevokeDIDAllowanceResponse)
+func (x fastReflection_MsgExpireDIDAllowanceResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgExpireDIDAllowanceResponse)
 }
-func (x fastReflection_MsgRevokeDIDAllowanceResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRevokeDIDAllowanceResponse
+func (x fastReflection_MsgExpireDIDAllowanceResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgExpireDIDAllowanceResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgRevokeDIDAllowanceResponse
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgExpireDIDAllowanceResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgRevokeDIDAllowanceResponse_messageType
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgExpireDIDAllowanceResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgRevokeDIDAllowanceResponse)
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgExpireDIDAllowanceResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgRevokeDIDAllowanceResponse)(x)
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgExpireDIDAllowanceResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -4027,7 +4027,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Interface() protoreflect.
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -4041,13 +4041,13 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Range(f func(protoreflect
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4057,13 +4057,13 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Has(fd protoreflect.Field
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4073,13 +4073,13 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Clear(fd protoreflect.Fie
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4093,13 +4093,13 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Get(descriptor protorefle
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4113,36 +4113,36 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Set(fd protoreflect.Field
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -4150,7 +4150,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) WhichOneof(d protoreflect
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -4161,7 +4161,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) GetUnknown() protoreflect
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -4173,7 +4173,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) SetUnknown(fields protore
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) IsValid() bool {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -4183,9 +4183,9 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgRevokeDIDAllowanceResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgExpireDIDAllowanceResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowanceResponse)
+		x := input.Message.Interface().(*MsgExpireDIDAllowanceResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4207,7 +4207,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) ProtoMethods() *protoifac
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowanceResponse)
+		x := input.Message.Interface().(*MsgExpireDIDAllowanceResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4237,7 +4237,7 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) ProtoMethods() *protoifac
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgRevokeDIDAllowanceResponse)
+		x := input.Message.Interface().(*MsgExpireDIDAllowanceResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -4269,10 +4269,10 @@ func (x *fastReflection_MsgRevokeDIDAllowanceResponse) ProtoMethods() *protoifac
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRevokeDIDAllowanceResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgExpireDIDAllowanceResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgRevokeDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgExpireDIDAllowanceResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -4795,27 +4795,27 @@ func (x *fastReflection_EventGrantDIDAllowance) ProtoMethods() *protoiface.Metho
 }
 
 var (
-	md_EventRevokeDIDAllowance             protoreflect.MessageDescriptor
-	fd_EventRevokeDIDAllowance_granter     protoreflect.FieldDescriptor
-	fd_EventRevokeDIDAllowance_grantee_did protoreflect.FieldDescriptor
+	md_EventExpireDIDAllowance             protoreflect.MessageDescriptor
+	fd_EventExpireDIDAllowance_granter     protoreflect.FieldDescriptor
+	fd_EventExpireDIDAllowance_grantee_did protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_feegrant_v1beta1_tx_proto_init()
-	md_EventRevokeDIDAllowance = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("EventRevokeDIDAllowance")
-	fd_EventRevokeDIDAllowance_granter = md_EventRevokeDIDAllowance.Fields().ByName("granter")
-	fd_EventRevokeDIDAllowance_grantee_did = md_EventRevokeDIDAllowance.Fields().ByName("grantee_did")
+	md_EventExpireDIDAllowance = File_sourcehub_feegrant_v1beta1_tx_proto.Messages().ByName("EventExpireDIDAllowance")
+	fd_EventExpireDIDAllowance_granter = md_EventExpireDIDAllowance.Fields().ByName("granter")
+	fd_EventExpireDIDAllowance_grantee_did = md_EventExpireDIDAllowance.Fields().ByName("grantee_did")
 }
 
-var _ protoreflect.Message = (*fastReflection_EventRevokeDIDAllowance)(nil)
+var _ protoreflect.Message = (*fastReflection_EventExpireDIDAllowance)(nil)
 
-type fastReflection_EventRevokeDIDAllowance EventRevokeDIDAllowance
+type fastReflection_EventExpireDIDAllowance EventExpireDIDAllowance
 
-func (x *EventRevokeDIDAllowance) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_EventRevokeDIDAllowance)(x)
+func (x *EventExpireDIDAllowance) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_EventExpireDIDAllowance)(x)
 }
 
-func (x *EventRevokeDIDAllowance) slowProtoReflect() protoreflect.Message {
+func (x *EventExpireDIDAllowance) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -4827,43 +4827,43 @@ func (x *EventRevokeDIDAllowance) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_EventRevokeDIDAllowance_messageType fastReflection_EventRevokeDIDAllowance_messageType
-var _ protoreflect.MessageType = fastReflection_EventRevokeDIDAllowance_messageType{}
+var _fastReflection_EventExpireDIDAllowance_messageType fastReflection_EventExpireDIDAllowance_messageType
+var _ protoreflect.MessageType = fastReflection_EventExpireDIDAllowance_messageType{}
 
-type fastReflection_EventRevokeDIDAllowance_messageType struct{}
+type fastReflection_EventExpireDIDAllowance_messageType struct{}
 
-func (x fastReflection_EventRevokeDIDAllowance_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_EventRevokeDIDAllowance)(nil)
+func (x fastReflection_EventExpireDIDAllowance_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_EventExpireDIDAllowance)(nil)
 }
-func (x fastReflection_EventRevokeDIDAllowance_messageType) New() protoreflect.Message {
-	return new(fastReflection_EventRevokeDIDAllowance)
+func (x fastReflection_EventExpireDIDAllowance_messageType) New() protoreflect.Message {
+	return new(fastReflection_EventExpireDIDAllowance)
 }
-func (x fastReflection_EventRevokeDIDAllowance_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_EventRevokeDIDAllowance
+func (x fastReflection_EventExpireDIDAllowance_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_EventExpireDIDAllowance
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_EventRevokeDIDAllowance) Descriptor() protoreflect.MessageDescriptor {
-	return md_EventRevokeDIDAllowance
+func (x *fastReflection_EventExpireDIDAllowance) Descriptor() protoreflect.MessageDescriptor {
+	return md_EventExpireDIDAllowance
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_EventRevokeDIDAllowance) Type() protoreflect.MessageType {
-	return _fastReflection_EventRevokeDIDAllowance_messageType
+func (x *fastReflection_EventExpireDIDAllowance) Type() protoreflect.MessageType {
+	return _fastReflection_EventExpireDIDAllowance_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_EventRevokeDIDAllowance) New() protoreflect.Message {
-	return new(fastReflection_EventRevokeDIDAllowance)
+func (x *fastReflection_EventExpireDIDAllowance) New() protoreflect.Message {
+	return new(fastReflection_EventExpireDIDAllowance)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_EventRevokeDIDAllowance) Interface() protoreflect.ProtoMessage {
-	return (*EventRevokeDIDAllowance)(x)
+func (x *fastReflection_EventExpireDIDAllowance) Interface() protoreflect.ProtoMessage {
+	return (*EventExpireDIDAllowance)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -4871,16 +4871,16 @@ func (x *fastReflection_EventRevokeDIDAllowance) Interface() protoreflect.ProtoM
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_EventRevokeDIDAllowance) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_EventExpireDIDAllowance) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Granter != "" {
 		value := protoreflect.ValueOfString(x.Granter)
-		if !f(fd_EventRevokeDIDAllowance_granter, value) {
+		if !f(fd_EventExpireDIDAllowance_granter, value) {
 			return
 		}
 	}
 	if x.GranteeDid != "" {
 		value := protoreflect.ValueOfString(x.GranteeDid)
-		if !f(fd_EventRevokeDIDAllowance_grantee_did, value) {
+		if !f(fd_EventExpireDIDAllowance_grantee_did, value) {
 			return
 		}
 	}
@@ -4897,17 +4897,17 @@ func (x *fastReflection_EventRevokeDIDAllowance) Range(f func(protoreflect.Field
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_EventRevokeDIDAllowance) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_EventExpireDIDAllowance) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
 		return x.Granter != ""
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
 		return x.GranteeDid != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4917,17 +4917,17 @@ func (x *fastReflection_EventRevokeDIDAllowance) Has(fd protoreflect.FieldDescri
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventRevokeDIDAllowance) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_EventExpireDIDAllowance) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
 		x.Granter = ""
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
 		x.GranteeDid = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4937,19 +4937,19 @@ func (x *fastReflection_EventRevokeDIDAllowance) Clear(fd protoreflect.FieldDesc
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_EventRevokeDIDAllowance) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_EventExpireDIDAllowance) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
 		value := x.Granter
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
 		value := x.GranteeDid
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -4963,17 +4963,17 @@ func (x *fastReflection_EventRevokeDIDAllowance) Get(descriptor protoreflect.Fie
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventRevokeDIDAllowance) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_EventExpireDIDAllowance) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
 		x.Granter = value.Interface().(string)
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
 		x.GranteeDid = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -4987,44 +4987,44 @@ func (x *fastReflection_EventRevokeDIDAllowance) Set(fd protoreflect.FieldDescri
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventRevokeDIDAllowance) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_EventExpireDIDAllowance) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
-		panic(fmt.Errorf("field granter of message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance is not mutable"))
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
-		panic(fmt.Errorf("field grantee_did of message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance is not mutable"))
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
+		panic(fmt.Errorf("field granter of message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance is not mutable"))
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
+		panic(fmt.Errorf("field grantee_did of message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_EventRevokeDIDAllowance) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_EventExpireDIDAllowance) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.granter":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.granter":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance.grantee_did":
+	case "sourcehub.feegrant.v1beta1.EventExpireDIDAllowance.grantee_did":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance"))
 		}
-		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.feegrant.v1beta1.EventExpireDIDAllowance does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_EventRevokeDIDAllowance) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_EventExpireDIDAllowance) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.feegrant.v1beta1.EventExpireDIDAllowance", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -5032,7 +5032,7 @@ func (x *fastReflection_EventRevokeDIDAllowance) WhichOneof(d protoreflect.Oneof
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_EventRevokeDIDAllowance) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_EventExpireDIDAllowance) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -5043,7 +5043,7 @@ func (x *fastReflection_EventRevokeDIDAllowance) GetUnknown() protoreflect.RawFi
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_EventRevokeDIDAllowance) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_EventExpireDIDAllowance) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -5055,7 +5055,7 @@ func (x *fastReflection_EventRevokeDIDAllowance) SetUnknown(fields protoreflect.
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_EventRevokeDIDAllowance) IsValid() bool {
+func (x *fastReflection_EventExpireDIDAllowance) IsValid() bool {
 	return x != nil
 }
 
@@ -5065,9 +5065,9 @@ func (x *fastReflection_EventRevokeDIDAllowance) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_EventRevokeDIDAllowance) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_EventExpireDIDAllowance) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*EventRevokeDIDAllowance)
+		x := input.Message.Interface().(*EventExpireDIDAllowance)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5097,7 +5097,7 @@ func (x *fastReflection_EventRevokeDIDAllowance) ProtoMethods() *protoiface.Meth
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*EventRevokeDIDAllowance)
+		x := input.Message.Interface().(*EventExpireDIDAllowance)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5141,7 +5141,7 @@ func (x *fastReflection_EventRevokeDIDAllowance) ProtoMethods() *protoiface.Meth
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*EventRevokeDIDAllowance)
+		x := input.Message.Interface().(*EventExpireDIDAllowance)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -5173,10 +5173,10 @@ func (x *fastReflection_EventRevokeDIDAllowance) ProtoMethods() *protoiface.Meth
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventRevokeDIDAllowance: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventExpireDIDAllowance: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventRevokeDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventExpireDIDAllowance: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -6370,20 +6370,20 @@ func (*MsgGrantDIDAllowanceResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_feegrant_v1beta1_tx_proto_rawDescGZIP(), []int{7}
 }
 
-// MsgRevokeDIDAllowance removes any existing Allowance from Granter to a DID.
-type MsgRevokeDIDAllowance struct {
+// MsgExpireDIDAllowance expires an existing DID allowance by setting the expiration to current PeriodReset.
+type MsgExpireDIDAllowance struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// granter is the address of the user granting an allowance of their funds.
+	// granter is the address of the user who granted the allowance.
 	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
-	// grantee_did is the DID being granted an allowance of another user's funds.
+	// grantee_did is the DID whose allowance should be expired.
 	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
 }
 
-func (x *MsgRevokeDIDAllowance) Reset() {
-	*x = MsgRevokeDIDAllowance{}
+func (x *MsgExpireDIDAllowance) Reset() {
+	*x = MsgExpireDIDAllowance{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6391,40 +6391,40 @@ func (x *MsgRevokeDIDAllowance) Reset() {
 	}
 }
 
-func (x *MsgRevokeDIDAllowance) String() string {
+func (x *MsgExpireDIDAllowance) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRevokeDIDAllowance) ProtoMessage() {}
+func (*MsgExpireDIDAllowance) ProtoMessage() {}
 
-// Deprecated: Use MsgRevokeDIDAllowance.ProtoReflect.Descriptor instead.
-func (*MsgRevokeDIDAllowance) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgExpireDIDAllowance.ProtoReflect.Descriptor instead.
+func (*MsgExpireDIDAllowance) Descriptor() ([]byte, []int) {
 	return file_sourcehub_feegrant_v1beta1_tx_proto_rawDescGZIP(), []int{8}
 }
 
-func (x *MsgRevokeDIDAllowance) GetGranter() string {
+func (x *MsgExpireDIDAllowance) GetGranter() string {
 	if x != nil {
 		return x.Granter
 	}
 	return ""
 }
 
-func (x *MsgRevokeDIDAllowance) GetGranteeDid() string {
+func (x *MsgExpireDIDAllowance) GetGranteeDid() string {
 	if x != nil {
 		return x.GranteeDid
 	}
 	return ""
 }
 
-// MsgRevokeDIDAllowanceResponse defines the Msg/RevokeDIDAllowanceResponse response type.
-type MsgRevokeDIDAllowanceResponse struct {
+// MsgExpireDIDAllowanceResponse defines the Msg/ExpireDIDAllowanceResponse response type.
+type MsgExpireDIDAllowanceResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgRevokeDIDAllowanceResponse) Reset() {
-	*x = MsgRevokeDIDAllowanceResponse{}
+func (x *MsgExpireDIDAllowanceResponse) Reset() {
+	*x = MsgExpireDIDAllowanceResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6432,14 +6432,14 @@ func (x *MsgRevokeDIDAllowanceResponse) Reset() {
 	}
 }
 
-func (x *MsgRevokeDIDAllowanceResponse) String() string {
+func (x *MsgExpireDIDAllowanceResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgRevokeDIDAllowanceResponse) ProtoMessage() {}
+func (*MsgExpireDIDAllowanceResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgRevokeDIDAllowanceResponse.ProtoReflect.Descriptor instead.
-func (*MsgRevokeDIDAllowanceResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgExpireDIDAllowanceResponse.ProtoReflect.Descriptor instead.
+func (*MsgExpireDIDAllowanceResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_feegrant_v1beta1_tx_proto_rawDescGZIP(), []int{9}
 }
 
@@ -6489,20 +6489,20 @@ func (x *EventGrantDIDAllowance) GetGranteeDid() string {
 	return ""
 }
 
-// EventRevokeDIDAllowance is emitted when a DID allowance is revoked.
-type EventRevokeDIDAllowance struct {
+// EventExpireDIDAllowance is emitted when a DID allowance is expired.
+type EventExpireDIDAllowance struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// granter is the address of the user revoking an allowance of their funds.
+	// granter is the address of the user expiring an allowance of their funds.
 	Granter string `protobuf:"bytes,1,opt,name=granter,proto3" json:"granter,omitempty"`
-	// grantee_did is the DID whose allowance is being revoked.
+	// grantee_did is the DID whose allowance is being expired.
 	GranteeDid string `protobuf:"bytes,2,opt,name=grantee_did,json=granteeDid,proto3" json:"grantee_did,omitempty"`
 }
 
-func (x *EventRevokeDIDAllowance) Reset() {
-	*x = EventRevokeDIDAllowance{}
+func (x *EventExpireDIDAllowance) Reset() {
+	*x = EventExpireDIDAllowance{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -6510,25 +6510,25 @@ func (x *EventRevokeDIDAllowance) Reset() {
 	}
 }
 
-func (x *EventRevokeDIDAllowance) String() string {
+func (x *EventExpireDIDAllowance) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*EventRevokeDIDAllowance) ProtoMessage() {}
+func (*EventExpireDIDAllowance) ProtoMessage() {}
 
-// Deprecated: Use EventRevokeDIDAllowance.ProtoReflect.Descriptor instead.
-func (*EventRevokeDIDAllowance) Descriptor() ([]byte, []int) {
+// Deprecated: Use EventExpireDIDAllowance.ProtoReflect.Descriptor instead.
+func (*EventExpireDIDAllowance) Descriptor() ([]byte, []int) {
 	return file_sourcehub_feegrant_v1beta1_tx_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *EventRevokeDIDAllowance) GetGranter() string {
+func (x *EventExpireDIDAllowance) GetGranter() string {
 	if x != nil {
 		return x.Granter
 	}
 	return ""
 }
 
-func (x *EventRevokeDIDAllowance) GetGranteeDid() string {
+func (x *EventExpireDIDAllowance) GetGranteeDid() string {
 	if x != nil {
 		return x.GranteeDid
 	}
@@ -6672,7 +6672,7 @@ var file_sourcehub_feegrant_v1beta1_tx_proto_rawDesc = []byte{
 	0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x22, 0x1e, 0x0a, 0x1c, 0x4d, 0x73,
 	0x67, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e,
 	0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x9e, 0x01, 0x0a, 0x15, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77,
+	0x73, 0x67, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77,
 	0x61, 0x6e, 0x63, 0x65, 0x12, 0x32, 0x0a, 0x07, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
 	0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
@@ -6680,16 +6680,16 @@ var file_sourcehub_feegrant_v1beta1_tx_proto_rawDesc = []byte{
 	0x74, 0x65, 0x65, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x67,
 	0x72, 0x61, 0x6e, 0x74, 0x65, 0x65, 0x44, 0x69, 0x64, 0x3a, 0x30, 0x82, 0xe7, 0xb0, 0x2a, 0x07,
 	0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x8a, 0xe7, 0xb0, 0x2a, 0x1f, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65, 0x44,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x4d, 0x73, 0x67, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65, 0x44,
 	0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x22, 0x1f, 0x0a, 0x1d, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77,
+	0x73, 0x67, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77,
 	0x61, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x53, 0x0a, 0x16,
 	0x45, 0x76, 0x65, 0x6e, 0x74, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c,
 	0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65,
 	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72,
 	0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x65, 0x5f, 0x64, 0x69, 0x64, 0x18,
 	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x65, 0x44, 0x69,
-	0x64, 0x22, 0x54, 0x0a, 0x17, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65,
+	0x64, 0x22, 0x54, 0x0a, 0x17, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65,
 	0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x18, 0x0a, 0x07,
 	0x67, 0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x67,
 	0x72, 0x61, 0x6e, 0x74, 0x65, 0x72, 0x12, 0x1f, 0x0a, 0x0b, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x65,
@@ -6735,13 +6735,13 @@ var file_sourcehub_feegrant_v1beta1_tx_proto_rawDesc = []byte{
 	0x75, 0x62, 0x2e, 0x66, 0x65, 0x65, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x62, 0x65,
 	0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x47, 0x72, 0x61, 0x6e, 0x74, 0x44, 0x49, 0x44, 0x41,
 	0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x82, 0x01, 0x0a, 0x12, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c,
+	0x12, 0x82, 0x01, 0x0a, 0x12, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65, 0x44, 0x49, 0x44, 0x41, 0x6c,
 	0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x12, 0x31, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
 	0x68, 0x75, 0x62, 0x2e, 0x66, 0x65, 0x65, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x2e, 0x76, 0x31, 0x62,
-	0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x76, 0x6f, 0x6b, 0x65, 0x44, 0x49,
+	0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x45, 0x78, 0x70, 0x69, 0x72, 0x65, 0x44, 0x49,
 	0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x1a, 0x39, 0x2e, 0x73, 0x6f, 0x75,
 	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x66, 0x65, 0x65, 0x67, 0x72, 0x61, 0x6e, 0x74, 0x2e,
-	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x76, 0x6f, 0x6b,
+	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x45, 0x78, 0x70, 0x69, 0x72,
 	0x65, 0x44, 0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x52, 0x65, 0x73,
 	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x82, 0x01, 0x0a, 0x12, 0x50, 0x72, 0x75, 0x6e, 0x65, 0x44,
 	0x49, 0x44, 0x41, 0x6c, 0x6c, 0x6f, 0x77, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x12, 0x31, 0x2e, 0x73,
@@ -6792,10 +6792,10 @@ var file_sourcehub_feegrant_v1beta1_tx_proto_goTypes = []interface{}{
 	(*MsgPruneAllowancesResponse)(nil),    // 5: sourcehub.feegrant.v1beta1.MsgPruneAllowancesResponse
 	(*MsgGrantDIDAllowance)(nil),          // 6: sourcehub.feegrant.v1beta1.MsgGrantDIDAllowance
 	(*MsgGrantDIDAllowanceResponse)(nil),  // 7: sourcehub.feegrant.v1beta1.MsgGrantDIDAllowanceResponse
-	(*MsgRevokeDIDAllowance)(nil),         // 8: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance
-	(*MsgRevokeDIDAllowanceResponse)(nil), // 9: sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse
+	(*MsgExpireDIDAllowance)(nil),         // 8: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance
+	(*MsgExpireDIDAllowanceResponse)(nil), // 9: sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse
 	(*EventGrantDIDAllowance)(nil),        // 10: sourcehub.feegrant.v1beta1.EventGrantDIDAllowance
-	(*EventRevokeDIDAllowance)(nil),       // 11: sourcehub.feegrant.v1beta1.EventRevokeDIDAllowance
+	(*EventExpireDIDAllowance)(nil),       // 11: sourcehub.feegrant.v1beta1.EventExpireDIDAllowance
 	(*MsgPruneDIDAllowances)(nil),         // 12: sourcehub.feegrant.v1beta1.MsgPruneDIDAllowances
 	(*MsgPruneDIDAllowancesResponse)(nil), // 13: sourcehub.feegrant.v1beta1.MsgPruneDIDAllowancesResponse
 	(*anypb.Any)(nil),                     // 14: google.protobuf.Any
@@ -6807,13 +6807,13 @@ var file_sourcehub_feegrant_v1beta1_tx_proto_depIdxs = []int32{
 	2,  // 3: sourcehub.feegrant.v1beta1.Msg.RevokeAllowance:input_type -> sourcehub.feegrant.v1beta1.MsgRevokeAllowance
 	4,  // 4: sourcehub.feegrant.v1beta1.Msg.PruneAllowances:input_type -> sourcehub.feegrant.v1beta1.MsgPruneAllowances
 	6,  // 5: sourcehub.feegrant.v1beta1.Msg.GrantDIDAllowance:input_type -> sourcehub.feegrant.v1beta1.MsgGrantDIDAllowance
-	8,  // 6: sourcehub.feegrant.v1beta1.Msg.RevokeDIDAllowance:input_type -> sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowance
+	8,  // 6: sourcehub.feegrant.v1beta1.Msg.ExpireDIDAllowance:input_type -> sourcehub.feegrant.v1beta1.MsgExpireDIDAllowance
 	12, // 7: sourcehub.feegrant.v1beta1.Msg.PruneDIDAllowances:input_type -> sourcehub.feegrant.v1beta1.MsgPruneDIDAllowances
 	1,  // 8: sourcehub.feegrant.v1beta1.Msg.GrantAllowance:output_type -> sourcehub.feegrant.v1beta1.MsgGrantAllowanceResponse
 	3,  // 9: sourcehub.feegrant.v1beta1.Msg.RevokeAllowance:output_type -> sourcehub.feegrant.v1beta1.MsgRevokeAllowanceResponse
 	5,  // 10: sourcehub.feegrant.v1beta1.Msg.PruneAllowances:output_type -> sourcehub.feegrant.v1beta1.MsgPruneAllowancesResponse
 	7,  // 11: sourcehub.feegrant.v1beta1.Msg.GrantDIDAllowance:output_type -> sourcehub.feegrant.v1beta1.MsgGrantDIDAllowanceResponse
-	9,  // 12: sourcehub.feegrant.v1beta1.Msg.RevokeDIDAllowance:output_type -> sourcehub.feegrant.v1beta1.MsgRevokeDIDAllowanceResponse
+	9,  // 12: sourcehub.feegrant.v1beta1.Msg.ExpireDIDAllowance:output_type -> sourcehub.feegrant.v1beta1.MsgExpireDIDAllowanceResponse
 	13, // 13: sourcehub.feegrant.v1beta1.Msg.PruneDIDAllowances:output_type -> sourcehub.feegrant.v1beta1.MsgPruneDIDAllowancesResponse
 	8,  // [8:14] is the sub-list for method output_type
 	2,  // [2:8] is the sub-list for method input_type
@@ -6925,7 +6925,7 @@ func file_sourcehub_feegrant_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRevokeDIDAllowance); i {
+			switch v := v.(*MsgExpireDIDAllowance); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6937,7 +6937,7 @@ func file_sourcehub_feegrant_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRevokeDIDAllowanceResponse); i {
+			switch v := v.(*MsgExpireDIDAllowanceResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -6961,7 +6961,7 @@ func file_sourcehub_feegrant_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_feegrant_v1beta1_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EventRevokeDIDAllowance); i {
+			switch v := v.(*EventExpireDIDAllowance); i {
 			case 0:
 				return &v.state
 			case 1:

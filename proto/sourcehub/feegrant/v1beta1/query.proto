@@ -32,6 +32,11 @@ service Query {
     option (google.api.http).get = "/sourcehub/feegrant/v1beta1/did_allowance/{granter}/{grantee_did}";
   }
 
+  // DIDAllowances returns all the DID grants for the given grantee DID.
+  rpc DIDAllowances(QueryDIDAllowancesRequest) returns (QueryDIDAllowancesResponse) {
+    option (google.api.http).get = "/sourcehub/feegrant/v1beta1/did_allowances/{grantee_did}";
+  }
+
   // DIDAllowancesByGranter returns all the DID grants given by an address.
   rpc DIDAllowancesByGranter(QueryDIDAllowancesByGranterRequest) returns (QueryDIDAllowancesByGranterResponse) {
     option (google.api.http).get = "/sourcehub/feegrant/v1beta1/did_issued/{granter}";
@@ -102,6 +107,24 @@ message QueryDIDAllowanceRequest {
 message QueryDIDAllowanceResponse {
   // allowance is an allowance granted for DID by granter.
   sourcehub.feegrant.v1beta1.Grant allowance = 1;
+}
+
+// QueryDIDAllowancesRequest is the request type for the Query/DIDAllowances RPC method.
+message QueryDIDAllowancesRequest {
+  // grantee_did is the DID being granted allowances.
+  string grantee_did = 1;
+
+  // pagination defines a pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// QueryDIDAllowancesResponse is the response type for the Query/DIDAllowances RPC method.
+message QueryDIDAllowancesResponse {
+  // allowances are DID allowances granted for the grantee DID.
+  repeated sourcehub.feegrant.v1beta1.Grant allowances = 1;
+
+  // pagination defines a pagination for the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
 // QueryDIDAllowancesByGranterRequest is the request type for the Query/DIDAllowancesByGranter RPC method.
