@@ -50,10 +50,13 @@ func paginateSlice(items []string, pageReq *query.PageRequest) ([]string, *query
 	// Handle key-based pagination
 	offset := pageReq.Offset
 	if len(pageReq.Key) > 0 {
-		// Decode offset from key
-		if len(pageReq.Key) == 8 {
-			offset = binary.BigEndian.Uint64(pageReq.Key)
+		// Decode offset from key (uint64 = 8 bytes)
+		if len(pageReq.Key) != 8 {
+			return []string{}, &query.PageResponse{
+				Total: total,
+			}
 		}
+		offset = binary.BigEndian.Uint64(pageReq.Key)
 	}
 
 	// Determine limit

@@ -328,3 +328,24 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeOffset() {
 	require.Empty(s.T(), resp.Ids)
 	require.Equal(s.T(), uint64(100), resp.Pagination.Total)
 }
+
+func (s *queryPolicyIdsSuite) TestQueryPolicyIds_MalformedKey() {
+	ctx, k, accKeep := setupKeeper(s.T())
+
+	creator := accKeep.FirstAcc().GetAddress().String()
+
+	names := []string{"P1", "P2", "P3"}
+	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+
+	// Test with malformed key
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Key:   []byte{0x01, 0x02}, // Only 2 bytes instead of 8
+			Limit: 10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
+	require.Empty(s.T(), resp.Ids) // Should return empty on malformed key
+	require.Equal(s.T(), uint64(3), resp.Pagination.Total)
+}
