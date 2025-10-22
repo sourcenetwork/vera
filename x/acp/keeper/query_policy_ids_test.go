@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/types/query"
 	"gopkg.in/yaml.v3"
 
 	"github.com/stretchr/testify/require"
@@ -180,4 +181,150 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	require.NoError(s.T(), err)
 	require.NotNil(s.T(), resp)
 	require.ElementsMatch(s.T(), policyIds, resp.Ids)
+}
+
+func (s *queryPolicyIdsSuite) TestQueryPolicyIds_WithPagination() {
+	ctx, k, accKeep := setupKeeper(s.T())
+
+	creator := accKeep.FirstAcc().GetAddress().String()
+
+	// Create 25 policies
+	names := []string{}
+	for i := 0; i < 25; i++ {
+		names = append(names, "Policy"+strconv.Itoa(i))
+	}
+	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+
+	// Test first page with limit 10
+	resp1, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Limit: 10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp1)
+	require.Len(s.T(), resp1.Ids, 10)
+	require.Equal(s.T(), uint64(25), resp1.Pagination.Total)
+	require.NotNil(s.T(), resp1.Pagination.NextKey)
+
+	// Test second page with offset 10
+	resp2, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Offset: 10,
+			Limit:  10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp2)
+	require.Len(s.T(), resp2.Ids, 10)
+	require.Equal(s.T(), uint64(25), resp2.Pagination.Total)
+
+	// Test third page with offset 20 (should get remaining 5)
+	resp3, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Offset: 20,
+			Limit:  10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp3)
+	require.Len(s.T(), resp3.Ids, 5)
+	require.Equal(s.T(), uint64(25), resp3.Pagination.Total)
+	require.Nil(s.T(), resp3.Pagination.NextKey)
+
+	// Verify all pages combined match all policy IDs
+	allPages := append(resp1.Ids, resp2.Ids...)
+	allPages = append(allPages, resp3.Ids...)
+	require.ElementsMatch(s.T(), allPolicyIds, allPages)
+
+	// Verify no overlap between pages
+	require.NotContains(s.T(), resp2.Ids, resp1.Ids[0])
+	require.NotContains(s.T(), resp3.Ids, resp1.Ids[0])
+	require.NotContains(s.T(), resp3.Ids, resp2.Ids[0])
+}
+
+func (s *queryPolicyIdsSuite) TestQueryPolicyIds_WithKeyBasedPagination() {
+	ctx, k, accKeep := setupKeeper(s.T())
+
+	creator := accKeep.FirstAcc().GetAddress().String()
+
+	// Create 25 policies
+	names := []string{}
+	for i := 0; i < 25; i++ {
+		names = append(names, "Policy"+strconv.Itoa(i))
+	}
+	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+
+	// Test first page with limit 10
+	resp1, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Limit: 10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp1)
+	require.Len(s.T(), resp1.Ids, 10)
+	require.Equal(s.T(), uint64(25), resp1.Pagination.Total)
+	require.NotNil(s.T(), resp1.Pagination.NextKey)
+
+	// Test second page using NextKey from first page
+	resp2, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Key:   resp1.Pagination.NextKey,
+			Limit: 10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp2)
+	require.Len(s.T(), resp2.Ids, 10)
+	require.Equal(s.T(), uint64(25), resp2.Pagination.Total)
+	require.NotNil(s.T(), resp2.Pagination.NextKey)
+
+	// Test third page using NextKey from second page
+	resp3, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Key:   resp2.Pagination.NextKey,
+			Limit: 10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp3)
+	require.Len(s.T(), resp3.Ids, 5)
+	require.Equal(s.T(), uint64(25), resp3.Pagination.Total)
+	require.Nil(s.T(), resp3.Pagination.NextKey)
+
+	// Verify all pages combined match all policy IDs
+	allPages := append(resp1.Ids, resp2.Ids...)
+	allPages = append(allPages, resp3.Ids...)
+	require.ElementsMatch(s.T(), allPolicyIds, allPages)
+
+	// Verify no overlap between pages
+	require.NotContains(s.T(), resp2.Ids, resp1.Ids[0])
+	require.NotContains(s.T(), resp3.Ids, resp1.Ids[0])
+	require.NotContains(s.T(), resp3.Ids, resp2.Ids[0])
+}
+
+func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeOffset() {
+	ctx, k, accKeep := setupKeeper(s.T())
+
+	creator := accKeep.FirstAcc().GetAddress().String()
+
+	// Create policies to test large offset handling
+	names := []string{}
+	for i := 0; i < 100; i++ {
+		names = append(names, "Policy"+strconv.Itoa(i))
+	}
+	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+
+	// Test with offset beyond total
+	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
+		Pagination: &query.PageRequest{
+			Offset: 300,
+			Limit:  10,
+		},
+	})
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
+	require.Empty(s.T(), resp.Ids)
+	require.Equal(s.T(), uint64(100), resp.Pagination.Total)
 }
