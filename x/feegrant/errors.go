@@ -20,4 +20,6 @@ var (
 	ErrNoMessages = errors.Register(DefaultCodespace, 6, "allowed messages are empty")
 	// ErrMessageNotAllowed error if message is not allowed
 	ErrMessageNotAllowed = errors.Register(DefaultCodespace, 7, "message not allowed")
+	// ErrInvalidDID error if a DID is not valid
+	ErrInvalidDID = errors.Register(DefaultCodespace, 8, "invalid DID")
 )

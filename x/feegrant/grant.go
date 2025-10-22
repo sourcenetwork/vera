@@ -92,7 +92,7 @@ func (a DIDGrant) ValidateBasic() error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "missing granter address")
 	}
 	if len(a.GranteeDid) <= 4 || a.GranteeDid[:4] != "did:" {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "invalid DID format")
+		return ErrInvalidDID
 	}
 
 	f, err := a.GetDIDGrant()

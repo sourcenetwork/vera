@@ -147,14 +147,14 @@ func TestDIDGrant(t *testing.T) {
 			expires:    oneYear,
 			valid:      false,
 		},
-		"invalid DID format - no prefix": {
+		"invalid DID - no prefix": {
 			granter:    addr,
 			granteeDID: "example:bob",
 			limit:      uopen,
 			expires:    oneYear,
 			valid:      false,
 		},
-		"invalid DID format - short": {
+		"invalid DID - short": {
 			granter:    addr,
 			granteeDID: "did:",
 			limit:      uopen,
