@@ -160,8 +160,7 @@ func (am AppModule) EndBlock(ctx context.Context) error {
 	// Check and update expired JWS tokens
 	if err := am.keeper.CheckAndUpdateExpiredTokens(ctx); err != nil {
 		// Log error but don't halt the chain
-		sdkCtx := sdk.UnwrapSDKContext(ctx)
-		sdkCtx.Logger().Error("failed to check and update expired JWS tokens", "error", err)
+		sdk.UnwrapSDKContext(ctx).Logger().Error("failed to check and update expired JWS tokens", "error", err)
 	}
 	return nil
 }
