@@ -19,11 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Params_FullMethodName             = "/sourcehub.hub.Query/Params"
-	Query_JWSToken_FullMethodName           = "/sourcehub.hub.Query/JWSToken"
-	Query_JWSTokensByDID_FullMethodName     = "/sourcehub.hub.Query/JWSTokensByDID"
-	Query_JWSTokensByAccount_FullMethodName = "/sourcehub.hub.Query/JWSTokensByAccount"
-	Query_AllJWSTokens_FullMethodName       = "/sourcehub.hub.Query/AllJWSTokens"
+	Query_Params_FullMethodName = "/sourcehub.hub.Query/Params"
 )
 
 // QueryClient is the client API for Query service.
@@ -34,14 +30,6 @@ const (
 type QueryClient interface {
 	// Parameters queries the parameters of the module.
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
-	// JWSToken queries a specific JWS token by its hash.
-	JWSToken(ctx context.Context, in *QueryJWSTokenRequest, opts ...grpc.CallOption) (*QueryJWSTokenResponse, error)
-	// JWSTokensByDID queries all JWS tokens for a specific DID.
-	JWSTokensByDID(ctx context.Context, in *QueryJWSTokensByDIDRequest, opts ...grpc.CallOption) (*QueryJWSTokensByDIDResponse, error)
-	// JWSTokensByAccount queries all JWS tokens for a specific authorized account.
-	JWSTokensByAccount(ctx context.Context, in *QueryJWSTokensByAccountRequest, opts ...grpc.CallOption) (*QueryJWSTokensByAccountResponse, error)
-	// AllJWSTokens queries all JWS tokens with pagination.
-	AllJWSTokens(ctx context.Context, in *QueryAllJWSTokensRequest, opts ...grpc.CallOption) (*QueryAllJWSTokensResponse, error)
 }
 
 type queryClient struct {
@@ -62,46 +50,6 @@ func (c *queryClient) Params(ctx context.Context, in *QueryParamsRequest, opts .
 	return out, nil
 }
 
-func (c *queryClient) JWSToken(ctx context.Context, in *QueryJWSTokenRequest, opts ...grpc.CallOption) (*QueryJWSTokenResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryJWSTokenResponse)
-	err := c.cc.Invoke(ctx, Query_JWSToken_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) JWSTokensByDID(ctx context.Context, in *QueryJWSTokensByDIDRequest, opts ...grpc.CallOption) (*QueryJWSTokensByDIDResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryJWSTokensByDIDResponse)
-	err := c.cc.Invoke(ctx, Query_JWSTokensByDID_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) JWSTokensByAccount(ctx context.Context, in *QueryJWSTokensByAccountRequest, opts ...grpc.CallOption) (*QueryJWSTokensByAccountResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryJWSTokensByAccountResponse)
-	err := c.cc.Invoke(ctx, Query_JWSTokensByAccount_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) AllJWSTokens(ctx context.Context, in *QueryAllJWSTokensRequest, opts ...grpc.CallOption) (*QueryAllJWSTokensResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(QueryAllJWSTokensResponse)
-	err := c.cc.Invoke(ctx, Query_AllJWSTokens_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -110,14 +58,6 @@ func (c *queryClient) AllJWSTokens(ctx context.Context, in *QueryAllJWSTokensReq
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
-	// JWSToken queries a specific JWS token by its hash.
-	JWSToken(context.Context, *QueryJWSTokenRequest) (*QueryJWSTokenResponse, error)
-	// JWSTokensByDID queries all JWS tokens for a specific DID.
-	JWSTokensByDID(context.Context, *QueryJWSTokensByDIDRequest) (*QueryJWSTokensByDIDResponse, error)
-	// JWSTokensByAccount queries all JWS tokens for a specific authorized account.
-	JWSTokensByAccount(context.Context, *QueryJWSTokensByAccountRequest) (*QueryJWSTokensByAccountResponse, error)
-	// AllJWSTokens queries all JWS tokens with pagination.
-	AllJWSTokens(context.Context, *QueryAllJWSTokensRequest) (*QueryAllJWSTokensResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -130,18 +70,6 @@ type UnimplementedQueryServer struct{}
 
 func (UnimplementedQueryServer) Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
-}
-func (UnimplementedQueryServer) JWSToken(context.Context, *QueryJWSTokenRequest) (*QueryJWSTokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JWSToken not implemented")
-}
-func (UnimplementedQueryServer) JWSTokensByDID(context.Context, *QueryJWSTokensByDIDRequest) (*QueryJWSTokensByDIDResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JWSTokensByDID not implemented")
-}
-func (UnimplementedQueryServer) JWSTokensByAccount(context.Context, *QueryJWSTokensByAccountRequest) (*QueryJWSTokensByAccountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method JWSTokensByAccount not implemented")
-}
-func (UnimplementedQueryServer) AllJWSTokens(context.Context, *QueryAllJWSTokensRequest) (*QueryAllJWSTokensResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AllJWSTokens not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -182,78 +110,6 @@ func _Query_Params_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_JWSToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryJWSTokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).JWSToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_JWSToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).JWSToken(ctx, req.(*QueryJWSTokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_JWSTokensByDID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryJWSTokensByDIDRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).JWSTokensByDID(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_JWSTokensByDID_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).JWSTokensByDID(ctx, req.(*QueryJWSTokensByDIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_JWSTokensByAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryJWSTokensByAccountRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).JWSTokensByAccount(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_JWSTokensByAccount_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).JWSTokensByAccount(ctx, req.(*QueryJWSTokensByAccountRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_AllJWSTokens_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllJWSTokensRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).AllJWSTokens(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Query_AllJWSTokens_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).AllJWSTokens(ctx, req.(*QueryAllJWSTokensRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -264,22 +120,6 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Params",
 			Handler:    _Query_Params_Handler,
-		},
-		{
-			MethodName: "JWSToken",
-			Handler:    _Query_JWSToken_Handler,
-		},
-		{
-			MethodName: "JWSTokensByDID",
-			Handler:    _Query_JWSTokensByDID_Handler,
-		},
-		{
-			MethodName: "JWSTokensByAccount",
-			Handler:    _Query_JWSTokensByAccount_Handler,
-		},
-		{
-			MethodName: "AllJWSTokens",
-			Handler:    _Query_AllJWSTokens_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

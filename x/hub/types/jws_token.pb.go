@@ -59,13 +59,12 @@ func (JWSTokenStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_9cf48ac1bca5ef47, []int{0}
 }
 
-// JWSTokenRecord represents a stored JWS token with its metadata
-// This message is used for internal storage and SHOULD NOT be returned
-// directly in query responses. Use JWSTokenInfo for public queries instead.
+// JWSTokenRecord represents a stored JWS token with its metadata.
+// The bearer_token field contains sensitive credentials and should never be exposed via public APIs or query endpoints.
 type JWSTokenRecord struct {
 	// token_hash is the unique identifier of the JWS token
 	TokenHash string `protobuf:"bytes,1,opt,name=token_hash,json=tokenHash,proto3" json:"token_hash,omitempty"`
-	// bearer_token is the full JWS token string. It should not be exposed in queries.
+	// bearer_token is the full JWS token string.
 	BearerToken string `protobuf:"bytes,2,opt,name=bearer_token,json=bearerToken,proto3" json:"bearer_token,omitempty"`
 	// issuer_did is the DID that issued/signed the token.
 	IssuerDid string `protobuf:"bytes,3,opt,name=issuer_did,json=issuerDid,proto3" json:"issuer_did,omitempty"`
@@ -197,178 +196,46 @@ func (m *JWSTokenRecord) GetInvalidatedBy() string {
 	return ""
 }
 
-// JWSTokenInfo is the public-facing information about a JWS token.
-// This message is safe to return in queries as it excludes the bearer_token.
-type JWSTokenInfo struct {
-	// token_hash is the unique identifier (hash) of the JWS token.
-	TokenHash string `protobuf:"bytes,1,opt,name=token_hash,json=tokenHash,proto3" json:"token_hash,omitempty"`
-	// issuer_did is the DID that issued/signed the token.
-	IssuerDid string `protobuf:"bytes,2,opt,name=issuer_did,json=issuerDid,proto3" json:"issuer_did,omitempty"`
-	// authorized_account is the account authorized to use this token.
-	AuthorizedAccount string `protobuf:"bytes,3,opt,name=authorized_account,json=authorizedAccount,proto3" json:"authorized_account,omitempty"`
-	// issued_at is when the token was created.
-	IssuedAt time.Time `protobuf:"bytes,4,opt,name=issued_at,json=issuedAt,proto3,stdtime" json:"issued_at"`
-	// expires_at is when the token expires.
-	ExpiresAt time.Time `protobuf:"bytes,5,opt,name=expires_at,json=expiresAt,proto3,stdtime" json:"expires_at"`
-	// status is the current validity status of the token.
-	Status JWSTokenStatus `protobuf:"varint,6,opt,name=status,proto3,enum=sourcehub.hub.JWSTokenStatus" json:"status,omitempty"`
-	// first_used_at is when the token was first used in a transaction.
-	FirstUsedAt *time.Time `protobuf:"bytes,7,opt,name=first_used_at,json=firstUsedAt,proto3,stdtime" json:"first_used_at,omitempty"`
-	// last_used_at is when the token was last used in a transaction.
-	LastUsedAt *time.Time `protobuf:"bytes,8,opt,name=last_used_at,json=lastUsedAt,proto3,stdtime" json:"last_used_at,omitempty"`
-	// invalidated_at is when the token was manually invalidated (if applicable).
-	InvalidatedAt *time.Time `protobuf:"bytes,9,opt,name=invalidated_at,json=invalidatedAt,proto3,stdtime" json:"invalidated_at,omitempty"`
-	// invalidated_by is the account that invalidated the token (if applicable).
-	InvalidatedBy string `protobuf:"bytes,10,opt,name=invalidated_by,json=invalidatedBy,proto3" json:"invalidated_by,omitempty"`
-}
-
-func (m *JWSTokenInfo) Reset()         { *m = JWSTokenInfo{} }
-func (m *JWSTokenInfo) String() string { return proto.CompactTextString(m) }
-func (*JWSTokenInfo) ProtoMessage()    {}
-func (*JWSTokenInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9cf48ac1bca5ef47, []int{1}
-}
-func (m *JWSTokenInfo) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *JWSTokenInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_JWSTokenInfo.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *JWSTokenInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_JWSTokenInfo.Merge(m, src)
-}
-func (m *JWSTokenInfo) XXX_Size() int {
-	return m.Size()
-}
-func (m *JWSTokenInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_JWSTokenInfo.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_JWSTokenInfo proto.InternalMessageInfo
-
-func (m *JWSTokenInfo) GetTokenHash() string {
-	if m != nil {
-		return m.TokenHash
-	}
-	return ""
-}
-
-func (m *JWSTokenInfo) GetIssuerDid() string {
-	if m != nil {
-		return m.IssuerDid
-	}
-	return ""
-}
-
-func (m *JWSTokenInfo) GetAuthorizedAccount() string {
-	if m != nil {
-		return m.AuthorizedAccount
-	}
-	return ""
-}
-
-func (m *JWSTokenInfo) GetIssuedAt() time.Time {
-	if m != nil {
-		return m.IssuedAt
-	}
-	return time.Time{}
-}
-
-func (m *JWSTokenInfo) GetExpiresAt() time.Time {
-	if m != nil {
-		return m.ExpiresAt
-	}
-	return time.Time{}
-}
-
-func (m *JWSTokenInfo) GetStatus() JWSTokenStatus {
-	if m != nil {
-		return m.Status
-	}
-	return JWSTokenStatus_STATUS_UNSPECIFIED
-}
-
-func (m *JWSTokenInfo) GetFirstUsedAt() *time.Time {
-	if m != nil {
-		return m.FirstUsedAt
-	}
-	return nil
-}
-
-func (m *JWSTokenInfo) GetLastUsedAt() *time.Time {
-	if m != nil {
-		return m.LastUsedAt
-	}
-	return nil
-}
-
-func (m *JWSTokenInfo) GetInvalidatedAt() *time.Time {
-	if m != nil {
-		return m.InvalidatedAt
-	}
-	return nil
-}
-
-func (m *JWSTokenInfo) GetInvalidatedBy() string {
-	if m != nil {
-		return m.InvalidatedBy
-	}
-	return ""
-}
-
 func init() {
 	proto.RegisterEnum("sourcehub.hub.JWSTokenStatus", JWSTokenStatus_name, JWSTokenStatus_value)
 	proto.RegisterType((*JWSTokenRecord)(nil), "sourcehub.hub.JWSTokenRecord")
-	proto.RegisterType((*JWSTokenInfo)(nil), "sourcehub.hub.JWSTokenInfo")
 }
 
 func init() { proto.RegisterFile("sourcehub/hub/jws_token.proto", fileDescriptor_9cf48ac1bca5ef47) }
 
 var fileDescriptor_9cf48ac1bca5ef47 = []byte{
-	// 542 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xdd, 0x6a, 0x1a, 0x41,
-	0x14, 0xc7, 0xdd, 0xc4, 0x18, 0x3d, 0x7e, 0x60, 0x87, 0x52, 0x16, 0xc1, 0xd5, 0x06, 0x0a, 0x52,
-	0xe8, 0x2e, 0xa4, 0xf4, 0x01, 0xd6, 0x98, 0x36, 0x96, 0x22, 0xc5, 0x8f, 0x16, 0x7a, 0xb3, 0xcc,
-	0xba, 0xa3, 0x3b, 0x8d, 0x3a, 0x32, 0x33, 0xdb, 0xc4, 0x3e, 0x45, 0x1e, 0xa6, 0x0f, 0x91, 0xcb,
-	0x5c, 0xb6, 0x37, 0x6d, 0xd1, 0x17, 0x29, 0x3b, 0xa3, 0x55, 0xa1, 0x10, 0x4b, 0xbc, 0x58, 0xd8,
-	0x3d, 0xe7, 0x7f, 0x7e, 0xb3, 0x67, 0xce, 0x9f, 0x03, 0x65, 0xc1, 0x22, 0xde, 0x27, 0x61, 0xe4,
-	0x3b, 0xf1, 0xf3, 0xf9, 0x4a, 0x78, 0x92, 0x5d, 0x92, 0x89, 0x3d, 0xe5, 0x4c, 0x32, 0x94, 0xff,
-	0x9b, 0xb6, 0xc3, 0xc8, 0x2f, 0x3d, 0x1e, 0xb2, 0x21, 0x53, 0x19, 0x27, 0x7e, 0xd3, 0xa2, 0x52,
-	0x65, 0xc8, 0xd8, 0x70, 0x44, 0x1c, 0xf5, 0xe5, 0x47, 0x03, 0x47, 0xd2, 0x31, 0x11, 0x12, 0x8f,
-	0xa7, 0x5a, 0x70, 0xf2, 0x23, 0x09, 0x85, 0xb7, 0x1f, 0x3b, 0xdd, 0x18, 0xdc, 0x26, 0x7d, 0xc6,
-	0x03, 0x54, 0x06, 0x50, 0xe7, 0x78, 0x21, 0x16, 0xa1, 0x69, 0x54, 0x8d, 0x5a, 0xa6, 0x9d, 0x51,
-	0x91, 0x0b, 0x2c, 0x42, 0xf4, 0x14, 0x72, 0x3e, 0xc1, 0x9c, 0x70, 0xfd, 0x37, 0xe6, 0x81, 0x12,
-	0x64, 0x75, 0x4c, 0x71, 0x62, 0x02, 0x15, 0x22, 0x22, 0xdc, 0x0b, 0x68, 0x60, 0x1e, 0x6a, 0x82,
-	0x8e, 0x34, 0x68, 0x80, 0x5e, 0x00, 0xc2, 0x91, 0x0c, 0x19, 0xa7, 0x5f, 0x49, 0xe0, 0xe1, 0x7e,
-	0x9f, 0x45, 0x13, 0x69, 0x26, 0x95, 0xec, 0xd1, 0x3a, 0xe3, 0xea, 0x04, 0x72, 0x41, 0xd7, 0x06,
-	0x1e, 0x96, 0xe6, 0x51, 0xd5, 0xa8, 0x65, 0x4f, 0x4b, 0xb6, 0xee, 0xcb, 0x5e, 0xf5, 0x65, 0x77,
-	0x57, 0x7d, 0xd5, 0xd3, 0xb7, 0x3f, 0x2b, 0x89, 0x9b, 0x5f, 0x15, 0xa3, 0x9d, 0xd6, 0x65, 0xae,
-	0x44, 0x67, 0x00, 0xe4, 0x7a, 0x4a, 0x39, 0x11, 0x31, 0x23, 0xf5, 0x1f, 0x8c, 0xcc, 0xb2, 0xce,
-	0x95, 0xe8, 0x15, 0xa4, 0x84, 0xc4, 0x32, 0x12, 0xe6, 0x71, 0xd5, 0xa8, 0x15, 0x4e, 0xcb, 0xf6,
-	0xd6, 0x04, 0xec, 0xd5, 0x35, 0x76, 0x94, 0xa8, 0xbd, 0x14, 0xa3, 0x06, 0xe4, 0x07, 0x94, 0x0b,
-	0xe9, 0x45, 0x42, 0xb7, 0x90, 0xbe, 0xf7, 0xf8, 0xa4, 0x3a, 0x3a, 0xab, 0xca, 0x7a, 0x42, 0x75,
-	0x50, 0x87, 0xdc, 0x08, 0x6f, 0x40, 0x32, 0x3b, 0x42, 0x20, 0xae, 0x5a, 0x32, 0xde, 0x40, 0x81,
-	0x4e, 0xbe, 0xe0, 0x11, 0x0d, 0xb0, 0xd4, 0x14, 0xd8, 0x91, 0x92, 0xdf, 0xa8, 0x73, 0x25, 0x7a,
-	0xb6, 0x0d, 0xf2, 0x67, 0x66, 0x56, 0x0d, 0x6f, 0x53, 0x56, 0x9f, 0x9d, 0x7c, 0x4b, 0x42, 0x6e,
-	0x75, 0x29, 0xcd, 0xc9, 0x80, 0xdd, 0xe7, 0xac, 0x6d, 0xdb, 0x1c, 0xec, 0x66, 0x9b, 0xc3, 0x9d,
-	0x6c, 0x93, 0xdc, 0x83, 0x6d, 0x8e, 0x1e, 0x6a, 0x9b, 0xd4, 0x83, 0x6c, 0x73, 0xbc, 0x0f, 0xdb,
-	0xa4, 0xf7, 0x62, 0x9b, 0xcc, 0xbe, 0x6c, 0x03, 0xff, 0xb0, 0xcd, 0xf3, 0xd6, 0x7a, 0x23, 0xe9,
-	0x3b, 0x41, 0x4f, 0x00, 0x75, 0xba, 0x6e, 0xb7, 0xd7, 0xf1, 0x7a, 0xad, 0xce, 0xfb, 0xf3, 0xb3,
-	0xe6, 0xeb, 0xe6, 0x79, 0xa3, 0x98, 0x40, 0x45, 0xc8, 0x2d, 0xe3, 0x1f, 0xdc, 0x77, 0xcd, 0x46,
-	0xd1, 0x40, 0x08, 0x0a, 0xcb, 0x48, 0xb3, 0xa5, 0x63, 0x07, 0xf5, 0x8b, 0xdb, 0xb9, 0x65, 0xdc,
-	0xcd, 0x2d, 0xe3, 0xf7, 0xdc, 0x32, 0x6e, 0x16, 0x56, 0xe2, 0x6e, 0x61, 0x25, 0xbe, 0x2f, 0xac,
-	0xc4, 0x27, 0x7b, 0x48, 0x65, 0x3c, 0x82, 0x3e, 0x1b, 0x3b, 0x7a, 0x28, 0x13, 0x22, 0xaf, 0x18,
-	0xbf, 0x74, 0xd6, 0xab, 0xf7, 0x5a, 0x2d, 0x5f, 0x39, 0x9b, 0x12, 0xe1, 0xa7, 0x54, 0xa7, 0x2f,
-	0xff, 0x04, 0x00, 0x00, 0xff, 0xff, 0xad, 0x0e, 0xcd, 0x59, 0x9a, 0x05, 0x00, 0x00,
+	// 489 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x5f, 0x8f, 0xd2, 0x4c,
+	0x14, 0xc6, 0xdb, 0x7d, 0x79, 0x11, 0x0e, 0x7f, 0x82, 0x13, 0x63, 0x1a, 0x12, 0x0a, 0x9a, 0x98,
+	0x10, 0x13, 0xdb, 0x64, 0x8d, 0x1f, 0xa0, 0x2c, 0xab, 0x8b, 0x31, 0xc4, 0x50, 0xd0, 0xc4, 0x9b,
+	0x66, 0xda, 0xce, 0xb6, 0xe3, 0x02, 0x43, 0x66, 0xa6, 0xee, 0xe2, 0xa7, 0xd8, 0x8f, 0xb5, 0x97,
+	0x7b, 0xa9, 0x37, 0x6a, 0xe0, 0x8b, 0x98, 0xce, 0x14, 0x61, 0xaf, 0x5c, 0x2f, 0x48, 0xe8, 0x39,
+	0xcf, 0xf3, 0x3b, 0x7d, 0xe6, 0x74, 0xa0, 0x23, 0x58, 0xc6, 0x23, 0x92, 0x66, 0xa1, 0x9b, 0xff,
+	0x3e, 0x5f, 0x8a, 0x40, 0xb2, 0x0b, 0xb2, 0x74, 0x56, 0x9c, 0x49, 0x86, 0x1a, 0x7f, 0xda, 0x4e,
+	0x9a, 0x85, 0xed, 0x47, 0x09, 0x4b, 0x98, 0xea, 0xb8, 0xf9, 0x3f, 0x2d, 0x6a, 0x77, 0x13, 0xc6,
+	0x92, 0x39, 0x71, 0xd5, 0x53, 0x98, 0x9d, 0xbb, 0x92, 0x2e, 0x88, 0x90, 0x78, 0xb1, 0xd2, 0x82,
+	0xa7, 0xdf, 0x4b, 0xd0, 0x7c, 0xfb, 0xd1, 0x9f, 0xe6, 0xe0, 0x09, 0x89, 0x18, 0x8f, 0x51, 0x07,
+	0x40, 0xcd, 0x09, 0x52, 0x2c, 0x52, 0xcb, 0xec, 0x99, 0xfd, 0xea, 0xa4, 0xaa, 0x2a, 0x67, 0x58,
+	0xa4, 0xe8, 0x09, 0xd4, 0x43, 0x82, 0x39, 0xe1, 0xfa, 0x6d, 0xac, 0x23, 0x25, 0xa8, 0xe9, 0x9a,
+	0xe2, 0xe4, 0x04, 0x2a, 0x44, 0x46, 0x78, 0x10, 0xd3, 0xd8, 0xfa, 0x4f, 0x13, 0x74, 0x65, 0x48,
+	0x63, 0xf4, 0x02, 0x10, 0xce, 0x64, 0xca, 0x38, 0xfd, 0x4a, 0xe2, 0x00, 0x47, 0x11, 0xcb, 0x96,
+	0xd2, 0x2a, 0x29, 0xd9, 0xc3, 0x7d, 0xc7, 0xd3, 0x0d, 0xe4, 0x81, 0xf6, 0xc6, 0x01, 0x96, 0xd6,
+	0xff, 0x3d, 0xb3, 0x5f, 0x3b, 0x6e, 0x3b, 0x3a, 0x97, 0xb3, 0xcb, 0xe5, 0x4c, 0x77, 0xb9, 0x06,
+	0x95, 0x9b, 0x1f, 0x5d, 0xe3, 0xfa, 0x67, 0xd7, 0x9c, 0x54, 0xb4, 0xcd, 0x93, 0xe8, 0x04, 0x80,
+	0x5c, 0xad, 0x28, 0x27, 0x22, 0x67, 0x94, 0xff, 0x81, 0x51, 0x2d, 0x7c, 0x9e, 0x44, 0xaf, 0xa0,
+	0x2c, 0x24, 0x96, 0x99, 0xb0, 0x1e, 0xf4, 0xcc, 0x7e, 0xf3, 0xb8, 0xe3, 0xdc, 0xd9, 0x80, 0xb3,
+	0x3b, 0x46, 0x5f, 0x89, 0x26, 0x85, 0x18, 0x0d, 0xa1, 0x71, 0x4e, 0xb9, 0x90, 0x41, 0x26, 0x74,
+	0x84, 0xca, 0x5f, 0xc7, 0x97, 0xd4, 0xe8, 0x9a, 0xb2, 0xcd, 0x84, 0x4a, 0x30, 0x80, 0xfa, 0x1c,
+	0x1f, 0x40, 0xaa, 0xf7, 0x84, 0x40, 0xee, 0x2a, 0x18, 0x6f, 0xa0, 0x49, 0x97, 0x5f, 0xf0, 0x9c,
+	0xc6, 0x58, 0x6a, 0x0a, 0xdc, 0x93, 0xd2, 0x38, 0xf0, 0x79, 0x12, 0x3d, 0xbb, 0x0b, 0x0a, 0xd7,
+	0x56, 0x4d, 0x2d, 0xef, 0x50, 0x36, 0x58, 0x3f, 0x1f, 0xef, 0x3f, 0x2d, 0x7d, 0x26, 0xe8, 0x31,
+	0x20, 0x7f, 0xea, 0x4d, 0x67, 0x7e, 0x30, 0x1b, 0xfb, 0xef, 0x4f, 0x4f, 0x46, 0xaf, 0x47, 0xa7,
+	0xc3, 0x96, 0x81, 0x5a, 0x50, 0x2f, 0xea, 0x1f, 0xbc, 0x77, 0xa3, 0x61, 0xcb, 0x44, 0x08, 0x9a,
+	0x45, 0x65, 0x34, 0xd6, 0xb5, 0xa3, 0xc1, 0xd9, 0xcd, 0xc6, 0x36, 0x6f, 0x37, 0xb6, 0xf9, 0x6b,
+	0x63, 0x9b, 0xd7, 0x5b, 0xdb, 0xb8, 0xdd, 0xda, 0xc6, 0xb7, 0xad, 0x6d, 0x7c, 0x72, 0x12, 0x2a,
+	0xf3, 0x15, 0x44, 0x6c, 0xe1, 0xea, 0xa5, 0x2c, 0x89, 0xbc, 0x64, 0xfc, 0xc2, 0xdd, 0xdf, 0xa1,
+	0x2b, 0x75, 0x8b, 0xe4, 0x7a, 0x45, 0x44, 0x58, 0x56, 0x49, 0x5f, 0xfe, 0x0e, 0x00, 0x00, 0xff,
+	0xff, 0x31, 0xd6, 0xab, 0x52, 0x63, 0x03, 0x00, 0x00,
 }
 
 func (m *JWSTokenRecord) Marshal() (dAtA []byte, err error) {
@@ -480,108 +347,6 @@ func (m *JWSTokenRecord) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *JWSTokenInfo) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *JWSTokenInfo) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *JWSTokenInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.InvalidatedBy) > 0 {
-		i -= len(m.InvalidatedBy)
-		copy(dAtA[i:], m.InvalidatedBy)
-		i = encodeVarintJwsToken(dAtA, i, uint64(len(m.InvalidatedBy)))
-		i--
-		dAtA[i] = 0x52
-	}
-	if m.InvalidatedAt != nil {
-		n6, err6 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.InvalidatedAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.InvalidatedAt):])
-		if err6 != nil {
-			return 0, err6
-		}
-		i -= n6
-		i = encodeVarintJwsToken(dAtA, i, uint64(n6))
-		i--
-		dAtA[i] = 0x4a
-	}
-	if m.LastUsedAt != nil {
-		n7, err7 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.LastUsedAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.LastUsedAt):])
-		if err7 != nil {
-			return 0, err7
-		}
-		i -= n7
-		i = encodeVarintJwsToken(dAtA, i, uint64(n7))
-		i--
-		dAtA[i] = 0x42
-	}
-	if m.FirstUsedAt != nil {
-		n8, err8 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.FirstUsedAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.FirstUsedAt):])
-		if err8 != nil {
-			return 0, err8
-		}
-		i -= n8
-		i = encodeVarintJwsToken(dAtA, i, uint64(n8))
-		i--
-		dAtA[i] = 0x3a
-	}
-	if m.Status != 0 {
-		i = encodeVarintJwsToken(dAtA, i, uint64(m.Status))
-		i--
-		dAtA[i] = 0x30
-	}
-	n9, err9 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.ExpiresAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.ExpiresAt):])
-	if err9 != nil {
-		return 0, err9
-	}
-	i -= n9
-	i = encodeVarintJwsToken(dAtA, i, uint64(n9))
-	i--
-	dAtA[i] = 0x2a
-	n10, err10 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.IssuedAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.IssuedAt):])
-	if err10 != nil {
-		return 0, err10
-	}
-	i -= n10
-	i = encodeVarintJwsToken(dAtA, i, uint64(n10))
-	i--
-	dAtA[i] = 0x22
-	if len(m.AuthorizedAccount) > 0 {
-		i -= len(m.AuthorizedAccount)
-		copy(dAtA[i:], m.AuthorizedAccount)
-		i = encodeVarintJwsToken(dAtA, i, uint64(len(m.AuthorizedAccount)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.IssuerDid) > 0 {
-		i -= len(m.IssuerDid)
-		copy(dAtA[i:], m.IssuerDid)
-		i = encodeVarintJwsToken(dAtA, i, uint64(len(m.IssuerDid)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.TokenHash) > 0 {
-		i -= len(m.TokenHash)
-		copy(dAtA[i:], m.TokenHash)
-		i = encodeVarintJwsToken(dAtA, i, uint64(len(m.TokenHash)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintJwsToken(dAtA []byte, offset int, v uint64) int {
 	offset -= sovJwsToken(v)
 	base := offset
@@ -604,50 +369,6 @@ func (m *JWSTokenRecord) Size() (n int) {
 		n += 1 + l + sovJwsToken(uint64(l))
 	}
 	l = len(m.BearerToken)
-	if l > 0 {
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	l = len(m.IssuerDid)
-	if l > 0 {
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	l = len(m.AuthorizedAccount)
-	if l > 0 {
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.IssuedAt)
-	n += 1 + l + sovJwsToken(uint64(l))
-	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.ExpiresAt)
-	n += 1 + l + sovJwsToken(uint64(l))
-	if m.Status != 0 {
-		n += 1 + sovJwsToken(uint64(m.Status))
-	}
-	if m.FirstUsedAt != nil {
-		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.FirstUsedAt)
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	if m.LastUsedAt != nil {
-		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.LastUsedAt)
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	if m.InvalidatedAt != nil {
-		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.InvalidatedAt)
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	l = len(m.InvalidatedBy)
-	if l > 0 {
-		n += 1 + l + sovJwsToken(uint64(l))
-	}
-	return n
-}
-
-func (m *JWSTokenInfo) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.TokenHash)
 	if l > 0 {
 		n += 1 + l + sovJwsToken(uint64(l))
 	}
@@ -1042,377 +763,6 @@ func (m *JWSTokenRecord) Unmarshal(dAtA []byte) error {
 			}
 			iNdEx = postIndex
 		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InvalidatedBy", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.InvalidatedBy = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipJwsToken(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *JWSTokenInfo) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowJwsToken
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: JWSTokenInfo: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: JWSTokenInfo: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field TokenHash", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.TokenHash = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IssuerDid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.IssuerDid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field AuthorizedAccount", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.AuthorizedAccount = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field IssuedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.IssuedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ExpiresAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.ExpiresAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
-			}
-			m.Status = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Status |= JWSTokenStatus(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field FirstUsedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.FirstUsedAt == nil {
-				m.FirstUsedAt = new(time.Time)
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.FirstUsedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LastUsedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.LastUsedAt == nil {
-				m.LastUsedAt = new(time.Time)
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.LastUsedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field InvalidatedAt", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowJwsToken
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthJwsToken
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.InvalidatedAt == nil {
-				m.InvalidatedAt = new(time.Time)
-			}
-			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.InvalidatedAt, dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field InvalidatedBy", wireType)
 			}

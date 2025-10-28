@@ -4,9 +4,7 @@ package sourcehub.hub;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "cosmos/base/query/v1beta1/pagination.proto";
 import "sourcehub/hub/params.proto";
-import "sourcehub/hub/jws_token.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
 
@@ -15,26 +13,6 @@ service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/hub/params";
-  }
-
-  // JWSToken queries a specific JWS token by its hash.
-  rpc JWSToken(QueryJWSTokenRequest) returns (QueryJWSTokenResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/hub/jws_token/{token_hash}";
-  }
-
-  // JWSTokensByDID queries all JWS tokens for a specific DID.
-  rpc JWSTokensByDID(QueryJWSTokensByDIDRequest) returns (QueryJWSTokensByDIDResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/hub/jws_tokens/did/{did}";
-  }
-
-  // JWSTokensByAccount queries all JWS tokens for a specific authorized account.
-  rpc JWSTokensByAccount(QueryJWSTokensByAccountRequest) returns (QueryJWSTokensByAccountResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/hub/jws_tokens/account/{account}";
-  }
-
-  // AllJWSTokens queries all JWS tokens with pagination.
-  rpc AllJWSTokens(QueryAllJWSTokensRequest) returns (QueryAllJWSTokensResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/hub/jws_tokens";
   }
 }
 
@@ -48,62 +26,4 @@ message QueryParamsResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
-}
-
-// QueryJWSTokenRequest is request type for the Query/JWSToken RPC method.
-message QueryJWSTokenRequest {
-  // token_hash is the unique identifier of the JWS token.
-  string token_hash = 1;
-}
-
-// QueryJWSTokenResponse is response type for the Query/JWSToken RPC method.
-message QueryJWSTokenResponse {
-  // token is the JWS token info (excludes bearer_token).
-  JWSTokenInfo token = 1;
-}
-
-// QueryJWSTokensByDIDRequest is request type for the Query/JWSTokensByDID RPC method.
-message QueryJWSTokensByDIDRequest {
-  // did is the DID to query tokens for.
-  string did = 1;
-  // pagination defines an optional pagination for the request.
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
-}
-
-// QueryJWSTokensByDIDResponse is response type for the Query/JWSTokensByDID RPC method.
-message QueryJWSTokensByDIDResponse {
-  // tokens is the list of JWS token info for the DID (excludes bearer_token).
-  repeated JWSTokenInfo tokens = 1;
-  // pagination defines the pagination in the response.
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-// QueryJWSTokensByAccountRequest is request type for the Query/JWSTokensByAccount RPC method.
-message QueryJWSTokensByAccountRequest {
-  // account is the authorized account address to query tokens for.
-  string account = 1;
-  // pagination defines an optional pagination for the request.
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
-}
-
-// QueryJWSTokensByAccountResponse is response type for the Query/JWSTokensByAccount RPC method.
-message QueryJWSTokensByAccountResponse {
-  // tokens is the list of JWS token info for the account (excludes bearer_token).
-  repeated JWSTokenInfo tokens = 1;
-  // pagination defines the pagination in the response.
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
-}
-
-// QueryAllJWSTokensRequest is request type for the Query/AllJWSTokens RPC method.
-message QueryAllJWSTokensRequest {
-  // pagination defines an optional pagination for the request.
-  cosmos.base.query.v1beta1.PageRequest pagination = 1;
-}
-
-// QueryAllJWSTokensResponse is response type for the Query/AllJWSTokens RPC method.
-message QueryAllJWSTokensResponse {
-  // tokens is the list of all JWS token info (excludes bearer_token).
-  repeated JWSTokenInfo tokens = 1;
-  // pagination defines the pagination in the response.
-  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
