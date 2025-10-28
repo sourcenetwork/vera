@@ -16,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -124,11 +125,20 @@ func TestJWSExtensionOptionWithDIDBasedFeegrant(t *testing.T) {
 
 	res, err := clientCtx.BroadcastTxSync(txBytes)
 	require.NoError(t, err)
-	require.Equal(t, uint32(0), res.Code, "grant allowance transaction failed: %s", res.RawLog)
+	require.Equal(t, uint32(0), res.Code, "grant allowance check tx failed: %s", res.RawLog)
 
 	// Wait for transaction to be processed
 	_, err = net.WaitForHeight(3)
 	require.NoError(t, err)
+
+	// Query the transaction to verify it was actually executed successfully
+	txClient := txtypes.NewServiceClient(conn)
+	txResp, err := txClient.GetTx(context.Background(), &txtypes.GetTxRequest{
+		Hash: res.TxHash,
+	})
+	require.NoError(t, err, "should be able to query grant transaction")
+	require.NotNil(t, txResp.TxResponse, "tx response should not be nil")
+	require.Equal(t, uint32(0), txResp.TxResponse.Code, "grant transaction should succeed in block: %s", txResp.TxResponse.RawLog)
 
 	// Verify the DID allowance was created successfully via gRPC query
 	feegrantClient := feegrant.NewQueryClient(conn)

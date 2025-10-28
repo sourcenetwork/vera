@@ -24,7 +24,7 @@ func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -70,7 +70,7 @@ func TestExtensionOptionsDecorator_InvalidJWSExtension(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -111,7 +111,7 @@ func TestExtensionOptionsDecorator_InvalidJWSFormat(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -152,7 +152,7 @@ func TestExtensionOptionsDecorator_InvalidJWSSignature(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -193,7 +193,7 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -236,7 +236,7 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -262,11 +262,62 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 	require.Empty(t, extractedDID, "No DID should be extracted when no extension options are present")
 }
 
+func TestExtensionOptionsDecorator_MultipleExtensionOptions(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+
+	decorator := NewExtensionOptionsDecorator(nil)
+	antehandler := sdk.ChainAnteDecorators(decorator)
+
+	accs := s.CreateTestAccounts(1)
+
+	msg := &acptypes.MsgCreatePolicy{
+		Creator:     accs[0].acc.GetAddress().String(),
+		Policy:      "name: test policy",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+	require.NoError(t, s.txBuilder.SetMsgs(msg))
+
+	// Create two JWS extension options
+	authorizedAccount := accs[0].acc.GetAddress().String()
+	bearerToken1, _ := test.GenerateSignedJWSWithMatchingDID(t, authorizedAccount)
+	bearerToken2, _ := test.GenerateSignedJWSWithMatchingDID(t, authorizedAccount)
+
+	jwsOpt1 := &antetypes.JWSExtensionOption{
+		BearerToken: bearerToken1,
+	}
+	jwsOpt2 := &antetypes.JWSExtensionOption{
+		BearerToken: bearerToken2,
+	}
+
+	// Pack both extension options
+	any1, err := codectypes.NewAnyWithValue(jwsOpt1)
+	require.NoError(t, err)
+	any2, err := codectypes.NewAnyWithValue(jwsOpt2)
+	require.NoError(t, err)
+
+	// Add multiple extension options to the transaction
+	if extBuilder, ok := s.txBuilder.(client.ExtendedTxBuilder); ok {
+		extBuilder.SetExtensionOptions(any1, any2)
+	} else {
+		t.Fatal("TxBuilder does not implement ExtendedTxBuilder")
+	}
+
+	privs, accNums, accSeqs := []cryptotypes.PrivKey{accs[0].priv}, []uint64{0}, []uint64{0}
+	tx, err := s.CreateTestTx(s.ctx, privs, accNums, accSeqs, s.ctx.ChainID(), signing.SignMode_SIGN_MODE_DIRECT)
+	require.NoError(t, err)
+
+	_, err = antehandler(s.ctx, tx, false)
+	require.Error(t, err, "ExtensionOptionsDecorator should reject transactions with multiple extension options")
+	require.Contains(t, err.Error(), "only one extension option is supported")
+	require.Contains(t, err.Error(), "got 2")
+}
+
 func TestExtensionOptionsDecorator_JWSOptionWithInvalidSignature(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -307,7 +358,7 @@ func TestExtensionOptionsDecorator_ExtractDIDFromJWSPayload(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -353,7 +404,7 @@ func TestExtensionOptionsDecorator_ValidJWSWithDIDInPayload(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -399,7 +450,7 @@ func TestExtensionOptionsDecorator_SecurityTamperedJWS(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -444,7 +495,7 @@ func TestExtensionOptionsDecorator_SecurityNoDIDInPayload(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -491,8 +542,8 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	mockFeegrantKeeper := test.NewMockDIDFeegrantKeeper(ctrl)
 
 	// Create both decorators
-	extensionDecorator := NewExtensionOptionsDecorator()
-	feeDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockFeegrantKeeper, nil, s.authStoreKey)
+	extensionDecorator := NewExtensionOptionsDecorator(nil)
+	feeDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockFeegrantKeeper, nil, nil)
 
 	// Chain them in the same order as actual ante handler
 	antehandler := sdk.ChainAnteDecorators(extensionDecorator, feeDecorator)
@@ -532,7 +583,8 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	s.txBuilder.SetGasLimit(200000)
 
 	// Mock expectations for DID-based feegrant
-	mockFeegrantKeeper.EXPECT().UseGrantedFeesByDID(gomock.Any(), feeGranter, userDID, validFee, gomock.Any()).Return(nil)
+	mockFeegrantKeeper.EXPECT().UseFirstAvailableDIDGrant(gomock.Any(), userDID, validFee, gomock.Any()).Return(feeGranter, nil)
+	// Fee deduction happens in the ante handler after feegrant validation
 	s.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), feeGranter, authtypes.FeeCollectorName, validFee).Return(nil)
 
 	// Create transaction
@@ -554,8 +606,8 @@ func TestExtensionAndFeeDecorators_NoDID(t *testing.T) {
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
 	// Create both decorators
-	extensionDecorator := NewExtensionOptionsDecorator()
-	feeDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, s.authStoreKey)
+	extensionDecorator := NewExtensionOptionsDecorator(nil)
+	feeDecorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, s.feeGrantKeeper, nil, nil)
 
 	// Chain them in the same order as actual ante handler
 	antehandler := sdk.ChainAnteDecorators(extensionDecorator, feeDecorator)
@@ -599,7 +651,7 @@ func TestExtensionOptionsDecorator_CorrectAuthorizedAccount(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -645,7 +697,7 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -688,7 +740,7 @@ func TestExtensionOptionsDecorator_MultipleMessagesAllAuthorized(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(1)
@@ -742,7 +794,7 @@ func TestExtensionOptionsDecorator_MultipleMessagesOneUnauthorized(t *testing.T)
 	s := SetupTestSuite(t, true)
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
-	decorator := NewExtensionOptionsDecorator()
+	decorator := NewExtensionOptionsDecorator(nil)
 	antehandler := sdk.ChainAnteDecorators(decorator)
 
 	accs := s.CreateTestAccounts(2)

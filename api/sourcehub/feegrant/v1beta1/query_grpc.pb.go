@@ -23,6 +23,7 @@ const (
 	Query_Allowances_FullMethodName             = "/sourcehub.feegrant.v1beta1.Query/Allowances"
 	Query_AllowancesByGranter_FullMethodName    = "/sourcehub.feegrant.v1beta1.Query/AllowancesByGranter"
 	Query_DIDAllowance_FullMethodName           = "/sourcehub.feegrant.v1beta1.Query/DIDAllowance"
+	Query_DIDAllowances_FullMethodName          = "/sourcehub.feegrant.v1beta1.Query/DIDAllowances"
 	Query_DIDAllowancesByGranter_FullMethodName = "/sourcehub.feegrant.v1beta1.Query/DIDAllowancesByGranter"
 )
 
@@ -40,6 +41,8 @@ type QueryClient interface {
 	AllowancesByGranter(ctx context.Context, in *QueryAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryAllowancesByGranterResponse, error)
 	// DIDAllowance returns granted allowance to the DID by the granter.
 	DIDAllowance(ctx context.Context, in *QueryDIDAllowanceRequest, opts ...grpc.CallOption) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowances returns all the DID grants for the given grantee DID.
+	DIDAllowances(ctx context.Context, in *QueryDIDAllowancesRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesResponse, error)
 	// DIDAllowancesByGranter returns all the DID grants given by an address.
 	DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error)
 }
@@ -92,6 +95,16 @@ func (c *queryClient) DIDAllowance(ctx context.Context, in *QueryDIDAllowanceReq
 	return out, nil
 }
 
+func (c *queryClient) DIDAllowances(ctx context.Context, in *QueryDIDAllowancesRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryDIDAllowancesResponse)
+	err := c.cc.Invoke(ctx, Query_DIDAllowances_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *queryClient) DIDAllowancesByGranter(ctx context.Context, in *QueryDIDAllowancesByGranterRequest, opts ...grpc.CallOption) (*QueryDIDAllowancesByGranterResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryDIDAllowancesByGranterResponse)
@@ -116,6 +129,8 @@ type QueryServer interface {
 	AllowancesByGranter(context.Context, *QueryAllowancesByGranterRequest) (*QueryAllowancesByGranterResponse, error)
 	// DIDAllowance returns granted allowance to the DID by the granter.
 	DIDAllowance(context.Context, *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error)
+	// DIDAllowances returns all the DID grants for the given grantee DID.
+	DIDAllowances(context.Context, *QueryDIDAllowancesRequest) (*QueryDIDAllowancesResponse, error)
 	// DIDAllowancesByGranter returns all the DID grants given by an address.
 	DIDAllowancesByGranter(context.Context, *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error)
 	mustEmbedUnimplementedQueryServer()
@@ -139,6 +154,9 @@ func (UnimplementedQueryServer) AllowancesByGranter(context.Context, *QueryAllow
 }
 func (UnimplementedQueryServer) DIDAllowance(context.Context, *QueryDIDAllowanceRequest) (*QueryDIDAllowanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowance not implemented")
+}
+func (UnimplementedQueryServer) DIDAllowances(context.Context, *QueryDIDAllowancesRequest) (*QueryDIDAllowancesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowances not implemented")
 }
 func (UnimplementedQueryServer) DIDAllowancesByGranter(context.Context, *QueryDIDAllowancesByGranterRequest) (*QueryDIDAllowancesByGranterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DIDAllowancesByGranter not implemented")
@@ -236,6 +254,24 @@ func _Query_DIDAllowance_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_DIDAllowances_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryDIDAllowancesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).DIDAllowances(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_DIDAllowances_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).DIDAllowances(ctx, req.(*QueryDIDAllowancesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Query_DIDAllowancesByGranter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryDIDAllowancesByGranterRequest)
 	if err := dec(in); err != nil {
@@ -276,6 +312,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DIDAllowance",
 			Handler:    _Query_DIDAllowance_Handler,
+		},
+		{
+			MethodName: "DIDAllowances",
+			Handler:    _Query_DIDAllowances_Handler,
 		},
 		{
 			MethodName: "DIDAllowancesByGranter",

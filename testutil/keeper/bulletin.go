@@ -25,7 +25,7 @@ import (
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	icatestutil "github.com/sourcenetwork/sourcehub/x/ica/testutil"
+	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
 )
 
 func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -77,7 +77,7 @@ func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		icatestutil.NewICAKeeperStub(),
+		hubtestutil.NewICAKeeperStub(),
 	)
 
 	k := keeper.NewKeeper(

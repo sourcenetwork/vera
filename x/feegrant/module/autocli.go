@@ -56,6 +56,16 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					},
 				},
 				{
+					RpcMethod: "DIDAllowances",
+					Use:       "did-grants-by-grantee [grantee-did]",
+					Short:     "Query all DID grants of a grantee DID",
+					Long:      "Queries all the DID grants for a grantee DID.",
+					Example:   fmt.Sprintf(`$ %s query feegrant did-grants-by-grantee [grantee-did]`, version.AppName),
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "grantee_did"},
+					},
+				},
+				{
 					RpcMethod: "DIDAllowancesByGranter",
 					Use:       "did-grants-by-granter [granter]",
 					Short:     "Query all DID grants by a granter",

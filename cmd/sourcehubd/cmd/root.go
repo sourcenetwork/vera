@@ -26,6 +26,7 @@ import (
 
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/sourcenetwork/sourcehub/app"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 )
 
 // NewRootCmd creates a new root command for sourcehubd. It is called once in the main function.
@@ -152,6 +153,9 @@ func ProvideClientContext(
 	txConfig client.TxConfig,
 	legacyAmino *codec.LegacyAmino,
 ) client.Context {
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(interfaceRegistry)
+
 	clientCtx := client.Context{}.
 		WithCodec(appCodec).
 		WithInterfaceRegistry(interfaceRegistry).

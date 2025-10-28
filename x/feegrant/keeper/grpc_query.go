@@ -170,6 +170,45 @@ func (q Keeper) DIDAllowance(c context.Context, req *feegrant.QueryDIDAllowanceR
 	}, nil
 }
 
+// DIDAllowances queries all the DID allowances granted to the given DID.
+func (q Keeper) DIDAllowances(c context.Context, req *feegrant.QueryDIDAllowancesRequest) (*feegrant.QueryDIDAllowancesResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	if req.GranteeDid == "" {
+		return nil, status.Error(codes.InvalidArgument, "grantee DID cannot be empty")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	var grants []*feegrant.Grant
+
+	store := q.storeService.OpenKVStore(ctx)
+	grantsStore := prefix.NewStore(runtime.KVStoreAdapter(store), feegrant.FeeAllowancePrefixByDID(req.GranteeDid))
+
+	pageRes, err := query.Paginate(grantsStore, req.Pagination, func(key, value []byte) error {
+		var didGrant feegrant.DIDGrant
+
+		if err := q.cdc.Unmarshal(value, &didGrant); err != nil {
+			return err
+		}
+
+		grant := &feegrant.Grant{
+			Granter:   didGrant.Granter,
+			Grantee:   didGrant.GranteeDid,
+			Allowance: didGrant.Allowance,
+		}
+		grants = append(grants, grant)
+		return nil
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &feegrant.QueryDIDAllowancesResponse{Allowances: grants, Pagination: pageRes}, nil
+}
+
 // DIDAllowancesByGranter queries all the DID allowances granted by the given granter.
 func (q Keeper) DIDAllowancesByGranter(c context.Context, req *feegrant.QueryDIDAllowancesByGranterRequest) (*feegrant.QueryDIDAllowancesByGranterResponse, error) {
 	if req == nil {

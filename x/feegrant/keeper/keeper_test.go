@@ -534,9 +534,6 @@ func (suite *KeeperTestSuite) TestDIDAllowanceUsage() {
 	fee := sdk.NewCoins(sdk.NewInt64Coin("uopen", 100))
 	msgs := []sdk.Msg{}
 
-	// Mock bank operations
-	suite.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), granter, "fee_collector", fee).Return(nil)
-
 	err = suite.feegrantKeeper.UseGrantedFeesByDID(suite.ctx, granter, testDID, fee, msgs)
 	suite.NoError(err)
 
@@ -563,9 +560,6 @@ func (suite *KeeperTestSuite) TestDIDAllowanceWithFallback() {
 
 	fee := sdk.NewCoins(sdk.NewInt64Coin("uopen", 100))
 	msgs := []sdk.Msg{} // Mock messages with DID
-
-	// Mock DID extraction (this would normally be done by the DID extractor)
-	suite.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), granter, "fee_collector", fee).Return(nil)
 
 	err = suite.feegrantKeeper.UseGrantedFeesByDID(suite.ctx, granter, testDID, fee, msgs)
 	suite.NoError(err)
@@ -803,4 +797,294 @@ func (suite *KeeperTestSuite) TestIterationSeparation() {
 	})
 	suite.NoError(err)
 	suite.Equal(1, didCount)
+}
+
+// TestGetFirstAvailableDIDGrant tests retrieving the first available grant for a DID
+func (suite *KeeperTestSuite) TestGetFirstAvailableDIDGrant() {
+	testDID := "did:example:charlie"
+
+	testCases := []struct {
+		name          string
+		setupGrants   func()
+		expectedError string
+		validateGrant func(granter sdk.AccAddress, allowance feegrant.FeeAllowanceI)
+	}{
+		{
+			name: "no grants available",
+			setupGrants: func() {
+				// Don't create any grants
+			},
+			expectedError: "no fee-grant found for DID",
+		},
+		{
+			name: "single grant available",
+			setupGrants: func() {
+				granter := suite.addrs[10]
+				allowance := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+				suite.NoError(err)
+			},
+			validateGrant: func(granter sdk.AccAddress, allowance feegrant.FeeAllowanceI) {
+				suite.Equal(suite.addrs[10], granter)
+				basic, ok := allowance.(*feegrant.BasicAllowance)
+				suite.True(ok)
+				suite.Equal(sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)), basic.SpendLimit)
+			},
+		},
+		{
+			name: "multiple grants available - returns first one",
+			setupGrants: func() {
+				// Create multiple grants for the same DID
+				granter1 := suite.addrs[11]
+				allowance1 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 500)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter1, testDID, allowance1)
+				suite.NoError(err)
+
+				granter2 := suite.addrs[12]
+				allowance2 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 2000)),
+				}
+				err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter2, testDID, allowance2)
+				suite.NoError(err)
+			},
+			validateGrant: func(granter sdk.AccAddress, allowance feegrant.FeeAllowanceI) {
+				// Should return one of the grants
+				suite.NotNil(granter)
+				suite.NotNil(allowance)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		suite.Run(tc.name, func() {
+			suite.SetupTest()
+
+			if tc.setupGrants != nil {
+				tc.setupGrants()
+			}
+
+			granter, allowance, err := suite.feegrantKeeper.GetFirstAvailableDIDGrant(suite.ctx, testDID)
+
+			if tc.expectedError != "" {
+				suite.Error(err)
+				suite.Contains(err.Error(), tc.expectedError)
+				suite.Nil(granter)
+				suite.Nil(allowance)
+				return
+			}
+
+			suite.NoError(err)
+			if tc.validateGrant != nil {
+				tc.validateGrant(granter, allowance)
+			}
+		})
+	}
+}
+
+// TestUseFirstAvailableDIDGrant tests using the first available grant for a DID
+func (suite *KeeperTestSuite) TestUseFirstAvailableDIDGrant() {
+	testDID := "did:example:dave"
+
+	testCases := []struct {
+		name          string
+		setupGrants   func()
+		fee           sdk.Coins
+		expectedError string
+		validateAfter func()
+	}{
+		{
+			name: "no grants available",
+			setupGrants: func() {
+				// Don't create any grants
+			},
+			fee:           sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			expectedError: "no usable fee-grant found for DID",
+		},
+		{
+			name: "single grant - successful use",
+			setupGrants: func() {
+				granter := suite.addrs[13]
+				allowance := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+				suite.NoError(err)
+			},
+			fee: sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			validateAfter: func() {
+				// Grant should still exist with reduced spend limit
+				allowance, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[13], testDID)
+				suite.NoError(err)
+				basic, ok := allowance.(*feegrant.BasicAllowance)
+				suite.True(ok)
+				suite.Equal(sdk.NewCoins(sdk.NewInt64Coin("uopen", 900)), basic.SpendLimit)
+			},
+		},
+		{
+			name: "single grant - depletes allowance completely",
+			setupGrants: func() {
+				granter := suite.addrs[14]
+				allowance := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+				suite.NoError(err)
+			},
+			fee: sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			validateAfter: func() {
+				// Grant should be removed when fully depleted
+				_, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[14], testDID)
+				suite.Error(err)
+				suite.Contains(err.Error(), "not found")
+			},
+		},
+		{
+			name: "single grant - fee exceeds limit",
+			setupGrants: func() {
+				granter := suite.addrs[15]
+				allowance := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 50)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+				suite.NoError(err)
+			},
+			fee:           sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			expectedError: "no usable fee-grant found for DID",
+		},
+		{
+			name: "multiple grants - first one insufficient, second one works",
+			setupGrants: func() {
+				// First grant with insufficient limit
+				granter1 := suite.addrs[16]
+				allowance1 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 50)),
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter1, testDID, allowance1)
+				suite.NoError(err)
+
+				// Second grant with sufficient limit
+				granter2 := suite.addrs[17]
+				allowance2 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+				}
+				err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter2, testDID, allowance2)
+				suite.NoError(err)
+			},
+			fee: sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			validateAfter: func() {
+				// First grant should still exist (wasn't used)
+				allowance1, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[16], testDID)
+				suite.NoError(err)
+				basic1, ok := allowance1.(*feegrant.BasicAllowance)
+				suite.True(ok)
+				suite.Equal(sdk.NewCoins(sdk.NewInt64Coin("uopen", 50)), basic1.SpendLimit)
+
+				// Second grant should have reduced limit
+				allowance2, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[17], testDID)
+				suite.NoError(err)
+				basic2, ok := allowance2.(*feegrant.BasicAllowance)
+				suite.True(ok)
+				suite.Equal(sdk.NewCoins(sdk.NewInt64Coin("uopen", 900)), basic2.SpendLimit)
+			},
+		},
+		{
+			name: "expired grant - should be skipped and removed",
+			setupGrants: func() {
+				now := suite.ctx.BlockTime()
+				futureExpiry := now.Add(time.Hour)
+
+				granter := suite.addrs[18]
+				allowance := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+					Expiration: &futureExpiry,
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter, testDID, allowance)
+				suite.NoError(err)
+
+				// Advance time to make it expired
+				suite.ctx = suite.ctx.WithBlockTime(now.Add(2 * time.Hour))
+			},
+			fee:           sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			expectedError: "no usable fee-grant found for DID",
+			validateAfter: func() {
+				// Expired grant should be removed
+				_, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[18], testDID)
+				suite.Error(err)
+				suite.Contains(err.Error(), "not found")
+			},
+		},
+		{
+			name: "mixed grants - expired first, valid second",
+			setupGrants: func() {
+				now := suite.ctx.BlockTime()
+				futureExpiry := now.Add(time.Hour)
+
+				// First grant - will be expired (using lower index so it comes first in iteration)
+				granter1 := suite.addrs[7]
+				allowance1 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+					Expiration: &futureExpiry,
+				}
+				err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter1, testDID, allowance1)
+				suite.NoError(err)
+
+				// Second grant - valid (no expiration, using higher index so it comes second in iteration)
+				granter2 := suite.addrs[19]
+				allowance2 := &feegrant.BasicAllowance{
+					SpendLimit: sdk.NewCoins(sdk.NewInt64Coin("uopen", 1000)),
+				}
+				err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, granter2, testDID, allowance2)
+				suite.NoError(err)
+
+				// Advance time to make first grant expired
+				suite.ctx = suite.ctx.WithBlockTime(now.Add(2 * time.Hour))
+			},
+			fee: sdk.NewCoins(sdk.NewInt64Coin("uopen", 100)),
+			validateAfter: func() {
+				// First grant should be removed (expired)
+				_, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[7], testDID)
+				suite.Error(err)
+				suite.Contains(err.Error(), "not found")
+
+				// Second grant should have reduced limit
+				allowance2, err := suite.feegrantKeeper.GetDIDAllowance(suite.ctx, suite.addrs[19], testDID)
+				suite.NoError(err)
+				basic2, ok := allowance2.(*feegrant.BasicAllowance)
+				suite.True(ok)
+				suite.Equal(sdk.NewCoins(sdk.NewInt64Coin("uopen", 900)), basic2.SpendLimit)
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		suite.Run(tc.name, func() {
+			suite.SetupTest()
+
+			if tc.setupGrants != nil {
+				tc.setupGrants()
+			}
+
+			granter, err := suite.feegrantKeeper.UseFirstAvailableDIDGrant(suite.ctx, testDID, tc.fee, []sdk.Msg{})
+
+			if tc.expectedError != "" {
+				suite.Error(err)
+				suite.Contains(err.Error(), tc.expectedError)
+				suite.Nil(granter)
+				return
+			}
+
+			suite.NoError(err)
+			suite.NotNil(granter)
+
+			if tc.validateAfter != nil {
+				tc.validateAfter()
+			}
+		})
+	}
 }

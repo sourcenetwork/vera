@@ -408,3 +408,99 @@ func (suite *KeeperTestSuite) grantDIDFeeAllowance(granter sdk.AccAddress, grant
 	})
 	suite.Require().NoError(err)
 }
+
+func (suite *KeeperTestSuite) TestDIDAllowances() {
+	testDID := "did:example:charlie"
+
+	testCases := []struct {
+		name      string
+		req       *feegrant.QueryDIDAllowancesRequest
+		expectErr bool
+		preRun    func()
+		postRun   func(_ *feegrant.QueryDIDAllowancesResponse)
+	}{
+		{
+			"nil request",
+			nil,
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowancesResponse) {},
+		},
+		{
+			"fail: empty DID",
+			&feegrant.QueryDIDAllowancesRequest{
+				GranteeDid: "",
+			},
+			true,
+			func() {},
+			func(*feegrant.QueryDIDAllowancesResponse) {},
+		},
+		{
+			"no DID grants for this DID",
+			&feegrant.QueryDIDAllowancesRequest{
+				GranteeDid: "did:example:nonexistent",
+			},
+			false,
+			func() {},
+			func(resp *feegrant.QueryDIDAllowancesResponse) {
+				suite.Require().Equal(len(resp.Allowances), 0)
+			},
+		},
+		{
+			"valid query: expect single DID grant",
+			&feegrant.QueryDIDAllowancesRequest{
+				GranteeDid: testDID,
+			},
+			false,
+			func() {
+				suite.grantDIDFeeAllowance(suite.addrs[0], testDID)
+			},
+			func(resp *feegrant.QueryDIDAllowancesResponse) {
+				suite.Require().Equal(len(resp.Allowances), 1)
+				suite.Require().Equal(resp.Allowances[0].Granter, suite.addrs[0].String())
+				suite.Require().Equal(resp.Allowances[0].Grantee, testDID)
+			},
+		},
+		{
+			"valid query: expect multiple DID grants from different granters",
+			&feegrant.QueryDIDAllowancesRequest{
+				GranteeDid: "did:example:multiple",
+			},
+			false,
+			func() {
+				// Multiple granters giving allowances to the same DID
+				suite.grantDIDFeeAllowance(suite.addrs[0], "did:example:multiple")
+				suite.grantDIDFeeAllowance(suite.addrs[1], "did:example:multiple")
+				suite.grantDIDFeeAllowance(suite.addrs[2], "did:example:multiple")
+
+				// Grant to a different DID to ensure it's not returned
+				suite.grantDIDFeeAllowance(suite.addrs[3], "did:example:other")
+			},
+			func(resp *feegrant.QueryDIDAllowancesResponse) {
+				suite.Require().Equal(len(resp.Allowances), 3)
+				granters := make(map[string]bool)
+				for _, allowance := range resp.Allowances {
+					suite.Require().Equal(allowance.Grantee, "did:example:multiple")
+					granters[allowance.Granter] = true
+				}
+				// Verify all three granters are present
+				suite.Require().True(granters[suite.addrs[0].String()])
+				suite.Require().True(granters[suite.addrs[1].String()])
+				suite.Require().True(granters[suite.addrs[2].String()])
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.name, func() {
+			tc.preRun()
+			resp, err := suite.feegrantKeeper.DIDAllowances(suite.ctx, tc.req)
+			if tc.expectErr {
+				suite.Require().Error(err)
+			} else {
+				suite.Require().NoError(err)
+				tc.postRun(resp)
+			}
+		})
+	}
+}

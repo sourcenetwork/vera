@@ -24,7 +24,7 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 	}
 
 	// Check if this is an ICA address
-	if _, found := k.icaKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), addr); found {
+	if _, found := k.hubKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), addr); found {
 		controllerDID := did.IssueInterchainAccountDID(addr)
 		return controllerDID, nil
 	}

@@ -17,7 +17,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
 // Keeper manages state of all fee grants, as well as calculating approval.
@@ -613,7 +612,7 @@ func (k Keeper) ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 	return nil
 }
 
-// UseGrantedFeesByDID will try to pay the given fee from the granter's account for a DID.
+// UseGrantedFeesByDID validates the DID-based fee allowance for the given granter and DID.
 func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) error {
 	didGrant, err := k.GetDIDAllowance(ctx, granter, granteeDID)
 	if err != nil {
@@ -621,38 +620,25 @@ func (k Keeper) UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress,
 	}
 
 	remove, err := didGrant.Accept(ctx, fee, msgs)
+
 	if remove {
 		k.revokeDIDAllowance(ctx, granter, granteeDID)
 		if err != nil {
 			return err
 		}
+
+		emitUseDIDGrantEvent(ctx, granter.String(), granteeDID)
+
 		return nil
 	}
+
 	if err != nil {
 		return err
 	}
 
-	// if fee allowance is accepted, deduct the fees from the granter
-	err = k.bankKeeper.SendCoinsFromAccountToModule(ctx, granter, authtypes.FeeCollectorName, fee)
-	if err != nil {
-		return err
-	}
+	emitUseDIDGrantEvent(ctx, granter.String(), granteeDID)
 
-	// if fee allowance is accepted, update the existing grant
-	err = k.UpdateDIDAllowance(ctx, granter, granteeDID, didGrant)
-	if err != nil {
-		return err
-	}
-
-	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
-		sdk.NewEvent(
-			feegrant.EventTypeUseDIDFeeGrant,
-			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter.String()),
-			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, granteeDID),
-		),
-	)
-
-	return nil
+	return k.UpdateDIDAllowance(ctx, granter, granteeDID, didGrant)
 }
 
 // UpdateDIDAllowance updates the existing DID-based grant.
@@ -695,4 +681,98 @@ func (k Keeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 func (k Keeper) addToDIDFeeAllowanceQueue(ctx context.Context, grantKey []byte, exp *time.Time) error {
 	store := k.storeService.OpenKVStore(ctx)
 	return store.Set(feegrant.DIDFeeAllowancePrefixQueue(exp, grantKey), []byte{})
+}
+
+// GetFirstAvailableDIDGrant returns the first available grant for a given DID.
+// Returns the granter address and the fee allowance, or an error if no grant is found.
+func (k Keeper) GetFirstAvailableDIDGrant(ctx context.Context, granteeDID string) (sdk.AccAddress, feegrant.FeeAllowanceI, error) {
+	store := k.storeService.OpenKVStore(ctx)
+	prefix := feegrant.FeeAllowancePrefixByDID(granteeDID)
+	iter := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), prefix)
+	defer iter.Close()
+
+	if !iter.Valid() {
+		return nil, nil, sdkerrors.ErrNotFound.Wrap("no fee-grant found for DID")
+	}
+
+	var didGrant feegrant.DIDGrant
+	if err := k.cdc.Unmarshal(iter.Value(), &didGrant); err != nil {
+		return nil, nil, err
+	}
+
+	granter, err := k.authKeeper.AddressCodec().StringToBytes(didGrant.Granter)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	allowance, err := didGrant.GetDIDGrant()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return granter, allowance, nil
+}
+
+// UseFirstAvailableDIDGrant finds and validates the first available grant for a given DID.
+// Returns the granter address that was used, or an error if no grant is found or cannot be used.
+func (k Keeper) UseFirstAvailableDIDGrant(ctx context.Context, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) (sdk.AccAddress, error) {
+	store := k.storeService.OpenKVStore(ctx)
+	prefix := feegrant.FeeAllowancePrefixByDID(granteeDID)
+	iter := storetypes.KVStorePrefixIterator(runtime.KVStoreAdapter(store), prefix)
+	defer iter.Close()
+
+	// Try each grant until we find one that works
+	for ; iter.Valid(); iter.Next() {
+		var didGrant feegrant.DIDGrant
+		if err := k.cdc.Unmarshal(iter.Value(), &didGrant); err != nil {
+			continue
+		}
+
+		granter, err := k.authKeeper.AddressCodec().StringToBytes(didGrant.Granter)
+		if err != nil {
+			continue
+		}
+
+		allowance, err := didGrant.GetDIDGrant()
+		if err != nil {
+			continue
+		}
+
+		// Try to use this grant
+		remove, err := allowance.Accept(ctx, fee, msgs)
+		if remove {
+			k.revokeDIDAllowance(ctx, granter, granteeDID)
+			if err != nil {
+				continue
+			}
+
+			emitUseDIDGrantEvent(ctx, didGrant.Granter, granteeDID)
+
+			return granter, nil
+		}
+		if err != nil {
+			continue
+		}
+		// Update the allowance
+		err = k.UpdateDIDAllowance(ctx, granter, granteeDID, allowance)
+		if err != nil {
+			continue
+		}
+
+		emitUseDIDGrantEvent(ctx, didGrant.Granter, granteeDID)
+
+		return granter, nil
+	}
+
+	return nil, sdkerrors.ErrNotFound.Wrap("no usable fee-grant found for DID")
+}
+
+func emitUseDIDGrantEvent(ctx context.Context, granter, grantee string) {
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			feegrant.EventTypeUseDIDFeeGrant,
+			sdk.NewAttribute(feegrant.AttributeKeyGranter, granter),
+			sdk.NewAttribute(feegrant.AttributeKeyGranteeDid, grantee),
+		),
+	)
 }
