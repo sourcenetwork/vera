@@ -18,7 +18,7 @@ enum JWSTokenStatus {
 }
 
 // JWSTokenRecord represents a stored JWS token with its metadata.
-// The bearer_token field contains sensitive credentials and should never be exposed via public APIs or query endpoints.
+// The bearer_token field contains sensitive credentials and should not be exposed via public endpoints.
 message JWSTokenRecord {
   // token_hash is the unique identifier of the JWS token
   string token_hash = 1;
@@ -42,4 +42,16 @@ message JWSTokenRecord {
   google.protobuf.Timestamp invalidated_at = 10 [(gogoproto.stdtime) = true];
   // invalidated_by is the account that invalidated the token (if applicable).
   string invalidated_by = 11;
+}
+
+// EventJWSTokenInvalidated is emitted when a JWS token is invalidated.
+message EventJWSTokenInvalidated {
+  // token_hash is the unique identifier of the invalidated token.
+  string token_hash = 1;
+  // issuer_did is the DID that issued the token.
+  string issuer_did = 2;
+  // authorized_account is the account that was authorized to use this token.
+  string authorized_account = 3;
+  // invalidated_by is the account that invalidated the token.
+  string invalidated_by = 4;
 }

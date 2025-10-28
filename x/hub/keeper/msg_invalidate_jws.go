@@ -28,7 +28,7 @@ func (k *Keeper) InvalidateJWS(goCtx context.Context, req *types.MsgInvalidateJW
 		return nil, errorsmod.Wrapf(types.ErrJWSTokenAlreadyInvalid, "token hash: %s", req.TokenHash)
 	}
 
-	// Get the DID from the context (if present from JWS extension option)
+	// Get the DID from the context
 	extractedDID := ""
 	if did, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok {
 		extractedDID = did
@@ -60,15 +60,14 @@ func (k *Keeper) InvalidateJWS(goCtx context.Context, req *types.MsgInvalidateJW
 		return nil, errorsmod.Wrap(types.ErrFailedToInvalidateToken, err.Error())
 	}
 
-	// Emit event
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventTypeInvalidateJWS,
-			sdk.NewAttribute(types.AttributeKeyTokenHash, req.TokenHash),
-			sdk.NewAttribute(types.AttributeKeyInvalidatedBy, req.Creator),
-			sdk.NewAttribute(types.AttributeKeyIssuerDID, record.IssuerDid),
-		),
-	)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventJWSTokenInvalidated{
+		TokenHash:         req.TokenHash,
+		IssuerDid:         record.IssuerDid,
+		AuthorizedAccount: record.AuthorizedAccount,
+		InvalidatedBy:     req.Creator,
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgInvalidateJWSResponse{Success: true}, nil
 }
