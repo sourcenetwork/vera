@@ -155,14 +155,8 @@ func (am AppModule) BeginBlock(_ context.Context) error {
 
 // EndBlock contains the logic that is automatically triggered at the end of each block.
 // The end block implementation is optional.
-// It checks for expired JWS tokens and marks them as invalid.
 func (am AppModule) EndBlock(ctx context.Context) error {
-	// Check and update expired JWS tokens
-	if err := am.keeper.CheckAndUpdateExpiredTokens(ctx); err != nil {
-		// Log error but don't halt the chain
-		sdk.UnwrapSDKContext(ctx).Logger().Error("failed to check and update expired JWS tokens", "error", err)
-	}
-	return nil
+	return am.keeper.EndBlocker(ctx)
 }
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
