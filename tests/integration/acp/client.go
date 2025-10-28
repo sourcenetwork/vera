@@ -32,7 +32,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/testutil/e2e"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	icatestutil "github.com/sourcenetwork/sourcehub/x/ica/testutil"
+	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
 )
 
 type KeeperACPClient struct {
@@ -189,7 +189,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 		authority.String(),
 		accKeeper,
 		&capabilitykeeper.ScopedKeeper{},
-		icatestutil.NewICAKeeperStub(),
+		hubtestutil.NewICAKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

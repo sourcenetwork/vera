@@ -179,9 +179,6 @@ func main() {
 	txBuilder.SetGasLimit(200000)
 	txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewCoin("uopen", math.NewInt(5000))))
 
-	// Set faucet as feegranter to enable DID-based feegrant
-	txBuilder.SetFeeGranter(sdk.MustAccAddressFromBech32("source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt"))
-
 	// Query account to get acc number and sequence
 	authClient := authtypes.NewQueryClient(grpcConn)
 	accountResp, err := authClient.Account(context.Background(), &authtypes.QueryAccountRequest{

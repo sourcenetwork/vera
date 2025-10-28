@@ -9,6 +9,7 @@ import (
 	"time"
 
 	storetypes "cosmossdk.io/store/types"
+	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
@@ -17,7 +18,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/sourcenetwork/sourcehub/x/feegrant"
@@ -70,12 +70,8 @@ func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APICon
 
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
 func (app *App) zeroFeeTxsAllowed() bool {
-	store := app.BaseApp.CommitMultiStore().GetKVStore(app.GetKey(authtypes.StoreKey))
-	if store == nil {
-		return false
-	}
-	bz := store.Get([]byte(appparams.AllowZeroFeeTxsKey))
-	return len(bz) > 0 && bz[0] == 0x01
+	ctx := sdk.NewContext(app.CommitMultiStore(), cmtproto.Header{}, false, app.Logger())
+	return app.HubKeeper != nil && app.HubKeeper.IsZeroFeeTxsAllowed(ctx)
 }
 
 // hasAddressRequested checks if an address has already requested funds.

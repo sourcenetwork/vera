@@ -23,7 +23,7 @@ func (k *Keeper) VerifyAccessRequest(
 	engine := k.getACPEngine(ctx)
 
 	actorId := req.AccessRequest.Actor.Id
-	if did, err := k.IssueDIDFromAccountAddr(goCtx, actorId); err == nil {
+	if did, err := k.GetActorDID(ctx, actorId); err == nil {
 		req.AccessRequest.Actor.Id = did
 	}
 

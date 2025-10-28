@@ -31,7 +31,7 @@ func RequiredClaims() []string {
 	return []string{
 		IssuedAtClaim,
 		IssuerClaim,
-		AuthorizedAccountClaim,
+		// AuthorizedAccountClaim, // Authorized account claim is no longer required
 		ExpiresClaim,
 	}
 }

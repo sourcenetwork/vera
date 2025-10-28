@@ -1,7 +1,6 @@
 package ante
 
 import (
-	storetypes "cosmossdk.io/store/types"
 	"cosmossdk.io/x/tx/signing"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -15,19 +14,22 @@ func NewAnteHandler(
 	accountKeeper ante.AccountKeeper,
 	bankKeeper bankkeeper.Keeper,
 	feegrantKeeper ante.FeegrantKeeper,
+	channelKeeper *ibckeeper.Keeper,
+	hubKeeper HubKeeper,
 	signModeHandler *signing.HandlerMap,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
-	channelKeeper *ibckeeper.Keeper,
 	TxEncoder sdk.TxEncoder,
-	authStoreKey storetypes.StoreKey,
 ) sdk.AnteHandler {
 	return sdk.ChainAnteDecorators(
 		// Wraps panics with the string format of the transaction.
 		NewHandlePanicDecorator(),
 		// Initializes the context with the gas meter. Must run before any gas consumption.
 		ante.NewSetUpContextDecorator(),
+		// Rejects legacy transactions (SIGN_MODE_LEGACY_AMINO_JSON) that don't sign extension options.
+		NewRejectLegacyTxDecorator(),
 		// Validates extension options and extracts DID for feegrant usage.
-		NewExtensionOptionsDecorator(),
+		// Also stores JWS tokens for tracking and invalidation.
+		NewExtensionOptionsDecorator(hubKeeper),
 		// Performs basic validation on the transaction.
 		ante.NewValidateBasicDecorator(),
 		// Ensures that the tx has not exceeded the height timeout.
@@ -39,7 +41,7 @@ func NewAnteHandler(
 		// Ensures that the fee payer has enough funds to pay for the tx, validates tx fees based on denom
 		// (e.g. ucredit fees are higher than uopen fees) and deducts the fees. Does not affect tx priority.
 		// Enforces DefaultMinGasPrice if min gas price was set to 0 by the validator to prevent spam.
-		NewCustomDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, nil, authStoreKey),
+		NewCustomDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, hubKeeper, nil),
 		// Sets public keys in the context for the fee payer and signers. Must happen before signature checks.
 		ante.NewSetPubKeyDecorator(accountKeeper),
 		// Ensures that the number of signatures does not exceed the tx's signature limit.

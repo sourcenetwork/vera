@@ -73,7 +73,7 @@ import (
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	icakeeper "github.com/sourcenetwork/sourcehub/x/ica/keeper"
+	hubkeeper "github.com/sourcenetwork/sourcehub/x/hub/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
@@ -132,7 +132,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
-	IcaKeeper      *icakeeper.Keeper
+	HubKeeper      *hubkeeper.Keeper
 	AcpKeeper      *acpkeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
@@ -261,7 +261,7 @@ func New(
 		&app.GroupKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
-		&app.IcaKeeper,
+		&app.HubKeeper,
 		&app.AcpKeeper,
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,
@@ -344,11 +344,11 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.FeeGrantKeeper,
+		app.IBCKeeper,
+		app.HubKeeper,
 		app.txConfig.SignModeHandler(),
 		ante.DefaultSigVerificationGasConsumer,
-		app.IBCKeeper,
 		app.txConfig.TxEncoder(),
-		app.GetKey(authtypes.StoreKey),
 	)
 
 	app.SetAnteHandler(anteHandler)
@@ -431,16 +431,19 @@ func New(
 			return nil, err
 		}
 
-		// Parse app_state.app_params.allow_zero_fee_txs and save to auth (acc) store.
-		val := byte(0x00)
+		// Parse app_state.app_params.allow_zero_fee_txs / app_state.app_params.ignore_bearer_auth
+		// and store them in x/hub module store.
 		if raw, ok := genesisState["app_params"]; ok {
 			var appParams appparams.AppParamsGenesis
-			if err := json.Unmarshal(raw, &appParams); err == nil && appParams.AllowZeroFeeTxs {
-				val = 0x01
+			if err := json.Unmarshal(raw, &appParams); err == nil {
+				if err := app.HubKeeper.SetAllowZeroFeeTxs(ctx, appParams.AllowZeroFeeTxs); err != nil {
+					return nil, err
+				}
+				if err := app.HubKeeper.SetIgnoreBearerAuth(ctx, appParams.IgnoreBearerAuth); err != nil {
+					return nil, err
+				}
 			}
 		}
-		store := ctx.KVStore(app.GetKey(authtypes.StoreKey))
-		store.Set([]byte(appparams.AllowZeroFeeTxsKey), []byte{val})
 
 		req.AppStateBytes, err = json.Marshal(genesisState)
 		if err != nil {

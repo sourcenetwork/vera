@@ -7,7 +7,6 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -26,6 +25,7 @@ type CustomDeductFeeDecorator struct {
 	bankKeeper     types.BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
 	txFeeChecker   TxFeeChecker
+	hubKeeper      HubKeeper
 }
 
 // NewCustomDeductFeeDecorator initializes custom deduct fee decorator with a fee checker.
@@ -33,13 +33,13 @@ func NewCustomDeductFeeDecorator(
 	ak ante.AccountKeeper,
 	bk types.BankKeeper,
 	fk ante.FeegrantKeeper,
+	hk HubKeeper,
 	tfc TxFeeChecker,
-	authStoreKey storetypes.StoreKey,
 ) CustomDeductFeeDecorator {
 
 	if tfc == nil {
 		tfc = func(ctx sdk.Context, tx sdk.Tx) (sdk.Coins, int64, error) {
-			return checkTxFeeWithMinGasPrices(ctx, tx, authStoreKey)
+			return checkTxFeeWithMinGasPrices(ctx, tx, hk)
 		}
 	}
 
@@ -47,6 +47,7 @@ func NewCustomDeductFeeDecorator(
 		accountKeeper:  ak,
 		bankKeeper:     bk,
 		feegrantKeeper: fk,
+		hubKeeper:      hk,
 		txFeeChecker:   tfc,
 	}
 }
@@ -93,17 +94,10 @@ func (cdfd CustomDeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	return next(newCtx, tx, simulate)
 }
 
-// zeroFeeTxsAllowed returns true if zero-fee transactions are allowed, false otherwise.
-func zeroFeeTxsAllowed(ctx sdk.Context, authStoreKey storetypes.StoreKey) bool {
-	store := ctx.KVStore(authStoreKey)
-	bz := store.Get([]byte(appparams.AllowZeroFeeTxsKey))
-	return len(bz) > 0 && bz[0] == 0x01
-}
-
 // checkTxFeeWithMinGasPrices checks if the tx fee with denom fee multiplier >= min gas price of the validator.
 // Enforces the DefaultMinGasPrice to prefent spam if minimum gas price was set to 0 by the validator.
 // NOTE: Always returns 0 for transaction priority because we handle TxPriority in priority_lane.go.
-func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, authStoreKey storetypes.StoreKey) (sdk.Coins, int64, error) {
+func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, hubKeeper HubKeeper) (sdk.Coins, int64, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return nil, 0, errorsmod.Wrap(sdkerrors.ErrTxDecode, "tx must be a FeeTx")
@@ -112,9 +106,9 @@ func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, authStoreKey storety
 	fees := feeTx.GetFee()
 	gas := feeTx.GetGas()
 
-	// Allow zero-fee transactions if zeroFeeTxsAllowed and the "--fees" flag is omitted
+	// Allow zero-fee transactions if allowed by app config and the "--fees" flag is omitted
 	if fees.Empty() {
-		if zeroFeeTxsAllowed(ctx, authStoreKey) {
+		if hubKeeper != nil && hubKeeper.IsZeroFeeTxsAllowed(ctx) {
 			return fees, 0, nil
 		}
 		return nil, 0, sdkerrors.ErrInsufficientFee.Wrap("zero fees are not allowed")
@@ -177,23 +171,11 @@ func (cdfd CustomDeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.T
 
 	feePayer := feeTx.FeePayer()
 	feeGranter := feeTx.FeeGranter()
-	deductFeesFrom := feePayer
 
-	// If fee granter is used, deduct from feeGranterAddr
-	if feeGranter != nil {
-		feeGranterAddr := sdk.AccAddress(feeGranter)
-
-		if cdfd.feegrantKeeper == nil {
-			return sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
-		} else if !bytes.Equal(feeGranterAddr, feePayer) {
-			// Use DID-based feegrant if JWS extension provided, use standard feegrant otherwise
-			err := cdfd.handleFeegrant(ctx, feeGranterAddr, feePayer, fees, sdkTx.GetMsgs())
-			if err != nil {
-				return errorsmod.Wrapf(err, "%s does not allow to pay fees for %s", feeGranter, feePayer)
-			}
-		}
-
-		deductFeesFrom = feeGranterAddr
+	// Determine who will pay the fees
+	deductFeesFrom, err := cdfd.handleFeegrant(ctx, feeGranter, feePayer, fees, sdkTx.GetMsgs())
+	if err != nil {
+		return err
 	}
 
 	deductFeesFromAcc := cdfd.accountKeeper.GetAccount(ctx, deductFeesFrom)
@@ -217,27 +199,50 @@ func (cdfd CustomDeductFeeDecorator) checkDeductFee(ctx sdk.Context, sdkTx sdk.T
 	return nil
 }
 
-// handleFeegrant routes to the appropriate feegrant method based on DID availability.
-// If a verified DID was extracted from JWS extension, uses DID-based feegrant.
-// Otherwise, uses standard address-based feegrant.
+// handleFeegrant determines who should pay for fees based on feegrant configuration.
+// It handles both DID-based feegrants (when DID is extracted from context) and standard feegrants.
+// Returns the address that should be charged for fees, or an error if feegrant validation fails.
 func (cdfd CustomDeductFeeDecorator) handleFeegrant(
 	ctx sdk.Context,
-	granter, grantee sdk.AccAddress,
+	feeGranter []byte,
+	feePayer sdk.AccAddress,
 	fees sdk.Coins,
 	msgs []sdk.Msg,
-) error {
-	// Check if DID was extracted from verified JWS extension
+) (sdk.AccAddress, error) {
 	extractedDID := getExtractedDIDFromContext(ctx)
-	if extractedDID != "" {
-		// User provided verified DID via JWS extension - use DID-based feegrant
+
+	// If DID was extracted, try to use the first available grant for that DID
+	if extractedDID != "" && cdfd.feegrantKeeper != nil {
 		if didKeeper, ok := cdfd.feegrantKeeper.(interface {
-			UseGrantedFeesByDID(ctx context.Context, granter sdk.AccAddress, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) error
+			UseFirstAvailableDIDGrant(ctx context.Context, granteeDID string, fee sdk.Coins, msgs []sdk.Msg) (sdk.AccAddress, error)
 		}); ok {
-			return didKeeper.UseGrantedFeesByDID(ctx, granter, extractedDID, fees, msgs)
+			usedGranter, err := didKeeper.UseFirstAvailableDIDGrant(ctx, extractedDID, fees, msgs)
+			if err == nil {
+				return usedGranter, nil
+			}
 		}
 	}
-	// No DID available or DID-based feegrant not supported - use standard feegrant
-	return cdfd.feegrantKeeper.UseGrantedFees(ctx, granter, grantee, fees, msgs)
+
+	// If no DID extracted, try to use fee granter from the tx
+	if feeGranter != nil {
+		feeGranterAddr := sdk.AccAddress(feeGranter)
+
+		if cdfd.feegrantKeeper == nil {
+			return nil, sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
+		}
+
+		if !bytes.Equal(feeGranterAddr, feePayer) {
+			err := cdfd.feegrantKeeper.UseGrantedFees(ctx, feeGranterAddr, feePayer, fees, msgs)
+			if err != nil {
+				return nil, errorsmod.Wrapf(err, "%s does not allow to pay fees for %s", feeGranter, feePayer)
+			}
+		}
+
+		return feeGranterAddr, nil
+	}
+
+	// If there is no fee grant, we deduct from the fee payer
+	return feePayer, nil
 }
 
 // deductFees deducts fees from the given account.

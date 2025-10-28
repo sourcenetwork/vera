@@ -42,7 +42,7 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 		return nil, types.ErrNamespaceAlreadyExists
 	}
 
-	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(goCtx, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -80,12 +80,14 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 		return nil, types.ErrInvalidPolicyId
 	}
 
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
 	namespaceId := getNamespaceId(msg.Namespace)
 	if !k.hasNamespace(goCtx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	creatorDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(goCtx, msg.Creator)
+	creatorDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +117,7 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	k.SetPost(goCtx, post)
 
 	b64Payload := base64.StdEncoding.EncodeToString(post.Payload)
-	sdk.UnwrapSDKContext(goCtx).EventManager().EmitEvent(
+	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventCreatePost,
 			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
@@ -130,18 +132,20 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 
 // AddCollaborator adds a new collaborator to the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
-func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollaborator) (*types.MsgAddCollaboratorResponse, error) {
-	policyId := k.GetPolicyId(ctx)
+func (k *Keeper) AddCollaborator(goCtx context.Context, msg *types.MsgAddCollaborator) (*types.MsgAddCollaboratorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	policyId := k.GetPolicyId(goCtx)
 	if policyId == "" {
 		return nil, types.ErrInvalidPolicyId
 	}
 
 	namespaceId := getNamespaceId(msg.Namespace)
-	if !k.hasNamespace(ctx, namespaceId) {
+	if !k.hasNamespace(goCtx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +155,7 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 		return nil, err
 	}
 
-	err = AddCollaborator(ctx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
+	err = AddCollaborator(goCtx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -161,9 +165,9 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 		Did:       collaboratorDID,
 		Namespace: namespaceId,
 	}
-	k.SetCollaborator(ctx, collaborator)
+	k.SetCollaborator(goCtx, collaborator)
 
-	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventAddCollaborator,
 			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
@@ -177,18 +181,20 @@ func (k *Keeper) AddCollaborator(ctx context.Context, msg *types.MsgAddCollabora
 
 // RemoveCollaborator removes existing collaborator from the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
-func (k *Keeper) RemoveCollaborator(ctx context.Context, msg *types.MsgRemoveCollaborator) (*types.MsgRemoveCollaboratorResponse, error) {
-	policyId := k.GetPolicyId(ctx)
+func (k *Keeper) RemoveCollaborator(goCtx context.Context, msg *types.MsgRemoveCollaborator) (*types.MsgRemoveCollaboratorResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	policyId := k.GetPolicyId(goCtx)
 	if policyId == "" {
 		return nil, types.ErrInvalidPolicyId
 	}
 
 	namespaceId := getNamespaceId(msg.Namespace)
-	if !k.hasNamespace(ctx, namespaceId) {
+	if !k.hasNamespace(goCtx, namespaceId) {
 		return nil, types.ErrNamespaceNotFound
 	}
 
-	ownerDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, msg.Creator)
+	ownerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
@@ -198,14 +204,14 @@ func (k *Keeper) RemoveCollaborator(ctx context.Context, msg *types.MsgRemoveCol
 		return nil, err
 	}
 
-	err = deleteCollaborator(ctx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
+	err = deleteCollaborator(goCtx, k, policyId, namespaceId, collaboratorDID, ownerDID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	k.DeleteCollaborator(ctx, namespaceId, collaboratorDID)
+	k.DeleteCollaborator(goCtx, namespaceId, collaboratorDID)
 
-	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventRemoveCollaborator,
 			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
