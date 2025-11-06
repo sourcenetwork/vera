@@ -1,4 +1,4 @@
-FROM golang:1.23.8 AS builder
+FROM golang:1.24.7 AS builder
 
 WORKDIR /app
 
@@ -13,7 +13,10 @@ RUN --mount=type=cache,target=/root/.cache go build -o /app/build/sourcehubd ./c
 # Deployment entrypoint
 FROM debian:bookworm-slim
 
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY docker/config.toml /etc/sourcehub/config.toml
+COPY docker/app.toml /etc/sourcehub/app.toml
+COPY docker/faucet-key.json /etc/sourcehub/faucet-key.json
 COPY --from=builder /app/build/sourcehubd /usr/local/bin/sourcehubd
 
 RUN useradd --create-home --home-dir /home/node node && mkdir /sourcehub && chown node:node /sourcehub && ln -s /sourcehub /home/node/.sourcehub && chown node:node -R /home/node
@@ -50,6 +53,8 @@ ENV COMET_CONFIG_PATH=""
 # APP_CONFIG_PATH is an optional variable which, if set, will overwrite
 # the default app.toml with the provided file.
 ENV APP_CONFIG_PATH=""
+
+ENV STANDALONE=""
 
 # Comet P2P Port
 EXPOSE 26656
