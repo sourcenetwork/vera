@@ -467,7 +467,7 @@ func (m *MsgRedelegateResponse) GetCompletionTime() time.Time {
 type MsgCancelUnlocking struct {
 	DelegatorAddress string `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
 	ValidatorAddress string `protobuf:"bytes,2,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
-	// amount is always less than or equal to unlocking delegation entry balance
+	// amount is always less than or equal to unlocking delegation entry balance.
 	Stake types.Coin `protobuf:"bytes,3,opt,name=stake,proto3" json:"stake"`
 	// creation_height is the height which the unlocking took place.
 	CreationHeight int64 `protobuf:"varint,4,opt,name=creation_height,json=creationHeight,proto3" json:"creation_height,omitempty"`
@@ -571,6 +571,588 @@ func (m *MsgCancelUnlockingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCancelUnlockingResponse proto.InternalMessageInfo
 
+// MsgCreateDeveloper is the Msg/CreateDeveloper request type.
+type MsgCreateDeveloper struct {
+	// developer is the address of the developer being created.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+	// auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens,
+	// so that the developer always has enough credits to cover all active user subscriptions.
+	AutoLockEnabled bool `protobuf:"varint,2,opt,name=auto_lock_enabled,json=autoLockEnabled,proto3" json:"auto_lock_enabled,omitempty"`
+}
+
+func (m *MsgCreateDeveloper) Reset()         { *m = MsgCreateDeveloper{} }
+func (m *MsgCreateDeveloper) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDeveloper) ProtoMessage()    {}
+func (*MsgCreateDeveloper) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{10}
+}
+func (m *MsgCreateDeveloper) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateDeveloper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateDeveloper.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateDeveloper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDeveloper.Merge(m, src)
+}
+func (m *MsgCreateDeveloper) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateDeveloper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDeveloper.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateDeveloper proto.InternalMessageInfo
+
+func (m *MsgCreateDeveloper) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+func (m *MsgCreateDeveloper) GetAutoLockEnabled() bool {
+	if m != nil {
+		return m.AutoLockEnabled
+	}
+	return false
+}
+
+// MsgCreateDeveloperResponse defines the response structure for executing a MsgCreateDeveloper message.
+type MsgCreateDeveloperResponse struct {
+}
+
+func (m *MsgCreateDeveloperResponse) Reset()         { *m = MsgCreateDeveloperResponse{} }
+func (m *MsgCreateDeveloperResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateDeveloperResponse) ProtoMessage()    {}
+func (*MsgCreateDeveloperResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{11}
+}
+func (m *MsgCreateDeveloperResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateDeveloperResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateDeveloperResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateDeveloperResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateDeveloperResponse.Merge(m, src)
+}
+func (m *MsgCreateDeveloperResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateDeveloperResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateDeveloperResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateDeveloperResponse proto.InternalMessageInfo
+
+// MsgUpdateDeveloper is the Msg/UpdateDeveloper request type.
+type MsgUpdateDeveloper struct {
+	// developer is the address of the developer being updated.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+	// auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens,
+	// so that the developer always has enough credits to cover all active user subscriptions.
+	AutoLockEnabled bool `protobuf:"varint,2,opt,name=auto_lock_enabled,json=autoLockEnabled,proto3" json:"auto_lock_enabled,omitempty"`
+}
+
+func (m *MsgUpdateDeveloper) Reset()         { *m = MsgUpdateDeveloper{} }
+func (m *MsgUpdateDeveloper) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDeveloper) ProtoMessage()    {}
+func (*MsgUpdateDeveloper) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{12}
+}
+func (m *MsgUpdateDeveloper) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDeveloper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDeveloper.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDeveloper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDeveloper.Merge(m, src)
+}
+func (m *MsgUpdateDeveloper) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDeveloper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDeveloper.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDeveloper proto.InternalMessageInfo
+
+func (m *MsgUpdateDeveloper) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+func (m *MsgUpdateDeveloper) GetAutoLockEnabled() bool {
+	if m != nil {
+		return m.AutoLockEnabled
+	}
+	return false
+}
+
+// MsgUpdateDeveloperResponse defines the response structure for executing a MsgUpdateDeveloper message.
+type MsgUpdateDeveloperResponse struct {
+}
+
+func (m *MsgUpdateDeveloperResponse) Reset()         { *m = MsgUpdateDeveloperResponse{} }
+func (m *MsgUpdateDeveloperResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateDeveloperResponse) ProtoMessage()    {}
+func (*MsgUpdateDeveloperResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{13}
+}
+func (m *MsgUpdateDeveloperResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateDeveloperResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateDeveloperResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateDeveloperResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateDeveloperResponse.Merge(m, src)
+}
+func (m *MsgUpdateDeveloperResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateDeveloperResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateDeveloperResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateDeveloperResponse proto.InternalMessageInfo
+
+// MsgRemoveDeveloper is the Msg/RemoveDeveloper request type.
+type MsgRemoveDeveloper struct {
+	// developer is the address of the developer being removed.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+}
+
+func (m *MsgRemoveDeveloper) Reset()         { *m = MsgRemoveDeveloper{} }
+func (m *MsgRemoveDeveloper) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveDeveloper) ProtoMessage()    {}
+func (*MsgRemoveDeveloper) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{14}
+}
+func (m *MsgRemoveDeveloper) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveDeveloper) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveDeveloper.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveDeveloper) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveDeveloper.Merge(m, src)
+}
+func (m *MsgRemoveDeveloper) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveDeveloper) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveDeveloper.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveDeveloper proto.InternalMessageInfo
+
+func (m *MsgRemoveDeveloper) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+// MsgRemoveDeveloperResponse defines the response structure for executing a MsgRemoveDeveloper message.
+type MsgRemoveDeveloperResponse struct {
+}
+
+func (m *MsgRemoveDeveloperResponse) Reset()         { *m = MsgRemoveDeveloperResponse{} }
+func (m *MsgRemoveDeveloperResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveDeveloperResponse) ProtoMessage()    {}
+func (*MsgRemoveDeveloperResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{15}
+}
+func (m *MsgRemoveDeveloperResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveDeveloperResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveDeveloperResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveDeveloperResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveDeveloperResponse.Merge(m, src)
+}
+func (m *MsgRemoveDeveloperResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveDeveloperResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveDeveloperResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveDeveloperResponse proto.InternalMessageInfo
+
+// MsgAddUserSubscription is the Msg/AddUserSubscription request type.
+type MsgAddUserSubscription struct {
+	// developer is the address of the developer adding the subscription.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+	// user_did is the DID of the user being added to the subscription.
+	UserDid string `protobuf:"bytes,2,opt,name=user_did,json=userDid,proto3" json:"user_did,omitempty"`
+	// amount is the credit amount to be allocated to the user per period.
+	Amount uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	// period is the subscription period duration in seconds.
+	Period uint64 `protobuf:"varint,4,opt,name=period,proto3" json:"period,omitempty"`
+}
+
+func (m *MsgAddUserSubscription) Reset()         { *m = MsgAddUserSubscription{} }
+func (m *MsgAddUserSubscription) String() string { return proto.CompactTextString(m) }
+func (*MsgAddUserSubscription) ProtoMessage()    {}
+func (*MsgAddUserSubscription) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{16}
+}
+func (m *MsgAddUserSubscription) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddUserSubscription) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddUserSubscription.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddUserSubscription) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddUserSubscription.Merge(m, src)
+}
+func (m *MsgAddUserSubscription) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddUserSubscription) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddUserSubscription.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddUserSubscription proto.InternalMessageInfo
+
+func (m *MsgAddUserSubscription) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+func (m *MsgAddUserSubscription) GetUserDid() string {
+	if m != nil {
+		return m.UserDid
+	}
+	return ""
+}
+
+func (m *MsgAddUserSubscription) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
+func (m *MsgAddUserSubscription) GetPeriod() uint64 {
+	if m != nil {
+		return m.Period
+	}
+	return 0
+}
+
+// MsgAddUserSubscriptionResponse defines the response structure for executing a MsgAddUserSubscription message.
+type MsgAddUserSubscriptionResponse struct {
+}
+
+func (m *MsgAddUserSubscriptionResponse) Reset()         { *m = MsgAddUserSubscriptionResponse{} }
+func (m *MsgAddUserSubscriptionResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddUserSubscriptionResponse) ProtoMessage()    {}
+func (*MsgAddUserSubscriptionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{17}
+}
+func (m *MsgAddUserSubscriptionResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddUserSubscriptionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddUserSubscriptionResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddUserSubscriptionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddUserSubscriptionResponse.Merge(m, src)
+}
+func (m *MsgAddUserSubscriptionResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddUserSubscriptionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddUserSubscriptionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddUserSubscriptionResponse proto.InternalMessageInfo
+
+// MsgUpdateUserSubscription is the Msg/UpdateUserSubscription request type.
+type MsgUpdateUserSubscription struct {
+	// developer is the address of the developer updating the subscription.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+	// user_did is the DID of the user whose subscription is being updated.
+	UserDid string `protobuf:"bytes,2,opt,name=user_did,json=userDid,proto3" json:"user_did,omitempty"`
+	// amount is the new credit amount to be allocated to the user per period.
+	Amount uint64 `protobuf:"varint,3,opt,name=amount,proto3" json:"amount,omitempty"`
+	// period is the new subscription period duration in seconds.
+	Period uint64 `protobuf:"varint,4,opt,name=period,proto3" json:"period,omitempty"`
+}
+
+func (m *MsgUpdateUserSubscription) Reset()         { *m = MsgUpdateUserSubscription{} }
+func (m *MsgUpdateUserSubscription) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateUserSubscription) ProtoMessage()    {}
+func (*MsgUpdateUserSubscription) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{18}
+}
+func (m *MsgUpdateUserSubscription) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateUserSubscription) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateUserSubscription.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateUserSubscription) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateUserSubscription.Merge(m, src)
+}
+func (m *MsgUpdateUserSubscription) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateUserSubscription) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateUserSubscription.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateUserSubscription proto.InternalMessageInfo
+
+func (m *MsgUpdateUserSubscription) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+func (m *MsgUpdateUserSubscription) GetUserDid() string {
+	if m != nil {
+		return m.UserDid
+	}
+	return ""
+}
+
+func (m *MsgUpdateUserSubscription) GetAmount() uint64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
+func (m *MsgUpdateUserSubscription) GetPeriod() uint64 {
+	if m != nil {
+		return m.Period
+	}
+	return 0
+}
+
+// MsgUpdateUserSubscriptionResponse defines the response structure for executing a MsgUpdateUserSubscription message.
+type MsgUpdateUserSubscriptionResponse struct {
+}
+
+func (m *MsgUpdateUserSubscriptionResponse) Reset()         { *m = MsgUpdateUserSubscriptionResponse{} }
+func (m *MsgUpdateUserSubscriptionResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateUserSubscriptionResponse) ProtoMessage()    {}
+func (*MsgUpdateUserSubscriptionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{19}
+}
+func (m *MsgUpdateUserSubscriptionResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateUserSubscriptionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateUserSubscriptionResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateUserSubscriptionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateUserSubscriptionResponse.Merge(m, src)
+}
+func (m *MsgUpdateUserSubscriptionResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateUserSubscriptionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateUserSubscriptionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateUserSubscriptionResponse proto.InternalMessageInfo
+
+// MsgRemoveUserSubscription is the Msg/RemoveUserSubscription request type.
+// This message removes the user subscription and expires the associated allowance at the end of the current period.
+type MsgRemoveUserSubscription struct {
+	// developer is the address of the developer removing the subscription.
+	Developer string `protobuf:"bytes,1,opt,name=developer,proto3" json:"developer,omitempty"`
+	// user_did is the DID of the user whose subscription is being removed.
+	UserDid string `protobuf:"bytes,2,opt,name=user_did,json=userDid,proto3" json:"user_did,omitempty"`
+}
+
+func (m *MsgRemoveUserSubscription) Reset()         { *m = MsgRemoveUserSubscription{} }
+func (m *MsgRemoveUserSubscription) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveUserSubscription) ProtoMessage()    {}
+func (*MsgRemoveUserSubscription) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{20}
+}
+func (m *MsgRemoveUserSubscription) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveUserSubscription) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveUserSubscription.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveUserSubscription) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveUserSubscription.Merge(m, src)
+}
+func (m *MsgRemoveUserSubscription) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveUserSubscription) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveUserSubscription.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveUserSubscription proto.InternalMessageInfo
+
+func (m *MsgRemoveUserSubscription) GetDeveloper() string {
+	if m != nil {
+		return m.Developer
+	}
+	return ""
+}
+
+func (m *MsgRemoveUserSubscription) GetUserDid() string {
+	if m != nil {
+		return m.UserDid
+	}
+	return ""
+}
+
+// MsgRemoveUserSubscriptionResponse defines the response structure for executing a MsgRemoveUserSubscription message.
+type MsgRemoveUserSubscriptionResponse struct {
+}
+
+func (m *MsgRemoveUserSubscriptionResponse) Reset()         { *m = MsgRemoveUserSubscriptionResponse{} }
+func (m *MsgRemoveUserSubscriptionResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveUserSubscriptionResponse) ProtoMessage()    {}
+func (*MsgRemoveUserSubscriptionResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a120ff6388a0dc08, []int{21}
+}
+func (m *MsgRemoveUserSubscriptionResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveUserSubscriptionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveUserSubscriptionResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveUserSubscriptionResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveUserSubscriptionResponse.Merge(m, src)
+}
+func (m *MsgRemoveUserSubscriptionResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveUserSubscriptionResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveUserSubscriptionResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveUserSubscriptionResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "sourcehub.tier.v1beta1.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "sourcehub.tier.v1beta1.MsgUpdateParamsResponse")
@@ -582,60 +1164,90 @@ func init() {
 	proto.RegisterType((*MsgRedelegateResponse)(nil), "sourcehub.tier.v1beta1.MsgRedelegateResponse")
 	proto.RegisterType((*MsgCancelUnlocking)(nil), "sourcehub.tier.v1beta1.MsgCancelUnlocking")
 	proto.RegisterType((*MsgCancelUnlockingResponse)(nil), "sourcehub.tier.v1beta1.MsgCancelUnlockingResponse")
+	proto.RegisterType((*MsgCreateDeveloper)(nil), "sourcehub.tier.v1beta1.MsgCreateDeveloper")
+	proto.RegisterType((*MsgCreateDeveloperResponse)(nil), "sourcehub.tier.v1beta1.MsgCreateDeveloperResponse")
+	proto.RegisterType((*MsgUpdateDeveloper)(nil), "sourcehub.tier.v1beta1.MsgUpdateDeveloper")
+	proto.RegisterType((*MsgUpdateDeveloperResponse)(nil), "sourcehub.tier.v1beta1.MsgUpdateDeveloperResponse")
+	proto.RegisterType((*MsgRemoveDeveloper)(nil), "sourcehub.tier.v1beta1.MsgRemoveDeveloper")
+	proto.RegisterType((*MsgRemoveDeveloperResponse)(nil), "sourcehub.tier.v1beta1.MsgRemoveDeveloperResponse")
+	proto.RegisterType((*MsgAddUserSubscription)(nil), "sourcehub.tier.v1beta1.MsgAddUserSubscription")
+	proto.RegisterType((*MsgAddUserSubscriptionResponse)(nil), "sourcehub.tier.v1beta1.MsgAddUserSubscriptionResponse")
+	proto.RegisterType((*MsgUpdateUserSubscription)(nil), "sourcehub.tier.v1beta1.MsgUpdateUserSubscription")
+	proto.RegisterType((*MsgUpdateUserSubscriptionResponse)(nil), "sourcehub.tier.v1beta1.MsgUpdateUserSubscriptionResponse")
+	proto.RegisterType((*MsgRemoveUserSubscription)(nil), "sourcehub.tier.v1beta1.MsgRemoveUserSubscription")
+	proto.RegisterType((*MsgRemoveUserSubscriptionResponse)(nil), "sourcehub.tier.v1beta1.MsgRemoveUserSubscriptionResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/tier/v1beta1/tx.proto", fileDescriptor_a120ff6388a0dc08) }
 
 var fileDescriptor_a120ff6388a0dc08 = []byte{
-	// 765 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x56, 0x4f, 0x4f, 0x13, 0x4f,
-	0x18, 0xee, 0xb6, 0xc0, 0x2f, 0x1d, 0x7e, 0x50, 0xbb, 0xf2, 0xa7, 0x6c, 0x74, 0x0b, 0x35, 0x06,
-	0x6c, 0xc2, 0x6e, 0x80, 0xc4, 0x03, 0x37, 0x4a, 0x4c, 0xd4, 0x58, 0x43, 0xaa, 0x70, 0xf0, 0xd2,
-	0x6c, 0xb7, 0xe3, 0x74, 0xd3, 0xee, 0x4e, 0xdd, 0x99, 0x56, 0xb8, 0x19, 0x8f, 0x9e, 0xf8, 0x18,
-	0x1c, 0x39, 0xf0, 0x05, 0xbc, 0x71, 0x24, 0x9c, 0x38, 0x18, 0x35, 0x70, 0xe0, 0x0b, 0x18, 0xbd,
-	0x9a, 0xf9, 0xb3, 0x5b, 0x58, 0xda, 0x52, 0x03, 0x27, 0xbd, 0xb4, 0xdd, 0xf7, 0x7d, 0xe6, 0x99,
-	0xf7, 0x7d, 0xe6, 0x79, 0x77, 0x0a, 0xb2, 0x04, 0xb7, 0x7c, 0x1b, 0xd6, 0x5a, 0x15, 0x93, 0x3a,
-	0xd0, 0x37, 0xdb, 0x4b, 0x15, 0x48, 0xad, 0x25, 0x93, 0x6e, 0x1b, 0x4d, 0x1f, 0x53, 0xac, 0x4e,
-	0x85, 0x00, 0x83, 0x01, 0x0c, 0x09, 0xd0, 0xd2, 0x96, 0xeb, 0x78, 0xd8, 0xe4, 0x9f, 0x02, 0xaa,
-	0xe9, 0x36, 0x26, 0x2e, 0x26, 0x66, 0xc5, 0x22, 0x30, 0x24, 0xb2, 0xb1, 0xe3, 0xc9, 0xfc, 0xb4,
-	0xcc, 0xbb, 0x04, 0x99, 0xed, 0x25, 0xf6, 0x25, 0x13, 0x33, 0x22, 0x51, 0xe6, 0x4f, 0xa6, 0x78,
-	0x90, 0xa9, 0x09, 0x84, 0x11, 0x16, 0x71, 0xf6, 0x4b, 0x46, 0xb3, 0x08, 0x63, 0xd4, 0x80, 0x26,
-	0x7f, 0xaa, 0xb4, 0xde, 0x9a, 0xd4, 0x71, 0x21, 0xa1, 0x96, 0xdb, 0x94, 0x80, 0x07, 0x3d, 0xda,
-	0x6a, 0x5a, 0xbe, 0xe5, 0x4a, 0xee, 0xdc, 0x67, 0x05, 0xa4, 0x8a, 0x04, 0x6d, 0x36, 0xab, 0x16,
-	0x85, 0x1b, 0x3c, 0xa3, 0x3e, 0x06, 0x49, 0xab, 0x45, 0x6b, 0xd8, 0x77, 0xe8, 0x4e, 0x46, 0x99,
-	0x55, 0x16, 0x92, 0x85, 0xcc, 0xf1, 0xc1, 0xe2, 0x84, 0x2c, 0x6a, 0xad, 0x5a, 0xf5, 0x21, 0x21,
-	0xaf, 0xa8, 0xef, 0x78, 0xa8, 0xd4, 0x81, 0xaa, 0x6b, 0x60, 0x44, 0x70, 0x67, 0xe2, 0xb3, 0xca,
-	0xc2, 0xe8, 0xb2, 0x6e, 0x74, 0xd7, 0xcd, 0x10, 0xfb, 0x14, 0x92, 0x87, 0x5f, 0xb3, 0xb1, 0xbd,
-	0xf3, 0xfd, 0xbc, 0x52, 0x92, 0x0b, 0x57, 0x57, 0x3e, 0x9e, 0xef, 0xe7, 0x3b, 0x94, 0x9f, 0xce,
-	0xf7, 0xf3, 0xb3, 0x9d, 0x36, 0xb6, 0x45, 0x23, 0x91, 0x7a, 0x73, 0x33, 0x60, 0x3a, 0x12, 0x2a,
-	0x41, 0xd2, 0xc4, 0x1e, 0x81, 0xb9, 0x1f, 0x0a, 0xf8, 0xaf, 0x48, 0xd0, 0x0b, 0x6c, 0xd7, 0xd5,
-	0x27, 0x20, 0x5d, 0x85, 0x0d, 0x88, 0x2c, 0x8a, 0xfd, 0xb2, 0x25, 0x9a, 0xb8, 0xb6, 0xbd, 0x3b,
-	0xe1, 0x12, 0x19, 0x57, 0x5f, 0x82, 0x74, 0xdb, 0x6a, 0x38, 0xd5, 0x4b, 0x34, 0x71, 0x4e, 0x33,
-	0x77, 0x7c, 0xb0, 0x78, 0x5f, 0xd2, 0x6c, 0x05, 0x98, 0x08, 0x5f, 0x3b, 0x12, 0x57, 0x57, 0xc1,
-	0x30, 0xa1, 0x56, 0x1d, 0x66, 0x12, 0x5c, 0xb4, 0x19, 0x43, 0x12, 0x30, 0x07, 0x85, 0x8a, 0xad,
-	0x63, 0xc7, 0xbb, 0xa8, 0x97, 0x58, 0xb2, 0x3a, 0xc5, 0xe4, 0xba, 0xda, 0x55, 0x2e, 0xcd, 0x0f,
-	0x95, 0x75, 0x1d, 0x2a, 0xf1, 0x53, 0x01, 0x49, 0xa6, 0x92, 0xd7, 0xf8, 0xc7, 0xb4, 0xf8, 0xa2,
-	0x80, 0x74, 0xd8, 0x78, 0x20, 0x87, 0x3a, 0x0f, 0x52, 0xb6, 0x0f, 0x2d, 0xea, 0x60, 0xaf, 0x5c,
-	0x83, 0x0e, 0xaa, 0x51, 0xde, 0x7e, 0xa2, 0x34, 0x1e, 0x84, 0x9f, 0xf2, 0xa8, 0x5a, 0x02, 0x29,
-	0x1b, 0xbb, 0xcd, 0x06, 0xe4, 0x50, 0x36, 0x63, 0xd2, 0xdd, 0x9a, 0x21, 0x06, 0xd0, 0x08, 0x06,
-	0xd0, 0x78, 0x1d, 0x0c, 0x60, 0x61, 0x8c, 0x55, 0xb7, 0xfb, 0x2d, 0xab, 0x88, 0x0a, 0xc7, 0x3b,
-	0x0c, 0x0c, 0xa3, 0x3e, 0x07, 0xa3, 0x2d, 0x5e, 0x8e, 0xe0, 0x4b, 0xfc, 0x29, 0x1f, 0x10, 0xab,
-	0x59, 0x3e, 0x77, 0x12, 0x07, 0x63, 0x45, 0x82, 0x4a, 0x50, 0x76, 0x0e, 0x6f, 0xeb, 0x6c, 0x37,
-	0xc1, 0x24, 0xf1, 0xed, 0xf2, 0x0d, 0xce, 0xf7, 0x2e, 0xf1, 0xed, 0x68, 0x8a, 0xd1, 0x56, 0x09,
-	0xed, 0x42, 0x9b, 0x18, 0x98, 0xb6, 0x4a, 0xe8, 0x56, 0x4f, 0xe7, 0x0c, 0xdd, 0x9e, 0x73, 0xea,
-	0x60, 0xf2, 0x92, 0xb2, 0xa1, 0x79, 0xba, 0x78, 0x42, 0xb9, 0xa1, 0x27, 0x72, 0x7b, 0x71, 0xa0,
-	0x16, 0x09, 0x5a, 0xb7, 0x3c, 0x1b, 0x36, 0x84, 0x59, 0x1d, 0x0f, 0xfd, 0x85, 0x83, 0xda, 0x6d,
-	0xf4, 0x86, 0xba, 0x8d, 0x5e, 0xcf, 0x73, 0xb9, 0x07, 0xb4, 0xab, 0x4a, 0x05, 0x87, 0xb3, 0xfc,
-	0x2b, 0x01, 0x12, 0x45, 0x82, 0xd4, 0x1a, 0xf8, 0xff, 0xd2, 0xad, 0x36, 0xdf, 0xeb, 0x36, 0x8a,
-	0xdc, 0x1d, 0x9a, 0x39, 0x20, 0x30, 0xb4, 0xc3, 0x06, 0x18, 0xe2, 0x17, 0x4c, 0xb6, 0xcf, 0x42,
-	0x06, 0xd0, 0xe6, 0xaf, 0x01, 0x84, 0x8c, 0x5b, 0x60, 0x44, 0xbe, 0xa8, 0xe7, 0xfa, 0x15, 0xc3,
-	0x21, 0xda, 0xa3, 0x6b, 0x21, 0x21, 0x6f, 0x05, 0x80, 0x0b, 0x2f, 0x8a, 0x87, 0x7d, 0x16, 0x76,
-	0x60, 0xda, 0xe2, 0x40, 0xb0, 0x70, 0x8f, 0x77, 0x20, 0x15, 0x35, 0x71, 0xbe, 0x0f, 0x43, 0x04,
-	0xab, 0x2d, 0x0f, 0x8e, 0x0d, 0xb6, 0xd4, 0x86, 0x3f, 0x30, 0x7f, 0x15, 0x9e, 0x1d, 0x9e, 0xea,
-	0xca, 0xd1, 0xa9, 0xae, 0x7c, 0x3f, 0xd5, 0x95, 0xdd, 0x33, 0x3d, 0x76, 0x74, 0xa6, 0xc7, 0x4e,
-	0xce, 0xf4, 0xd8, 0x1b, 0x13, 0x39, 0x94, 0x11, 0xda, 0xd8, 0x35, 0x05, 0xbd, 0x07, 0xe9, 0x7b,
-	0xec, 0xd7, 0xcd, 0x2b, 0x7f, 0x2e, 0xe8, 0x4e, 0x13, 0x92, 0xca, 0x08, 0x1f, 0xe0, 0x95, 0xdf,
-	0x01, 0x00, 0x00, 0xff, 0xff, 0xfe, 0x55, 0x74, 0xd9, 0x1b, 0x0a, 0x00, 0x00,
+	// 1056 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe4, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0x26, 0x6e, 0x5a, 0xbf, 0xd2, 0x18, 0x6f, 0x5b, 0x37, 0x5e, 0x81, 0x9d, 0xb8, 0x42,
+	0x29, 0x96, 0xb2, 0x2b, 0xa7, 0x52, 0x25, 0x72, 0x4b, 0xda, 0x4a, 0x80, 0x30, 0xaa, 0xb6, 0x24,
+	0x07, 0x84, 0x64, 0xad, 0x77, 0x87, 0xf5, 0x2a, 0xde, 0x9d, 0x65, 0x67, 0x6c, 0xda, 0x03, 0x08,
+	0x71, 0x40, 0x88, 0x53, 0x3f, 0x46, 0x25, 0x24, 0x94, 0x43, 0xbf, 0x00, 0xb7, 0x1e, 0xab, 0x9e,
+	0x7a, 0x40, 0xfc, 0x49, 0x0e, 0xf9, 0x02, 0x88, 0x33, 0x9a, 0x99, 0xf5, 0xb8, 0x5e, 0xef, 0xae,
+	0x1d, 0x52, 0x21, 0xfe, 0x5c, 0x6c, 0xcf, 0xbc, 0xdf, 0xfc, 0xde, 0xef, 0xbd, 0x79, 0xf3, 0x66,
+	0x0c, 0x75, 0x82, 0x07, 0x91, 0x8d, 0x7a, 0x83, 0xae, 0x41, 0x3d, 0x14, 0x19, 0xc3, 0x56, 0x17,
+	0x51, 0xab, 0x65, 0xd0, 0x07, 0x7a, 0x18, 0x61, 0x8a, 0xd5, 0x8a, 0x04, 0xe8, 0x0c, 0xa0, 0xc7,
+	0x00, 0xad, 0x6c, 0xf9, 0x5e, 0x80, 0x0d, 0xfe, 0x29, 0xa0, 0x5a, 0xcd, 0xc6, 0xc4, 0xc7, 0xc4,
+	0xe8, 0x5a, 0x04, 0x49, 0x22, 0x1b, 0x7b, 0x41, 0x6c, 0xbf, 0x16, 0xdb, 0x7d, 0xe2, 0x1a, 0xc3,
+	0x16, 0xfb, 0x8a, 0x0d, 0x55, 0x61, 0xe8, 0xf0, 0x91, 0x21, 0x06, 0xb1, 0xe9, 0x8a, 0x8b, 0x5d,
+	0x2c, 0xe6, 0xd9, 0xaf, 0x78, 0xb6, 0xee, 0x62, 0xec, 0xf6, 0x91, 0xc1, 0x47, 0xdd, 0xc1, 0xa7,
+	0x06, 0xf5, 0x7c, 0x44, 0xa8, 0xe5, 0x87, 0x31, 0xe0, 0x7a, 0x46, 0x58, 0xa1, 0x15, 0x59, 0x7e,
+	0xcc, 0xdd, 0xf8, 0x51, 0x81, 0x52, 0x9b, 0xb8, 0x7b, 0xa1, 0x63, 0x51, 0x74, 0x8f, 0x5b, 0xd4,
+	0x5b, 0x50, 0xb4, 0x06, 0xb4, 0x87, 0x23, 0x8f, 0x3e, 0x5c, 0x55, 0xd6, 0x94, 0x1b, 0xc5, 0xdd,
+	0xd5, 0xe7, 0x4f, 0x36, 0xaf, 0xc4, 0xa2, 0x76, 0x1c, 0x27, 0x42, 0x84, 0xdc, 0xa7, 0x91, 0x17,
+	0xb8, 0xe6, 0x18, 0xaa, 0xee, 0xc0, 0xb2, 0xe0, 0x5e, 0x5d, 0x5c, 0x53, 0x6e, 0x5c, 0xdc, 0xaa,
+	0xe9, 0xe9, 0x79, 0xd3, 0x85, 0x9f, 0xdd, 0xe2, 0xd3, 0x9f, 0xeb, 0x0b, 0x8f, 0x4f, 0x0e, 0x9b,
+	0x8a, 0x19, 0x2f, 0xdc, 0xbe, 0xf9, 0xf5, 0xc9, 0x61, 0x73, 0x4c, 0xf9, 0xdd, 0xc9, 0x61, 0x73,
+	0x6d, 0x1c, 0xc6, 0x03, 0x11, 0x48, 0x42, 0x6f, 0xa3, 0x0a, 0xd7, 0x12, 0x53, 0x26, 0x22, 0x21,
+	0x0e, 0x08, 0x6a, 0xfc, 0xae, 0xc0, 0xf9, 0x36, 0x71, 0x3f, 0xc0, 0xf6, 0x81, 0x7a, 0x17, 0xca,
+	0x0e, 0xea, 0x23, 0xd7, 0xa2, 0x38, 0xea, 0x58, 0x22, 0x88, 0x99, 0xe1, 0xbd, 0x2e, 0x97, 0xc4,
+	0xf3, 0xea, 0x87, 0x50, 0x1e, 0x5a, 0x7d, 0xcf, 0x99, 0xa0, 0x59, 0xe4, 0x34, 0xeb, 0xcf, 0x9f,
+	0x6c, 0xbe, 0x19, 0xd3, 0xec, 0x8f, 0x30, 0x09, 0xbe, 0x61, 0x62, 0x5e, 0xdd, 0x86, 0x73, 0x84,
+	0x5a, 0x07, 0x68, 0x75, 0x89, 0x27, 0xad, 0xaa, 0xc7, 0x04, 0xac, 0x82, 0x64, 0xc6, 0x6e, 0x63,
+	0x2f, 0x78, 0x39, 0x5f, 0x62, 0xc9, 0x76, 0x85, 0xa5, 0x6b, 0x3a, 0xaa, 0x46, 0x99, 0x6f, 0x2a,
+	0x8b, 0x5a, 0x66, 0xe2, 0x0f, 0x05, 0x8a, 0x2c, 0x4b, 0x41, 0xff, 0x7f, 0x96, 0x8b, 0x9f, 0x14,
+	0x28, 0xcb, 0xc0, 0x47, 0xe9, 0x50, 0x37, 0xa0, 0x64, 0x47, 0xc8, 0xa2, 0x1e, 0x0e, 0x3a, 0x3d,
+	0xe4, 0xb9, 0x3d, 0xca, 0xc3, 0x5f, 0x32, 0x57, 0x46, 0xd3, 0xef, 0xf2, 0x59, 0xd5, 0x84, 0x92,
+	0x8d, 0xfd, 0xb0, 0x8f, 0x38, 0x94, 0x9d, 0xb1, 0xb8, 0xba, 0x35, 0x5d, 0x1c, 0x40, 0x7d, 0x74,
+	0x00, 0xf5, 0x8f, 0x46, 0x07, 0x70, 0xf7, 0x12, 0x53, 0xf7, 0xe8, 0x97, 0xba, 0x22, 0x14, 0xae,
+	0x8c, 0x19, 0x18, 0x46, 0x7d, 0x1f, 0x2e, 0x0e, 0xb8, 0x1c, 0xc1, 0xb7, 0x74, 0x5a, 0x3e, 0x10,
+	0xab, 0x99, 0xbd, 0xf1, 0x62, 0x11, 0x2e, 0xb5, 0x89, 0x6b, 0xa2, 0x38, 0x72, 0xf4, 0xaa, 0xf6,
+	0x76, 0x0f, 0xae, 0x92, 0xc8, 0xee, 0x9c, 0x61, 0x7f, 0x2f, 0x93, 0xc8, 0x4e, 0x9a, 0x18, 0xad,
+	0x43, 0x68, 0x0a, 0xed, 0xd2, 0xdc, 0xb4, 0x0e, 0xa1, 0xfb, 0x99, 0x95, 0x53, 0x78, 0x75, 0x95,
+	0x73, 0x00, 0x57, 0x27, 0x32, 0x2b, 0x8b, 0x27, 0xa5, 0x26, 0x94, 0x33, 0xd6, 0x44, 0xe3, 0xf1,
+	0x22, 0xa8, 0x6d, 0xe2, 0xde, 0xb6, 0x02, 0x1b, 0xf5, 0x45, 0xb1, 0x7a, 0x81, 0xfb, 0x1f, 0x3c,
+	0xa8, 0x69, 0x47, 0xaf, 0x90, 0x76, 0xf4, 0x32, 0xf7, 0xe5, 0x0d, 0xd0, 0xa6, 0x33, 0x25, 0x1b,
+	0xdd, 0xb7, 0x8a, 0x48, 0x24, 0xe3, 0x42, 0x77, 0xd0, 0x10, 0xf5, 0x71, 0x88, 0x22, 0x76, 0xa9,
+	0x39, 0xa3, 0xc1, 0xec, 0x4b, 0x4d, 0x42, 0xd5, 0x26, 0x94, 0xad, 0x01, 0xc5, 0x1d, 0x7e, 0x5c,
+	0x51, 0x60, 0x75, 0xfb, 0xc8, 0xe1, 0x99, 0xbb, 0x60, 0x96, 0x98, 0x81, 0x35, 0xd9, 0xbb, 0x62,
+	0x7a, 0x7b, 0x85, 0xdf, 0x5e, 0x72, 0xed, 0x48, 0xe8, 0xa4, 0x92, 0xa4, 0x50, 0x71, 0x6f, 0xfd,
+	0x13, 0x84, 0x26, 0x94, 0x48, 0xa1, 0x9f, 0x70, 0x9d, 0x26, 0xf2, 0xf1, 0xf0, 0xec, 0x3a, 0x33,
+	0x7c, 0x27, 0xd8, 0xa5, 0xef, 0xef, 0x15, 0xa8, 0xb4, 0x89, 0xbb, 0xe3, 0x38, 0x7b, 0x04, 0x45,
+	0xf7, 0x07, 0x5d, 0x62, 0x47, 0x5e, 0xc8, 0x8a, 0xe4, 0x2f, 0x27, 0xaa, 0x0a, 0x17, 0x06, 0x04,
+	0x45, 0x1d, 0xc7, 0x13, 0xf9, 0x29, 0x9a, 0xe7, 0xd9, 0xf8, 0x8e, 0xe7, 0xa8, 0x15, 0x58, 0xb6,
+	0x7c, 0x3c, 0x08, 0x28, 0xaf, 0xeb, 0x82, 0x19, 0x8f, 0xd8, 0x7c, 0x88, 0x22, 0x0f, 0x3b, 0xbc,
+	0x52, 0x0b, 0x66, 0x3c, 0x9a, 0x8a, 0x65, 0x0d, 0x6a, 0xe9, 0x62, 0x65, 0x3c, 0x3f, 0x28, 0x50,
+	0x95, 0xa9, 0xfe, 0x37, 0x84, 0x74, 0x1d, 0xd6, 0x33, 0xf5, 0xca, 0xa8, 0xbe, 0xe4, 0x41, 0x89,
+	0x3d, 0xfc, 0x1b, 0x82, 0xca, 0x10, 0x99, 0xee, 0x7f, 0x24, 0x72, 0xeb, 0xb7, 0x22, 0x2c, 0xb5,
+	0x89, 0xab, 0xf6, 0xe0, 0xb5, 0x89, 0xe7, 0xee, 0x46, 0xd6, 0x33, 0x35, 0xf1, 0xa8, 0xd4, 0x8c,
+	0x39, 0x81, 0xf2, 0x9e, 0xb8, 0x07, 0x05, 0xfe, 0xf2, 0xac, 0xe7, 0x2c, 0x64, 0x00, 0x6d, 0x63,
+	0x06, 0x40, 0x32, 0xee, 0xc3, 0x72, 0xfc, 0x82, 0x5b, 0xcf, 0x13, 0xc3, 0x21, 0xda, 0xdb, 0x33,
+	0x21, 0x92, 0xb7, 0x0b, 0xf0, 0xd2, 0x0b, 0xe2, 0xad, 0x9c, 0x85, 0x63, 0x98, 0xb6, 0x39, 0x17,
+	0x4c, 0xfa, 0xf8, 0x0c, 0x4a, 0xc9, 0xdb, 0xad, 0x99, 0xc3, 0x90, 0xc0, 0x6a, 0x5b, 0xf3, 0x63,
+	0x27, 0x5c, 0x26, 0xee, 0x81, 0x5c, 0x97, 0x93, 0xd8, 0x7c, 0x97, 0xe9, 0x5d, 0x9d, 0xb9, 0x4c,
+	0x76, 0xf4, 0xe6, 0xcc, 0xba, 0x99, 0xcf, 0x65, 0x46, 0x7f, 0x66, 0x2e, 0x93, 0xcd, 0xb9, 0x99,
+	0xbb, 0x35, 0x13, 0xd8, 0x5c, 0x97, 0x19, 0x6d, 0x59, 0xfd, 0x02, 0x2e, 0xa7, 0xb5, 0x64, 0x3d,
+	0x87, 0x2a, 0x05, 0xaf, 0xdd, 0x3a, 0x1d, 0x5e, 0xba, 0xff, 0x46, 0x81, 0x4a, 0x46, 0x0b, 0x6d,
+	0xcd, 0x4c, 0xe0, 0x94, 0x8a, 0x77, 0x4e, 0xbd, 0x64, 0x42, 0x48, 0x46, 0xdb, 0x6b, 0xcd, 0x4c,
+	0xeb, 0xa9, 0x84, 0xe4, 0x37, 0x37, 0xed, 0xdc, 0x57, 0xec, 0x89, 0xb5, 0xfb, 0xde, 0xd3, 0xa3,
+	0x9a, 0xf2, 0xec, 0xa8, 0xa6, 0xfc, 0x7a, 0x54, 0x53, 0x1e, 0x1d, 0xd7, 0x16, 0x9e, 0x1d, 0xd7,
+	0x16, 0x5e, 0x1c, 0xd7, 0x16, 0x3e, 0x36, 0x5c, 0x8f, 0x32, 0x5e, 0x1b, 0xfb, 0x86, 0xf0, 0x12,
+	0x20, 0xfa, 0x39, 0x8e, 0x0e, 0x8c, 0xa9, 0xff, 0xd7, 0xf4, 0x61, 0x88, 0x48, 0x77, 0x99, 0xbf,
+	0x61, 0x6f, 0xfe, 0x19, 0x00, 0x00, 0xff, 0xff, 0xb2, 0x9a, 0x21, 0x2c, 0x1e, 0x11, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -653,14 +1265,27 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
-	// Lock defines a (delegator) operation for locking a stake.
+	// Lock defines a (developer) operation for locking a stake.
 	Lock(ctx context.Context, in *MsgLock, opts ...grpc.CallOption) (*MsgLockResponse, error)
-	// Unlock defines a (delegator) operation for unlocking a stake.
+	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(ctx context.Context, in *MsgUnlock, opts ...grpc.CallOption) (*MsgUnlockResponse, error)
-	// Redelegate defines a (delegator) operation for re-delegating a stake.
+	// Redelegate defines a (developer) operation for re-delegating a stake.
 	Redelegate(ctx context.Context, in *MsgRedelegate, opts ...grpc.CallOption) (*MsgRedelegateResponse, error)
-	// CancelUnlocking defines a (delegator) operation for canceling an unlocking stake.
+	// CancelUnlocking defines a (developer) operation for canceling an unlocking stake.
 	CancelUnlocking(ctx context.Context, in *MsgCancelUnlocking, opts ...grpc.CallOption) (*MsgCancelUnlockingResponse, error)
+	// CreateDeveloper defines a (developer) operation for creating a new developer record.
+	CreateDeveloper(ctx context.Context, in *MsgCreateDeveloper, opts ...grpc.CallOption) (*MsgCreateDeveloperResponse, error)
+	// UpdateDeveloper defines a (developer) operation for updating an existing developer record.
+	UpdateDeveloper(ctx context.Context, in *MsgUpdateDeveloper, opts ...grpc.CallOption) (*MsgUpdateDeveloperResponse, error)
+	// RemoveDeveloper defines a (developer) operation for removing a developer record.
+	RemoveDeveloper(ctx context.Context, in *MsgRemoveDeveloper, opts ...grpc.CallOption) (*MsgRemoveDeveloperResponse, error)
+	// AddUserSubscription defines a (developer) operation for adding a user subscription.
+	AddUserSubscription(ctx context.Context, in *MsgAddUserSubscription, opts ...grpc.CallOption) (*MsgAddUserSubscriptionResponse, error)
+	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
+	UpdateUserSubscription(ctx context.Context, in *MsgUpdateUserSubscription, opts ...grpc.CallOption) (*MsgUpdateUserSubscriptionResponse, error)
+	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
+	RemoveUserSubscription(ctx context.Context, in *MsgRemoveUserSubscription, opts ...grpc.CallOption) (*MsgRemoveUserSubscriptionResponse, error)
 }
 
 type msgClient struct {
@@ -716,19 +1341,86 @@ func (c *msgClient) CancelUnlocking(ctx context.Context, in *MsgCancelUnlocking,
 	return out, nil
 }
 
+func (c *msgClient) CreateDeveloper(ctx context.Context, in *MsgCreateDeveloper, opts ...grpc.CallOption) (*MsgCreateDeveloperResponse, error) {
+	out := new(MsgCreateDeveloperResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/CreateDeveloper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateDeveloper(ctx context.Context, in *MsgUpdateDeveloper, opts ...grpc.CallOption) (*MsgUpdateDeveloperResponse, error) {
+	out := new(MsgUpdateDeveloperResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/UpdateDeveloper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveDeveloper(ctx context.Context, in *MsgRemoveDeveloper, opts ...grpc.CallOption) (*MsgRemoveDeveloperResponse, error) {
+	out := new(MsgRemoveDeveloperResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/RemoveDeveloper", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddUserSubscription(ctx context.Context, in *MsgAddUserSubscription, opts ...grpc.CallOption) (*MsgAddUserSubscriptionResponse, error) {
+	out := new(MsgAddUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/AddUserSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateUserSubscription(ctx context.Context, in *MsgUpdateUserSubscription, opts ...grpc.CallOption) (*MsgUpdateUserSubscriptionResponse, error) {
+	out := new(MsgUpdateUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/UpdateUserSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveUserSubscription(ctx context.Context, in *MsgRemoveUserSubscription, opts ...grpc.CallOption) (*MsgRemoveUserSubscriptionResponse, error) {
+	out := new(MsgRemoveUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.tier.v1beta1.Msg/RemoveUserSubscription", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
-	// Lock defines a (delegator) operation for locking a stake.
+	// Lock defines a (developer) operation for locking a stake.
 	Lock(context.Context, *MsgLock) (*MsgLockResponse, error)
-	// Unlock defines a (delegator) operation for unlocking a stake.
+	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(context.Context, *MsgUnlock) (*MsgUnlockResponse, error)
-	// Redelegate defines a (delegator) operation for re-delegating a stake.
+	// Redelegate defines a (developer) operation for re-delegating a stake.
 	Redelegate(context.Context, *MsgRedelegate) (*MsgRedelegateResponse, error)
-	// CancelUnlocking defines a (delegator) operation for canceling an unlocking stake.
+	// CancelUnlocking defines a (developer) operation for canceling an unlocking stake.
 	CancelUnlocking(context.Context, *MsgCancelUnlocking) (*MsgCancelUnlockingResponse, error)
+	// CreateDeveloper defines a (developer) operation for creating a new developer record.
+	CreateDeveloper(context.Context, *MsgCreateDeveloper) (*MsgCreateDeveloperResponse, error)
+	// UpdateDeveloper defines a (developer) operation for updating an existing developer record.
+	UpdateDeveloper(context.Context, *MsgUpdateDeveloper) (*MsgUpdateDeveloperResponse, error)
+	// RemoveDeveloper defines a (developer) operation for removing a developer record.
+	RemoveDeveloper(context.Context, *MsgRemoveDeveloper) (*MsgRemoveDeveloperResponse, error)
+	// AddUserSubscription defines a (developer) operation for adding a user subscription.
+	AddUserSubscription(context.Context, *MsgAddUserSubscription) (*MsgAddUserSubscriptionResponse, error)
+	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
+	UpdateUserSubscription(context.Context, *MsgUpdateUserSubscription) (*MsgUpdateUserSubscriptionResponse, error)
+	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
+	RemoveUserSubscription(context.Context, *MsgRemoveUserSubscription) (*MsgRemoveUserSubscriptionResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -749,6 +1441,24 @@ func (*UnimplementedMsgServer) Redelegate(ctx context.Context, req *MsgRedelegat
 }
 func (*UnimplementedMsgServer) CancelUnlocking(ctx context.Context, req *MsgCancelUnlocking) (*MsgCancelUnlockingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelUnlocking not implemented")
+}
+func (*UnimplementedMsgServer) CreateDeveloper(ctx context.Context, req *MsgCreateDeveloper) (*MsgCreateDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDeveloper not implemented")
+}
+func (*UnimplementedMsgServer) UpdateDeveloper(ctx context.Context, req *MsgUpdateDeveloper) (*MsgUpdateDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDeveloper not implemented")
+}
+func (*UnimplementedMsgServer) RemoveDeveloper(ctx context.Context, req *MsgRemoveDeveloper) (*MsgRemoveDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveDeveloper not implemented")
+}
+func (*UnimplementedMsgServer) AddUserSubscription(ctx context.Context, req *MsgAddUserSubscription) (*MsgAddUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserSubscription not implemented")
+}
+func (*UnimplementedMsgServer) UpdateUserSubscription(ctx context.Context, req *MsgUpdateUserSubscription) (*MsgUpdateUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSubscription not implemented")
+}
+func (*UnimplementedMsgServer) RemoveUserSubscription(ctx context.Context, req *MsgRemoveUserSubscription) (*MsgRemoveUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveUserSubscription not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -845,6 +1555,114 @@ func _Msg_CancelUnlocking_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/CreateDeveloper",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateDeveloper(ctx, req.(*MsgCreateDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/UpdateDeveloper",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateDeveloper(ctx, req.(*MsgUpdateDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/RemoveDeveloper",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveDeveloper(ctx, req.(*MsgRemoveDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/AddUserSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddUserSubscription(ctx, req.(*MsgAddUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/UpdateUserSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateUserSubscription(ctx, req.(*MsgUpdateUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.tier.v1beta1.Msg/RemoveUserSubscription",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveUserSubscription(ctx, req.(*MsgRemoveUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.tier.v1beta1.Msg",
@@ -869,6 +1687,30 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelUnlocking",
 			Handler:    _Msg_CancelUnlocking_Handler,
+		},
+		{
+			MethodName: "CreateDeveloper",
+			Handler:    _Msg_CreateDeveloper_Handler,
+		},
+		{
+			MethodName: "UpdateDeveloper",
+			Handler:    _Msg_UpdateDeveloper_Handler,
+		},
+		{
+			MethodName: "RemoveDeveloper",
+			Handler:    _Msg_RemoveDeveloper_Handler,
+		},
+		{
+			MethodName: "AddUserSubscription",
+			Handler:    _Msg_AddUserSubscription_Handler,
+		},
+		{
+			MethodName: "UpdateUserSubscription",
+			Handler:    _Msg_UpdateUserSubscription_Handler,
+		},
+		{
+			MethodName: "RemoveUserSubscription",
+			Handler:    _Msg_RemoveUserSubscription_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1259,6 +2101,385 @@ func (m *MsgCancelUnlockingResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateDeveloper) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateDeveloper) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateDeveloper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.AutoLockEnabled {
+		i--
+		if m.AutoLockEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateDeveloperResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateDeveloperResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateDeveloperResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateDeveloper) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateDeveloper) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateDeveloper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.AutoLockEnabled {
+		i--
+		if m.AutoLockEnabled {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateDeveloperResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateDeveloperResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateDeveloperResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveDeveloper) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveDeveloper) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveDeveloper) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveDeveloperResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveDeveloperResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveDeveloperResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAddUserSubscription) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddUserSubscription) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddUserSubscription) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Period != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Period))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.UserDid) > 0 {
+		i -= len(m.UserDid)
+		copy(dAtA[i:], m.UserDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.UserDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAddUserSubscriptionResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddUserSubscriptionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddUserSubscriptionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateUserSubscription) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateUserSubscription) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateUserSubscription) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Period != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Period))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.UserDid) > 0 {
+		i -= len(m.UserDid)
+		copy(dAtA[i:], m.UserDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.UserDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateUserSubscriptionResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateUserSubscriptionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateUserSubscriptionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveUserSubscription) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveUserSubscription) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveUserSubscription) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.UserDid) > 0 {
+		i -= len(m.UserDid)
+		copy(dAtA[i:], m.UserDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.UserDid)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Developer) > 0 {
+		i -= len(m.Developer)
+		copy(dAtA[i:], m.Developer)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Developer)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveUserSubscriptionResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveUserSubscriptionResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveUserSubscriptionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1414,6 +2635,168 @@ func (m *MsgCancelUnlocking) Size() (n int) {
 }
 
 func (m *MsgCancelUnlockingResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreateDeveloper) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.AutoLockEnabled {
+		n += 2
+	}
+	return n
+}
+
+func (m *MsgCreateDeveloperResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateDeveloper) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.AutoLockEnabled {
+		n += 2
+	}
+	return n
+}
+
+func (m *MsgUpdateDeveloperResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgRemoveDeveloper) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRemoveDeveloperResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAddUserSubscription) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.UserDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	if m.Period != 0 {
+		n += 1 + sovTx(uint64(m.Period))
+	}
+	return n
+}
+
+func (m *MsgAddUserSubscriptionResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateUserSubscription) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.UserDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	if m.Period != 0 {
+		n += 1 + sovTx(uint64(m.Period))
+	}
+	return n
+}
+
+func (m *MsgUpdateUserSubscriptionResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgRemoveUserSubscription) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Developer)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.UserDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgRemoveUserSubscriptionResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2527,6 +3910,1010 @@ func (m *MsgCancelUnlockingResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgCancelUnlockingResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateDeveloper) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateDeveloper: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateDeveloper: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoLockEnabled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutoLockEnabled = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateDeveloperResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateDeveloperResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateDeveloperResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateDeveloper) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateDeveloper: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateDeveloper: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoLockEnabled", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.AutoLockEnabled = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateDeveloperResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateDeveloperResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateDeveloperResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveDeveloper) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveDeveloper: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveDeveloper: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveDeveloperResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveDeveloperResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveDeveloperResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddUserSubscription) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddUserSubscription: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddUserSubscription: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Period", wireType)
+			}
+			m.Period = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Period |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddUserSubscriptionResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddUserSubscriptionResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddUserSubscriptionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateUserSubscription) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateUserSubscription: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateUserSubscription: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Period", wireType)
+			}
+			m.Period = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Period |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateUserSubscriptionResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateUserSubscriptionResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateUserSubscriptionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveUserSubscription) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveUserSubscription: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveUserSubscription: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Developer", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Developer = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UserDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.UserDid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveUserSubscriptionResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveUserSubscriptionResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveUserSubscriptionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

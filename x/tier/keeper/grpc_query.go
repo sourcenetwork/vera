@@ -114,6 +114,45 @@ func (k *Keeper) UnlockingLockups(ctx context.Context, req *types.UnlockingLocku
 	return &types.UnlockingLockupsResponse{UnlockingLockups: lockups, Pagination: pageRes}, nil
 }
 
+// Developers query returns all registered developers.
+func (k *Keeper) Developers(ctx context.Context, req *types.DevelopersRequest) (*types.DevelopersResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	developers, pageRes, err := k.getDevelopersPaginated(ctx, req.Pagination)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.DevelopersResponse{
+		Developers: developers,
+		Pagination: pageRes,
+	}, nil
+}
+
+// UserSubscriptions query returns all user subscriptions for a specific developer.
+func (k *Keeper) UserSubscriptions(ctx context.Context, req *types.UserSubscriptionsRequest) (*types.UserSubscriptionsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	developerAddr, err := sdk.AccAddressFromBech32(req.Developer)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid developer address")
+	}
+
+	userSubscriptions, pageRes, err := k.getUserSubscriptionsPaginated(ctx, developerAddr, req.Pagination)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.UserSubscriptionsResponse{
+		UserSubscriptions: userSubscriptions,
+		Pagination:        pageRes,
+	}, nil
+}
+
 // getLockupsPaginated returns delegator lockups with pagination.
 func (k *Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress, page *query.PageRequest) (
 	[]types.Lockup, *query.PageResponse, error) {
@@ -160,4 +199,51 @@ func (k *Keeper) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.A
 	}
 
 	return unlockingLockups, pageRes, nil
+}
+
+// getDevelopersPaginated returns all registered developers with pagination.
+func (k *Keeper) getDevelopersPaginated(ctx context.Context, page *query.PageRequest) (
+	[]types.Developer, *query.PageResponse, error) {
+
+	var developers []types.Developer
+	store := k.developerStore(ctx)
+
+	onResult := func(key []byte, value []byte) error {
+		var developer types.Developer
+		k.cdc.MustUnmarshal(value, &developer)
+		developers = append(developers, developer)
+		return nil
+	}
+
+	pageRes, err := query.Paginate(store, page, onResult)
+	if err != nil {
+		return nil, nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return developers, pageRes, nil
+}
+
+// getUserSubscriptionsPaginated returns user subscriptions for a developer with pagination.
+func (k *Keeper) getUserSubscriptionsPaginated(ctx context.Context, developerAddr sdk.AccAddress, page *query.PageRequest) (
+	[]types.UserSubscription, *query.PageResponse, error) {
+
+	var userSubscriptions []types.UserSubscription
+	store := k.userSubscriptionStore(ctx)
+
+	onResult := func(key []byte, value []byte) error {
+		if !bytes.HasPrefix(key, developerAddr.Bytes()) {
+			return nil
+		}
+		var userSubscription types.UserSubscription
+		k.cdc.MustUnmarshal(value, &userSubscription)
+		userSubscriptions = append(userSubscriptions, userSubscription)
+		return nil
+	}
+
+	pageRes, err := query.Paginate(store, page, onResult)
+	if err != nil {
+		return nil, nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return userSubscriptions, pageRes, nil
 }

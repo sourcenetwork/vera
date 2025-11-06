@@ -6,6 +6,8 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/query"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
@@ -203,4 +205,92 @@ func TestUnlockingLockupsQuery_InvalidRequest(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "invalid request")
 	require.Nil(t, response)
+}
+
+func TestDevelopersQuery(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	dev1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+	dev2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+
+	require.NoError(t, k.CreateDeveloper(ctx, dev1, true))
+	require.NoError(t, k.CreateDeveloper(ctx, dev2, false))
+
+	resp, err := k.Developers(ctx, &types.DevelopersRequest{})
+	require.NoError(t, err)
+	require.Len(t, resp.Developers, 2)
+
+	page1, err := k.Developers(ctx, &types.DevelopersRequest{Pagination: &query.PageRequest{Limit: 1}})
+	require.NoError(t, err)
+	require.Len(t, page1.Developers, 1)
+	require.NotNil(t, page1.Pagination)
+	require.NotEmpty(t, page1.Pagination.NextKey)
+
+	page2, err := k.Developers(ctx, &types.DevelopersRequest{Pagination: &query.PageRequest{Key: page1.Pagination.NextKey, Limit: 1}})
+	require.NoError(t, err)
+	require.Len(t, page2.Developers, 1)
+}
+
+func TestDevelopersQuery_InvalidRequest(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
+
+	resp, err := k.Developers(ctx, nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, resp)
+}
+
+func TestUserSubscriptionsQuery(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
+
+	require.NoError(t, k.CreateDeveloper(ctx, developerAddr, true))
+
+	initialValidatorBalance := math.NewInt(1000)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user1Did, uint64(0), 0))
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user2Did, uint64(0), 0))
+
+	resp, err := k.UserSubscriptions(ctx, &types.UserSubscriptionsRequest{Developer: developerAddr.String()})
+	require.NoError(t, err)
+	require.Len(t, resp.UserSubscriptions, 2)
+
+	page1, err := k.UserSubscriptions(ctx, &types.UserSubscriptionsRequest{
+		Developer:  developerAddr.String(),
+		Pagination: &query.PageRequest{Limit: 1},
+	})
+	require.NoError(t, err)
+	require.Len(t, page1.UserSubscriptions, 1)
+	require.NotNil(t, page1.Pagination)
+	require.NotEmpty(t, page1.Pagination.NextKey)
+
+	page2, err := k.UserSubscriptions(ctx, &types.UserSubscriptionsRequest{
+		Developer:  developerAddr.String(),
+		Pagination: &query.PageRequest{Key: page1.Pagination.NextKey, Limit: 1},
+	})
+	require.NoError(t, err)
+	require.Len(t, page2.UserSubscriptions, 1)
+}
+
+func TestUserSubscriptionsQuery_InvalidRequest(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+	params := k.GetParams(ctx)
+	require.NoError(t, k.SetParams(ctx, params))
+
+	resp, err := k.UserSubscriptions(ctx, nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, resp)
 }

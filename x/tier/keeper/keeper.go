@@ -35,6 +35,7 @@ type (
 		stakingKeeper      types.StakingKeeper
 		epochsKeeper       types.EpochsKeeper
 		distributionKeeper types.DistributionKeeper
+		feegrantKeeper     types.FeegrantKeeper
 	}
 )
 
@@ -49,6 +50,7 @@ func NewKeeper(
 	stakingKeeper types.StakingKeeper,
 	epochsKeeper types.EpochsKeeper,
 	distributionKeeper types.DistributionKeeper,
+	feegrantKeeper types.FeegrantKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -64,6 +66,7 @@ func NewKeeper(
 		stakingKeeper:      stakingKeeper,
 		epochsKeeper:       epochsKeeper,
 		distributionKeeper: distributionKeeper,
+		feegrantKeeper:     feegrantKeeper,
 	}
 }
 
@@ -90,6 +93,11 @@ func (k *Keeper) GetEpochsKeeper() types.EpochsKeeper {
 // GetDistributionKeeper returns the module's DistributionKeeper.
 func (k *Keeper) GetDistributionKeeper() types.DistributionKeeper {
 	return k.distributionKeeper
+}
+
+// GetFeegrantKeeper returns the module's FeegrantKeeper.
+func (k *Keeper) GetFeegrantKeeper() types.FeegrantKeeper {
+	return k.feegrantKeeper
 }
 
 // Logger returns a module-specific logger.
@@ -237,9 +245,12 @@ func (k *Keeper) Lock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.V
 
 // Unlock initiates the unlocking of the specified lockup amount of a delegator from a validator.
 // The specified lockup amount will be unlocked in CompleteUnlocking after the unlocking period has passed.
-func (k *Keeper) Unlock(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress,
-	amt math.Int) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
-
+func (k *Keeper) Unlock(
+	ctx context.Context,
+	delAddr sdk.AccAddress,
+	valAddr sdk.ValAddress,
+	amt math.Int,
+) (creationHeight int64, completionTime, unlockTime time.Time, err error) {
 	start := time.Now()
 
 	defer func() {
@@ -492,6 +503,365 @@ func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, va
 			sdk.NewAttribute(stakingtypes.AttributeKeyValidator, valAddr.String()),
 			sdk.NewAttribute(types.AttributeKeyCreationHeight, fmt.Sprintf("%d", creationHeight)),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, amt.String()),
+		),
+	)
+
+	return nil
+}
+
+// CreateDeveloper creates a new developer record.
+// Returns an error if the developer already exists.
+func (k *Keeper) CreateDeveloper(ctx context.Context, developerAddr sdk.AccAddress, autoLockEnabled bool) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.CreateDeveloper,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+			},
+		)
+	}()
+
+	existingDev := k.GetDeveloper(ctx, developerAddr)
+	if existingDev != nil {
+		return types.ErrInvalidAddress.Wrapf("developer %s already exists", developerAddr.String())
+	}
+
+	developer := &types.Developer{
+		Address:         developerAddr.String(),
+		AutoLockEnabled: autoLockEnabled,
+	}
+
+	k.SetDeveloper(ctx, developerAddr, developer)
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDeveloperCreated,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyAutoLockEnabled, fmt.Sprintf("%t", autoLockEnabled)),
+		),
+	)
+
+	return nil
+}
+
+// UpdateDeveloper updates an existing developer record.
+// Returns an error if the developer doesn't exist.
+func (k *Keeper) UpdateDeveloper(ctx context.Context, developerAddr sdk.AccAddress, autoLockEnabled bool) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.UpdateDeveloper,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+			},
+		)
+	}()
+
+	developer := k.GetDeveloper(ctx, developerAddr)
+	if developer == nil {
+		return types.ErrInvalidAddress.Wrapf("developer %s does not exist", developerAddr.String())
+	}
+
+	developer.AutoLockEnabled = autoLockEnabled
+
+	k.SetDeveloper(ctx, developerAddr, developer)
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDeveloperUpdated,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyAutoLockEnabled, fmt.Sprintf("%t", autoLockEnabled)),
+		),
+	)
+
+	return nil
+}
+
+// RemoveDeveloper removes the developer record and all associated user subscriptions.
+// All corresponding feegrant allowances are set to expire at the current period reset time.
+func (k *Keeper) RemoveDeveloper(ctx context.Context, developerAddr sdk.AccAddress) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.RemoveDeveloper,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+			},
+		)
+	}()
+
+	existingDev := k.GetDeveloper(ctx, developerAddr)
+	if existingDev == nil {
+		return types.ErrInvalidAddress.Wrapf("developer %s does not exist", developerAddr.String())
+	}
+
+	var subscriptionsToRemove []struct {
+		developerAddr sdk.AccAddress
+		userDid       string
+	}
+
+	k.mustIterateUserSubscriptionsForDeveloper(ctx, developerAddr,
+		func(devAddr sdk.AccAddress, userDid string, userSubscription types.UserSubscription) {
+			subscriptionsToRemove = append(subscriptionsToRemove, struct {
+				developerAddr sdk.AccAddress
+				userDid       string
+			}{devAddr, userDid})
+		})
+
+	for _, sub := range subscriptionsToRemove {
+		err := k.RemoveUserSubscription(ctx, sub.developerAddr, sub.userDid)
+		if err != nil {
+			continue
+		}
+	}
+
+	k.removeDeveloper(ctx, developerAddr)
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeDeveloperRemoved,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+		),
+	)
+
+	return nil
+}
+
+// AddUserSubscription registers a user to a developer for receiving allowances.
+func (k *Keeper) AddUserSubscription(
+	ctx context.Context,
+	developerAddr sdk.AccAddress,
+	userDid string,
+	amount uint64,
+	period uint64,
+) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.AddUserSubscription,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+				metrics.NewLabel(metrics.UserDid, userDid),
+				metrics.NewLabel(metrics.SubscriptionAmount, fmt.Sprintf("%d", amount)),
+				metrics.NewLabel(metrics.SubscriptionPeriod, fmt.Sprintf("%d", period)),
+			},
+		)
+	}()
+
+	amountInt := math.NewIntFromUint64(amount)
+	existingSub := k.GetUserSubscription(ctx, developerAddr, userDid)
+	if existingSub != nil {
+		return types.ErrInvalidAddress.Wrapf("user %s is already subscribed to developer %s", userDid, developerAddr.String())
+	}
+
+	developer := k.GetDeveloper(ctx, developerAddr)
+	if developer == nil {
+		return types.ErrInvalidAddress.Wrapf("developer %s not found", developerAddr.String())
+	}
+
+	// Check if developer has enough available credits
+	err = k.validateDeveloperCredits(ctx, developerAddr, amountInt)
+	if err != nil {
+		if !developer.AutoLockEnabled {
+			return types.ErrInvalidAmount.Wrapf("insufficient credits and auto-lock disabled: %v", err)
+		}
+		// Convert required credits to uopen to lock using highest applicable rate
+		params := k.GetParams(ctx)
+		effectiveRate := int64(0)
+		for _, r := range params.RewardRates {
+			if amountInt.GTE(r.Amount) {
+				effectiveRate = r.Rate
+				break
+			}
+		}
+		if effectiveRate <= 0 {
+			last := params.RewardRates[len(params.RewardRates)-1]
+			effectiveRate = last.Rate
+		}
+		lockNumerator := amountInt.MulRaw(100).AddRaw(effectiveRate - 1)
+		lockAmt := lockNumerator.QuoRaw(effectiveRate)
+		if !lockAmt.IsPositive() {
+			lockAmt = math.OneInt()
+		}
+
+		// Try to add more lockup to cover the required amount
+		err = k.addLockupForRegistration(ctx, developerAddr, lockAmt)
+		if err != nil {
+			return types.ErrInvalidAmount.Wrapf("auto-lock failed: %v", err)
+		}
+	}
+
+	now := sdk.UnwrapSDKContext(ctx).BlockTime()
+	userSubscription := &types.UserSubscription{
+		Developer:    developerAddr.String(),
+		UserDid:      userDid,
+		CreditAmount: amount,
+		StartDate:    now,
+		Period:       period,
+		LastRenewed:  now,
+	}
+
+	k.SetUserSubscription(ctx, developerAddr, userDid, userSubscription)
+
+	// Grant or update periodic DID allowance via feegrant to the user DID from the developer
+	spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, amountInt))
+	grantPeriod := time.Duration(period) * time.Second
+	if grantPeriod == 0 {
+		params := k.GetParams(ctx)
+		grantPeriod = *params.EpochDuration
+	}
+	if err := k.grantPeriodicDIDAllowance(ctx, developerAddr, userDid, spendLimit, grantPeriod); err != nil {
+		return errorsmod.Wrap(err, "grant periodic DID allowance")
+	}
+
+	err = k.updateDeveloperTotalGranted(ctx, developerAddr, math.NewIntFromUint64(userSubscription.CreditAmount), true)
+	if err != nil {
+		return types.ErrInvalidAmount.Wrapf("failed to update total granted amount: %v", err)
+	}
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUserSubscriptionCreated,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyUserDid, userDid),
+			sdk.NewAttribute(types.AttributeKeySubscriptionAmount, fmt.Sprintf("%d", amount)),
+			sdk.NewAttribute(types.AttributeKeySubscriptionPeriod, fmt.Sprintf("%d", period)),
+		),
+	)
+
+	return nil
+}
+
+// UpdateUserSubscription updates the user subscription.
+func (k *Keeper) UpdateUserSubscription(
+	ctx context.Context,
+	developerAddr sdk.AccAddress,
+	userDid string,
+	amount uint64,
+	period uint64,
+) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.UpdateUserSubscription,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+				metrics.NewLabel(metrics.UserDid, userDid),
+				metrics.NewLabel(metrics.SubscriptionAmount, fmt.Sprintf("%d", amount)),
+				metrics.NewLabel(metrics.SubscriptionPeriod, fmt.Sprintf("%d", period)),
+			},
+		)
+	}()
+
+	userSubscription := k.GetUserSubscription(ctx, developerAddr, userDid)
+	if userSubscription == nil {
+		return types.ErrInvalidAddress.Wrapf("user %s is not subscribed to developer %s", userDid, developerAddr.String())
+	}
+
+	oldAmount := userSubscription.CreditAmount
+	if amount > oldAmount {
+		delta := amount - oldAmount
+		if err := k.updateDeveloperTotalGranted(ctx, developerAddr, math.NewIntFromUint64(delta), true); err != nil {
+			return err
+		}
+	} else if oldAmount > amount {
+		delta := oldAmount - amount
+		if err := k.updateDeveloperTotalGranted(ctx, developerAddr, math.NewIntFromUint64(delta), false); err != nil {
+			return err
+		}
+	}
+
+	userSubscription.CreditAmount = amount
+	userSubscription.Period = period
+	userSubscription.LastRenewed = sdk.UnwrapSDKContext(ctx).BlockTime()
+	k.SetUserSubscription(ctx, developerAddr, userDid, userSubscription)
+
+	spendLimit := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewIntFromUint64(amount)))
+	updatePeriod := time.Duration(period) * time.Second
+	if updatePeriod == 0 {
+		params := k.GetParams(ctx)
+		updatePeriod = *params.EpochDuration
+	}
+	if err := k.grantPeriodicDIDAllowance(ctx, developerAddr, userDid, spendLimit, updatePeriod); err != nil {
+		return errorsmod.Wrap(err, "grant periodic DID allowance")
+	}
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUserSubscriptionUpdated,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyUserDid, userDid),
+			sdk.NewAttribute(types.AttributeKeySubscriptionAmount, fmt.Sprintf("%d", amount)),
+			sdk.NewAttribute(types.AttributeKeySubscriptionPeriod, fmt.Sprintf("%d", period)),
+		),
+	)
+
+	return nil
+}
+
+// RemoveUserSubscription removes the user subscription.
+// The corresponding feegrant allowance is set to expire at the current period reset time.
+func (k *Keeper) RemoveUserSubscription(
+	ctx context.Context,
+	developerAddr sdk.AccAddress,
+	userDid string,
+) (err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.RemoveUserSubscription,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Developer, developerAddr.String()),
+				metrics.NewLabel(metrics.UserDid, userDid),
+			},
+		)
+	}()
+
+	existingSub := k.GetUserSubscription(ctx, developerAddr, userDid)
+	if existingSub == nil {
+		return types.ErrInvalidAddress.Wrapf("user %s is not subscribed to developer %s", userDid, developerAddr.String())
+	}
+
+	if err := k.updateDeveloperTotalGranted(ctx, developerAddr, math.NewIntFromUint64(existingSub.CreditAmount), false); err != nil {
+		return err
+	}
+
+	k.removeUserSubscription(ctx, developerAddr, userDid)
+
+	// Expire the DID allowance by setting the expiration to the current period reset
+	// Ignore error if no allowance exists
+	_ = k.feegrantKeeper.ExpireDIDAllowance(ctx, developerAddr, userDid)
+
+	sdk.UnwrapSDKContext(ctx).EventManager().EmitEvent(
+		sdk.NewEvent(
+			types.EventTypeUserSubscriptionRemoved,
+			sdk.NewAttribute(types.AttributeKeyDeveloper, developerAddr.String()),
+			sdk.NewAttribute(types.AttributeKeyUserDid, userDid),
 		),
 	)
 

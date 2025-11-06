@@ -10,6 +10,7 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 )
 
 // EpochsKeeper defines the expected interface for the Epochs module.
@@ -67,6 +68,18 @@ type DistributionKeeper interface {
 	AllocateTokens(ctx context.Context, totalReward int64, bondedValidators []abcitypes.VoteInfo) error
 	GetValidatorOutstandingRewards(ctx context.Context, valAddr sdk.ValAddress) (distrtypes.ValidatorOutstandingRewards, error)
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
+}
+
+// FeegrantKeeper defines the expected interface for the Feegrant module.
+type FeegrantKeeper interface {
+	GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error)
+	GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error
+	UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error
+	// DID-based feegrant methods
+	GrantDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, allowance feegrant.FeeAllowanceI) error
+	UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, feeAllowance feegrant.FeeAllowanceI) error
+	ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error
+	GetDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) (feegrant.FeeAllowanceI, error)
 }
 
 // ParamSubspace defines the expected Subspace interface for parameters.

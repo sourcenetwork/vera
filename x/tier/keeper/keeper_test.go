@@ -40,13 +40,13 @@ func TestLock(t *testing.T) {
 	// locking invalid amounts should fail
 	err = k.Lock(ctx, delAddr, valAddr, math.NewInt(-100))
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "lock non-positive amount")
+	require.ErrorContains(t, err, "lock non-positive amount")
 	err = k.Lock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "lock non-positive amount")
+	require.ErrorContains(t, err, "lock non-positive amount")
 	err = k.Lock(ctx, delAddr, valAddr, math.NewInt(10_000_000))
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "insufficient funds")
+	require.ErrorContains(t, err, "insufficient funds")
 
 	// lock valid amount
 	err = k.Lock(ctx, delAddr, valAddr, amount)
@@ -88,10 +88,10 @@ func TestUnlock(t *testing.T) {
 	// unlocking invalid amounts should fail
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, invalidUnlockAmount)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "unlock non-positive amount")
+	require.ErrorContains(t, err, "unlock non-positive amount")
 	_, _, _, err = k.Unlock(ctx, delAddr, valAddr, math.ZeroInt())
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "unlock non-positive amount")
+	require.ErrorContains(t, err, "unlock non-positive amount")
 
 	creationHeight, completionTime, unlockTime, err := k.Unlock(ctx, delAddr, valAddr, unlockAmount)
 	require.NoError(t, err)
@@ -137,10 +137,10 @@ func TestRedelegate(t *testing.T) {
 	// redelegating invalid amounts should fail
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, invalidAmount)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "redelegate non-positive amount")
+	require.ErrorContains(t, err, "redelegate non-positive amount")
 	_, err = k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.ZeroInt())
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "redelegate non-positive amount")
+	require.ErrorContains(t, err, "redelegate non-positive amount")
 
 	// redelegate from the source validator to the destination validator
 	completionTime, err := k.Redelegate(ctx, delAddr, srcValAddr, dstValAddr, math.NewInt(500))
@@ -286,10 +286,10 @@ func TestCancelUnlocking(t *testing.T) {
 
 	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.NewInt(-100))
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
+	require.ErrorContains(t, err, "cancel unlocking non-positive amount")
 	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, math.ZeroInt())
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "cancel unlocking non-positive amount")
+	require.ErrorContains(t, err, "cancel unlocking non-positive amount")
 
 	// partially cancel the unlocking lockup
 	err = k.CancelUnlocking(ctx, delAddr, valAddr, creationHeight, partialUnlockAmount)
@@ -352,4 +352,231 @@ func TestCancelUnlocking(t *testing.T) {
 	// confirm that unlocking lockup was removed if we cancel whole amount (e.g. use nil)
 	unlockingLockup = k.GetUnlockingLockup(ctx, delAddr, valAddr, creationHeight)
 	require.Nil(t, unlockingLockup)
+}
+
+// TestCreateDeveloper verifies that a developer can be created.
+func TestCreateDeveloper(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+
+	err = k.CreateDeveloper(ctx, developerAddr, true)
+	require.NoError(t, err)
+
+	developer := k.GetDeveloper(ctx, developerAddr)
+	require.NotNil(t, developer)
+	require.Equal(t, developerAddr.String(), developer.Address)
+	require.True(t, developer.AutoLockEnabled)
+
+	err = k.CreateDeveloper(ctx, developerAddr, false)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "already exists")
+}
+
+// TestUpdateDeveloper verifies that a developer can be updated.
+func TestUpdateDeveloper(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+
+	err = k.CreateDeveloper(ctx, developerAddr, true)
+	require.NoError(t, err)
+
+	developer := k.GetDeveloper(ctx, developerAddr)
+	require.NotNil(t, developer)
+	require.Equal(t, developerAddr.String(), developer.Address)
+	require.True(t, developer.AutoLockEnabled)
+
+	err = k.UpdateDeveloper(ctx, developerAddr, false)
+	require.NoError(t, err)
+
+	developer = k.GetDeveloper(ctx, developerAddr)
+	require.NotNil(t, developer)
+	require.Equal(t, developerAddr.String(), developer.Address)
+	require.False(t, developer.AutoLockEnabled)
+}
+
+// TestRemoveDeveloper verifies that a developer can be removed.
+func TestRemoveDeveloper(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+
+	err = k.RemoveDeveloper(ctx, developerAddr)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "does not exist")
+
+	err = k.CreateDeveloper(ctx, developerAddr, true)
+	require.NoError(t, err)
+
+	developer := k.GetDeveloper(ctx, developerAddr)
+	require.NotNil(t, developer)
+
+	err = k.RemoveDeveloper(ctx, developerAddr)
+	require.NoError(t, err)
+
+	developer = k.GetDeveloper(ctx, developerAddr)
+	require.Nil(t, developer)
+}
+
+// TestAddUserSubscription verifies that a user can be subscribed to a developer.
+func TestAddUserSubscription(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
+
+	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
+
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.CreateDeveloper(ctx, developerAddr, false)
+	require.NoError(t, err)
+
+	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
+
+	amount := uint64(1000)
+	period := uint64(3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, period)
+	require.NoError(t, err)
+
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.NotNil(t, subscription)
+	require.Equal(t, developerAddr.String(), subscription.Developer)
+	require.Equal(t, userDid, subscription.UserDid)
+	require.Equal(t, amount, subscription.CreditAmount)
+	require.Equal(t, period, subscription.Period)
+
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, period)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "already subscribed")
+}
+
+// TestUpdateUserSubscription verifies that a user's subscription can be updated.
+func TestUpdateUserSubscription(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
+
+	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
+
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.CreateDeveloper(ctx, developerAddr, false)
+	require.NoError(t, err)
+
+	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
+
+	initialAmount := uint64(1000)
+	newAmount := uint64(2000)
+	lowerAmount := uint64(500)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, initialAmount, 7200)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "is not subscribed")
+
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, initialAmount, 3600)
+	require.NoError(t, err)
+
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, newAmount, 7200)
+	require.NoError(t, err)
+
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.NotNil(t, subscription)
+	require.Equal(t, newAmount, subscription.CreditAmount)
+	require.Equal(t, uint64(7200), subscription.Period)
+
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, lowerAmount, 1800)
+	require.NoError(t, err)
+
+	subscription = k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.NotNil(t, subscription)
+	require.Equal(t, lowerAmount, subscription.CreditAmount)
+	require.Equal(t, uint64(1800), subscription.Period)
+}
+
+// TestRemoveUserSubscription verifies that a user's subscription can be removed.
+func TestRemoveUserSubscription(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
+
+	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
+
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.RemoveUserSubscription(ctx, developerAddr, userDid)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "is not subscribed")
+
+	err = k.CreateDeveloper(ctx, developerAddr, false)
+	require.NoError(t, err)
+
+	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
+
+	amount := uint64(1000)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
+	require.NoError(t, err)
+
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.NotNil(t, subscription)
+
+	err = k.RemoveUserSubscription(ctx, developerAddr, userDid)
+	require.NoError(t, err)
+
+	subscription = k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.Nil(t, subscription)
+}
+
+// TestAddUserSubscriptionAutoLock verifies that a user can be subscribed to a developer with auto-lock enabled.
+func TestAddUserSubscriptionAutoLock(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	require.NoError(t, err)
+	userDid := "did:key:alice"
+
+	keepertest.InitializeDelegator(t, &k, ctx, developerAddr, math.NewInt(5000))
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))
+
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	err = k.CreateDeveloper(ctx, developerAddr, false)
+	require.NoError(t, err)
+
+	amount := uint64(1000)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
+	require.Error(t, err)
+	require.ErrorContains(t, err, "insufficient credits and auto-lock disabled")
+
+	err = k.UpdateDeveloper(ctx, developerAddr, true)
+	require.NoError(t, err)
+
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
+	require.NoError(t, err)
+
+	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
+	require.NotNil(t, subscription)
+	require.Equal(t, developerAddr.String(), subscription.Developer)
+	require.Equal(t, userDid, subscription.UserDid)
+	require.Equal(t, amount, subscription.CreditAmount)
+	require.Equal(t, uint64(3600), subscription.Period)
 }

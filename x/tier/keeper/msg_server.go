@@ -90,3 +90,84 @@ func (m *msgServer) Redelegate(ctx context.Context, msg *types.MsgRedelegate) (*
 
 	return &types.MsgRedelegateResponse{CompletionTime: completionTime}, nil
 }
+
+func (m *msgServer) CreateDeveloper(ctx context.Context, msg *types.MsgCreateDeveloper) (*types.MsgCreateDeveloperResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.CreateDeveloper(ctx, developerAddr, msg.AutoLockEnabled)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "create developer")
+	}
+
+	return &types.MsgCreateDeveloperResponse{}, nil
+}
+
+func (m *msgServer) UpdateDeveloper(ctx context.Context, msg *types.MsgUpdateDeveloper) (*types.MsgUpdateDeveloperResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.UpdateDeveloper(ctx, developerAddr, msg.AutoLockEnabled)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "update developer")
+	}
+
+	return &types.MsgUpdateDeveloperResponse{}, nil
+}
+
+func (m *msgServer) RemoveDeveloper(ctx context.Context, msg *types.MsgRemoveDeveloper) (*types.MsgRemoveDeveloperResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.RemoveDeveloper(ctx, developerAddr)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "remove developer")
+	}
+
+	return &types.MsgRemoveDeveloperResponse{}, nil
+}
+
+func (m *msgServer) AddUserSubscription(
+	ctx context.Context,
+	msg *types.MsgAddUserSubscription,
+) (*types.MsgAddUserSubscriptionResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.AddUserSubscription(ctx, developerAddr, msg.UserDid, msg.Amount, msg.Period)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "add subscription")
+	}
+
+	return &types.MsgAddUserSubscriptionResponse{}, nil
+}
+
+func (m *msgServer) UpdateUserSubscription(
+	ctx context.Context,
+	msg *types.MsgUpdateUserSubscription,
+) (*types.MsgUpdateUserSubscriptionResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.UpdateUserSubscription(ctx, developerAddr, msg.UserDid, msg.Amount, msg.Period)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "update user subscription")
+	}
+
+	return &types.MsgUpdateUserSubscriptionResponse{}, nil
+}
+
+func (m *msgServer) RemoveUserSubscription(
+	ctx context.Context,
+	msg *types.MsgRemoveUserSubscription,
+) (*types.MsgRemoveUserSubscriptionResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
+
+	err := m.Keeper.RemoveUserSubscription(ctx, developerAddr, msg.UserDid)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "remove user subscription")
+	}
+
+	return &types.MsgRemoveUserSubscriptionResponse{}, nil
+}

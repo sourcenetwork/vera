@@ -29,12 +29,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query all locked stakes made by the delegator",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}},
 				},
-				// {
-				// 	RpcMethod:      "LockupsTo",
-				// 	Use:            "lockups-to [validator-address]",
-				// 	Short:          "Query all lockups made to one validator",
-				// 	PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validatorAddress"}},
-				// },
 				{
 					RpcMethod:      "UnlockingLockup",
 					Use:            "unlocking-lockup [delegator-address] [validator-address] [creation-height]",
@@ -47,13 +41,17 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query all unlocking stakes made by the delegator",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}},
 				},
-				// {
-				// 	RpcMethod:      "UnlockingLockupsFrom",
-				// 	Use:            "unlocking-lockups-from [validator-address]",
-				// 	Short:          "Query all unlocking-lockups made from a validator",
-				// 	PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}},
-				// },
-				// this line is used by ignite scaffolding # autocli/query
+				{
+					RpcMethod: "Developers",
+					Use:       "developers",
+					Short:     "Query all registered developers",
+				},
+				{
+					RpcMethod:      "UserSubscriptions",
+					Use:            "user-subscriptions [developer]",
+					Short:          "Query all user subscriptions for a specific developer",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "developer"}},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
@@ -88,7 +86,41 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Send a cancel-unlocking tx",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validator_address"}, {ProtoField: "stake"}, {ProtoField: "creation_height"}},
 				},
-				// this line is used by ignite scaffolding # autocli/tx
+				{
+					RpcMethod:      "CreateDeveloper",
+					Use:            "create-developer [auto-lock-enabled]",
+					Short:          "Create a developer",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "auto_lock_enabled"}},
+				},
+				{
+					RpcMethod:      "UpdateDeveloper",
+					Use:            "update-developer [auto-lock-enabled]",
+					Short:          "Update a developer",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "auto_lock_enabled"}},
+				},
+				{
+					RpcMethod: "RemoveDeveloper",
+					Use:       "remove-developer",
+					Short:     "Remove a developer",
+				},
+				{
+					RpcMethod:      "AddUserSubscription",
+					Use:            "add-user-subscription [user-did] [amount] [period]",
+					Short:          "Add a user subscription",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "user_did"}, {ProtoField: "amount"}, {ProtoField: "period"}},
+				},
+				{
+					RpcMethod:      "UpdateUserSubscription",
+					Use:            "update-user-subscription [user-did] [amount] [period]",
+					Short:          "Update a user subscription",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "user_did"}, {ProtoField: "amount"}, {ProtoField: "period"}},
+				},
+				{
+					RpcMethod:      "RemoveUserSubscription",
+					Use:            "remove-user-subscription [user-did]",
+					Short:          "Remove a user subscription",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "user_did"}},
+				},
 			},
 		},
 	}

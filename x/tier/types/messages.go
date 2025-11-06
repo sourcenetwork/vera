@@ -10,6 +10,12 @@ var (
 	_ sdk.Msg = &MsgUnlock{}
 	_ sdk.Msg = &MsgCancelUnlocking{}
 	_ sdk.Msg = &MsgRedelegate{}
+	_ sdk.Msg = &MsgCreateDeveloper{}
+	_ sdk.Msg = &MsgUpdateDeveloper{}
+	_ sdk.Msg = &MsgRemoveDeveloper{}
+	_ sdk.Msg = &MsgAddUserSubscription{}
+	_ sdk.Msg = &MsgUpdateUserSubscription{}
+	_ sdk.Msg = &MsgRemoveUserSubscription{}
 )
 
 // MsgLock
@@ -108,6 +114,120 @@ func (msg *MsgRedelegate) ValidateBasic() error {
 	return nil
 }
 
+// MsgCreateDeveloper
+func NewMsgCreateDeveloper(developerAddr string, autoLockEnabled bool) *MsgCreateDeveloper {
+	return &MsgCreateDeveloper{
+		Developer:       developerAddr,
+		AutoLockEnabled: autoLockEnabled,
+	}
+}
+
+func (msg *MsgCreateDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgUpdateDeveloper
+func NewMsgUpdateDeveloper(developerAddr string, autoLockEnabled bool) *MsgUpdateDeveloper {
+	return &MsgUpdateDeveloper{
+		Developer:       developerAddr,
+		AutoLockEnabled: autoLockEnabled,
+	}
+}
+
+func (msg *MsgUpdateDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgRemoveDeveloper
+func NewMsgRemoveDeveloper(developerAddr string) *MsgRemoveDeveloper {
+	return &MsgRemoveDeveloper{
+		Developer: developerAddr,
+	}
+}
+
+func (msg *MsgRemoveDeveloper) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgAddUserSubscription
+func NewMsgAddUserSubscription(developerAddr, userAddr, userDid string, amount uint64, period uint64) *MsgAddUserSubscription {
+	return &MsgAddUserSubscription{
+		Developer: developerAddr,
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    period,
+	}
+}
+
+func (msg *MsgAddUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
+	}
+	if msg.Amount <= 0 {
+		return ErrInvalidAmount
+	}
+	if msg.Period <= 0 {
+		return ErrInvalidSubscribtionPeriod
+	}
+	return nil
+}
+
+// MsgUpdateUserSubscription
+func NewMsgUpdateUserSubscription(developerAddr, userAddr, userDid string, amount uint64, period uint64) *MsgUpdateUserSubscription {
+	return &MsgUpdateUserSubscription{
+		Developer: developerAddr,
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    period,
+	}
+}
+
+func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
+	}
+	if msg.Amount <= 0 {
+		return ErrInvalidAmount
+	}
+	if msg.Period <= 0 {
+		return ErrInvalidSubscribtionPeriod
+	}
+	return nil
+}
+
+// MsgRemoveUserSubscription
+func NewMsgRemoveUserSubscription(developerAddr, userAddr, userDid string) *MsgRemoveUserSubscription {
+	return &MsgRemoveUserSubscription{
+		Developer: developerAddr,
+		UserDid:   userDid,
+	}
+}
+
+func (msg *MsgRemoveUserSubscription) ValidateBasic() error {
+	if err := validateAccAddr(msg.Developer); err != nil {
+		return err
+	}
+	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
+		return ErrInvalidDID
+	}
+	return nil
+}
+
 func validateAccAddr(address string) error {
 	_, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
@@ -128,7 +248,6 @@ func validateDenom(stake sdk.Coin) error {
 	if !stake.IsValid() || !stake.Amount.IsPositive() || !stake.Amount.IsInt64() {
 		return ErrInvalidDenom.Wrapf("invalid amount %s", stake)
 	}
-
 	if stake.Denom != appparams.DefaultBondDenom {
 		return ErrInvalidDenom.Wrapf("got %s, expected %s", stake.Denom, appparams.DefaultBondDenom)
 	}
