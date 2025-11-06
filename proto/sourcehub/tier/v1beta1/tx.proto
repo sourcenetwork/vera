@@ -156,7 +156,8 @@ message MsgCreateDeveloper {
   // developer is the address of the developer being created.
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens, 
-  // so that the developer always has enough credits to cover all active user subscriptions.  bool auto_lock_enabled = 2;
+  // so that the developer always has enough credits to cover all active user subscriptions.
+  bool auto_lock_enabled = 2;
 }
 
 // MsgCreateDeveloperResponse defines the response structure for executing a MsgCreateDeveloper message.
@@ -168,7 +169,8 @@ message MsgUpdateDeveloper {
   // developer is the address of the developer being updated.
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens, 
-  // so that the developer always has enough credits to cover all active user subscriptions.  bool auto_lock_enabled = 2;
+  // so that the developer always has enough credits to cover all active user subscriptions.
+  bool auto_lock_enabled = 2;
 }
 
 // MsgUpdateDeveloperResponse defines the response structure for executing a MsgUpdateDeveloper message.
@@ -192,10 +194,7 @@ message MsgAddUserSubscription {
   // user_did is the DID of the user being added to the subscription.
   string user_did = 2;
   // amount is the credit amount to be allocated to the user per period.
-  cosmos.base.v1beta1.Coin amount = 3 [
-    (gogoproto.nullable) = false,
-    (amino.dont_omitempty) = true
-  ];
+  uint64 amount = 3;
   // period is the subscription period duration in seconds.
   uint64 period = 4;
 }
@@ -211,10 +210,7 @@ message MsgUpdateUserSubscription {
   // user_did is the DID of the user whose subscription is being updated.
   string user_did = 2;
   // amount is the new credit amount to be allocated to the user per period.
-  cosmos.base.v1beta1.Coin amount = 3 [
-    (gogoproto.nullable) = false,
-    (amino.dont_omitempty) = true
-  ];
+  uint64 amount = 3;
   // period is the new subscription period duration in seconds.
   uint64 period = 4;
 }

@@ -4,7 +4,6 @@ package sourcehub.tier.v1beta1;
 import "amino/amino.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/tier/types";
@@ -25,10 +24,7 @@ message UserSubscription {
   // user_did is the DID of the registered user.
   string user_did = 2;
   // credit_amount is the credit amount allocated to this user.
-  cosmos.base.v1beta1.Coin credit_amount = 3 [
-    (gogoproto.nullable) = false,
-    (amino.dont_omitempty) = true
-  ];
+  uint64 credit_amount = 3;
   // period is the subscription period duration in seconds.
   uint64 period = 4;
   // start_date is when the subscription started.
@@ -45,13 +41,10 @@ message UserSubscription {
   ];
 }
 
-// TotalDevGranted represents the total amount granted by a developer to all users.
+// TotalDevGranted represents the total credit amount granted by a developer to all users.
 message TotalDevGranted {
   // developer is the address of the developer.
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  // total_granted is the total amount granted to all users.
-  cosmos.base.v1beta1.Coin total_granted = 2 [
-    (gogoproto.nullable) = false,
-    (amino.dont_omitempty) = true
-  ];
+  // total_granted is the total credit amount granted to all users.
+  uint64 total_granted = 2;
 } 
