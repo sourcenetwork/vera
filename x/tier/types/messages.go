@@ -159,7 +159,7 @@ func (msg *MsgRemoveDeveloper) ValidateBasic() error {
 }
 
 // MsgAddUserSubscription
-func NewMsgAddUserSubscription(developerAddr, userAddr, userDid string, amount sdk.Coin, period uint64) *MsgAddUserSubscription {
+func NewMsgAddUserSubscription(developerAddr, userAddr, userDid string, amount uint64, period uint64) *MsgAddUserSubscription {
 	return &MsgAddUserSubscription{
 		Developer: developerAddr,
 		UserDid:   userDid,
@@ -175,14 +175,17 @@ func (msg *MsgAddUserSubscription) ValidateBasic() error {
 	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
 		return ErrInvalidDID
 	}
-	if err := validateCreditDenom(msg.Amount); err != nil {
-		return err
+	if msg.Amount <= 0 {
+		return ErrInvalidAmount
+	}
+	if msg.Period <= 0 {
+		return ErrInvalidSubscribtionPeriod
 	}
 	return nil
 }
 
 // MsgUpdateUserSubscription
-func NewMsgUpdateUserSubscription(developerAddr, userAddr, userDid string, amount sdk.Coin, period uint64) *MsgUpdateUserSubscription {
+func NewMsgUpdateUserSubscription(developerAddr, userAddr, userDid string, amount uint64, period uint64) *MsgUpdateUserSubscription {
 	return &MsgUpdateUserSubscription{
 		Developer: developerAddr,
 		UserDid:   userDid,
@@ -198,8 +201,11 @@ func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
 	if len(msg.UserDid) <= 4 || msg.UserDid[:4] != "did:" {
 		return ErrInvalidDID
 	}
-	if err := validateCreditDenom(msg.Amount); err != nil {
-		return err
+	if msg.Amount <= 0 {
+		return ErrInvalidAmount
+	}
+	if msg.Period <= 0 {
+		return ErrInvalidSubscribtionPeriod
 	}
 	return nil
 }
@@ -244,16 +250,6 @@ func validateDenom(stake sdk.Coin) error {
 	}
 	if stake.Denom != appparams.DefaultBondDenom {
 		return ErrInvalidDenom.Wrapf("got %s, expected %s", stake.Denom, appparams.DefaultBondDenom)
-	}
-	return nil
-}
-
-func validateCreditDenom(amount sdk.Coin) error {
-	if !amount.IsValid() || !amount.Amount.IsPositive() || !amount.Amount.IsInt64() {
-		return ErrInvalidDenom.Wrapf("invalid amount %s", amount)
-	}
-	if amount.Denom != appparams.MicroCreditDenom {
-		return ErrInvalidDenom.Wrapf("got %s, expected %s", amount.Denom, appparams.MicroCreditDenom)
 	}
 	return nil
 }
