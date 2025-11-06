@@ -155,8 +155,8 @@ message MsgCreateDeveloper {
   option (cosmos.msg.v1.signer) = "developer";
   // developer is the address of the developer being created.
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  // auto_lock_enabled indicates whether the module should auto-lock to ensure enough credits.
-  bool auto_lock_enabled = 2;
+  // auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens, 
+  // so that the developer always has enough credits to cover all active user subscriptions.  bool auto_lock_enabled = 2;
 }
 
 // MsgCreateDeveloperResponse defines the response structure for executing a MsgCreateDeveloper message.
@@ -167,8 +167,8 @@ message MsgUpdateDeveloper {
   option (cosmos.msg.v1.signer) = "developer";
   // developer is the address of the developer being updated.
   string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  // auto_lock_enabled indicates whether the module should auto-lock to ensure enough credits.
-  bool auto_lock_enabled = 2;
+  // auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens, 
+  // so that the developer always has enough credits to cover all active user subscriptions.  bool auto_lock_enabled = 2;
 }
 
 // MsgUpdateDeveloperResponse defines the response structure for executing a MsgUpdateDeveloper message.
