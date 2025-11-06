@@ -35,6 +35,10 @@ var (
 
 	ParamsKey = []byte("p_hub")
 
+	// ChainConfigKey stores Hub's chain config params
+	// set at genesis
+	ChainConfigKey = []byte("chain_config")
+
 	// AllowZeroFeeTxsKey stores whether zero-fee transactions are allowed.
 	AllowZeroFeeTxsKey = []byte("app_config/allow_zero_fee_txs")
 

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	stdlog "log"
 	"net"
 	"os"
 	"path/filepath"
@@ -43,8 +42,8 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/sourcenetwork/sourcehub/app"
 
-	"github.com/sourcenetwork/sourcehub/app/params"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
 var (
@@ -575,14 +574,9 @@ func initGenFiles(
 	}
 	appGenState[banktypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(&bankGenState)
 
-	appParamsGenesis := params.AppParamsGenesis{
-		AllowZeroFeeTxs: noFees,
-	}
-	appParamsBytes, err := json.Marshal(&appParamsGenesis)
-	if err != nil {
-		stdlog.Fatalf("could not marshal app_params: %v", err)
-	}
-	appGenState[params.AppParamsGenesisKey] = appParamsBytes
+	hubGenesis := hubtypes.DefaultGenesis()
+	hubGenesis.ChainConfig.AllowZeroFeeTxs = noFees
+	appGenState[hubtypes.ModuleName] = clientCtx.Codec.MustMarshalJSON(hubGenesis)
 
 	appGenStateJSON, err := json.MarshalIndent(appGenState, "", "  ")
 	if err != nil {

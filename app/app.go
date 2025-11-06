@@ -64,7 +64,6 @@ import (
 	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
 	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -423,31 +422,6 @@ func New(
 			app.setDefaultIBCParams(ctx)
 			// Call InitGenesis() to set default state for the custom mint module
 			customMintModule.InitGenesis(ctx, app.appCodec, json.RawMessage{})
-		}
-
-		var genesisState GenesisState
-		err := json.Unmarshal(req.AppStateBytes, &genesisState)
-		if err != nil {
-			return nil, err
-		}
-
-		// Parse app_state.app_params.allow_zero_fee_txs / app_state.app_params.ignore_bearer_auth
-		// and store them in x/hub module store.
-		if raw, ok := genesisState["app_params"]; ok {
-			var appParams appparams.AppParamsGenesis
-			if err := json.Unmarshal(raw, &appParams); err == nil {
-				if err := app.HubKeeper.SetAllowZeroFeeTxs(ctx, appParams.AllowZeroFeeTxs); err != nil {
-					return nil, err
-				}
-				if err := app.HubKeeper.SetIgnoreBearerAuth(ctx, appParams.IgnoreBearerAuth); err != nil {
-					return nil, err
-				}
-			}
-		}
-
-		req.AppStateBytes, err = json.Marshal(genesisState)
-		if err != nil {
-			return nil, err
 		}
 
 		return app.App.InitChainer(ctx, req)
