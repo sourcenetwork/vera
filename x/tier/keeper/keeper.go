@@ -510,6 +510,7 @@ func (k *Keeper) CancelUnlocking(ctx context.Context, delAddr sdk.AccAddress, va
 }
 
 // CreateDeveloper creates a new developer record.
+// Returns an error if the developer already exists.
 func (k *Keeper) CreateDeveloper(ctx context.Context, developerAddr sdk.AccAddress, autoLockEnabled bool) (err error) {
 	start := time.Now()
 
@@ -548,7 +549,8 @@ func (k *Keeper) CreateDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 	return nil
 }
 
-// UpdateDeveloper updates the developer record.
+// UpdateDeveloper updates an existing developer record.
+// Returns an error if the developer doesn't exist.
 func (k *Keeper) UpdateDeveloper(ctx context.Context, developerAddr sdk.AccAddress, autoLockEnabled bool) (err error) {
 	start := time.Now()
 
@@ -566,7 +568,7 @@ func (k *Keeper) UpdateDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 
 	developer := k.GetDeveloper(ctx, developerAddr)
 	if developer == nil {
-		return k.CreateDeveloper(ctx, developerAddr, autoLockEnabled)
+		return types.ErrInvalidAddress.Wrapf("developer %s does not exist", developerAddr.String())
 	}
 
 	developer.AutoLockEnabled = autoLockEnabled

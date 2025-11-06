@@ -114,20 +114,16 @@ func (suite *TierIntegrationTestSuite) TestUpdateDeveloper() {
 		require.True(t, dev.AutoLockEnabled)
 	})
 
-	suite.T().Run("Update non-existent developer creates new one", func(t *testing.T) {
+	suite.T().Run("Update non-existent developer fails", func(t *testing.T) {
 		developer, _ := suite.createTestAddresses()
 
 		updateMsg := &tiertypes.MsgUpdateDeveloper{
 			Developer:       developer.String(),
 			AutoLockEnabled: true,
 		}
-		resp, err := suite.msgServer.UpdateDeveloper(suite.ctx, updateMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
-		require.NotNil(t, dev)
-		require.True(t, dev.AutoLockEnabled)
+		_, err := suite.msgServer.UpdateDeveloper(suite.ctx, updateMsg)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "does not exist")
 	})
 }
 
