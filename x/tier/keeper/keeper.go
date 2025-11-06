@@ -587,6 +587,7 @@ func (k *Keeper) UpdateDeveloper(ctx context.Context, developerAddr sdk.AccAddre
 }
 
 // RemoveDeveloper removes the developer record and all associated user subscriptions.
+// All corresponding feegrant allowances are set to expire at the current period reset time.
 func (k *Keeper) RemoveDeveloper(ctx context.Context, developerAddr sdk.AccAddress) (err error) {
 	start := time.Now()
 
@@ -850,6 +851,7 @@ func (k *Keeper) UpdateUserSubscription(
 }
 
 // RemoveUserSubscription removes the user subscription.
+// The corresponding feegrant allowance is set to expire at the current period reset time.
 func (k *Keeper) RemoveUserSubscription(
 	ctx context.Context,
 	developerAddr sdk.AccAddress,
