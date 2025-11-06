@@ -43,35 +43,40 @@ var TestUserAddrs = []string{
 
 const TestValidatorAddr = "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
 
-var testDevIdx, testUserIdx int
-
-func ResetTestAddrIndices() {
-	testDevIdx = 0
-	testUserIdx = 0
+type TestAddressFactory struct {
+	devIdx  int
+	userIdx int
 }
 
-func NextUserDid() string {
-	did := fmt.Sprintf("did:key:user%d", testUserIdx)
-	testUserIdx++
+func NewTestAddressFactory() *TestAddressFactory {
+	return &TestAddressFactory{
+		devIdx:  0,
+		userIdx: 0,
+	}
+}
+
+func (f *TestAddressFactory) NextUserDid() string {
+	did := fmt.Sprintf("did:key:user%d", f.userIdx)
+	f.userIdx++
 	return did
 }
 
-func NextDeveloper(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) sdk.AccAddress {
-	addr := mustAccFromBech32(TestDeveloperAddrs[testDevIdx%len(TestDeveloperAddrs)])
-	testDevIdx++
+func (f *TestAddressFactory) NextDeveloper(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) sdk.AccAddress {
+	addr := mustAccFromBech32(TestDeveloperAddrs[f.devIdx%len(TestDeveloperAddrs)])
+	f.devIdx++
 	keepertest.CreateAccount(t, k, ctx, addr)
 	return addr
 }
 
-func NextUser(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) sdk.AccAddress {
-	addr := mustAccFromBech32(TestUserAddrs[testUserIdx%len(TestUserAddrs)])
-	testUserIdx++
+func (f *TestAddressFactory) NextUser(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) sdk.AccAddress {
+	addr := mustAccFromBech32(TestUserAddrs[f.userIdx%len(TestUserAddrs)])
+	f.userIdx++
 	keepertest.CreateAccount(t, k, ctx, addr)
 	return addr
 }
 
-func NextPair(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) (sdk.AccAddress, sdk.AccAddress) {
-	return NextDeveloper(t, k, ctx), NextUser(t, k, ctx)
+func (f *TestAddressFactory) NextPair(t *testing.T, k *tierkeeper.Keeper, ctx sdk.Context) (sdk.AccAddress, sdk.AccAddress) {
+	return f.NextDeveloper(t, k, ctx), f.NextUser(t, k, ctx)
 }
 
 func mustAccFromBech32(s string) sdk.AccAddress {
