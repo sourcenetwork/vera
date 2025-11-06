@@ -67,7 +67,7 @@ func TestGetAndSetUserSubscription(t *testing.T) {
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
-	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
+	creditAmount := uint64(1000)
 	expectedUserSub := &types.UserSubscription{
 		Developer:    developerAddr.String(),
 		UserDid:      userDid,
@@ -96,7 +96,7 @@ func TestRemoveUserSubscription(t *testing.T) {
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
-	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
+	creditAmount := uint64(500)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
 	userSub := &types.UserSubscription{
@@ -128,8 +128,8 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 	user1Did := "did:key:alice"
 	user2Did := "did:key:bob"
 
-	creditAmount1 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	creditAmount2 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
+	creditAmount1 := uint64(1000)
+	creditAmount2 := uint64(2000)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
 
@@ -186,7 +186,7 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 	user1Did := "did:key:alice"
 	user2Did := "did:key:bob"
 
-	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
+	creditAmount := uint64(1000)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
 
@@ -430,7 +430,7 @@ func TestCheckDeveloperCredits(t *testing.T) {
 	// Set up a user subscription that requires more credits than available
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	now := sdkCtx.BlockTime()
-	creditAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
+	creditAmount := uint64(2000)
 	userSub := &types.UserSubscription{
 		Developer:    developerAddr.String(),
 		UserDid:      userDid,
@@ -441,7 +441,7 @@ func TestCheckDeveloperCredits(t *testing.T) {
 	}
 	k.SetUserSubscription(ctx, developerAddr, userDid, userSub)
 
-	err = k.updateDeveloperTotalGranted(ctx, developerAddr, creditAmount.Amount, true)
+	err = k.updateDeveloperTotalGranted(ctx, developerAddr, math.NewIntFromUint64(creditAmount), true)
 	require.NoError(t, err)
 
 	developer := &types.Developer{

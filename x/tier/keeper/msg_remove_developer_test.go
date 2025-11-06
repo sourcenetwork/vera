@@ -9,7 +9,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -125,8 +124,8 @@ func TestMsgRemoveDeveloper_WithSubscriptions(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
+	amount := uint64(100)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, amount, 30)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)

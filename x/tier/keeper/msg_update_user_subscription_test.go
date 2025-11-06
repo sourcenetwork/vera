@@ -9,7 +9,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -36,16 +35,12 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &initialAmount, 30)
+	initialAmount := uint64(100)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, initialAmount, 30)
 	require.NoError(t, err)
 
-	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
-	zeroAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
-	negativeAmount := sdk.Coin{
-		Denom:  appparams.MicroCreditDenom,
-		Amount: math.NewInt(-100),
-	}
+	validAmount := uint64(200)
+	zeroAmount := uint64(0)
 
 	testCases := []struct {
 		name      string
@@ -78,7 +73,7 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 			input: &types.MsgUpdateUserSubscription{
 				Developer: validDeveloperAddr,
 				UserDid:   userDid,
-				Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(300)),
+				Amount:    uint64(300),
 				Period:    90,
 			},
 			expErr: false,
@@ -111,17 +106,6 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 				Developer: validDeveloperAddr,
 				UserDid:   userDid,
 				Amount:    zeroAmount,
-				Period:    30,
-			},
-			expErr:    true,
-			expErrMsg: "invalid amount",
-		},
-		{
-			name: "negative amount",
-			input: &types.MsgUpdateUserSubscription{
-				Developer: validDeveloperAddr,
-				UserDid:   userDid,
-				Amount:    negativeAmount,
 				Period:    30,
 			},
 			expErr:    true,
@@ -192,8 +176,8 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &initialAmount, 30)
+	initialAmount := uint64(100)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, initialAmount, 30)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
@@ -204,7 +188,7 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 	msg := &types.MsgUpdateUserSubscription{
 		Developer: validDeveloperAddr,
 		UserDid:   userDid,
-		Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)),
+		Amount:    uint64(200),
 		Period:    30,
 	}
 
@@ -214,10 +198,10 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 
 	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
-	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
+	require.Equal(t, uint64(200), subscription.CreditAmount)
 	require.Equal(t, uint64(30), subscription.Period)
 
-	msg.Amount = sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
+	msg.Amount = uint64(200)
 	msg.Period = 60
 
 	resp, err = ms.UpdateUserSubscription(sdkCtx, msg)
@@ -226,10 +210,10 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 
 	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
-	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription.CreditAmount)
+	require.Equal(t, uint64(200), subscription.CreditAmount)
 	require.Equal(t, uint64(60), subscription.Period)
 
-	msg.Amount = sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
+	msg.Amount = uint64(500)
 	msg.Period = 90
 
 	resp, err = ms.UpdateUserSubscription(sdkCtx, msg)
@@ -238,7 +222,7 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 
 	subscription = k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 	require.NotNil(t, subscription)
-	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500)), subscription.CreditAmount)
+	require.Equal(t, uint64(500), subscription.CreditAmount)
 	require.Equal(t, uint64(90), subscription.Period)
 }
 
@@ -252,8 +236,7 @@ func TestMsgUpdateUserSubscription_NonExistentDeveloper(t *testing.T) {
 	nonExistentDeveloperAddr := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
 	userDid := "did:key:alice"
 
-	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-
+	validAmount := uint64(100)
 	msg := &types.MsgUpdateUserSubscription{
 		Developer: nonExistentDeveloperAddr,
 		UserDid:   userDid,

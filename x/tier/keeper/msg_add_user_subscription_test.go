@@ -9,7 +9,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -38,12 +37,8 @@ func TestMsgAddUserSubscription(t *testing.T) {
 	err = k.CreateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
-	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	zeroAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
-	negativeAmount := sdk.Coin{
-		Denom:  appparams.MicroCreditDenom,
-		Amount: math.NewInt(-100),
-	}
+	validAmount := uint64(100)
+	zeroAmount := uint64(0)
 
 	testCases := []struct {
 		name      string
@@ -69,7 +64,8 @@ func TestMsgAddUserSubscription(t *testing.T) {
 				Amount:    validAmount,
 				Period:    0,
 			},
-			expErr: false,
+			expErr:    true,
+			expErrMsg: "invalid subscription period",
 		},
 		{
 			name: "invalid developer address",
@@ -99,17 +95,6 @@ func TestMsgAddUserSubscription(t *testing.T) {
 				Developer: validDeveloperAddr,
 				UserDid:   user1Did,
 				Amount:    zeroAmount,
-				Period:    30,
-			},
-			expErr:    true,
-			expErrMsg: "invalid amount",
-		},
-		{
-			name: "negative amount",
-			input: &types.MsgAddUserSubscription{
-				Developer: validDeveloperAddr,
-				UserDid:   user1Did,
-				Amount:    negativeAmount,
 				Period:    30,
 			},
 			expErr:    true,
@@ -181,8 +166,7 @@ func TestMsgAddUserSubscription_DuplicateSubscription(t *testing.T) {
 	err = k.CreateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
-	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-
+	validAmount := uint64(100)
 	msg := &types.MsgAddUserSubscription{
 		Developer: validDeveloperAddr,
 		UserDid:   userDid,
@@ -223,8 +207,7 @@ func TestMsgAddUserSubscription_MultipleDifferentUsers(t *testing.T) {
 	err = k.CreateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
-	validAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-
+	validAmount := uint64(100)
 	msg1 := &types.MsgAddUserSubscription{
 		Developer: validDeveloperAddr,
 		UserDid:   user1Did,
@@ -239,7 +222,7 @@ func TestMsgAddUserSubscription_MultipleDifferentUsers(t *testing.T) {
 	msg2 := &types.MsgAddUserSubscription{
 		Developer: validDeveloperAddr,
 		UserDid:   user2Did,
-		Amount:    sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)),
+		Amount:    uint64(200),
 		Period:    60,
 	}
 
@@ -254,6 +237,6 @@ func TestMsgAddUserSubscription_MultipleDifferentUsers(t *testing.T) {
 
 	subscription2 := k.GetUserSubscription(sdkCtx, developerAddr, user2Did)
 	require.NotNil(t, subscription2)
-	require.Equal(t, sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200)), subscription2.CreditAmount)
+	require.Equal(t, uint64(200), subscription2.CreditAmount)
 	require.Equal(t, uint64(60), subscription2.Period)
 }

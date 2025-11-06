@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/sourcehub/app"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/testutil/nullify"
@@ -89,7 +88,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
 				UserDid:      "did:key:alice",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(1000)),
+				CreditAmount: uint64(1000),
 				Period:       30,
 				StartDate:    timestamp1,
 				LastRenewed:  timestamp2,
@@ -97,7 +96,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
 				UserDid:      "did:key:bob",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(500)),
+				CreditAmount: uint64(500),
 				Period:       60,
 				StartDate:    timestamp3,
 				LastRenewed:  timestamp4,
@@ -105,7 +104,7 @@ func TestGenesis(t *testing.T) {
 			{
 				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
 				UserDid:      "did:key:charlie",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(2000)),
+				CreditAmount: uint64(2000),
 				Period:       90,
 				StartDate:    timestamp5,
 				LastRenewed:  timestamp6,
@@ -294,7 +293,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
 				UserDid:      "did:key:alice",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(1000)),
+				CreditAmount: uint64(1000),
 				Period:       30,
 				StartDate:    timestamp1,
 				LastRenewed:  timestamp2,
@@ -302,7 +301,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 			{
 				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
 				UserDid:      "did:key:bob",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(500)),
+				CreditAmount: uint64(500),
 				Period:       60,
 				StartDate:    timestamp2,
 				LastRenewed:  timestamp3,
@@ -310,7 +309,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 			{
 				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
 				UserDid:      "did:key:charlie",
-				CreditAmount: sdk.NewCoin("ucredit", math.NewInt(2000)),
+				CreditAmount: uint64(2000),
 				Period:       90,
 				StartDate:    timestamp3,
 				LastRenewed:  timestamp1,
@@ -328,15 +327,15 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 	require.Equal(t, 3, len(got.UserSubscriptions))
 	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[0].Developer)
 	require.Equal(t, "did:key:alice", got.UserSubscriptions[0].UserDid)
-	require.Equal(t, int64(1000), got.UserSubscriptions[0].CreditAmount.Amount.Int64())
+	require.Equal(t, uint64(1000), got.UserSubscriptions[0].CreditAmount)
 	require.Equal(t, uint64(30), got.UserSubscriptions[0].Period)
 	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[1].Developer)
 	require.Equal(t, "did:key:bob", got.UserSubscriptions[1].UserDid)
-	require.Equal(t, int64(500), got.UserSubscriptions[1].CreditAmount.Amount.Int64())
+	require.Equal(t, uint64(500), got.UserSubscriptions[1].CreditAmount)
 	require.Equal(t, uint64(60), got.UserSubscriptions[1].Period)
 	require.Equal(t, "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy", got.UserSubscriptions[2].Developer)
 	require.Equal(t, "did:key:charlie", got.UserSubscriptions[2].UserDid)
-	require.Equal(t, int64(2000), got.UserSubscriptions[2].CreditAmount.Amount.Int64())
+	require.Equal(t, uint64(2000), got.UserSubscriptions[2].CreditAmount)
 	require.Equal(t, uint64(90), got.UserSubscriptions[2].Period)
 
 	nullify.Fill(&genesisState)

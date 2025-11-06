@@ -7,6 +7,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
@@ -248,13 +249,19 @@ func TestUserSubscriptionsQuery(t *testing.T) {
 
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+
 	user1Did := "did:key:alice"
 	user2Did := "did:key:bob"
 
 	require.NoError(t, k.CreateDeveloper(ctx, developerAddr, true))
 
-	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user1Did, nil, 0))
-	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user2Did, nil, 0))
+	initialValidatorBalance := math.NewInt(1000)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, initialValidatorBalance)
+
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user1Did, uint64(0), 0))
+	require.NoError(t, k.AddUserSubscription(ctx, developerAddr, user2Did, uint64(0), 0))
 
 	resp, err := k.UserSubscriptions(ctx, &types.UserSubscriptionsRequest{Developer: developerAddr.String()})
 	require.NoError(t, err)

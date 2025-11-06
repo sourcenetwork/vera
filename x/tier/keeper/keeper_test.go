@@ -381,7 +381,7 @@ func TestUpdateDeveloper(t *testing.T) {
 	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
 	require.NoError(t, err)
 
-	err = k.UpdateDeveloper(ctx, developerAddr, true)
+	err = k.CreateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
 	developer := k.GetDeveloper(ctx, developerAddr)
@@ -442,9 +442,9 @@ func TestAddUserSubscription(t *testing.T) {
 
 	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
+	amount := uint64(1000)
 	period := uint64(3600)
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, period)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
@@ -454,29 +454,9 @@ func TestAddUserSubscription(t *testing.T) {
 	require.Equal(t, amount, subscription.CreditAmount)
 	require.Equal(t, period, subscription.Period)
 
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, period)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, period)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "already subscribed")
-
-	invalidAmount := sdk.NewCoin("invalid", math.NewInt(1000))
-	newUserAddr, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
-	require.NoError(t, err)
-	keepertest.CreateAccount(t, &k, ctx, newUserAddr)
-	newUserDid := "did:key:bob"
-
-	err = k.AddUserSubscription(ctx, developerAddr, newUserDid, &invalidAmount, period)
-	require.Error(t, err)
-	require.ErrorContains(t, err, "invalid amount denomination")
-
-	zeroAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
-	anotherUserAddr, err := sdk.AccAddressFromBech32("source18jtkvj0995fy7lggqayg2f5syna92ndq5mkuv4")
-	require.NoError(t, err)
-	keepertest.CreateAccount(t, &k, ctx, anotherUserAddr)
-	anotherUserDid := "did:key:charlie"
-
-	err = k.AddUserSubscription(ctx, developerAddr, anotherUserDid, &zeroAmount, period)
-	require.Error(t, err)
-	require.ErrorContains(t, err, "amount must be positive")
 }
 
 // TestUpdateUserSubscription verifies that a user's subscription can be updated.
@@ -499,16 +479,17 @@ func TestUpdateUserSubscription(t *testing.T) {
 
 	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
 
-	newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
-	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &newAmount, 7200)
+	initialAmount := uint64(1000)
+	newAmount := uint64(2000)
+	lowerAmount := uint64(500)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, initialAmount, 7200)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "is not subscribed")
 
-	initialAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &initialAmount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, initialAmount, 3600)
 	require.NoError(t, err)
 
-	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &newAmount, 7200)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, newAmount, 7200)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
@@ -516,8 +497,7 @@ func TestUpdateUserSubscription(t *testing.T) {
 	require.Equal(t, newAmount, subscription.CreditAmount)
 	require.Equal(t, uint64(7200), subscription.Period)
 
-	lowerAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(500))
-	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, &lowerAmount, 1800)
+	err = k.UpdateUserSubscription(ctx, developerAddr, userDid, lowerAmount, 1800)
 	require.NoError(t, err)
 
 	subscription = k.GetUserSubscription(ctx, developerAddr, userDid)
@@ -550,8 +530,8 @@ func TestRemoveUserSubscription(t *testing.T) {
 
 	require.NoError(t, k.Lock(ctx, developerAddr, valAddr, math.NewInt(1000)))
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
+	amount := uint64(1000)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
@@ -582,15 +562,15 @@ func TestAddUserSubscriptionAutoLock(t *testing.T) {
 	err = k.CreateDeveloper(ctx, developerAddr, false)
 	require.NoError(t, err)
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
+	amount := uint64(1000)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
 	require.Error(t, err)
 	require.ErrorContains(t, err, "insufficient credits and auto-lock disabled")
 
 	err = k.UpdateDeveloper(ctx, developerAddr, true)
 	require.NoError(t, err)
 
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 3600)
+	err = k.AddUserSubscription(ctx, developerAddr, userDid, amount, 3600)
 	require.NoError(t, err)
 
 	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
@@ -599,29 +579,4 @@ func TestAddUserSubscriptionAutoLock(t *testing.T) {
 	require.Equal(t, userDid, subscription.UserDid)
 	require.Equal(t, amount, subscription.CreditAmount)
 	require.Equal(t, uint64(3600), subscription.Period)
-}
-
-// TestAddUserSubscriptionWithoutAmount verifies that a user can be subscribed to a developer with zero amount (free tier).
-func TestAddUserSubscriptionWithoutAmount(t *testing.T) {
-	k, ctx := keepertest.TierKeeper(t)
-
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	require.NoError(t, err)
-	userDid := "did:key:alice"
-
-	keepertest.CreateAccount(t, &k, ctx, developerAddr)
-
-	err = k.CreateDeveloper(ctx, developerAddr, false)
-	require.NoError(t, err)
-
-	period := uint64(3600)
-	err = k.AddUserSubscription(ctx, developerAddr, userDid, nil, period)
-	require.NoError(t, err)
-
-	subscription := k.GetUserSubscription(ctx, developerAddr, userDid)
-	require.NotNil(t, subscription)
-	require.Equal(t, developerAddr.String(), subscription.Developer)
-	require.Equal(t, userDid, subscription.UserDid)
-	require.True(t, subscription.CreditAmount.Amount.IsZero())
-	require.Equal(t, period, subscription.Period)
 }

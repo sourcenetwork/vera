@@ -63,12 +63,13 @@ func TestMsgUpdateDeveloper(t *testing.T) {
 			expErrMsg: "delegator address",
 		},
 		{
-			name: "non-existent developer (should create)",
+			name: "non-existent developer (should fail)",
 			input: &types.MsgUpdateDeveloper{
 				Developer:       "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
 				AutoLockEnabled: true,
 			},
-			expErr: false,
+			expErr:    true,
+			expErrMsg: "does not exist",
 		},
 	}
 

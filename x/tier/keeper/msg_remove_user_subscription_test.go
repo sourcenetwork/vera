@@ -9,7 +9,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -37,8 +36,8 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
+	amount := uint64(100)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, amount, 30)
 	require.NoError(t, err)
 
 	testCases := []struct {
@@ -98,7 +97,7 @@ func TestMsgRemoveUserSubscription(t *testing.T) {
 			if tc.name == "valid remove user subscription" {
 				subscription := k.GetUserSubscription(sdkCtx, developerAddr, userDid)
 				if subscription == nil {
-					err := k.AddUserSubscription(ctx, developerAddr, userDid, &amount, 30)
+					err := k.AddUserSubscription(ctx, developerAddr, userDid, amount, 30)
 					require.NoError(t, err)
 				}
 			}
@@ -153,11 +152,11 @@ func TestMsgRemoveUserSubscription_MultipleSubscriptions(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	amount1 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	amount2 := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(200))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, user1Did, &amount1, 30)
+	amount1 := uint64(100)
+	amount2 := uint64(200)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, user1Did, amount1, 30)
 	require.NoError(t, err)
-	err = k.AddUserSubscription(sdkCtx, developerAddr, user2Did, &amount2, 60)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, user2Did, amount2, 60)
 	require.NoError(t, err)
 
 	subscription1 := k.GetUserSubscription(sdkCtx, developerAddr, user1Did)
@@ -213,8 +212,8 @@ func TestMsgRemoveUserSubscription_AlreadyRemoved(t *testing.T) {
 	err = k.CreateDeveloper(sdkCtx, developerAddr, true)
 	require.NoError(t, err)
 
-	amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(100))
-	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, &amount, 30)
+	amount := uint64(100)
+	err = k.AddUserSubscription(sdkCtx, developerAddr, userDid, amount, 30)
 	require.NoError(t, err)
 
 	err = k.RemoveUserSubscription(sdkCtx, developerAddr, userDid)
