@@ -11,487 +11,407 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/sourcenetwork/sourcehub/app"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
-type TierIntegrationTestSuite struct {
+type BaseTierTestSuite struct {
 	suite.Suite
 
-	ctx       sdk.Context
-	keeper    tierkeeper.Keeper
-	msgServer tiertypes.MsgServer
+	ctx         sdk.Context
+	keeper      tierkeeper.Keeper
+	msgServer   tiertypes.MsgServer
+	addrFactory *TestAddressFactory
 }
 
-func (suite *TierIntegrationTestSuite) SetupTest() {
+func (s *BaseTierTestSuite) SetupTest() {
 	app.SetConfig(false)
 
-	ResetTestAddrIndices()
-
-	k, ctx := keepertest.TierKeeper(suite.T())
-	suite.ctx = ctx
-	suite.keeper = k
-	suite.msgServer = tierkeeper.NewMsgServerImpl(&k)
+	k, ctx := keepertest.TierKeeper(s.T())
+	s.ctx = ctx
+	s.keeper = k
+	s.msgServer = tierkeeper.NewMsgServerImpl(&k)
+	s.addrFactory = NewTestAddressFactory()
 }
 
-func (suite *TierIntegrationTestSuite) createTestAddresses() (developer, user sdk.AccAddress) {
-	return NextPair(suite.T(), &suite.keeper, suite.ctx)
+func (s *BaseTierTestSuite) createTestAddresses() (developer, user sdk.AccAddress) {
+	return s.addrFactory.NextPair(s.T(), &s.keeper, s.ctx)
 }
 
-func TestTierIntegrationTestSuite(t *testing.T) {
-	suite.Run(t, new(TierIntegrationTestSuite))
+func (s *BaseTierTestSuite) setupDeveloperWithLockup(developer sdk.AccAddress, lockAmount math.Int) sdk.ValAddress {
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
+
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
+
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, lockAmount.MulRaw(1000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1_000_000))
+
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, lockAmount))
+
+	return valAddr
 }
 
-func (suite *TierIntegrationTestSuite) TestCreateDeveloper() {
-	suite.T().Run("Valid developer creation", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		msg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: true,
-		}
-
-		resp, err := suite.msgServer.CreateDeveloper(suite.ctx, msg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
-		require.NotNil(t, dev)
-		require.Equal(t, developer.String(), dev.Address)
-		require.True(t, dev.AutoLockEnabled)
-	})
-
-	suite.T().Run("Cannot create duplicate developer", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		msg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, msg)
-		require.NoError(t, err)
-
-		_, err = suite.msgServer.CreateDeveloper(suite.ctx, msg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "already exists")
-	})
-
-	suite.T().Run("Invalid developer address", func(t *testing.T) {
-		msg := &tiertypes.MsgCreateDeveloper{
-			Developer:       "cosmos1invalidaddress123456789012345678901234567890",
-			AutoLockEnabled: true,
-		}
-
-		err := msg.ValidateBasic()
-		require.Error(t, err)
-	})
+type DeveloperTestSuite struct {
+	BaseTierTestSuite
 }
 
-func (suite *TierIntegrationTestSuite) TestUpdateDeveloper() {
-	suite.T().Run("Update existing developer", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		updateMsg := &tiertypes.MsgUpdateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: true,
-		}
-		resp, err := suite.msgServer.UpdateDeveloper(suite.ctx, updateMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
-		require.NotNil(t, dev)
-		require.True(t, dev.AutoLockEnabled)
-	})
-
-	suite.T().Run("Update non-existent developer fails", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		updateMsg := &tiertypes.MsgUpdateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: true,
-		}
-		_, err := suite.msgServer.UpdateDeveloper(suite.ctx, updateMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "does not exist")
-	})
+func TestDeveloperTestSuite(t *testing.T) {
+	suite.Run(t, new(DeveloperTestSuite))
 }
 
-func (suite *TierIntegrationTestSuite) TestRemoveDeveloper() {
-	suite.T().Run("Remove existing developer", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
+func (s *DeveloperTestSuite) TestCreate() {
+	developer, _ := s.createTestAddresses()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: true,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	msg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: true,
+	}
 
-		removeMsg := &tiertypes.MsgRemoveDeveloper{
-			Developer: developer.String(),
-		}
-		resp, err := suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
+	resp, err := s.msgServer.CreateDeveloper(s.ctx, msg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
-		require.Nil(t, dev)
-	})
-
-	suite.T().Run("Remove non-existent developer", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-
-		removeMsg := &tiertypes.MsgRemoveDeveloper{
-			Developer: developer.String(),
-		}
-		_, err := suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "does not exist")
-	})
+	dev := s.keeper.GetDeveloper(s.ctx, developer)
+	require.NotNil(s.T(), dev)
+	require.Equal(s.T(), developer.String(), dev.Address)
+	require.True(s.T(), dev.AutoLockEnabled)
 }
 
-func (suite *TierIntegrationTestSuite) TestAddUserSubscription() {
-	suite.T().Run("Valid user subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *DeveloperTestSuite) TestCreateDuplicate() {
+	developer, _ := s.createTestAddresses()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	msg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	_, err := s.msgServer.CreateDeveloper(s.ctx, msg)
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(1000000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
-
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
-
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(1000)))
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		resp, err := suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.NotNil(t, sub)
-		require.Equal(t, developer.String(), sub.Developer)
-		require.Equal(t, userDid, sub.UserDid)
-		require.Equal(t, amount, sub.CreditAmount)
-		require.Equal(t, uint64(3600), sub.Period)
-	})
-
-	suite.T().Run("Zero amount should be rejected by validation", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "amount must be positive")
-	})
-
-	suite.T().Run("Cannot add duplicate subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
-
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(1_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
-
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
-
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(1000)))
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "already subscribed")
-	})
-
-	suite.T().Run("Non-existent developer", func(t *testing.T) {
-		developer := NextDeveloper(suite.T(), &suite.keeper, suite.ctx)
-		userDid := NextUserDid()
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err := suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "not found")
-	})
-
-	suite.T().Run("Invalid credit denomination", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		amount := sdk.NewCoin("invalid_denom", math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "invalid amount denomination")
-	})
+	_, err = s.msgServer.CreateDeveloper(s.ctx, msg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "already exists")
 }
 
-func (suite *TierIntegrationTestSuite) TestUpdateUserSubscription() {
-	suite.T().Run("Update existing subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *DeveloperTestSuite) TestCreateInvalidAddress() {
+	msg := &tiertypes.MsgCreateDeveloper{
+		Developer:       "cosmos1invalidaddress123456789012345678901234567890",
+		AutoLockEnabled: true,
+	}
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
-
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
-
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
-
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
-
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(2000)))
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-
-		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
-		updateMsg := &tiertypes.MsgUpdateUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    newAmount,
-			Period:    7200,
-		}
-
-		resp, err := suite.msgServer.UpdateUserSubscription(suite.ctx, updateMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.NotNil(t, sub)
-		require.Equal(t, newAmount, sub.CreditAmount)
-		require.Equal(t, uint64(7200), sub.Period)
-	})
-
-	suite.T().Run("Update non-existent subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		updateMsg := &tiertypes.MsgUpdateUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-
-		_, err := suite.msgServer.UpdateUserSubscription(suite.ctx, updateMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "not subscribed")
-	})
+	err := msg.ValidateBasic()
+	require.Error(s.T(), err)
 }
 
-func (suite *TierIntegrationTestSuite) TestRemoveUserSubscription() {
-	suite.T().Run("Remove existing subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *DeveloperTestSuite) TestUpdate() {
+	developer, _ := s.createTestAddresses()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	updateMsg := &tiertypes.MsgUpdateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: true,
+	}
+	resp, err := s.msgServer.UpdateDeveloper(s.ctx, updateMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(1_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
-
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
-
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(1000)))
-
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-
-		removeMsg := &tiertypes.MsgRemoveUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-		}
-
-		resp, err := suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.Nil(t, sub)
-	})
-
-	suite.T().Run("Remove non-existent subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-
-		removeMsg := &tiertypes.MsgRemoveUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-		}
-
-		_, err := suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "not subscribed")
-	})
+	dev := s.keeper.GetDeveloper(s.ctx, developer)
+	require.NotNil(s.T(), dev)
+	require.True(s.T(), dev.AutoLockEnabled)
 }
 
-func (suite *TierIntegrationTestSuite) TestRemoveDeveloperWithSubscriptions() {
-	suite.T().Run("Remove developer should remove all subscriptions", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		user1Did := "did:key:alice"
-		user2Did := "did:key:bob"
+func (s *DeveloperTestSuite) TestUpdateNonExistent() {
+	developer, _ := s.createTestAddresses()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	updateMsg := &tiertypes.MsgUpdateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: true,
+	}
+	_, err := s.msgServer.UpdateDeveloper(s.ctx, updateMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "does not exist")
+}
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+func (s *DeveloperTestSuite) TestRemove() {
+	developer, _ := s.createTestAddresses()
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: true,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	removeMsg := &tiertypes.MsgRemoveDeveloper{
+		Developer: developer.String(),
+	}
+	resp, err := s.msgServer.RemoveDeveloper(s.ctx, removeMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(2000)))
+	dev := s.keeper.GetDeveloper(s.ctx, developer)
+	require.Nil(s.T(), dev)
+}
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg1 := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   user1Did,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg1)
-		require.NoError(t, err)
+func (s *DeveloperTestSuite) TestRemoveNonExistent() {
+	developer, _ := s.createTestAddresses()
 
-		addMsg2 := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   user2Did,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg2)
-		require.NoError(t, err)
+	removeMsg := &tiertypes.MsgRemoveDeveloper{
+		Developer: developer.String(),
+	}
+	_, err := s.msgServer.RemoveDeveloper(s.ctx, removeMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "does not exist")
+}
 
-		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, user1Did)
-		require.NotNil(t, sub1)
-		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
-		require.NotNil(t, sub2)
+func (s *DeveloperTestSuite) TestRemoveWithSubscriptions() {
+	developer, _ := s.createTestAddresses()
+	user1Did := "did:key:alice"
+	user2Did := "did:key:bob"
 
-		removeMsg := &tiertypes.MsgRemoveDeveloper{
-			Developer: developer.String(),
-		}
-		_, err = suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
-		require.NoError(t, err)
+	s.setupDeveloperWithLockup(developer, math.NewInt(2000))
 
-		dev := suite.keeper.GetDeveloper(suite.ctx, developer)
-		require.Nil(t, dev)
-		sub1 = suite.keeper.GetUserSubscription(suite.ctx, developer, user1Did)
-		require.Nil(t, sub1)
-		sub2 = suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
-		require.Nil(t, sub2)
-	})
+	amount := uint64(1000)
+	addMsg1 := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   user1Did,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err := s.msgServer.AddUserSubscription(s.ctx, addMsg1)
+	require.NoError(s.T(), err)
+
+	addMsg2 := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   user2Did,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg2)
+	require.NoError(s.T(), err)
+
+	sub1 := s.keeper.GetUserSubscription(s.ctx, developer, user1Did)
+	require.NotNil(s.T(), sub1)
+	sub2 := s.keeper.GetUserSubscription(s.ctx, developer, user2Did)
+	require.NotNil(s.T(), sub2)
+
+	removeMsg := &tiertypes.MsgRemoveDeveloper{
+		Developer: developer.String(),
+	}
+	_, err = s.msgServer.RemoveDeveloper(s.ctx, removeMsg)
+	require.NoError(s.T(), err)
+
+	dev := s.keeper.GetDeveloper(s.ctx, developer)
+	require.Nil(s.T(), dev)
+	sub1 = s.keeper.GetUserSubscription(s.ctx, developer, user1Did)
+	require.Nil(s.T(), sub1)
+	sub2 = s.keeper.GetUserSubscription(s.ctx, developer, user2Did)
+	require.Nil(s.T(), sub2)
+}
+
+// UserSubscriptionTestSuite tests user subscription operations.
+type UserSubscriptionTestSuite struct {
+	BaseTierTestSuite
+}
+
+func TestUserSubscriptionTestSuite(t *testing.T) {
+	suite.Run(t, new(UserSubscriptionTestSuite))
+}
+
+func (s *UserSubscriptionTestSuite) TestAdd() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	s.setupDeveloperWithLockup(developer, math.NewInt(1000))
+
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+
+	resp, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
+
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.NotNil(s.T(), sub)
+	require.Equal(s.T(), developer.String(), sub.Developer)
+	require.Equal(s.T(), userDid, sub.UserDid)
+	require.Equal(s.T(), amount, sub.CreditAmount)
+	require.Equal(s.T(), uint64(3600), sub.Period)
+}
+
+func (s *UserSubscriptionTestSuite) TestAddZeroAmount() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
+
+	amount := uint64(0)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+
+	err = addMsg.ValidateBasic()
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "invalid amount")
+}
+
+func (s *UserSubscriptionTestSuite) TestAddDuplicate() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	s.setupDeveloperWithLockup(developer, math.NewInt(1000))
+
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+
+	_, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "already subscribed")
+}
+
+func (s *UserSubscriptionTestSuite) TestAddNonExistentDeveloper() {
+	developer := s.addrFactory.NextDeveloper(s.T(), &s.keeper, s.ctx)
+	userDid := s.addrFactory.NextUserDid()
+
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+
+	_, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "not found")
+}
+
+func (s *UserSubscriptionTestSuite) TestUpdate() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	s.setupDeveloperWithLockup(developer, math.NewInt(2000))
+
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+
+	newAmount := uint64(2000)
+	updateMsg := &tiertypes.MsgUpdateUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    newAmount,
+		Period:    7200,
+	}
+
+	resp, err := s.msgServer.UpdateUserSubscription(s.ctx, updateMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
+
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.NotNil(s.T(), sub)
+	require.Equal(s.T(), newAmount, sub.CreditAmount)
+	require.Equal(s.T(), uint64(7200), sub.Period)
+}
+
+func (s *UserSubscriptionTestSuite) TestUpdateNonExistent() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	amount := uint64(1000)
+	updateMsg := &tiertypes.MsgUpdateUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+
+	_, err := s.msgServer.UpdateUserSubscription(s.ctx, updateMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "not subscribed")
+}
+
+func (s *UserSubscriptionTestSuite) TestRemove() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	s.setupDeveloperWithLockup(developer, math.NewInt(1000))
+
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+
+	removeMsg := &tiertypes.MsgRemoveUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+	}
+
+	resp, err := s.msgServer.RemoveUserSubscription(s.ctx, removeMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
+
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.Nil(s.T(), sub)
+}
+
+func (s *UserSubscriptionTestSuite) TestRemoveNonExistent() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+
+	removeMsg := &tiertypes.MsgRemoveUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+	}
+
+	_, err := s.msgServer.RemoveUserSubscription(s.ctx, removeMsg)
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "not subscribed")
 }

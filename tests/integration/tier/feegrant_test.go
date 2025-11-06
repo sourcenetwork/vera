@@ -21,309 +21,296 @@ import (
 type FeegrantIntegrationTestSuite struct {
 	suite.Suite
 
-	ctx       sdk.Context
-	keeper    tierkeeper.Keeper
-	msgServer tiertypes.MsgServer
+	ctx         sdk.Context
+	keeper      tierkeeper.Keeper
+	msgServer   tiertypes.MsgServer
+	addrFactory *TestAddressFactory
 }
 
 func (suite *FeegrantIntegrationTestSuite) SetupTest() {
 	app.SetConfig(false)
 
-	ResetTestAddrIndices()
-
 	k, ctx := keepertest.TierKeeper(suite.T())
 	suite.ctx = ctx
 	suite.keeper = k
 	suite.msgServer = tierkeeper.NewMsgServerImpl(&k)
+	suite.addrFactory = NewTestAddressFactory()
 }
 
 func (suite *FeegrantIntegrationTestSuite) createTestAddresses() (developer, user sdk.AccAddress) {
-	return NextPair(suite.T(), &suite.keeper, suite.ctx)
+	return suite.addrFactory.NextPair(suite.T(), &suite.keeper, suite.ctx)
 }
 
 func TestFeegrantIntegrationTestSuite(t *testing.T) {
 	suite.Run(t, new(FeegrantIntegrationTestSuite))
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
-	suite.T().Run("Periodic allowance should be created with subscription", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1_000_000))
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(10_000)))
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, math.NewInt(10_000)))
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
 
-		resp, err := suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
+	resp, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.NotNil(t, sub)
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.NotNil(s.T(), sub)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
-		require.NoError(t, err)
-		require.NotNil(t, allowance)
-		_, ok := allowance.(*feegrant.PeriodicAllowance)
-		require.True(t, ok, "Expected PeriodicAllowance type")
-	})
+	allowance, err := s.keeper.GetFeegrantKeeper().GetDIDAllowance(s.ctx, developer, userDid)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), allowance)
+	_, ok := allowance.(*feegrant.PeriodicAllowance)
+	require.True(s.T(), ok, "Expected PeriodicAllowance type")
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod() {
-	suite.T().Run("Zero period should use default epoch duration", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1_000_000))
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(10_000)))
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, math.NewInt(10_000)))
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    0,
-		}
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    0,
+	}
 
-		resp, err := suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
+	resp, err := s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.NotNil(t, sub)
-		require.Equal(t, uint64(0), sub.Period)
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.NotNil(s.T(), sub)
+	require.Equal(s.T(), uint64(0), sub.Period)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
-		require.NoError(t, err)
-		periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
-		require.True(t, ok, "Expected PeriodicAllowance type")
-		params := suite.keeper.GetParams(suite.ctx)
-		expectedPeriod := *params.EpochDuration
-		require.Equal(t, expectedPeriod, periodicAllowance.Period)
-	})
+	allowance, err := s.keeper.GetFeegrantKeeper().GetDIDAllowance(s.ctx, developer, userDid)
+	require.NoError(s.T(), err)
+	periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
+	require.True(s.T(), ok, "Expected PeriodicAllowance type")
+	params := s.keeper.GetParams(s.ctx)
+	expectedPeriod := *params.EpochDuration
+	require.Equal(s.T(), expectedPeriod, periodicAllowance.Period)
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpdate() {
-	suite.T().Run("Allowance should be updated when subscription is updated", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpdate() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(5_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(5_000_000))
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(5_000_000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(5_000_000))
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(20_000)))
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, math.NewInt(20_000)))
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
 
-		newAmount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(2000))
-		updateMsg := &tiertypes.MsgUpdateUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    newAmount,
-			Period:    7200,
-		}
+	newAmount := uint64(2000)
+	updateMsg := &tiertypes.MsgUpdateUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    newAmount,
+		Period:    7200,
+	}
 
-		resp, err := suite.msgServer.UpdateUserSubscription(suite.ctx, updateMsg)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
+	resp, err := s.msgServer.UpdateUserSubscription(s.ctx, updateMsg)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), resp)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.NotNil(t, sub)
-		require.Equal(t, newAmount, sub.CreditAmount)
-		require.Equal(t, uint64(7200), sub.Period)
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.NotNil(s.T(), sub)
+	require.Equal(s.T(), newAmount, sub.CreditAmount)
+	require.Equal(s.T(), uint64(7200), sub.Period)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
-		require.NoError(t, err)
-		periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
-		require.True(t, ok, "Expected PeriodicAllowance type")
-		expectedPeriod := time.Duration(7200) * time.Second
-		require.Equal(t, expectedPeriod, periodicAllowance.Period)
-		expectedSpendLimit := sdk.NewCoins(newAmount)
-		require.Equal(t, expectedSpendLimit, periodicAllowance.Basic.SpendLimit)
-	})
+	allowance, err := s.keeper.GetFeegrantKeeper().GetDIDAllowance(s.ctx, developer, userDid)
+	require.NoError(s.T(), err)
+	periodicAllowance, ok := allowance.(*feegrant.PeriodicAllowance)
+	require.True(s.T(), ok, "Expected PeriodicAllowance type")
+	expectedPeriod := time.Duration(7200) * time.Second
+	require.Equal(s.T(), expectedPeriod, periodicAllowance.Period)
+	require.Equal(s.T(), math.NewIntFromUint64(newAmount), periodicAllowance.Basic.SpendLimit.AmountOf(appparams.MicroCreditDenom))
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestAllowanceRemovalOnSubscriptionRemoval() {
-	suite.T().Run("Allowance should be removed when subscription is removed", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *FeegrantIntegrationTestSuite) TestAllowanceRemovalOnSubscriptionRemoval() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(2_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(1_000_000))
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1_000_000))
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(10_000)))
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, math.NewInt(10_000)))
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.NoError(t, err)
+	amount := uint64(1000)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg)
+	require.NoError(s.T(), err)
 
-		allowance, err := suite.keeper.GetFeegrantKeeper().GetDIDAllowance(suite.ctx, developer, userDid)
-		require.NoError(t, err)
-		require.NotNil(t, allowance)
+	allowance, err := s.keeper.GetFeegrantKeeper().GetDIDAllowance(s.ctx, developer, userDid)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), allowance)
 
-		removeMsg := &tiertypes.MsgRemoveUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-		}
-		_, err = suite.msgServer.RemoveUserSubscription(suite.ctx, removeMsg)
-		require.NoError(t, err)
+	removeMsg := &tiertypes.MsgRemoveUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+	}
+	_, err = s.msgServer.RemoveUserSubscription(s.ctx, removeMsg)
+	require.NoError(s.T(), err)
 
-		sub := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.Nil(t, sub)
-	})
+	sub := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.Nil(s.T(), sub)
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestZeroAmountValidation() {
-	suite.T().Run("Zero amount should be rejected by validation", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
+func (s *FeegrantIntegrationTestSuite) TestZeroAmountValidation() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.ZeroInt())
-		addMsg := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
+	amount := uint64(0)
+	addMsg := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
 
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg)
-		require.Error(t, err)
-		require.ErrorContains(t, err, "amount must be positive")
-	})
+	err = addMsg.ValidateBasic()
+	require.Error(s.T(), err)
+	require.ErrorContains(s.T(), err, "invalid amount")
 }
 
-func (suite *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemoval() {
-	suite.T().Run("All allowances should be cleaned up when developer is removed", func(t *testing.T) {
-		developer, _ := suite.createTestAddresses()
-		userDid := NextUserDid()
-		user2Did := "did:key:bob"
+func (s *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemoval() {
+	developer, _ := s.createTestAddresses()
+	userDid := s.addrFactory.NextUserDid()
+	user2Did := "did:key:bob"
 
-		createMsg := &tiertypes.MsgCreateDeveloper{
-			Developer:       developer.String(),
-			AutoLockEnabled: false,
-		}
-		_, err := suite.msgServer.CreateDeveloper(suite.ctx, createMsg)
-		require.NoError(t, err)
+	createMsg := &tiertypes.MsgCreateDeveloper{
+		Developer:       developer.String(),
+		AutoLockEnabled: false,
+	}
+	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
+	require.NoError(s.T(), err)
 
-		valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
-		require.NoError(t, err)
+	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(s.T(), err)
 
-		keepertest.InitializeDelegator(t, &suite.keeper, suite.ctx, developer, math.NewInt(5_000_000))
-		keepertest.InitializeValidator(t, suite.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), suite.ctx, valAddr, math.NewInt(5_000_000))
+	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(5_000_000))
+	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(5_000_000))
 
-		suite.ctx = suite.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
 
-		require.NoError(t, suite.keeper.Lock(suite.ctx, developer, valAddr, math.NewInt(20_000)))
+	require.NoError(s.T(), s.keeper.Lock(s.ctx, developer, valAddr, math.NewInt(20_000)))
 
-		amount := sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(1000))
+	amount := uint64(1000)
 
-		addMsg1 := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   userDid,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg1)
-		require.NoError(t, err)
+	addMsg1 := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   userDid,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg1)
+	require.NoError(s.T(), err)
 
-		addMsg2 := &tiertypes.MsgAddUserSubscription{
-			Developer: developer.String(),
-			UserDid:   user2Did,
-			Amount:    amount,
-			Period:    3600,
-		}
-		_, err = suite.msgServer.AddUserSubscription(suite.ctx, addMsg2)
-		require.NoError(t, err)
+	addMsg2 := &tiertypes.MsgAddUserSubscription{
+		Developer: developer.String(),
+		UserDid:   user2Did,
+		Amount:    amount,
+		Period:    3600,
+	}
+	_, err = s.msgServer.AddUserSubscription(s.ctx, addMsg2)
+	require.NoError(s.T(), err)
 
-		removeMsg := &tiertypes.MsgRemoveDeveloper{
-			Developer: developer.String(),
-		}
-		_, err = suite.msgServer.RemoveDeveloper(suite.ctx, removeMsg)
-		require.NoError(t, err)
+	removeMsg := &tiertypes.MsgRemoveDeveloper{
+		Developer: developer.String(),
+	}
+	_, err = s.msgServer.RemoveDeveloper(s.ctx, removeMsg)
+	require.NoError(s.T(), err)
 
-		sub1 := suite.keeper.GetUserSubscription(suite.ctx, developer, userDid)
-		require.Nil(t, sub1)
-		sub2 := suite.keeper.GetUserSubscription(suite.ctx, developer, user2Did)
-		require.Nil(t, sub2)
-	})
+	sub1 := s.keeper.GetUserSubscription(s.ctx, developer, userDid)
+	require.Nil(s.T(), sub1)
+	sub2 := s.keeper.GetUserSubscription(s.ctx, developer, user2Did)
+	require.Nil(s.T(), sub2)
 }
