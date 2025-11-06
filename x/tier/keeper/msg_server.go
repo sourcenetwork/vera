@@ -134,7 +134,7 @@ func (m *msgServer) AddUserSubscription(
 	// Input validation has been done by ValidateBasic.
 	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
 
-	err := m.Keeper.AddUserSubscription(ctx, developerAddr, msg.UserDid, &msg.Amount, msg.Period)
+	err := m.Keeper.AddUserSubscription(ctx, developerAddr, msg.UserDid, msg.Amount, msg.Period)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "add subscription")
 	}
@@ -149,7 +149,7 @@ func (m *msgServer) UpdateUserSubscription(
 	// Input validation has been done by ValidateBasic.
 	developerAddr := sdk.MustAccAddressFromBech32(msg.Developer)
 
-	err := m.Keeper.UpdateUserSubscription(ctx, developerAddr, msg.UserDid, &msg.Amount, msg.Period)
+	err := m.Keeper.UpdateUserSubscription(ctx, developerAddr, msg.UserDid, msg.Amount, msg.Period)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "update user subscription")
 	}

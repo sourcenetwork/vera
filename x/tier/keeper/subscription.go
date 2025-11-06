@@ -400,7 +400,7 @@ func (k *Keeper) updateDeveloperTotalGranted(ctx context.Context, developerAddr 
 	key := types.TotalDevGrantedKey(developerAddr)
 	totalDevGranted := &types.TotalDevGranted{
 		Developer:    developerAddr.String(),
-		TotalGranted: sdk.NewCoin(appparams.MicroCreditDenom, newTotal),
+		TotalGranted: newTotal.Uint64(),
 	}
 
 	b := k.cdc.MustMarshal(totalDevGranted)
@@ -434,7 +434,7 @@ func (k *Keeper) getTotalDevGranted(ctx context.Context, developerAddr sdk.AccAd
 		return math.ZeroInt(), errorsmod.Wrapf(err, "unmarshal developer total granted amount")
 	}
 
-	return totalDevGranted.TotalGranted.Amount, nil
+	return math.NewIntFromUint64(totalDevGranted.TotalGranted), nil
 }
 
 // addLockupForRegistration adds more lockup to cover the required amount for user registration.
