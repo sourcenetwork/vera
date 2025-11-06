@@ -25,9 +25,6 @@ const (
 	InflationMax        = "0.15"
 	InflationRateChange = "0.13"
 	InitialInflation    = "0.13"
-
-	// AppParamsGenesisKey is the Genesis' file "app_state" key name to set SourceHub app_params
-	AppParamsGenesisKey = "app_params"
 )
 
 // FaucetStoreKey is the store key for faucet data.

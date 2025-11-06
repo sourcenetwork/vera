@@ -64,7 +64,7 @@ func setupFaucetInGenesis(cfg *network.Config) error {
 	hubGenesis.ChainConfig.AllowZeroFeeTxs = true
 	bz, err := json.Marshal(&hubGenesis)
 	if err != nil {
-		return fmt.Errorf("could not marshal app_params: %w", err)
+		return fmt.Errorf("could not marshal x/hub/ChainConfig: %w", err)
 	}
 	cfg.GenesisState[hubtypes.ModuleName] = bz
 
