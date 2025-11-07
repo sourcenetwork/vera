@@ -130,7 +130,7 @@ func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time, s
 	now := currentTime.Unix()
 
 	if now > token.ExpirationTime {
-		return fmt.Errorf("token expired: current time %d > expiration time %d", token.ExpirationTime, now)
+		return fmt.Errorf("token expired: current time %d > expiration time %d", now, token.ExpirationTime)
 	}
 
 	return nil
