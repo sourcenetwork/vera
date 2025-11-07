@@ -243,6 +243,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		epochsKeeper,
 		distributionKeeper,
 		feegrantKeeper,
+		nil,
 	)
 
 	// Initialize params

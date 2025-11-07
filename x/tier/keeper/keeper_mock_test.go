@@ -81,6 +81,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 		suite.epochsKeeper,
 		suite.distrKeeper,
 		suite.feegrantKeeper,
+		nil,
 	)
 
 	err := suite.tierKeeper.SetParams(suite.ctx, types.DefaultParams())
