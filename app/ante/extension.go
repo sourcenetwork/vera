@@ -72,6 +72,7 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	// Validate JWS format, signature, required claims, and timing
 	did, authorizedAccount, err := validateJWSExtension(ctx, jwsOpt.BearerToken, currentTime, skipAuthValidation)
 	if err != nil {
+		ctx.Logger().Error("Bearer token validation failed", "error", err, "did", did)
 		return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "bearer token validation failed: %v", err)
 	}
 
