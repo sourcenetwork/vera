@@ -51,6 +51,18 @@ func (m *msgServer) Lock(ctx context.Context, msg *types.MsgLock) (*types.MsgLoc
 	return &types.MsgLockResponse{}, nil
 }
 
+func (m *msgServer) LockAuto(ctx context.Context, msg *types.MsgLockAuto) (*types.MsgLockAutoResponse, error) {
+	// Input validation has been done by ValidateBasic.
+	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
+
+	valAddr, err := m.Keeper.LockAuto(ctx, delAddr, msg.Stake.Amount)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "lock auto")
+	}
+
+	return &types.MsgLockAutoResponse{ValidatorAddress: valAddr.String()}, nil
+}
+
 func (m *msgServer) Unlock(ctx context.Context, msg *types.MsgUnlock) (*types.MsgUnlockResponse, error) {
 	// Input validation has been done by ValidateBasic.
 	delAddr := sdk.MustAccAddressFromBech32(msg.DelegatorAddress)
