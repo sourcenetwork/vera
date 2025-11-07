@@ -25,27 +25,10 @@ const (
 	InflationMax        = "0.15"
 	InflationRateChange = "0.13"
 	InitialInflation    = "0.13"
-
-	// AppParamsGenesisKey is the Genesis' file "app_state" key name to set SourceHub app_params
-	AppParamsGenesisKey = "app_params"
 )
-
-// AllowZeroFeeTxsKey stores a flag that indicates whether zero-fee transactions are allowed.
-// The value is parsed from app_state.app_params.allow_zero_fee_txs in genesis.json on chain init.
-const AllowZeroFeeTxsKey = "appparams/allow_zero_fee_txs"
-
-// IgnoreBearerAuthKey stores a flag that indicates whether tx extension option bearer token authority should be ignored.
-// The value is parsed from app_state.app_params.ignore_bearer_auth in genesis.json on chain init.
-const IgnoreBearerAuthKey = "appparams/ignore_bearer_auth"
 
 // FaucetStoreKey is the store key for faucet data.
 const FaucetStoreKey = "faucet"
-
-// AppParamsGenesis defines app-specific params that can be set during genesis.
-type AppParamsGenesis struct {
-	AllowZeroFeeTxs  bool `json:"allow_zero_fee_txs"`
-	IgnoreBearerAuth bool `json:"ignore_bearer_auth"`
-}
 
 // FaucetConfig defines the configuration for the faucet service.
 type FaucetConfig struct {

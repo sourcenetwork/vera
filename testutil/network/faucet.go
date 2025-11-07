@@ -17,6 +17,7 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/app"
 	"github.com/sourcenetwork/sourcehub/app/params"
+	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
 const (
@@ -59,14 +60,14 @@ func setupFaucetKeyFiles(val network.ValidatorI) error {
 
 // setupFaucetInGenesis sets up the faucet account and balance in the genesis state.
 func setupFaucetInGenesis(cfg *network.Config) error {
-	appParamsGenesis := params.AppParamsGenesis{
-		AllowZeroFeeTxs: true,
-	}
-	appParamsBytes, err := json.Marshal(&appParamsGenesis)
+	hubGenesis := hubtypes.DefaultGenesis()
+	hubGenesis.ChainConfig.AllowZeroFeeTxs = true
+	bz, err := json.Marshal(&hubGenesis)
 	if err != nil {
-		return fmt.Errorf("could not marshal app_params: %w", err)
+		return fmt.Errorf("could not marshal x/hub/ChainConfig: %w", err)
 	}
-	cfg.GenesisState[params.AppParamsGenesisKey] = appParamsBytes
+	cfg.GenesisState[hubtypes.ModuleName] = bz
+
 	if err := addFaucetAccountToGenesis(cfg); err != nil {
 		return fmt.Errorf("failed to add faucet account to genesis: %w", err)
 	}

@@ -71,7 +71,7 @@ func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APICon
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
 func (app *App) zeroFeeTxsAllowed() bool {
 	ctx := sdk.NewContext(app.CommitMultiStore(), cmtproto.Header{}, false, app.Logger())
-	return app.HubKeeper != nil && app.HubKeeper.IsZeroFeeTxsAllowed(ctx)
+	return app.HubKeeper != nil && app.HubKeeper.GetChainConfig(ctx).AllowZeroFeeTxs
 }
 
 // hasAddressRequested checks if an address has already requested funds.

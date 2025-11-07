@@ -35,11 +35,9 @@ var (
 
 	ParamsKey = []byte("p_hub")
 
-	// AllowZeroFeeTxsKey stores whether zero-fee transactions are allowed.
-	AllowZeroFeeTxsKey = []byte("app_config/allow_zero_fee_txs")
-
-	// IgnoreBearerAuthKey stores whether bearer auth should be ignored.
-	IgnoreBearerAuthKey = []byte("app_config/ignore_bearer_auth")
+	// ChainConfigKey stores Hub's chain config params
+	// set at genesis
+	ChainConfigKey = []byte("chain_config")
 )
 
 // HashJWSToken returns the SHA256 hash of a JWS token string.

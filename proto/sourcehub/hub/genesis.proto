@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "sourcehub/hub/params.proto";
 import "sourcehub/hub/ica_connection.proto";
 import "sourcehub/hub/jws_token.proto";
+import "sourcehub/hub/chain_config.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
 
@@ -20,4 +21,9 @@ message GenesisState {
   repeated ICAConnection ica_connections = 2 [(gogoproto.nullable) = false];
   // jws_tokens defines the list of JWS token records.
   repeated JWSTokenRecord jws_tokens = 3 [(gogoproto.nullable) = false];
+
+  ChainConfig chain_config = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }

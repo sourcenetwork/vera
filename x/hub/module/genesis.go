@@ -32,6 +32,10 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 			panic(err)
 		}
 	}
+
+	if err := k.SetChainConfig(ctx, genState.ChainConfig); err != nil {
+		panic(err)
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -54,6 +58,8 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper) *types.GenesisState {
 			genesis.JwsTokens = append(genesis.JwsTokens, *token)
 		}
 	}
+
+	genesis.ChainConfig = k.GetChainConfig(ctx)
 
 	return genesis
 }

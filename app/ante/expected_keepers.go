@@ -3,13 +3,13 @@ package ante
 import (
 	"context"
 	"time"
+
+	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
 // HubKeeper is an interface for the x/hub module keeper.
 type HubKeeper interface {
-	// App-wide configuration flags
-	IsZeroFeeTxsAllowed(ctx context.Context) bool
-	IsBearerAuthIgnored(ctx context.Context) bool
+	GetChainConfig(context.Context) hubtypes.ChainConfig
 
 	// JWS token management
 	StoreOrUpdateJWSToken(

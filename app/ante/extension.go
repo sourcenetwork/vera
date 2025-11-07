@@ -67,7 +67,7 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	currentTime := ctx.BlockTime()
 
 	// Check if bearer auth should be ignored for validation
-	skipAuthValidation := eod.hubKeeper != nil && eod.hubKeeper.IsBearerAuthIgnored(ctx)
+	skipAuthValidation := eod.hubKeeper != nil && eod.hubKeeper.GetChainConfig(ctx).IgnoreBearerAuth
 
 	// Validate JWS format, signature, required claims, and timing
 	did, authorizedAccount, err := validateJWSExtension(ctx, jwsOpt.BearerToken, currentTime, skipAuthValidation)
