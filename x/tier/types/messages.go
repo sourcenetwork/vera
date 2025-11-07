@@ -198,7 +198,7 @@ func (msg *MsgAddUserSubscription) ValidateBasic() error {
 		return ErrInvalidAmount
 	}
 	if msg.Period <= 0 {
-		return ErrInvalidSubscribtionPeriod
+		return ErrInvalidSubscriptionPeriod
 	}
 	return nil
 }
@@ -224,7 +224,7 @@ func (msg *MsgUpdateUserSubscription) ValidateBasic() error {
 		return ErrInvalidAmount
 	}
 	if msg.Period <= 0 {
-		return ErrInvalidSubscribtionPeriod
+		return ErrInvalidSubscriptionPeriod
 	}
 	return nil
 }

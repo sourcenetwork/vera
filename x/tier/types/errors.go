@@ -15,5 +15,5 @@ var (
 	ErrInvalidDenom              = sdkerrors.Register(ModuleName, 1105, "invalid denom")
 	ErrInvalidAmount             = sdkerrors.Register(ModuleName, 1106, "invalid amount")
 	ErrInvalidDID                = sdkerrors.Register(ModuleName, 1107, "invalid DID")
-	ErrInvalidSubscribtionPeriod = sdkerrors.Register(ModuleName, 1108, "invalid subscription period")
+	ErrInvalidSubscriptionPeriod = sdkerrors.Register(ModuleName, 1108, "invalid subscription period")
 )
