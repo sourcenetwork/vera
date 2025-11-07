@@ -57,6 +57,83 @@ func TestLock(t *testing.T) {
 	require.Equal(t, amount, lockedAmt)
 }
 
+// TestLockAuto verifies that a valid lockup is created with automatic validator selection on keeper.LockAuto().
+func TestLockAuto(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	amount := math.NewInt(1000)
+
+	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	require.NoError(t, err)
+	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	require.NoError(t, err)
+
+	initialDelegatorBalance := math.NewInt(5000)
+	keepertest.InitializeDelegator(t, &k, ctx, delAddr, initialDelegatorBalance)
+	initialValidatorBalance := math.NewInt(1000)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr1, initialValidatorBalance)
+	keepertest.InitializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr2, initialValidatorBalance)
+
+	ctx = ctx.WithBlockHeight(1).WithBlockTime(time.Now())
+
+	// initial lockup amount should be zero for both validators
+	lockedAmt1 := k.GetLockupAmount(ctx, delAddr, valAddr1)
+	require.Equal(t, math.ZeroInt(), lockedAmt1)
+	lockedAmt2 := k.GetLockupAmount(ctx, delAddr, valAddr2)
+	require.Equal(t, math.ZeroInt(), lockedAmt2)
+
+	// locking invalid amounts should fail
+	_, err = k.LockAuto(ctx, delAddr, math.NewInt(-100))
+	require.Error(t, err)
+	require.ErrorContains(t, err, "lock non-positive amount")
+	_, err = k.LockAuto(ctx, delAddr, math.ZeroInt())
+	require.Error(t, err)
+	require.ErrorContains(t, err, "lock non-positive amount")
+	_, err = k.LockAuto(ctx, delAddr, math.NewInt(10_000_000))
+	require.Error(t, err)
+	require.ErrorContains(t, err, "insufficient funds")
+
+	// lock valid amount with auto validator selection (first lock - no existing lockups)
+	selectedValAddr, err := k.LockAuto(ctx, delAddr, amount)
+	require.NoError(t, err)
+	require.NotNil(t, selectedValAddr)
+
+	// verify that the selected validator is one of the bonded validators
+	require.True(t, selectedValAddr.Equals(valAddr1) || selectedValAddr.Equals(valAddr2))
+
+	// verify that lockup was added to the selected validator
+	lockedAmt := k.GetLockupAmount(ctx, delAddr, selectedValAddr)
+	require.Equal(t, amount, lockedAmt)
+
+	// second auto lock should go to the same validator (smallest existing lockup)
+	selectedValAddr2, err := k.LockAuto(ctx, delAddr, math.NewInt(500))
+	require.NoError(t, err)
+	require.True(t, selectedValAddr2.Equals(selectedValAddr), "second lock should go to same validator with smallest lockup")
+
+	// verify lockup was updated
+	lockedAmt = k.GetLockupAmount(ctx, delAddr, selectedValAddr)
+	require.Equal(t, math.NewInt(1500), lockedAmt) // 1000 + 500
+
+	// manually lock a smaller amount to the other validator
+	otherValAddr := valAddr1
+	if selectedValAddr.Equals(valAddr1) {
+		otherValAddr = valAddr2
+	}
+	err = k.Lock(ctx, delAddr, otherValAddr, math.NewInt(200))
+	require.NoError(t, err)
+
+	// third auto lock should go to the validator with smallest lockup (200 < 1500)
+	selectedValAddr3, err := k.LockAuto(ctx, delAddr, math.NewInt(100))
+	require.NoError(t, err)
+	require.True(t, selectedValAddr3.Equals(otherValAddr), "third lock should go to validator with smallest lockup")
+
+	// verify lockup was updated on the other validator
+	lockedAmt = k.GetLockupAmount(ctx, delAddr, otherValAddr)
+	require.Equal(t, math.NewInt(300), lockedAmt) // 200 + 100
+}
+
 // TestUnlock verifies that a valid unlocking lockup is created on keeper.Unock().
 func TestUnlock(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
