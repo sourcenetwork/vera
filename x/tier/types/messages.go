@@ -7,6 +7,7 @@ import (
 
 var (
 	_ sdk.Msg = &MsgLock{}
+	_ sdk.Msg = &MsgLockAuto{}
 	_ sdk.Msg = &MsgUnlock{}
 	_ sdk.Msg = &MsgCancelUnlocking{}
 	_ sdk.Msg = &MsgRedelegate{}
@@ -32,6 +33,24 @@ func (msg *MsgLock) ValidateBasic() error {
 		return err
 	}
 	if err := validateValAddr(msg.ValidatorAddress); err != nil {
+		return err
+	}
+	if err := validateDenom(msg.Stake); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MsgLockAuto
+func NewMsgLockAuto(delAddr string, stake sdk.Coin) *MsgLockAuto {
+	return &MsgLockAuto{
+		DelegatorAddress: delAddr,
+		Stake:            stake,
+	}
+}
+
+func (msg *MsgLockAuto) ValidateBasic() error {
+	if err := validateAccAddr(msg.DelegatorAddress); err != nil {
 		return err
 	}
 	if err := validateDenom(msg.Stake); err != nil {
