@@ -36,6 +36,7 @@ type (
 		epochsKeeper       types.EpochsKeeper
 		distributionKeeper types.DistributionKeeper
 		feegrantKeeper     types.FeegrantKeeper
+		acpKeeper          types.AcpKeeper
 	}
 )
 
@@ -51,6 +52,7 @@ func NewKeeper(
 	epochsKeeper types.EpochsKeeper,
 	distributionKeeper types.DistributionKeeper,
 	feegrantKeeper types.FeegrantKeeper,
+	acpKeeper types.AcpKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -67,6 +69,7 @@ func NewKeeper(
 		epochsKeeper:       epochsKeeper,
 		distributionKeeper: distributionKeeper,
 		feegrantKeeper:     feegrantKeeper,
+		acpKeeper:          acpKeeper,
 	}
 }
 
@@ -98,6 +101,11 @@ func (k *Keeper) GetDistributionKeeper() types.DistributionKeeper {
 // GetFeegrantKeeper returns the module's FeegrantKeeper.
 func (k *Keeper) GetFeegrantKeeper() types.FeegrantKeeper {
 	return k.feegrantKeeper
+}
+
+// GetAcpKeeper returns the module's AcpKeeper.
+func (k *Keeper) GetAcpKeeper() types.AcpKeeper {
+	return k.acpKeeper
 }
 
 // Logger returns a module-specific logger.
@@ -650,6 +658,15 @@ func (k *Keeper) AddUserSubscription(
 ) (err error) {
 	start := time.Now()
 
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			k.Logger().Error("Failed to convert DID to address", "did", extractedDID, "error", err)
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
+
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
@@ -759,6 +776,15 @@ func (k *Keeper) UpdateUserSubscription(
 ) (err error) {
 	start := time.Now()
 
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			k.Logger().Error("Failed to convert DID to address", "did", extractedDID, "error", err)
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
+
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
@@ -828,6 +854,14 @@ func (k *Keeper) RemoveUserSubscription(
 	userDid string,
 ) (err error) {
 	start := time.Now()
+
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
 
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(
