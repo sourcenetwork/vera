@@ -4,6 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/TBD54566975/ssi-sdk/crypto"
+	"github.com/TBD54566975/ssi-sdk/did/key"
+	ed25519sdk "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
@@ -38,4 +43,30 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 		)
 	}
 	return did, nil
+}
+
+// GetAddressFromDID extracts and returns the bech32 address from a DID.
+func (k *Keeper) GetAddressFromDID(ctx context.Context, didStr string) (sdk.AccAddress, error) {
+	if err := did.IsValidDID(didStr); err != nil {
+		return nil, fmt.Errorf("invalid DID: %w", err)
+	}
+
+	didKey := key.DIDKey(didStr)
+	pubBytes, _, keyType, err := didKey.Decode()
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode DID key: %w", err)
+	}
+
+	var pubKey cryptotypes.PubKey
+	switch keyType {
+	case crypto.SECP256k1:
+		pubKey = &secp256k1.PubKey{Key: pubBytes}
+	case crypto.Ed25519:
+		pubKey = &ed25519sdk.PubKey{Key: pubBytes}
+	default:
+		return nil, fmt.Errorf("unsupported key type: %v", keyType)
+	}
+
+	addr := sdk.AccAddress(pubKey.Address())
+	return addr, nil
 }
