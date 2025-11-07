@@ -8,6 +8,10 @@ func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		Params:         DefaultParams(),
 		IcaConnections: []ICAConnection{},
+		ChainConfig: ChainConfig{
+			AllowZeroFeeTxs:  false,
+			IgnoreBearerAuth: false,
+		},
 	}
 }
 

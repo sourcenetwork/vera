@@ -108,7 +108,7 @@ func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, hubKeeper HubKeeper)
 
 	// Allow zero-fee transactions if allowed by app config and the "--fees" flag is omitted
 	if fees.Empty() {
-		if hubKeeper != nil && hubKeeper.IsZeroFeeTxsAllowed(ctx) {
+		if hubKeeper != nil && hubKeeper.GetChainConfig(ctx).AllowZeroFeeTxs {
 			return fees, 0, nil
 		}
 		return nil, 0, sdkerrors.ErrInsufficientFee.Wrap("zero fees are not allowed")
