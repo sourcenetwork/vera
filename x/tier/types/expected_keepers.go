@@ -87,3 +87,13 @@ type ParamSubspace interface {
 	Get(context.Context, []byte, interface{})
 	Set(context.Context, []byte, interface{})
 }
+
+// AcpKeeper defines the expected interface for the ACP module.
+type AcpKeeper interface {
+	// GetActorDID returns the actor DID, checking context first, then falling back to issuing from account address
+	GetActorDID(ctx sdk.Context, accountAddr string) (string, error)
+	// IssueDIDFromAccountAddr creates a DID from an account address
+	IssueDIDFromAccountAddr(ctx context.Context, accountAddr string) (string, error)
+	// GetAddressFromDID extracts and returns the bech32 address from a DID
+	GetAddressFromDID(ctx context.Context, did string) (sdk.AccAddress, error)
+}
