@@ -11,7 +11,7 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
 message ChainConfig {
   option (gogoproto.equal) = true;
 
-  // allow_zero_fee_txs if true configures the antee handler
+  // allow_zero_fee_txs if true configures the ante handler
   // to not reject txs with 0 fees
   bool allow_zero_fee_txs = 1 [
     (amino.dont_omitempty) = true

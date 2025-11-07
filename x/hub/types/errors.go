@@ -17,5 +17,5 @@ var (
 	ErrFailedToInvalidateToken  = sdkerrors.Register(ModuleName, 1106, "failed to invalidate JWS token")
 	ErrJWSTokenExpired          = sdkerrors.Register(ModuleName, 1107, "JWS token has expired")
 	ErrJWSTokenInvalid          = sdkerrors.Register(ModuleName, 1108, "JWS token is invalid")
-	ErrConfigSet                = sdkerrors.Register(ModuleName, 1109, "ChainCofig already inititalized")
+	ErrConfigSet                = sdkerrors.Register(ModuleName, 1109, "ChainConfig already inititalized: config is immutable and can only be set at genesis")
 )
