@@ -20,6 +20,12 @@ if [ ! -d /sourcehub/config ]; then
 
     sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 2>/dev/null
 
+    # recover genesis
+    if [ -n "$GENESIS_PATH" ]; then
+        echo "GENESIS_PATH set: copying genesis"
+        cp $GENESIS_PATH /sourcehub/config/genesis.json
+    fi
+
     # recover account mnemonic
     if [ -n "$MNEMONIC_PATH" ]; then
         echo "MNEMONIC_PATH set: recovering key"
@@ -36,23 +42,6 @@ if [ ! -d /sourcehub/config ]; then
         cp $CONSENSUS_KEY_PATH /sourcehub/config/priv_validator_key.json
         cp $COMET_NODE_KEY_PATH /sourcehub/config/node_key.json
     fi
-
-    # recover genesis
-    if [ -n "$GENESIS_PATH" ]; then
-        echo "GENESIS_PATH set: copying genesis"
-        cp $GENESIS_PATH /sourcehub/config/genesis.json
-    else
-    # initialize chain / create genesis
-        sourcehubd keys add validator --keyring-backend test
-        VALIDATOR_ADDR=$(sourcehubd keys show validator -a --keyring-backend test)
-        sourcehubd genesis add-genesis-account $VALIDATOR_ADDR 1000000000000000uopen # 1b open
-        #sourcehubd genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen # 100m open
-        sourcehubd genesis gentx validator 100000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 100m open
-        sourcehubd genesis collect-gentxs
-
-        echo "initialized sourcehub genesis"
-    fi
-
 else
     echo "Skipping initialization: container previously initialized"
 fi
