@@ -7,6 +7,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/sourcenetwork/sourcehub/utils"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -125,6 +126,50 @@ func (k *Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*type
 	}
 
 	return &types.QueryPostsResponse{Posts: posts, Pagination: pageRes}, nil
+}
+
+func (k *Keeper) IterateGlob(goCtx context.Context, req *types.QueryIterateGlobRequest) (*types.QueryIterateGlobResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	if len(req.Namespace) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid namespace")
+	}
+
+	namespaceId := getNamespaceId(req.Namespace)
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(goCtx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix+namespaceId+"/"))
+
+	var posts []*types.Post
+
+	// Use the Paginate function to handle the pagination logic.
+	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
+		// We need to strip the trailing "/" before glob matching
+		keyStr := string(key)
+		if len(keyStr) > 0 && keyStr[len(keyStr)-1] == '/' {
+			keyStr = keyStr[:len(keyStr)-1]
+		}
+
+		matched := utils.Glob(req.Glob, keyStr)
+		if matched {
+			var post types.Post
+			k.cdc.MustUnmarshal(value, &post)
+			posts = append(posts, &post)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &types.QueryIterateGlobResponse{
+		Posts:      posts,
+		Pagination: pageRes,
+	}
+
+	return resp, nil
 }
 
 // getNamespacesPaginated returns all namespaces with pagination.
