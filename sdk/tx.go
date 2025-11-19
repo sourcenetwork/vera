@@ -3,18 +3,24 @@ package sdk
 import (
 	"context"
 	"fmt"
+	"math"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	xauthsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	"github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
 type TxBuilder struct {
@@ -22,10 +28,13 @@ type TxBuilder struct {
 	gasLimit      uint64
 	feeGranter    sdk.AccAddress
 	authClient    authtypes.QueryClient
+	txClient      txtypes.ServiceClient
 	txCfg         client.TxConfig
 	feeTokenDenom string
 	feeAmt        int64
 	account       authtypes.BaseAccount
+	gasAdjustment float64
+	bearerToken   string // JWS bearer token for DID-based authorization
 }
 
 func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
@@ -38,12 +47,13 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 		},
 	)
 
-	builder := TxBuilder{ // TODO evaluate tx
+	builder := TxBuilder{
 		txCfg:         cfg,
 		chainID:       DefaultChainID,
-		feeTokenDenom: "stake",
-		feeAmt:        100,
+		feeTokenDenom: appparams.DefaultBondDenom,
+		feeAmt:        200,
 		gasLimit:      200000,
+		gasAdjustment: 1.5,
 	}
 
 	for _, opt := range opts {
@@ -74,6 +84,10 @@ func (b *TxBuilder) BuildFromMsgs(ctx context.Context, signer TxSigner, msgs ...
 		return nil, err
 	}
 
+	if err := b.evaluateTx(ctx, builder); err != nil {
+		return nil, err
+	}
+
 	tx, err := b.finalizeTx(ctx, signer, builder)
 	if err != nil {
 		return nil, err
@@ -89,9 +103,28 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 		return nil, fmt.Errorf("failed to set msgs: %v", err)
 	}
 
+	// Set JWS bearer token extension option if provided
+	if b.bearerToken != "" {
+		jwsOpt := &antetypes.JWSExtensionOption{
+			BearerToken: b.bearerToken,
+		}
+		any, err := cdctypes.NewAnyWithValue(jwsOpt)
+		if err != nil {
+			return nil, fmt.Errorf("failed to pack JWS extension option: %v", err)
+		}
+		if extBuilder, ok := txBuilder.(client.ExtendedTxBuilder); ok {
+			extBuilder.SetExtensionOptions(any)
+		} else {
+			return nil, fmt.Errorf("txBuilder does not support extension options")
+		}
+	}
+
 	txBuilder.SetGasLimit(b.gasLimit)
 	feeAmt := sdk.NewCoins(sdk.NewInt64Coin(b.feeTokenDenom, b.feeAmt))
 	txBuilder.SetFeeAmount(feeAmt)
+	if b.feeGranter != nil {
+		txBuilder.SetFeeGranter(b.feeGranter)
+	}
 
 	acc, err := b.getAccount(ctx, signer.GetAccAddress())
 	if err != nil {
@@ -120,6 +153,51 @@ func (b *TxBuilder) initTx(ctx context.Context, signer TxSigner, msgs ...sdk.Msg
 	return txBuilder, nil
 }
 
+// evaluateTx simulates the tx and adjusts gas and fee amounts accordingly.
+func (b *TxBuilder) evaluateTx(ctx context.Context, txBuilder client.TxBuilder) error {
+	if b.txClient == nil {
+		return nil
+	}
+
+	encoder := b.txCfg.TxEncoder()
+	txBytes, err := encoder(txBuilder.GetTx())
+	if err != nil {
+		return fmt.Errorf("encode tx for simulation: %w", err)
+	}
+
+	simRes, err := b.txClient.Simulate(ctx, &txtypes.SimulateRequest{TxBytes: txBytes})
+	if err != nil {
+		return fmt.Errorf("simulate tx: %w", err)
+	}
+
+	gasUsed := simRes.GetGasInfo().GetGasUsed()
+	if gasUsed == 0 {
+		return nil
+	}
+
+	adjusted := uint64(math.Ceil(float64(gasUsed) * b.gasAdjustment))
+	txBuilder.SetGasLimit(adjusted)
+	b.gasLimit = adjusted
+
+	minGasPrice := sdkmath.LegacyMustNewDecFromStr(appparams.DefaultMinGasPrice)
+	denomMultiplier := sdkmath.LegacyNewDec(1)
+	if b.feeTokenDenom == params.MicroCreditDenom {
+		denomMultiplier = sdkmath.LegacyNewDec(appparams.CreditFeeMultiplier)
+	}
+	gasInt := sdkmath.NewIntFromUint64(adjusted)
+	requiredAmount := minGasPrice.Mul(sdkmath.LegacyNewDecFromInt(gasInt)).Mul(denomMultiplier).Ceil().RoundInt()
+	txBuilder.SetFeeAmount(sdk.NewCoins(sdk.NewCoin(b.feeTokenDenom, requiredAmount)))
+	if requiredAmount.IsInt64() {
+		b.feeAmt = requiredAmount.Int64()
+	}
+
+	if b.feeGranter != nil {
+		txBuilder.SetFeeGranter(b.feeGranter)
+	}
+
+	return nil
+}
+
 func (b *TxBuilder) finalizeTx(ctx context.Context, signer TxSigner, txBuilder client.TxBuilder) (xauthsigning.Tx, error) {
 	signerData := xauthsigning.SignerData{
 		ChainID:       b.chainID,
@@ -129,7 +207,7 @@ func (b *TxBuilder) finalizeTx(ctx context.Context, signer TxSigner, txBuilder c
 	}
 
 	sigV2, err := tx.SignWithPrivKey(
-		context.Background(),
+		ctx,
 		signing.SignMode_SIGN_MODE_DIRECT,
 		signerData,
 		txBuilder,
@@ -175,6 +253,22 @@ type TxBuilderOpt func(*TxBuilder) error
 func WithChainID(id string) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.chainID = id
+		return nil
+	}
+}
+
+// WithMicroOpen configures TxBuilder to build Txs paid using open tokens
+func WithMicroOpen() TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.feeTokenDenom = params.MicroOpenDenom
+		return nil
+	}
+}
+
+// WithMicroCredit configures TxBuilder to build Txs paid using credits
+func WithMicroCredit() TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.feeTokenDenom = params.MicroCreditDenom
 		return nil
 	}
 }
@@ -245,23 +339,21 @@ func WithAuthQueryClient(client authtypes.QueryClient) TxBuilderOpt {
 func WithSDKClient(client *Client) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.authClient = client.AuthQueryClient()
+		b.txClient = client.txClient
+		return nil
+	}
+}
+
+// WithBearerToken sets a JWS bearer token for DID-based authorization.
+// The bearer token will be added as an extension option to the transaction.
+func WithBearerToken(token string) TxBuilderOpt {
+	return func(b *TxBuilder) error {
+		b.bearerToken = token
 		return nil
 	}
 }
 
 // FIXME what's a better way of doing this for a lib?
 func init() {
-	// Set prefixes
-	accountPubKeyPrefix := app.AccountAddressPrefix + "pub"
-	validatorAddressPrefix := app.AccountAddressPrefix + "valoper"
-	validatorPubKeyPrefix := app.AccountAddressPrefix + "valoperpub"
-	consNodeAddressPrefix := app.AccountAddressPrefix + "valcons"
-	consNodePubKeyPrefix := app.AccountAddressPrefix + "valconspub"
-
-	// Set and seal config
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(app.AccountAddressPrefix, accountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	//config.Seal()
+	app.SetConfig(false)
 }

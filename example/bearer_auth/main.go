@@ -8,7 +8,6 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocdc "github.com/cosmos/cosmos-sdk/crypto/codec"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
-	prototypes "github.com/cosmos/gogoproto/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
 	"github.com/sourcenetwork/sourcehub/sdk"
@@ -57,7 +56,7 @@ resources:
 `
 
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicyNow(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
 	tx, err := txBuilder.Build(ctx, txSigner, &msgSet)
 	if err != nil {
 		log.Fatal(err)
@@ -81,7 +80,7 @@ resources:
 		log.Fatal(err)
 	}
 
-	log.Printf("policy created: %v", policyResponse.Policy.Id)
+	log.Printf("policy created: %v", policyResponse.Record.Policy.Id)
 
 	alice, signer, err := did.ProduceDID()
 	if err != nil {
@@ -99,11 +98,10 @@ resources:
 	log.Printf("alice's JWS: %v", jws)
 
 	bearerCmd := acptypes.MsgBearerPolicyCmd{
-		Creator:      txSigner.GetAccAddress(),
-		BearerToken:  jws,
-		PolicyId:     policyResponse.Policy.Id,
-		Cmd:          acptypes.NewRegisterObjectCmd(coretypes.NewObject("resource", "foo")),
-		CreationTime: prototypes.TimestampNow(),
+		Creator:     txSigner.GetAccAddress(),
+		BearerToken: jws,
+		PolicyId:    policyResponse.Record.Policy.Id,
+		Cmd:         acptypes.NewRegisterObjectCmd(coretypes.NewObject("resource", "foo")),
 	}
 
 	log.Printf("Bearer Cmd: %v", bearerCmd)

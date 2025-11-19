@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	prototypes "github.com/cosmos/gogoproto/types"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
@@ -18,13 +17,13 @@ const DefaultExpirationDelta uint64 = 100
 
 type EvaluateAccessRequestsCommand struct {
 	Policy     *coretypes.Policy
-	Operations []*types.Operation
+	Operations []*coretypes.Operation
 	Actor      string
 
-	CreationTime *prototypes.Timestamp
+	CreationTime *types.Timestamp
 
 	// Creator is the same as the Tx signer
-	Creator authtypes.AccountI
+	Creator sdktypes.AccountI
 
 	// Current block height
 	CurrentHeight uint64
@@ -75,7 +74,7 @@ func (c *EvaluateAccessRequestsCommand) validate() error {
 }
 
 func (c *EvaluateAccessRequestsCommand) evaluateRequest(ctx context.Context, engine coretypes.ACPEngineServer) error {
-	operations := utils.MapSlice(c.Operations, func(op *types.Operation) *coretypes.Operation {
+	operations := utils.MapSlice(c.Operations, func(op *coretypes.Operation) *coretypes.Operation {
 		return &coretypes.Operation{
 			Object:     op.Object,
 			Permission: op.Permission,
@@ -85,7 +84,9 @@ func (c *EvaluateAccessRequestsCommand) evaluateRequest(ctx context.Context, eng
 		PolicyId: c.Policy.Id,
 		AccessRequest: &coretypes.AccessRequest{
 			Operations: operations,
-			Actor:      &coretypes.Actor{c.Actor},
+			Actor: &coretypes.Actor{
+				Id: c.Actor,
+			},
 		},
 	})
 	if err != nil {

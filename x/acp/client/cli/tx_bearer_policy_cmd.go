@@ -24,7 +24,7 @@ func bearerDispatcher(cmd *cobra.Command, polId string, polCmd *types.PolicyCmd)
 	token := flag.Value.String()
 
 	creator := clientCtx.GetFromAddress().String()
-	msg := types.NewMsgBearerPolicyCmdNow(creator, token, polId, polCmd)
+	msg := types.NewMsgBearerPolicyCmd(creator, token, polId, polCmd)
 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 }
 
@@ -38,8 +38,12 @@ func CmdBearerPolicyCmd() *cobra.Command {
 	flags.String(BearerFlag, "", "specifies the bearer token to be broadcast with the command")
 
 	cmd.AddCommand(CmdRegisterObject(bearerDispatcher))
-	cmd.AddCommand(CmdUnregisterObject(bearerDispatcher))
+	cmd.AddCommand(CmdArchiveObject(bearerDispatcher))
 	cmd.AddCommand(CmdSetRelationship(bearerDispatcher))
 	cmd.AddCommand(CmdDeleteRelationship(bearerDispatcher))
+	cmd.AddCommand(CmdCreateCommitment(bearerDispatcher))
+	cmd.AddCommand(CmdRevealRegistration(bearerDispatcher))
+	cmd.AddCommand(CmdFlagHijack(bearerDispatcher))
+	cmd.AddCommand(CmdUnarchiveObject(bearerDispatcher))
 	return cmd
 }

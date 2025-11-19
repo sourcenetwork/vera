@@ -1,7 +1,6 @@
 package test
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -17,14 +16,6 @@ const (
 	SourceHubActorEnvVar     string = "SOURCEHUB_ACP_TEST_ACTOR"
 )
 
-var _ signed_policy_cmd.LogicalClock = (*logicalClockImpl)(nil)
-
-type logicalClockImpl struct{}
-
-func (c *logicalClockImpl) GetTimestampNow(context.Context) (uint64, error) {
-	return 1, nil
-}
-
 type AccountCreator interface {
 	// GetOrCreateActor retrieves an account from a TestActor's address
 	// if the account does not exist in the chain, it must be created
@@ -32,16 +23,29 @@ type AccountCreator interface {
 	GetOrCreateAccountFromActor(*TestCtx, *TestActor) (sdk.AccountI, error)
 }
 
-// MsgExecutor represents a component which can execute an ACP Msg and produce a result
-type MsgExecutor interface {
+// ACPClient represents a component which can execute an ACP Msg and produce a result
+type ACPClient interface {
 	AccountCreator
+	signed_policy_cmd.LogicalClock
 
 	CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error)
+	EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error)
 	BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error)
 	SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error)
 	DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error)
 
+	Policy(ctx *TestCtx, msg *types.QueryPolicyRequest) (*types.QueryPolicyResponse, error)
+	RegistrationsCommitmentByCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentByCommitmentRequest) (*types.QueryRegistrationsCommitmentByCommitmentResponse, error)
+	RegistrationsCommitment(ctx *TestCtx, msg *types.QueryRegistrationsCommitmentRequest) (*types.QueryRegistrationsCommitmentResponse, error)
+
+	ObjectOwner(ctx *TestCtx, msg *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error)
+
+	// GetLastBlockTs returns an ACP Timestamp for the last accepted block in SourceHub
+	GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error)
+
 	Cleanup()
+	// WaitBlock waits until the Executor has advanced to the next block
+	WaitBlock()
 }
 
 // AuthenticationStrategy is an enum representing the Authentication format
@@ -92,7 +96,7 @@ const (
 var ExecutorStrategyMap map[string]ExecutorStrategy = map[string]ExecutorStrategy{
 	"KEEPER": Keeper,
 	//"CLI":    CLI,
-	"SDK": SDK,
+	//"SDK": SDK,
 }
 
 // TestConfig models how the tests suite will be run

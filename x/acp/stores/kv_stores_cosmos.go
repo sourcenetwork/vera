@@ -5,6 +5,8 @@ import (
 	rcdb "github.com/sourcenetwork/raccoondb"
 )
 
+// RaccoonKVFromCosmos adapts a cosmossdk KVStore
+// into a raccondb v1 KVStore
 func RaccoonKVFromCosmos(store storetypes.KVStore) rcdb.KVStore {
 	return &cosmosKvWrapper{
 		store: store,

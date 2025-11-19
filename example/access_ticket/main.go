@@ -81,7 +81,7 @@ func runDemo(chainId string, nodeAddr string, validatorKeyName string) {
 	record := registerObject(ctx, client, &txBuilder, txSigner, policy.Id)
 
 	log.Printf("Evaluating Access Request to read file:readme")
-	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.OwnerDid, []*acptypes.Operation{
+	decision := checkAccess(ctx, client, &txBuilder, txSigner, policy.Id, record.Metadata.OwnerDid, []*coretypes.Operation{
 		{
 			Object:     coretypes.NewObject("file", "readme"),
 			Permission: "read",
@@ -133,7 +133,7 @@ func getSigner(accAddr string) sdk.TxSigner {
 
 func createPolicy(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner) *coretypes.Policy {
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicyNow(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
 	tx, err := txBuilder.Build(ctx, txSigner, &msgSet)
 	if err != nil {
 		log.Fatal(err)
@@ -157,14 +157,14 @@ func createPolicy(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuil
 		log.Fatal(err)
 	}
 
-	log.Printf("policy created: %v", policyResponse.Policy.Id)
-	return policyResponse.Policy
+	log.Printf("policy created: %v", policyResponse.Record.Policy.Id)
+	return policyResponse.Record.Policy
 }
 
-func registerObject(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string) *coretypes.RelationshipRecord {
+func registerObject(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string) *acptypes.RelationshipRecord {
 	msgSet := sdk.MsgSet{}
 	mapper := msgSet.WithDirectPolicyCmd(
-		acptypes.NewMsgDirectPolicyCmdNow(
+		acptypes.NewMsgDirectPolicyCmd(
 			txSigner.GetAccAddress(),
 			policyId,
 			acptypes.NewRegisterObjectCmd(coretypes.NewObject("file", "readme")),
@@ -197,10 +197,10 @@ func registerObject(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBu
 	return response.Result.GetRegisterObjectResult().Record
 }
 
-func checkAccess(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string, actorId string, operations []*acptypes.Operation) *acptypes.AccessDecision {
+func checkAccess(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner, policyId string, actorId string, operations []*coretypes.Operation) *acptypes.AccessDecision {
 	msgSet := sdk.MsgSet{}
 	mapper := msgSet.WithCheckAccess(
-		acptypes.NewMsgCheckAccess(txSigner.GetAccAddress(), policyId, &acptypes.AccessRequest{
+		acptypes.NewMsgCheckAccess(txSigner.GetAccAddress(), policyId, &coretypes.AccessRequest{
 			Operations: operations,
 			Actor:      &coretypes.Actor{Id: actorId},
 		}),

@@ -49,6 +49,29 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "id"}},
 				},
 
+				{
+					RpcMethod: "RegistrationsCommitment",
+					Use:       "registrations-commitment",
+					Short:     "Query RegistrationsCommitment",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "id"},
+					},
+				},
+
+				{
+					RpcMethod:      "RegistrationsCommitmentByCommitment",
+					Use:            "registrations-commitment-by-commitment",
+					Short:          "Query RegistrationsCommitmentByCommitment",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
+				},
+
+				{
+					RpcMethod:      "HijackAttemptsByPolicy",
+					Use:            "hijack-attempts-by-policy",
+					Short:          "Query HijackAttemptsByPolicy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
+				},
+
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},

@@ -3,7 +3,9 @@ package sourcehub.acp;
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
+import "sourcehub/acp/time.proto";
 import "sourcenetwork/acp_core/relationship.proto";
+import "sourcenetwork/acp_core/request.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
@@ -17,13 +19,13 @@ message AccessDecision {
 
   uint64 creator_acc_sequence = 4; // used as part of id generation
 
-  repeated Operation operations = 5; // used as part of id generation
+  repeated sourcenetwork.acp_core.Operation operations = 5; // used as part of id generation
 
   string actor = 6; // used as part of id generation
 
   DecisionParams params = 7; // used as part of id generation
 
-  google.protobuf.Timestamp creation_time = 8;
+  Timestamp creation_time = 8;
 
   // issued_height stores the block height when the Decision was evaluated
   uint64 issued_height = 9;
@@ -39,21 +41,4 @@ message DecisionParams {
 
   // number of blocks an AccessTicket is valid for
   uint64 ticket_expiration_delta = 3;
-}
-
-// AccessRequest represents the wish to perform a set of operations by an actor
-message AccessRequest {
-  repeated Operation operations = 1;
-
-  // actor requesting operations
-  sourcenetwork.acp_core.Actor actor = 2;
-}
-
-// Operation represents an action over an object.
-message Operation {
-  // target object for operation
-  sourcenetwork.acp_core.Object object = 1;
-
-  // permission required to perform operation
-  string permission = 2;
 }

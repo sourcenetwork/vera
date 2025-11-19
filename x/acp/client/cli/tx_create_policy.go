@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	gogotypes "github.com/cosmos/gogoproto/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
@@ -23,16 +22,16 @@ func CmdCreatePolicy() *cobra.Command {
 		Use:   "create-policy [marshaling_type] {policy_file | -}",
 		Short: "Broadcast message CreatePolicy",
 		Long: `
-                       Broadcast message CreatePolicy.
+		Broadcast message CreatePolicy.
 
-                       marshaling_type specifies the marshaling format for the policy.
-                       Defaults to SHORT_YAML.
-                       See PolicyMarshalingType for accepted values.
+		marshaling_type specifies the marshaling format for the policy.
+		Defaults to SHORT_YAML.
+		See PolicyMarshalingType for accepted values.
 
-                       policy_file specifies a file whose contents is the policy.
-                       - to read from stdin.
-                       Note: if reading from stdin make sure flag --yes is set.`,
-		Args: cobra.ExactArgs(1),
+		policy_file specifies a file whose contents is the policy.
+		- to read from stdin.
+		Note: if reading from stdin make sure flag --yes is set.`,
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			var policyFile string
 			var marshalingType coretypes.PolicyMarshalingType
@@ -73,10 +72,9 @@ func CmdCreatePolicy() *cobra.Command {
 			}
 
 			msg := &types.MsgCreatePolicy{
-				Creator:      clientCtx.GetFromAddress().String(),
-				Policy:       string(policy),
-				MarshalType:  marshalingType,
-				CreationTime: gogotypes.TimestampNow(),
+				Creator:     clientCtx.GetFromAddress().String(),
+				Policy:      string(policy),
+				MarshalType: marshalingType,
 			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err

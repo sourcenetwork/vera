@@ -11,17 +11,14 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
+func (k *Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.getACPEngine(ctx)
 
 	result, err := engine.GetObjectRegistration(ctx, &coretypes.GetObjectRegistrationRequest{
 		PolicyId: req.PolicyId,
@@ -31,8 +28,16 @@ func (k Keeper) ObjectOwner(goCtx context.Context, req *types.QueryObjectOwnerRe
 		return nil, err
 	}
 
+	var record *types.RelationshipRecord
+	if result.IsRegistered {
+		record, err = types.MapRelationshipRecord(result.Record)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &types.QueryObjectOwnerResponse{
 		IsRegistered: result.IsRegistered,
-		OwnerId:      result.OwnerId,
+		Record:       record,
 	}, nil
 }

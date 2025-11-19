@@ -1,7 +1,6 @@
 package object
 
 import (
-	stderrors "errors"
 	"testing"
 
 	"github.com/sourcenetwork/acp_core/pkg/errors"
@@ -34,17 +33,12 @@ func TestRegisterObject_RegisteringNewObjectIsSucessful(t *testing.T) {
 	bob := ctx.GetActor("bob")
 	a2 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
-		Expected: &types.RegisterObjectCmdResult{
-			Result: coretypes.RegistrationResult_Registered,
-			Record: &coretypes.RelationshipRecord{
-				PolicyId:     ctx.State.PolicyId,
-				OwnerDid:     bob.DID,
-				Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
-				Archived:     false,
-				CreationTime: test.TimeToProto(ctx.Timestamp),
-			},
+		Actor:    bob,
+		Expected: &types.RelationshipRecord{
+			PolicyId:     ctx.State.PolicyId,
+			Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
+			Archived:     false,
 		},
 	}
 	a2.Run(ctx)
@@ -73,8 +67,8 @@ func TestRegisterObject_RegisteringObjectRegisteredToAnotherUserErrors(t *testin
 
 	a2 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
+		Actor:    ctx.GetActor("bob"),
 	}
 	a2.Run(ctx)
 
@@ -82,14 +76,14 @@ func TestRegisterObject_RegisteringObjectRegisteredToAnotherUserErrors(t *testin
 	// then she is denied
 	a2 = test.RegisterObjectAction{
 		PolicyId:    pol.Id,
-		Actor:       ctx.GetActor("alice"),
 		Object:      coretypes.NewObject("resource", "foo"),
-		ExpectedErr: errors.ErrorType_UNAUTHORIZED,
+		Actor:       ctx.GetActor("alice"),
+		ExpectedErr: errors.ErrorType_OPERATION_FORBIDDEN,
 	}
 	a2.Run(ctx)
 }
 
-func TestRegisterObject_ReregisteringObjectOwnedByUserIsNoop(t *testing.T) {
+func TestRegisterObject_ReregisteringObjectOwnedByUser_Errors(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
@@ -102,33 +96,23 @@ func TestRegisterObject_ReregisteringObjectOwnedByUserIsNoop(t *testing.T) {
 
 	a2 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
+		Actor:    ctx.GetActor("bob"),
 	}
 	a2.Run(ctx)
 
 	// when Bob tries to reregister foo
-	// then the result is a noop
-	bob := ctx.GetActor("bob")
+	// then forbidden op
 	a2 = test.RegisterObjectAction{
-		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
-		Object:   coretypes.NewObject("resource", "foo"),
-		Expected: &types.RegisterObjectCmdResult{
-			Result: coretypes.RegistrationResult_NoOp,
-			Record: &coretypes.RelationshipRecord{
-				PolicyId:     ctx.State.PolicyId,
-				OwnerDid:     bob.DID,
-				Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
-				Archived:     false,
-				CreationTime: test.TimeToProto(ctx.Timestamp),
-			},
-		},
+		PolicyId:    pol.Id,
+		Object:      coretypes.NewObject("resource", "foo"),
+		Actor:       ctx.GetActor("bob"),
+		ExpectedErr: errors.ErrorType_OPERATION_FORBIDDEN,
 	}
 	a2.Run(ctx)
 }
 
-func TestRegisterObject_RegisteringAnotherUsersArchivedObjectErrors(t *testing.T) {
+func TestRegisterObject_RegisteringAnotherUsersArchivedObject_Errors(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
@@ -141,30 +125,29 @@ func TestRegisterObject_RegisteringAnotherUsersArchivedObjectErrors(t *testing.T
 
 	a2 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
+		Actor:    ctx.GetActor("bob"),
 	}
 	a2.Run(ctx)
 
-	a3 := test.UnregisterObjectAction{
+	a3 := test.ArchiveObjectAction{
 		PolicyId: pol.Id,
 		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
 	}
 	a3.Run(ctx)
 
-	// when Alice tries to register foo
-	// then she is denied
+	// when Alice tries to register foo op forbidden
 	action := test.RegisterObjectAction{
 		PolicyId:    pol.Id,
-		Actor:       ctx.GetActor("alice"),
 		Object:      coretypes.NewObject("resource", "foo"),
-		ExpectedErr: errors.ErrorType_UNAUTHORIZED,
+		Actor:       ctx.GetActor("alice"),
+		ExpectedErr: errors.ErrorType_OPERATION_FORBIDDEN,
 	}
 	action.Run(ctx)
 }
 
-func TestRegisterObject_RegisteringArchivedUserObjectUnarchivesObject(t *testing.T) {
+func TestRegisterObject_RegisteringArchivedUserObject_ReturnsOperationForbidden(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
@@ -174,35 +157,26 @@ func TestRegisterObject_RegisteringArchivedUserObjectUnarchivesObject(t *testing
 		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
+
 	a2 := test.RegisterObjectAction{
 		PolicyId: pol.Id,
-		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
+		Actor:    ctx.GetActor("bob"),
 	}
 	a2.Run(ctx)
-	a3 := test.UnregisterObjectAction{
+	a3 := test.ArchiveObjectAction{
 		PolicyId: pol.Id,
 		Actor:    ctx.GetActor("bob"),
 		Object:   coretypes.NewObject("resource", "foo"),
 	}
 	a3.Run(ctx)
 
-	// when Bob tries to register foo, it is unarchived
-	bob := ctx.GetActor("bob")
+	// when Bob tries to register the archived foo
 	action := test.RegisterObjectAction{
-		PolicyId: pol.Id,
-		Actor:    bob,
-		Object:   coretypes.NewObject("resource", "foo"),
-		Expected: &types.RegisterObjectCmdResult{
-			Result: coretypes.RegistrationResult_Unarchived,
-			Record: &coretypes.RelationshipRecord{
-				PolicyId:     ctx.State.PolicyId,
-				OwnerDid:     bob.DID,
-				Relationship: coretypes.NewActorRelationship("resource", "foo", "owner", bob.DID),
-				Archived:     false,
-				CreationTime: test.TimeToProto(ctx.Timestamp),
-			},
-		},
+		PolicyId:    pol.Id,
+		Object:      coretypes.NewObject("resource", "foo"),
+		Actor:       ctx.GetActor("bob"),
+		ExpectedErr: errors.ErrorType_OPERATION_FORBIDDEN,
 	}
 	action.Run(ctx)
 
@@ -227,11 +201,12 @@ func TestRegisterObject_RegisteringObjectInAnUndefinedResourceErrors(t *testing.
 		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
+
 	a2 := test.RegisterObjectAction{
 		PolicyId:    pol.Id,
-		Actor:       ctx.GetActor("bob"),
 		Object:      coretypes.NewObject("abc", "foo"),
-		ExpectedErr: stderrors.New("resource not found"), // FIXME update once zanzi errors are sorted
+		Actor:       ctx.GetActor("bob"),
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	a2.Run(ctx)
 }
@@ -240,11 +215,10 @@ func TestRegisterObject_RegisteringToUnknownPolicyReturnsError(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
-	// Given Bob as previous owner of foo
 	a2 := test.RegisterObjectAction{
 		PolicyId:    "abc1234",
-		Actor:       ctx.GetActor("bob"),
 		Object:      coretypes.NewObject("resource", "foo"),
+		Actor:       ctx.GetActor("bob"),
 		ExpectedErr: errors.ErrorType_NOT_FOUND,
 	}
 	a2.Run(ctx)
@@ -254,17 +228,17 @@ func TestRegisterObject_BlankResourceErrors(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
-	// Given Bob as previous owner of foo
 	a1 := test.CreatePolicyAction{
 		Policy:  policyDef,
 		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
+
 	a2 := test.RegisterObjectAction{
 		PolicyId:    pol.Id,
-		Actor:       ctx.GetActor("bob"),
 		Object:      coretypes.NewObject("abc", "foo"),
-		ExpectedErr: stderrors.New("resource not found"), //FIXME once zanzi errors are sorted, change this to the correct type
+		Actor:       ctx.GetActor("bob"),
+		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	a2.Run(ctx)
 }
@@ -273,16 +247,16 @@ func TestRegisterObject_BlankObjectIdErrors(t *testing.T) {
 	ctx := test.NewTestCtx(t)
 	defer ctx.Cleanup()
 
-	// Given Bob as previous owner of foo
 	a1 := test.CreatePolicyAction{
 		Policy:  policyDef,
 		Creator: ctx.TxSigner,
 	}
 	pol := a1.Run(ctx)
+
 	a2 := test.RegisterObjectAction{
 		PolicyId:    pol.Id,
+		Object:      coretypes.NewObject("resource", ""),
 		Actor:       ctx.GetActor("bob"),
-		Object:      coretypes.NewObject("abc", ""),
 		ExpectedErr: errors.ErrorType_BAD_INPUT,
 	}
 	a2.Run(ctx)

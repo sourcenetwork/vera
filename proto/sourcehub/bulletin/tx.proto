@@ -7,6 +7,7 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "sourcehub/bulletin/params.proto";
+import "sourcehub/bulletin/namespace.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 
@@ -18,6 +19,9 @@ service Msg {
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreatePost(MsgCreatePost) returns (MsgCreatePostResponse);
+  rpc RegisterNamespace(MsgRegisterNamespace) returns (MsgRegisterNamespaceResponse);
+  rpc AddCollaborator(MsgAddCollaborator) returns (MsgAddCollaboratorResponse);
+  rpc RemoveCollaborator(MsgRemoveCollaborator) returns (MsgRemoveCollaboratorResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -50,3 +54,35 @@ message MsgCreatePost {
 }
 
 message MsgCreatePostResponse {}
+
+message MsgRegisterNamespace {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+}
+
+message MsgRegisterNamespaceResponse {
+  Namespace namespace = 1;
+}
+
+message MsgAddCollaborator {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string collaborator = 3;
+}
+
+message MsgAddCollaboratorResponse {
+  string collaborator_did = 1;
+}
+
+message MsgRemoveCollaborator {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string collaborator = 3;
+}
+
+message MsgRemoveCollaboratorResponse {
+  string collaborator_did = 1;
+}

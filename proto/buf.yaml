@@ -9,7 +9,7 @@ deps:
 - buf.build/googleapis/googleapis
 - buf.build/cosmos/ics23
 - buf.build/cosmos/ibc
-- buf.build/sourcenetwork/acp_core
+- buf.build/sourcenetwork/acp-core
 lint:
   except:
   - UNARY_RPC

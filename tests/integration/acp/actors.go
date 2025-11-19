@@ -18,6 +18,7 @@ import (
 // Each actor has a keypair and a DID
 // The actor has a SourceHubAddr only if their keys are of type secp256k1
 type TestActor struct {
+	Name          string
 	DID           string
 	PubKey        sdkcrypto.PubKey
 	PrivKey       sdkcrypto.PrivKey
@@ -38,6 +39,7 @@ func MustNewED25519ActorFromName(name string) *TestActor {
 	stdPriv := ed25519.PrivateKey(privKey.Bytes())
 
 	return &TestActor{
+		Name:          name,
 		DID:           didStr,
 		PubKey:        privKey.PubKey(),
 		PrivKey:       privKey,
@@ -63,6 +65,7 @@ func MustNewSourceHubActorFromName(name string) *TestActor {
 	stdPrivKey := s256Priv.ToECDSA()
 
 	return &TestActor{
+		Name:          name,
 		DID:           didStr,
 		PubKey:        key.PubKey(),
 		PrivKey:       key,

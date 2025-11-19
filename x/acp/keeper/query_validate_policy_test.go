@@ -1,0 +1,209 @@
+package keeper
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
+
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/types"
+)
+
+type queryValidatePolicySuite struct {
+	suite.Suite
+}
+
+func TestValidatePolicy(t *testing.T) {
+	suite.Run(t, &queryValidatePolicySuite{})
+}
+
+func (s *queryValidatePolicySuite) TestValidatePolicy_ValidPolicy() {
+	ctx, k, _ := setupKeeper(s.T())
+
+	req := &types.QueryValidatePolicyRequest{
+		Policy: `
+name: Source Policy
+description: A valid policy
+resources:
+  file:
+    relations: 
+      owner:
+        types:
+          - actor
+    permissions: 
+      read: 
+        expr: owner
+      write: 
+        expr: owner
+actor:
+  name: actor
+  doc: some actor
+`,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+
+	result, err := k.ValidatePolicy(ctx, req)
+
+	want := &types.QueryValidatePolicyResponse{
+		Valid:    true,
+		ErrorMsg: "",
+		Policy: &coretypes.Policy{
+			Id:          "",
+			Name:        "Source Policy",
+			Description: "A valid policy",
+			ActorResource: &coretypes.ActorResource{
+				Name: "actor",
+				Doc:  "some actor",
+			},
+			Attributes:        nil,
+			SpecificationType: 0,
+			Resources: []*coretypes.Resource{
+				{
+					Name: "file",
+					Permissions: []*coretypes.Permission{
+						{
+							Name:       "_can_manage_owner",
+							Expression: "owner",
+							Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
+						},
+						{
+							Name:       "read",
+							Expression: "owner",
+						},
+						{
+							Name:       "write",
+							Expression: "owner",
+						},
+					},
+					Relations: []*coretypes.Relation{
+						{
+							Name: "owner",
+							VrTypes: []*coretypes.Restriction{
+								{
+									ResourceName: "actor",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
+}
+
+func (s *queryValidatePolicySuite) TestValidatePolicy_ComplexValidPolicy() {
+	ctx, k, _ := setupKeeper(s.T())
+
+	req := &types.QueryValidatePolicyRequest{
+		Policy: `
+name: Source Policy
+description: Another valid policy
+resources:
+  file:
+    relations:
+      owner:
+        doc: owner owns
+        types:
+          - actor-source
+      reader:
+      admin:
+        manages:
+          - reader
+    permissions:
+      own:
+        expr: owner
+        doc: own doc
+      read:
+        expr: owner + reader
+actor:
+  name: actor-source
+  doc: my actor
+`,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+
+	result, err := k.ValidatePolicy(ctx, req)
+	require.True(s.T(), result.Valid)
+	require.Nil(s.T(), err)
+}
+
+func (s *queryValidatePolicySuite) TestValidatePolicy_InvalidSyntax() {
+	ctx, k, _ := setupKeeper(s.T())
+
+	req := &types.QueryValidatePolicyRequest{
+		Policy: `
+name: Invalid policy
+description: Policy with invalid syntax
+resources:
+  file
+    permissions:
+      read:
+        expr: owner
+`,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+
+	result, err := k.ValidatePolicy(ctx, req)
+
+	require.NotNil(s.T(), result)
+	require.False(s.T(), result.Valid)
+	require.Contains(s.T(), result.ErrorMsg, "mapping values are not allowed in this context")
+	require.Nil(s.T(), err)
+}
+
+func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
+	ctx, k, _ := setupKeeper(s.T())
+
+	req := &types.QueryValidatePolicyRequest{
+		Policy:      "",
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+
+	result, err := k.ValidatePolicy(ctx, req)
+
+	require.False(s.T(), result.Valid)
+	require.Contains(s.T(), result.ErrorMsg, "name required")
+	require.Nil(s.T(), err)
+}
+
+func (s *queryValidatePolicySuite) TestValidatePolicy_BadActor() {
+	ctx, k, _ := setupKeeper(s.T())
+
+	req := &types.QueryValidatePolicyRequest{
+		Policy: `
+name: Yet another invalid policy
+description: Policy with bad actor
+resources:
+  file:
+    relations:
+      owner:
+        doc: owner owns
+        types:
+          - actor-source
+      reader:
+      admin:
+        manages:
+          - reader
+    permissions:
+      own:
+        expr: owner
+        doc: own doc
+      read:
+        expr: owner + reader
+actor:
+  name: actor-factor
+  doc: bad actor
+`,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+	}
+
+	result, err := k.ValidatePolicy(ctx, req)
+
+	require.NotNil(s.T(), result)
+	require.False(s.T(), result.Valid)
+	require.Contains(s.T(), result.ErrorMsg, "resource not found")
+	require.NoError(s.T(), err)
+}

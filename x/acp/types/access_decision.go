@@ -7,6 +7,7 @@ import (
 
 	prototypes "github.com/cosmos/gogoproto/types"
 
+	"github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/utils"
 )
 
@@ -20,7 +21,7 @@ func (d *AccessDecision) ProduceId() string {
 // hashDecision produces a sha256 hash of all fields (except the id) of an AccessDecision.
 // The hash is used to produce an unique and deterministic ID for a decision
 func (decision *AccessDecision) hashDecision() []byte {
-	sortableOperations := utils.FromComparator(decision.Operations, func(left, right *Operation) bool {
+	sortableOperations := utils.FromComparator(decision.Operations, func(left, right *types.Operation) bool {
 		return left.Object.Resource < right.Object.Resource && left.Object.Id < right.Object.Id && left.Permission < right.Permission
 	})
 	operations := sortableOperations.Sort()
@@ -31,7 +32,7 @@ func (decision *AccessDecision) hashDecision() []byte {
 	hasher.Write([]byte(decision.Actor))
 	hasher.Write([]byte(fmt.Sprintf("%v", decision.CreatorAccSequence)))
 	hasher.Write([]byte(fmt.Sprintf("%v", decision.IssuedHeight)))
-	hasher.Write([]byte(prototypes.TimestampString(decision.CreationTime)))
+	hasher.Write([]byte(prototypes.TimestampString(decision.CreationTime.ProtoTs)))
 
 	for _, operation := range operations {
 		hasher.Write([]byte(operation.Object.Resource))

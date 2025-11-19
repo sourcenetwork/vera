@@ -11,23 +11,19 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {
+func (k *Keeper) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	eventManager := ctx.EventManager()
 
-	repository := k.GetAccessDecisionRepository(ctx)
+	repository := k.getAccessDecisionRepository(ctx)
 	paramsRepository := access_decision.StaticParamsRepository{}
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.getACPEngine(ctx)
 
 	record, err := engine.GetPolicy(goCtx, &coretypes.GetPolicyRequest{Id: msg.PolicyId})
 	if err != nil {
 		return nil, err
 	}
 	if record == nil {
-		return nil, errors.NewPolicyNotFound(msg.PolicyId)
+		return nil, errors.ErrPolicyNotFound(msg.PolicyId)
 	}
 
 	creatorAddr, err := sdk.AccAddressFromBech32(msg.Creator)
@@ -39,11 +35,16 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 		return nil, types.NewAccNotFoundErr(msg.Creator)
 	}
 
+	ts, err := types.TimestampFromCtx(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	cmd := access_decision.EvaluateAccessRequestsCommand{
-		Policy:        record.Policy,
+		Policy:        record.Record.Policy,
 		Operations:    msg.AccessRequest.Operations,
 		Actor:         msg.AccessRequest.Actor.Id,
-		CreationTime:  msg.CreationTime,
+		CreationTime:  ts,
 		Creator:       creatorAcc,
 		CurrentHeight: uint64(ctx.BlockHeight()),
 	}
@@ -52,7 +53,7 @@ func (k msgServer) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess)
 		return nil, err
 	}
 
-	err = eventManager.EmitTypedEvent(&coretypes.EventAccessDecisionCreated{
+	err = ctx.EventManager().EmitTypedEvent(&coretypes.EventAccessDecisionCreated{
 		Creator:    msg.Creator,
 		PolicyId:   msg.PolicyId,
 		DecisionId: decision.Id,

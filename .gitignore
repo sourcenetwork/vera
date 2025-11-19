@@ -9,3 +9,4 @@ release/
 build
 cover.out
 .env
+.testnets

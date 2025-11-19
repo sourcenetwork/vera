@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
+	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
 	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 )
 
 var DefaultTs = MustDateTimeToProto("2024-01-01 00:00:00")
@@ -20,22 +21,39 @@ var _ context.Context = (*TestCtx)(nil)
 type TestState struct {
 	PolicyId      string
 	PolicyCreator string
+	// Txs is a list of bytes which contains the Txs that have been broadcast during a test
+	Txs               [][]byte
+	TokenIssueTs      time.Time
+	TokenIssueProtoTs *prototypes.Timestamp
+}
+
+func (s *TestState) PushTx(tx []byte) {
+	s.Txs = append(s.Txs, tx)
+}
+
+func (s *TestState) GetLastTx() []byte {
+	if len(s.Txs) == 0 {
+		return nil
+	}
+	return s.Txs[len(s.Txs)-1]
 }
 
 func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
-	baseCtx, executor := NewExecutor(t, config.ExecutorStrategy)
+	params := types.Params{
+		PolicyCommandMaxExpirationDelta: 1,
+		RegistrationsCommitmentValidity: types.NewBlockCountDuration(7),
+	}
+	executor := NewACPClient(t, config.ExecutorStrategy, params)
 
 	root := MustNewSourceHubActorFromName("root")
 	ctx := &TestCtx{
-		Ctx:          baseCtx,
-		T:            t,
-		TxSigner:     root,
-		Timestamp:    time.Now(),
-		TokenIssueTs: time.Now(),
-		Executor:     executor,
-		Strategy:     config.AuthStrategy,
-		ActorType:    config.ActorType,
-		LogicalClock: &logicalClockImpl{},
+		Ctx:       context.TODO(),
+		T:         t,
+		TxSigner:  root,
+		Executor:  executor,
+		Strategy:  config.AuthStrategy,
+		ActorType: config.ActorType,
+		Params:    params,
 	}
 
 	_, err := executor.GetOrCreateAccountFromActor(ctx, root)
@@ -49,16 +67,12 @@ type TestCtx struct {
 	T     *testing.T
 	State TestState
 	// Signer for Txs while running tests under Bearer or Signed Auth modes
-	TxSigner *TestActor
-	// Timestamp used to generate Msgs in Test
-	Timestamp     time.Time
-	TokenIssueTs  time.Time
-	Executor      MsgExecutor
+	TxSigner      *TestActor
+	Executor      ACPClient
 	Strategy      AuthenticationStrategy
 	AccountKeeper *testutil.AccountKeeperStub
 	ActorType     ActorKeyType
-	LogicalClock  signed_policy_cmd.LogicalClock
-	TxHash        string
+	Params        types.Params
 }
 
 func NewTestCtx(t *testing.T) *TestCtx {
@@ -94,10 +108,51 @@ func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
 	return acc
 }
 
+// GetRecordMetadataForActor, fetches actor from the actor registry
+// and builds a RecordMetadata object for the recovered DID
+func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata {
+	return &types.RecordMetadata{
+		CreationTs: c.GetBlockTs(),
+		TxHash:     utils.HashTx(c.State.GetLastTx()),
+		TxSigner:   c.TxSigner.SourceHubAddr,
+		OwnerDid:   c.GetActor(actor).DID,
+	}
+}
+
+// GetSignerRecordMetadata builds RecordMetadata for the current
+// Tx Signer
+func (c *TestCtx) GetSignerRecordMetadata() *types.RecordMetadata {
+	return &types.RecordMetadata{
+		CreationTs: c.GetBlockTs(),
+		TxHash:     utils.HashTx(c.State.GetLastTx()),
+		TxSigner:   c.TxSigner.SourceHubAddr,
+		OwnerDid:   c.TxSigner.DID,
+	}
+}
+
 func (c *TestCtx) GetParams() types.Params {
-	return types.NewParams()
+	return c.Params
 }
 
 func (c *TestCtx) Cleanup() {
 	c.Executor.Cleanup()
+}
+
+// WaitBlock waits until the underlying SourceHub node advances to the next block
+func (c *TestCtx) WaitBlock() {
+	c.Executor.WaitBlock()
+}
+
+// WaitBlock waits until the underlying SourceHub node advances to the next block
+func (c *TestCtx) WaitBlocks(n uint64) {
+	for i := uint64(0); i < n; i += 1 {
+		c.Executor.WaitBlock()
+	}
+}
+
+// GetBlockTs returns the timestamp of the last processed block
+func (c *TestCtx) GetBlockTs() *types.Timestamp {
+	ts, err := c.Executor.GetLastBlockTs(c)
+	require.NoError(c.T, err)
+	return ts
 }

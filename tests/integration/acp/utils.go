@@ -27,32 +27,36 @@ func MustDateTimeToProto(timestamp string) *gogotypes.Timestamp {
 	return ts
 }
 
-func TimeToProto(ts time.Time) *gogotypes.Timestamp {
-	return &gogotypes.Timestamp{
-		Seconds: ts.Unix(),
-		Nanos:   0,
+// AssertError asserts that got and want match
+// if want is not nil.
+// If ant is nil, it asserts that got has no error
+func AssertError(ctx *TestCtx, got, want error) bool {
+	if want != nil {
+		require.NotNil(ctx.T, got, "expected an error but got none")
+		if errors.Is(got, want) {
+			return assert.ErrorIs(ctx.T, got, want)
+		} else {
+			// Errors returned from SDK operations (RPC communication to a SourceHub node)
+			// no longer have the original errors wrapped, therefore we compare a string as fallback strat.
+			gotErrStr := got.Error()
+			wantErrStr := want.Error()
+			return assert.Contains(ctx.T, gotErrStr, wantErrStr)
+		}
+	} else {
+		return assert.NoError(ctx.T, got)
+	}
+}
+
+// AssertValue asserts got matches want, if want is not nil
+func AssertValue(ctx *TestCtx, got, want any) {
+	if !isNil(want) {
+		assert.Equal(ctx.T, want, got)
 	}
 }
 
 func AssertResults(ctx *TestCtx, got, want any, gotErr, wantErr error) {
-	if wantErr != nil {
-		require.NotNil(ctx.T, gotErr, "expected an error but got none")
-		if errors.Is(gotErr, wantErr) {
-			assert.ErrorIs(ctx.T, gotErr, wantErr)
-		} else {
-			// Errors returned from SDK operations (RPC communication to a SourceHub node)
-			// no longer have the original errors wrapped, therefore we compare a string as fallback strat.
-
-			gotErrStr := gotErr.Error()
-			wantErrStr := wantErr.Error()
-			assert.Contains(ctx.T, gotErrStr, wantErrStr)
-		}
-	} else {
-		assert.NoError(ctx.T, gotErr)
-	}
-	if !isNil(want) {
-		assert.Equal(ctx.T, want, got)
-	}
+	AssertError(ctx, gotErr, wantErr)
+	AssertValue(ctx, got, want)
 }
 
 func isNil(object interface{}) bool {

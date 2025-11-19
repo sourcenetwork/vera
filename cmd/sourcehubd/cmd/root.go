@@ -24,12 +24,14 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
+	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/sourcenetwork/sourcehub/app"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 )
 
 // NewRootCmd creates a new root command for sourcehubd. It is called once in the main function.
 func NewRootCmd() *cobra.Command {
-	initSDKConfig()
+	app.SetConfig(true)
 
 	var (
 		txConfigOpts       tx.ConfigOptions
@@ -111,6 +113,10 @@ func NewRootCmd() *cobra.Command {
 	for name, module := range ibcModules {
 		autoCliOpts.Modules[name] = module
 	}
+
+	// Manually set auto cli options for the mint module since we removed it from depinject
+	autoCliOpts.Modules[minttypes.ModuleName] = app.RegisterMintInterfaces(clientCtx.InterfaceRegistry)
+
 	initRootCmd(rootCmd, clientCtx.TxConfig, clientCtx.InterfaceRegistry, clientCtx.Codec, moduleBasicManager)
 
 	overwriteFlagDefaults(rootCmd, map[string]string{
@@ -147,6 +153,9 @@ func ProvideClientContext(
 	txConfig client.TxConfig,
 	legacyAmino *codec.LegacyAmino,
 ) client.Context {
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(interfaceRegistry)
+
 	clientCtx := client.Context{}.
 		WithCodec(appCodec).
 		WithInterfaceRegistry(interfaceRegistry).

@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package sourcehub.faucet;
+
+import "amino/amino.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/app/faucet/types";
+
+// FaucetRequestRecord represents a faucet request record stored internally.
+message FaucetRequestRecord {
+  string address = 1;
+  cosmos.base.v1beta1.Coin amount = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  string tx_hash = 3;
+}
+
+// FaucetRequest represents a request to get funds from the faucet.
+message FaucetRequest {
+  string address = 1;
+}
+
+// FaucetResponse represents the response from a faucet request.
+message FaucetResponse {
+  string txhash = 1;
+  uint32 code = 2;
+  string raw_log = 3;
+  string address = 4;
+  cosmos.base.v1beta1.Coin amount = 5 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// InitAccountRequest represents a request to initialize an account.
+message InitAccountRequest {
+  string address = 1;
+}
+
+// InitAccountResponse represents the response from an account initialization request.
+message InitAccountResponse {
+  string message = 1;
+  string txhash = 2;
+  uint32 code = 3;
+  string raw_log = 4;
+  string address = 5;
+  cosmos.base.v1beta1.Coin amount = 6 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  bool exists = 7;
+}
+
+// FaucetInfoResponse represents the faucet information response.
+message FaucetInfoResponse {
+  string address = 1;
+  cosmos.base.v1beta1.Coin balance = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  int32 request_count = 3;
+}
+
+// GrantAllowanceRequest represents a request to grant fee allowance from the faucet.
+message GrantAllowanceRequest {
+  string address = 1;
+  // Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
+  cosmos.base.v1beta1.Coin amount_limit = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  // Optional expiration time. If not provided, defaults to 30 days from now
+  google.protobuf.Timestamp expiration = 3 [(gogoproto.stdtime) = true];
+}
+
+// GrantAllowanceResponse represents the response from a grant allowance request.
+message GrantAllowanceResponse {
+  string message = 1;
+  string txhash = 2;
+  uint32 code = 3;
+  string raw_log = 4;
+  string granter = 5;
+  string grantee = 6;
+  cosmos.base.v1beta1.Coin amount_limit = 7 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  google.protobuf.Timestamp expiration = 8 [(gogoproto.stdtime) = true];
+} 
+
+// GrantDIDAllowanceRequest represents a request to grant fee allowance to a DID from the faucet.
+message GrantDIDAllowanceRequest {
+  string did = 1;
+  // Optional amount limit for the allowance (in uopen). If not provided, defaults to 10000000000 (10,000 OPEN)
+  cosmos.base.v1beta1.Coin amount_limit = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  // Optional expiration time. If not provided, defaults to 30 days from now
+  google.protobuf.Timestamp expiration = 3 [(gogoproto.stdtime) = true];
+}
+
+// GrantDIDAllowanceResponse represents the response from a DID grant allowance request.
+message GrantDIDAllowanceResponse {
+  string message = 1;
+  string txhash = 2;
+  uint32 code = 3;
+  string raw_log = 4;
+  string granter = 5;
+  string grantee_did = 6;
+  cosmos.base.v1beta1.Coin amount_limit = 7 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  google.protobuf.Timestamp expiration = 8 [(gogoproto.stdtime) = true];
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package sourcehub.hub;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
+
+// ICAConnection represents an interchain account connection between a controller and host chain.
+message ICAConnection {
+  // ica_address is the interchain account address generated on the host chain.
+  string ica_address = 1;
+  // controller_address is the address of the controlling account on the controller chain.
+  string controller_address = 2;
+  // controller_chain_id is the chain ID of the controller chain.
+  string controller_chain_id = 3;
+  // connection_id is the IBC connection ID used for this interchain account.
+  string connection_id = 4;
+}

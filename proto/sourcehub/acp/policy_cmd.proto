@@ -3,51 +3,24 @@ syntax = "proto3";
 package sourcehub.acp;
 
 import "google/protobuf/timestamp.proto";
+import "sourcehub/acp/commitment.proto";
+import "sourcehub/acp/record.proto";
+import "sourcehub/acp/registration.proto";
 import "sourcenetwork/acp_core/relationship.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/acp/types";
 
-// SignedPolicyCmd represents a Command issued by an Actor in the context of a Policy
-// The command represents an instruction to be executed
-// The message type contains a signature which is used to authenticate the Command's Actor
-message SignedPolicyCmd {
-  // payload contains the command context
-  SignedPolicyCmdPayload payload = 1;
-
-  // signature is a signature of the payload.
-  // The signature is generated using the VerificationMethod / Authorization fields
-  // specificied by the DID document of the Actor.
-  bytes signature = 2;
-}
-
-// SignedPolicyCmdPayload represents the payload containing the context of the issued command
-message SignedPolicyCmdPayload {
-  // actor is a did string representing the actor which issued the command
-  string actor = 1;
-
-  // issued_height is the SourceHub block height of when the Payload was created
-  uint64 issued_height = 2;
-
-  // expiration_delta specifies the maximum number of blocks from the issued height during which the Command Payload will be accepted.
-  // This field is mandatory and is used to prevent replay attacks
-  uint64 expiration_delta = 3;
-
-  // creation_time contains a client generated timestamp for the creation of the command.
-  // This is used only as metadata and isn't trusted
-  google.protobuf.Timestamp creation_time = 4;
-
-  // policy_id is the ID of the policy under which the Command will be executed
-  string policy_id = 5;
-
-  PolicyCmd cmd = 6;
-}
-
+// PolicyCmd models an operation to be performed against the context of a Policy
 message PolicyCmd {
   oneof cmd {
     SetRelationshipCmd set_relationship_cmd = 1;
     DeleteRelationshipCmd delete_relationship_cmd = 2;
     RegisterObjectCmd register_object_cmd = 3;
-    UnregisterObjectCmd unregister_object_cmd = 4;
+    ArchiveObjectCmd archive_object_cmd = 4;
+    CommitRegistrationsCmd commit_registrations_cmd = 5;
+    RevealRegistrationCmd reveal_registration_cmd = 6;
+    FlagHijackAttemptCmd flag_hijack_attempt_cmd = 7;
+    UnarchiveObjectCmd unarchive_object_cmd = 8;
   }
 }
 
@@ -76,20 +49,55 @@ message RegisterObjectCmd {
   sourcenetwork.acp_core.Object object = 1;
 }
 
+// CommitRegistrationsCmd creates a new batched commitment to a set of Object registrations
+message CommitRegistrationsCmd {
+  bytes commitment = 1;
+}
 
-// UnregisterObject let's an Object's Owner effectively "unshare" their Object.
+message CommitRegistrationsCmdResult {
+  RegistrationsCommitment registrations_commitment = 1;
+}
+
+message RevealRegistrationCmd {
+  uint64 registrations_commitment_id = 1;
+  RegistrationProof proof = 2;
+}
+
+message RevealRegistrationCmdResult {
+  RelationshipRecord record = 1;
+  AmendmentEvent event = 2;
+}
+
+message FlagHijackAttemptCmd {
+  uint64 event_id = 1;
+}
+
+message FlagHijackAttemptCmdResult {
+  AmendmentEvent event = 1;
+}
+
+message UnarchiveObjectCmd {
+  sourcenetwork.acp_core.Object object = 1;
+}
+
+message UnarchiveObjectCmdResult {
+  RelationshipRecord record = 1;
+  bool relationship_modified = 2;
+}
+
+// ArchiveObject let's an Object's Owner effectively "unshare" their Object.
 // This method wipes all Relationships referencing the given Object.
 //
 // A caveat is that after removing the Relationships, a record of the original Object owner
 // is maintained to prevent an "ownership hijack" attack.
-// 
+//
 // Suppose Bob owns object Foo, which is shared with Bob but not Eve.
-// Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Unregister Foo,
+// Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Archive Foo,
 // then submitting a RegisterObject Msg, effectively becoming Foo's new owner.
 // If Charlie has a copy of the object, Eve could convince Charlie to share his copy, granting Eve access to Foo.
 // The previous scenario where an unauthorized user is able to claim ownership to data previously unaccessible to them
 // is an "ownership hijack".
-message UnregisterObjectCmd {
+message ArchiveObjectCmd {
   sourcenetwork.acp_core.Object object = 1;
 }
 
@@ -97,7 +105,7 @@ message UnregisterObjectCmd {
 message SetRelationshipCmdResult {
   // Indicates whether the given Relationship previously existed, ie the Tx was a no op
   bool record_existed = 1;
-  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  RelationshipRecord record = 2;
 }
 
 // DeleteRelationshipCmdResult removes a Relationship in a Policy
@@ -107,12 +115,11 @@ message DeleteRelationshipCmdResult {
 
 // RegisterObjectCmdResult registers an Object in a Policy
 message RegisterObjectCmdResult {
-  sourcenetwork.acp_core.RegistrationResult result = 1;
-  sourcenetwork.acp_core.RelationshipRecord record = 2;
+  RelationshipRecord record = 1;
 }
 
-// UnregisterObjectCmdResult unregisters an Object in a Policy
-message UnregisterObjectCmdResult {
+// ArchiveObjectCmdResult unregisters an Object in a Policy
+message ArchiveObjectCmdResult {
   bool found = 1;
   uint64 relationships_removed = 2;
 }
@@ -122,6 +129,10 @@ message PolicyCmdResult {
     SetRelationshipCmdResult set_relationship_result = 1;
     DeleteRelationshipCmdResult delete_relationship_result = 2;
     RegisterObjectCmdResult register_object_result = 3;
-    UnregisterObjectCmdResult unregister_object_result = 4;
+    ArchiveObjectCmdResult archive_object_result = 4;
+    CommitRegistrationsCmdResult commit_registrations_result = 5;
+    RevealRegistrationCmdResult reveal_registration_result = 6;
+    FlagHijackAttemptCmdResult flag_hijack_attempt_result = 7;
+    UnarchiveObjectCmdResult unarchive_object_result = 8;
   }
 }

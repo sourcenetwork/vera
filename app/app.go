@@ -5,15 +5,15 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
-	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-	abci "github.com/cometbft/cometbft/abci/types"
+	abcitypes "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -24,6 +24,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	testdata_pulsar "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -33,18 +34,17 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	consensuskeeper "github.com/cosmos/cosmos-sdk/x/consensus/keeper"
 	crisiskeeper "github.com/cosmos/cosmos-sdk/x/crisis/keeper"
+	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
@@ -52,20 +52,29 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	_ "github.com/cosmos/ibc-go/modules/capability" // import for side-effects
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	icacontrollerkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/keeper"
-	icahostkeeper "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/keeper"
-	ibcfeekeeper "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/keeper"
-	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
-	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
+	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
+	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
+	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
+	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
+	abci "github.com/skip-mev/block-sdk/v2/abci"
+	"github.com/skip-mev/block-sdk/v2/block"
+	"github.com/skip-mev/block-sdk/v2/block/base"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/sourcehub/app/ante"
+	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
+	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
 	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
-	acpmodulekeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	bulletinmodulekeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	bulletinkeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
+	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
+	hubkeeper "github.com/sourcenetwork/sourcehub/x/hub/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
-
-	// this line is used by starport scaffolding # stargate/app/moduleImport
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
 	"github.com/sourcenetwork/sourcehub/docs"
 )
@@ -95,6 +104,8 @@ type App struct {
 	txConfig          client.TxConfig
 	interfaceRegistry codectypes.InterfaceRegistry
 
+	appOpts servertypes.AppOptions
+
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
 	BankKeeper            bankkeeper.Keeper
@@ -112,26 +123,19 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensuskeeper.Keeper
 	CircuitBreakerKeeper  circuitkeeper.Keeper
+	CapabilityKeeper      *capabilitykeeper.Keeper
 
 	// IBC
-	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	CapabilityKeeper    *capabilitykeeper.Keeper
-	IBCFeeKeeper        ibcfeekeeper.Keeper
+	IBCKeeper           *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouterV2 on it correctly
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
-	// Scoped IBC
-	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
-	ScopedIBCTransferKeeper   capabilitykeeper.ScopedKeeper
-	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
-	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
-
-	AcpKeeper      acpmodulekeeper.Keeper
-	BulletinKeeper bulletinmodulekeeper.Keeper
+	HubKeeper      *hubkeeper.Keeper
+	AcpKeeper      *acpkeeper.Keeper
+	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
-	TierKeeper     tierkeeper.Keeper
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
+	TierKeeper     *tierkeeper.Keeper
 
 	// simulation manager
 	sm *module.SimulationManager
@@ -146,31 +150,20 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 }
 
-// getGovProposalHandlers return the chain proposal handlers.
-func getGovProposalHandlers() []govclient.ProposalHandler {
-	var govProposalHandlers []govclient.ProposalHandler
-	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
-
-	govProposalHandlers = append(govProposalHandlers,
-		paramsclient.ProposalHandler,
-		// this line is used by starport scaffolding # stargate/app/govProposalHandler
-	)
-
-	return govProposalHandlers
-}
-
 // AppConfig returns the default app config.
 func AppConfig() depinject.Config {
 	return depinject.Configs(
 		appConfig,
-		// Loads the ao config from a YAML file.
-		// appconfig.LoadYAML(AppConfigYAML),
 		depinject.Supply(
-			// supply custom module basics
+			// Supply custom module basics
 			map[string]module.AppModuleBasic{
 				genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
-				govtypes.ModuleName:     gov.NewAppModuleBasic(getGovProposalHandlers()),
-				// this line is used by starport scaffolding # stargate/appConfig/moduleBasic
+				banktypes.ModuleName:    overrides.BankModuleBasic{},
+				crisistypes.ModuleName:  overrides.CrisisModuleBasic{},
+				govtypes.ModuleName:     overrides.NewGovModuleBasic(),
+				stakingtypes.ModuleName: overrides.StakingModuleBasic{},
+				epochstypes.ModuleName:  overrides.EpochsModuleBasic{},
+				tiertypes.ModuleName:    overrides.TierModuleBasic{},
 			},
 		),
 	)
@@ -186,7 +179,7 @@ func New(
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) (*App, error) {
 	var (
-		app        = &App{}
+		app        = &App{appOpts: appOpts}
 		appBuilder *runtime.AppBuilder
 
 		// merge the AppConfig and other configuration in one config
@@ -256,7 +249,6 @@ func New(
 		&app.BankKeeper,
 		&app.StakingKeeper,
 		&app.SlashingKeeper,
-		&app.MintKeeper,
 		&app.DistrKeeper,
 		&app.GovKeeper,
 		&app.CrisisKeeper,
@@ -268,11 +260,11 @@ func New(
 		&app.GroupKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
+		&app.HubKeeper,
 		&app.AcpKeeper,
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,
 		&app.TierKeeper,
-		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
 		panic(err)
 	}
@@ -311,13 +303,94 @@ func New(
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
+	// Register ante interfaces for extension options
+	antetypes.RegisterInterfaces(app.interfaceRegistry)
+
 	// Register legacy modules
 	app.registerIBCModules()
 
-	// register streaming services
+	customMintModule := app.registerCustomMintModule()
+
+	// Initialize capability keeper in acp module which is initialized by IBC modules
+	acpKeeper := app.GetCapabilityScopedKeeper(acptypes.ModuleName)
+	app.AcpKeeper.InitializeCapabilityKeeper(&acpKeeper)
+
+	// Initialize capability keeper for the bulletin module
+	bulletinKeeper := app.GetCapabilityScopedKeeper(bulletintypes.ModuleName)
+	app.BulletinKeeper.InitializeCapabilityKeeper(&bulletinKeeper)
+
+	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {
 		return nil, err
 	}
+
+	// Create priority lane
+	priorityLane := CreatePriorityLane(app)
+
+	// Create the laned mempool with priority and default lanes
+	mempool, err := block.NewLanedMempool(
+		app.Logger(),
+		[]block.Lane{priorityLane},
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	app.App.SetMempool(mempool)
+
+	// AnteHandler performs stateful checks on transactions before internal messages are processed.
+	anteHandler := ante.NewAnteHandler(
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.FeeGrantKeeper,
+		app.IBCKeeper,
+		app.HubKeeper,
+		app.txConfig.SignModeHandler(),
+		ante.DefaultSigVerificationGasConsumer,
+		app.txConfig.TxEncoder(),
+	)
+
+	app.SetAnteHandler(anteHandler)
+
+	// Set the ante handler on the lanes
+	opt := []base.LaneOption{
+		base.WithAnteHandler(anteHandler),
+	}
+	priorityLane.WithOptions(
+		opt...,
+	)
+
+	// Create the default proposal handler with the laned mempool
+	proposalHandler := abci.NewDefaultProposalHandler(
+		app.Logger(),
+		app.txConfig.TxDecoder(),
+		app.txConfig.TxEncoder(),
+		mempool,
+	)
+
+	prepareProposalHandler := proposalHandler.PrepareProposalHandler()
+	prepareProposal := func(ctx sdk.Context, req *abcitypes.RequestPrepareProposal) (*abcitypes.ResponsePrepareProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), metrics.App, metrics.PrepareProposal, metrics.SecondsUnit)
+		telemetry.IncrCounterWithLabels(
+			[]string{metrics.App, metrics.PrepareProposal, metrics.Tx, metrics.Count},
+			float32(len(req.Txs)),
+			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.PrepareProposal)},
+		)
+		return prepareProposalHandler(ctx, req)
+	}
+	app.App.SetPrepareProposal(prepareProposal)
+
+	processProposalHandler := proposalHandler.ProcessProposalHandler()
+	processProposal := func(ctx sdk.Context, req *abcitypes.RequestProcessProposal) (*abcitypes.ResponseProcessProposal, error) {
+		defer telemetry.MeasureSince(time.Now(), metrics.App, metrics.ProcessProposal, metrics.SecondsUnit)
+		telemetry.IncrCounterWithLabels(
+			[]string{metrics.App, metrics.ProcessProposal, metrics.Tx, metrics.Count},
+			float32(len(req.Txs)),
+			[]metrics.Label{telemetry.NewLabel(metrics.Method, metrics.ProcessProposal)},
+		)
+		return processProposalHandler(ctx, req)
+	}
+	app.App.SetProcessProposal(processProposal)
 
 	/****  Module Options ****/
 
@@ -343,41 +416,17 @@ func New(
 	// However, when registering a module manually (i.e. that does not support app wiring), the module version map
 	// must be set manually as follow. The upgrade module will de-duplicate the module version map.
 	//
-	initChainer := func(ctx sdk.Context, req *abci.RequestInitChain) (*abci.ResponseInitChain, error) {
-
-		// TODO: Is there a cleaner way to update the denom without having to unmarshal and marshal the genesis state?
-		// At the time of validator being created, the denom is still the old one if we just set the params here:
-		//
-		//   stakingParams := app.StakingKeeper.GetParams(ctx)
-		//   stakingParams.BondDenom = BondDenom
-		//   app.StakingKeeper.SetParams(ctx, stakingParams)
-		//
-		// The above approach doesn't work because the params need to be set before InitGenesis runs.
-		// Hence, we need to update the genesis state directly.
-
-		var genesisState GenesisState
-		err := json.Unmarshal(req.AppStateBytes, &genesisState)
-		if err != nil {
-			return nil, err
-		}
-
-		// Update the bond denomination in the staking module genesis state.
-		stakingGenesis := stakingtypes.GetGenesisStateFromAppState(app.appCodec, genesisState)
-		stakingGenesis.Params.BondDenom = appparams.DefaultBondDenom
-
-		// Marshal the updated staking genesis state back into the app state
-		genesisState[stakingtypes.ModuleName] = app.appCodec.MustMarshalJSON(stakingGenesis)
-
-		appparams.RegisterDenoms(ctx, app.BankKeeper)
-
-		req.AppStateBytes, err = json.Marshal(genesisState)
-		if err != nil {
-			return nil, err
+	initChainer := func(ctx sdk.Context, req *abcitypes.RequestInitChain) (*abcitypes.ResponseInitChain, error) {
+		if req.InitialHeight == 1 {
+			// Temp workaround to set default IBC params until app wiring is fully supported.
+			app.setDefaultIBCParams(ctx)
+			// Call InitGenesis() to set default state for the custom mint module
+			customMintModule.InitGenesis(ctx, app.appCodec, json.RawMessage{})
 		}
 
 		return app.App.InitChainer(ctx, req)
-
 	}
+
 	app.SetInitChainer(initChainer)
 
 	if err := app.Load(loadLatest); err != nil {
@@ -403,6 +452,10 @@ func (app *App) AppCodec() codec.Codec {
 	return app.appCodec
 }
 
+func (app *App) TxConfig() client.TxConfig {
+	return app.txConfig
+}
+
 // GetKey returns the KVStoreKey for the provided store key.
 func (app *App) GetKey(storeKey string) *storetypes.KVStoreKey {
 	kvStoreKey, ok := app.UnsafeFindStoreKey(storeKey).(*storetypes.KVStoreKey)
@@ -418,7 +471,6 @@ func (app *App) GetMemKey(storeKey string) *storetypes.MemoryStoreKey {
 	if !ok {
 		return nil
 	}
-
 	return key
 }
 
@@ -430,7 +482,6 @@ func (app *App) kvStoreKeys() map[string]*storetypes.KVStoreKey {
 			keys[kv.Name()] = kv
 		}
 	}
-
 	return keys
 }
 
@@ -454,8 +505,11 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 		panic(err)
 	}
 
-	// register app's OpenAPI routes.
+	// register app's OpenAPI routes
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+
+	// register faucet routes
+	app.RegisterFaucetRoutes(apiSvr, apiConfig, app.appOpts)
 }
 
 // GetIBCKeeper returns the IBC keeper.

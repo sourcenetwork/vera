@@ -19,9 +19,8 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	// this line is used by starport scaffolding # 1
-
 	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/acp/client/cli"
 	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -97,14 +96,14 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
+	keeper        *keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
@@ -128,8 +127,13 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+	// Inject instrumentation into msg service handler
+	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
+	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
+
+	// Inject instrumentation into query service handler
+	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
+	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
@@ -163,7 +167,12 @@ func (am AppModule) BeginBlock(_ context.Context) error {
 
 // EndBlock contains the logic that is automatically triggered at the end of each block.
 // The end block implementation is optional.
-func (am AppModule) EndBlock(_ context.Context) error {
+func (am AppModule) EndBlock(ctx context.Context) error {
+	_, err := am.keeper.EndBlocker(ctx)
+	if err != nil {
+		am.keeper.Logger().Error("EndBlocker failed", "error", err)
+	}
+
 	return nil
 }
 
@@ -194,12 +203,13 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
+	IcaKeeper     types.ICAKeeper
 }
 
 type ModuleOutputs struct {
 	depinject.Out
 
-	AcpKeeper keeper.Keeper
+	AcpKeeper *keeper.Keeper
 	Module    appmodule.AppModule
 }
 
@@ -215,13 +225,17 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
+		// set cap keeper as nil it is initialized
+		// after depinject is finished executing
+		nil,
+		in.IcaKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,
-		k,
+		&k,
 		in.AccountKeeper,
 		in.BankKeeper,
 	)
 
-	return ModuleOutputs{AcpKeeper: k, Module: m}
+	return ModuleOutputs{AcpKeeper: &k, Module: m}
 }

@@ -9,12 +9,12 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) ValidatePolicy(goCtx context.Context, req *types.QueryValidatePolicyRequest) (*types.QueryValidatePolicyResponse, error) {
+func (k *Keeper) ValidatePolicy(
+	goCtx context.Context,
+	req *types.QueryValidatePolicyRequest,
+) (*types.QueryValidatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.getACPEngine(ctx)
 
 	resp, err := engine.ValidatePolicy(ctx, &coretypes.ValidatePolicyRequest{
 		Policy:      req.Policy,
@@ -27,5 +27,6 @@ func (k Keeper) ValidatePolicy(goCtx context.Context, req *types.QueryValidatePo
 	return &types.QueryValidatePolicyResponse{
 		Valid:    resp.Valid,
 		ErrorMsg: resp.ErrorMsg,
+		Policy:   resp.Policy,
 	}, nil
 }

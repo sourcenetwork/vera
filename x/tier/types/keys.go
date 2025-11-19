@@ -2,6 +2,7 @@ package types
 
 import (
 	"bytes"
+	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -9,6 +10,12 @@ import (
 const (
 	// ModuleName defines the module name
 	ModuleName = "tier"
+
+	// DeveloperPoolName defines the developer pool module account
+	DeveloperPoolName = "developer_pool"
+
+	// InsurancePoolName defines the developer insurance pool module account
+	InsurancePoolName = "insurance_pool"
 
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
@@ -22,15 +29,29 @@ const (
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_tier"
 
-	// LockupKeyPrefix is the prefix to retrieve all Lockup
-	LockupKeyPrefix = "Lockup/"
+	// LockupKeyPrefix is the prefix to retrieve all Lockups
+	LockupKeyPrefix = "lockup/"
 
-	// UnlockingLockupKeyPrefix is the prefix to retrieve all UnlockingLockup
-	UnlockingLockupKeyPrefix = "UnlockingLockup/"
+	// UnlockingLockupKeyPrefix is the prefix to retrieve all UnlockingLockups
+	UnlockingLockupKeyPrefix = "unlockingLockup/"
+
+	// InsuranceLockupKeyPrefix is the prefix to retrieve all insurance Lockups
+	InsuranceLockupKeyPrefix = "insuranceLockup/"
+
+	// UserSubscriptionKeyPrefix is the prefix to store user subscriptions
+	UserSubscriptionKeyPrefix = "userSub/"
+
+	// TotalDevGrantedKeyPrefix is the prefix to store developer total granted amounts
+	TotalDevGrantedKeyPrefix = "totalDevGranted/"
+
+	// DeveloperKeyPrefix is the prefix to store developer configurations
+	DeveloperKeyPrefix = "developer/"
 )
 
 var (
-	ParamsKey = []byte("p_tier")
+	ParamsKey       = []byte("p_tier")
+	TotalLockupsKey = []byte("total_lockups")
+	TotalCreditsKey = []byte("total_credits")
 )
 
 func KeyPrefix(unlocking bool) []byte {
@@ -40,9 +61,8 @@ func KeyPrefix(unlocking bool) []byte {
 	return []byte(LockupKeyPrefix)
 }
 
-// LockupKey returns the store key to retrieve a Lockup from the index fields
+// LockupKey builds and returns a key to store/retrieve the Lockup.
 func LockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress) []byte {
-
 	// Calculate the size of the buffer in advance
 	size := len(delAddr.Bytes()) + 1 + len(valAddr.Bytes()) + 1
 	buf := make([]byte, 0, size)
@@ -56,12 +76,30 @@ func LockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress) []byte {
 	return buf
 }
 
-func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
+// UnlockingLockupKey builds and returns the key to store/retrieve the UnlockingLockup.
+func UnlockingLockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64) []byte {
+	// Calculate the size of the buffer in advance, allocating 20 more bytes for creationHeight.
+	creationHeightLength := 20
+	size := len(delAddr.Bytes()) + 1 + len(valAddr.Bytes()) + 1 + creationHeightLength + 1
+	buf := make([]byte, 0, size)
 
+	// Append bytes to the buffer
+	buf = append(buf, delAddr.Bytes()...)
+	buf = append(buf, '/')
+	buf = append(buf, valAddr.Bytes()...)
+	buf = append(buf, '/')
+	buf = strconv.AppendInt(buf, creationHeight, 10)
+	buf = append(buf, '/')
+
+	return buf
+}
+
+// LockupKeyToAddresses retrieves delAddr and valAddr from provided Lockup key.
+func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
 	// Find the positions of the delimiters
 	parts := bytes.Split(key, []byte{'/'})
 	if len(parts) != 3 {
-		panic("expected format in delAddr/valAddr/")
+		panic("invalid key format: expected format delAddr/valAddr/")
 	}
 
 	// Reconstruct the addresses
@@ -69,4 +107,93 @@ func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
 	valAddr := sdk.ValAddress(parts[1])
 
 	return delAddr, valAddr
+}
+
+// UnlockingLockupKeyToAddressesAtHeight retrieves delAddr, valAddr, and creationHeight from provided unlocking Lockup key.
+func UnlockingLockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValAddress, int64) {
+	// Find the positions of the delimiters
+	parts := bytes.Split(key, []byte{'/'})
+	if len(parts) != 4 {
+		panic("invalid key format: expected format delAddr/valAddr/creationHeight/")
+	}
+
+	// Reconstruct the addresses and creation height
+	delAddr := sdk.AccAddress(parts[0])
+	valAddr := sdk.ValAddress(parts[1])
+	creationHeight, err := strconv.ParseInt(string(parts[2]), 10, 64)
+	if err != nil {
+		panic("unexpected creation height")
+	}
+
+	return delAddr, valAddr, creationHeight
+}
+
+// UserSubscriptionKey builds and returns a key to store user subscription data.
+func UserSubscriptionKey(developerAddr sdk.AccAddress, userDid string) []byte {
+	// Calculate the size of the buffer in advance
+	size := len(developerAddr.Bytes()) + 1 + len([]byte(userDid)) + 1
+	buf := make([]byte, 0, size)
+
+	// Append bytes to the buffer
+	buf = append(buf, developerAddr.Bytes()...)
+	buf = append(buf, '/')
+	buf = append(buf, []byte(userDid)...)
+	buf = append(buf, '/')
+
+	return buf
+}
+
+// UserSubscriptionKeyToAddresses retrieves developerAddr and userDid from provided UserSubscriptionKey.
+func UserSubscriptionKeyToAddresses(key []byte) (sdk.AccAddress, string) {
+	// Find the positions of the delimiters
+	parts := bytes.Split(key, []byte{'/'})
+	if len(parts) != 3 {
+		panic("invalid key format: expected format developerAddr/userDid/")
+	}
+
+	// Reconstruct the developer address and user DID
+	developerAddr := sdk.AccAddress(parts[0])
+	userDid := string(parts[1])
+
+	return developerAddr, userDid
+}
+
+// DeveloperKey builds and returns a key to store developer configuration.
+func DeveloperKey(developerAddr sdk.AccAddress) []byte {
+	// Calculate the size of the buffer in advance
+	size := len(developerAddr.Bytes()) + 1
+	buf := make([]byte, 0, size)
+
+	// Append bytes to the buffer
+	buf = append(buf, developerAddr.Bytes()...)
+	buf = append(buf, '/')
+
+	return buf
+}
+
+// DeveloperKeyToAddress retrieves developerAddr from provided DeveloperKey.
+func DeveloperKeyToAddress(key []byte) sdk.AccAddress {
+	// Find the positions of the delimiters
+	parts := bytes.Split(key, []byte{'/'})
+	if len(parts) != 2 {
+		panic("invalid key format: expected format developerAddr/")
+	}
+
+	// Reconstruct the address
+	developerAddr := sdk.AccAddress(parts[0])
+
+	return developerAddr
+}
+
+// TotalDevGrantedKey builds and returns a key to store developer total granted amount.
+func TotalDevGrantedKey(developerAddr sdk.AccAddress) []byte {
+	// Calculate the size of the buffer in advance
+	size := len(developerAddr.Bytes()) + 1
+	buf := make([]byte, 0, size)
+
+	// Append bytes to the buffer
+	buf = append(buf, developerAddr.Bytes()...)
+	buf = append(buf, '/')
+
+	return buf
 }

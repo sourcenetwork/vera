@@ -6,7 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types/query"
+	query "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
@@ -160,7 +160,7 @@ func (m *QueryPolicyRequest) GetId() string {
 }
 
 type QueryPolicyResponse struct {
-	Policy *types.Policy `protobuf:"bytes,1,opt,name=policy,proto3" json:"policy,omitempty"`
+	Record *PolicyRecord `protobuf:"bytes,1,opt,name=record,proto3" json:"record,omitempty"`
 }
 
 func (m *QueryPolicyResponse) Reset()         { *m = QueryPolicyResponse{} }
@@ -196,14 +196,15 @@ func (m *QueryPolicyResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryPolicyResponse proto.InternalMessageInfo
 
-func (m *QueryPolicyResponse) GetPolicy() *types.Policy {
+func (m *QueryPolicyResponse) GetRecord() *PolicyRecord {
 	if m != nil {
-		return m.Policy
+		return m.Record
 	}
 	return nil
 }
 
 type QueryPolicyIdsRequest struct {
+	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryPolicyIdsRequest) Reset()         { *m = QueryPolicyIdsRequest{} }
@@ -239,9 +240,16 @@ func (m *QueryPolicyIdsRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryPolicyIdsRequest proto.InternalMessageInfo
 
+func (m *QueryPolicyIdsRequest) GetPagination() *query.PageRequest {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
 type QueryPolicyIdsResponse struct {
-	//cosmos.base.query.v1beta1.PageResponse pagination = 1;
-	Ids []string `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	Ids        []string            `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
+	Pagination *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
 func (m *QueryPolicyIdsResponse) Reset()         { *m = QueryPolicyIdsResponse{} }
@@ -280,6 +288,13 @@ var xxx_messageInfo_QueryPolicyIdsResponse proto.InternalMessageInfo
 func (m *QueryPolicyIdsResponse) GetIds() []string {
 	if m != nil {
 		return m.Ids
+	}
+	return nil
+}
+
+func (m *QueryPolicyIdsResponse) GetPagination() *query.PageResponse {
+	if m != nil {
+		return m.Pagination
 	}
 	return nil
 }
@@ -337,7 +352,7 @@ func (m *QueryFilterRelationshipsRequest) GetSelector() *types.RelationshipSelec
 }
 
 type QueryFilterRelationshipsResponse struct {
-	Records []*types.RelationshipRecord `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
+	Records []*RelationshipRecord `protobuf:"bytes,1,rep,name=records,proto3" json:"records,omitempty"`
 }
 
 func (m *QueryFilterRelationshipsResponse) Reset()         { *m = QueryFilterRelationshipsResponse{} }
@@ -373,7 +388,7 @@ func (m *QueryFilterRelationshipsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_QueryFilterRelationshipsResponse proto.InternalMessageInfo
 
-func (m *QueryFilterRelationshipsResponse) GetRecords() []*types.RelationshipRecord {
+func (m *QueryFilterRelationshipsResponse) GetRecords() []*RelationshipRecord {
 	if m != nil {
 		return m.Records
 	}
@@ -529,8 +544,9 @@ func (m *QueryValidatePolicyRequest) GetMarshalType() types.PolicyMarshalingType
 }
 
 type QueryValidatePolicyResponse struct {
-	Valid    bool   `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
-	ErrorMsg string `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+	Valid    bool          `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
+	ErrorMsg string        `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+	Policy   *types.Policy `protobuf:"bytes,3,opt,name=policy,proto3" json:"policy,omitempty"`
 }
 
 func (m *QueryValidatePolicyResponse) Reset()         { *m = QueryValidatePolicyResponse{} }
@@ -578,6 +594,13 @@ func (m *QueryValidatePolicyResponse) GetErrorMsg() string {
 		return m.ErrorMsg
 	}
 	return ""
+}
+
+func (m *QueryValidatePolicyResponse) GetPolicy() *types.Policy {
+	if m != nil {
+		return m.Policy
+	}
+	return nil
 }
 
 type QueryAccessDecisionRequest struct {
@@ -721,8 +744,8 @@ func (m *QueryObjectOwnerRequest) GetObject() *types.Object {
 }
 
 type QueryObjectOwnerResponse struct {
-	IsRegistered bool   `protobuf:"varint,1,opt,name=is_registered,json=isRegistered,proto3" json:"is_registered,omitempty"`
-	OwnerId      string `protobuf:"bytes,2,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
+	IsRegistered bool                `protobuf:"varint,1,opt,name=is_registered,json=isRegistered,proto3" json:"is_registered,omitempty"`
+	Record       *RelationshipRecord `protobuf:"bytes,2,opt,name=record,proto3" json:"record,omitempty"`
 }
 
 func (m *QueryObjectOwnerResponse) Reset()         { *m = QueryObjectOwnerResponse{} }
@@ -765,11 +788,411 @@ func (m *QueryObjectOwnerResponse) GetIsRegistered() bool {
 	return false
 }
 
-func (m *QueryObjectOwnerResponse) GetOwnerId() string {
+func (m *QueryObjectOwnerResponse) GetRecord() *RelationshipRecord {
 	if m != nil {
-		return m.OwnerId
+		return m.Record
+	}
+	return nil
+}
+
+type QueryRegistrationsCommitmentRequest struct {
+	Id uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (m *QueryRegistrationsCommitmentRequest) Reset()         { *m = QueryRegistrationsCommitmentRequest{} }
+func (m *QueryRegistrationsCommitmentRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryRegistrationsCommitmentRequest) ProtoMessage()    {}
+func (*QueryRegistrationsCommitmentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{16}
+}
+func (m *QueryRegistrationsCommitmentRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryRegistrationsCommitmentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryRegistrationsCommitmentRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryRegistrationsCommitmentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRegistrationsCommitmentRequest.Merge(m, src)
+}
+func (m *QueryRegistrationsCommitmentRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryRegistrationsCommitmentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRegistrationsCommitmentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRegistrationsCommitmentRequest proto.InternalMessageInfo
+
+func (m *QueryRegistrationsCommitmentRequest) GetId() uint64 {
+	if m != nil {
+		return m.Id
+	}
+	return 0
+}
+
+type QueryRegistrationsCommitmentResponse struct {
+	RegistrationsCommitment *RegistrationsCommitment `protobuf:"bytes,1,opt,name=registrations_commitment,json=registrationsCommitment,proto3" json:"registrations_commitment,omitempty"`
+}
+
+func (m *QueryRegistrationsCommitmentResponse) Reset()         { *m = QueryRegistrationsCommitmentResponse{} }
+func (m *QueryRegistrationsCommitmentResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryRegistrationsCommitmentResponse) ProtoMessage()    {}
+func (*QueryRegistrationsCommitmentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{17}
+}
+func (m *QueryRegistrationsCommitmentResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryRegistrationsCommitmentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryRegistrationsCommitmentResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryRegistrationsCommitmentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRegistrationsCommitmentResponse.Merge(m, src)
+}
+func (m *QueryRegistrationsCommitmentResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryRegistrationsCommitmentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRegistrationsCommitmentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRegistrationsCommitmentResponse proto.InternalMessageInfo
+
+func (m *QueryRegistrationsCommitmentResponse) GetRegistrationsCommitment() *RegistrationsCommitment {
+	if m != nil {
+		return m.RegistrationsCommitment
+	}
+	return nil
+}
+
+type QueryRegistrationsCommitmentByCommitmentRequest struct {
+	Commitment []byte `protobuf:"bytes,1,opt,name=commitment,proto3" json:"commitment,omitempty"`
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) Reset() {
+	*m = QueryRegistrationsCommitmentByCommitmentRequest{}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) String() string {
+	return proto.CompactTextString(m)
+}
+func (*QueryRegistrationsCommitmentByCommitmentRequest) ProtoMessage() {}
+func (*QueryRegistrationsCommitmentByCommitmentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{18}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentRequest.Merge(m, src)
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentRequest proto.InternalMessageInfo
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) GetCommitment() []byte {
+	if m != nil {
+		return m.Commitment
+	}
+	return nil
+}
+
+type QueryRegistrationsCommitmentByCommitmentResponse struct {
+	RegistrationsCommitments []*RegistrationsCommitment `protobuf:"bytes,1,rep,name=registrations_commitments,json=registrationsCommitments,proto3" json:"registrations_commitments,omitempty"`
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) Reset() {
+	*m = QueryRegistrationsCommitmentByCommitmentResponse{}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) String() string {
+	return proto.CompactTextString(m)
+}
+func (*QueryRegistrationsCommitmentByCommitmentResponse) ProtoMessage() {}
+func (*QueryRegistrationsCommitmentByCommitmentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{19}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentResponse.Merge(m, src)
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryRegistrationsCommitmentByCommitmentResponse proto.InternalMessageInfo
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) GetRegistrationsCommitments() []*RegistrationsCommitment {
+	if m != nil {
+		return m.RegistrationsCommitments
+	}
+	return nil
+}
+
+type QueryGenerateCommitmentRequest struct {
+	PolicyId string          `protobuf:"bytes,1,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Objects  []*types.Object `protobuf:"bytes,2,rep,name=objects,proto3" json:"objects,omitempty"`
+	Actor    *types.Actor    `protobuf:"bytes,3,opt,name=actor,proto3" json:"actor,omitempty"`
+}
+
+func (m *QueryGenerateCommitmentRequest) Reset()         { *m = QueryGenerateCommitmentRequest{} }
+func (m *QueryGenerateCommitmentRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGenerateCommitmentRequest) ProtoMessage()    {}
+func (*QueryGenerateCommitmentRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{20}
+}
+func (m *QueryGenerateCommitmentRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGenerateCommitmentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGenerateCommitmentRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGenerateCommitmentRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGenerateCommitmentRequest.Merge(m, src)
+}
+func (m *QueryGenerateCommitmentRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGenerateCommitmentRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGenerateCommitmentRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGenerateCommitmentRequest proto.InternalMessageInfo
+
+func (m *QueryGenerateCommitmentRequest) GetPolicyId() string {
+	if m != nil {
+		return m.PolicyId
 	}
 	return ""
+}
+
+func (m *QueryGenerateCommitmentRequest) GetObjects() []*types.Object {
+	if m != nil {
+		return m.Objects
+	}
+	return nil
+}
+
+func (m *QueryGenerateCommitmentRequest) GetActor() *types.Actor {
+	if m != nil {
+		return m.Actor
+	}
+	return nil
+}
+
+type QueryGenerateCommitmentResponse struct {
+	Commitment    []byte               `protobuf:"bytes,1,opt,name=commitment,proto3" json:"commitment,omitempty"`
+	HexCommitment string               `protobuf:"bytes,2,opt,name=hex_commitment,json=hexCommitment,proto3" json:"hex_commitment,omitempty"`
+	Proofs        []*RegistrationProof `protobuf:"bytes,3,rep,name=proofs,proto3" json:"proofs,omitempty"`
+	ProofsJson    []string             `protobuf:"bytes,4,rep,name=proofs_json,json=proofsJson,proto3" json:"proofs_json,omitempty"`
+}
+
+func (m *QueryGenerateCommitmentResponse) Reset()         { *m = QueryGenerateCommitmentResponse{} }
+func (m *QueryGenerateCommitmentResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGenerateCommitmentResponse) ProtoMessage()    {}
+func (*QueryGenerateCommitmentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{21}
+}
+func (m *QueryGenerateCommitmentResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryGenerateCommitmentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryGenerateCommitmentResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryGenerateCommitmentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGenerateCommitmentResponse.Merge(m, src)
+}
+func (m *QueryGenerateCommitmentResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryGenerateCommitmentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGenerateCommitmentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryGenerateCommitmentResponse proto.InternalMessageInfo
+
+func (m *QueryGenerateCommitmentResponse) GetCommitment() []byte {
+	if m != nil {
+		return m.Commitment
+	}
+	return nil
+}
+
+func (m *QueryGenerateCommitmentResponse) GetHexCommitment() string {
+	if m != nil {
+		return m.HexCommitment
+	}
+	return ""
+}
+
+func (m *QueryGenerateCommitmentResponse) GetProofs() []*RegistrationProof {
+	if m != nil {
+		return m.Proofs
+	}
+	return nil
+}
+
+func (m *QueryGenerateCommitmentResponse) GetProofsJson() []string {
+	if m != nil {
+		return m.ProofsJson
+	}
+	return nil
+}
+
+type QueryHijackAttemptsByPolicyRequest struct {
+	PolicyId string `protobuf:"bytes,1,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+}
+
+func (m *QueryHijackAttemptsByPolicyRequest) Reset()         { *m = QueryHijackAttemptsByPolicyRequest{} }
+func (m *QueryHijackAttemptsByPolicyRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryHijackAttemptsByPolicyRequest) ProtoMessage()    {}
+func (*QueryHijackAttemptsByPolicyRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{22}
+}
+func (m *QueryHijackAttemptsByPolicyRequest) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryHijackAttemptsByPolicyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryHijackAttemptsByPolicyRequest.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryHijackAttemptsByPolicyRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryHijackAttemptsByPolicyRequest.Merge(m, src)
+}
+func (m *QueryHijackAttemptsByPolicyRequest) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryHijackAttemptsByPolicyRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryHijackAttemptsByPolicyRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryHijackAttemptsByPolicyRequest proto.InternalMessageInfo
+
+func (m *QueryHijackAttemptsByPolicyRequest) GetPolicyId() string {
+	if m != nil {
+		return m.PolicyId
+	}
+	return ""
+}
+
+type QueryHijackAttemptsByPolicyResponse struct {
+	Events []*AmendmentEvent `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`
+}
+
+func (m *QueryHijackAttemptsByPolicyResponse) Reset()         { *m = QueryHijackAttemptsByPolicyResponse{} }
+func (m *QueryHijackAttemptsByPolicyResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryHijackAttemptsByPolicyResponse) ProtoMessage()    {}
+func (*QueryHijackAttemptsByPolicyResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0e48f8debbc27977, []int{23}
+}
+func (m *QueryHijackAttemptsByPolicyResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *QueryHijackAttemptsByPolicyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_QueryHijackAttemptsByPolicyResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *QueryHijackAttemptsByPolicyResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryHijackAttemptsByPolicyResponse.Merge(m, src)
+}
+func (m *QueryHijackAttemptsByPolicyResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *QueryHijackAttemptsByPolicyResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryHijackAttemptsByPolicyResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_QueryHijackAttemptsByPolicyResponse proto.InternalMessageInfo
+
+func (m *QueryHijackAttemptsByPolicyResponse) GetEvents() []*AmendmentEvent {
+	if m != nil {
+		return m.Events
+	}
+	return nil
 }
 
 func init() {
@@ -789,77 +1212,114 @@ func init() {
 	proto.RegisterType((*QueryAccessDecisionResponse)(nil), "sourcehub.acp.QueryAccessDecisionResponse")
 	proto.RegisterType((*QueryObjectOwnerRequest)(nil), "sourcehub.acp.QueryObjectOwnerRequest")
 	proto.RegisterType((*QueryObjectOwnerResponse)(nil), "sourcehub.acp.QueryObjectOwnerResponse")
+	proto.RegisterType((*QueryRegistrationsCommitmentRequest)(nil), "sourcehub.acp.QueryRegistrationsCommitmentRequest")
+	proto.RegisterType((*QueryRegistrationsCommitmentResponse)(nil), "sourcehub.acp.QueryRegistrationsCommitmentResponse")
+	proto.RegisterType((*QueryRegistrationsCommitmentByCommitmentRequest)(nil), "sourcehub.acp.QueryRegistrationsCommitmentByCommitmentRequest")
+	proto.RegisterType((*QueryRegistrationsCommitmentByCommitmentResponse)(nil), "sourcehub.acp.QueryRegistrationsCommitmentByCommitmentResponse")
+	proto.RegisterType((*QueryGenerateCommitmentRequest)(nil), "sourcehub.acp.QueryGenerateCommitmentRequest")
+	proto.RegisterType((*QueryGenerateCommitmentResponse)(nil), "sourcehub.acp.QueryGenerateCommitmentResponse")
+	proto.RegisterType((*QueryHijackAttemptsByPolicyRequest)(nil), "sourcehub.acp.QueryHijackAttemptsByPolicyRequest")
+	proto.RegisterType((*QueryHijackAttemptsByPolicyResponse)(nil), "sourcehub.acp.QueryHijackAttemptsByPolicyResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/acp/query.proto", fileDescriptor_0e48f8debbc27977) }
 
 var fileDescriptor_0e48f8debbc27977 = []byte{
-	// 1034 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x56, 0xcf, 0x6f, 0xdc, 0x44,
-	0x14, 0x8e, 0x13, 0x75, 0xbb, 0x3b, 0x69, 0x56, 0x30, 0x49, 0xdb, 0xd4, 0x85, 0x6d, 0x98, 0x34,
-	0x34, 0x59, 0x22, 0x9b, 0xa4, 0xa2, 0xb4, 0x87, 0xf2, 0xa3, 0x2a, 0x55, 0x2b, 0x11, 0xa5, 0xb8,
-	0x80, 0x50, 0x39, 0x58, 0x5e, 0x7b, 0xea, 0x1d, 0xd8, 0xf5, 0xb8, 0x33, 0x4e, 0x4a, 0x14, 0xf6,
-	0x00, 0x12, 0x12, 0x48, 0x1c, 0x90, 0xf8, 0x0f, 0x7a, 0x40, 0x1c, 0xb9, 0x23, 0x38, 0xf7, 0x58,
-	0x89, 0x0b, 0x27, 0x84, 0x12, 0x24, 0xfe, 0x8d, 0xca, 0x33, 0xcf, 0x9b, 0xf5, 0xc6, 0x76, 0xf6,
-	0x92, 0xd8, 0x33, 0xdf, 0x7b, 0xdf, 0xf7, 0xde, 0xbc, 0xf9, 0xbc, 0xe8, 0x82, 0xe4, 0x3b, 0xc2,
-	0xa7, 0xdd, 0x9d, 0x8e, 0xed, 0xf9, 0xb1, 0xfd, 0x78, 0x87, 0x8a, 0x3d, 0x2b, 0x16, 0x3c, 0xe1,
-	0x78, 0x6e, 0xb8, 0x65, 0x79, 0x7e, 0x6c, 0xbe, 0xec, 0xf5, 0x59, 0xc4, 0x6d, 0xf5, 0x57, 0x23,
-	0xcc, 0xb6, 0xcf, 0x65, 0x9f, 0x4b, 0xbb, 0xe3, 0x49, 0xaa, 0x43, 0xed, 0xdd, 0x8d, 0x0e, 0x4d,
-	0xbc, 0x0d, 0x3b, 0xf6, 0x42, 0x16, 0x79, 0x09, 0xe3, 0x11, 0x60, 0x17, 0x42, 0x1e, 0x72, 0xf5,
-	0x68, 0xa7, 0x4f, 0xb0, 0xfa, 0x4a, 0xc8, 0x79, 0xd8, 0xa3, 0xb6, 0x17, 0x33, 0xdb, 0x8b, 0x22,
-	0x9e, 0xa8, 0x10, 0x09, 0xbb, 0x66, 0x5e, 0x5c, 0xec, 0x09, 0xaf, 0x9f, 0xed, 0x2d, 0xe7, 0xf7,
-	0x3c, 0xdf, 0xa7, 0x52, 0xba, 0x01, 0xf5, 0x99, 0x3c, 0x22, 0x05, 0x50, 0x44, 0x93, 0x27, 0x5c,
-	0x7c, 0x99, 0x02, 0x5d, 0x9f, 0x0b, 0x6a, 0xc7, 0xbc, 0xc7, 0x7c, 0xa8, 0xd3, 0x5c, 0xab, 0x04,
-	0xb9, 0xb2, 0xcb, 0x45, 0x72, 0x02, 0x54, 0xd0, 0x9e, 0x16, 0xde, 0x65, 0x31, 0x40, 0x37, 0x27,
-	0x80, 0xba, 0x92, 0xf6, 0xa8, 0x9f, 0x70, 0x01, 0x31, 0xeb, 0x25, 0x31, 0x85, 0xc5, 0x91, 0x05,
-	0x84, 0x3f, 0x4a, 0x7b, 0x7e, 0x5f, 0xb5, 0xc5, 0xa1, 0x8f, 0x77, 0xa8, 0x4c, 0xc8, 0x36, 0x9a,
-	0xcf, 0xad, 0xca, 0x98, 0x47, 0x92, 0xe2, 0xeb, 0xa8, 0xa6, 0xdb, 0xb7, 0x68, 0x2c, 0x19, 0xab,
-	0xb3, 0x9b, 0x67, 0xad, 0xdc, 0xe9, 0x5a, 0x1a, 0x7e, 0xab, 0xf1, 0xec, 0x9f, 0x4b, 0x53, 0xbf,
-	0xfe, 0xff, 0x5b, 0xdb, 0x70, 0x00, 0x4f, 0x2e, 0x67, 0x34, 0xaa, 0x1d, 0x40, 0x83, 0x9b, 0x68,
-	0x9a, 0x05, 0x2a, 0x57, 0xc3, 0x99, 0x66, 0x01, 0xd9, 0xca, 0x68, 0x01, 0x05, 0xb4, 0xd7, 0x50,
-	0x4d, 0xb7, 0x11, 0x68, 0x5b, 0x56, 0xae, 0x44, 0x2b, 0x2b, 0xd1, 0x82, 0x38, 0x40, 0x93, 0xf3,
-	0xe8, 0xec, 0x48, 0xba, 0x7b, 0xc1, 0xb0, 0xbc, 0x36, 0x3a, 0x37, 0xbe, 0x01, 0x54, 0x2f, 0xa1,
-	0x19, 0x16, 0xa4, 0xe5, 0xcd, 0xac, 0x36, 0x9c, 0xf4, 0x91, 0x7c, 0x6f, 0xa0, 0x4b, 0x0a, 0x7c,
-	0x87, 0xf5, 0x12, 0x2a, 0x9c, 0x91, 0xce, 0x67, 0xf9, 0xf0, 0x45, 0xd4, 0x80, 0x73, 0x1e, 0x96,
-	0x53, 0x8f, 0x21, 0x37, 0xbe, 0x8b, 0xea, 0xd9, 0x09, 0x2d, 0x4e, 0x2b, 0xfd, 0xeb, 0x65, 0xfa,
-	0x47, 0x93, 0x3f, 0x80, 0x18, 0x67, 0x18, 0x4d, 0xba, 0x68, 0xa9, 0x5c, 0x09, 0x14, 0x70, 0x1b,
-	0x9d, 0x16, 0xd4, 0xe7, 0x02, 0x8a, 0x98, 0xdd, 0x6c, 0x4f, 0x42, 0xe6, 0xa8, 0x10, 0x27, 0x0b,
-	0x25, 0x3f, 0x66, 0x45, 0x7f, 0x4a, 0x05, 0x7b, 0xb4, 0xf7, 0xbe, 0x1a, 0x1d, 0xa8, 0x76, 0xa2,
-	0xa2, 0x3f, 0x44, 0x4d, 0x98, 0x37, 0xa1, 0xe1, 0x50, 0xfa, 0x4a, 0x99, 0x9a, 0x3c, 0xc5, 0x9c,
-	0x37, 0xfa, 0x4a, 0xae, 0x43, 0xe1, 0x85, 0x6a, 0xa0, 0xf0, 0x05, 0x74, 0x6a, 0xd7, 0xeb, 0x81,
-	0x94, 0xba, 0xa3, 0x5f, 0xc8, 0x77, 0x06, 0x32, 0x75, 0x68, 0xfa, 0xea, 0x25, 0x34, 0x3f, 0x80,
-	0xe7, 0x72, 0x93, 0xd5, 0xc8, 0x26, 0x07, 0x6f, 0xa3, 0x33, 0x7d, 0x4f, 0xc8, 0xae, 0xd7, 0x73,
-	0x93, 0xbd, 0x98, 0x2e, 0xce, 0x2c, 0x19, 0xab, 0xcd, 0xf2, 0x73, 0xd3, 0x49, 0xb7, 0x74, 0x04,
-	0x8b, 0xc2, 0x8f, 0xf7, 0x62, 0xea, 0xcc, 0x42, 0x86, 0xf4, 0x85, 0xdc, 0x47, 0x17, 0x0b, 0x65,
-	0x54, 0x89, 0x4f, 0x3b, 0x4c, 0x85, 0xe0, 0xc2, 0xed, 0xcb, 0x50, 0xf5, 0xaf, 0xe1, 0xd4, 0xd5,
-	0xc2, 0x96, 0x0c, 0xc9, 0x3a, 0x14, 0xa6, 0xbb, 0x71, 0x1b, 0x6e, 0x75, 0xd9, 0xcd, 0xfa, 0x0c,
-	0xf8, 0xc7, 0xd1, 0xc0, 0x7f, 0x03, 0xd5, 0x33, 0x5f, 0x80, 0x3b, 0xf6, 0xea, 0xd8, 0xd5, 0x1e,
-	0x0b, 0x1c, 0xc2, 0x49, 0x84, 0xce, 0xab, 0xcc, 0xdb, 0x9d, 0x2f, 0xa8, 0x9f, 0x6c, 0x3f, 0x89,
-	0xd2, 0xc9, 0x9c, 0x60, 0x42, 0xae, 0xa1, 0x1a, 0x57, 0x21, 0x30, 0x19, 0xa5, 0x97, 0x5a, 0x27,
-	0x76, 0x00, 0x4d, 0x1e, 0xa2, 0xc5, 0xe3, 0x7c, 0x50, 0xc6, 0x32, 0x9a, 0x63, 0xe9, 0xc4, 0x85,
-	0x4c, 0x26, 0x54, 0xd0, 0xac, 0x9d, 0x67, 0x98, 0x74, 0x86, 0x6b, 0xf8, 0x02, 0xaa, 0xf3, 0x34,
-	0x2a, 0x15, 0xa5, 0x9b, 0x7a, 0x5a, 0xbd, 0xdf, 0x0b, 0x36, 0x9f, 0x22, 0x74, 0x4a, 0x25, 0xc7,
-	0x5f, 0xa3, 0x9a, 0x36, 0x33, 0xfc, 0xda, 0x58, 0x23, 0x8e, 0xbb, 0xa5, 0x49, 0xaa, 0x20, 0x5a,
-	0x1a, 0x79, 0xe3, 0xdb, 0xbf, 0xfe, 0xfb, 0x79, 0x7a, 0x05, 0x2f, 0xdb, 0x79, 0x7b, 0x2e, 0xfa,
-	0x38, 0xe1, 0x6f, 0x0c, 0x54, 0xd3, 0x13, 0x52, 0x42, 0x3f, 0x3a, 0xc4, 0x25, 0xf4, 0xb9, 0x01,
-	0x23, 0x6f, 0x2a, 0xfa, 0x36, 0x5e, 0xad, 0xa6, 0x57, 0x41, 0xf6, 0x3e, 0x0b, 0x06, 0xf8, 0x07,
-	0x03, 0x35, 0x86, 0xfe, 0x88, 0x2f, 0x97, 0x73, 0x1c, 0xf9, 0xaa, 0xb9, 0x72, 0x02, 0x0a, 0xc4,
-	0xd8, 0x4a, 0xcc, 0x1a, 0xbe, 0x32, 0x81, 0x18, 0x97, 0x05, 0x12, 0xff, 0x61, 0xa0, 0xf9, 0x02,
-	0xd3, 0xc3, 0x56, 0x11, 0x5f, 0xb9, 0x4f, 0x9b, 0xf6, 0xc4, 0x78, 0x50, 0xfa, 0x81, 0x52, 0xfa,
-	0x2e, 0xbe, 0x59, 0xa9, 0xf4, 0x91, 0xca, 0xe0, 0x8e, 0x7e, 0x94, 0xa5, 0xbd, 0x3f, 0xd4, 0x3f,
-	0xc0, 0x7f, 0x1a, 0x68, 0xbe, 0xc0, 0xbb, 0x8a, 0xf5, 0x97, 0x5b, 0x6e, 0xb1, 0xfe, 0x0a, 0x53,
-	0x24, 0x77, 0x94, 0xfe, 0xf7, 0xf0, 0x3b, 0x95, 0xfa, 0x77, 0x55, 0x06, 0x37, 0x6f, 0xd8, 0xb9,
-	0x02, 0x7e, 0x31, 0x50, 0x33, 0x6f, 0x5d, 0x78, 0xad, 0x50, 0x4b, 0x91, 0xcb, 0x9a, 0xed, 0x49,
-	0xa0, 0xa0, 0xf8, 0xa6, 0x52, 0xfc, 0x36, 0x7e, 0xab, 0x5a, 0x31, 0x04, 0xbb, 0xd9, 0xc4, 0xea,
-	0xff, 0x03, 0xfc, 0xd4, 0x40, 0xcd, 0xbc, 0x55, 0x15, 0x0b, 0x2d, 0x74, 0xcd, 0x62, 0xa1, 0xc5,
-	0x96, 0x49, 0x6e, 0x28, 0xa1, 0x57, 0xf1, 0x46, 0xa5, 0xd0, 0xb1, 0x1f, 0x5d, 0xfa, 0x6a, 0xfd,
-	0x6e, 0xa0, 0xd9, 0x11, 0xfb, 0xc2, 0xaf, 0x17, 0xd1, 0x1e, 0xf7, 0x53, 0xf3, 0xca, 0x89, 0x38,
-	0xd0, 0xf6, 0xb9, 0xd2, 0xf6, 0x09, 0x7e, 0x50, 0xa9, 0x4d, 0x1b, 0xaa, 0xab, 0xcc, 0x6f, 0xf4,
-	0xb4, 0xed, 0x7d, 0xbd, 0x63, 0x09, 0xaa, 0x03, 0x8e, 0x56, 0x58, 0x30, 0xb8, 0x75, 0xf7, 0xd9,
-	0x41, 0xcb, 0x78, 0x7e, 0xd0, 0x32, 0xfe, 0x3d, 0x68, 0x19, 0x3f, 0x1d, 0xb6, 0xa6, 0x9e, 0x1f,
-	0xb6, 0xa6, 0xfe, 0x3e, 0x6c, 0x4d, 0x3d, 0xb4, 0x42, 0x96, 0xa4, 0xda, 0x7c, 0xde, 0x2f, 0x25,
-	0xfe, 0x4a, 0x51, 0xa7, 0x1f, 0x55, 0xd9, 0xa9, 0xa9, 0x9f, 0xa0, 0x57, 0x5f, 0x04, 0x00, 0x00,
-	0xff, 0xff, 0x47, 0x70, 0x86, 0x4c, 0x3f, 0x0c, 0x00, 0x00,
+	// 1497 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x58, 0xcf, 0x6f, 0xdc, 0xc4,
+	0x17, 0x8f, 0x93, 0x76, 0x9b, 0xbc, 0x34, 0x51, 0xbf, 0xd3, 0x5f, 0x5b, 0xf7, 0xcb, 0x36, 0x38,
+	0x49, 0x9b, 0x86, 0x62, 0x37, 0x89, 0x5a, 0x52, 0xa1, 0xb6, 0x34, 0xa5, 0x3f, 0x28, 0x54, 0x69,
+	0x5d, 0x40, 0x08, 0x90, 0x2c, 0xc7, 0x3b, 0xdd, 0x75, 0xbb, 0xeb, 0x71, 0x3d, 0x4e, 0xda, 0x50,
+	0x7a, 0x00, 0x09, 0x89, 0x4a, 0x1c, 0x90, 0x38, 0x70, 0xe7, 0x80, 0x38, 0x80, 0xc4, 0x1d, 0x01,
+	0x42, 0x5c, 0x7a, 0x42, 0x95, 0xb8, 0x70, 0x42, 0xa8, 0x45, 0xe2, 0x0f, 0xe0, 0x1f, 0x40, 0x9e,
+	0x79, 0xde, 0xd8, 0xbb, 0x63, 0x67, 0xd3, 0x4b, 0x6b, 0x7b, 0xde, 0x8f, 0xcf, 0xe7, 0xcd, 0x9b,
+	0x37, 0x9f, 0x0d, 0x1c, 0xe0, 0x6c, 0x35, 0xf2, 0x68, 0x73, 0x75, 0xc5, 0x72, 0xbd, 0xd0, 0xba,
+	0xb3, 0x4a, 0xa3, 0x75, 0x33, 0x8c, 0x58, 0xcc, 0xc8, 0x58, 0x67, 0xc9, 0x74, 0xbd, 0x50, 0xff,
+	0x9f, 0xdb, 0xf6, 0x03, 0x66, 0x89, 0x7f, 0xa5, 0x85, 0x3e, 0xeb, 0x31, 0xde, 0x66, 0xdc, 0x5a,
+	0x71, 0x39, 0x95, 0xae, 0xd6, 0xda, 0xdc, 0x0a, 0x8d, 0xdd, 0x39, 0x2b, 0x74, 0x1b, 0x7e, 0xe0,
+	0xc6, 0x3e, 0x0b, 0xd0, 0x76, 0x4f, 0x83, 0x35, 0x98, 0x78, 0xb4, 0x92, 0x27, 0xfc, 0xfa, 0xff,
+	0x06, 0x63, 0x8d, 0x16, 0xb5, 0xdc, 0xd0, 0xb7, 0xdc, 0x20, 0x60, 0xb1, 0x70, 0xe1, 0xb8, 0x3a,
+	0x99, 0x07, 0xe7, 0x7a, 0x1e, 0xe5, 0xdc, 0xa9, 0x53, 0xcf, 0xe7, 0x1b, 0x81, 0x6b, 0x79, 0x23,
+	0x8f, 0xb5, 0xdb, 0x7e, 0xdc, 0xa6, 0x41, 0x8c, 0xeb, 0x7a, 0x7e, 0x3d, 0x74, 0x23, 0xb7, 0xcd,
+	0xd5, 0x6b, 0x11, 0xf5, 0x58, 0x54, 0xc7, 0xb5, 0x89, 0xee, 0xb5, 0x86, 0xcf, 0xe3, 0x28, 0x4b,
+	0x09, 0xe1, 0x05, 0x34, 0xbe, 0xcb, 0xa2, 0xdb, 0x89, 0x95, 0xe3, 0xb1, 0x88, 0x5a, 0x21, 0x6b,
+	0xf9, 0x1e, 0x56, 0x51, 0x3f, 0x5a, 0x6a, 0xe4, 0xf0, 0x26, 0x8b, 0xe2, 0x4d, 0x4c, 0x23, 0xda,
+	0x92, 0x65, 0x69, 0xfa, 0x21, 0x9a, 0xce, 0xf7, 0x61, 0xea, 0x70, 0xda, 0xa2, 0x5e, 0xcc, 0x22,
+	0xf4, 0x99, 0x2a, 0xf4, 0xb9, 0xb3, 0x4a, 0x39, 0x82, 0x30, 0xf6, 0x00, 0xb9, 0x9e, 0xec, 0xe4,
+	0x35, 0x51, 0x27, 0x5b, 0xae, 0x19, 0xcb, 0xb0, 0x3b, 0xf7, 0x95, 0x87, 0x2c, 0xe0, 0x94, 0x2c,
+	0x42, 0x45, 0xd6, 0xb3, 0xaa, 0x4d, 0x68, 0x33, 0xa3, 0xf3, 0x7b, 0xcd, 0x5c, 0xcf, 0x98, 0xd2,
+	0x7c, 0x69, 0xe4, 0xd1, 0x9f, 0x87, 0x06, 0xbe, 0xf9, 0xe7, 0xfb, 0x59, 0xcd, 0x46, 0x7b, 0x63,
+	0x2a, 0x4d, 0x23, 0xca, 0x80, 0x69, 0xc8, 0x38, 0x0c, 0xfa, 0x75, 0x11, 0x6b, 0xc4, 0x1e, 0xf4,
+	0xeb, 0xc6, 0x95, 0x34, 0x2d, 0x5a, 0x61, 0xda, 0x05, 0xa8, 0xc8, 0xad, 0xc2, 0xb4, 0x07, 0xbb,
+	0xd3, 0xa2, 0x79, 0x62, 0x62, 0xa3, 0xa9, 0xe1, 0xc0, 0xde, 0x4c, 0xac, 0xd7, 0xea, 0x29, 0x37,
+	0x72, 0x11, 0x60, 0xa3, 0x5b, 0x31, 0xe2, 0x61, 0x53, 0xb6, 0xb6, 0x99, 0xb4, 0xb6, 0x29, 0x4f,
+	0x05, 0xb6, 0xb6, 0x79, 0xcd, 0x6d, 0x50, 0xf4, 0xb5, 0x33, 0x9e, 0x06, 0x87, 0x7d, 0xdd, 0x09,
+	0x10, 0xef, 0x2e, 0x18, 0xf2, 0xeb, 0x49, 0x8d, 0x86, 0x66, 0x46, 0xec, 0xe4, 0x91, 0x5c, 0xca,
+	0xe5, 0x1c, 0x14, 0x39, 0x8f, 0x6c, 0x9a, 0x53, 0x86, 0xcb, 0x25, 0xfd, 0x54, 0x83, 0x43, 0x22,
+	0xeb, 0x45, 0xbf, 0x15, 0xd3, 0xc8, 0xce, 0xec, 0x7f, 0x87, 0xe0, 0x41, 0x18, 0xc1, 0x6e, 0xeb,
+	0x14, 0x77, 0x38, 0x44, 0x90, 0xe4, 0x32, 0x0c, 0xa7, 0x7d, 0x82, 0x38, 0x8e, 0x99, 0xb9, 0x46,
+	0x31, 0xd3, 0x46, 0x31, 0xb3, 0xc1, 0x6f, 0xa0, 0x8f, 0xdd, 0xf1, 0x36, 0x1c, 0x98, 0x28, 0x46,
+	0x82, 0x95, 0x78, 0x19, 0x76, 0xc8, 0xed, 0x90, 0xd5, 0x18, 0x9d, 0x7f, 0xbe, 0x6b, 0xeb, 0xb2,
+	0x6e, 0xb8, 0x81, 0xa9, 0x87, 0xf1, 0x59, 0xca, 0xf5, 0x6d, 0x1a, 0xf9, 0x37, 0xd7, 0xcf, 0x89,
+	0x71, 0x90, 0xee, 0x44, 0x3f, 0x5c, 0xdf, 0x80, 0x71, 0x9c, 0x21, 0xd8, 0xf3, 0xc8, 0x78, 0xba,
+	0x88, 0x71, 0x3e, 0xc5, 0x98, 0x9b, 0x7d, 0x35, 0x16, 0x91, 0xaf, 0x12, 0x0d, 0xf2, 0xdd, 0x03,
+	0xdb, 0xd7, 0xdc, 0x16, 0x42, 0x19, 0xb6, 0xe5, 0x8b, 0xf1, 0x89, 0x06, 0xba, 0x74, 0x4d, 0x5e,
+	0xdd, 0x98, 0xe6, 0x4f, 0xc1, 0x3e, 0xa8, 0x48, 0xc8, 0x48, 0x00, 0xdf, 0xc8, 0x32, 0xec, 0x6c,
+	0xbb, 0x11, 0x6f, 0xba, 0x2d, 0x27, 0x5e, 0x0f, 0x69, 0x75, 0x68, 0x42, 0x9b, 0x19, 0x2f, 0xde,
+	0x2e, 0x19, 0xf4, 0xaa, 0xf4, 0xf0, 0x83, 0xc6, 0x9b, 0xeb, 0x21, 0xb5, 0x47, 0x31, 0x42, 0xf2,
+	0x92, 0x34, 0xcf, 0x41, 0x25, 0x8e, 0x32, 0xf4, 0x49, 0x89, 0x69, 0x14, 0xb1, 0xc8, 0x69, 0xf3,
+	0x86, 0x28, 0xe0, 0x88, 0x3d, 0x2c, 0x3e, 0x5c, 0xe5, 0x0d, 0x72, 0xb2, 0x83, 0x7d, 0x48, 0x94,
+	0xb6, 0x56, 0x8e, 0x2e, 0xe5, 0x66, 0x1c, 0xc3, 0x8a, 0xc8, 0x32, 0xbe, 0x8a, 0x23, 0xbe, 0x68,
+	0x2e, 0xbc, 0x83, 0xb8, 0xbb, 0xad, 0x11, 0xf7, 0x29, 0x18, 0x4e, 0x2f, 0x09, 0x3c, 0xcf, 0xcf,
+	0x75, 0xb5, 0x59, 0x97, 0x63, 0xc7, 0xdc, 0x08, 0x60, 0xbf, 0x88, 0xbc, 0xbc, 0x72, 0x8b, 0x7a,
+	0xf1, 0xf2, 0xdd, 0x20, 0xe9, 0xe4, 0x3e, 0x5a, 0xeb, 0x24, 0x54, 0x98, 0x70, 0xc1, 0x96, 0x2a,
+	0xe4, 0x2d, 0x03, 0xdb, 0x68, 0x6d, 0x7c, 0x00, 0xd5, 0xde, 0x7c, 0x48, 0x63, 0x12, 0xc6, 0xfc,
+	0xa4, 0x55, 0x93, 0x8b, 0x87, 0x46, 0x34, 0xdd, 0x86, 0x9d, 0x3e, 0xb7, 0x3b, 0xdf, 0xc8, 0xa9,
+	0xce, 0x2c, 0x94, 0x89, 0xfb, 0x38, 0x50, 0xe9, 0x44, 0x3c, 0x01, 0x93, 0x22, 0xb7, 0x9d, 0xb9,
+	0xda, 0xf8, 0xf9, 0xce, 0xfd, 0xd9, 0x5b, 0xfc, 0x6d, 0xa2, 0xf8, 0x0f, 0x35, 0x98, 0x2a, 0xf7,
+	0x43, 0xfc, 0x2e, 0x54, 0xb3, 0xb7, 0x26, 0x77, 0x36, 0xee, 0xe6, 0xce, 0x98, 0xed, 0x06, 0xab,
+	0x8e, 0xb8, 0x3f, 0x52, 0x2f, 0x18, 0xd7, 0xc1, 0x2a, 0x83, 0xb2, 0xb4, 0xde, 0x4b, 0xa7, 0x06,
+	0xd0, 0x85, 0x63, 0xa7, 0x9d, 0xf9, 0x62, 0x7c, 0xa9, 0xc1, 0xf1, 0xfe, 0x63, 0x22, 0x55, 0x0f,
+	0x0e, 0x14, 0x51, 0x4d, 0x27, 0x5d, 0xbf, 0x5c, 0xab, 0x05, 0x5c, 0xb9, 0xf1, 0xad, 0x06, 0x35,
+	0x81, 0xec, 0x12, 0x0d, 0x68, 0xe4, 0xc6, 0xb4, 0x97, 0x5c, 0x69, 0x8f, 0x2e, 0xc2, 0x0e, 0xd9,
+	0x75, 0xbc, 0x3a, 0x28, 0x20, 0x6d, 0xd6, 0xa4, 0xa9, 0x39, 0x59, 0x80, 0xed, 0xae, 0xb8, 0x21,
+	0x86, 0x72, 0xa7, 0x49, 0x31, 0x2f, 0x93, 0x2b, 0x41, 0xda, 0x1a, 0xbf, 0xa6, 0xe3, 0x5a, 0x05,
+	0x17, 0xeb, 0xb6, 0xc9, 0x66, 0x90, 0x69, 0x18, 0x6f, 0xd2, 0x7b, 0xd9, 0xc6, 0x91, 0x03, 0x67,
+	0xac, 0x49, 0xef, 0x6d, 0x84, 0x13, 0x3a, 0x24, 0x62, 0xec, 0x26, 0xaf, 0x0e, 0x09, 0x62, 0x13,
+	0x25, 0xb5, 0xbe, 0x96, 0x18, 0xda, 0x68, 0x4f, 0x0e, 0xc1, 0xa8, 0x7c, 0x72, 0x6e, 0x71, 0x16,
+	0x54, 0xb7, 0x89, 0x2b, 0x1a, 0xe4, 0xa7, 0x2b, 0x9c, 0x05, 0xc6, 0x39, 0x30, 0x04, 0x89, 0xcb,
+	0xfe, 0x2d, 0xd7, 0xbb, 0x7d, 0x2e, 0x8e, 0x69, 0x3b, 0x8c, 0xf9, 0x52, 0x97, 0x70, 0x29, 0xab,
+	0xbb, 0xf1, 0x3e, 0x9e, 0xb3, 0xa2, 0x10, 0x58, 0x8b, 0x13, 0x50, 0xa1, 0x6b, 0x99, 0x86, 0xe9,
+	0x99, 0x59, 0x6d, 0x1a, 0xd4, 0x13, 0xba, 0x17, 0x12, 0x2b, 0x1b, 0x8d, 0xe7, 0x7f, 0xdb, 0x05,
+	0xdb, 0x45, 0x78, 0xf2, 0x21, 0x54, 0xa4, 0xe0, 0x22, 0xdd, 0x43, 0xa0, 0x57, 0xd1, 0xe9, 0x46,
+	0x99, 0x89, 0x44, 0x64, 0xbc, 0xf0, 0xf1, 0xef, 0x7f, 0x7f, 0x31, 0x38, 0x4d, 0x26, 0xad, 0xbc,
+	0x74, 0x54, 0x29, 0x6a, 0xf2, 0x91, 0x06, 0x15, 0xc9, 0xa8, 0x20, 0x7d, 0xb6, 0x60, 0x05, 0xe9,
+	0x73, 0x05, 0x31, 0x8e, 0x8b, 0xf4, 0xb3, 0x64, 0xa6, 0x3c, 0xbd, 0x70, 0xb2, 0xee, 0xfb, 0xf5,
+	0x07, 0xe4, 0xa1, 0x06, 0x23, 0x1d, 0xf9, 0x45, 0xa6, 0x8a, 0x73, 0x6c, 0xc8, 0x3f, 0x7d, 0x7a,
+	0x13, 0x2b, 0x04, 0x63, 0x09, 0x30, 0x47, 0xc9, 0x91, 0x3e, 0xc0, 0x38, 0x89, 0xc4, 0xfb, 0x51,
+	0x83, 0xdd, 0x0a, 0x29, 0x44, 0x4c, 0x55, 0xbe, 0x62, 0xf5, 0xa6, 0x5b, 0x7d, 0xdb, 0x23, 0xd2,
+	0x0b, 0x02, 0xe9, 0x59, 0x72, 0xba, 0x14, 0xe9, 0x4d, 0x11, 0xc1, 0xc9, 0xfe, 0x60, 0xe0, 0xd6,
+	0xfd, 0x0e, 0xfe, 0x07, 0xe4, 0x27, 0x0d, 0x76, 0x2b, 0xa4, 0x8d, 0x1a, 0x7f, 0xb1, 0x22, 0x53,
+	0xe3, 0x2f, 0xd1, 0x4c, 0xc6, 0x45, 0x81, 0xff, 0x15, 0x72, 0xa6, 0x14, 0xff, 0x9a, 0x88, 0xe0,
+	0xe4, 0xf5, 0x5c, 0x8e, 0xc0, 0xd7, 0x1a, 0x8c, 0xe7, 0x85, 0x0d, 0x39, 0xaa, 0xc4, 0xa2, 0x12,
+	0x61, 0xfa, 0x6c, 0x3f, 0xa6, 0x88, 0xf8, 0xb4, 0x40, 0xfc, 0x12, 0x39, 0x51, 0x8e, 0x18, 0x9d,
+	0x9d, 0xb4, 0x63, 0xe5, 0xff, 0x0f, 0xc8, 0x57, 0x1a, 0x8c, 0xe7, 0x05, 0x89, 0x1a, 0xa8, 0x52,
+	0x1b, 0xa9, 0x81, 0xaa, 0x85, 0x91, 0x71, 0x4a, 0x00, 0x5d, 0x20, 0x73, 0xa5, 0x40, 0xbb, 0x7e,
+	0x67, 0xcb, 0xa3, 0xf5, 0x83, 0x06, 0xa3, 0x19, 0x91, 0x42, 0x0e, 0xab, 0xd2, 0xf6, 0xaa, 0x26,
+	0xfd, 0xc8, 0xa6, 0x76, 0x88, 0xed, 0x3d, 0x81, 0xed, 0x2d, 0x72, 0xa3, 0x14, 0x9b, 0xbc, 0x91,
+	0x1c, 0x96, 0xb8, 0x66, 0x77, 0xdb, 0xba, 0x2f, 0x57, 0xcc, 0x88, 0x4a, 0x87, 0x8d, 0x2f, 0x09,
+	0xfa, 0x5f, 0x34, 0xd8, 0x5f, 0x70, 0xe1, 0x92, 0x79, 0x15, 0xc2, 0x72, 0x4d, 0xa4, 0x2f, 0x6c,
+	0xc9, 0x67, 0x4b, 0x6d, 0x52, 0xa4, 0x23, 0xc8, 0xbf, 0x1a, 0x4c, 0xf6, 0xa1, 0x49, 0xc8, 0x99,
+	0x2d, 0x60, 0x53, 0x08, 0x24, 0xfd, 0xec, 0x33, 0xfb, 0x23, 0xcf, 0xd7, 0x05, 0xcf, 0x0b, 0xe4,
+	0xfc, 0x33, 0xf1, 0x74, 0x56, 0xd6, 0xb3, 0xac, 0xbf, 0xd3, 0x80, 0xf4, 0x0a, 0x08, 0xf2, 0xa2,
+	0x0a, 0x64, 0xa1, 0x2e, 0xd2, 0xcd, 0x7e, 0xcd, 0x91, 0xc2, 0xa2, 0xa0, 0x30, 0x4f, 0x8e, 0x97,
+	0x52, 0x68, 0x60, 0x80, 0x2c, 0xde, 0x9f, 0x35, 0xd8, 0xa7, 0xbe, 0xe8, 0xc9, 0x9c, 0x0a, 0x44,
+	0xa9, 0xae, 0xd0, 0xe7, 0xb7, 0xe2, 0x82, 0xd8, 0xcf, 0x08, 0xec, 0x8b, 0xe4, 0x64, 0x29, 0xf6,
+	0xa6, 0x08, 0xe2, 0xb8, 0x18, 0x25, 0xa9, 0xba, 0x3c, 0x4d, 0x4b, 0x97, 0x1f, 0x3d, 0xa9, 0x69,
+	0x8f, 0x9f, 0xd4, 0xb4, 0xbf, 0x9e, 0xd4, 0xb4, 0xcf, 0x9f, 0xd6, 0x06, 0x1e, 0x3f, 0xad, 0x0d,
+	0xfc, 0xf1, 0xb4, 0x36, 0xf0, 0xae, 0xd9, 0xf0, 0xe3, 0x04, 0x89, 0xc7, 0xda, 0x85, 0xb1, 0xef,
+	0x89, 0xe8, 0xc9, 0xef, 0x53, 0xbe, 0x52, 0x11, 0x7f, 0x52, 0x5a, 0xf8, 0x2f, 0x00, 0x00, 0xff,
+	0xff, 0x8b, 0xea, 0x53, 0x0b, 0x65, 0x14, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -890,6 +1350,18 @@ type QueryClient interface {
 	AccessDecision(ctx context.Context, in *QueryAccessDecisionRequest, opts ...grpc.CallOption) (*QueryAccessDecisionResponse, error)
 	// ObjectOwner returns the Actor ID of the the given Object's owner
 	ObjectOwner(ctx context.Context, in *QueryObjectOwnerRequest, opts ...grpc.CallOption) (*QueryObjectOwnerResponse, error)
+	// RegistrationsCommitment returns a specific RegistrationsCommitment record
+	RegistrationsCommitment(ctx context.Context, in *QueryRegistrationsCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentResponse, error)
+	// RegistrationsCommitmentByCommitment returns all RegistrationCommitment records with a given commitment
+	RegistrationsCommitmentByCommitment(ctx context.Context, in *QueryRegistrationsCommitmentByCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentByCommitmentResponse, error)
+	// GenerateCommitment generates a Object registration commitment for the given objects
+	//
+	// Note: this operation assures the commitment is valid (no object is registered and the policy exists)
+	// but exposes the Object Ids to the RPC node.
+	// ONLY use this method if the node is trusted
+	GenerateCommitment(ctx context.Context, in *QueryGenerateCommitmentRequest, opts ...grpc.CallOption) (*QueryGenerateCommitmentResponse, error)
+	// HijackAttemptsByPolicy returns, for a given policy, all AmendmentEvent whose hijack flag is true
+	HijackAttemptsByPolicy(ctx context.Context, in *QueryHijackAttemptsByPolicyRequest, opts ...grpc.CallOption) (*QueryHijackAttemptsByPolicyResponse, error)
 }
 
 type queryClient struct {
@@ -972,6 +1444,42 @@ func (c *queryClient) ObjectOwner(ctx context.Context, in *QueryObjectOwnerReque
 	return out, nil
 }
 
+func (c *queryClient) RegistrationsCommitment(ctx context.Context, in *QueryRegistrationsCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentResponse, error) {
+	out := new(QueryRegistrationsCommitmentResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.acp.Query/RegistrationsCommitment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) RegistrationsCommitmentByCommitment(ctx context.Context, in *QueryRegistrationsCommitmentByCommitmentRequest, opts ...grpc.CallOption) (*QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	out := new(QueryRegistrationsCommitmentByCommitmentResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.acp.Query/RegistrationsCommitmentByCommitment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) GenerateCommitment(ctx context.Context, in *QueryGenerateCommitmentRequest, opts ...grpc.CallOption) (*QueryGenerateCommitmentResponse, error) {
+	out := new(QueryGenerateCommitmentResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.acp.Query/GenerateCommitment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *queryClient) HijackAttemptsByPolicy(ctx context.Context, in *QueryHijackAttemptsByPolicyRequest, opts ...grpc.CallOption) (*QueryHijackAttemptsByPolicyResponse, error) {
+	out := new(QueryHijackAttemptsByPolicyResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.acp.Query/HijackAttemptsByPolicy", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
@@ -990,6 +1498,18 @@ type QueryServer interface {
 	AccessDecision(context.Context, *QueryAccessDecisionRequest) (*QueryAccessDecisionResponse, error)
 	// ObjectOwner returns the Actor ID of the the given Object's owner
 	ObjectOwner(context.Context, *QueryObjectOwnerRequest) (*QueryObjectOwnerResponse, error)
+	// RegistrationsCommitment returns a specific RegistrationsCommitment record
+	RegistrationsCommitment(context.Context, *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error)
+	// RegistrationsCommitmentByCommitment returns all RegistrationCommitment records with a given commitment
+	RegistrationsCommitmentByCommitment(context.Context, *QueryRegistrationsCommitmentByCommitmentRequest) (*QueryRegistrationsCommitmentByCommitmentResponse, error)
+	// GenerateCommitment generates a Object registration commitment for the given objects
+	//
+	// Note: this operation assures the commitment is valid (no object is registered and the policy exists)
+	// but exposes the Object Ids to the RPC node.
+	// ONLY use this method if the node is trusted
+	GenerateCommitment(context.Context, *QueryGenerateCommitmentRequest) (*QueryGenerateCommitmentResponse, error)
+	// HijackAttemptsByPolicy returns, for a given policy, all AmendmentEvent whose hijack flag is true
+	HijackAttemptsByPolicy(context.Context, *QueryHijackAttemptsByPolicyRequest) (*QueryHijackAttemptsByPolicyResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -1019,6 +1539,18 @@ func (*UnimplementedQueryServer) AccessDecision(ctx context.Context, req *QueryA
 }
 func (*UnimplementedQueryServer) ObjectOwner(ctx context.Context, req *QueryObjectOwnerRequest) (*QueryObjectOwnerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ObjectOwner not implemented")
+}
+func (*UnimplementedQueryServer) RegistrationsCommitment(ctx context.Context, req *QueryRegistrationsCommitmentRequest) (*QueryRegistrationsCommitmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegistrationsCommitment not implemented")
+}
+func (*UnimplementedQueryServer) RegistrationsCommitmentByCommitment(ctx context.Context, req *QueryRegistrationsCommitmentByCommitmentRequest) (*QueryRegistrationsCommitmentByCommitmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegistrationsCommitmentByCommitment not implemented")
+}
+func (*UnimplementedQueryServer) GenerateCommitment(ctx context.Context, req *QueryGenerateCommitmentRequest) (*QueryGenerateCommitmentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GenerateCommitment not implemented")
+}
+func (*UnimplementedQueryServer) HijackAttemptsByPolicy(ctx context.Context, req *QueryHijackAttemptsByPolicyRequest) (*QueryHijackAttemptsByPolicyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HijackAttemptsByPolicy not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -1169,6 +1701,79 @@ func _Query_ObjectOwner_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_RegistrationsCommitment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRegistrationsCommitmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).RegistrationsCommitment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.acp.Query/RegistrationsCommitment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).RegistrationsCommitment(ctx, req.(*QueryRegistrationsCommitmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_RegistrationsCommitmentByCommitment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRegistrationsCommitmentByCommitmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).RegistrationsCommitmentByCommitment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.acp.Query/RegistrationsCommitmentByCommitment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).RegistrationsCommitmentByCommitment(ctx, req.(*QueryRegistrationsCommitmentByCommitmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_GenerateCommitment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGenerateCommitmentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).GenerateCommitment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.acp.Query/GenerateCommitment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).GenerateCommitment(ctx, req.(*QueryGenerateCommitmentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Query_HijackAttemptsByPolicy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryHijackAttemptsByPolicyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).HijackAttemptsByPolicy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.acp.Query/HijackAttemptsByPolicy",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).HijackAttemptsByPolicy(ctx, req.(*QueryHijackAttemptsByPolicyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var Query_serviceDesc = _Query_serviceDesc
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.acp.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -1204,6 +1809,22 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ObjectOwner",
 			Handler:    _Query_ObjectOwner_Handler,
+		},
+		{
+			MethodName: "RegistrationsCommitment",
+			Handler:    _Query_RegistrationsCommitment_Handler,
+		},
+		{
+			MethodName: "RegistrationsCommitmentByCommitment",
+			Handler:    _Query_RegistrationsCommitmentByCommitment_Handler,
+		},
+		{
+			MethodName: "GenerateCommitment",
+			Handler:    _Query_GenerateCommitment_Handler,
+		},
+		{
+			MethodName: "HijackAttemptsByPolicy",
+			Handler:    _Query_HijackAttemptsByPolicy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1316,9 +1937,9 @@ func (m *QueryPolicyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Policy != nil {
+	if m.Record != nil {
 		{
-			size, err := m.Policy.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.Record.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
@@ -1351,6 +1972,18 @@ func (m *QueryPolicyIdsRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -1374,6 +2007,18 @@ func (m *QueryPolicyIdsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 	_ = i
 	var l int
 	_ = l
+	if m.Pagination != nil {
+		{
+			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.Ids) > 0 {
 		for iNdEx := len(m.Ids) - 1; iNdEx >= 0; iNdEx-- {
 			i -= len(m.Ids[iNdEx])
@@ -1595,6 +2240,18 @@ func (m *QueryValidatePolicyResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	_ = i
 	var l int
 	_ = l
+	if m.Policy != nil {
+		{
+			size, err := m.Policy.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
 	if len(m.ErrorMsg) > 0 {
 		i -= len(m.ErrorMsg)
 		copy(dAtA[i:], m.ErrorMsg)
@@ -1742,10 +2399,15 @@ func (m *QueryObjectOwnerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 	_ = i
 	var l int
 	_ = l
-	if len(m.OwnerId) > 0 {
-		i -= len(m.OwnerId)
-		copy(dAtA[i:], m.OwnerId)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.OwnerId)))
+	if m.Record != nil {
+		{
+			size, err := m.Record.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x12
 	}
@@ -1758,6 +2420,319 @@ func (m *QueryObjectOwnerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error
 		}
 		i--
 		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryRegistrationsCommitmentRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryRegistrationsCommitmentRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryRegistrationsCommitmentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Id != 0 {
+		i = encodeVarintQuery(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryRegistrationsCommitmentResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryRegistrationsCommitmentResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryRegistrationsCommitmentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.RegistrationsCommitment != nil {
+		{
+			size, err := m.RegistrationsCommitment.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Commitment) > 0 {
+		i -= len(m.Commitment)
+		copy(dAtA[i:], m.Commitment)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Commitment)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RegistrationsCommitments) > 0 {
+		for iNdEx := len(m.RegistrationsCommitments) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.RegistrationsCommitments[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGenerateCommitmentRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGenerateCommitmentRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGenerateCommitmentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Actor != nil {
+		{
+			size, err := m.Actor.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintQuery(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Objects) > 0 {
+		for iNdEx := len(m.Objects) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Objects[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.PolicyId) > 0 {
+		i -= len(m.PolicyId)
+		copy(dAtA[i:], m.PolicyId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PolicyId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryGenerateCommitmentResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryGenerateCommitmentResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryGenerateCommitmentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ProofsJson) > 0 {
+		for iNdEx := len(m.ProofsJson) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.ProofsJson[iNdEx])
+			copy(dAtA[i:], m.ProofsJson[iNdEx])
+			i = encodeVarintQuery(dAtA, i, uint64(len(m.ProofsJson[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.Proofs) > 0 {
+		for iNdEx := len(m.Proofs) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Proofs[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.HexCommitment) > 0 {
+		i -= len(m.HexCommitment)
+		copy(dAtA[i:], m.HexCommitment)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.HexCommitment)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Commitment) > 0 {
+		i -= len(m.Commitment)
+		copy(dAtA[i:], m.Commitment)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.Commitment)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryHijackAttemptsByPolicyRequest) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryHijackAttemptsByPolicyRequest) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryHijackAttemptsByPolicyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PolicyId) > 0 {
+		i -= len(m.PolicyId)
+		copy(dAtA[i:], m.PolicyId)
+		i = encodeVarintQuery(dAtA, i, uint64(len(m.PolicyId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *QueryHijackAttemptsByPolicyResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *QueryHijackAttemptsByPolicyResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *QueryHijackAttemptsByPolicyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Events) > 0 {
+		for iNdEx := len(m.Events) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Events[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintQuery(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
 	}
 	return len(dAtA) - i, nil
 }
@@ -1812,8 +2787,8 @@ func (m *QueryPolicyResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Policy != nil {
-		l = m.Policy.Size()
+	if m.Record != nil {
+		l = m.Record.Size()
 		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
@@ -1825,6 +2800,10 @@ func (m *QueryPolicyIdsRequest) Size() (n int) {
 	}
 	var l int
 	_ = l
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
@@ -1839,6 +2818,10 @@ func (m *QueryPolicyIdsResponse) Size() (n int) {
 			l = len(s)
 			n += 1 + l + sovQuery(uint64(l))
 		}
+	}
+	if m.Pagination != nil {
+		l = m.Pagination.Size()
+		n += 1 + l + sovQuery(uint64(l))
 	}
 	return n
 }
@@ -1933,6 +2916,10 @@ func (m *QueryValidatePolicyResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
 	}
+	if m.Policy != nil {
+		l = m.Policy.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
 	return n
 }
 
@@ -1988,9 +2975,142 @@ func (m *QueryObjectOwnerResponse) Size() (n int) {
 	if m.IsRegistered {
 		n += 2
 	}
-	l = len(m.OwnerId)
+	if m.Record != nil {
+		l = m.Record.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryRegistrationsCommitmentRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Id != 0 {
+		n += 1 + sovQuery(uint64(m.Id))
+	}
+	return n
+}
+
+func (m *QueryRegistrationsCommitmentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.RegistrationsCommitment != nil {
+		l = m.RegistrationsCommitment.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Commitment)
 	if l > 0 {
 		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.RegistrationsCommitments) > 0 {
+		for _, e := range m.RegistrationsCommitments {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *QueryGenerateCommitmentRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PolicyId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if len(m.Objects) > 0 {
+		for _, e := range m.Objects {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if m.Actor != nil {
+		l = m.Actor.Size()
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryGenerateCommitmentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Commitment)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	l = len(m.HexCommitment)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	if len(m.Proofs) > 0 {
+		for _, e := range m.Proofs {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	if len(m.ProofsJson) > 0 {
+		for _, s := range m.ProofsJson {
+			l = len(s)
+			n += 1 + l + sovQuery(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *QueryHijackAttemptsByPolicyRequest) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PolicyId)
+	if l > 0 {
+		n += 1 + l + sovQuery(uint64(l))
+	}
+	return n
+}
+
+func (m *QueryHijackAttemptsByPolicyResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Events) > 0 {
+		for _, e := range m.Events {
+			l = e.Size()
+			n += 1 + l + sovQuery(uint64(l))
+		}
 	}
 	return n
 }
@@ -2247,7 +3367,7 @@ func (m *QueryPolicyResponse) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Policy", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Record", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -2274,10 +3394,10 @@ func (m *QueryPolicyResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Policy == nil {
-				m.Policy = &types.Policy{}
+			if m.Record == nil {
+				m.Record = &PolicyRecord{}
 			}
-			if err := m.Policy.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.Record.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2331,6 +3451,42 @@ func (m *QueryPolicyIdsRequest) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: QueryPolicyIdsRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageRequest{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -2412,6 +3568,42 @@ func (m *QueryPolicyIdsResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Ids = append(m.Ids, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pagination == nil {
+				m.Pagination = &query.PageResponse{}
+			}
+			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -2610,7 +3802,7 @@ func (m *QueryFilterRelationshipsResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Records = append(m.Records, &types.RelationshipRecord{})
+			m.Records = append(m.Records, &RelationshipRecord{})
 			if err := m.Records[len(m.Records)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3006,6 +4198,42 @@ func (m *QueryValidatePolicyResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.ErrorMsg = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Policy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Policy == nil {
+				m.Policy = &types.Policy{}
+			}
+			if err := m.Policy.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQuery(dAtA[iNdEx:])
@@ -3364,7 +4592,416 @@ func (m *QueryObjectOwnerResponse) Unmarshal(dAtA []byte) error {
 			m.IsRegistered = bool(v != 0)
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field OwnerId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Record", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Record == nil {
+				m.Record = &RelationshipRecord{}
+			}
+			if err := m.Record.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryRegistrationsCommitmentRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			}
+			m.Id = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Id |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryRegistrationsCommitmentResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationsCommitment", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.RegistrationsCommitment == nil {
+				m.RegistrationsCommitment = &RegistrationsCommitment{}
+			}
+			if err := m.RegistrationsCommitment.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryRegistrationsCommitmentByCommitmentRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentByCommitmentRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentByCommitmentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Commitment", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Commitment = append(m.Commitment[:0], dAtA[iNdEx:postIndex]...)
+			if m.Commitment == nil {
+				m.Commitment = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryRegistrationsCommitmentByCommitmentResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentByCommitmentResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryRegistrationsCommitmentByCommitmentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RegistrationsCommitments", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RegistrationsCommitments = append(m.RegistrationsCommitments, &RegistrationsCommitment{})
+			if err := m.RegistrationsCommitments[len(m.RegistrationsCommitments)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGenerateCommitmentRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGenerateCommitmentRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGenerateCommitmentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3392,7 +5029,425 @@ func (m *QueryObjectOwnerResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OwnerId = string(dAtA[iNdEx:postIndex])
+			m.PolicyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Objects", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Objects = append(m.Objects, &types.Object{})
+			if err := m.Objects[len(m.Objects)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Actor", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Actor == nil {
+				m.Actor = &types.Actor{}
+			}
+			if err := m.Actor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryGenerateCommitmentResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryGenerateCommitmentResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryGenerateCommitmentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Commitment", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Commitment = append(m.Commitment[:0], dAtA[iNdEx:postIndex]...)
+			if m.Commitment == nil {
+				m.Commitment = []byte{}
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field HexCommitment", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.HexCommitment = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Proofs", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Proofs = append(m.Proofs, &RegistrationProof{})
+			if err := m.Proofs[len(m.Proofs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProofsJson", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProofsJson = append(m.ProofsJson, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryHijackAttemptsByPolicyRequest) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryHijackAttemptsByPolicyRequest: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryHijackAttemptsByPolicyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PolicyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQuery(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *QueryHijackAttemptsByPolicyResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQuery
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: QueryHijackAttemptsByPolicyResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: QueryHijackAttemptsByPolicyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Events", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQuery
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthQuery
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthQuery
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Events = append(m.Events, &AmendmentEvent{})
+			if err := m.Events[len(m.Events)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

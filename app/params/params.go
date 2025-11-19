@@ -1,60 +1,44 @@
 package params
 
-import (
-	"context"
+const (
+	MicroOpenDenom      = "uopen"
+	MicroOpenDenomAlias = "microopen"
+	OpenDenom           = "open"
+	OpenName            = "Source Open"
+	OpenSymbol          = "OPEN"
+	OpenDescription     = "OPEN is the native staking token of SourceHub."
 
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	MicroCreditDenom      = "ucredit"
+	MicroCreditDenomAlias = "microcredit"
+	CreditDenom           = "credit"
+	CreditName            = "Source Credit"
+	CreditSymbol          = "CREDIT"
+	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non-transferable."
+	CreditFeeMultiplier   = 10
+
+	DefaultBondDenom   = MicroOpenDenom
+	DefaultMinGasPrice = "0.001"
+
+	BlocksPerYear       = 31557600
+	GoalBonded          = "0.67"
+	InflationMin        = "0.02"
+	InflationMax        = "0.15"
+	InflationRateChange = "0.13"
+	InitialInflation    = "0.13"
 )
+
+// FaucetStoreKey is the store key for faucet data.
+const FaucetStoreKey = "faucet"
+
+// FaucetConfig defines the configuration for the faucet service.
+type FaucetConfig struct {
+	EnableFaucet bool `mapstructure:"enable_faucet"`
+}
+
+// Context key for storing extracted DID from JWS extension options.
+type contextKey string
 
 const (
-	OpenDenom   = "open"
-	CreditDenom = "credit"
-
-	DefaultBondDenom = OpenDenom
+	// ExtractedDIDContextKey is the key used to store extracted DID in context
+	ExtractedDIDContextKey contextKey = "extracted_did"
 )
-
-var denomMetadatas = []banktypes.Metadata{
-	{
-		Description: "OPEN is the native staking token of SourceHub",
-		DenomUnits: []*banktypes.DenomUnit{
-			{
-				Denom:    "open",
-				Exponent: 0,
-			},
-			{
-				Denom:    "uopen",
-				Exponent: 6,
-			},
-		},
-		Base:    "open",
-		Display: "open",
-		Name:    "Source Open",
-		Symbol:  "OPEN",
-	},
-	{
-		Description: "Credit is the utility token for access services on SourceHub",
-		DenomUnits: []*banktypes.DenomUnit{
-			{
-				Denom:    "credit",
-				Exponent: 0,
-			},
-			{
-				Denom:    "ucredit",
-				Exponent: 6,
-			},
-		},
-		Base:    "credit",
-		Display: "credit",
-		Name:    "Source Credit",
-		Symbol:  "CREDIT",
-	},
-}
-
-// RegisterDenoms registers token denoms.
-func RegisterDenoms(ctx context.Context, bk bankkeeper.Keeper) {
-
-	for _, denomMetadata := range denomMetadatas {
-		bk.SetDenomMetaData(ctx, denomMetadata)
-	}
-}

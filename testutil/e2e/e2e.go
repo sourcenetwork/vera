@@ -1,14 +1,20 @@
 package e2e
 
 import (
+	"fmt"
 	"testing"
 
+	dbm "github.com/cosmos/cosmos-db"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
+	"github.com/cosmos/cosmos-sdk/testutil/sims"
 	"github.com/stretchr/testify/require"
 
 	"github.com/sourcenetwork/sourcehub/app"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/sdk"
 )
 
@@ -24,7 +30,30 @@ func (n *TestNetwork) Setup(t *testing.T) {
 
 	cfg, err := network.DefaultConfigWithAppConfig(injectConfig)
 	require.NoError(t, err)
+
 	cfg.NumValidators = 1
+	cfg.BondDenom = appparams.DefaultBondDenom
+	cfg.MinGasPrices = fmt.Sprintf(
+		"%s%s,%s%s",
+		appparams.DefaultMinGasPrice,
+		appparams.MicroOpenDenom,
+		appparams.DefaultMinGasPrice,
+		appparams.MicroCreditDenom,
+	)
+
+	cfg.AppConstructor = func(val network.ValidatorI) servertypes.Application {
+		appInstance, err := app.New(
+			val.GetCtx().Logger,
+			dbm.NewMemDB(),
+			nil,
+			true,
+			sims.EmptyAppOptions{},
+			baseapp.SetChainID(cfg.ChainID),
+		)
+		require.NoError(t, err)
+
+		return appInstance
+	}
 
 	network, err := network.New(t, t.TempDir(), cfg)
 	require.NoError(t, err)

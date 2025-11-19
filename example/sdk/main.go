@@ -60,7 +60,7 @@ resources:
 `
 
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicyNow(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
 	tx, err := txBuilder.Build(ctx, signer, &msgSet)
 	if err != nil {
 		log.Fatal(err)
@@ -91,8 +91,8 @@ resources:
 	if err != nil {
 		log.Fatal(err)
 	}
-	cmdBuilder.RegisterObject(coretypes.NewObject("resource", "readme.txt"))
-	cmdBuilder.PolicyID(policyResponse.Policy.Id)
+	cmdBuilder.PolicyCmd(acptypes.NewRegisterObjectCmd(coretypes.NewObject("resource", "readme.txt")))
+	cmdBuilder.PolicyID(policyResponse.Record.Policy.Id)
 	cmdBuilder.Actor(aliceDid)
 	cmdBuilder.SetSigner(aliceSigner)
 	jws, err := cmdBuilder.BuildJWS(ctx)

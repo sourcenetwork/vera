@@ -1,9 +1,12 @@
 package cli
 
 import (
+	"encoding/hex"
 	"fmt"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/gogoproto/jsonpb"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 	"github.com/spf13/cobra"
@@ -80,17 +83,121 @@ func CmdRegisterObject(dispatcher dispatcher) *cobra.Command {
 	return cmd
 }
 
-func CmdUnregisterObject(dispatcher dispatcher) *cobra.Command {
+func CmdArchiveObject(dispatcher dispatcher) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "unregister-object policy-id resource objectId",
+		Use:   "archive-object policy-id resource objectId",
+		Short: "Issue ArchiveObject PolicyCmd",
+		Long:  ``,
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId, polCmd, err := parseArchiveObjectArgs(args)
+			if err != nil {
+				return err
+			}
+			err = dispatcher(cmd, polId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "reveal-registration commitment-id json-proof",
+		Short: "Reveal an Object Registration for a Commitment",
+		Long:  ``,
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			commitId, err := strconv.ParseUint(args[0], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid commitId: %w", err)
+			}
+			proofJson := args[1]
+
+			proof := &types.RegistrationProof{}
+			err = jsonpb.UnmarshalString(proofJson, proof)
+			if err != nil {
+				return fmt.Errorf("unmarshaling proof: %v", err)
+			}
+
+			polCmd := types.NewRevealRegistrationCmd(commitId, proof)
+
+			err = dispatcher(cmd, "", polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdCreateCommitment(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-commitment policy-id hex-commitment",
+		Short: "Create a new Registration Commitment on SourceHub",
+		Long:  ``,
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId := args[0]
+			commitment, err := hex.DecodeString(args[1])
+			if err != nil {
+				return fmt.Errorf("decoding commitment: %v", err)
+			}
+			polCmd := types.NewCommitRegistrationCmd(commitment)
+
+			err = dispatcher(cmd, polId, polCmd)
+			if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdFlagHijack(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "flag-hijack policy-id event-id",
 		Short: "Issue UnregisterObject PolicyCmd",
 		Long:  ``,
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			polId, polCmd, err := parseUnregisterObjectArgs(args)
+			polId := args[0]
+			eventId, err := strconv.ParseUint(args[1], 10, 64)
+			if err != nil {
+				return fmt.Errorf("invalid event id: %w", err)
+			}
+
+			polCmd := types.NewFlagHijackAttemptCmd(eventId)
+
+			err = dispatcher(cmd, polId, polCmd)
 			if err != nil {
 				return err
 			}
+			return nil
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func CmdUnarchiveObject(dispatcher dispatcher) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "unarchive-object policy-id resource objectId",
+		Short: "Issue UnarchiveObject PolicyCmd",
+		Long:  ``,
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			polId := args[0]
+			obj := coretypes.NewObject(args[1], args[2])
+			polCmd := types.NewUnarchiveObjectCmd(obj)
 			err = dispatcher(cmd, polId, polCmd)
 			if err != nil {
 				return err
@@ -168,12 +275,12 @@ func parseRegisterObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	return polId, types.NewRegisterObjectCmd(coretypes.NewObject(resource, objId)), nil
 }
 
-func parseUnregisterObjectArgs(args []string) (string, *types.PolicyCmd, error) {
+func parseArchiveObjectArgs(args []string) (string, *types.PolicyCmd, error) {
 	if len(args) != 3 {
-		return "", nil, fmt.Errorf("UnregisterObject: invalid number of arguments: policy-id resource objectId")
+		return "", nil, fmt.Errorf("ArchiveObject: invalid number of arguments: policy-id resource objectId")
 	}
 	polId := args[0]
 	resource := args[1]
 	objId := args[2]
-	return polId, types.NewUnregisterObjectCmd(coretypes.NewObject(resource, objId)), nil
+	return polId, types.NewArchiveObjectCmd(coretypes.NewObject(resource, objId)), nil
 }

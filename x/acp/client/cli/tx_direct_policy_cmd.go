@@ -19,7 +19,7 @@ func directDispatcher(cmd *cobra.Command, polId string, polCmd *types.PolicyCmd)
 	}
 
 	creator := clientCtx.GetFromAddress().String()
-	msg := types.NewMsgDirectPolicyCmdNow(creator, polId, polCmd)
+	msg := types.NewMsgDirectPolicyCmd(creator, polId, polCmd)
 	return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 }
 
@@ -30,8 +30,12 @@ func CmdDirectPolicyCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdRegisterObject(directDispatcher))
-	cmd.AddCommand(CmdUnregisterObject(directDispatcher))
+	cmd.AddCommand(CmdArchiveObject(directDispatcher))
 	cmd.AddCommand(CmdSetRelationship(directDispatcher))
 	cmd.AddCommand(CmdDeleteRelationship(directDispatcher))
+	cmd.AddCommand(CmdCreateCommitment(directDispatcher))
+	cmd.AddCommand(CmdRevealRegistration(directDispatcher))
+	cmd.AddCommand(CmdFlagHijack(directDispatcher))
+	cmd.AddCommand(CmdUnarchiveObject(directDispatcher))
 	return cmd
 }

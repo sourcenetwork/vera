@@ -5,8 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"log"
+	"os"
 
-	"cosmossdk.io/x/feegrant"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	cmtlog "github.com/cometbft/cometbft/libs/log"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
 	"github.com/cometbft/cometbft/rpc/client/http"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -27,7 +29,7 @@ import (
 type Opt func(*Client) error
 
 // WithGRPCAddr sets the GRPC Address of a SourceHub node which the Client will connect to.
-// If not specified defines to DefaultGRPCAddr
+// If not specified defaults to DefaultGRPCAddr
 // Note: Cosmos queries are not verifiable therefore only trusted RPC nodes should be used.
 func WithGRPCAddr(addr string) Opt {
 	return func(c *Client) error {
@@ -45,6 +47,7 @@ func WithCometRPCAddr(addr string) Opt {
 	}
 }
 
+// WithGRPCOpts specifies the dial options which will be used to dial SourceHub's GRPC (queries) service
 func WithGRPCOpts(opts ...grpc.DialOption) Opt {
 	return func(c *Client) error {
 		c.grpcOpts = opts
@@ -57,6 +60,7 @@ func NewClient(opts ...Opt) (*Client, error) {
 	client := &Client{
 		grpcAddr:     DefaultGRPCAddr,
 		cometRPCAddr: DefaultCometRPCAddr,
+		logger:       cmtlog.NewTMLogger(os.Stderr),
 	}
 
 	for _, opt := range opts {
@@ -76,12 +80,16 @@ func NewClient(opts ...Opt) (*Client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("comet rpc client: %w", err)
 	}
+	err = cometClient.Start()
+	if err != nil {
+		return nil, fmt.Errorf("starting comet rpc client: %w", err)
+	}
 
-	txClient := txtypes.NewServiceClient(conn)
-
-	client.txClient = txClient
+	client.txClient = txtypes.NewServiceClient(conn)
+	client.listener = NewTxListener(cometClient)
 	client.conn = conn
 	client.cometClient = cometClient
+
 	return client, nil
 }
 
@@ -93,10 +101,12 @@ type Client struct {
 	grpcAddr     string
 	cometRPCAddr string
 	grpcOpts     []grpc.DialOption
+	logger       cmtlog.Logger
 
 	cometClient cometclient.Client
 	conn        *grpc.ClientConn
 	txClient    txtypes.ServiceClient
+	listener    TxListener
 }
 
 // BroadcastTx broadcasts a signed Tx to a SourceHub node and returns the node's response.
@@ -130,6 +140,12 @@ func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxRe
 	return response, nil
 }
 
+// Close terminates the Client, freeing up resources and connections
+func (b *Client) Close() {
+	b.cometClient.Stop()
+	b.conn.Close()
+}
+
 // ACPQueryClient returns a Query Client for the ACP module
 func (c *Client) ACPQueryClient() acptypes.QueryClient {
 	return acptypes.NewQueryClient(c.conn)
@@ -155,9 +171,14 @@ func (c *Client) AuthQueryClient() authtypes.QueryClient {
 	return authtypes.NewQueryClient(c.conn)
 }
 
-// CometBFTRPCClient returns a RPC Client
+// CometBFTRPCClient returns a Comet RPC Client
 func (c *Client) CometBFTRPCClient() cometclient.Client {
 	return c.cometClient
+}
+
+// TxListener returns a TxListener
+func (c *Client) TxListener() TxListener {
+	return c.listener
 }
 
 func (c *Client) ListenForTx(ctx context.Context, txHash string) <-chan *ListenResult {

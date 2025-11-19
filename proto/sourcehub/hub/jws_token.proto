@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package sourcehub.hub;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/hub/types";
+
+// JWSTokenStatus represents the validity status of a JWS token.
+enum JWSTokenStatus {
+  // STATUS_UNSPECIFIED is the default/invalid status.
+  STATUS_UNSPECIFIED = 0;
+  // STATUS_VALID indicates the token is valid and can be used.
+  STATUS_VALID = 1;
+  // STATUS_INVALID indicates the token has been invalidated.
+  STATUS_INVALID = 2;
+}
+
+// JWSTokenRecord represents a stored JWS token with its metadata.
+// The bearer_token field contains sensitive credentials and should not be exposed via public endpoints.
+message JWSTokenRecord {
+  // token_hash is the unique identifier of the JWS token
+  string token_hash = 1;
+  // bearer_token is the full JWS token string.
+  string bearer_token = 2;
+  // issuer_did is the DID that issued/signed the token.
+  string issuer_did = 3;
+  // authorized_account is the account authorized to use this token.
+  string authorized_account = 4;
+  // issued_at is when the token was created.
+  google.protobuf.Timestamp issued_at = 5 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  // expires_at is when the token expires.
+  google.protobuf.Timestamp expires_at = 6 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  // status is the current validity status of the token.
+  JWSTokenStatus status = 7;
+  // first_used_at is when the token was first used in a transaction.
+  google.protobuf.Timestamp first_used_at = 8 [(gogoproto.stdtime) = true];
+  // last_used_at is when the token was last used in a transaction.
+  google.protobuf.Timestamp last_used_at = 9 [(gogoproto.stdtime) = true];
+  // invalidated_at is when the token was manually invalidated (if applicable).
+  google.protobuf.Timestamp invalidated_at = 10 [(gogoproto.stdtime) = true];
+  // invalidated_by is the account that invalidated the token (if applicable).
+  string invalidated_by = 11;
+}
+
+// EventJWSTokenInvalidated is emitted when a JWS token is invalidated.
+message EventJWSTokenInvalidated {
+  // token_hash is the unique identifier of the invalidated token.
+  string token_hash = 1;
+  // issuer_did is the DID that issued the token.
+  string issuer_did = 2;
+  // authorized_account is the account that was authorized to use this token.
+  string authorized_account = 3;
+  // invalidated_by is the account that invalidated the token.
+  string invalidated_by = 4;
+}

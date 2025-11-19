@@ -3,14 +3,6 @@ package app
 import (
 	"time"
 
-	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
-	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-
-	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
-	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
-
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
 	authmodulev1 "cosmossdk.io/api/cosmos/auth/module/v1"
@@ -21,11 +13,9 @@ import (
 	crisismodulev1 "cosmossdk.io/api/cosmos/crisis/module/v1"
 	distrmodulev1 "cosmossdk.io/api/cosmos/distribution/module/v1"
 	evidencemodulev1 "cosmossdk.io/api/cosmos/evidence/module/v1"
-	feegrantmodulev1 "cosmossdk.io/api/cosmos/feegrant/module/v1"
 	genutilmodulev1 "cosmossdk.io/api/cosmos/genutil/module/v1"
 	govmodulev1 "cosmossdk.io/api/cosmos/gov/module/v1"
 	groupmodulev1 "cosmossdk.io/api/cosmos/group/module/v1"
-	mintmodulev1 "cosmossdk.io/api/cosmos/mint/module/v1"
 	paramsmodulev1 "cosmossdk.io/api/cosmos/params/module/v1"
 	slashingmodulev1 "cosmossdk.io/api/cosmos/slashing/module/v1"
 	stakingmodulev1 "cosmossdk.io/api/cosmos/staking/module/v1"
@@ -37,9 +27,7 @@ import (
 	circuittypes "cosmossdk.io/x/circuit/types"
 	_ "cosmossdk.io/x/evidence" // import for side-effects
 	evidencetypes "cosmossdk.io/x/evidence/types"
-	"cosmossdk.io/x/feegrant"
-	_ "cosmossdk.io/x/feegrant/module" // import for side-effects
-	_ "cosmossdk.io/x/upgrade"         // import for side-effects
+	_ "cosmossdk.io/x/upgrade" // import for side-effects
 	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	_ "github.com/cosmos/cosmos-sdk/x/auth/tx/config" // import for side-effects
@@ -71,21 +59,30 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	_ "github.com/cosmos/ibc-go/modules/capability" // import for side-effects
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts" // import for side-effects
-	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
-	_ "github.com/cosmos/ibc-go/v8/modules/apps/29-fee" // import for side-effects
-	ibcfeetypes "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	_ "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts" // import for side-effects
+	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
+	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
+	feegrantmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/feegrant/module/v1"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	_ "github.com/sourcenetwork/sourcehub/x/feegrant/module" // import for side-effects
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
+	hubmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
+	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
-	acpmoduletypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	_ "github.com/sourcenetwork/sourcehub/x/bulletin/module" // import for side-effects
-	bulletinmoduletypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	// this line is used by starport scaffolding # stargate/app/moduleImport
+	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
+	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	_ "github.com/sourcenetwork/sourcehub/x/hub/module"
+	hubmoduletypes "github.com/sourcenetwork/sourcehub/x/hub/types"
+	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
+	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
 var (
@@ -112,7 +109,6 @@ var (
 		authz.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
@@ -122,11 +118,11 @@ var (
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -148,13 +144,12 @@ var (
 		ibcexported.ModuleName,
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	}
 
 	endBlockers = []string{
@@ -170,18 +165,16 @@ var (
 		ibctransfertypes.ModuleName,
 		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
 		// chain modules
-		acpmoduletypes.ModuleName,
-		bulletinmoduletypes.ModuleName,
+		hubmoduletypes.ModuleName,
+		acptypes.ModuleName,
+		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/endBlockers
 	}
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/preBlockers
 	}
 
 	// module account permissions
@@ -193,10 +186,11 @@ var (
 		{Account: stakingtypes.NotBondedPoolName, Permissions: []string{authtypes.Burner, stakingtypes.ModuleName}},
 		{Account: govtypes.ModuleName, Permissions: []string{authtypes.Burner}},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
-		{Account: ibcfeetypes.ModuleName},
 		{Account: icatypes.ModuleName},
 		{Account: tiertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner, authtypes.Staking}},
-		// this line is used by starport scaffolding # stargate/app/maccPerms
+		{Account: tiertypes.DeveloperPoolName},
+		{Account: tiertypes.InsurancePoolName},
+		{Account: bulletintypes.ModuleName},
 	}
 
 	// blocked account addresses
@@ -206,8 +200,11 @@ var (
 		minttypes.ModuleName,
 		stakingtypes.BondedPoolName,
 		stakingtypes.NotBondedPoolName,
+		tiertypes.DeveloperPoolName,
+		tiertypes.InsurancePoolName,
 		// We allow the following module accounts to receive funds:
 		// govtypes.ModuleName
+		// tiertypes.ModuleName
 	}
 
 	// appConfig application configuration (used by depinject)
@@ -296,10 +293,6 @@ var (
 				Config: appconfig.WrapAny(&evidencemodulev1.Module{}),
 			},
 			{
-				Name:   minttypes.ModuleName,
-				Config: appconfig.WrapAny(&mintmodulev1.Module{}),
-			},
-			{
 				Name: group.ModuleName,
 				Config: appconfig.WrapAny(&groupmodulev1.Module{
 					MaxExecutionPeriod: durationpb.New(time.Second * 1209600),
@@ -327,11 +320,15 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
-				Name:   acpmoduletypes.ModuleName,
+				Name:   hubmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&hubmodulev1.Module{}),
+			},
+			{
+				Name:   acptypes.ModuleName,
 				Config: appconfig.WrapAny(&acpmodulev1.Module{}),
 			},
 			{
-				Name:   bulletinmoduletypes.ModuleName,
+				Name:   bulletintypes.ModuleName,
 				Config: appconfig.WrapAny(&bulletinmodulev1.Module{}),
 			},
 			{
@@ -342,7 +339,6 @@ var (
 				Name:   tiertypes.ModuleName,
 				Config: appconfig.WrapAny(&tiermodulev1.Module{}),
 			},
-			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
 	})
 )

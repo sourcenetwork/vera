@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	gogotypes "github.com/cosmos/gogoproto/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
@@ -25,18 +24,18 @@ func CmdCheckAccess() *cobra.Command {
 			policyId := args[0]
 			subject := args[1]
 
-			var operations []*types.Operation
+			var operations []*coretypes.Operation
 			for _, operationStr := range args[2:] {
 				resource, operationStr, _ := strings.Cut(operationStr, ":")
 				objId, relation, _ := strings.Cut(operationStr, "#")
-				operation := &types.Operation{
+				operation := &coretypes.Operation{
 					Object:     coretypes.NewObject(resource, objId),
 					Permission: relation,
 				}
 				operations = append(operations, operation)
 			}
 
-			accessRequest := &types.AccessRequest{
+			accessRequest := &coretypes.AccessRequest{
 				Operations: operations,
 				Actor: &coretypes.Actor{
 					Id: subject,
@@ -51,7 +50,6 @@ func CmdCheckAccess() *cobra.Command {
 			msg := &types.MsgCheckAccess{
 				Creator:       clientCtx.GetFromAddress().String(),
 				PolicyId:      policyId,
-				CreationTime:  gogotypes.TimestampNow(),
 				AccessRequest: accessRequest,
 			}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)

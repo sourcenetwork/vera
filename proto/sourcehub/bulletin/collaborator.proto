@@ -1,0 +1,11 @@
+syntax = "proto3";
+package sourcehub.bulletin;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
+
+// Collaborator represents an actor with collaborator permissions in a namespace.
+message Collaborator {
+  string address = 1;
+  string did = 2;
+  string namespace = 3;
+}

@@ -21,6 +21,7 @@ import (
 	// this line is used by starport scaffolding # 1
 
 	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
+	"github.com/sourcenetwork/sourcehub/app/metrics"
 
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 
@@ -98,13 +99,13 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper     keeper.Keeper
+	keeper     *keeper.Keeper
 	bankKeeper types.BankKeeper
 }
 
 func NewAppModule(
 	cdc codec.Codec,
-	keeper keeper.Keeper,
+	keeper *keeper.Keeper,
 	bankKeeper types.BankKeeper,
 ) AppModule {
 	return AppModule{
@@ -116,8 +117,13 @@ func NewAppModule(
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
-	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQuerier(am.keeper))
+	// Inject instrumentation into msg service handler
+	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
+	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
+
+	// Inject instrumentation into query service handler
+	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
+	cfg.QueryServer().RegisterService(&descriptor, am.keeper)
 }
 
 // RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value, the InvariantRegistry triggers appropriate logic (most often the chain will be halted)
@@ -146,7 +152,7 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block.
 // The begin block implementation is optional.
 func (am AppModule) BeginBlock(ctx context.Context) error {
-	return nil
+	return am.keeper.BeginBlocker(ctx)
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block.
@@ -180,15 +186,17 @@ type ModuleInputs struct {
 	Config       *modulev1beta1.Module
 	Logger       log.Logger
 
-	BankKeeper    types.BankKeeper
-	StakingKeeper types.StakingKeeper
-	EpochsKeeper  types.EpochsKeeper
+	BankKeeper         types.BankKeeper
+	StakingKeeper      types.StakingKeeper
+	EpochsKeeper       types.EpochsKeeper
+	DistributionKeeper types.DistributionKeeper
+	FeegrantKeeper     types.FeegrantKeeper
 }
 
 type ModuleOutputs struct {
 	depinject.Out
 
-	TierKeeper keeper.Keeper
+	TierKeeper *keeper.Keeper
 	Module     appmodule.AppModule
 	Hooks      epochstypes.EpochsHooksWrapper
 }
@@ -207,16 +215,18 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 		in.StakingKeeper,
 		in.EpochsKeeper,
+		in.DistributionKeeper,
+		in.FeegrantKeeper,
 	)
 
 	m := NewAppModule(
 		in.Cdc,
-		k,
+		&k,
 		in.BankKeeper,
 	)
 
 	return ModuleOutputs{
-		TierKeeper: k,
+		TierKeeper: &k,
 		Module:     m,
 		Hooks:      epochstypes.EpochsHooksWrapper{EpochHooks: k.EpochHooks()},
 	}

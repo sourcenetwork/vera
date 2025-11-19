@@ -12,12 +12,18 @@ managed:
       - buf.build/googleapis/googleapis
       - buf.build/cosmos/gogo-proto
       - buf.build/cosmos/cosmos-proto
-    override:
-      buf.build/sourcenetwork/acp_core: github.com/sourcenetwork/sourcehub/api
+      - buf.build/sourcenetwork/acp-core
 plugins:
   - name: go-pulsar
     out: ./api
-    opt: paths=source_relative
+    opt: 
+    - paths=source_relative
+    - Msourcenetwork/acp_core/relationship.proto=github.com/sourcenetwork/acp_core/pkg/pulsar/types
+    - Msourcenetwork/acp_core/policy_short.proto=github.com/sourcenetwork/acp_core/pkg/pulsar/types
+    - Msourcenetwork/acp_core/policy.proto=github.com/sourcenetwork/acp_core/pkg/pulsar/types
+    - Msourcenetwork/acp_core/relationship_selector.proto=github.com/sourcenetwork/acp_core/pkg/pulsar/types
+    - Msourcenetwork/acp_core/request.proto=github.com/sourcenetwork/acp_core/pkg/pulsar/types
+
   - name: go-grpc
     out: ./api
     opt: paths=source_relative

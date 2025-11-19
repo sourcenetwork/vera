@@ -2,52 +2,58 @@ package keeper
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
-	comettypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/acp_core/pkg/auth"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
+	"github.com/sourcenetwork/sourcehub/x/acp/utils"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-const (
-	txHashMapKey  = "tx_hash"
-	creatorMapKey = "creator"
-)
-
-func (k msgServer) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
+func (k *Keeper) CreatePolicy(goCtx context.Context, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
+	engine := k.getACPEngine(ctx)
+
+	actorID, err := k.GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePolicy: %w", err)
+	}
+
+	metadata, err := types.BuildACPSuppliedMetadata(ctx, actorID, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	principal := auth.RootPrincipal()
-	goCtx = auth.InjectPrincipal(goCtx, principal)
+	ctx, err = utils.InjectPrincipal(ctx, actorID)
+	if err != nil {
+		return nil, err
+	}
 
-	tx := comettypes.Tx(ctx.TxBytes())
-	txHash := hex.EncodeToString(tx.Hash())
-
-	coreResult, err := engine.CreatePolicy(goCtx, &coretypes.CreatePolicyRequest{
-		Policy:       msg.Policy,
-		MarshalType:  msg.MarshalType,
-		CreationTime: msg.CreationTime,
-		Metadata: map[string]string{
-			txHashMapKey:  txHash,
-			creatorMapKey: msg.Creator,
-		},
+	coreResult, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
+		Policy:      msg.Policy,
+		MarshalType: msg.MarshalType,
+		Metadata:    metadata,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("CreatePolicy: %w", err)
 	}
 
-	// TODO event
+	rec, err := types.MapPolicy(coreResult.Record)
+	if err != nil {
+		return nil, fmt.Errorf("CreatePolicy: %w", err)
+	}
+
+	err = ctx.EventManager().EmitTypedEvent(&coretypes.EventPolicyCreated{
+		PolicyId:   rec.Policy.Id,
+		PolicyName: msg.Policy,
+	})
+	if err != nil {
+		return nil, err
+	}
 
 	return &types.MsgCreatePolicyResponse{
-		Policy: coreResult.Policy,
+		Record: rec,
 	}, nil
 }

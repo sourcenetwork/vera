@@ -4,6 +4,10 @@ package sourcehub.bulletin;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "sourcehub/bulletin/params.proto";
+import "sourcehub/bulletin/namespace.proto";
+import "sourcehub/bulletin/collaborator.proto";
+import "sourcehub/bulletin/post.proto";
+
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 
@@ -11,6 +15,19 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 message GenesisState {
   // params defines all the parameters of the module.
   Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  string policy_id = 2;
+  repeated Namespace namespaces = 3 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Collaborator collaborators = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Post posts = 5 [
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];

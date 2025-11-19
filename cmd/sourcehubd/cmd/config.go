@@ -1,27 +1,18 @@
 package cmd
 
 import (
+	"fmt"
+
 	cmtcfg "github.com/cometbft/cometbft/config"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/sourcenetwork/sourcehub/app"
+	appparams "github.com/sourcenetwork/sourcehub/app/params"
 )
 
-func initSDKConfig() {
-	// Set prefixes
-	accountPubKeyPrefix := app.AccountAddressPrefix + "pub"
-	validatorAddressPrefix := app.AccountAddressPrefix + "valoper"
-	validatorPubKeyPrefix := app.AccountAddressPrefix + "valoperpub"
-	consNodeAddressPrefix := app.AccountAddressPrefix + "valcons"
-	consNodePubKeyPrefix := app.AccountAddressPrefix + "valconspub"
+// CustomAppConfig extends the default Cosmos SDK app config
+type CustomAppConfig struct {
+	serverconfig.Config `mapstructure:",squash"`
 
-	// Set and seal config
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(app.AccountAddressPrefix, accountPubKeyPrefix)
-	config.SetBech32PrefixForValidator(validatorAddressPrefix, validatorPubKeyPrefix)
-	config.SetBech32PrefixForConsensusNode(consNodeAddressPrefix, consNodePubKeyPrefix)
-	config.Seal()
+	Faucet appparams.FaucetConfig `mapstructure:"faucet"`
 }
 
 // initCometBFTConfig helps to override default CometBFT Config values.
@@ -39,14 +30,15 @@ func initCometBFTConfig() *cmtcfg.Config {
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
-	// The following code snippet is just for reference.
-	type CustomAppConfig struct {
-		serverconfig.Config `mapstructure:",squash"`
-	}
-
-	// Optionally allow the chain developer to overwrite the SDK's default
-	// server config.
+	// Optionally allow the chain developer to overwrite the SDK's default server config.
 	srvCfg := serverconfig.DefaultConfig()
+	srvCfg.MinGasPrices = fmt.Sprintf(
+		"%s%s,%s%s",
+		appparams.DefaultMinGasPrice,
+		appparams.MicroOpenDenom,
+		appparams.DefaultMinGasPrice,
+		appparams.MicroCreditDenom,
+	)
 	// The SDK's default minimum gas price is set to "" (empty value) inside
 	// app.toml. If left empty by validators, the node will halt on startup.
 	// However, the chain developer can set a default app.toml value for their
@@ -64,18 +56,21 @@ func initAppConfig() (string, interface{}) {
 
 	customAppConfig := CustomAppConfig{
 		Config: *srvCfg,
+		Faucet: appparams.FaucetConfig{
+			EnableFaucet: false,
+		},
 	}
 
-	customAppTemplate := serverconfig.DefaultConfigTemplate
-	// Edit the default template file
-	//
-	// customAppTemplate := serverconfig.DefaultConfigTemplate + `
-	// [wasm]
-	// # This is the maximum sdk gas (wasm and storage) that we allow for any x/wasm "smart" queries
-	// query_gas_limit = 300000
-	// # This is the number of wasm vm instances we keep cached in memory for speed-up
-	// # Warning: this is currently unstable and may lead to crashes, best to keep for 0 unless testing locally
-	// lru_size = 0`
+	customAppTemplate := serverconfig.DefaultConfigTemplate + `
+###############################################################################
+###                           Faucet Configuration                          ###
+###############################################################################
+
+[faucet]
+
+# Defines if the faucet service should be enabled.
+enable_faucet = {{ .Faucet.EnableFaucet }}
+`
 
 	return customAppTemplate, customAppConfig
 }

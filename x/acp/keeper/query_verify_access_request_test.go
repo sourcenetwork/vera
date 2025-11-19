@@ -6,14 +6,22 @@ import (
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/suite"
 
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
+type queryVerifyAccessRequestSuite struct {
+	suite.Suite
+}
+
+func TestVerifyAccessRequest(t *testing.T) {
+	suite.Run(t, &queryVerifyAccessRequestSuite{})
+}
+
 func setupTestVerifyAccessRequest(t *testing.T) (context.Context, Keeper, *coretypes.Policy, string) {
-	ctx, keeper, accKeep := setupKeeper(t)
-	msgServer := NewMsgServerImpl(keeper)
+	ctx, k, accKeep := setupKeeper(t)
 
 	creatorAcc := accKeep.GenAccount()
 	creator := creatorAcc.GetAddress().String()
@@ -38,28 +46,26 @@ resources:
 `
 
 	msg := types.MsgCreatePolicy{
-		Creator:      creator,
-		Policy:       policyStr,
-		MarshalType:  coretypes.PolicyMarshalingType_SHORT_YAML,
-		CreationTime: timestamp,
+		Creator:     creator,
+		Policy:      policyStr,
+		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
 	}
 
-	resp, err := msgServer.CreatePolicy(ctx, &msg)
+	resp, err := k.CreatePolicy(ctx, &msg)
 	require.Nil(t, err)
 
-	_, err = msgServer.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
-		Creator:      creator,
-		PolicyId:     resp.Policy.Id,
-		Cmd:          types.NewRegisterObjectCmd(obj),
-		CreationTime: timestamp,
+	_, err = k.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
+		Creator:  creator,
+		PolicyId: resp.Record.Policy.Id,
+		Cmd:      types.NewRegisterObjectCmd(obj),
 	})
 	require.Nil(t, err)
 
-	return ctx, keeper, resp.Policy, creatorDID
+	return ctx, k, resp.Record.Policy, creatorDID
 }
 
-func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -79,17 +85,17 @@ func TestVerifyAccessRequest_QueryingObjectsTheActorHasAccessToReturnsTrue(t *te
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: true,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }
 
-func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -105,17 +111,17 @@ func TestVerifyAccessRequest_QueryingOperationActorIsNotAuthorizedReturnNotValid
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }
 
-func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *testing.T) {
-	ctx, keeper, pol, creator := setupTestVerifyAccessRequest(t)
+func (s *queryVerifyAccessRequestSuite) TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse() {
+	ctx, k, pol, creator := setupTestVerifyAccessRequest(s.T())
 
 	req := &types.QueryVerifyAccessRequestRequest{
 		PolicyId: pol.Id,
@@ -131,11 +137,11 @@ func TestVerifyAccessRequest_QueryingObjectThatDoesNotExistReturnValidFalse(t *t
 			},
 		},
 	}
-	result, err := keeper.VerifyAccessRequest(ctx, req)
+	result, err := k.VerifyAccessRequest(ctx, req)
 
 	want := &types.QueryVerifyAccessRequestResponse{
 		Valid: false,
 	}
-	require.Equal(t, want, result)
-	require.Nil(t, err)
+	require.Equal(s.T(), want, result)
+	require.Nil(s.T(), err)
 }

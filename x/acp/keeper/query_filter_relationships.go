@@ -8,19 +8,20 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/sourcenetwork/sourcehub/utils"
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-func (k Keeper) FilterRelationships(goCtx context.Context, req *types.QueryFilterRelationshipsRequest) (*types.QueryFilterRelationshipsResponse, error) {
+func (k *Keeper) FilterRelationships(
+	goCtx context.Context,
+	req *types.QueryFilterRelationshipsRequest,
+) (*types.QueryFilterRelationshipsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	engine, err := k.GetACPEngine(ctx)
-	if err != nil {
-		return nil, err
-	}
+	engine := k.getACPEngine(ctx)
 
 	records, err := engine.FilterRelationships(goCtx, &coretypes.FilterRelationshipsRequest{
 		PolicyId: req.PolicyId,
@@ -30,7 +31,12 @@ func (k Keeper) FilterRelationships(goCtx context.Context, req *types.QueryFilte
 		return nil, err
 	}
 
+	mappedRecs, err := utils.MapFailableSlice(records.Records, types.MapRelationshipRecord)
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.QueryFilterRelationshipsResponse{
-		Records: records.Records,
+		Records: mappedRecs,
 	}, nil
 }

@@ -10,11 +10,11 @@ import (
 )
 
 func TestParamsQuery(t *testing.T) {
-	keeper, ctx := keepertest.AcpKeeper(t)
+	k, ctx := keepertest.AcpKeeper(t)
 	params := types.DefaultParams()
-	require.NoError(t, keeper.SetParams(ctx, params))
+	require.NoError(t, k.SetParams(ctx, params))
 
-	response, err := keeper.Params(ctx, &types.QueryParamsRequest{})
+	response, err := k.Params(ctx, &types.QueryParamsRequest{})
 	require.NoError(t, err)
 	require.Equal(t, &types.QueryParamsResponse{Params: params}, response)
 }

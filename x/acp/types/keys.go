@@ -10,14 +10,19 @@ const (
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_acp"
 
-	// AccessDecisionRepositoryKey defines the namespace for Access Decisions
-	AccessDecisionRepositoryKey = "access_decision"
+	// AccessDecisionRepositoryKeyPrefix defines the namespace for Access Decisions
+	AccessDecisionRepositoryKeyPrefix = "access_decision/"
+
+	// RegistrationsCommitmentKeyPrefix defines a key prefix for RegistrationsCommitments
+	RegistrationsCommitmentKeyPrefix = "commitment/"
+
+	// AmendmentEventKeyPrefix defines a key prefix for Amendment Events
+	AmendmentEventKeyPrefix = "amendment_event/"
+
+	// SignedPolicyCmdSeenKeyPrefix defines a key prefix for seen signed policy command payloads
+	SignedPolicyCmdSeenKeyPrefix = "spc_seen/"
 )
 
 var (
 	ParamsKey = []byte("p_acp")
 )
-
-func KeyPrefix(p string) []byte {
-	return []byte(p)
-}

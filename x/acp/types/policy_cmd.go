@@ -1,8 +1,8 @@
 package types
 
-import acptypes "github.com/sourcenetwork/acp_core/pkg/types"
+import coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-func NewSetRelationshipCmd(rel *acptypes.Relationship) *PolicyCmd {
+func NewSetRelationshipCmd(rel *coretypes.Relationship) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_SetRelationshipCmd{
 			SetRelationshipCmd: &SetRelationshipCmd{
@@ -12,7 +12,7 @@ func NewSetRelationshipCmd(rel *acptypes.Relationship) *PolicyCmd {
 	}
 }
 
-func NewDeleteRelationshipCmd(rel *acptypes.Relationship) *PolicyCmd {
+func NewDeleteRelationshipCmd(rel *coretypes.Relationship) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_DeleteRelationshipCmd{
 			DeleteRelationshipCmd: &DeleteRelationshipCmd{
@@ -22,7 +22,7 @@ func NewDeleteRelationshipCmd(rel *acptypes.Relationship) *PolicyCmd {
 	}
 }
 
-func NewRegisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
+func NewRegisterObjectCmd(obj *coretypes.Object) *PolicyCmd {
 	return &PolicyCmd{
 		Cmd: &PolicyCmd_RegisterObjectCmd{
 			RegisterObjectCmd: &RegisterObjectCmd{
@@ -32,11 +32,52 @@ func NewRegisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
 	}
 }
 
-func NewUnregisterObjectCmd(obj *acptypes.Object) *PolicyCmd {
+func NewArchiveObjectCmd(obj *coretypes.Object) *PolicyCmd {
 	return &PolicyCmd{
-		Cmd: &PolicyCmd_UnregisterObjectCmd{
-			UnregisterObjectCmd: &UnregisterObjectCmd{
+		Cmd: &PolicyCmd_ArchiveObjectCmd{
+			ArchiveObjectCmd: &ArchiveObjectCmd{
 				Object: obj,
+			},
+		},
+	}
+}
+
+func NewCommitRegistrationCmd(commitment []byte) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_CommitRegistrationsCmd{
+			CommitRegistrationsCmd: &CommitRegistrationsCmd{
+				Commitment: commitment,
+			},
+		},
+	}
+}
+
+func NewRevealRegistrationCmd(commitmentId uint64, proof *RegistrationProof) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_RevealRegistrationCmd{
+			RevealRegistrationCmd: &RevealRegistrationCmd{
+				Proof:                     proof,
+				RegistrationsCommitmentId: commitmentId,
+			},
+		},
+	}
+}
+
+func NewFlagHijackAttemptCmd(eventId uint64) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_FlagHijackAttemptCmd{
+			FlagHijackAttemptCmd: &FlagHijackAttemptCmd{
+				EventId: eventId,
+			},
+		},
+	}
+}
+
+func NewUnarchiveObjectCmd(object *coretypes.Object) *PolicyCmd {
+	return &PolicyCmd{
+		Cmd: &PolicyCmd_UnarchiveObjectCmd{
+			UnarchiveObjectCmd: &UnarchiveObjectCmd{
+				Object: object,
 			},
 		},
 	}

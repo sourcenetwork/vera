@@ -12,15 +12,16 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams() Params {
+func NewParams(policyCmdExpirationDelta uint64, registrationCommitmentValidity *Duration) Params {
 	return Params{
-		PolicyCommandMaxExpirationDelta: DefaultPolicyCommandMaxExpirationDelta,
+		PolicyCommandMaxExpirationDelta: policyCmdExpirationDelta,
+		RegistrationsCommitmentValidity: registrationCommitmentValidity,
 	}
 }
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	return NewParams()
+	return NewParams(DefaultPolicyCommandMaxExpirationDelta, DefaultRegistrationCommitmentLifetime)
 }
 
 // ParamSetPairs get the params.ParamSet

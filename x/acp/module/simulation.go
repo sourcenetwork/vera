@@ -35,6 +35,10 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgPolicyCmd int = 100
 
+	opWeightMsgMsgEditPolicy = "op_weight_msg_msg_edit_policy"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgMsgEditPolicy int = 100
+
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -96,6 +100,17 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		acpsimulation.SimulateMsgPolicyCmd(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
+	var weightMsgMsgEditPolicy int
+	simState.AppParams.GetOrGenerate(opWeightMsgMsgEditPolicy, &weightMsgMsgEditPolicy, nil,
+		func(_ *rand.Rand) {
+			weightMsgMsgEditPolicy = defaultWeightMsgMsgEditPolicy
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgMsgEditPolicy,
+		acpsimulation.SimulateMsgMsgEditPolicy(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
+
 	// this line is used by starport scaffolding # simapp/module/operation
 
 	return operations
@@ -125,6 +140,14 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			defaultWeightMsgPolicyCmd,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
 				acpsimulation.SimulateMsgPolicyCmd(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgMsgEditPolicy,
+			defaultWeightMsgMsgEditPolicy,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				acpsimulation.SimulateMsgMsgEditPolicy(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

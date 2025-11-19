@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 # dial-peers.sh informs node1 of the addresses of its peers.
-# This script performs a tenedermint / cometbft rpc call to the remaining validators and queries their Id.
+# This script performs a tendermint / cometbft rpc call to the remaining validators and queries their Id.
 # The ID is used to construct the peer address of the persistent peers in node1.
 #
 # Note: this script makes use of an 'unsafe' Tendermint RPC call, which is disabled by default.

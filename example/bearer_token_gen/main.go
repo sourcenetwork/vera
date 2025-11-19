@@ -18,7 +18,7 @@ func main() {
 
 var cmd = cobra.Command{
 	Use:   "bearer-token authorized_account",
-	Short: "bearer-token generates a oneshot did / bearer token the given account address",
+	Short: "bearer-token generates a oneshot did / bearer token for the given account address",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		addr := args[0]

@@ -26,7 +26,7 @@ All the aforementioned claims MUST be present in the JWS.
 
 ### Claims
 
-The `exp` (expires) and `isa` (issued at) claims are used as defined in the JWT RFC, an Unix time stamp (ie seconds since the epoch).
+The `exp` (expires) and `isa` (issued at) claims are used as defined in the JWT RFC, a Unix time stamp (ie seconds since the epoch).
 
 The `iss` claim is as defined by the JWT RFC, it identifies the entity that issued the JWS through a string.
 This string MUST be the DID of the Actor issuing the JWS.
@@ -36,7 +36,7 @@ This public key is used to validate the JWS signature.
 The `authorized_account` claim MUST contain a valid SourceHub address (ie a bech32 encoded Cosmos Account with the `source` prefix).
 The address specified in this claim is used to limit which account can use the Bearer JWS.
 A Policy Cmd is only accepted and processed if it is submitted in a Tx signed by the SAME account as the one set in the claim.
-This is done to prevent mallicious actors from extracting Bearer JWSs from the public ledger and impersonating an Actor.
+This is done to prevent malicious actors from extracting Bearer JWSs from the public ledger and impersonating an Actor.
 
 The following is an example of a acceptable Bearer JWS payload:
 ```json
@@ -66,7 +66,7 @@ eyJhbGciOiJFZERTQSJ9.eyJpc3MiOiJkaWQ6a2V5Ono2TWtrSHNRYnAzdFhFQ3FtVUpvQ0p3eXV4U0t
 
 ### Usage Recommendation
 
-A Bearer JWS allows the holder with the `auhtorized_account` to issue *any* Policy Commands on behalf of the issuer for the lifespan of the token.
+A Bearer JWS allows the holder with the `authorized_account` to issue *any* Policy Commands on behalf of the issuer for the lifespan of the token.
 As such, we recommend that SourceHub users use this method ONLY if they truly 100% trust the Account owner to act on their behalf.
 
 Furthermore, a short JWS validity (~15 mins) is still RECOMMENDED to minimize the risk if the `authorized_account` gets compromised.

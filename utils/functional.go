@@ -29,3 +29,17 @@ func MapFailableSlice[T any, U any](ts []T, mapper func(T) (U, error)) ([]U, err
 
 	return us, nil
 }
+
+// MapNullableSlice produces a new slice of elements from a slice of pointers, excluding 'nil' elements.
+func MapNullableSlice[T any, U any](ts []*T, mapper func(*T) U) []U {
+	us := make([]U, 0, len(ts))
+
+	for _, t := range ts {
+		if t != nil {
+			u := mapper(t)
+			us = append(us, u)
+		}
+	}
+
+	return us
+}
