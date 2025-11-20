@@ -498,7 +498,7 @@ type ChainConfig struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// allow_zero_fee_txs if true configures the antee handler
+	// allow_zero_fee_txs if true configures the ante handler
 	// to not reject txs with 0 fees
 	AllowZeroFeeTxs bool `protobuf:"varint,1,opt,name=allow_zero_fee_txs,json=allowZeroFeeTxs,proto3" json:"allow_zero_fee_txs,omitempty"`
 	// ignore_bearer_auth if true ignores the `authorized_account`

@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package sourcehub.bulletin;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
+
+// EventNamespaceRegistered is emitted when a namespace is registered.
+message EventNamespaceRegistered {
+  // namespace_id is the unique identifier of the namespace.
+  string namespace_id = 1;
+  // owner_did is the DID of the namespace owner.
+  string owner_did = 2;
+  // created_at is the timestamp when the namespace was created.
+  google.protobuf.Timestamp created_at = 3 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+}
+
+// EventPostCreated is emitted when a post is created.
+message EventPostCreated {
+  // namespace_id is the namespace the post belongs to.
+  string namespace_id = 1;
+  // post_id is the unique identifier of the post.
+  string post_id = 2;
+  // creator_did is the DID of the post creator.
+  string creator_did = 3;
+  // payload is the base64-encoded content of the post.
+  string payload = 4;
+}
+
+// EventCollaboratorAdded is emitted when a collaborator is added to a namespace.
+message EventCollaboratorAdded {
+  // namespace_id is the namespace the collaborator was added to.
+  string namespace_id = 1;
+  // collaborator_did is the DID of the collaborator.
+  string collaborator_did = 2;
+  // added_by is the DID of the user who added the collaborator.
+  string added_by = 3;
+}
+
+// EventCollaboratorRemoved is emitted when a collaborator is removed from a namespace.
+message EventCollaboratorRemoved {
+  // namespace_id is the namespace the collaborator was removed from.
+  string namespace_id = 1;
+  // collaborator_did is the DID of the collaborator.
+  string collaborator_did = 2;
+}

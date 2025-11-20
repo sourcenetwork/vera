@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"encoding/base64"
-	"time"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -60,14 +59,13 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 	}
 	k.SetNamespace(goCtx, namespace)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventRegisterNamespace,
-			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
-			sdk.NewAttribute(types.AttributeKeyOwnerDid, ownerDID),
-			sdk.NewAttribute(types.AttributeKeyCreatedAt, namespace.CreatedAt.Format(time.RFC3339)),
-		),
-	)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNamespaceRegistered{
+		NamespaceId: namespaceId,
+		OwnerDid:    ownerDID,
+		CreatedAt:   namespace.CreatedAt,
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgRegisterNamespaceResponse{Namespace: &namespace}, nil
 }
@@ -117,15 +115,14 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	k.SetPost(goCtx, post)
 
 	b64Payload := base64.StdEncoding.EncodeToString(post.Payload)
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventCreatePost,
-			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
-			sdk.NewAttribute(types.AttributeKeyPostId, postId),
-			sdk.NewAttribute(types.AttributeKeyCreatorDid, creatorDID),
-			sdk.NewAttribute(types.AttributeKeyPayload, b64Payload),
-		),
-	)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventPostCreated{
+		NamespaceId: namespaceId,
+		PostId:      postId,
+		CreatorDid:  creatorDID,
+		Payload:     b64Payload,
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgCreatePostResponse{}, nil
 }
@@ -167,14 +164,13 @@ func (k *Keeper) AddCollaborator(goCtx context.Context, msg *types.MsgAddCollabo
 	}
 	k.SetCollaborator(goCtx, collaborator)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventAddCollaborator,
-			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
-			sdk.NewAttribute(types.AttributeKeyCollaboratorDid, collaboratorDID),
-			sdk.NewAttribute(types.AttributeKeyAddedBy, ownerDID),
-		),
-	)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventCollaboratorAdded{
+		NamespaceId:     namespaceId,
+		CollaboratorDid: collaboratorDID,
+		AddedBy:         ownerDID,
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgAddCollaboratorResponse{}, nil
 }
@@ -211,13 +207,12 @@ func (k *Keeper) RemoveCollaborator(goCtx context.Context, msg *types.MsgRemoveC
 
 	k.DeleteCollaborator(goCtx, namespaceId, collaboratorDID)
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			types.EventRemoveCollaborator,
-			sdk.NewAttribute(types.AttributeKeyNamespaceId, namespaceId),
-			sdk.NewAttribute(types.AttributeKeyCollaboratorDid, collaboratorDID),
-		),
-	)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventCollaboratorRemoved{
+		NamespaceId:     namespaceId,
+		CollaboratorDid: collaboratorDID,
+	}); err != nil {
+		return nil, err
+	}
 
 	return &types.MsgRemoveCollaboratorResponse{}, nil
 }
