@@ -117,16 +117,6 @@ message QueryPostsResponse {
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryReadPostRequest
-message QueryReadPostRequest {
-  string namespace = 1;
-}
-
-// QueryReadPostResponse
-message QueryReadPostResponse {
-  Post post = 1;
-}
-
 // QueryIterateGlobRequest
 message QueryIterateGlobRequest {
   string namespace = 1;
