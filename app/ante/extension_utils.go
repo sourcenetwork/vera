@@ -100,10 +100,31 @@ func unmarshalJWSPayload(payload []byte) (antetypes.BearerToken, error) {
 	return token, nil
 }
 
-// validateBearerTokenValues validates the bearer token values
+// validateProviderToken validates the provider token fields.
+func validateProviderToken(token *antetypes.ProviderToken) error {
+	if token.ProviderName == "" {
+		return fmt.Errorf("provider token missing provider_name")
+	}
+	if token.UserID == "" {
+		return fmt.Errorf("provider token missing user_id")
+	}
+	if token.ActorDID == "" {
+		return fmt.Errorf("provider token missing actor_did")
+	}
+	return nil
+}
+
+// validateBearerTokenValues validates the bearer token values.
 func validateBearerTokenValues(token *antetypes.BearerToken, skipAuthAccountValidation bool) error {
-	if err := did.IsValidDID(token.IssuerID); err != nil {
-		return fmt.Errorf("invalid issuer DID: %v", err)
+	if strings.HasPrefix(token.IssuerID, "did:") {
+		if err := did.IsValidDID(token.IssuerID); err != nil {
+			return fmt.Errorf("invalid issuer DID: %v", err)
+		}
+	} else {
+		var providerToken antetypes.ProviderToken
+		if err := json.Unmarshal([]byte(token.IssuerID), &providerToken); err != nil {
+			return fmt.Errorf("issuer is neither a valid DID nor a valid provider token: %v", err)
+		}
 	}
 
 	// Only validate authorized account if bearer auth is not being ignored
@@ -137,7 +158,7 @@ func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time, s
 }
 
 // validateJWSExtension parses and validates JWS extension option bearer token.
-// Returns both the issuer DID and the authorized account.
+// Returns the actor DID (from provider token if present, otherwise issuer DID) and the authorized account.
 // If skipAuthAccountValidation is true, the authorized account validation is skipped (when ignoreBearerAuth is enabled).
 func validateJWSExtension(ctx context.Context, bearerToken string, currentTime time.Time, skipAuthAccountValidation bool) (string, string, error) {
 	resolver := &did.KeyResolver{}
@@ -152,7 +173,22 @@ func validateJWSExtension(ctx context.Context, bearerToken string, currentTime t
 		return "", "", err
 	}
 
-	return token.IssuerID, token.AuthorizedAccount, nil
+	actorDID := token.IssuerID
+
+	if token.ProviderToken != "" {
+		var providerToken antetypes.ProviderToken
+		if err := json.Unmarshal([]byte(token.ProviderToken), &providerToken); err != nil {
+			return "", "", fmt.Errorf("failed to unmarshal provider token: %v", err)
+		}
+
+		if err := validateProviderToken(&providerToken); err != nil {
+			return "", "", err
+		}
+
+		actorDID = providerToken.ActorDID
+	}
+
+	return actorDID, token.AuthorizedAccount, nil
 }
 
 // getExtractedDIDFromContext retrieves the extracted DID from context.
