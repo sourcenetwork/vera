@@ -51,7 +51,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 		controllerChainID := "shinzo-1"
 		connectionID := "connection-0"
 
-		err := k.hubKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
+		err := k.icaKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
 		require.NoError(t, err)
 
 		did, err := k.IssueDIDFromAccountAddr(ctx, icaAddress)
@@ -66,7 +66,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 		controllerChainID := "shinzo-1"
 		connectionID := "connection-1"
 
-		err := k.hubKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
+		err := k.icaKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
 		require.NoError(t, err)
 
 		did, err := k.IssueDIDFromAccountAddr(ctx, icaAddress)
@@ -82,7 +82,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 		controllerChainID := "shinzo-1"
 		connectionID := "connection-full"
 
-		err := k.hubKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
+		err := k.icaKeeper.SetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress, controllerAddress, controllerChainID, connectionID)
 		require.NoError(t, err)
 
 		did, err := k.IssueDIDFromAccountAddr(ctx, icaAddress)
@@ -90,7 +90,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 		require.NotEmpty(t, did)
 		require.Contains(t, did, "did:ica:")
 
-		connection, found := k.hubKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress)
+		connection, found := k.icaKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), icaAddress)
 		require.True(t, found)
 		require.Equal(t, controllerAddress, connection.ControllerAddress)
 		require.Equal(t, controllerChainID, connection.ControllerChainId)
