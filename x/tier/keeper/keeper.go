@@ -195,7 +195,32 @@ func (k *Keeper) LockAuto(ctx context.Context, delAddr sdk.AccAddress, amt math.
 		)
 	}()
 
-	// Check if developer has any existing lockups
+	// Try to select validator from existing lockups first
+	valAddr = k.selectValidatorFromExistingLockups(ctx, delAddr)
+	if valAddr != nil {
+		err = k.Lock(ctx, delAddr, valAddr, amt)
+		if err != nil {
+			return nil, err
+		}
+		return valAddr, nil
+	}
+
+	// Fall back to selecting validator with smallest tier module delegation
+	valAddr, err = k.selectValidatorWithSmallestDelegation(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.Lock(ctx, delAddr, valAddr, amt)
+	if err != nil {
+		return nil, err
+	}
+
+	return valAddr, nil
+}
+
+// selectValidatorFromExistingLockups finds the bonded validator with the smallest existing lockup for the given delegator.
+func (k *Keeper) selectValidatorFromExistingLockups(ctx context.Context, delAddr sdk.AccAddress) sdk.ValAddress {
 	type lockupInfo struct {
 		valAddr sdk.ValAddress
 		amount  math.Int
@@ -211,29 +236,30 @@ func (k *Keeper) LockAuto(ctx context.Context, delAddr sdk.AccAddress, amt math.
 		}
 	})
 
-	// If developer has existing lockups, select the validator with the smallest lockup
-	if len(developerLockups) > 0 {
-		var minLockup *lockupInfo
-		for i := range developerLockups {
-			if minLockup == nil || developerLockups[i].amount.LT(minLockup.amount) {
-				minLockup = &developerLockups[i]
-			}
-		}
+	if len(developerLockups) == 0 {
+		return nil
+	}
 
-		// Verify the validator is still bonded
-		validator, err := k.stakingKeeper.GetValidator(ctx, minLockup.valAddr)
-		if err == nil && validator.IsBonded() {
-			valAddr = minLockup.valAddr
-			err = k.Lock(ctx, delAddr, valAddr, amt)
-			if err != nil {
-				return nil, err
-			}
-			return valAddr, nil
+	// Find the lockup with the smallest amount
+	var minLockup *lockupInfo
+	for i := range developerLockups {
+		if minLockup == nil || developerLockups[i].amount.LT(minLockup.amount) {
+			minLockup = &developerLockups[i]
 		}
 	}
 
-	// Developer has no existing lockups or all validators with existing developer lockups are unbonded
-	// Select the bonded validator with the smallest delegation from the tier module
+	// Verify the validator is still bonded
+	validator, err := k.stakingKeeper.GetValidator(ctx, minLockup.valAddr)
+	if err != nil || !validator.IsBonded() {
+		return nil
+	}
+
+	return minLockup.valAddr
+}
+
+// selectValidatorWithSmallestDelegation finds the bonded validator with the smallest
+// total delegation from the tier module.
+func (k *Keeper) selectValidatorWithSmallestDelegation(ctx context.Context) (sdk.ValAddress, error) {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	type validatorDelegation struct {
 		valAddr    sdk.ValAddress
@@ -241,7 +267,7 @@ func (k *Keeper) LockAuto(ctx context.Context, delAddr sdk.AccAddress, amt math.
 	}
 	var validatorDelegations []validatorDelegation
 
-	err = k.stakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
+	err := k.stakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
 		if !validator.IsBonded() {
 			return false
 		}
@@ -282,13 +308,7 @@ func (k *Keeper) LockAuto(ctx context.Context, delAddr sdk.AccAddress, amt math.
 		}
 	}
 
-	valAddr = minDelegation.valAddr
-	err = k.Lock(ctx, delAddr, valAddr, amt)
-	if err != nil {
-		return nil, err
-	}
-
-	return valAddr, nil
+	return minDelegation.valAddr, nil
 }
 
 // Lock locks the stake of a delegator to a validator.
