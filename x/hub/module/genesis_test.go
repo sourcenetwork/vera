@@ -36,7 +36,7 @@ func TestGenesis(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
@@ -60,7 +60,7 @@ func TestInitWithEmptyIcaConnections(t *testing.T) {
 		IcaConnections: []types.ICAConnection{},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
@@ -90,7 +90,7 @@ func TestInitWithMultipleIdenticalIcaConnections(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
@@ -131,7 +131,7 @@ func TestInitWithDifferentChainIds(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 	require.NotNil(t, got)
@@ -163,7 +163,7 @@ func TestInitWithEmptyStrings(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 
 	// Genesis initialization should panic with invalid ICA connections
 	require.Panics(t, func() {
@@ -216,7 +216,7 @@ func TestGenesisWithJWSTokens(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 
@@ -245,7 +245,7 @@ func TestGenesisWithEmptyJWSTokens(t *testing.T) {
 		JwsTokens: []types.JWSTokenRecord{},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 
@@ -276,7 +276,7 @@ func TestGenesisWithInvalidJWSToken(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 
 	// Should panic with empty token hash
 	require.Panics(t, func() {
@@ -316,7 +316,7 @@ func TestGenesisWithMultipleTokensSameDID(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 
@@ -364,7 +364,7 @@ func TestGenesisWithJWSTokensAndICAConnections(t *testing.T) {
 		},
 	}
 
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	hub.InitGenesis(ctx, &k, genesisState)
 	got := hub.ExportGenesis(ctx, &k)
 

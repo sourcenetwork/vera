@@ -50,7 +50,7 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 		if _, err := sdk.AccAddressFromBech32(record.AuthorizedAccount); err != nil {
 			return fmt.Errorf("invalid authorized account address: %w", err)
 		}
-	} else if !k.IsBearerAuthIgnored(ctx) {
+	} else if !k.GetChainConfig(ctx).IgnoreBearerAuth {
 		return fmt.Errorf("authorized account is required when bearer auth is enabled")
 	}
 

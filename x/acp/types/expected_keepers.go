@@ -25,8 +25,8 @@ type ParamSubspace interface {
 	Set(context.Context, []byte, interface{})
 }
 
-// ICAKeeper defines the expected interface for the ICA module.
-type ICAKeeper interface {
+// HubKeeper defines the expected interface for the hub module.
+type HubKeeper interface {
 	GetICAConnection(ctx sdk.Context, icaAddress string) (hubtypes.ICAConnection, bool)
 	SetICAConnection(ctx sdk.Context, icaAddress, controllerAddress, controllerChainID, connectionID string) error
 }
