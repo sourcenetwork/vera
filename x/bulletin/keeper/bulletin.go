@@ -30,7 +30,7 @@ func (k Keeper) EnsurePolicy(ctx sdk.Context) (string, error) {
 	_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 		ctx,
 		types.BasePolicy(),
-		coretypes.PolicyMarshalingType_SHORT_YAML,
+		coretypes.PolicyMarshalingType_YAML,
 		types.ModuleName,
 	)
 	if err != nil {

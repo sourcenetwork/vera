@@ -24,7 +24,7 @@ func TestRejectLegacyTxDecorator_RejectsLegacyAmino(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -52,7 +52,7 @@ func TestRejectLegacyTxDecorator_AllowsDirectSignMode(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -78,12 +78,12 @@ func TestRejectLegacyTxDecorator_MultipleSigners(t *testing.T) {
 	msg1 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy 1",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	msg2 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[1].acc.GetAddress().String(),
 		Policy:      "name: test policy 2",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg1, msg2))
 

@@ -26,7 +26,7 @@ func runPropTest(t *testing.T) {
 
 	resp, err := ctx.Executor.CreatePolicy(ctx, &types.MsgCreatePolicy{
 		Policy:      Policy,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 		Creator:     ctx.TxSigner.SourceHubAddr,
 	})
 	require.NoError(t, err)

@@ -23,7 +23,7 @@ func main() {
 		panic("--creator is required")
 	}
 
-	mt := coretypes.PolicyMarshalingType_SHORT_YAML
+	mt := coretypes.PolicyMarshalingType_YAML
 	if marshalType == "SHORT_JSON" {
 		mt = coretypes.PolicyMarshalingType_SHORT_JSON
 	}

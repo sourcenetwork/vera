@@ -73,7 +73,7 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 
 		var policyString string
 		switch marshalingType {
-		case coretypes.PolicyMarshalingType_SHORT_YAML:
+		case coretypes.PolicyMarshalingType_YAML:
 			policyYAML, err := yaml.Marshal(policy)
 			require.NoError(t, err, "failed to marshal policy to YAML")
 			policyString = string(policyYAML)
@@ -106,7 +106,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_YAML() {
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	policyIds := s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_SHORT_YAML)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P2", "P3"}, coretypes.PolicyMarshalingType_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -141,7 +141,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_DuplicatePolicyNames() {
 
 	creator := accKeep.FirstAcc().GetAddress().String()
 
-	_ = s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_SHORT_YAML)
+	_ = s.setupPolicies(s.T(), ctx, k, creator, []string{"P1", "P1"}, coretypes.PolicyMarshalingType_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -175,7 +175,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeNumberOfPolicies_YAML() {
 	for i := 0; i < 10_000; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-	policyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	policyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_YAML)
 
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{})
 	require.NoError(s.T(), err)
@@ -193,7 +193,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_WithPagination() {
 	for i := 0; i < 25; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_YAML)
 
 	// Test first page with limit 10
 	resp1, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
@@ -253,7 +253,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_WithKeyBasedPagination() {
 	for i := 0; i < 25; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	allPolicyIds := s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_YAML)
 
 	// Test first page with limit 10
 	resp1, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
@@ -314,7 +314,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_LargeOffset() {
 	for i := 0; i < 100; i++ {
 		names = append(names, "Policy"+strconv.Itoa(i))
 	}
-	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_YAML)
 
 	// Test with offset beyond total
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{
@@ -335,7 +335,7 @@ func (s *queryPolicyIdsSuite) TestQueryPolicyIds_MalformedKey() {
 	creator := accKeep.FirstAcc().GetAddress().String()
 
 	names := []string{"P1", "P2", "P3"}
-	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_SHORT_YAML)
+	_ = s.setupPolicies(s.T(), ctx, k, creator, names, coretypes.PolicyMarshalingType_YAML)
 
 	// Test with malformed key
 	resp, err := k.PolicyIds(ctx, &types.QueryPolicyIdsRequest{

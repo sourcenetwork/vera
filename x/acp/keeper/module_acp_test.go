@@ -14,7 +14,7 @@ func Test_CreateModulePolicy_ModuleCanCreatePolicy(t *testing.T) {
 	ctx, k, _, _ := setupKeeperWithCapability(t)
 
 	pol := "name: test"
-	record, capability, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, "external")
+	record, capability, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, "external")
 
 	require.NoError(t, err)
 	require.Equal(t, pol, record.RawPolicy)
@@ -28,12 +28,12 @@ func Test_EditModulePolicy_CannotEditWithoutClaimingCapability(t *testing.T) {
 
 	// Given Policy created by module without a claimed capability
 	pol := "name: test"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, "external")
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, "external")
 	require.NoError(t, err)
 
 	// When the module attempts to edit the policy
 	pol = "name: new-name"
-	result, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
+	result, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_YAML)
 
 	// Then cmd is reject due to invalid capability
 	require.Nil(t, result)
@@ -48,7 +48,7 @@ func Test_EditModulePolicy_ModuleCanEditPolicyTiedToClaimedCapability(t *testing
 
 	// Given policy create by test_module
 	pol := "name: test"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, moduleName)
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)
 	require.NoError(t, err)
 	// And capability claimed by the module
 	manager := capability.NewPolicyCapabilityManager(&scopedKeeper)
@@ -57,7 +57,7 @@ func Test_EditModulePolicy_ModuleCanEditPolicyTiedToClaimedCapability(t *testing
 
 	// When the module edits the policy
 	pol = "name: new-name"
-	record, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_SHORT_YAML)
+	record, _, err := k.EditModulePolicy(ctx, cap, pol, coretypes.PolicyMarshalingType_YAML)
 
 	// Then policy record was edited with no error
 	require.NoError(t, err)
@@ -74,7 +74,7 @@ resources:
   file:
 `
 	moduleName := "mod1"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, moduleName)
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)
 	require.NoError(t, err)
 	// And claimed by mod1
 	scopedKeeper := capK.ScopeToModule(moduleName)
@@ -104,7 +104,7 @@ resources:
   file:
 `
 	moduleName := "mod1"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, moduleName)
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)
 	require.NoError(t, err)
 	// And claimed by mod1
 	scopedKeeper := capK.ScopeToModule(moduleName)
@@ -132,7 +132,7 @@ func Test_ModulePolicyCmdForActorAccount_ModuleCannotUsePolicyWithoutClaimingCap
 
 	// Given Policy created by module without a claimed capability
 	pol := "name: test"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_SHORT_YAML, "external")
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, "external")
 	require.NoError(t, err)
 
 	// When module issues a policy cmd to an actor acc

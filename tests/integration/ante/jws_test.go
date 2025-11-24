@@ -170,7 +170,7 @@ resources:
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     faucetAddr.String(),
 		Policy:      policyContent,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	// Create bearer token payload

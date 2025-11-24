@@ -40,7 +40,7 @@ actor:
   name: actor
   doc: some actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)
@@ -122,7 +122,7 @@ actor:
   name: actor-source
   doc: my actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)
@@ -143,7 +143,7 @@ resources:
       read:
         expr: owner
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)
@@ -159,7 +159,7 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy:      "",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)
@@ -197,7 +197,7 @@ actor:
   name: actor-factor
   doc: bad actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	result, err := k.ValidatePolicy(ctx, req)

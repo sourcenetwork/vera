@@ -44,7 +44,7 @@ resources:
 	msg := types.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policyStr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := k.CreatePolicy(ctx, &msg)

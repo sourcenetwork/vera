@@ -60,7 +60,7 @@ resources:
 `
 
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_YAML))
 	tx, err := txBuilder.Build(ctx, signer, &msgSet)
 	if err != nil {
 		log.Fatal(err)

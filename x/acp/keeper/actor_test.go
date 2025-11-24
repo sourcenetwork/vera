@@ -62,7 +62,7 @@ func TestCreatePolicy_WithExtractedDID(t *testing.T) {
 	msg := &types.MsgCreatePolicy{
 		Creator:     testAddr,
 		Policy:      "name: test\nresources:\n  file:\n    relations:\n      owner: {}\n",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := msgServer.CreatePolicy(ctx, msg)
@@ -85,7 +85,7 @@ func TestCreatePolicy_WithoutExtractedDID(t *testing.T) {
 	msg := &types.MsgCreatePolicy{
 		Creator:     testAddr,
 		Policy:      "name: test\nresources:\n  file:\n    relations:\n      owner: {}\n",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := msgServer.CreatePolicy(ctx, msg)
@@ -119,7 +119,7 @@ resources:
         types:
           - actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	createResp, err := msgServer.CreatePolicy(ctx, createMsg)
@@ -141,7 +141,7 @@ resources:
         types:
           - actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	editResp, err := msgServer.EditPolicy(ctx, editMsg)
@@ -174,7 +174,7 @@ resources:
         types:
           - actor
 `,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	createResp, err := msgServer.CreatePolicy(ctx, createMsg)

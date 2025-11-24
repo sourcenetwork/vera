@@ -3983,7 +3983,7 @@ const (
 	// Fallback value for a missing Marshaling Type
 	PolicyMarshalingType_UNKNOWN PolicyMarshalingType = 0
 	// Policy Marshaled as a YAML Short Policy definition
-	PolicyMarshalingType_SHORT_YAML PolicyMarshalingType = 1
+	PolicyMarshalingType_YAML PolicyMarshalingType = 1
 	// Policy Marshaled as a JSON Short Policy definition
 	PolicyMarshalingType_SHORT_JSON PolicyMarshalingType = 2
 )

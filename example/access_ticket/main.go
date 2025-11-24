@@ -133,7 +133,7 @@ func getSigner(accAddr string) sdk.TxSigner {
 
 func createPolicy(ctx context.Context, client *sdk.Client, txBuilder *sdk.TxBuilder, txSigner sdk.TxSigner) *coretypes.Policy {
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(txSigner.GetAccAddress(), policy, coretypes.PolicyMarshalingType_YAML))
 	tx, err := txBuilder.Build(ctx, txSigner, &msgSet)
 	if err != nil {
 		log.Fatal(err)
