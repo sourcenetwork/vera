@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
 	cmtlog "github.com/cometbft/cometbft/libs/log"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
 	"github.com/cometbft/cometbft/rpc/client/http"
@@ -18,6 +17,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ignite/cli/v28/ignite/pkg/cosmosclient"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 

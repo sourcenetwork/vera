@@ -13,22 +13,22 @@ import (
 var deletePolicy = `
 name: policy
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-      reader:
-        types:
-          - actor
-      writer:
-        types:
-          - actor
-      admin:
-        types:
-          - actor
-        manages:
-          - reader
+- name: file
+  relations:
+  - manages:
+    - reader
+    name: admin
+    types:
+    - actor
+  - name: owner
+    types:
+    - actor
+  - name: reader
+    types:
+    - actor
+  - name: writer
+    types:
+    - actor
 `
 
 func setupDelete(t *testing.T) *test.TestCtx {

@@ -13,19 +13,19 @@ import (
 var setPolicy string = `
 name: policy
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-      admin:
-        manages:
-          - reader
-        types:
-          - actor
-      reader:
-        types:
-          - actor
+- name: file
+  relations:
+  - manages:
+    - reader
+    name: admin
+    types:
+    - actor
+  - name: owner
+    types:
+    - actor
+  - name: reader
+    types:
+    - actor
 `
 
 func setupSetRel(t *testing.T) *test.TestCtx {

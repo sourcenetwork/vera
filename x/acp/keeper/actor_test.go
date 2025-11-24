@@ -61,7 +61,7 @@ func TestCreatePolicy_WithExtractedDID(t *testing.T) {
 	// Create a policy
 	msg := &types.MsgCreatePolicy{
 		Creator:     testAddr,
-		Policy:      "name: test\nresources:\n  file:\n    relations:\n      owner: {}\n",
+		Policy:      "name: test\nresources:\n- name: file\n  relations:\n  - name: owner",
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
@@ -84,7 +84,7 @@ func TestCreatePolicy_WithoutExtractedDID(t *testing.T) {
 	// Create a policy
 	msg := &types.MsgCreatePolicy{
 		Creator:     testAddr,
-		Policy:      "name: test\nresources:\n  file:\n    relations:\n      owner: {}\n",
+		Policy:      "name: test\nresources:\n- name: file\n  relations:\n  - name: owner",
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
@@ -111,15 +111,15 @@ func TestEditPolicy_WithExtractedDID(t *testing.T) {
 
 	createMsg := &types.MsgCreatePolicy{
 		Creator: testAddr,
-		Policy: `name: test
+		Policy: `
+name: test
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-`,
-		MarshalType: coretypes.PolicyMarshalingType_YAML,
+- name: file
+  relations:
+  - name: owner
+    types:
+    - actor
+`, MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	createResp, err := msgServer.CreatePolicy(ctx, createMsg)
@@ -133,15 +133,15 @@ resources:
 	editMsg := &types.MsgEditPolicy{
 		Creator:  testAddr,
 		PolicyId: policyID,
-		Policy: `name: test 2
+		Policy: `
+name: test 2
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-`,
-		MarshalType: coretypes.PolicyMarshalingType_YAML,
+- name: file
+  relations:
+  - name: owner
+    types:
+    - actor
+`, MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	editResp, err := msgServer.EditPolicy(ctx, editMsg)
@@ -166,15 +166,15 @@ func TestDirectPolicyCmd_WithExtractedDID(t *testing.T) {
 
 	createMsg := &types.MsgCreatePolicy{
 		Creator: testAddr,
-		Policy: `name: test
+		Policy: `
+name: test
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-`,
-		MarshalType: coretypes.PolicyMarshalingType_YAML,
+- name: file
+  relations:
+  - name: owner
+    types:
+    - actor
+`, MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	createResp, err := msgServer.CreatePolicy(ctx, createMsg)

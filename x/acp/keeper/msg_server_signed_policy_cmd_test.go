@@ -16,24 +16,24 @@ func TestSignedPolicyCmd_ReplayProtection(t *testing.T) {
 	creator := accK.GenAccount().GetAddress().String()
 
 	policyStr := `
-name: policy
 description: ok
+name: policy
 resources:
-	file:
-		relations:
-			owner:
-				doc: owner owns
-				types:
-					- actor
-			reader:
-				types:
-					- actor
-		permissions:
-			own:
-				expr: owner
-				doc: own doc
-			read:
-				expr: owner + reader
+- name: file
+  permissions:
+  - doc: own doc
+    expr: owner
+    name: own
+  - expr: owner + reader
+    name: read
+  relations:
+  - doc: owner owns
+    name: owner
+    types:
+    - actor
+  - name: reader
+    types:
+    - actor
 `
 
 	msg := types.MsgCreatePolicy{

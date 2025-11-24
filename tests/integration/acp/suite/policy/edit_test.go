@@ -13,18 +13,18 @@ func TestEditPolicy_CanEditPolicy(t *testing.T) {
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      reader:
-      writer:
-    permissions:
-      read:
-        expr: reader + writer
-      write:
-        expr: writer
+- name: file
+  permissions:
+  - expr: reader + writer
+    name: read
+  - expr: writer
+    name: write
+  relations:
+  - name: reader
+  - name: writer
 `,
 		Creator: ctx.TxSigner,
 	}
@@ -92,18 +92,18 @@ resources:
 		Id:      ctx.State.PolicyId,
 		Creator: ctx.TxSigner,
 		Policy: `
-name: new policy
 description: new ok
+name: new policy
 resources:
-  file:
-    relations:
-      writer:
-      collaborator:
-    permissions:
-      read:
-        expr: collaborator
-      write:
-        expr: collaborator + writer
+- name: file
+  permissions:
+  - expr: collaborator
+    name: read
+  - expr: collaborator + writer
+    name: write
+  relations:
+  - name: collaborator
+  - name: writer
 `,
 		Expected: want,
 	}

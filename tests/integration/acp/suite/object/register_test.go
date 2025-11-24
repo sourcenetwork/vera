@@ -13,11 +13,11 @@ import (
 var policyDef string = `
 name: policy
 resources:
-  resource:
-    relations:
-      owner:
-        types:
-          - actor
+- name: resource
+  relations:
+  - name: owner
+    types:
+    - actor
 `
 
 func TestRegisterObject_RegisteringNewObjectIsSucessful(t *testing.T) {

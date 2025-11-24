@@ -27,29 +27,29 @@ func (s *queryObjectOwnerSuite) setup(t *testing.T) (context.Context, Keeper, sd
 	s.obj = coretypes.NewObject("file", "1")
 
 	policyStr := `
-name: policy
-description: ok
-resources:
-  file:
-    relations: 
-      owner:
-        doc: owner owns
-        types:
-          - actor-resource
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions: 
-      own:
-        expr: owner
-        doc: own doc
-      read: 
-        expr: owner + reader
 actor:
-  name: actor-resource
   doc: my actor
-          `
+  name: actor-resource
+description: ok
+name: policy
+resources:
+- name: file
+  permissions:
+  - doc: own doc
+    expr: owner
+    name: own
+  - expr: owner + reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - doc: owner owns
+    name: owner
+    types:
+    - actor-resource
+  - name: reader
+`
 
 	ctx, k, accKeep := setupKeeper(t)
 	creator := accKeep.FirstAcc().GetAddress().String()

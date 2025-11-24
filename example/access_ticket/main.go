@@ -26,14 +26,14 @@ const nodeAddrFlag = "node-addr"
 var policy string = `
 name: access ticket example
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-    permissions:
-      read:
-        expr: owner
+- name: file
+  permissions:
+  - expr: owner
+    name: read
+  relations:
+  - name: owner
+    types:
+    - actor
 `
 
 func main() {

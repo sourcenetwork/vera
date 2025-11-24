@@ -15,28 +15,28 @@ func TestCreatePolicy_ValidPolicyIsCreated(t *testing.T) {
 	defer ctx.Cleanup()
 
 	policyStr := `
-name: policy
-description: ok
-resources:
-  file:
-    relations:
-      owner:
-        doc: owner owns
-        types:
-          - actor-resource
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions:
-      own:
-        expr: owner
-        doc: own doc
-      read:
-        expr: owner + reader
 actor:
-  name: actor-resource
   doc: my actor
+  name: actor-resource
+description: ok
+name: policy
+resources:
+- name: file
+  permissions:
+  - doc: own doc
+    expr: owner
+    name: own
+  - expr: owner + reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - doc: owner owns
+    name: owner
+    types:
+    - actor-resource
+  - name: reader
 `
 	want := &coretypes.Policy{
 		Id:                "da7be65027664708551f97197ba5f5993aa99bc7b57055df9766426dc6da9605",
@@ -123,18 +123,17 @@ func TestCreatePolicy_PolicyResources_OwnerRelationImplicitlyAdded(t *testing.T)
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      reader:
-    permissions:
-  foo:
-    relations:
-      owner:
-    permissions:
+- name: file
+  relations:
+  - name: reader
+- name: foo
+  relations:
+  - name: owner
 `,
+
 		Creator: ctx.TxSigner,
 	}
 	pol := action.Run(ctx)
@@ -147,17 +146,17 @@ func TestCreatePolicy_ManagementReferencingUndefinedRelationReturnsError(t *test
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      owner:
-      admin:
-        manages:
-          - deleter
-    permissions:
+- name: file
+  relations:
+  - manages:
+    - deleter
+    name: admin
+  - name: owner
 `,
+
 		Creator: ctx.TxSigner,
 		//ExpectedErr: coretypes.ErrInvalidManagementRule, // FIXME
 		ExpectedErr: errors.ErrorType_BAD_INPUT,

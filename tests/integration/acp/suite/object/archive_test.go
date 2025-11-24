@@ -13,14 +13,14 @@ import (
 var unregisterTestPol = `
 name: policy
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
-      reader:
-        types:
-          - actor
+- name: file
+  relations:
+  - name: owner
+    types:
+    - actor
+  - name: reader
+    types:
+    - actor
 `
 
 func setupArchive(t *testing.T) *test.TestCtx {

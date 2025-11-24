@@ -23,22 +23,22 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_ValidPolicy() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
-name: Source Policy
-description: A valid policy
-resources:
-  file:
-    relations: 
-      owner:
-        types:
-          - actor
-    permissions: 
-      read: 
-        expr: owner
-      write: 
-        expr: owner
 actor:
-  name: actor
   doc: some actor
+  name: actor
+description: A valid policy
+name: Source Policy
+resources:
+- name: file
+  permissions:
+  - expr: owner
+    name: read
+  - expr: owner
+    name: write
+  relations:
+  - name: owner
+    types:
+    - actor
 `,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
@@ -99,28 +99,28 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_ComplexValidPolicy() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
-name: Source Policy
-description: Another valid policy
-resources:
-  file:
-    relations:
-      owner:
-        doc: owner owns
-        types:
-          - actor-source
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions:
-      own:
-        expr: owner
-        doc: own doc
-      read:
-        expr: owner + reader
 actor:
-  name: actor-source
   doc: my actor
+  name: actor-source
+description: Another valid policy
+name: Source Policy
+resources:
+- name: file
+  permissions:
+  - doc: own doc
+    expr: owner
+    name: own
+  - expr: owner + reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - doc: owner owns
+    name: owner
+    types:
+    - actor-source
+  - name: reader
 `,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
@@ -174,28 +174,28 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_BadActor() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
-name: Yet another invalid policy
-description: Policy with bad actor
-resources:
-  file:
-    relations:
-      owner:
-        doc: owner owns
-        types:
-          - actor-source
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions:
-      own:
-        expr: owner
-        doc: own doc
-      read:
-        expr: owner + reader
 actor:
-  name: actor-factor
   doc: bad actor
+  name: actor-factor
+description: Policy with bad actor
+name: Yet another invalid policy
+resources:
+- name: file
+  permissions:
+  - doc: own doc
+    expr: owner
+    name: own
+  - expr: owner + reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - doc: owner owns
+    name: owner
+    types:
+    - actor-source
+  - name: reader
 `,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}

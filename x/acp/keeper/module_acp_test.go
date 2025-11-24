@@ -71,7 +71,7 @@ func Test_ModulePolicyCmdForActorDID_ModuleCanAddRelationshipsToTheirPolicy(t *t
 	pol := `
 name: test
 resources:
-  file:
+- name: file
 `
 	moduleName := "mod1"
 	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)
@@ -101,7 +101,7 @@ func Test_ModulePolicyCmdForActorAccount_ModuleCanAddRelationshipsToTheirPolicy(
 	pol := `
 name: test
 resources:
-  file:
+- name: file
 `
 	moduleName := "mod1"
 	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)

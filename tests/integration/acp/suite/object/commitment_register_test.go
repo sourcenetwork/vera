@@ -13,11 +13,11 @@ import (
 var commitPolicy string = `
 name: policy
 resources:
-  resource:
-    relations:
-      owner:
-        types:
-          - actor
+- name: resource
+  relations:
+  - name: owner
+    types:
+    - actor
 `
 
 func TestCommitRegistration_CreatingCommitmentReturnsID(t *testing.T) {

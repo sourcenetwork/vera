@@ -48,11 +48,11 @@ func main() {
 	policy := `
 name: test
 resources:
-  resource:
-    relations:
-      owner:
-        types:
-          - actor
+- name: resource
+  relations:
+  - name: owner
+    types:
+    - actor
 `
 
 	msgSet := sdk.MsgSet{}

@@ -5,9 +5,9 @@ const ObjectId = "readme.txt"
 const Policy string = `
 name: test
 resources:
-  file:
-    relations:
-      owner:
-        types:
-          - actor
+- name: file
+  relations:
+  - name: owner
+    types:
+    - actor
 `

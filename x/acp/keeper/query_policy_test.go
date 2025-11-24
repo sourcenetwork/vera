@@ -22,20 +22,20 @@ func TestQueryPolicy(t *testing.T) {
 
 func (s *queryPolicySuite) setupPolicy(t *testing.T) (context.Context, Keeper, string) {
 	policyStr := `
-name: Source Policy
 description: A valid policy
+name: Source Policy
 resources:
-  file:
-    relations: 
-      owner:
-        types:
-          - actor
-      rm-root:
-    permissions: 
-      read: 
-        expr: owner
-      write: 
-        expr: owner
+- name: file
+  permissions:
+  - expr: owner
+    name: read
+  - expr: owner
+    name: write
+  relations:
+  - name: owner
+    types:
+    - actor
+  - name: rm-root
 `
 
 	ctx, k, accKeep := setupKeeper(t)
