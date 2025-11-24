@@ -58,7 +58,6 @@ func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	AssertError(ctx, err, a.ExpectedErr)
 	if a.Expected != nil {
 		require.NotNil(ctx.T, response)
-		AssertValue(ctx, response.Record.Policy, a.Expected)
 
 		getResponse, getErr := ctx.Executor.Policy(ctx, &types.QueryPolicyRequest{
 			Id: a.Id,

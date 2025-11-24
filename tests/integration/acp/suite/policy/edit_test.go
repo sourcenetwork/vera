@@ -36,7 +36,7 @@ resources:
 		Description:       "new ok",
 		SpecificationType: coretypes.PolicySpecificationType_NO_SPEC,
 		Resources: []*coretypes.Resource{
-			&coretypes.Resource{
+			{
 				Name: "file",
 				Relations: []*coretypes.Relation{
 					{
@@ -58,27 +58,26 @@ resources:
 				},
 				Permissions: []*coretypes.Permission{
 					{
-						Name:       "_can_manage_collaborator",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the collaborator relation (permission was auto-generated).",
-					},
-					{
-						Name:       "_can_manage_owner",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
-					},
-					{
-						Name:       "_can_manage_writer",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the writer relation (permission was auto-generated).",
-					},
-					{
 						Name:       "read",
 						Expression: "(owner + collaborator)",
 					},
 					{
 						Name:       "write",
 						Expression: "(owner + (collaborator + writer))",
+					},
+				},
+				ManagementPermissions: []*coretypes.ManagementPermission{
+					{
+						Name:       "collaborator",
+						Expression: "owner",
+					},
+					{
+						Name:       "owner",
+						Expression: "owner",
+					},
+					{
+						Name:       "writer",
+						Expression: "owner",
 					},
 				},
 			},

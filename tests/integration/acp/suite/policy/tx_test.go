@@ -39,22 +39,22 @@ resources:
   - name: reader
 `
 	want := &coretypes.Policy{
-		Id:                "da7be65027664708551f97197ba5f5993aa99bc7b57055df9766426dc6da9605",
+		Id:                "ba5162bd61996b6fb6e66ef85449f0de2e89584743df7f71577674cfb531eb25",
 		Name:              "policy",
 		Description:       "ok",
 		SpecificationType: coretypes.PolicySpecificationType_NO_SPEC,
 		Resources: []*coretypes.Resource{
-			&coretypes.Resource{
+			{
 				Name: "file",
 				Relations: []*coretypes.Relation{
-					&coretypes.Relation{
+					{
 						Name: "admin",
 						Manages: []string{
 							"reader",
 						},
 						VrTypes: []*coretypes.Restriction{},
 					},
-					&coretypes.Relation{
+					{
 						Name: "owner",
 						Doc:  "owner owns",
 						VrTypes: []*coretypes.Restriction{
@@ -64,26 +64,12 @@ resources:
 							},
 						},
 					},
-					&coretypes.Relation{
-						Name: "reader",
+					{
+						Name:    "reader",
+						VrTypes: []*coretypes.Restriction{},
 					},
 				},
 				Permissions: []*coretypes.Permission{
-					{
-						Name:       "_can_manage_admin",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the admin relation (permission was auto-generated).",
-					},
-					{
-						Name:       "_can_manage_owner",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
-					},
-					{
-						Name:       "_can_manage_reader",
-						Expression: "(admin + owner)",
-						Doc:        "permission controls actors which are allowed to create relationships for the reader relation (permission was auto-generated).",
-					},
 					{
 						Name:       "own",
 						Expression: "owner",
@@ -94,11 +80,26 @@ resources:
 						Expression: "(owner + reader)",
 					},
 				},
+				ManagementPermissions: []*coretypes.ManagementPermission{
+					{
+						Name:       "admin",
+						Expression: "owner",
+					},
+					{
+						Name:       "owner",
+						Expression: "owner",
+					},
+					{
+						Name:       "reader",
+						Expression: "(admin + owner)",
+					},
+				},
 			},
 		},
 		ActorResource: &coretypes.ActorResource{
-			Name: "actor-resource",
-			Doc:  "my actor",
+			Name:      "actor-resource",
+			Doc:       "my actor",
+			Relations: []*coretypes.Relation{},
 		},
 	}
 

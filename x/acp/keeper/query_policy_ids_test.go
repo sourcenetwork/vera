@@ -34,37 +34,41 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 	policyIds := []string{}
 
 	for _, name := range policyNames {
-		policy := &coretypes.PolicyShort{
+		policy := &coretypes.PolicyYaml{
 			Name:        name,
 			Description: "Test policy for " + name,
 			Meta: map[string]string{
 				"k1": "v1",
 				"k2": "v2",
 			},
-			Resources: map[string]*coretypes.ResourceShort{
-				"file": {
-					Doc: "A test resource",
-					Permissions: map[string]*coretypes.PermissionShort{
-						"manage": {
+			Resources: []*coretypes.ResourceYaml{
+				{
+					Name:        "file",
+					Description: "A test resource",
+					Permissions: []*coretypes.PermissionYaml{
+						{
+							Name: "manage",
 							Doc:  "Permission to manage resources",
 							Expr: "owner",
 						},
 					},
-					Relations: map[string]*coretypes.RelationShort{
-						"owner": {
+					Relations: []*coretypes.RelationYaml{
+						{
+							Name:    "owner",
 							Doc:     "Owner relation",
 							Manages: []string{"reader"},
 							Types: []string{
 								"actor-resource->",
 							},
 						},
-						"reader": {
-							Doc: "Reader relation",
+						{
+							Name: "reader",
+							Doc:  "Reader relation",
 						},
 					},
 				},
 			},
-			Actor: &coretypes.ActorResource{
+			Actor: &coretypes.ActorResourceYaml{
 				Name: "actor-resource",
 				Doc:  "Test actor resource",
 			},

@@ -53,8 +53,9 @@ resources:
 			Name:        "Source Policy",
 			Description: "A valid policy",
 			ActorResource: &coretypes.ActorResource{
-				Name: "actor",
-				Doc:  "some actor",
+				Name:      "actor",
+				Doc:       "some actor",
+				Relations: []*coretypes.Relation{},
 			},
 			Attributes:        nil,
 			SpecificationType: 0,
@@ -62,11 +63,6 @@ resources:
 				{
 					Name: "file",
 					Permissions: []*coretypes.Permission{
-						{
-							Name:       "_can_manage_owner",
-							Expression: "owner",
-							Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
-						},
 						{
 							Name:       "read",
 							Expression: "owner",
@@ -84,6 +80,12 @@ resources:
 									ResourceName: "actor",
 								},
 							},
+						},
+					},
+					ManagementPermissions: []*coretypes.ManagementPermission{
+						{
+							Name:       "owner",
+							Expression: "owner",
 						},
 					},
 				},
