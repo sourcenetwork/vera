@@ -34,14 +34,14 @@ func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
 
-// SanitizeKeyPart replaces "/" with ":" in key parts to prevent key collisions.
+// SanitizeKeyPart replaces "/" with "|" in key parts to prevent key collisions.
 func SanitizeKeyPart(part string) string {
-	return strings.ReplaceAll(part, "/", ":")
+	return strings.ReplaceAll(part, "/", "|")
 }
 
-// unsanitizeKeyPart restores "/" from ":" in key parts.
+// unsanitizeKeyPart restores "/" from "|" in key parts.
 func unsanitizeKeyPart(part string) string {
-	return strings.ReplaceAll(part, ":", "/")
+	return strings.ReplaceAll(part, "|", "/")
 }
 
 // PostKey builds and returns the store key to store/retrieve the Post.
