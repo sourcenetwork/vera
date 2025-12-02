@@ -66,7 +66,7 @@ func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.Acc
 		authority.String(),
 		accKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

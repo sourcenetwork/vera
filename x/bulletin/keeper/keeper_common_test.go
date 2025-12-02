@@ -78,7 +78,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	k := NewKeeper(

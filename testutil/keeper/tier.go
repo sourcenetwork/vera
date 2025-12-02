@@ -231,6 +231,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		epochsKeeper,
 		distributionKeeper,
 		feegrantKeeper,
+		nil,
 	)
 
 	// Initialize params

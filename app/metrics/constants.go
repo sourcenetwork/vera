@@ -59,6 +59,7 @@ const (
 	HandleDoubleSign       = "handle_double_sign"
 	HandleMissingSignature = "handle_missing_signature"
 	Lock                   = "lock"
+	LockAuto               = "lock_auto"
 	ProcessRewards         = "process_rewards"
 	Redelegate             = "redelegate"
 	RemoveDeveloper        = "remove_developer"

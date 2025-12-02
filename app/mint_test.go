@@ -78,6 +78,7 @@ func (suite *MintTestSuite) SetupTest() {
 		suite.epochsKeeper,
 		suite.distrKeeper,
 		suite.feegrantKeeper,
+		nil,
 	)
 
 	suite.mintKeeper = mintkeeper.NewKeeper(

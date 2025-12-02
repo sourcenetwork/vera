@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Msg_UpdateParams_FullMethodName           = "/sourcehub.tier.v1beta1.Msg/UpdateParams"
 	Msg_Lock_FullMethodName                   = "/sourcehub.tier.v1beta1.Msg/Lock"
+	Msg_LockAuto_FullMethodName               = "/sourcehub.tier.v1beta1.Msg/LockAuto"
 	Msg_Unlock_FullMethodName                 = "/sourcehub.tier.v1beta1.Msg/Unlock"
 	Msg_Redelegate_FullMethodName             = "/sourcehub.tier.v1beta1.Msg/Redelegate"
 	Msg_CancelUnlocking_FullMethodName        = "/sourcehub.tier.v1beta1.Msg/CancelUnlocking"
@@ -43,6 +44,8 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	// Lock defines a (developer) operation for locking a stake.
 	Lock(ctx context.Context, in *MsgLock, opts ...grpc.CallOption) (*MsgLockResponse, error)
+	// LockAuto defines a (developer) operation for locking a stake with automatic validator selection.
+	LockAuto(ctx context.Context, in *MsgLockAuto, opts ...grpc.CallOption) (*MsgLockAutoResponse, error)
 	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(ctx context.Context, in *MsgUnlock, opts ...grpc.CallOption) (*MsgUnlockResponse, error)
 	// Redelegate defines a (developer) operation for re-delegating a stake.
@@ -86,6 +89,16 @@ func (c *msgClient) Lock(ctx context.Context, in *MsgLock, opts ...grpc.CallOpti
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgLockResponse)
 	err := c.cc.Invoke(ctx, Msg_Lock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) LockAuto(ctx context.Context, in *MsgLockAuto, opts ...grpc.CallOption) (*MsgLockAutoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgLockAutoResponse)
+	err := c.cc.Invoke(ctx, Msg_LockAuto_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -193,6 +206,8 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	// Lock defines a (developer) operation for locking a stake.
 	Lock(context.Context, *MsgLock) (*MsgLockResponse, error)
+	// LockAuto defines a (developer) operation for locking a stake with automatic validator selection.
+	LockAuto(context.Context, *MsgLockAuto) (*MsgLockAutoResponse, error)
 	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(context.Context, *MsgUnlock) (*MsgUnlockResponse, error)
 	// Redelegate defines a (developer) operation for re-delegating a stake.
@@ -227,6 +242,9 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 }
 func (UnimplementedMsgServer) Lock(context.Context, *MsgLock) (*MsgLockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Lock not implemented")
+}
+func (UnimplementedMsgServer) LockAuto(context.Context, *MsgLockAuto) (*MsgLockAutoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LockAuto not implemented")
 }
 func (UnimplementedMsgServer) Unlock(context.Context, *MsgUnlock) (*MsgUnlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unlock not implemented")
@@ -308,6 +326,24 @@ func _Msg_Lock_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).Lock(ctx, req.(*MsgLock))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_LockAuto_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgLockAuto)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).LockAuto(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_LockAuto_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).LockAuto(ctx, req.(*MsgLockAuto))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -488,6 +524,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Lock",
 			Handler:    _Msg_Lock_Handler,
+		},
+		{
+			MethodName: "LockAuto",
+			Handler:    _Msg_LockAuto_Handler,
 		},
 		{
 			MethodName: "Unlock",

@@ -97,3 +97,70 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 		require.Equal(t, connectionID, connection.ConnectionId)
 	})
 }
+
+func TestGetAddressFromDID(t *testing.T) {
+	ctx, k, accountKeeper := setupKeeper(t)
+
+	t.Run("round-trip: account -> DID -> address", func(t *testing.T) {
+		account := accountKeeper.GenAccount()
+		originalAddr := account.GetAddress()
+
+		did, err := k.IssueDIDFromAccountAddr(ctx, originalAddr.String())
+		require.NoError(t, err)
+		require.NotEmpty(t, did)
+		require.Contains(t, did, "did:key:")
+
+		derivedAddr, err := k.GetAddressFromDID(ctx, did)
+		require.NoError(t, err)
+		require.NotNil(t, derivedAddr)
+
+		require.Equal(t, originalAddr.String(), derivedAddr.String(),
+			"Address derived from DID should match original address")
+	})
+
+	t.Run("invalid DID format", func(t *testing.T) {
+		invalidDID := "not-a-valid-did"
+
+		addr, err := k.GetAddressFromDID(ctx, invalidDID)
+		require.Error(t, err)
+		require.Nil(t, addr)
+		require.Contains(t, err.Error(), "invalid DID")
+	})
+
+	t.Run("empty DID", func(t *testing.T) {
+		addr, err := k.GetAddressFromDID(ctx, "")
+		require.Error(t, err)
+		require.Nil(t, addr)
+	})
+
+	t.Run("valid did:key format with secp256k1", func(t *testing.T) {
+		testDID := "did:key:zQ3shokFTS3brHcDQrn82RUDfCZESWL1ZdCEJwekUDPQiYBme"
+
+		addr, err := k.GetAddressFromDID(ctx, testDID)
+		require.NoError(t, err)
+		require.NotNil(t, addr)
+		require.NotEmpty(t, addr.String())
+
+		require.True(t, len(addr) > 0)
+	})
+
+	t.Run("multiple conversions of same DID produce same address", func(t *testing.T) {
+		account := accountKeeper.GenAccount()
+		originalAddr := account.GetAddress()
+		did, err := k.IssueDIDFromAccountAddr(ctx, originalAddr.String())
+		require.NoError(t, err)
+
+		addr1, err := k.GetAddressFromDID(ctx, did)
+		require.NoError(t, err)
+
+		addr2, err := k.GetAddressFromDID(ctx, did)
+		require.NoError(t, err)
+
+		addr3, err := k.GetAddressFromDID(ctx, did)
+		require.NoError(t, err)
+
+		require.Equal(t, addr1.String(), addr2.String())
+		require.Equal(t, addr2.String(), addr3.String())
+		require.Equal(t, originalAddr.String(), addr1.String())
+	})
+}

@@ -203,7 +203,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	IcaKeeper     types.ICAKeeper
+	HubKeeper     types.HubKeeper
 }
 
 type ModuleOutputs struct {
@@ -225,10 +225,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
-		// set cap keeper as nil it is initialized
-		// after depinject is finished executing
-		nil,
-		in.IcaKeeper,
+		nil, // cap keeper is initialized after depinject is finished executing
+		in.HubKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,

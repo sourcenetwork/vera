@@ -5,23 +5,23 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
-// ICAKeeperStub is a stub implementation of the ICA keeper for testing.
-type ICAKeeperStub struct {
+// HubKeeperStub is a stub implementation of the ICA keeper for testing.
+type HubKeeperStub struct {
 	connections map[string]types.ICAConnection
 }
 
-func NewICAKeeperStub() *ICAKeeperStub {
-	return &ICAKeeperStub{
+func NewHubKeeperStub() *HubKeeperStub {
+	return &HubKeeperStub{
 		connections: make(map[string]types.ICAConnection),
 	}
 }
 
-func (iks *ICAKeeperStub) GetICAConnection(ctx sdk.Context, icaAddress string) (types.ICAConnection, bool) {
+func (iks *HubKeeperStub) GetICAConnection(ctx sdk.Context, icaAddress string) (types.ICAConnection, bool) {
 	connection, found := iks.connections[icaAddress]
 	return connection, found
 }
 
-func (iks *ICAKeeperStub) SetICAConnection(ctx sdk.Context, icaAddress, controllerAddress, controllerChainID, connectionID string) error {
+func (iks *HubKeeperStub) SetICAConnection(ctx sdk.Context, icaAddress, controllerAddress, controllerChainID, connectionID string) error {
 	iks.connections[icaAddress] = types.ICAConnection{
 		IcaAddress:        icaAddress,
 		ControllerAddress: controllerAddress,

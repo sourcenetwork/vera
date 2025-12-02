@@ -78,6 +78,8 @@ func TestFaucetRequest(t *testing.T) {
 		_, err = net.WaitForHeight(3)
 		require.NoError(t, err)
 
+		time.Sleep(3 * time.Second)
+
 		balanceResp, err := http.Get(fmt.Sprintf("%s/cosmos/bank/v1beta1/balances/%s", httpAddr, testAddress))
 		assert.Equal(t, http.StatusOK, balanceResp.StatusCode)
 		require.NoError(t, err)
@@ -177,6 +179,8 @@ func TestFaucetInitAccount(t *testing.T) {
 
 		_, err = net.WaitForHeight(3)
 		require.NoError(t, err)
+
+		time.Sleep(3 * time.Second)
 
 		balanceResp, err := http.Get(fmt.Sprintf("%s/cosmos/bank/v1beta1/balances/%s", httpAddr, testAddress))
 		assert.Equal(t, http.StatusOK, balanceResp.StatusCode)

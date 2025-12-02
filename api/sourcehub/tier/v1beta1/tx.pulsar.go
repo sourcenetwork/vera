@@ -1793,6 +1793,925 @@ func (x *fastReflection_MsgLockResponse) ProtoMethods() *protoiface.Methods {
 }
 
 var (
+	md_MsgLockAuto                   protoreflect.MessageDescriptor
+	fd_MsgLockAuto_delegator_address protoreflect.FieldDescriptor
+	fd_MsgLockAuto_stake             protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_tier_v1beta1_tx_proto_init()
+	md_MsgLockAuto = File_sourcehub_tier_v1beta1_tx_proto.Messages().ByName("MsgLockAuto")
+	fd_MsgLockAuto_delegator_address = md_MsgLockAuto.Fields().ByName("delegator_address")
+	fd_MsgLockAuto_stake = md_MsgLockAuto.Fields().ByName("stake")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgLockAuto)(nil)
+
+type fastReflection_MsgLockAuto MsgLockAuto
+
+func (x *MsgLockAuto) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgLockAuto)(x)
+}
+
+func (x *MsgLockAuto) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgLockAuto_messageType fastReflection_MsgLockAuto_messageType
+var _ protoreflect.MessageType = fastReflection_MsgLockAuto_messageType{}
+
+type fastReflection_MsgLockAuto_messageType struct{}
+
+func (x fastReflection_MsgLockAuto_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgLockAuto)(nil)
+}
+func (x fastReflection_MsgLockAuto_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgLockAuto)
+}
+func (x fastReflection_MsgLockAuto_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgLockAuto
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgLockAuto) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgLockAuto
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgLockAuto) Type() protoreflect.MessageType {
+	return _fastReflection_MsgLockAuto_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgLockAuto) New() protoreflect.Message {
+	return new(fastReflection_MsgLockAuto)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgLockAuto) Interface() protoreflect.ProtoMessage {
+	return (*MsgLockAuto)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgLockAuto) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.DelegatorAddress != "" {
+		value := protoreflect.ValueOfString(x.DelegatorAddress)
+		if !f(fd_MsgLockAuto_delegator_address, value) {
+			return
+		}
+	}
+	if x.Stake != nil {
+		value := protoreflect.ValueOfMessage(x.Stake.ProtoReflect())
+		if !f(fd_MsgLockAuto_stake, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgLockAuto) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		return x.DelegatorAddress != ""
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		return x.Stake != nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAuto) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		x.DelegatorAddress = ""
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		x.Stake = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgLockAuto) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		value := x.DelegatorAddress
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		value := x.Stake
+		return protoreflect.ValueOfMessage(value.ProtoReflect())
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAuto) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		x.DelegatorAddress = value.Interface().(string)
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		x.Stake = value.Message().Interface().(*v1beta1.Coin)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAuto) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		if x.Stake == nil {
+			x.Stake = new(v1beta1.Coin)
+		}
+		return protoreflect.ValueOfMessage(x.Stake.ProtoReflect())
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		panic(fmt.Errorf("field delegator_address of message sourcehub.tier.v1beta1.MsgLockAuto is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgLockAuto) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAuto.delegator_address":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.tier.v1beta1.MsgLockAuto.stake":
+		m := new(v1beta1.Coin)
+		return protoreflect.ValueOfMessage(m.ProtoReflect())
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAuto"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAuto does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgLockAuto) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.tier.v1beta1.MsgLockAuto", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgLockAuto) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAuto) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgLockAuto) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgLockAuto) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgLockAuto)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.DelegatorAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.Stake != nil {
+			l = options.Size(x.Stake)
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgLockAuto)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Stake != nil {
+			encoded, err := options.Marshal(x.Stake)
+			if err != nil {
+				return protoiface.MarshalOutput{
+					NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+					Buf:               input.Buf,
+				}, err
+			}
+			i -= len(encoded)
+			copy(dAtA[i:], encoded)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(encoded)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.DelegatorAddress) > 0 {
+			i -= len(x.DelegatorAddress)
+			copy(dAtA[i:], x.DelegatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.DelegatorAddress)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgLockAuto)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgLockAuto: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgLockAuto: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field DelegatorAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.DelegatorAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Stake", wireType)
+				}
+				var msglen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					msglen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if msglen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + msglen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if x.Stake == nil {
+					x.Stake = &v1beta1.Coin{}
+				}
+				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.Stake); err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_MsgLockAutoResponse                   protoreflect.MessageDescriptor
+	fd_MsgLockAutoResponse_validator_address protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_tier_v1beta1_tx_proto_init()
+	md_MsgLockAutoResponse = File_sourcehub_tier_v1beta1_tx_proto.Messages().ByName("MsgLockAutoResponse")
+	fd_MsgLockAutoResponse_validator_address = md_MsgLockAutoResponse.Fields().ByName("validator_address")
+}
+
+var _ protoreflect.Message = (*fastReflection_MsgLockAutoResponse)(nil)
+
+type fastReflection_MsgLockAutoResponse MsgLockAutoResponse
+
+func (x *MsgLockAutoResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgLockAutoResponse)(x)
+}
+
+func (x *MsgLockAutoResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_MsgLockAutoResponse_messageType fastReflection_MsgLockAutoResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgLockAutoResponse_messageType{}
+
+type fastReflection_MsgLockAutoResponse_messageType struct{}
+
+func (x fastReflection_MsgLockAutoResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgLockAutoResponse)(nil)
+}
+func (x fastReflection_MsgLockAutoResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgLockAutoResponse)
+}
+func (x fastReflection_MsgLockAutoResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgLockAutoResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_MsgLockAutoResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgLockAutoResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_MsgLockAutoResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgLockAutoResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_MsgLockAutoResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgLockAutoResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_MsgLockAutoResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgLockAutoResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_MsgLockAutoResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.ValidatorAddress != "" {
+		value := protoreflect.ValueOfString(x.ValidatorAddress)
+		if !f(fd_MsgLockAutoResponse_validator_address, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_MsgLockAutoResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		return x.ValidatorAddress != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAutoResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		x.ValidatorAddress = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_MsgLockAutoResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		value := x.ValidatorAddress
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAutoResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		x.ValidatorAddress = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAutoResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		panic(fmt.Errorf("field validator_address of message sourcehub.tier.v1beta1.MsgLockAutoResponse is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_MsgLockAutoResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.tier.v1beta1.MsgLockAutoResponse.validator_address":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.tier.v1beta1.MsgLockAutoResponse"))
+		}
+		panic(fmt.Errorf("message sourcehub.tier.v1beta1.MsgLockAutoResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_MsgLockAutoResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.tier.v1beta1.MsgLockAutoResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_MsgLockAutoResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_MsgLockAutoResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_MsgLockAutoResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_MsgLockAutoResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*MsgLockAutoResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.ValidatorAddress)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*MsgLockAutoResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.ValidatorAddress) > 0 {
+			i -= len(x.ValidatorAddress)
+			copy(dAtA[i:], x.ValidatorAddress)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ValidatorAddress)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*MsgLockAutoResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgLockAutoResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgLockAutoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ValidatorAddress", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ValidatorAddress = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
 	md_MsgUnlock                   protoreflect.MessageDescriptor
 	fd_MsgUnlock_delegator_address protoreflect.FieldDescriptor
 	fd_MsgUnlock_validator_address protoreflect.FieldDescriptor
@@ -1816,7 +2735,7 @@ func (x *MsgUnlock) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUnlock) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[4]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2379,7 +3298,7 @@ func (x *MsgUnlockResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUnlockResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[5]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2943,7 +3862,7 @@ func (x *MsgRedelegate) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRedelegate) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[6]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[8]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3564,7 +4483,7 @@ func (x *MsgRedelegateResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRedelegateResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[7]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4005,7 +4924,7 @@ func (x *MsgCancelUnlocking) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgCancelUnlocking) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[8]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4608,7 +5527,7 @@ func (x *MsgCancelUnlockingResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgCancelUnlockingResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[9]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4968,7 +5887,7 @@ func (x *MsgCreateDeveloper) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgCreateDeveloper) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[10]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5438,7 +6357,7 @@ func (x *MsgCreateDeveloperResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgCreateDeveloperResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[11]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5798,7 +6717,7 @@ func (x *MsgUpdateDeveloper) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateDeveloper) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[12]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6268,7 +7187,7 @@ func (x *MsgUpdateDeveloperResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateDeveloperResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[13]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[15]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6626,7 +7545,7 @@ func (x *MsgRemoveDeveloper) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRemoveDeveloper) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[14]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[16]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7044,7 +7963,7 @@ func (x *MsgRemoveDeveloperResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRemoveDeveloperResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[15]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[17]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7408,7 +8327,7 @@ func (x *MsgAddUserSubscription) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgAddUserSubscription) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[16]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[18]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7980,7 +8899,7 @@ func (x *MsgAddUserSubscriptionResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgAddUserSubscriptionResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[17]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[19]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8344,7 +9263,7 @@ func (x *MsgUpdateUserSubscription) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgUpdateUserSubscription) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[18]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[20]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -8916,7 +9835,7 @@ func (x *MsgUpdateUserSubscriptionResponse) ProtoReflect() protoreflect.Message 
 }
 
 func (x *MsgUpdateUserSubscriptionResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[19]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[21]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9276,7 +10195,7 @@ func (x *MsgRemoveUserSubscription) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRemoveUserSubscription) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[20]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[22]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -9756,7 +10675,7 @@ func (x *MsgRemoveUserSubscriptionResponse) ProtoReflect() protoreflect.Message 
 }
 
 func (x *MsgRemoveUserSubscriptionResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[21]
+	mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[23]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -10260,6 +11179,86 @@ func (*MsgLockResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{3}
 }
 
+// MsgLockAuto is the Msg/LockAuto request type.
+type MsgLockAuto struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	DelegatorAddress string        `protobuf:"bytes,1,opt,name=delegator_address,json=delegatorAddress,proto3" json:"delegator_address,omitempty"`
+	Stake            *v1beta1.Coin `protobuf:"bytes,2,opt,name=stake,proto3" json:"stake,omitempty"`
+}
+
+func (x *MsgLockAuto) Reset() {
+	*x = MsgLockAuto{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgLockAuto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgLockAuto) ProtoMessage() {}
+
+// Deprecated: Use MsgLockAuto.ProtoReflect.Descriptor instead.
+func (*MsgLockAuto) Descriptor() ([]byte, []int) {
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *MsgLockAuto) GetDelegatorAddress() string {
+	if x != nil {
+		return x.DelegatorAddress
+	}
+	return ""
+}
+
+func (x *MsgLockAuto) GetStake() *v1beta1.Coin {
+	if x != nil {
+		return x.Stake
+	}
+	return nil
+}
+
+// MsgLockAutoResponse defines the response structure for executing a MsgLockAuto message.
+type MsgLockAutoResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ValidatorAddress string `protobuf:"bytes,1,opt,name=validator_address,json=validatorAddress,proto3" json:"validator_address,omitempty"`
+}
+
+func (x *MsgLockAutoResponse) Reset() {
+	*x = MsgLockAutoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MsgLockAutoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgLockAutoResponse) ProtoMessage() {}
+
+// Deprecated: Use MsgLockAutoResponse.ProtoReflect.Descriptor instead.
+func (*MsgLockAutoResponse) Descriptor() ([]byte, []int) {
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MsgLockAutoResponse) GetValidatorAddress() string {
+	if x != nil {
+		return x.ValidatorAddress
+	}
+	return ""
+}
+
 // MsgUnlock is the Msg/Unlock request type.
 type MsgUnlock struct {
 	state         protoimpl.MessageState
@@ -10274,7 +11273,7 @@ type MsgUnlock struct {
 func (x *MsgUnlock) Reset() {
 	*x = MsgUnlock{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[4]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10288,7 +11287,7 @@ func (*MsgUnlock) ProtoMessage() {}
 
 // Deprecated: Use MsgUnlock.ProtoReflect.Descriptor instead.
 func (*MsgUnlock) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{4}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MsgUnlock) GetDelegatorAddress() string {
@@ -10326,7 +11325,7 @@ type MsgUnlockResponse struct {
 func (x *MsgUnlockResponse) Reset() {
 	*x = MsgUnlockResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[5]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10340,7 +11339,7 @@ func (*MsgUnlockResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgUnlockResponse.ProtoReflect.Descriptor instead.
 func (*MsgUnlockResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{5}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MsgUnlockResponse) GetCreationHeight() int64 {
@@ -10379,7 +11378,7 @@ type MsgRedelegate struct {
 func (x *MsgRedelegate) Reset() {
 	*x = MsgRedelegate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[6]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[8]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10393,7 +11392,7 @@ func (*MsgRedelegate) ProtoMessage() {}
 
 // Deprecated: Use MsgRedelegate.ProtoReflect.Descriptor instead.
 func (*MsgRedelegate) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{6}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *MsgRedelegate) GetDelegatorAddress() string {
@@ -10436,7 +11435,7 @@ type MsgRedelegateResponse struct {
 func (x *MsgRedelegateResponse) Reset() {
 	*x = MsgRedelegateResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[7]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10450,7 +11449,7 @@ func (*MsgRedelegateResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgRedelegateResponse.ProtoReflect.Descriptor instead.
 func (*MsgRedelegateResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{7}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MsgRedelegateResponse) GetCompletionTime() *timestamppb.Timestamp {
@@ -10477,7 +11476,7 @@ type MsgCancelUnlocking struct {
 func (x *MsgCancelUnlocking) Reset() {
 	*x = MsgCancelUnlocking{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[8]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10491,7 +11490,7 @@ func (*MsgCancelUnlocking) ProtoMessage() {}
 
 // Deprecated: Use MsgCancelUnlocking.ProtoReflect.Descriptor instead.
 func (*MsgCancelUnlocking) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{8}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MsgCancelUnlocking) GetDelegatorAddress() string {
@@ -10532,7 +11531,7 @@ type MsgCancelUnlockingResponse struct {
 func (x *MsgCancelUnlockingResponse) Reset() {
 	*x = MsgCancelUnlockingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[9]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10546,7 +11545,7 @@ func (*MsgCancelUnlockingResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgCancelUnlockingResponse.ProtoReflect.Descriptor instead.
 func (*MsgCancelUnlockingResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{9}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{11}
 }
 
 // MsgCreateDeveloper is the Msg/CreateDeveloper request type.
@@ -10565,7 +11564,7 @@ type MsgCreateDeveloper struct {
 func (x *MsgCreateDeveloper) Reset() {
 	*x = MsgCreateDeveloper{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[10]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10579,7 +11578,7 @@ func (*MsgCreateDeveloper) ProtoMessage() {}
 
 // Deprecated: Use MsgCreateDeveloper.ProtoReflect.Descriptor instead.
 func (*MsgCreateDeveloper) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{10}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MsgCreateDeveloper) GetDeveloper() string {
@@ -10606,7 +11605,7 @@ type MsgCreateDeveloperResponse struct {
 func (x *MsgCreateDeveloperResponse) Reset() {
 	*x = MsgCreateDeveloperResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[11]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10620,7 +11619,7 @@ func (*MsgCreateDeveloperResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgCreateDeveloperResponse.ProtoReflect.Descriptor instead.
 func (*MsgCreateDeveloperResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{11}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{13}
 }
 
 // MsgUpdateDeveloper is the Msg/UpdateDeveloper request type.
@@ -10639,7 +11638,7 @@ type MsgUpdateDeveloper struct {
 func (x *MsgUpdateDeveloper) Reset() {
 	*x = MsgUpdateDeveloper{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[12]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10653,7 +11652,7 @@ func (*MsgUpdateDeveloper) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateDeveloper.ProtoReflect.Descriptor instead.
 func (*MsgUpdateDeveloper) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{12}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *MsgUpdateDeveloper) GetDeveloper() string {
@@ -10680,7 +11679,7 @@ type MsgUpdateDeveloperResponse struct {
 func (x *MsgUpdateDeveloperResponse) Reset() {
 	*x = MsgUpdateDeveloperResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[13]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[15]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10694,7 +11693,7 @@ func (*MsgUpdateDeveloperResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateDeveloperResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateDeveloperResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{13}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{15}
 }
 
 // MsgRemoveDeveloper is the Msg/RemoveDeveloper request type.
@@ -10710,7 +11709,7 @@ type MsgRemoveDeveloper struct {
 func (x *MsgRemoveDeveloper) Reset() {
 	*x = MsgRemoveDeveloper{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[14]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[16]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10724,7 +11723,7 @@ func (*MsgRemoveDeveloper) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveDeveloper.ProtoReflect.Descriptor instead.
 func (*MsgRemoveDeveloper) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{14}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MsgRemoveDeveloper) GetDeveloper() string {
@@ -10744,7 +11743,7 @@ type MsgRemoveDeveloperResponse struct {
 func (x *MsgRemoveDeveloperResponse) Reset() {
 	*x = MsgRemoveDeveloperResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[15]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[17]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10758,7 +11757,7 @@ func (*MsgRemoveDeveloperResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveDeveloperResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveDeveloperResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{15}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{17}
 }
 
 // MsgAddUserSubscription is the Msg/AddUserSubscription request type.
@@ -10780,7 +11779,7 @@ type MsgAddUserSubscription struct {
 func (x *MsgAddUserSubscription) Reset() {
 	*x = MsgAddUserSubscription{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[16]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[18]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10794,7 +11793,7 @@ func (*MsgAddUserSubscription) ProtoMessage() {}
 
 // Deprecated: Use MsgAddUserSubscription.ProtoReflect.Descriptor instead.
 func (*MsgAddUserSubscription) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{16}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *MsgAddUserSubscription) GetDeveloper() string {
@@ -10835,7 +11834,7 @@ type MsgAddUserSubscriptionResponse struct {
 func (x *MsgAddUserSubscriptionResponse) Reset() {
 	*x = MsgAddUserSubscriptionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[17]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[19]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10849,7 +11848,7 @@ func (*MsgAddUserSubscriptionResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgAddUserSubscriptionResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddUserSubscriptionResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{17}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{19}
 }
 
 // MsgUpdateUserSubscription is the Msg/UpdateUserSubscription request type.
@@ -10871,7 +11870,7 @@ type MsgUpdateUserSubscription struct {
 func (x *MsgUpdateUserSubscription) Reset() {
 	*x = MsgUpdateUserSubscription{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[18]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[20]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10885,7 +11884,7 @@ func (*MsgUpdateUserSubscription) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateUserSubscription.ProtoReflect.Descriptor instead.
 func (*MsgUpdateUserSubscription) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{18}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *MsgUpdateUserSubscription) GetDeveloper() string {
@@ -10926,7 +11925,7 @@ type MsgUpdateUserSubscriptionResponse struct {
 func (x *MsgUpdateUserSubscriptionResponse) Reset() {
 	*x = MsgUpdateUserSubscriptionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[19]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[21]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10940,7 +11939,7 @@ func (*MsgUpdateUserSubscriptionResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgUpdateUserSubscriptionResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateUserSubscriptionResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{19}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{21}
 }
 
 // MsgRemoveUserSubscription is the Msg/RemoveUserSubscription request type.
@@ -10959,7 +11958,7 @@ type MsgRemoveUserSubscription struct {
 func (x *MsgRemoveUserSubscription) Reset() {
 	*x = MsgRemoveUserSubscription{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[20]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[22]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -10973,7 +11972,7 @@ func (*MsgRemoveUserSubscription) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveUserSubscription.ProtoReflect.Descriptor instead.
 func (*MsgRemoveUserSubscription) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{20}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *MsgRemoveUserSubscription) GetDeveloper() string {
@@ -11000,7 +11999,7 @@ type MsgRemoveUserSubscriptionResponse struct {
 func (x *MsgRemoveUserSubscriptionResponse) Reset() {
 	*x = MsgRemoveUserSubscriptionResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[21]
+		mi := &file_sourcehub_tier_v1beta1_tx_proto_msgTypes[23]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -11014,7 +12013,7 @@ func (*MsgRemoveUserSubscriptionResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveUserSubscriptionResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveUserSubscriptionResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{21}
+	return file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP(), []int{23}
 }
 
 var File_sourcehub_tier_v1beta1_tx_proto protoreflect.FileDescriptor
@@ -11066,163 +12065,186 @@ var file_sourcehub_tier_v1beta1_tx_proto_rawDesc = []byte{
 	0xb0, 0x2a, 0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a,
 	0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65,
 	0x73, 0x73, 0x22, 0x11, 0x0a, 0x0f, 0x4d, 0x73, 0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xf6, 0x01, 0x0a, 0x09, 0x4d, 0x73, 0x67, 0x55, 0x6e, 0x6c,
-	0x6f, 0x63, 0x6b, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72,
-	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18,
-	0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65,
-	0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61,
-	0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
-	0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65,
-	0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61,
-	0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05, 0x73, 0x74,
-	0x61, 0x6b, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d,
-	0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e,
-	0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52,
-	0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c,
-	0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0xdc,
-	0x01, 0x0a, 0x11, 0x4d, 0x73, 0x67, 0x55, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x63,
-	0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12, 0x52, 0x0a,
-	0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0xa8, 0xe7, 0xb0, 0x2a,
-	0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d,
-	0x65, 0x12, 0x4a, 0x0a, 0x0b, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x69, 0x6d, 0x65,
-	0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0xa8, 0xe7, 0xb0, 0x2a,
-	0x01, 0x52, 0x0a, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xd8, 0x02,
-	0x0a, 0x0d, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x65, 0x12,
-	0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14,
-	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74,
-	0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a, 0x15, 0x73, 0x72, 0x63, 0x5f, 0x76, 0x61,
-	0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
-	0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65,
-	0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x13, 0x73, 0x72, 0x63, 0x56, 0x61, 0x6c,
-	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a,
-	0x15, 0x64, 0x73, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4,
-	0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
-	0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52,
-	0x13, 0x64, 0x73, 0x74, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
-	0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x18, 0x04, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73,
-	0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09,
-	0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65,
-	0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72,
-	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x6b, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x52,
-	0x65, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x52, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
-	0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f,
-	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d,
-	0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01,
-	0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f,
-	0x6e, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xa8, 0x02, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43, 0x61, 0x6e,
-	0x63, 0x65, 0x6c, 0x55, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x69, 0x6e, 0x67, 0x12, 0x45, 0x0a, 0x11,
-	0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73,
-	0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e,
-	0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72,
-	0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
-	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xa8, 0x01, 0x0a, 0x0b, 0x4d, 0x73, 0x67, 0x4c, 0x6f, 0x63,
+	0x6b, 0x41, 0x75, 0x74, 0x6f, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65,
+	0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a,
+	0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64,
+	0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x22, 0x65, 0x0a, 0x13, 0x4d, 0x73, 0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x41, 0x75, 0x74, 0x6f, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64,
+	0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
+	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0xf6, 0x01, 0x0a, 0x09, 0x4d, 0x73, 0x67, 0x55,
+	0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65,
+	0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69,
+	0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05,
+	0x73, 0x74, 0x61, 0x6b, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f,
+	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
+	0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a,
+	0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64,
+	0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x22, 0xdc, 0x01, 0x0a, 0x11, 0x4d, 0x73, 0x67, 0x55, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52,
+	0x0e, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x12,
+	0x52, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69,
+	0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0xa8, 0xe7,
+	0xb0, 0x2a, 0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f, 0x6e, 0x54,
+	0x69, 0x6d, 0x65, 0x12, 0x4a, 0x0a, 0x0b, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x74, 0x69,
+	0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
+	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf, 0x1f, 0x01, 0xa8, 0xe7,
+	0xb0, 0x2a, 0x01, 0x52, 0x0a, 0x75, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x54, 0x69, 0x6d, 0x65, 0x22,
+	0xd8, 0x02, 0x0a, 0x0d, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
+	0x65, 0x12, 0x45, 0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61,
+	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4,
+	0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f,
+	0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x55, 0x0a, 0x15, 0x73, 0x72, 0x63, 0x5f,
+	0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73,
+	0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73,
+	0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64,
+	0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x13, 0x73, 0x72, 0x63, 0x56,
+	0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12,
+	0x55, 0x0a, 0x15, 0x64, 0x73, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72,
+	0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x42, 0x21,
 	0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c, 0x69, 0x64,
 	0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e,
-	0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72,
-	0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61, 0x73, 0x65,
-	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42, 0x09, 0xc8,
-	0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x12,
-	0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67,
-	0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64,
-	0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
-	0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x43, 0x61, 0x6e, 0x63, 0x65, 0x6c, 0x55, 0x6e, 0x6c,
-	0x6f, 0x63, 0x6b, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x88,
-	0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x65, 0x76, 0x65,
-	0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70,
-	0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f,
-	0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69,
-	0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x2a, 0x0a,
-	0x11, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x65, 0x6e, 0x61, 0x62, 0x6c,
-	0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x61, 0x75, 0x74, 0x6f, 0x4c, 0x6f,
-	0x63, 0x6b, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09,
-	0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67,
-	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x88, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x36,
-	0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64,
-	0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76,
-	0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x2a, 0x0a, 0x11, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x6c,
-	0x6f, 0x63, 0x6b, 0x5f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x0f, 0x61, 0x75, 0x74, 0x6f, 0x4c, 0x6f, 0x63, 0x6b, 0x45, 0x6e, 0x61, 0x62, 0x6c,
-	0x65, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70,
-	0x65, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44,
-	0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x5c, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x44, 0x65, 0x76,
-	0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f,
-	0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63,
+	0x67, 0x52, 0x13, 0x64, 0x73, 0x74, 0x56, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41,
+	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62,
+	0x61, 0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e,
+	0x42, 0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x05, 0x73, 0x74, 0x61,
+	0x6b, 0x65, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x22, 0x6b, 0x0a, 0x15, 0x4d, 0x73,
+	0x67, 0x52, 0x65, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x52, 0x0a, 0x0f, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67,
+	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54,
+	0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x42, 0x0d, 0xc8, 0xde, 0x1f, 0x00, 0x90, 0xdf,
+	0x1f, 0x01, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0e, 0x63, 0x6f, 0x6d, 0x70, 0x6c, 0x65, 0x74,
+	0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x22, 0xa8, 0x02, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43,
+	0x61, 0x6e, 0x63, 0x65, 0x6c, 0x55, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x69, 0x6e, 0x67, 0x12, 0x45,
+	0x0a, 0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63,
 	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72,
-	0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x3a, 0x0e,
-	0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x1c,
-	0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x44, 0x65, 0x76, 0x65, 0x6c,
-	0x6f, 0x70, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xab, 0x01, 0x0a,
-	0x16, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63,
-	0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c,
+	0x69, 0x6e, 0x67, 0x52, 0x10, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x4e, 0x0a, 0x11, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74,
+	0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x42, 0x21, 0xd2, 0xb4, 0x2d, 0x1d, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x56, 0x61, 0x6c,
+	0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72,
+	0x69, 0x6e, 0x67, 0x52, 0x10, 0x76, 0x61, 0x6c, 0x69, 0x64, 0x61, 0x74, 0x6f, 0x72, 0x41, 0x64,
+	0x64, 0x72, 0x65, 0x73, 0x73, 0x12, 0x3a, 0x0a, 0x05, 0x73, 0x74, 0x61, 0x6b, 0x65, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x19, 0x2e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x62, 0x61,
+	0x73, 0x65, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x43, 0x6f, 0x69, 0x6e, 0x42,
+	0x09, 0xc8, 0xde, 0x1f, 0x00, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x05, 0x73, 0x74, 0x61, 0x6b,
+	0x65, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x72, 0x65, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x65,
+	0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0e, 0x63, 0x72, 0x65, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x3a, 0x16, 0x82, 0xe7, 0xb0, 0x2a,
+	0x11, 0x64, 0x65, 0x6c, 0x65, 0x67, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x65,
+	0x73, 0x73, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x43, 0x61, 0x6e, 0x63, 0x65, 0x6c, 0x55,
+	0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x88, 0x01, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x65,
+	0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c,
 	0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14,
 	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74,
 	0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12,
-	0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x44, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6d,
-	0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x61, 0x6d, 0x6f, 0x75,
-	0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x04, 0x52, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a,
-	0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x20, 0x0a, 0x1e, 0x4d, 0x73,
-	0x67, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70,
-	0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xae, 0x01, 0x0a,
-	0x19, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75,
-	0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65,
-	0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2,
-	0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73,
-	0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70,
-	0x65, 0x72, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x44, 0x69, 0x64, 0x12, 0x16, 0x0a,
-	0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x61,
-	0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18,
-	0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x3a, 0x0e, 0x82,
-	0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x23, 0x0a,
-	0x21, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75,
-	0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x22, 0x7e, 0x0a, 0x19, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x55,
-	0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12,
-	0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41,
-	0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65,
-	0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f,
-	0x64, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x44,
-	0x69, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70,
-	0x65, 0x72, 0x22, 0x23, 0x0a, 0x21, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x55,
-	0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe1, 0x09, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12,
-	0x68, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
-	0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72,
-	0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61,
-	0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x2f, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61,
-	0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x04, 0x4c, 0x6f, 0x63,
-	0x6b, 0x12, 0x1f, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69,
-	0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x6f,
-	0x63, 0x6b, 0x1a, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74,
-	0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c,
-	0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x56, 0x0a, 0x06, 0x55,
+	0x2a, 0x0a, 0x11, 0x61, 0x75, 0x74, 0x6f, 0x5f, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x65, 0x6e, 0x61,
+	0x62, 0x6c, 0x65, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x61, 0x75, 0x74, 0x6f,
+	0x4c, 0x6f, 0x63, 0x6b, 0x45, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0,
+	0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d,
+	0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x44, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65,
+	0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x88, 0x01, 0x0a, 0x12, 0x4d, 0x73,
+	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x44, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72,
+	0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e,
+	0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64,
+	0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x2a, 0x0a, 0x11, 0x61, 0x75, 0x74, 0x6f,
+	0x5f, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x08, 0x52, 0x0f, 0x61, 0x75, 0x74, 0x6f, 0x4c, 0x6f, 0x63, 0x6b, 0x45, 0x6e, 0x61,
+	0x62, 0x6c, 0x65, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c,
+	0x6f, 0x70, 0x65, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x44, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x5c, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x44,
+	0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65,
+	0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d,
+	0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53,
+	0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72,
+	0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72,
+	0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x44, 0x65, 0x76,
+	0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xab,
+	0x01, 0x0a, 0x16, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62,
+	0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76,
+	0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4,
+	0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73,
+	0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65,
+	0x72, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x44, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06,
+	0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x61, 0x6d,
+	0x6f, 0x75, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x18, 0x04,
+	0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x3a, 0x0e, 0x82, 0xe7,
+	0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22, 0x20, 0x0a, 0x1e,
+	0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72,
+	0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xae,
+	0x01, 0x0a, 0x19, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x36, 0x0a, 0x09,
+	0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x42,
+	0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x41, 0x64, 0x64, 0x72,
+	0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c,
+	0x6f, 0x70, 0x65, 0x72, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x64, 0x69, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65, 0x72, 0x44, 0x69, 0x64, 0x12,
+	0x16, 0x0a, 0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x06, 0x61, 0x6d, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f,
+	0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x06, 0x70, 0x65, 0x72, 0x69, 0x6f, 0x64, 0x3a,
+	0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x22,
+	0x23, 0x0a, 0x21, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x55, 0x73, 0x65, 0x72,
+	0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x7e, 0x0a, 0x19, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76,
+	0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x12, 0x36, 0x0a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x09, 0x42, 0x18, 0xd2, 0xb4, 0x2d, 0x14, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73,
+	0x2e, 0x41, 0x64, 0x64, 0x72, 0x65, 0x73, 0x73, 0x53, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x52, 0x09,
+	0x64, 0x65, 0x76, 0x65, 0x6c, 0x6f, 0x70, 0x65, 0x72, 0x12, 0x19, 0x0a, 0x08, 0x75, 0x73, 0x65,
+	0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x75, 0x73, 0x65,
+	0x72, 0x44, 0x69, 0x64, 0x3a, 0x0e, 0x82, 0xe7, 0xb0, 0x2a, 0x09, 0x64, 0x65, 0x76, 0x65, 0x6c,
+	0x6f, 0x70, 0x65, 0x72, 0x22, 0x23, 0x0a, 0x21, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76,
+	0x65, 0x55, 0x73, 0x65, 0x72, 0x53, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f,
+	0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xbf, 0x0a, 0x0a, 0x03, 0x4d, 0x73,
+	0x67, 0x12, 0x68, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
+	0x73, 0x12, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69,
+	0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70,
+	0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x2f, 0x2e, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65,
+	0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72,
+	0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x04, 0x4c,
+	0x6f, 0x63, 0x6b, 0x12, 0x1f, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67,
+	0x4c, 0x6f, 0x63, 0x6b, 0x1a, 0x27, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73,
+	0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5c, 0x0a,
+	0x08, 0x4c, 0x6f, 0x63, 0x6b, 0x41, 0x75, 0x74, 0x6f, 0x12, 0x23, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74,
+	0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x41, 0x75, 0x74, 0x6f, 0x1a, 0x2b,
+	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e,
+	0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d, 0x73, 0x67, 0x4c, 0x6f, 0x63, 0x6b, 0x41,
+	0x75, 0x74, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x56, 0x0a, 0x06, 0x55,
 	0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
 	0x62, 0x2e, 0x74, 0x69, 0x65, 0x72, 0x2e, 0x76, 0x31, 0x62, 0x65, 0x74, 0x61, 0x31, 0x2e, 0x4d,
 	0x73, 0x67, 0x55, 0x6e, 0x6c, 0x6f, 0x63, 0x6b, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
@@ -11317,70 +12339,75 @@ func file_sourcehub_tier_v1beta1_tx_proto_rawDescGZIP() []byte {
 	return file_sourcehub_tier_v1beta1_tx_proto_rawDescData
 }
 
-var file_sourcehub_tier_v1beta1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
+var file_sourcehub_tier_v1beta1_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_sourcehub_tier_v1beta1_tx_proto_goTypes = []interface{}{
 	(*MsgUpdateParams)(nil),                   // 0: sourcehub.tier.v1beta1.MsgUpdateParams
 	(*MsgUpdateParamsResponse)(nil),           // 1: sourcehub.tier.v1beta1.MsgUpdateParamsResponse
 	(*MsgLock)(nil),                           // 2: sourcehub.tier.v1beta1.MsgLock
 	(*MsgLockResponse)(nil),                   // 3: sourcehub.tier.v1beta1.MsgLockResponse
-	(*MsgUnlock)(nil),                         // 4: sourcehub.tier.v1beta1.MsgUnlock
-	(*MsgUnlockResponse)(nil),                 // 5: sourcehub.tier.v1beta1.MsgUnlockResponse
-	(*MsgRedelegate)(nil),                     // 6: sourcehub.tier.v1beta1.MsgRedelegate
-	(*MsgRedelegateResponse)(nil),             // 7: sourcehub.tier.v1beta1.MsgRedelegateResponse
-	(*MsgCancelUnlocking)(nil),                // 8: sourcehub.tier.v1beta1.MsgCancelUnlocking
-	(*MsgCancelUnlockingResponse)(nil),        // 9: sourcehub.tier.v1beta1.MsgCancelUnlockingResponse
-	(*MsgCreateDeveloper)(nil),                // 10: sourcehub.tier.v1beta1.MsgCreateDeveloper
-	(*MsgCreateDeveloperResponse)(nil),        // 11: sourcehub.tier.v1beta1.MsgCreateDeveloperResponse
-	(*MsgUpdateDeveloper)(nil),                // 12: sourcehub.tier.v1beta1.MsgUpdateDeveloper
-	(*MsgUpdateDeveloperResponse)(nil),        // 13: sourcehub.tier.v1beta1.MsgUpdateDeveloperResponse
-	(*MsgRemoveDeveloper)(nil),                // 14: sourcehub.tier.v1beta1.MsgRemoveDeveloper
-	(*MsgRemoveDeveloperResponse)(nil),        // 15: sourcehub.tier.v1beta1.MsgRemoveDeveloperResponse
-	(*MsgAddUserSubscription)(nil),            // 16: sourcehub.tier.v1beta1.MsgAddUserSubscription
-	(*MsgAddUserSubscriptionResponse)(nil),    // 17: sourcehub.tier.v1beta1.MsgAddUserSubscriptionResponse
-	(*MsgUpdateUserSubscription)(nil),         // 18: sourcehub.tier.v1beta1.MsgUpdateUserSubscription
-	(*MsgUpdateUserSubscriptionResponse)(nil), // 19: sourcehub.tier.v1beta1.MsgUpdateUserSubscriptionResponse
-	(*MsgRemoveUserSubscription)(nil),         // 20: sourcehub.tier.v1beta1.MsgRemoveUserSubscription
-	(*MsgRemoveUserSubscriptionResponse)(nil), // 21: sourcehub.tier.v1beta1.MsgRemoveUserSubscriptionResponse
-	(*Params)(nil),                            // 22: sourcehub.tier.v1beta1.Params
-	(*v1beta1.Coin)(nil),                      // 23: cosmos.base.v1beta1.Coin
-	(*timestamppb.Timestamp)(nil),             // 24: google.protobuf.Timestamp
+	(*MsgLockAuto)(nil),                       // 4: sourcehub.tier.v1beta1.MsgLockAuto
+	(*MsgLockAutoResponse)(nil),               // 5: sourcehub.tier.v1beta1.MsgLockAutoResponse
+	(*MsgUnlock)(nil),                         // 6: sourcehub.tier.v1beta1.MsgUnlock
+	(*MsgUnlockResponse)(nil),                 // 7: sourcehub.tier.v1beta1.MsgUnlockResponse
+	(*MsgRedelegate)(nil),                     // 8: sourcehub.tier.v1beta1.MsgRedelegate
+	(*MsgRedelegateResponse)(nil),             // 9: sourcehub.tier.v1beta1.MsgRedelegateResponse
+	(*MsgCancelUnlocking)(nil),                // 10: sourcehub.tier.v1beta1.MsgCancelUnlocking
+	(*MsgCancelUnlockingResponse)(nil),        // 11: sourcehub.tier.v1beta1.MsgCancelUnlockingResponse
+	(*MsgCreateDeveloper)(nil),                // 12: sourcehub.tier.v1beta1.MsgCreateDeveloper
+	(*MsgCreateDeveloperResponse)(nil),        // 13: sourcehub.tier.v1beta1.MsgCreateDeveloperResponse
+	(*MsgUpdateDeveloper)(nil),                // 14: sourcehub.tier.v1beta1.MsgUpdateDeveloper
+	(*MsgUpdateDeveloperResponse)(nil),        // 15: sourcehub.tier.v1beta1.MsgUpdateDeveloperResponse
+	(*MsgRemoveDeveloper)(nil),                // 16: sourcehub.tier.v1beta1.MsgRemoveDeveloper
+	(*MsgRemoveDeveloperResponse)(nil),        // 17: sourcehub.tier.v1beta1.MsgRemoveDeveloperResponse
+	(*MsgAddUserSubscription)(nil),            // 18: sourcehub.tier.v1beta1.MsgAddUserSubscription
+	(*MsgAddUserSubscriptionResponse)(nil),    // 19: sourcehub.tier.v1beta1.MsgAddUserSubscriptionResponse
+	(*MsgUpdateUserSubscription)(nil),         // 20: sourcehub.tier.v1beta1.MsgUpdateUserSubscription
+	(*MsgUpdateUserSubscriptionResponse)(nil), // 21: sourcehub.tier.v1beta1.MsgUpdateUserSubscriptionResponse
+	(*MsgRemoveUserSubscription)(nil),         // 22: sourcehub.tier.v1beta1.MsgRemoveUserSubscription
+	(*MsgRemoveUserSubscriptionResponse)(nil), // 23: sourcehub.tier.v1beta1.MsgRemoveUserSubscriptionResponse
+	(*Params)(nil),                            // 24: sourcehub.tier.v1beta1.Params
+	(*v1beta1.Coin)(nil),                      // 25: cosmos.base.v1beta1.Coin
+	(*timestamppb.Timestamp)(nil),             // 26: google.protobuf.Timestamp
 }
 var file_sourcehub_tier_v1beta1_tx_proto_depIdxs = []int32{
-	22, // 0: sourcehub.tier.v1beta1.MsgUpdateParams.params:type_name -> sourcehub.tier.v1beta1.Params
-	23, // 1: sourcehub.tier.v1beta1.MsgLock.stake:type_name -> cosmos.base.v1beta1.Coin
-	23, // 2: sourcehub.tier.v1beta1.MsgUnlock.stake:type_name -> cosmos.base.v1beta1.Coin
-	24, // 3: sourcehub.tier.v1beta1.MsgUnlockResponse.completion_time:type_name -> google.protobuf.Timestamp
-	24, // 4: sourcehub.tier.v1beta1.MsgUnlockResponse.unlock_time:type_name -> google.protobuf.Timestamp
-	23, // 5: sourcehub.tier.v1beta1.MsgRedelegate.stake:type_name -> cosmos.base.v1beta1.Coin
-	24, // 6: sourcehub.tier.v1beta1.MsgRedelegateResponse.completion_time:type_name -> google.protobuf.Timestamp
-	23, // 7: sourcehub.tier.v1beta1.MsgCancelUnlocking.stake:type_name -> cosmos.base.v1beta1.Coin
-	0,  // 8: sourcehub.tier.v1beta1.Msg.UpdateParams:input_type -> sourcehub.tier.v1beta1.MsgUpdateParams
-	2,  // 9: sourcehub.tier.v1beta1.Msg.Lock:input_type -> sourcehub.tier.v1beta1.MsgLock
-	4,  // 10: sourcehub.tier.v1beta1.Msg.Unlock:input_type -> sourcehub.tier.v1beta1.MsgUnlock
-	6,  // 11: sourcehub.tier.v1beta1.Msg.Redelegate:input_type -> sourcehub.tier.v1beta1.MsgRedelegate
-	8,  // 12: sourcehub.tier.v1beta1.Msg.CancelUnlocking:input_type -> sourcehub.tier.v1beta1.MsgCancelUnlocking
-	10, // 13: sourcehub.tier.v1beta1.Msg.CreateDeveloper:input_type -> sourcehub.tier.v1beta1.MsgCreateDeveloper
-	12, // 14: sourcehub.tier.v1beta1.Msg.UpdateDeveloper:input_type -> sourcehub.tier.v1beta1.MsgUpdateDeveloper
-	14, // 15: sourcehub.tier.v1beta1.Msg.RemoveDeveloper:input_type -> sourcehub.tier.v1beta1.MsgRemoveDeveloper
-	16, // 16: sourcehub.tier.v1beta1.Msg.AddUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgAddUserSubscription
-	18, // 17: sourcehub.tier.v1beta1.Msg.UpdateUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgUpdateUserSubscription
-	20, // 18: sourcehub.tier.v1beta1.Msg.RemoveUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgRemoveUserSubscription
-	1,  // 19: sourcehub.tier.v1beta1.Msg.UpdateParams:output_type -> sourcehub.tier.v1beta1.MsgUpdateParamsResponse
-	3,  // 20: sourcehub.tier.v1beta1.Msg.Lock:output_type -> sourcehub.tier.v1beta1.MsgLockResponse
-	5,  // 21: sourcehub.tier.v1beta1.Msg.Unlock:output_type -> sourcehub.tier.v1beta1.MsgUnlockResponse
-	7,  // 22: sourcehub.tier.v1beta1.Msg.Redelegate:output_type -> sourcehub.tier.v1beta1.MsgRedelegateResponse
-	9,  // 23: sourcehub.tier.v1beta1.Msg.CancelUnlocking:output_type -> sourcehub.tier.v1beta1.MsgCancelUnlockingResponse
-	11, // 24: sourcehub.tier.v1beta1.Msg.CreateDeveloper:output_type -> sourcehub.tier.v1beta1.MsgCreateDeveloperResponse
-	13, // 25: sourcehub.tier.v1beta1.Msg.UpdateDeveloper:output_type -> sourcehub.tier.v1beta1.MsgUpdateDeveloperResponse
-	15, // 26: sourcehub.tier.v1beta1.Msg.RemoveDeveloper:output_type -> sourcehub.tier.v1beta1.MsgRemoveDeveloperResponse
-	17, // 27: sourcehub.tier.v1beta1.Msg.AddUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgAddUserSubscriptionResponse
-	19, // 28: sourcehub.tier.v1beta1.Msg.UpdateUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgUpdateUserSubscriptionResponse
-	21, // 29: sourcehub.tier.v1beta1.Msg.RemoveUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgRemoveUserSubscriptionResponse
-	19, // [19:30] is the sub-list for method output_type
-	8,  // [8:19] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	24, // 0: sourcehub.tier.v1beta1.MsgUpdateParams.params:type_name -> sourcehub.tier.v1beta1.Params
+	25, // 1: sourcehub.tier.v1beta1.MsgLock.stake:type_name -> cosmos.base.v1beta1.Coin
+	25, // 2: sourcehub.tier.v1beta1.MsgLockAuto.stake:type_name -> cosmos.base.v1beta1.Coin
+	25, // 3: sourcehub.tier.v1beta1.MsgUnlock.stake:type_name -> cosmos.base.v1beta1.Coin
+	26, // 4: sourcehub.tier.v1beta1.MsgUnlockResponse.completion_time:type_name -> google.protobuf.Timestamp
+	26, // 5: sourcehub.tier.v1beta1.MsgUnlockResponse.unlock_time:type_name -> google.protobuf.Timestamp
+	25, // 6: sourcehub.tier.v1beta1.MsgRedelegate.stake:type_name -> cosmos.base.v1beta1.Coin
+	26, // 7: sourcehub.tier.v1beta1.MsgRedelegateResponse.completion_time:type_name -> google.protobuf.Timestamp
+	25, // 8: sourcehub.tier.v1beta1.MsgCancelUnlocking.stake:type_name -> cosmos.base.v1beta1.Coin
+	0,  // 9: sourcehub.tier.v1beta1.Msg.UpdateParams:input_type -> sourcehub.tier.v1beta1.MsgUpdateParams
+	2,  // 10: sourcehub.tier.v1beta1.Msg.Lock:input_type -> sourcehub.tier.v1beta1.MsgLock
+	4,  // 11: sourcehub.tier.v1beta1.Msg.LockAuto:input_type -> sourcehub.tier.v1beta1.MsgLockAuto
+	6,  // 12: sourcehub.tier.v1beta1.Msg.Unlock:input_type -> sourcehub.tier.v1beta1.MsgUnlock
+	8,  // 13: sourcehub.tier.v1beta1.Msg.Redelegate:input_type -> sourcehub.tier.v1beta1.MsgRedelegate
+	10, // 14: sourcehub.tier.v1beta1.Msg.CancelUnlocking:input_type -> sourcehub.tier.v1beta1.MsgCancelUnlocking
+	12, // 15: sourcehub.tier.v1beta1.Msg.CreateDeveloper:input_type -> sourcehub.tier.v1beta1.MsgCreateDeveloper
+	14, // 16: sourcehub.tier.v1beta1.Msg.UpdateDeveloper:input_type -> sourcehub.tier.v1beta1.MsgUpdateDeveloper
+	16, // 17: sourcehub.tier.v1beta1.Msg.RemoveDeveloper:input_type -> sourcehub.tier.v1beta1.MsgRemoveDeveloper
+	18, // 18: sourcehub.tier.v1beta1.Msg.AddUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgAddUserSubscription
+	20, // 19: sourcehub.tier.v1beta1.Msg.UpdateUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgUpdateUserSubscription
+	22, // 20: sourcehub.tier.v1beta1.Msg.RemoveUserSubscription:input_type -> sourcehub.tier.v1beta1.MsgRemoveUserSubscription
+	1,  // 21: sourcehub.tier.v1beta1.Msg.UpdateParams:output_type -> sourcehub.tier.v1beta1.MsgUpdateParamsResponse
+	3,  // 22: sourcehub.tier.v1beta1.Msg.Lock:output_type -> sourcehub.tier.v1beta1.MsgLockResponse
+	5,  // 23: sourcehub.tier.v1beta1.Msg.LockAuto:output_type -> sourcehub.tier.v1beta1.MsgLockAutoResponse
+	7,  // 24: sourcehub.tier.v1beta1.Msg.Unlock:output_type -> sourcehub.tier.v1beta1.MsgUnlockResponse
+	9,  // 25: sourcehub.tier.v1beta1.Msg.Redelegate:output_type -> sourcehub.tier.v1beta1.MsgRedelegateResponse
+	11, // 26: sourcehub.tier.v1beta1.Msg.CancelUnlocking:output_type -> sourcehub.tier.v1beta1.MsgCancelUnlockingResponse
+	13, // 27: sourcehub.tier.v1beta1.Msg.CreateDeveloper:output_type -> sourcehub.tier.v1beta1.MsgCreateDeveloperResponse
+	15, // 28: sourcehub.tier.v1beta1.Msg.UpdateDeveloper:output_type -> sourcehub.tier.v1beta1.MsgUpdateDeveloperResponse
+	17, // 29: sourcehub.tier.v1beta1.Msg.RemoveDeveloper:output_type -> sourcehub.tier.v1beta1.MsgRemoveDeveloperResponse
+	19, // 30: sourcehub.tier.v1beta1.Msg.AddUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgAddUserSubscriptionResponse
+	21, // 31: sourcehub.tier.v1beta1.Msg.UpdateUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgUpdateUserSubscriptionResponse
+	23, // 32: sourcehub.tier.v1beta1.Msg.RemoveUserSubscription:output_type -> sourcehub.tier.v1beta1.MsgRemoveUserSubscriptionResponse
+	21, // [21:33] is the sub-list for method output_type
+	9,  // [9:21] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_tier_v1beta1_tx_proto_init() }
@@ -11439,7 +12466,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUnlock); i {
+			switch v := v.(*MsgLockAuto); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11451,7 +12478,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUnlockResponse); i {
+			switch v := v.(*MsgLockAutoResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11463,7 +12490,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRedelegate); i {
+			switch v := v.(*MsgUnlock); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11475,7 +12502,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRedelegateResponse); i {
+			switch v := v.(*MsgUnlockResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11487,7 +12514,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCancelUnlocking); i {
+			switch v := v.(*MsgRedelegate); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11499,7 +12526,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCancelUnlockingResponse); i {
+			switch v := v.(*MsgRedelegateResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11511,7 +12538,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateDeveloper); i {
+			switch v := v.(*MsgCancelUnlocking); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11523,7 +12550,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgCreateDeveloperResponse); i {
+			switch v := v.(*MsgCancelUnlockingResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11535,7 +12562,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdateDeveloper); i {
+			switch v := v.(*MsgCreateDeveloper); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11547,7 +12574,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdateDeveloperResponse); i {
+			switch v := v.(*MsgCreateDeveloperResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11559,7 +12586,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRemoveDeveloper); i {
+			switch v := v.(*MsgUpdateDeveloper); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11571,7 +12598,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRemoveDeveloperResponse); i {
+			switch v := v.(*MsgUpdateDeveloperResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11583,7 +12610,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgAddUserSubscription); i {
+			switch v := v.(*MsgRemoveDeveloper); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11595,7 +12622,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[17].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgAddUserSubscriptionResponse); i {
+			switch v := v.(*MsgRemoveDeveloperResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11607,7 +12634,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdateUserSubscription); i {
+			switch v := v.(*MsgAddUserSubscription); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11619,7 +12646,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdateUserSubscriptionResponse); i {
+			switch v := v.(*MsgAddUserSubscriptionResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11631,7 +12658,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[20].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRemoveUserSubscription); i {
+			switch v := v.(*MsgUpdateUserSubscription); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -11643,6 +12670,30 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			}
 		}
 		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[21].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgUpdateUserSubscriptionResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[22].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgRemoveUserSubscription); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_tier_v1beta1_tx_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgRemoveUserSubscriptionResponse); i {
 			case 0:
 				return &v.state
@@ -11661,7 +12712,7 @@ func file_sourcehub_tier_v1beta1_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_tier_v1beta1_tx_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   22,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -69,6 +69,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "validator_address"}, {ProtoField: "stake"}},
 				},
 				{
+					RpcMethod:      "LockAuto",
+					Use:            "lock-auto [stake]",
+					Short:          "Send a lock tx with automatic validator selection",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "stake"}},
+				},
+				{
 					RpcMethod:      "Unlock",
 					Use:            "unlock [validator-address] [amount]",
 					Short:          "Send a unlock tx",
