@@ -74,7 +74,7 @@ func (k *Keeper) getPost(ctx context.Context, namespaceId string, postId string)
 	return &post
 }
 
-// getCollaborator retrieves a post based on existing namespaceId and collaboratorDID.
+// getCollaborator retrieves a namespace collaborator based on existing namespaceId and collaboratorDID.
 func (k *Keeper) getCollaborator(ctx context.Context, namespaceId string, collaboratorDID string) *types.Collaborator {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
