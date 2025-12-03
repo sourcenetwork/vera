@@ -15,9 +15,6 @@ func TestCreatePolicy_ValidPolicyIsCreated(t *testing.T) {
 	defer ctx.Cleanup()
 
 	policyStr := `
-actor:
-  doc: my actor
-  name: actor-resource
 description: ok
 name: policy
 resources:
@@ -35,13 +32,27 @@ resources:
 `
 
 	want := &coretypes.Policy{
-		Id:                "ba5162bd61996b6fb6e66ef85449f0de2e89584743df7f71577674cfb531eb25",
+		Id:                "199091661bdd06221eb0a8070673c76f25ca8c8dcc04d47934f0abb123daf78b",
 		Name:              "policy",
 		Description:       "ok",
 		SpecificationType: coretypes.PolicySpecificationType_NO_SPEC,
 		Resources: []*coretypes.Resource{
 			{
 				Name: "file",
+				Owner: &coretypes.Relation{
+					Name: "owner",
+					Doc:  "owner relations represents the object owner",
+					VrTypes: []*coretypes.Restriction{
+						{
+							ResourceName: "actor",
+						},
+					},
+					Manages: []string{
+						"admin",
+						"reader",
+						"owner",
+					},
+				},
 				Relations: []*coretypes.Relation{
 					{
 						Name: "admin",
@@ -51,51 +62,52 @@ resources:
 						VrTypes: []*coretypes.Restriction{},
 					},
 					{
-						Name: "owner",
-						Doc:  "owner owns",
-						VrTypes: []*coretypes.Restriction{
-							{
-								ResourceName: "actor-resource",
-								RelationName: "",
-							},
-						},
-					},
-					{
 						Name:    "reader",
 						VrTypes: []*coretypes.Restriction{},
 					},
 				},
 				Permissions: []*coretypes.Permission{
 					{
-						Name:       "own",
-						Expression: "owner",
-						Doc:        "own doc",
+						Name:                "own",
+						Expression:          "",
+						Doc:                 "own doc",
+						EffectiveExpression: "owner",
 					},
 					{
-						Name:       "read",
-						Expression: "(owner + reader)",
+						Name:                "read",
+						Expression:          "reader",
+						EffectiveExpression: "(owner + reader)",
 					},
 				},
 				ManagementRules: []*coretypes.ManagementRule{
 					{
 						Relation:   "admin",
 						Expression: "owner",
+						Managers: []string{
+							"owner",
+						},
 					},
 					{
 						Relation:   "owner",
 						Expression: "owner",
+						Managers: []string{
+							"owner",
+						},
 					},
 					{
 						Relation:   "reader",
 						Expression: "(admin + owner)",
+						Managers: []string{
+							"admin", "owner",
+						},
 					},
 				},
 			},
 		},
 		ActorResource: &coretypes.ActorResource{
-			Name:      "actor-resource",
-			Doc:       "my actor",
-			Relations: []*coretypes.Relation{},
+			Name:      "actor",
+			Doc:       "actor resource models the set of actors defined within a policy",
+			Relations: nil,
 		},
 	}
 

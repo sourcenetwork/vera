@@ -38,19 +38,24 @@ resources:
 		Resources: []*coretypes.Resource{
 			{
 				Name: "file",
+				Owner: &coretypes.Relation{
+					Name: "owner",
+					Doc:  "owner relations represents the object owner",
+					VrTypes: []*coretypes.Restriction{
+						{
+							ResourceName: "actor",
+							RelationName: "",
+						},
+					},
+					Manages: []string{
+						"collaborator",
+						"writer",
+						"owner",
+					},
+				},
 				Relations: []*coretypes.Relation{
 					{
 						Name: "collaborator",
-					},
-					{
-						Name: "owner",
-						Doc:  "owner relations represents the object owner",
-						VrTypes: []*coretypes.Restriction{
-							{
-								ResourceName: "actor",
-								RelationName: "",
-							},
-						},
 					},
 					{
 						Name: "writer",
@@ -58,33 +63,38 @@ resources:
 				},
 				Permissions: []*coretypes.Permission{
 					{
-						Name:       "read",
-						Expression: "(owner + collaborator)",
+						Name:                "read",
+						Expression:          "collaborator",
+						EffectiveExpression: "(owner + collaborator)",
 					},
 					{
-						Name:       "write",
-						Expression: "(owner + (collaborator + writer))",
+						Name:                "write",
+						Expression:          "(collaborator + writer)",
+						EffectiveExpression: "(owner + (collaborator + writer))",
 					},
 				},
 				ManagementRules: []*coretypes.ManagementRule{
 					{
 						Relation:   "collaborator",
 						Expression: "owner",
+						Managers:   []string{"owner"},
 					},
 					{
 						Relation:   "owner",
 						Expression: "owner",
+						Managers:   []string{"owner"},
 					},
 					{
 						Relation:   "writer",
 						Expression: "owner",
+						Managers:   []string{"owner"},
 					},
 				},
 			},
 		},
 		ActorResource: &coretypes.ActorResource{
 			Name: "actor",
-			Doc:  "",
+			Doc:  "actor resource models the set of actors defined within a policy",
 		},
 	}
 	a := test.EditPolicyAction{

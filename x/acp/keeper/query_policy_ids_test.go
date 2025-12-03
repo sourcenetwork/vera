@@ -3,10 +3,12 @@ package keeper
 import (
 	"context"
 	"strconv"
+	"strings"
 	"testing"
 
+	"text/template"
+
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"gopkg.in/yaml.v3"
 
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
@@ -31,59 +33,34 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 	policyNames []string,
 	marshalingType coretypes.PolicyMarshalingType,
 ) []string {
+	polTemplate := `
+name: {{.Name}}
+description: {{.Name}}
+meta:
+  k1: v1
+  k2: v2
+resources:
+  - name: file
+    permissions:
+    - name: manage
+    relations:
+    - name: reader
+`
 	policyIds := []string{}
 
 	for _, name := range policyNames {
-		policy := &coretypes.PolicyYaml{
-			Name:        name,
-			Description: "Test policy for " + name,
-			Meta: map[string]string{
-				"k1": "v1",
-				"k2": "v2",
-			},
-			Resources: []*coretypes.ResourceYaml{
-				{
-					Name:        "file",
-					Description: "A test resource",
-					Permissions: []*coretypes.PermissionYaml{
-						{
-							Name: "manage",
-							Doc:  "Permission to manage resources",
-							Expr: "owner",
-						},
-					},
-					Relations: []*coretypes.RelationYaml{
-						{
-							Name:    "owner",
-							Doc:     "Owner relation",
-							Manages: []string{"reader"},
-							Types: []string{
-								"actor-resource->",
-							},
-						},
-						{
-							Name: "reader",
-							Doc:  "Reader relation",
-						},
-					},
-				},
-			},
-			Actor: &coretypes.ActorResourceYaml{},
+		params := map[string]string{
+			"Name": name,
 		}
-
-		var policyString string
-		switch marshalingType {
-		case coretypes.PolicyMarshalingType_YAML:
-			policyYAML, err := yaml.Marshal(policy)
-			require.NoError(t, err, "failed to marshal policy to YAML")
-			policyString = string(policyYAML)
-		default:
-			t.Fatalf("unsupported marshaling type: %v", marshalingType)
-		}
+		tmp, err := template.New("test").Parse(polTemplate)
+		require.NoError(t, err)
+		builder := strings.Builder{}
+		err = tmp.Execute(&builder, params)
+		require.NoError(t, err)
 
 		msg := types.MsgCreatePolicy{
 			Creator:     creator,
-			Policy:      policyString,
+			Policy:      builder.String(),
 			MarshalType: marshalingType,
 		}
 

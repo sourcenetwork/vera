@@ -23,9 +23,6 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_ValidPolicy() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
-actor:
-  doc: some actor
-  name: actor
 description: A valid policy
 name: Source Policy
 resources:
@@ -48,9 +45,8 @@ resources:
 			Name:        "Source Policy",
 			Description: "A valid policy",
 			ActorResource: &coretypes.ActorResource{
-				Name:      "actor",
-				Doc:       "some actor",
-				Relations: []*coretypes.Relation{},
+				Name: "actor",
+				Doc:  "actor resource models the set of actors defined within a policy",
 			},
 			Attributes:        nil,
 			SpecificationType: 0,
@@ -59,28 +55,34 @@ resources:
 					Name: "file",
 					Permissions: []*coretypes.Permission{
 						{
-							Name:       "read",
-							Expression: "owner",
+							Name:                "read",
+							Expression:          "",
+							EffectiveExpression: "owner",
 						},
 						{
-							Name:       "write",
-							Expression: "owner",
+							Name:                "write",
+							Expression:          "",
+							EffectiveExpression: "owner",
 						},
 					},
-					Relations: []*coretypes.Relation{
-						{
-							Name: "owner",
-							VrTypes: []*coretypes.Restriction{
-								{
-									ResourceName: "actor",
-								},
-							},
-						},
-					},
+					Relations: []*coretypes.Relation{},
 					ManagementRules: []*coretypes.ManagementRule{
 						{
 							Relation:   "owner",
 							Expression: "owner",
+							Managers: []string{
+								"owner",
+							},
+						},
+					},
+					Owner: &coretypes.Relation{
+						Name:    "owner",
+						Doc:     "owner relations represents the object owner",
+						Manages: []string{"owner"},
+						VrTypes: []*coretypes.Restriction{
+							{
+								ResourceName: "actor",
+							},
 						},
 					},
 				},
@@ -96,9 +98,6 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_ComplexValidPolicy() {
 
 	req := &types.QueryValidatePolicyRequest{
 		Policy: `
-actor:
-  doc: my actor
-  name: actor-source
 description: Another valid policy
 name: Source Policy
 resources:
@@ -160,39 +159,4 @@ func (s *queryValidatePolicySuite) TestValidatePolicy_EmptyPolicy() {
 	require.False(s.T(), result.Valid)
 	require.Contains(s.T(), result.ErrorMsg, "name required")
 	require.Nil(s.T(), err)
-}
-
-func (s *queryValidatePolicySuite) TestValidatePolicy_BadActor() {
-	ctx, k, _ := setupKeeper(s.T())
-
-	req := &types.QueryValidatePolicyRequest{
-		Policy: `
-actor:
-  doc: bad actor
-  name: actor-factor
-description: Policy with bad actor
-name: Yet another invalid policy
-resources:
-- name: file
-  permissions:
-  - doc: own doc
-    name: own
-  - expr: reader
-    name: read
-  relations:
-  - manages:
-    - reader
-    name: admin
-  - name: reader
-`,
-
-		MarshalType: coretypes.PolicyMarshalingType_YAML,
-	}
-
-	result, err := k.ValidatePolicy(ctx, req)
-
-	require.NotNil(s.T(), result)
-	require.False(s.T(), result.Valid)
-	require.Contains(s.T(), result.ErrorMsg, "resource not found")
-	require.NoError(s.T(), err)
 }

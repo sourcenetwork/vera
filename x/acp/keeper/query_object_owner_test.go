@@ -27,9 +27,6 @@ func (s *queryObjectOwnerSuite) setup(t *testing.T) (context.Context, Keeper, sd
 	s.obj = coretypes.NewObject("file", "1")
 
 	policyStr := `
-actor:
-  doc: my actor
-  name: actor-resource
 description: ok
 name: policy
 resources:
