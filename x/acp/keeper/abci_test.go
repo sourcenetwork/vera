@@ -32,7 +32,8 @@ func TestEndBlocker(t *testing.T) {
 	resp, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
 		Policy: `
 name: test
-`, MarshalType: coretypes.PolicyMarshalingType_YAML,
+`,
+	MarshalType: coretypes.PolicyMarshalingType_YAML,
 	})
 	require.NoError(t, err)
 
