@@ -82,9 +82,9 @@ resources:
 							},
 						},
 					},
-					ManagementPermissions: []*coretypes.ManagementPermission{
+					ManagementRules: []*coretypes.ManagementRule{
 						{
-							Name:       "owner",
+							Relation:   "owner",
 							Expression: "owner",
 						},
 					},

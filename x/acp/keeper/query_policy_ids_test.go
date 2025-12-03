@@ -68,10 +68,7 @@ func (s *queryPolicyIdsSuite) setupPolicies(
 					},
 				},
 			},
-			Actor: &coretypes.ActorResourceYaml{
-				Name: "actor-resource",
-				Doc:  "Test actor resource",
-			},
+			Actor: &coretypes.ActorResourceYaml{},
 		}
 
 		var policyString string

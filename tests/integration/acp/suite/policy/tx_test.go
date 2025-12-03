@@ -80,17 +80,17 @@ resources:
 						Expression: "(owner + reader)",
 					},
 				},
-				ManagementPermissions: []*coretypes.ManagementPermission{
+				ManagementRules: []*coretypes.ManagementRule{
 					{
-						Name:       "admin",
+						Relation:   "admin",
 						Expression: "owner",
 					},
 					{
-						Name:       "owner",
+						Relation:   "owner",
 						Expression: "owner",
 					},
 					{
-						Name:       "reader",
+						Relation:   "reader",
 						Expression: "(admin + owner)",
 					},
 				},

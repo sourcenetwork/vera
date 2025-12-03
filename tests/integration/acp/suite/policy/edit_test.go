@@ -66,17 +66,17 @@ resources:
 						Expression: "(owner + (collaborator + writer))",
 					},
 				},
-				ManagementPermissions: []*coretypes.ManagementPermission{
+				ManagementRules: []*coretypes.ManagementRule{
 					{
-						Name:       "collaborator",
+						Relation:   "collaborator",
 						Expression: "owner",
 					},
 					{
-						Name:       "owner",
+						Relation:   "owner",
 						Expression: "owner",
 					},
 					{
-						Name:       "writer",
+						Relation:   "writer",
 						Expression: "owner",
 					},
 				},
