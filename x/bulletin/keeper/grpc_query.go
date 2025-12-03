@@ -128,6 +128,7 @@ func (k *Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*type
 	return &types.QueryPostsResponse{Posts: posts, Pagination: pageRes}, nil
 }
 
+// IterateGlob returns posts matching the glob pattern within the specified namespace.
 func (k *Keeper) IterateGlob(goCtx context.Context, req *types.QueryIterateGlobRequest) (*types.QueryIterateGlobResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -136,21 +137,31 @@ func (k *Keeper) IterateGlob(goCtx context.Context, req *types.QueryIterateGlobR
 		return nil, status.Error(codes.InvalidArgument, "invalid namespace")
 	}
 
-	namespaceId := getNamespaceId(req.Namespace)
-
+	// Use the sanitized namespace as prefix without trailing slash to match all keys that start with it
+	sanitizedNamespaceId := types.SanitizeKeyPart(getNamespaceId(req.Namespace))
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(goCtx))
-	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix+namespaceId+"/"))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix+sanitizedNamespaceId))
 
 	var posts []*types.Post
 
 	// Use the Paginate function to handle the pagination logic.
 	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
-		// We need to strip the trailing "/" before glob matching
 		keyStr := string(key)
+
+		// Strip leading separator:
+		// "|" appears when matching sub-paths within the namespace
+		// "/" appears when matching exactly at namespace boundary with non-empty postId
+		if len(keyStr) > 0 && (keyStr[0] == '|' || keyStr[0] == '/') {
+			keyStr = keyStr[1:]
+		}
+
+		// Strip trailing "/" before glob matching
 		if len(keyStr) > 0 && keyStr[len(keyStr)-1] == '/' {
 			keyStr = keyStr[:len(keyStr)-1]
 		}
 
+		// Unsanitize the key to restore original "/" characters for glob matching
+		keyStr = types.UnsanitizeKeyPart(keyStr)
 		matched := utils.Glob(req.Glob, keyStr)
 		if matched {
 			var post types.Post

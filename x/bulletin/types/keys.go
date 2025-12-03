@@ -39,8 +39,8 @@ func SanitizeKeyPart(part string) string {
 	return strings.ReplaceAll(part, "/", "|")
 }
 
-// unsanitizeKeyPart restores "/" from "|" in key parts.
-func unsanitizeKeyPart(part string) string {
+// UnsanitizeKeyPart restores "/" from "|" in key parts.
+func UnsanitizeKeyPart(part string) string {
 	return strings.ReplaceAll(part, "|", "/")
 }
 
@@ -85,8 +85,8 @@ func ParsePostKey(key []byte) (namespaceId string, postId string) {
 		panic("invalid post key format: expected format namespaceId/postId")
 	}
 
-	namespaceId = unsanitizeKeyPart(string(parts[0]))
-	postId = unsanitizeKeyPart(string(parts[1]))
+	namespaceId = UnsanitizeKeyPart(string(parts[0]))
+	postId = UnsanitizeKeyPart(string(parts[1]))
 
 	return namespaceId, postId
 }
@@ -98,8 +98,8 @@ func ParseCollaboratorKey(key []byte) (namespaceId string, actorDID string) {
 		panic("invalid post key format: expected format namespaceId/actorDID")
 	}
 
-	namespaceId = unsanitizeKeyPart(string(parts[0]))
-	actorDID = unsanitizeKeyPart(string(parts[1]))
+	namespaceId = UnsanitizeKeyPart(string(parts[0]))
+	actorDID = UnsanitizeKeyPart(string(parts[1]))
 
 	return namespaceId, actorDID
 }
