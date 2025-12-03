@@ -576,3 +576,91 @@ func TestIterateGlobWithPostIds(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, []*types.Post{posts[0]}, resp4.Posts)
 }
+
+func TestIterateGlobEdgeCases(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+
+	posts := []*types.Post{
+		{
+			Id:        "",
+			Namespace: "bulletin/test3/mixed/post1",
+			Payload:   []byte("val1"),
+		},
+		{
+			Id:        "actualId",
+			Namespace: "bulletin/test3/mixed",
+			Payload:   []byte("val2"),
+		},
+		{
+			Id:        "my/nested/id",
+			Namespace: "bulletin/test3",
+			Payload:   []byte("val3"),
+		},
+		{
+			Id:        "",
+			Namespace: "bulletin/test3/a/b/c/d/key",
+			Payload:   []byte("val4"),
+		},
+	}
+
+	// add posts
+	for _, post := range posts {
+		keeper.SetPost(ctx, *post)
+	}
+
+	// match all posts in test3 namespace
+	resp1, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "*",
+	})
+	require.NoError(t, err)
+	require.ElementsMatch(t, posts, resp1.Posts)
+
+	// postId with "/" characters should match after unsanitization
+	resp2, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "my/nested/id",
+	})
+	require.NoError(t, err)
+	require.Equal(t, []*types.Post{posts[2]}, resp2.Posts)
+
+	// match with wildcard in postId path
+	resp3, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "my/*/id",
+	})
+	require.NoError(t, err)
+	require.Equal(t, []*types.Post{posts[2]}, resp3.Posts)
+
+	// deep nesting with multiple wildcards
+	resp4, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "a/*/*/d/key",
+	})
+	require.NoError(t, err)
+	require.Equal(t, []*types.Post{posts[3]}, resp4.Posts)
+
+	// non-matching pattern should return empty
+	resp5, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "nonexistent/*",
+	})
+	require.NoError(t, err)
+	require.Empty(t, resp5.Posts)
+
+	// exact match for namespace path with no wildcards
+	resp6, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "mixed/post1",
+	})
+	require.NoError(t, err)
+	require.Equal(t, []*types.Post{posts[0]}, resp6.Posts)
+
+	// match mixed posts with empty and non-empty postIds
+	resp7, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test3",
+		Glob:      "mixed*",
+	})
+	require.NoError(t, err)
+	require.ElementsMatch(t, []*types.Post{posts[0], posts[1]}, resp7.Posts)
+}
