@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
+	"strings"
 )
 
 const (
@@ -33,30 +34,46 @@ func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
 
+// SanitizeKeyPart replaces "/" with "|" in key parts to prevent key collisions.
+func SanitizeKeyPart(part string) string {
+	return strings.ReplaceAll(part, "/", "|")
+}
+
+// unsanitizeKeyPart restores "/" from "|" in key parts.
+func unsanitizeKeyPart(part string) string {
+	return strings.ReplaceAll(part, "|", "/")
+}
+
 // PostKey builds and returns the store key to store/retrieve the Post.
 func PostKey(namespaceId string, postId string) []byte {
+	sanitizedNamespaceId := SanitizeKeyPart(namespaceId)
+	sanitizedPostId := SanitizeKeyPart(postId)
+
 	// Precompute buffer size
-	size := len(namespaceId) + 1 + len(postId)
+	size := len(sanitizedNamespaceId) + 1 + len(sanitizedPostId)
 	buf := make([]byte, 0, size)
 
 	// Append bytes to the buffer
-	buf = append(buf, namespaceId...)
+	buf = append(buf, sanitizedNamespaceId...)
 	buf = append(buf, '/')
-	buf = append(buf, postId...)
+	buf = append(buf, sanitizedPostId...)
 
 	return buf
 }
 
 // CollaboratorKey builds and returns the store key to store/retrieve the Actor.
 func CollaboratorKey(namespaceId string, collaboratorDID string) []byte {
+	sanitizedNamespaceId := SanitizeKeyPart(namespaceId)
+	sanitizedCollaboratorDID := SanitizeKeyPart(collaboratorDID)
+
 	// Precompute buffer size
-	size := len(namespaceId) + 1 + len(collaboratorDID)
+	size := len(sanitizedNamespaceId) + 1 + len(sanitizedCollaboratorDID)
 	buf := make([]byte, 0, size)
 
 	// Append bytes to the buffer
-	buf = append(buf, namespaceId...)
+	buf = append(buf, sanitizedNamespaceId...)
 	buf = append(buf, '/')
-	buf = append(buf, collaboratorDID...)
+	buf = append(buf, sanitizedCollaboratorDID...)
 
 	return buf
 }
@@ -68,7 +85,10 @@ func ParsePostKey(key []byte) (namespaceId string, postId string) {
 		panic("invalid post key format: expected format namespaceId/postId")
 	}
 
-	return string(parts[0]), string(parts[1])
+	namespaceId = unsanitizeKeyPart(string(parts[0]))
+	postId = unsanitizeKeyPart(string(parts[1]))
+
+	return namespaceId, postId
 }
 
 // ParseCollaboratorKey retrieves namespaceId and actorDID from the Collaborator key.
@@ -78,7 +98,10 @@ func ParseCollaboratorKey(key []byte) (namespaceId string, actorDID string) {
 		panic("invalid post key format: expected format namespaceId/actorDID")
 	}
 
-	return string(parts[0]), string(parts[1])
+	namespaceId = unsanitizeKeyPart(string(parts[0]))
+	actorDID = unsanitizeKeyPart(string(parts[1]))
+
+	return namespaceId, actorDID
 }
 
 // GeneratePostId generates deterministic post id from namespaceId and post payload.

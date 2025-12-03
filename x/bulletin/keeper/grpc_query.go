@@ -158,8 +158,9 @@ func (k *Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespa
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
+	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(namespaceId+"/")) {
+		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
 			return nil
 		}
 		var collaborator types.Collaborator
@@ -184,8 +185,9 @@ func (k *Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId str
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 
+	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(namespaceId+"/")) {
+		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
 			return nil
 		}
 		var post types.Post

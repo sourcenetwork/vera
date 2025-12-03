@@ -74,7 +74,7 @@ func (k *Keeper) getPost(ctx context.Context, namespaceId string, postId string)
 	return &post
 }
 
-// getCollaborator retrieves a post based on existing namespaceId and collaboratorDID.
+// getCollaborator retrieves a namespace collaborator based on existing namespaceId and collaboratorDID.
 func (k *Keeper) getCollaborator(ctx context.Context, namespaceId string, collaboratorDID string) *types.Collaborator {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
@@ -140,7 +140,8 @@ func (k *Keeper) mustIteratePosts(ctx context.Context, cb func(post types.Post))
 func (k *Keeper) mustIterateNamespacePosts(ctx context.Context, namespaceId string, cb func(namespaceId string, post types.Post)) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
-	iterator := storetypes.KVStorePrefixIterator(store, []byte(namespaceId+"/"))
+	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
+	iterator := storetypes.KVStorePrefixIterator(store, []byte(sanitizedPrefix))
 
 	defer iterator.Close()
 
