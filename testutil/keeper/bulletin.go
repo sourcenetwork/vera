@@ -77,7 +77,7 @@ func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	k := keeper.NewKeeper(

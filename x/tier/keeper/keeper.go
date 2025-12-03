@@ -36,6 +36,7 @@ type (
 		epochsKeeper       types.EpochsKeeper
 		distributionKeeper types.DistributionKeeper
 		feegrantKeeper     types.FeegrantKeeper
+		acpKeeper          types.AcpKeeper
 	}
 )
 
@@ -51,6 +52,7 @@ func NewKeeper(
 	epochsKeeper types.EpochsKeeper,
 	distributionKeeper types.DistributionKeeper,
 	feegrantKeeper types.FeegrantKeeper,
+	acpKeeper types.AcpKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -67,6 +69,7 @@ func NewKeeper(
 		epochsKeeper:       epochsKeeper,
 		distributionKeeper: distributionKeeper,
 		feegrantKeeper:     feegrantKeeper,
+		acpKeeper:          acpKeeper,
 	}
 }
 
@@ -98,6 +101,11 @@ func (k *Keeper) GetDistributionKeeper() types.DistributionKeeper {
 // GetFeegrantKeeper returns the module's FeegrantKeeper.
 func (k *Keeper) GetFeegrantKeeper() types.FeegrantKeeper {
 	return k.feegrantKeeper
+}
+
+// GetAcpKeeper returns the module's AcpKeeper.
+func (k *Keeper) GetAcpKeeper() types.AcpKeeper {
+	return k.acpKeeper
 }
 
 // Logger returns a module-specific logger.
@@ -164,6 +172,143 @@ func (k *Keeper) CompleteUnlocking(ctx context.Context) (err error) {
 	}
 
 	return nil
+}
+
+// LockAuto locks the stake of a delegator to an automatically selected validator.
+// Selection logic:
+// 1. If the developer already has lockups, select the validator with the smallest existing lockup amount.
+// 2. If the developer has no existing lockups, select the validator with the smallest total delegation from the tier module.
+func (k *Keeper) LockAuto(ctx context.Context, delAddr sdk.AccAddress, amt math.Int) (valAddr sdk.ValAddress, err error) {
+	start := time.Now()
+
+	defer func() {
+		metrics.ModuleMeasureSinceWithCounter(
+			types.ModuleName,
+			metrics.LockAuto,
+			start,
+			err,
+			[]metrics.Label{
+				metrics.NewLabel(metrics.Amount, amt.String()),
+				metrics.NewLabel(metrics.Delegator, delAddr.String()),
+				metrics.NewLabel(metrics.Validator, valAddr.String()),
+			},
+		)
+	}()
+
+	// Try to select validator from existing lockups first
+	valAddr = k.selectValidatorFromExistingLockups(ctx, delAddr)
+	if valAddr != nil {
+		err = k.Lock(ctx, delAddr, valAddr, amt)
+		if err != nil {
+			return nil, err
+		}
+		return valAddr, nil
+	}
+
+	// Fall back to selecting validator with smallest tier module delegation
+	valAddr, err = k.selectValidatorWithSmallestDelegation(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.Lock(ctx, delAddr, valAddr, amt)
+	if err != nil {
+		return nil, err
+	}
+
+	return valAddr, nil
+}
+
+// selectValidatorFromExistingLockups finds the bonded validator with the smallest existing lockup for the given delegator.
+func (k *Keeper) selectValidatorFromExistingLockups(ctx context.Context, delAddr sdk.AccAddress) sdk.ValAddress {
+	type lockupInfo struct {
+		valAddr sdk.ValAddress
+		amount  math.Int
+	}
+	var developerLockups []lockupInfo
+
+	k.mustIterateLockups(ctx, func(d sdk.AccAddress, v sdk.ValAddress, lockup types.Lockup) {
+		if d.Equals(delAddr) {
+			developerLockups = append(developerLockups, lockupInfo{
+				valAddr: v,
+				amount:  lockup.Amount,
+			})
+		}
+	})
+
+	if len(developerLockups) == 0 {
+		return nil
+	}
+
+	// Find the lockup with the smallest amount
+	var minLockup *lockupInfo
+	for i := range developerLockups {
+		if minLockup == nil || developerLockups[i].amount.LT(minLockup.amount) {
+			minLockup = &developerLockups[i]
+		}
+	}
+
+	// Verify the validator is still bonded
+	validator, err := k.stakingKeeper.GetValidator(ctx, minLockup.valAddr)
+	if err != nil || !validator.IsBonded() {
+		return nil
+	}
+
+	return minLockup.valAddr
+}
+
+// selectValidatorWithSmallestDelegation finds the bonded validator with the smallest
+// total delegation from the tier module.
+func (k *Keeper) selectValidatorWithSmallestDelegation(ctx context.Context) (sdk.ValAddress, error) {
+	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
+	type validatorDelegation struct {
+		valAddr    sdk.ValAddress
+		delegation math.Int
+	}
+	var validatorDelegations []validatorDelegation
+
+	err := k.stakingKeeper.IterateValidators(ctx, func(index int64, validator stakingtypes.ValidatorI) (stop bool) {
+		if !validator.IsBonded() {
+			return false
+		}
+
+		v := validator.(stakingtypes.Validator)
+		vAddr, err := sdk.ValAddressFromBech32(v.OperatorAddress)
+		if err != nil {
+			return false
+		}
+
+		// Get tier module's delegation to this validator
+		delegation, err := k.stakingKeeper.GetDelegation(ctx, tierModuleAddr, vAddr)
+		delegationAmount := math.ZeroInt()
+		if err == nil {
+			delegationAmount = delegation.GetShares().TruncateInt()
+		}
+
+		validatorDelegations = append(validatorDelegations, validatorDelegation{
+			valAddr:    vAddr,
+			delegation: delegationAmount,
+		})
+
+		return false
+	})
+	if err != nil {
+		return nil, types.ErrInvalidAddress.Wrap("failed to iterate validators")
+	}
+
+	if len(validatorDelegations) == 0 {
+		return nil, types.ErrInvalidAddress.Wrap("no bonded validators available")
+	}
+
+	// Select validator with smallest delegation
+	minDelegation := validatorDelegations[0]
+	for i := 1; i < len(validatorDelegations); i++ {
+		if validatorDelegations[i].delegation.LT(minDelegation.delegation) {
+			minDelegation = validatorDelegations[i]
+		}
+	}
+
+	return minDelegation.valAddr, nil
 }
 
 // Lock locks the stake of a delegator to a validator.
@@ -650,6 +795,15 @@ func (k *Keeper) AddUserSubscription(
 ) (err error) {
 	start := time.Now()
 
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			k.Logger().Error("Failed to convert DID to address", "did", extractedDID, "error", err)
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
+
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
@@ -759,6 +913,15 @@ func (k *Keeper) UpdateUserSubscription(
 ) (err error) {
 	start := time.Now()
 
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			k.Logger().Error("Failed to convert DID to address", "did", extractedDID, "error", err)
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
+
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(
 			types.ModuleName,
@@ -828,6 +991,14 @@ func (k *Keeper) RemoveUserSubscription(
 	userDid string,
 ) (err error) {
 	start := time.Now()
+
+	if extractedDID, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok && extractedDID != "" {
+		didAddr, err := k.GetAcpKeeper().GetAddressFromDID(sdk.UnwrapSDKContext(ctx), extractedDID)
+		if err != nil {
+			return errorsmod.Wrap(err, "convert DID to address")
+		}
+		developerAddr = didAddr
+	}
 
 	defer func() {
 		metrics.ModuleMeasureSinceWithCounter(

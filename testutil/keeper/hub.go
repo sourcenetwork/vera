@@ -21,7 +21,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/hub/types"
 )
 
-func IcaKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
+func HubKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 
 	db := dbm.NewMemDB()

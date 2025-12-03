@@ -45,17 +45,13 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 		return fmt.Errorf("issuer DID cannot be empty")
 	}
 
-	if record.AuthorizedAccount == "" {
-		return fmt.Errorf("authorized account cannot be empty")
-	}
-
-	if _, err := sdk.AccAddressFromBech32(record.AuthorizedAccount); err != nil {
-		return fmt.Errorf("invalid authorized account address: %w", err)
-	}
-
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	if !record.ExpiresAt.IsZero() && record.ExpiresAt.Before(sdkCtx.BlockTime()) {
-		return fmt.Errorf("expiration time cannot be in the past")
+	// Validate authorized account if provided
+	if record.AuthorizedAccount != "" {
+		if _, err := sdk.AccAddressFromBech32(record.AuthorizedAccount); err != nil {
+			return fmt.Errorf("invalid authorized account address: %w", err)
+		}
+	} else if !k.GetChainConfig(ctx).IgnoreBearerAuth {
+		return fmt.Errorf("authorized account is required when bearer auth is enabled")
 	}
 
 	bz, err := k.cdc.Marshal(record)
@@ -73,12 +69,14 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 	didKeyWithoutPrefix := didKey[len(types.JWSTokenByDIDKeyPrefix):]
 	didStore.Set(didKeyWithoutPrefix, []byte{0x01}) // Just a marker, actual data is in primary store
 
-	// Store in account index
-	accountStore := k.jwsTokenByAccountStore(ctx)
-	accountKey := types.JWSTokenByAccountKey(record.AuthorizedAccount, record.TokenHash)
-	// Remove the prefix since we're already in the account prefix store
-	accountKeyWithoutPrefix := accountKey[len(types.JWSTokenByAccountKeyPrefix):]
-	accountStore.Set(accountKeyWithoutPrefix, []byte{0x01}) // Just a marker
+	// Store in account index only if authorized account is provided
+	if record.AuthorizedAccount != "" {
+		accountStore := k.jwsTokenByAccountStore(ctx)
+		accountKey := types.JWSTokenByAccountKey(record.AuthorizedAccount, record.TokenHash)
+		// Remove the prefix since we're already in the account prefix store
+		accountKeyWithoutPrefix := accountKey[len(types.JWSTokenByAccountKeyPrefix):]
+		accountStore.Set(accountKeyWithoutPrefix, []byte{0x01}) // Just a marker
+	}
 
 	return nil
 }
@@ -119,11 +117,13 @@ func (k *Keeper) DeleteJWSToken(ctx context.Context, tokenHash string) error {
 	didKeyWithoutPrefix := didKey[len(types.JWSTokenByDIDKeyPrefix):]
 	didStore.Delete(didKeyWithoutPrefix)
 
-	// Delete from account index
-	accountStore := k.jwsTokenByAccountStore(ctx)
-	accountKey := types.JWSTokenByAccountKey(record.AuthorizedAccount, tokenHash)
-	accountKeyWithoutPrefix := accountKey[len(types.JWSTokenByAccountKeyPrefix):]
-	accountStore.Delete(accountKeyWithoutPrefix)
+	// Delete from account index only if authorized account was provided
+	if record.AuthorizedAccount != "" {
+		accountStore := k.jwsTokenByAccountStore(ctx)
+		accountKey := types.JWSTokenByAccountKey(record.AuthorizedAccount, tokenHash)
+		accountKeyWithoutPrefix := accountKey[len(types.JWSTokenByAccountKeyPrefix):]
+		accountStore.Delete(accountKeyWithoutPrefix)
+	}
 
 	return nil
 }
@@ -298,6 +298,11 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 	if found {
 		// Token exists, update usage timestamp
 		return k.RecordJWSTokenUsage(ctx, tokenHash)
+	}
+
+	// Validate that new tokens aren't already expired
+	if !expiresAt.IsZero() && expiresAt.Before(sdk.UnwrapSDKContext(ctx).BlockTime()) {
+		return fmt.Errorf("cannot create token with expiration time in the past")
 	}
 
 	// Create new token record
