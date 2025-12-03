@@ -46,7 +46,7 @@ require (
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/skip-mev/block-sdk/v2 v2.1.5
-	github.com/sourcenetwork/acp_core v0.7.2-0.20251203171508-0ec0c963a8bd
+	github.com/sourcenetwork/acp_core v0.8.0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.10.1
