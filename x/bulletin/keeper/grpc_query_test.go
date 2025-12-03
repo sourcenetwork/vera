@@ -505,3 +505,74 @@ func TestIterateGlob(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, posts[3:], resp7.Posts)
 }
+
+func TestIterateGlobWithPostIds(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+
+	posts := []*types.Post{
+		// posts with exact namespace match and non-empty postIds
+		{
+			Id:        "post1",
+			Namespace: "bulletin/test2",
+			Payload:   []byte("val1"),
+		},
+		{
+			Id:        "post2",
+			Namespace: "bulletin/test2",
+			Payload:   []byte("val2"),
+		},
+		{
+			Id:        "post3",
+			Namespace: "bulletin/test2",
+			Payload:   []byte("val3"),
+		},
+		// posts with sub-paths in namespace
+		{
+			Id:        "post1",
+			Namespace: "bulletin/test2/sub1",
+			Payload:   []byte("val4"),
+		},
+		{
+			Id:        "post2",
+			Namespace: "bulletin/test2/sub1",
+			Payload:   []byte("val5"),
+		},
+	}
+
+	// add posts
+	for _, post := range posts {
+		keeper.SetPost(ctx, *post)
+	}
+
+	// match all posts (both exact namespace and sub-paths)
+	resp1, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test2",
+		Glob:      "*",
+	})
+	require.NoError(t, err)
+	require.Equal(t, posts, resp1.Posts)
+
+	// match only posts with exact namespace (non-empty postIds, "/" separator case)
+	resp2, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test2",
+		Glob:      "post*",
+	})
+	require.NoError(t, err)
+	require.Equal(t, posts[0:3], resp2.Posts)
+
+	// match only posts in sub1 namespace
+	resp3, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test2",
+		Glob:      "sub1/*",
+	})
+	require.NoError(t, err)
+	require.Equal(t, posts[3:5], resp3.Posts)
+
+	// match specific postId at exact namespace boundary
+	resp4, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "bulletin/test2",
+		Glob:      "post1",
+	})
+	require.NoError(t, err)
+	require.Equal(t, []*types.Post{posts[0]}, resp4.Posts)
+}
