@@ -31,15 +31,10 @@ name: Source Policy
 resources:
 - name: file
   permissions:
-  - expr: owner
-    name: read
-  - expr: owner
-    name: write
-  relations:
-  - name: owner
-    types:
-    - actor
+  - name: read
+  - name: write
 `,
+
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
@@ -110,20 +105,16 @@ resources:
 - name: file
   permissions:
   - doc: own doc
-    expr: owner
     name: own
-  - expr: owner + reader
+  - expr: reader
     name: read
   relations:
   - manages:
     - reader
     name: admin
-  - doc: owner owns
-    name: owner
-    types:
-    - actor-source
   - name: reader
 `,
+
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
@@ -185,20 +176,16 @@ resources:
 - name: file
   permissions:
   - doc: own doc
-    expr: owner
     name: own
-  - expr: owner + reader
+  - expr: reader
     name: read
   relations:
   - manages:
     - reader
     name: admin
-  - doc: owner owns
-    name: owner
-    types:
-    - actor-source
   - name: reader
 `,
+
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 

@@ -28,12 +28,7 @@ name: access ticket example
 resources:
 - name: file
   permissions:
-  - expr: owner
-    name: read
-  relations:
-  - name: owner
-    types:
-    - actor
+  - name: read
 `
 
 func main() {

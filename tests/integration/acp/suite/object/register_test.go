@@ -14,10 +14,6 @@ var policyDef string = `
 name: policy
 resources:
 - name: resource
-  relations:
-  - name: owner
-    types:
-    - actor
 `
 
 func TestRegisterObject_RegisteringNewObjectIsSucessful(t *testing.T) {

@@ -34,14 +34,9 @@ name: policy
 resources:
 - name: file
   permissions:
-  - expr: owner
-    name: read
-  - expr: owner
-    name: write
+  - name: read
+  - name: write
   relations:
-  - name: owner
-    types:
-    - actor
   - name: rm-root
 `
 

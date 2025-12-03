@@ -8,15 +8,13 @@ name: Bulletin Policy
 resources:
 - name: namespace
   permissions:
-  - expr: owner + collaborator
+  - expr: collaborator
     name: create_post
   relations:
   - name: collaborator
     types:
     - actor
-  - name: owner
-    types:
-    - actor
 `
+
 	return policyStr
 }

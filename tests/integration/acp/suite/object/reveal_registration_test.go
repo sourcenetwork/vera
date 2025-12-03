@@ -14,10 +14,6 @@ const revealPolicy string = `
 name: pol
 resources:
 - name: file
-  relations:
-  - name: owner
-    types:
-    - actor
 `
 
 func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t *testing.T) {

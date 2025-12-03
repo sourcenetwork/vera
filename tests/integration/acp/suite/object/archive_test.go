@@ -15,9 +15,6 @@ name: policy
 resources:
 - name: file
   relations:
-  - name: owner
-    types:
-    - actor
   - name: reader
     types:
     - actor

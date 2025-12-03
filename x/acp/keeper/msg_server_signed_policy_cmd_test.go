@@ -22,15 +22,10 @@ resources:
 - name: file
   permissions:
   - doc: own doc
-    expr: owner
     name: own
-  - expr: owner + reader
+  - expr: reader
     name: read
   relations:
-  - doc: owner owns
-    name: owner
-    types:
-    - actor
   - name: reader
     types:
     - actor

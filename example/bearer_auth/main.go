@@ -49,10 +49,6 @@ func main() {
 name: test
 resources:
 - name: resource
-  relations:
-  - name: owner
-    types:
-    - actor
 `
 
 	msgSet := sdk.MsgSet{}

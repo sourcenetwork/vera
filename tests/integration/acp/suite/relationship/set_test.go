@@ -20,9 +20,6 @@ resources:
     name: admin
     types:
     - actor
-  - name: owner
-    types:
-    - actor
   - name: reader
     types:
     - actor

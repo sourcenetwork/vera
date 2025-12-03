@@ -24,20 +24,16 @@ resources:
 - name: file
   permissions:
   - doc: own doc
-    expr: owner
     name: own
-  - expr: owner + reader
+  - expr: reader
     name: read
   relations:
   - manages:
     - reader
     name: admin
-  - doc: owner owns
-    name: owner
-    types:
-    - actor-resource
   - name: reader
 `
+
 	want := &coretypes.Policy{
 		Id:                "ba5162bd61996b6fb6e66ef85449f0de2e89584743df7f71577674cfb531eb25",
 		Name:              "policy",
@@ -131,8 +127,6 @@ resources:
   relations:
   - name: reader
 - name: foo
-  relations:
-  - name: owner
 `,
 
 		Creator: ctx.TxSigner,
@@ -155,7 +149,6 @@ resources:
   - manages:
     - deleter
     name: admin
-  - name: owner
 `,
 
 		Creator: ctx.TxSigner,

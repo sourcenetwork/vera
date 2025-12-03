@@ -18,7 +18,7 @@ name: policy
 resources:
 - name: file
   permissions:
-  - expr: reader + writer
+  - expr: (reader + writer)
     name: read
   - expr: writer
     name: write
@@ -98,7 +98,7 @@ resources:
   permissions:
   - expr: collaborator
     name: read
-  - expr: collaborator + writer
+  - expr: (collaborator + writer)
     name: write
   relations:
   - name: collaborator

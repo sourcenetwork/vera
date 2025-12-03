@@ -14,10 +14,6 @@ var commitPolicy string = `
 name: policy
 resources:
 - name: resource
-  relations:
-  - name: owner
-    types:
-    - actor
 `
 
 func TestCommitRegistration_CreatingCommitmentReturnsID(t *testing.T) {
