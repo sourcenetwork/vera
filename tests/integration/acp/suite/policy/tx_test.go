@@ -15,90 +15,99 @@ func TestCreatePolicy_ValidPolicyIsCreated(t *testing.T) {
 	defer ctx.Cleanup()
 
 	policyStr := `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      owner:
-        doc: owner owns
-        types:
-          - actor-resource
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions:
-      own:
-        expr: owner
-        doc: own doc
-      read:
-        expr: owner + reader
-actor:
-  name: actor-resource
-  doc: my actor
+- name: file
+  permissions:
+  - doc: own doc
+    name: own
+  - expr: reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - name: reader
 `
+
 	want := &coretypes.Policy{
-		Id:                "da7be65027664708551f97197ba5f5993aa99bc7b57055df9766426dc6da9605",
+		Id:                "199091661bdd06221eb0a8070673c76f25ca8c8dcc04d47934f0abb123daf78b",
 		Name:              "policy",
 		Description:       "ok",
 		SpecificationType: coretypes.PolicySpecificationType_NO_SPEC,
 		Resources: []*coretypes.Resource{
-			&coretypes.Resource{
+			{
 				Name: "file",
+				Owner: &coretypes.Relation{
+					Name: "owner",
+					Doc:  "owner relations represents the object owner",
+					VrTypes: []*coretypes.Restriction{
+						{
+							ResourceName: "actor",
+						},
+					},
+					Manages: []string{
+						"admin",
+						"reader",
+						"owner",
+					},
+				},
 				Relations: []*coretypes.Relation{
-					&coretypes.Relation{
+					{
 						Name: "admin",
 						Manages: []string{
 							"reader",
 						},
 						VrTypes: []*coretypes.Restriction{},
 					},
-					&coretypes.Relation{
-						Name: "owner",
-						Doc:  "owner owns",
-						VrTypes: []*coretypes.Restriction{
-							{
-								ResourceName: "actor-resource",
-								RelationName: "",
-							},
-						},
-					},
-					&coretypes.Relation{
-						Name: "reader",
+					{
+						Name:    "reader",
+						VrTypes: []*coretypes.Restriction{},
 					},
 				},
 				Permissions: []*coretypes.Permission{
 					{
-						Name:       "_can_manage_admin",
-						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the admin relation (permission was auto-generated).",
+						Name:                "own",
+						Expression:          "",
+						Doc:                 "own doc",
+						EffectiveExpression: "owner",
 					},
 					{
-						Name:       "_can_manage_owner",
+						Name:                "read",
+						Expression:          "reader",
+						EffectiveExpression: "(owner + reader)",
+					},
+				},
+				ManagementRules: []*coretypes.ManagementRule{
+					{
+						Relation:   "admin",
 						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
+						Managers: []string{
+							"owner",
+						},
 					},
 					{
-						Name:       "_can_manage_reader",
+						Relation:   "owner",
+						Expression: "owner",
+						Managers: []string{
+							"owner",
+						},
+					},
+					{
+						Relation:   "reader",
 						Expression: "(admin + owner)",
-						Doc:        "permission controls actors which are allowed to create relationships for the reader relation (permission was auto-generated).",
-					},
-					{
-						Name:       "own",
-						Expression: "owner",
-						Doc:        "own doc",
-					},
-					{
-						Name:       "read",
-						Expression: "(owner + reader)",
+						Managers: []string{
+							"admin", "owner",
+						},
 					},
 				},
 			},
 		},
 		ActorResource: &coretypes.ActorResource{
-			Name: "actor-resource",
-			Doc:  "my actor",
+			Name:      "actor",
+			Doc:       "actor resource models the set of actors defined within a policy",
+			Relations: nil,
 		},
 	}
 
@@ -123,18 +132,15 @@ func TestCreatePolicy_PolicyResources_OwnerRelationImplicitlyAdded(t *testing.T)
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      reader:
-    permissions:
-  foo:
-    relations:
-      owner:
-    permissions:
+- name: file
+  relations:
+  - name: reader
+- name: foo
 `,
+
 		Creator: ctx.TxSigner,
 	}
 	pol := action.Run(ctx)
@@ -147,17 +153,16 @@ func TestCreatePolicy_ManagementReferencingUndefinedRelationReturnsError(t *test
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      owner:
-      admin:
-        manages:
-          - deleter
-    permissions:
+- name: file
+  relations:
+  - manages:
+    - deleter
+    name: admin
 `,
+
 		Creator: ctx.TxSigner,
 		//ExpectedErr: coretypes.ErrInvalidManagementRule, // FIXME
 		ExpectedErr: errors.ErrorType_BAD_INPUT,

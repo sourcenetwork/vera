@@ -3,20 +3,18 @@ package types
 // BasePolicy defines base policy for the bulletin module namespaces.
 func BasePolicy() string {
 	policyStr := `
-name: Bulletin Policy
 description: Base policy that defines permissions for bulletin namespaces
+name: Bulletin Policy
 resources:
-  namespace:
-    relations:
-      owner:
-        types:
-          - actor
-      collaborator:
-        types: 
-          - actor
-    permissions:
-      create_post:
-        expr: owner + collaborator
+- name: namespace
+  permissions:
+  - expr: collaborator
+    name: create_post
+  relations:
+  - name: collaborator
+    types:
+    - actor
 `
+
 	return policyStr
 }

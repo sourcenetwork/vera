@@ -32,7 +32,7 @@ func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -78,7 +78,7 @@ func TestExtensionOptionsDecorator_InvalidJWSExtension(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -119,7 +119,7 @@ func TestExtensionOptionsDecorator_InvalidJWSFormat(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -160,7 +160,7 @@ func TestExtensionOptionsDecorator_InvalidJWSSignature(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -201,7 +201,7 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -209,7 +209,7 @@ func TestExtensionOptionsDecorator_UnknownExtensionOption(t *testing.T) {
 	unknownOpt := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	// Pack the extension option
@@ -244,7 +244,7 @@ func TestExtensionOptionsDecorator_NoExtensionOptions(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -274,7 +274,7 @@ func TestExtensionOptionsDecorator_MultipleExtensionOptions(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -325,7 +325,7 @@ func TestExtensionOptionsDecorator_JWSOptionWithInvalidSignature(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -366,7 +366,7 @@ func TestExtensionOptionsDecorator_ExtractDIDFromJWSPayload(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -412,7 +412,7 @@ func TestExtensionOptionsDecorator_ValidJWSWithDIDInPayload(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -458,7 +458,7 @@ func TestExtensionOptionsDecorator_SecurityTamperedJWS(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -503,7 +503,7 @@ func TestExtensionOptionsDecorator_SecurityNoDIDInPayload(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -555,7 +555,7 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -619,7 +619,7 @@ func TestExtensionAndFeeDecorators_NoDID(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -659,7 +659,7 @@ func TestExtensionOptionsDecorator_CorrectAuthorizedAccount(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -705,7 +705,7 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "name: test policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
@@ -749,18 +749,18 @@ func TestExtensionOptionsDecorator_MultipleMessagesAllAuthorized(t *testing.T) {
 	msg1 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "policy 1",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	msg2 := &acptypes.MsgEditPolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		PolicyId:    "policy-id-1",
 		Policy:      "updated policy",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	msg3 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "policy 2",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg1, msg2, msg3))
 
@@ -803,18 +803,18 @@ func TestExtensionOptionsDecorator_MultipleMessagesOneUnauthorized(t *testing.T)
 	msg1 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "policy 1",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	msg2 := &acptypes.MsgEditPolicy{
 		Creator:     accs[1].acc.GetAddress().String(), // Different creator - unauthorized
 		PolicyId:    "policy-id-1",
 		Policy:      "malicious update",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	msg3 := &acptypes.MsgCreatePolicy{
 		Creator:     accs[0].acc.GetAddress().String(),
 		Policy:      "policy 2",
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	require.NoError(t, s.txBuilder.SetMsgs(msg1, msg2, msg3))
 

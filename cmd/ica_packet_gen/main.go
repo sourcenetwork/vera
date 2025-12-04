@@ -13,25 +13,19 @@ import (
 )
 
 func main() {
-	var creator, policy, marshalType string
+	var creator, policy string
 	flag.StringVar(&creator, "creator", "", "Host chain ICA address to use as creator")
 	flag.StringVar(&policy, "policy", "name: ica test policy", "Policy content")
-	flag.StringVar(&marshalType, "marshal", "SHORT_YAML", "Marshal type (SHORT_YAML|SHORT_JSON)")
 	flag.Parse()
 
 	if creator == "" {
 		panic("--creator is required")
 	}
 
-	mt := coretypes.PolicyMarshalingType_SHORT_YAML
-	if marshalType == "SHORT_JSON" {
-		mt = coretypes.PolicyMarshalingType_SHORT_JSON
-	}
-
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policy,
-		MarshalType: mt,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	anyMsg, err := codectypes.NewAnyWithValue(msg)

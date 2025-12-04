@@ -46,7 +46,7 @@ func setupEvaluateAccessRequest(t *testing.T) (context.Context, auth_engine.Auth
     actor:
       name: actor
     `
-	polIR, err := policy.Unmarshal(polStr, types.PolicyMarshalingType_SHORT_YAML)
+	polIR, err := policy.Unmarshal(polStr, types.PolicyMarshalingType_YAML)
 	require.Nil(t, err)
 
 	engine, _, ctx := testutil.GetTestAuthEngine(t)

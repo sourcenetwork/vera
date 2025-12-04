@@ -60,7 +60,7 @@ func CmdEditPolicy() *cobra.Command {
 				Creator:     clientCtx.GetFromAddress().String(),
 				Policy:      string(policy),
 				PolicyId:    policyId,
-				MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+				MarshalType: coretypes.PolicyMarshalingType_YAML,
 			}
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},

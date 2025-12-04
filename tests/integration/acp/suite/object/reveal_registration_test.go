@@ -13,11 +13,7 @@ import (
 const revealPolicy string = `
 name: pol
 resources:
-  file:
-    relations:
-	  owner:
-	    types:
-		  - actor
+- name: file
 `
 
 func TestRevealRegistration_UnregisteredObjectGetsRegistered_ReturnsNewRecord(t *testing.T) {
