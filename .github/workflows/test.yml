@@ -13,6 +13,13 @@ jobs:
           fetch-depth: 0
           submodules: true
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          check-latest: true
+          cache: false
+
       - name: Run Tests and Generate Coverage
         run: |
           go test -coverpkg=all ./... -coverprofile=coverage.txt
