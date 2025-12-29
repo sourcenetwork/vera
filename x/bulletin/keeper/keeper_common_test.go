@@ -78,7 +78,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	k := NewKeeper(
@@ -102,7 +102,7 @@ func setupTestPolicy(t *testing.T, ctx sdk.Context, k Keeper) {
 	_, polCap, err := k.GetAcpKeeper().CreateModulePolicy(
 		ctx,
 		types.BasePolicy(),
-		coretypes.PolicyMarshalingType_SHORT_YAML,
+		coretypes.PolicyMarshalingType_YAML,
 		types.ModuleName,
 	)
 	require.NoError(t, err)

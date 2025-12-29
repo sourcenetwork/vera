@@ -10,6 +10,7 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
 )
 
 // EpochsKeeper defines the expected interface for the Epochs module.
@@ -69,8 +70,30 @@ type DistributionKeeper interface {
 	WithdrawDelegationRewards(ctx context.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (sdk.Coins, error)
 }
 
+// FeegrantKeeper defines the expected interface for the Feegrant module.
+type FeegrantKeeper interface {
+	GetAllowance(ctx context.Context, granter, grantee sdk.AccAddress) (feegrant.FeeAllowanceI, error)
+	GrantAllowance(ctx context.Context, granter, grantee sdk.AccAddress, allowance feegrant.FeeAllowanceI) error
+	UpdateAllowance(ctx context.Context, granter, grantee sdk.AccAddress, feeAllowance feegrant.FeeAllowanceI) error
+	// DID-based feegrant methods
+	GrantDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, allowance feegrant.FeeAllowanceI) error
+	UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string, feeAllowance feegrant.FeeAllowanceI) error
+	ExpireDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) error
+	GetDIDAllowance(ctx context.Context, granter sdk.AccAddress, granteeDID string) (feegrant.FeeAllowanceI, error)
+}
+
 // ParamSubspace defines the expected Subspace interface for parameters.
 type ParamSubspace interface {
 	Get(context.Context, []byte, interface{})
 	Set(context.Context, []byte, interface{})
+}
+
+// AcpKeeper defines the expected interface for the ACP module.
+type AcpKeeper interface {
+	// GetActorDID returns the actor DID, checking context first, then falling back to issuing from account address
+	GetActorDID(ctx sdk.Context, accountAddr string) (string, error)
+	// IssueDIDFromAccountAddr creates a DID from an account address
+	IssueDIDFromAccountAddr(ctx context.Context, accountAddr string) (string, error)
+	// GetAddressFromDID extracts and returns the bech32 address from a DID
+	GetAddressFromDID(ctx context.Context, did string) (sdk.AccAddress, error)
 }

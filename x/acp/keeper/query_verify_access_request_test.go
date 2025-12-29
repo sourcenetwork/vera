@@ -32,23 +32,18 @@ func setupTestVerifyAccessRequest(t *testing.T) (context.Context, Keeper, *coret
 	policyStr := `
 name: policy
 resources:
-  file:
-    relations: 
-      owner:
-        types:
-          - actor
-      rm-root:
-    permissions: 
-      read: 
-        expr: owner
-      write: 
-        expr: owner
+- name: file
+  permissions:
+  - name: read
+  - name: write
+  relations:
+  - name: rm-root
 `
 
 	msg := types.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policyStr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := k.CreatePolicy(ctx, &msg)

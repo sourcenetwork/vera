@@ -16,30 +16,25 @@ func TestSignedPolicyCmd_ReplayProtection(t *testing.T) {
 	creator := accK.GenAccount().GetAddress().String()
 
 	policyStr := `
-name: policy
 description: ok
+name: policy
 resources:
-	file:
-		relations:
-			owner:
-				doc: owner owns
-				types:
-					- actor
-			reader:
-				types:
-					- actor
-		permissions:
-			own:
-				expr: owner
-				doc: own doc
-			read:
-				expr: owner + reader
+- name: file
+  permissions:
+  - doc: own doc
+    name: own
+  - expr: reader
+    name: read
+  relations:
+  - name: reader
+    types:
+    - actor
 `
 
 	msg := types.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policyStr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	resp, err := k.CreatePolicy(ctx, &msg)
 	require.Nil(t, err)

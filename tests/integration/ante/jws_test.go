@@ -15,8 +15,8 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -151,26 +151,23 @@ func TestJWSExtensionOptionWithDIDBasedFeegrant(t *testing.T) {
 
 	// Create policy message with JWS extension
 	policyContent := `
-name: Bulletin Policy
 description: Base policy that defines permissions for bulletin namespaces
+name: Bulletin Policy
 resources:
-  namespace:
-    relations:
-      owner:
-        types:
-          - actor
-      collaborator:
-        types: 
-          - actor
-    permissions:
-      create_post:
-        expr: owner + collaborator
+- name: namespace
+  permissions:
+  - expr: collaborator
+    name: create_post
+  relations:
+  - name: collaborator
+    types:
+    - actor
 `
 
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     faucetAddr.String(),
 		Policy:      policyContent,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	// Create bearer token payload

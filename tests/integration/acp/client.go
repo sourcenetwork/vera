@@ -189,7 +189,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 		authority.String(),
 		accKeeper,
 		&capabilitykeeper.ScopedKeeper{},
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

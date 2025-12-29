@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"testing"
 
@@ -66,7 +67,9 @@ func NewWithOptions(t *testing.T, options NetworkOptions, configs ...Config) *Ne
 	} else {
 		cfg = configs[0]
 	}
-	net, err := network.New(t, t.TempDir(), cfg)
+	baseDir, err := os.MkdirTemp("", t.Name())
+	require.NoError(t, err)
+	net, err := network.New(t, baseDir, cfg)
 	require.NoError(t, err)
 	val := net.Validators[0]
 	if options.EnableFaucet {
@@ -75,7 +78,10 @@ func NewWithOptions(t *testing.T, options NetworkOptions, configs ...Config) *Ne
 	}
 	_, err = net.WaitForHeight(1)
 	require.NoError(t, err)
-	t.Cleanup(net.Cleanup)
+	t.Cleanup(func() {
+		net.Cleanup()
+		os.RemoveAll(baseDir)
+	})
 	return net
 }
 

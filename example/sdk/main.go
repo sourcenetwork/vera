@@ -52,15 +52,11 @@ func main() {
 	policy := `
 name: test
 resources:
-  resource:
-    relations:
-      owner:
-        types:
-          - actor
+- name: resource
 `
 
 	msgSet := sdk.MsgSet{}
-	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_SHORT_YAML))
+	policyMapper := msgSet.WithCreatePolicy(acptypes.NewMsgCreatePolicy(signer.GetAccAddress(), policy, coretypes.PolicyMarshalingType_YAML))
 	tx, err := txBuilder.Build(ctx, signer, &msgSet)
 	if err != nil {
 		log.Fatal(err)

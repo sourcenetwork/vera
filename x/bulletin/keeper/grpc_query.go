@@ -7,6 +7,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/query"
+	"github.com/sourcenetwork/sourcehub/utils"
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -127,6 +128,61 @@ func (k *Keeper) Posts(ctx context.Context, req *types.QueryPostsRequest) (*type
 	return &types.QueryPostsResponse{Posts: posts, Pagination: pageRes}, nil
 }
 
+// IterateGlob returns posts matching the glob pattern within the specified namespace.
+func (k *Keeper) IterateGlob(goCtx context.Context, req *types.QueryIterateGlobRequest) (*types.QueryIterateGlobResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	if len(req.Namespace) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "invalid namespace")
+	}
+
+	// Use the sanitized namespace as prefix without trailing slash to match all keys that start with it
+	sanitizedNamespaceId := types.SanitizeKeyPart(getNamespaceId(req.Namespace))
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(goCtx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix+sanitizedNamespaceId))
+
+	var posts []*types.Post
+
+	// Use the Paginate function to handle the pagination logic.
+	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
+		keyStr := string(key)
+
+		// Strip leading separator:
+		// "|" appears when matching sub-paths within the namespace
+		// "/" appears when matching exactly at namespace boundary with non-empty postId
+		if len(keyStr) > 0 && (keyStr[0] == '|' || keyStr[0] == '/') {
+			keyStr = keyStr[1:]
+		}
+
+		// Strip trailing "/" before glob matching
+		if len(keyStr) > 0 && keyStr[len(keyStr)-1] == '/' {
+			keyStr = keyStr[:len(keyStr)-1]
+		}
+
+		// Unsanitize the key to restore original "/" characters for glob matching
+		keyStr = types.UnsanitizeKeyPart(keyStr)
+		matched := utils.Glob(req.Glob, keyStr)
+		if matched {
+			var post types.Post
+			k.cdc.MustUnmarshal(value, &post)
+			posts = append(posts, &post)
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &types.QueryIterateGlobResponse{
+		Posts:      posts,
+		Pagination: pageRes,
+	}
+
+	return resp, nil
+}
+
 // getNamespacesPaginated returns all namespaces with pagination.
 func (k *Keeper) getNamespacesPaginated(ctx context.Context, pageReq *query.PageRequest) (
 	[]types.Namespace, *query.PageResponse, error) {
@@ -158,8 +214,9 @@ func (k *Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespa
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
 
+	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(namespaceId+"/")) {
+		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
 			return nil
 		}
 		var collaborator types.Collaborator
@@ -184,8 +241,9 @@ func (k *Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId str
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
 
+	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(namespaceId+"/")) {
+		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
 			return nil
 		}
 		var post types.Post

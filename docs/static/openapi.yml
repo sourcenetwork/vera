@@ -72121,16 +72121,14 @@ paths:
                 type: string
                 enum:
                   - UNKNOWN
-                  - SHORT_YAML
-                  - SHORT_JSON
+                  - YAML
                 default: UNKNOWN
                 description: >-
-                  PolicyEncodingType enumerates supported marshaling types for
+                  PolicyMarshalingType enumerates supported marshaling types for
                   policies.
 
                    - UNKNOWN: Fallback value for a missing Marshaling Type
-                   - SHORT_YAML: Policy Marshaled as a YAML Short Policy definition
-                   - SHORT_JSON: Policy Marshaled as a JSON Short Policy definition
+                   - YAML: YAML Marshaled Policy
               creation_time:
                 type: string
                 format: date-time
@@ -73756,15 +73754,13 @@ paths:
         - name: marshal_type
           description: |2-
              - UNKNOWN: Fallback value for a missing Marshaling Type
-             - SHORT_YAML: Policy Marshaled as a YAML Short Policy definition
-             - SHORT_JSON: Policy Marshaled as a JSON Short Policy definition
+             - YAML: YAML Marshaled Policy
           in: query
           required: false
           type: string
           enum:
             - UNKNOWN
-            - SHORT_YAML
-            - SHORT_JSON
+            - YAML
           default: UNKNOWN
       tags:
         - Query
@@ -110905,15 +110901,13 @@ definitions:
         type: string
         enum:
           - UNKNOWN
-          - SHORT_YAML
-          - SHORT_JSON
+          - YAML
         default: UNKNOWN
         description: |-
-          PolicyEncodingType enumerates supported marshaling types for policies.
+          PolicyMarshalingType enumerates supported marshaling types for policies.
 
            - UNKNOWN: Fallback value for a missing Marshaling Type
-           - SHORT_YAML: Policy Marshaled as a YAML Short Policy definition
-           - SHORT_JSON: Policy Marshaled as a JSON Short Policy definition
+           - YAML: YAML Marshaled Policy
       creation_time:
         type: string
         format: date-time
@@ -112380,15 +112374,13 @@ definitions:
     type: string
     enum:
       - UNKNOWN
-      - SHORT_YAML
-      - SHORT_JSON
+      - YAML
     default: UNKNOWN
     description: |-
-      PolicyEncodingType enumerates supported marshaling types for policies.
+      PolicyMarshalingType enumerates supported marshaling types for policies.
 
        - UNKNOWN: Fallback value for a missing Marshaling Type
-       - SHORT_YAML: Policy Marshaled as a YAML Short Policy definition
-       - SHORT_JSON: Policy Marshaled as a JSON Short Policy definition
+       - YAML: YAML Marshaled Policy
   sourcehub.acp.RegisterObjectCmd:
     type: object
     properties:

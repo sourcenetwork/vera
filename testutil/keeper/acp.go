@@ -50,7 +50,7 @@ func AcpKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		&AccountKeeperStub{},
 		&acpCapKeeper,
-		hubtestutil.NewICAKeeperStub(),
+		hubtestutil.NewHubKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

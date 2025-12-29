@@ -18,12 +18,24 @@ const DefaultExpirationTime = time.Minute * 10
 type BearerToken struct {
 	// IssuerID is the Actor ID (DID) for the Token signer
 	IssuerID string `json:"iss,omitempty"`
+	// ProviderToken contains provider information (provider name, user id, etc.) as a JWT string
+	ProviderToken string `json:"provider_token,omitempty"`
 	// AuthorizedAccount is the SourceHub account address which is allowed to use this token
 	AuthorizedAccount string `json:"authorized_account,omitempty"`
 	// IssuedTime is the timestamp at which the token was generated
 	IssuedTime int64 `json:"iat,omitempty"`
 	// ExpirationTime is the timestamp at which the token will expire
 	ExpirationTime int64 `json:"exp,omitempty"`
+}
+
+// ProviderToken represents an authentication provider token.
+type ProviderToken struct {
+	// ProviderName is the name of the authentication provider (e.g., "google", "github")
+	ProviderName string `json:"provider_name,omitempty"`
+	// UserID is the unique user identifier from the provider
+	UserID string `json:"user_id,omitempty"`
+	// ActorDID is the actor/user DID derived from userID hash
+	ActorDID string `json:"actor_did,omitempty"`
 }
 
 // RequiredClaims returns the list of required claims for JWS payload validation

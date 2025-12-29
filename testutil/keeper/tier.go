@@ -33,6 +33,8 @@ import (
 	testutil "github.com/sourcenetwork/sourcehub/testutil"
 	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	"github.com/sourcenetwork/sourcehub/x/tier/types"
 	"github.com/stretchr/testify/require"
@@ -55,6 +57,22 @@ func InitializeDelegator(t *testing.T, k *keeper.Keeper, ctx sdk.Context, delAdd
 	require.NoError(t, err)
 }
 
+// CreateAccount creates an account with no balance.
+func CreateAccount(t *testing.T, k *keeper.Keeper, ctx sdk.Context, addr sdk.AccAddress) {
+	tempCoin := sdk.NewCoin(appparams.DefaultBondDenom, math.NewInt(1))
+	tempCoins := sdk.NewCoins(tempCoin)
+
+	err := k.GetBankKeeper().MintCoins(ctx, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().SendCoinsFromModuleToAccount(ctx, types.ModuleName, addr, tempCoins)
+	require.NoError(t, err)
+
+	err = k.GetBankKeeper().SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+	err = k.GetBankKeeper().BurnCoins(ctx, types.ModuleName, tempCoins)
+	require.NoError(t, err)
+}
+
 func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	storeKey := storetypes.NewKVStoreKey(types.StoreKey)
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
@@ -63,6 +81,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	distrStoreKey := storetypes.NewKVStoreKey(distrtypes.StoreKey)
 	epochsStoreKey := storetypes.NewKVStoreKey(epochstypes.StoreKey)
 	mintStoreKey := storetypes.NewKVStoreKey(minttypes.StoreKey)
+	feegrantStoreKey := storetypes.NewKVStoreKey(feegrant.StoreKey)
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
@@ -73,6 +92,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	stateStore.MountStoreWithDB(distrStoreKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(epochsStoreKey, storetypes.StoreTypeDB, db)
 	stateStore.MountStoreWithDB(mintStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(feegrantStoreKey, storetypes.StoreTypeDB, db)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
@@ -82,6 +102,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	stakingtypes.RegisterInterfaces(registry)
 	distrtypes.RegisterInterfaces(registry)
 	minttypes.RegisterInterfaces(registry)
+	feegrant.RegisterInterfaces(registry)
 
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
@@ -194,6 +215,12 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	}
 	epochsKeeper.SetEpochInfo(ctx, epochInfo)
 
+	feegrantKeeper := feegrantkeeper.NewKeeper(
+		cdc,
+		runtime.NewKVStoreService(feegrantStoreKey),
+		authKeeper,
+	)
+
 	k := keeper.NewKeeper(
 		cdc,
 		runtime.NewKVStoreService(storeKey),
@@ -203,6 +230,8 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		stakingKeeper,
 		epochsKeeper,
 		distributionKeeper,
+		feegrantKeeper,
+		nil,
 	)
 
 	// Initialize params

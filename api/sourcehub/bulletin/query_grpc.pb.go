@@ -26,6 +26,7 @@ const (
 	Query_NamespacePosts_FullMethodName         = "/sourcehub.bulletin.Query/NamespacePosts"
 	Query_Post_FullMethodName                   = "/sourcehub.bulletin.Query/Post"
 	Query_Posts_FullMethodName                  = "/sourcehub.bulletin.Query/Posts"
+	Query_IterateGlob_FullMethodName            = "/sourcehub.bulletin.Query/IterateGlob"
 )
 
 // QueryClient is the client API for Query service.
@@ -48,6 +49,8 @@ type QueryClient interface {
 	Post(ctx context.Context, in *QueryPostRequest, opts ...grpc.CallOption) (*QueryPostResponse, error)
 	// Queries all posts.
 	Posts(ctx context.Context, in *QueryPostsRequest, opts ...grpc.CallOption) (*QueryPostsResponse, error)
+	// Glob iteration over a namespace
+	IterateGlob(ctx context.Context, in *QueryIterateGlobRequest, opts ...grpc.CallOption) (*QueryIterateGlobResponse, error)
 }
 
 type queryClient struct {
@@ -128,6 +131,16 @@ func (c *queryClient) Posts(ctx context.Context, in *QueryPostsRequest, opts ...
 	return out, nil
 }
 
+func (c *queryClient) IterateGlob(ctx context.Context, in *QueryIterateGlobRequest, opts ...grpc.CallOption) (*QueryIterateGlobResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryIterateGlobResponse)
+	err := c.cc.Invoke(ctx, Query_IterateGlob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -148,6 +161,8 @@ type QueryServer interface {
 	Post(context.Context, *QueryPostRequest) (*QueryPostResponse, error)
 	// Queries all posts.
 	Posts(context.Context, *QueryPostsRequest) (*QueryPostsResponse, error)
+	// Glob iteration over a namespace
+	IterateGlob(context.Context, *QueryIterateGlobRequest) (*QueryIterateGlobResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -178,6 +193,9 @@ func (UnimplementedQueryServer) Post(context.Context, *QueryPostRequest) (*Query
 }
 func (UnimplementedQueryServer) Posts(context.Context, *QueryPostsRequest) (*QueryPostsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Posts not implemented")
+}
+func (UnimplementedQueryServer) IterateGlob(context.Context, *QueryIterateGlobRequest) (*QueryIterateGlobResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IterateGlob not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -326,6 +344,24 @@ func _Query_Posts_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_IterateGlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryIterateGlobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).IterateGlob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_IterateGlob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).IterateGlob(ctx, req.(*QueryIterateGlobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -360,6 +396,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Posts",
 			Handler:    _Query_Posts_Handler,
+		},
+		{
+			MethodName: "IterateGlob",
+			Handler:    _Query_IterateGlob_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

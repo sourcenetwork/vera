@@ -30,8 +30,10 @@ func TestEndBlocker(t *testing.T) {
 	ctx, err := utils.InjectPrincipal(ctx, "did:example:bob")
 	require.NoError(t, err)
 	resp, err := engine.CreatePolicy(ctx, &coretypes.CreatePolicyRequest{
-		Policy:      `name: test`,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		Policy: `
+name: test
+`,
+	MarshalType: coretypes.PolicyMarshalingType_YAML,
 	})
 	require.NoError(t, err)
 

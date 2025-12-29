@@ -36,7 +36,7 @@ name: test policy
 		types.NewMsgCreatePolicy(
 			network.GetValidatorAddr(),
 			policy,
-			coretypes.PolicyMarshalingType_SHORT_YAML,
+			coretypes.PolicyMarshalingType_YAML,
 		),
 	)
 
@@ -85,7 +85,7 @@ name: test policy
 		types.NewMsgCreatePolicy(
 			validatorAddr,
 			policy,
-			coretypes.PolicyMarshalingType_SHORT_YAML,
+			coretypes.PolicyMarshalingType_YAML,
 		),
 	)
 

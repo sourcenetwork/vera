@@ -108,7 +108,7 @@ func (msg MsgGrantDIDAllowance) ValidateBasic() error {
 	return allowance.ValidateBasic()
 }
 
-// NewMsgExpireDIDAllowance returns a message to revoke a fee allowance for a given granter and DID.
+// NewMsgExpireDIDAllowance returns a message to expire a fee allowance for a given granter and DID.
 func NewMsgExpireDIDAllowance(granter sdk.AccAddress, granteeDID string) MsgExpireDIDAllowance {
 	return MsgExpireDIDAllowance{Granter: granter.String(), GranteeDid: granteeDID}
 }

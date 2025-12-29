@@ -28,6 +28,7 @@ type MintTestSuite struct {
 
 	bankKeeper       *test.MockBankKeeper
 	distrKeeper      *test.MockDistributionKeeper
+	feegrantKeeper   *test.MockFeegrantKeeper
 	stakingKeeper    *test.MockStakingKeeper
 	epochsKeeper     *test.MockEpochsKeeper
 	tierKeeper       tierkeeper.Keeper
@@ -76,6 +77,8 @@ func (suite *MintTestSuite) SetupTest() {
 		suite.stakingKeeper,
 		suite.epochsKeeper,
 		suite.distrKeeper,
+		suite.feegrantKeeper,
+		nil,
 	)
 
 	suite.mintKeeper = mintkeeper.NewKeeper(

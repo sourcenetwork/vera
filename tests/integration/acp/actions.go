@@ -19,7 +19,7 @@ func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	msg := &types.MsgCreatePolicy{
 		Policy:      a.Policy,
 		Creator:     a.Creator.SourceHubAddr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	response, err := ctx.Executor.CreatePolicy(ctx, msg)
 
@@ -50,7 +50,7 @@ func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 		PolicyId:    a.Id,
 		Policy:      a.Policy,
 		Creator:     a.Creator.SourceHubAddr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	response, err := ctx.Executor.EditPolicy(ctx, msg)
 	a.Response = response
@@ -58,7 +58,6 @@ func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	AssertError(ctx, err, a.ExpectedErr)
 	if a.Expected != nil {
 		require.NotNil(ctx.T, response)
-		AssertValue(ctx, response.Record.Policy, a.Expected)
 
 		getResponse, getErr := ctx.Executor.Policy(ctx, &types.QueryPolicyRequest{
 			Id: a.Id,

@@ -8,10 +8,12 @@ import (
 
 // x/tier module sentinel errors
 var (
-	ErrUnauthorized   = sdkerrors.Register(ModuleName, 1101, "unauthorized")
-	ErrNotFound       = sdkerrors.Register(ModuleName, 1102, "not found")
-	ErrInvalidRequest = sdkerrors.Register(ModuleName, 1103, "invalid request")
-	ErrInvalidAddress = sdkerrors.Register(ModuleName, 1104, "invalid address")
-	ErrInvalidDenom   = sdkerrors.Register(ModuleName, 1105, "invalid denom")
-	ErrInvalidAmount  = sdkerrors.Register(ModuleName, 1106, "invalid amount")
+	ErrUnauthorized              = sdkerrors.Register(ModuleName, 1101, "unauthorized")
+	ErrNotFound                  = sdkerrors.Register(ModuleName, 1102, "not found")
+	ErrInvalidRequest            = sdkerrors.Register(ModuleName, 1103, "invalid request")
+	ErrInvalidAddress            = sdkerrors.Register(ModuleName, 1104, "invalid address")
+	ErrInvalidDenom              = sdkerrors.Register(ModuleName, 1105, "invalid denom")
+	ErrInvalidAmount             = sdkerrors.Register(ModuleName, 1106, "invalid amount")
+	ErrInvalidDID                = sdkerrors.Register(ModuleName, 1107, "invalid DID")
+	ErrInvalidSubscriptionPeriod = sdkerrors.Register(ModuleName, 1108, "invalid subscription period")
 )

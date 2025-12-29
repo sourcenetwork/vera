@@ -30,7 +30,7 @@ name: policy
 		Id: pol.Id,
 		Expected: &acptypes.PolicyRecord{
 			Policy:      pol,
-			MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+			MarshalType: coretypes.PolicyMarshalingType_YAML,
 			RawPolicy:   policyStr,
 			Metadata:    metadata,
 		},

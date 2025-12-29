@@ -13,18 +13,18 @@ func TestEditPolicy_CanEditPolicy(t *testing.T) {
 
 	action := test.CreatePolicyAction{
 		Policy: `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations:
-      reader:
-      writer:
-    permissions:
-      read:
-        expr: reader + writer
-      write:
-        expr: writer
+- name: file
+  permissions:
+  - expr: (reader + writer)
+    name: read
+  - expr: writer
+    name: write
+  relations:
+  - name: reader
+  - name: writer
 `,
 		Creator: ctx.TxSigner,
 	}
@@ -36,21 +36,26 @@ resources:
 		Description:       "new ok",
 		SpecificationType: coretypes.PolicySpecificationType_NO_SPEC,
 		Resources: []*coretypes.Resource{
-			&coretypes.Resource{
+			{
 				Name: "file",
+				Owner: &coretypes.Relation{
+					Name: "owner",
+					Doc:  "owner relations represents the object owner",
+					VrTypes: []*coretypes.Restriction{
+						{
+							ResourceName: "actor",
+							RelationName: "",
+						},
+					},
+					Manages: []string{
+						"collaborator",
+						"writer",
+						"owner",
+					},
+				},
 				Relations: []*coretypes.Relation{
 					{
 						Name: "collaborator",
-					},
-					{
-						Name: "owner",
-						Doc:  "owner relations represents the object owner",
-						VrTypes: []*coretypes.Restriction{
-							{
-								ResourceName: "actor",
-								RelationName: "",
-							},
-						},
 					},
 					{
 						Name: "writer",
@@ -58,52 +63,56 @@ resources:
 				},
 				Permissions: []*coretypes.Permission{
 					{
-						Name:       "_can_manage_collaborator",
+						Name:                "read",
+						Expression:          "collaborator",
+						EffectiveExpression: "(owner + collaborator)",
+					},
+					{
+						Name:                "write",
+						Expression:          "(collaborator + writer)",
+						EffectiveExpression: "(owner + (collaborator + writer))",
+					},
+				},
+				ManagementRules: []*coretypes.ManagementRule{
+					{
+						Relation:   "collaborator",
 						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the collaborator relation (permission was auto-generated).",
+						Managers:   []string{"owner"},
 					},
 					{
-						Name:       "_can_manage_owner",
+						Relation:   "owner",
 						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the owner relation (permission was auto-generated).",
+						Managers:   []string{"owner"},
 					},
 					{
-						Name:       "_can_manage_writer",
+						Relation:   "writer",
 						Expression: "owner",
-						Doc:        "permission controls actors which are allowed to create relationships for the writer relation (permission was auto-generated).",
-					},
-					{
-						Name:       "read",
-						Expression: "(owner + collaborator)",
-					},
-					{
-						Name:       "write",
-						Expression: "(owner + (collaborator + writer))",
+						Managers:   []string{"owner"},
 					},
 				},
 			},
 		},
 		ActorResource: &coretypes.ActorResource{
 			Name: "actor",
-			Doc:  "",
+			Doc:  "actor resource models the set of actors defined within a policy",
 		},
 	}
 	a := test.EditPolicyAction{
 		Id:      ctx.State.PolicyId,
 		Creator: ctx.TxSigner,
 		Policy: `
-name: new policy
 description: new ok
+name: new policy
 resources:
-  file:
-    relations:
-      writer:
-      collaborator:
-    permissions:
-      read:
-        expr: collaborator
-      write:
-        expr: collaborator + writer
+- name: file
+  permissions:
+  - expr: collaborator
+    name: read
+  - expr: (collaborator + writer)
+    name: write
+  relations:
+  - name: collaborator
+  - name: writer
 `,
 		Expected: want,
 	}

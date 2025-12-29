@@ -19,11 +19,18 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Msg_UpdateParams_FullMethodName    = "/sourcehub.tier.v1beta1.Msg/UpdateParams"
-	Msg_Lock_FullMethodName            = "/sourcehub.tier.v1beta1.Msg/Lock"
-	Msg_Unlock_FullMethodName          = "/sourcehub.tier.v1beta1.Msg/Unlock"
-	Msg_Redelegate_FullMethodName      = "/sourcehub.tier.v1beta1.Msg/Redelegate"
-	Msg_CancelUnlocking_FullMethodName = "/sourcehub.tier.v1beta1.Msg/CancelUnlocking"
+	Msg_UpdateParams_FullMethodName           = "/sourcehub.tier.v1beta1.Msg/UpdateParams"
+	Msg_Lock_FullMethodName                   = "/sourcehub.tier.v1beta1.Msg/Lock"
+	Msg_LockAuto_FullMethodName               = "/sourcehub.tier.v1beta1.Msg/LockAuto"
+	Msg_Unlock_FullMethodName                 = "/sourcehub.tier.v1beta1.Msg/Unlock"
+	Msg_Redelegate_FullMethodName             = "/sourcehub.tier.v1beta1.Msg/Redelegate"
+	Msg_CancelUnlocking_FullMethodName        = "/sourcehub.tier.v1beta1.Msg/CancelUnlocking"
+	Msg_CreateDeveloper_FullMethodName        = "/sourcehub.tier.v1beta1.Msg/CreateDeveloper"
+	Msg_UpdateDeveloper_FullMethodName        = "/sourcehub.tier.v1beta1.Msg/UpdateDeveloper"
+	Msg_RemoveDeveloper_FullMethodName        = "/sourcehub.tier.v1beta1.Msg/RemoveDeveloper"
+	Msg_AddUserSubscription_FullMethodName    = "/sourcehub.tier.v1beta1.Msg/AddUserSubscription"
+	Msg_UpdateUserSubscription_FullMethodName = "/sourcehub.tier.v1beta1.Msg/UpdateUserSubscription"
+	Msg_RemoveUserSubscription_FullMethodName = "/sourcehub.tier.v1beta1.Msg/RemoveUserSubscription"
 )
 
 // MsgClient is the client API for Msg service.
@@ -35,14 +42,29 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
-	// Lock defines a (delegator) operation for locking a stake.
+	// Lock defines a (developer) operation for locking a stake.
 	Lock(ctx context.Context, in *MsgLock, opts ...grpc.CallOption) (*MsgLockResponse, error)
-	// Unlock defines a (delegator) operation for unlocking a stake.
+	// LockAuto defines a (developer) operation for locking a stake with automatic validator selection.
+	LockAuto(ctx context.Context, in *MsgLockAuto, opts ...grpc.CallOption) (*MsgLockAutoResponse, error)
+	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(ctx context.Context, in *MsgUnlock, opts ...grpc.CallOption) (*MsgUnlockResponse, error)
-	// Redelegate defines a (delegator) operation for re-delegating a stake.
+	// Redelegate defines a (developer) operation for re-delegating a stake.
 	Redelegate(ctx context.Context, in *MsgRedelegate, opts ...grpc.CallOption) (*MsgRedelegateResponse, error)
-	// CancelUnlocking defines a (delegator) operation for canceling an unlocking stake.
+	// CancelUnlocking defines a (developer) operation for canceling an unlocking stake.
 	CancelUnlocking(ctx context.Context, in *MsgCancelUnlocking, opts ...grpc.CallOption) (*MsgCancelUnlockingResponse, error)
+	// CreateDeveloper defines a (developer) operation for creating a new developer record.
+	CreateDeveloper(ctx context.Context, in *MsgCreateDeveloper, opts ...grpc.CallOption) (*MsgCreateDeveloperResponse, error)
+	// UpdateDeveloper defines a (developer) operation for updating an existing developer record.
+	UpdateDeveloper(ctx context.Context, in *MsgUpdateDeveloper, opts ...grpc.CallOption) (*MsgUpdateDeveloperResponse, error)
+	// RemoveDeveloper defines a (developer) operation for removing a developer record.
+	RemoveDeveloper(ctx context.Context, in *MsgRemoveDeveloper, opts ...grpc.CallOption) (*MsgRemoveDeveloperResponse, error)
+	// AddUserSubscription defines a (developer) operation for adding a user subscription.
+	AddUserSubscription(ctx context.Context, in *MsgAddUserSubscription, opts ...grpc.CallOption) (*MsgAddUserSubscriptionResponse, error)
+	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
+	UpdateUserSubscription(ctx context.Context, in *MsgUpdateUserSubscription, opts ...grpc.CallOption) (*MsgUpdateUserSubscriptionResponse, error)
+	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
+	RemoveUserSubscription(ctx context.Context, in *MsgRemoveUserSubscription, opts ...grpc.CallOption) (*MsgRemoveUserSubscriptionResponse, error)
 }
 
 type msgClient struct {
@@ -67,6 +89,16 @@ func (c *msgClient) Lock(ctx context.Context, in *MsgLock, opts ...grpc.CallOpti
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgLockResponse)
 	err := c.cc.Invoke(ctx, Msg_Lock_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) LockAuto(ctx context.Context, in *MsgLockAuto, opts ...grpc.CallOption) (*MsgLockAutoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgLockAutoResponse)
+	err := c.cc.Invoke(ctx, Msg_LockAuto_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -103,6 +135,66 @@ func (c *msgClient) CancelUnlocking(ctx context.Context, in *MsgCancelUnlocking,
 	return out, nil
 }
 
+func (c *msgClient) CreateDeveloper(ctx context.Context, in *MsgCreateDeveloper, opts ...grpc.CallOption) (*MsgCreateDeveloperResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgCreateDeveloperResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateDeveloper_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateDeveloper(ctx context.Context, in *MsgUpdateDeveloper, opts ...grpc.CallOption) (*MsgUpdateDeveloperResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgUpdateDeveloperResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateDeveloper_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveDeveloper(ctx context.Context, in *MsgRemoveDeveloper, opts ...grpc.CallOption) (*MsgRemoveDeveloperResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRemoveDeveloperResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveDeveloper_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddUserSubscription(ctx context.Context, in *MsgAddUserSubscription, opts ...grpc.CallOption) (*MsgAddUserSubscriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgAddUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, Msg_AddUserSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateUserSubscription(ctx context.Context, in *MsgUpdateUserSubscription, opts ...grpc.CallOption) (*MsgUpdateUserSubscriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgUpdateUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateUserSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveUserSubscription(ctx context.Context, in *MsgRemoveUserSubscription, opts ...grpc.CallOption) (*MsgRemoveUserSubscriptionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRemoveUserSubscriptionResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveUserSubscription_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -112,14 +204,29 @@ type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
-	// Lock defines a (delegator) operation for locking a stake.
+	// Lock defines a (developer) operation for locking a stake.
 	Lock(context.Context, *MsgLock) (*MsgLockResponse, error)
-	// Unlock defines a (delegator) operation for unlocking a stake.
+	// LockAuto defines a (developer) operation for locking a stake with automatic validator selection.
+	LockAuto(context.Context, *MsgLockAuto) (*MsgLockAutoResponse, error)
+	// Unlock defines a (developer) operation for unlocking a stake.
 	Unlock(context.Context, *MsgUnlock) (*MsgUnlockResponse, error)
-	// Redelegate defines a (delegator) operation for re-delegating a stake.
+	// Redelegate defines a (developer) operation for re-delegating a stake.
 	Redelegate(context.Context, *MsgRedelegate) (*MsgRedelegateResponse, error)
-	// CancelUnlocking defines a (delegator) operation for canceling an unlocking stake.
+	// CancelUnlocking defines a (developer) operation for canceling an unlocking stake.
 	CancelUnlocking(context.Context, *MsgCancelUnlocking) (*MsgCancelUnlockingResponse, error)
+	// CreateDeveloper defines a (developer) operation for creating a new developer record.
+	CreateDeveloper(context.Context, *MsgCreateDeveloper) (*MsgCreateDeveloperResponse, error)
+	// UpdateDeveloper defines a (developer) operation for updating an existing developer record.
+	UpdateDeveloper(context.Context, *MsgUpdateDeveloper) (*MsgUpdateDeveloperResponse, error)
+	// RemoveDeveloper defines a (developer) operation for removing a developer record.
+	RemoveDeveloper(context.Context, *MsgRemoveDeveloper) (*MsgRemoveDeveloperResponse, error)
+	// AddUserSubscription defines a (developer) operation for adding a user subscription.
+	AddUserSubscription(context.Context, *MsgAddUserSubscription) (*MsgAddUserSubscriptionResponse, error)
+	// UpdateUserSubscription defines a (developer) operation for updating a user subscription.
+	UpdateUserSubscription(context.Context, *MsgUpdateUserSubscription) (*MsgUpdateUserSubscriptionResponse, error)
+	// RemoveUserSubscription defines a (developer) operation for removing a user subscription.
+	// This expires the allowance at the end of the current period rather than immediately revoking it.
+	RemoveUserSubscription(context.Context, *MsgRemoveUserSubscription) (*MsgRemoveUserSubscriptionResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -136,6 +243,9 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 func (UnimplementedMsgServer) Lock(context.Context, *MsgLock) (*MsgLockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Lock not implemented")
 }
+func (UnimplementedMsgServer) LockAuto(context.Context, *MsgLockAuto) (*MsgLockAutoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LockAuto not implemented")
+}
 func (UnimplementedMsgServer) Unlock(context.Context, *MsgUnlock) (*MsgUnlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Unlock not implemented")
 }
@@ -144,6 +254,24 @@ func (UnimplementedMsgServer) Redelegate(context.Context, *MsgRedelegate) (*MsgR
 }
 func (UnimplementedMsgServer) CancelUnlocking(context.Context, *MsgCancelUnlocking) (*MsgCancelUnlockingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelUnlocking not implemented")
+}
+func (UnimplementedMsgServer) CreateDeveloper(context.Context, *MsgCreateDeveloper) (*MsgCreateDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDeveloper not implemented")
+}
+func (UnimplementedMsgServer) UpdateDeveloper(context.Context, *MsgUpdateDeveloper) (*MsgUpdateDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateDeveloper not implemented")
+}
+func (UnimplementedMsgServer) RemoveDeveloper(context.Context, *MsgRemoveDeveloper) (*MsgRemoveDeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveDeveloper not implemented")
+}
+func (UnimplementedMsgServer) AddUserSubscription(context.Context, *MsgAddUserSubscription) (*MsgAddUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserSubscription not implemented")
+}
+func (UnimplementedMsgServer) UpdateUserSubscription(context.Context, *MsgUpdateUserSubscription) (*MsgUpdateUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSubscription not implemented")
+}
+func (UnimplementedMsgServer) RemoveUserSubscription(context.Context, *MsgRemoveUserSubscription) (*MsgRemoveUserSubscriptionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveUserSubscription not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -202,6 +330,24 @@ func _Msg_Lock_Handler(srv interface{}, ctx context.Context, dec func(interface{
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_LockAuto_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgLockAuto)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).LockAuto(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_LockAuto_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).LockAuto(ctx, req.(*MsgLockAuto))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_Unlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgUnlock)
 	if err := dec(in); err != nil {
@@ -256,6 +402,114 @@ func _Msg_CancelUnlocking_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CreateDeveloper_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateDeveloper(ctx, req.(*MsgCreateDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateDeveloper_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateDeveloper(ctx, req.(*MsgUpdateDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveDeveloper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveDeveloper)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveDeveloper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemoveDeveloper_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveDeveloper(ctx, req.(*MsgRemoveDeveloper))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_AddUserSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddUserSubscription(ctx, req.(*MsgAddUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateUserSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateUserSubscription(ctx, req.(*MsgUpdateUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveUserSubscription_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveUserSubscription)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveUserSubscription(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemoveUserSubscription_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveUserSubscription(ctx, req.(*MsgRemoveUserSubscription))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -272,6 +526,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_Lock_Handler,
 		},
 		{
+			MethodName: "LockAuto",
+			Handler:    _Msg_LockAuto_Handler,
+		},
+		{
 			MethodName: "Unlock",
 			Handler:    _Msg_Unlock_Handler,
 		},
@@ -282,6 +540,30 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelUnlocking",
 			Handler:    _Msg_CancelUnlocking_Handler,
+		},
+		{
+			MethodName: "CreateDeveloper",
+			Handler:    _Msg_CreateDeveloper_Handler,
+		},
+		{
+			MethodName: "UpdateDeveloper",
+			Handler:    _Msg_UpdateDeveloper_Handler,
+		},
+		{
+			MethodName: "RemoveDeveloper",
+			Handler:    _Msg_RemoveDeveloper_Handler,
+		},
+		{
+			MethodName: "AddUserSubscription",
+			Handler:    _Msg_AddUserSubscription_Handler,
+		},
+		{
+			MethodName: "UpdateUserSubscription",
+			Handler:    _Msg_UpdateUserSubscription_Handler,
+		},
+		{
+			MethodName: "RemoveUserSubscription",
+			Handler:    _Msg_RemoveUserSubscription_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

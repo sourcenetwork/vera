@@ -46,7 +46,7 @@ func CmdCreatePolicy() *cobra.Command {
 				}
 			} else {
 				policyFile = args[0]
-				marshalingType = coretypes.PolicyMarshalingType_SHORT_YAML
+				marshalingType = coretypes.PolicyMarshalingType_YAML
 			}
 
 			var file io.Reader

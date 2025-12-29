@@ -22,20 +22,15 @@ func TestQueryPolicy(t *testing.T) {
 
 func (s *queryPolicySuite) setupPolicy(t *testing.T) (context.Context, Keeper, string) {
 	policyStr := `
-name: Source Policy
 description: A valid policy
+name: Source Policy
 resources:
-  file:
-    relations: 
-      owner:
-        types:
-          - actor
-      rm-root:
-    permissions: 
-      read: 
-        expr: owner
-      write: 
-        expr: owner
+- name: file
+  permissions:
+  - name: read
+  - name: write
+  relations:
+  - name: rm-root
 `
 
 	ctx, k, accKeep := setupKeeper(t)
@@ -44,7 +39,7 @@ resources:
 	msg := types.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policyStr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := k.CreatePolicy(ctx, &msg)

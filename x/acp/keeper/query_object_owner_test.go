@@ -27,29 +27,21 @@ func (s *queryObjectOwnerSuite) setup(t *testing.T) (context.Context, Keeper, sd
 	s.obj = coretypes.NewObject("file", "1")
 
 	policyStr := `
-name: policy
 description: ok
+name: policy
 resources:
-  file:
-    relations: 
-      owner:
-        doc: owner owns
-        types:
-          - actor-resource
-      reader:
-      admin:
-        manages:
-          - reader
-    permissions: 
-      own:
-        expr: owner
-        doc: own doc
-      read: 
-        expr: owner + reader
-actor:
-  name: actor-resource
-  doc: my actor
-          `
+- name: file
+  permissions:
+  - doc: own doc
+    name: own
+  - expr: reader
+    name: read
+  relations:
+  - manages:
+    - reader
+    name: admin
+  - name: reader
+`
 
 	ctx, k, accKeep := setupKeeper(t)
 	creator := accKeep.FirstAcc().GetAddress().String()
@@ -57,7 +49,7 @@ actor:
 	msg := types.MsgCreatePolicy{
 		Creator:     creator,
 		Policy:      policyStr,
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	resp, err := k.CreatePolicy(ctx, &msg)

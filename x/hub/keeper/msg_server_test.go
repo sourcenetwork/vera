@@ -12,7 +12,7 @@ import (
 )
 
 func setupMsgServer(t testing.TB) (keeper.Keeper, types.MsgServer, context.Context) {
-	k, ctx := keepertest.IcaKeeper(t)
+	k, ctx := keepertest.HubKeeper(t)
 	return k, &k, ctx
 }
 

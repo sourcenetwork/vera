@@ -5,12 +5,13 @@ package types
 
 import (
 	fmt "fmt"
-	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
-	_ "github.com/cosmos/gogoproto/gogoproto"
-	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+
+	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -27,7 +28,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 // ChainConfig specifies flags and parameters which
 // tune the chain behavior during genesis creation
 type ChainConfig struct {
-	// allow_zero_fee_txs if true configures the antee handler
+	// allow_zero_fee_txs if true configures the ante handler
 	// to not reject txs with 0 fees
 	AllowZeroFeeTxs bool `protobuf:"varint,1,opt,name=allow_zero_fee_txs,json=allowZeroFeeTxs,proto3" json:"allow_zero_fee_txs,omitempty"`
 	// ignore_bearer_auth if true ignores the `authorized_account`

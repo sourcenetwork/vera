@@ -23,6 +23,7 @@ import (
 	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 
+	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 
 	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
@@ -119,7 +120,7 @@ func NewAppModule(
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	// Inject instrumentation into msg service handler
 	descriptor := metrics.WrapMsgServerServiceDescriptor(types.ModuleName, types.Msg_serviceDesc)
-	cfg.MsgServer().RegisterService(&descriptor, am.keeper)
+	cfg.MsgServer().RegisterService(&descriptor, keeper.NewMsgServerImpl(am.keeper))
 
 	// Inject instrumentation into query service handler
 	descriptor = metrics.WrapQueryServiceDescriptor(types.ModuleName, types.Query_serviceDesc)
@@ -190,6 +191,8 @@ type ModuleInputs struct {
 	StakingKeeper      types.StakingKeeper
 	EpochsKeeper       types.EpochsKeeper
 	DistributionKeeper types.DistributionKeeper
+	FeegrantKeeper     types.FeegrantKeeper
+	AcpKeeper          *acpkeeper.Keeper
 }
 
 type ModuleOutputs struct {
@@ -215,6 +218,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.StakingKeeper,
 		in.EpochsKeeper,
 		in.DistributionKeeper,
+		in.FeegrantKeeper,
+		in.AcpKeeper,
 	)
 
 	m := NewAppModule(

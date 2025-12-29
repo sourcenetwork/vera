@@ -107,7 +107,7 @@ func main() {
 	msg := &acptypes.MsgCreatePolicy{
 		Creator:     senderAddr,
 		Policy:      string(policyContent),
-		MarshalType: coretypes.PolicyMarshalingType_SHORT_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 
 	// Generate the key pair for signing
