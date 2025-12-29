@@ -53,7 +53,6 @@ if [ ! -d /sourcehub/.initialized ]; then
         sed -i 's/"allow_zero_fee_txs": false,/"allow_zero_fee_txs": true,/' /sourcehub/config/genesis.json
         cp /etc/sourcehub/faucet-key.json /sourcehub/config/faucet-key.json
         echo "initialized sourcehub genesis"
-        # TODO copy config files
     else 
         if [ -z "$GENESIS_PATH" ]; then
             echo "GENESIS_PATH not set and standalone is false: provide a genesis file or set env STANDALONE=1"
