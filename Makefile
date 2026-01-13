@@ -45,12 +45,10 @@ run: build
 docs:
 	pkgsite -http 0.0.0.0:8080
 
-.PHONY: image
-# builds a production docker image in the local system and tags it with
-# the ID of the current git HEAD
-image:
-	scripts/build-docker-image.sh
-
 .PHONY: test_env_generator
 test_env_generator:
 	go build -o build/test_env_generator cmd/test_env_generator/main.go
+
+.PHONY: docker
+docker:
+	docker image build -t ghcr.io/sourcenetwork/sourcehub:dev .

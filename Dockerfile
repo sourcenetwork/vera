@@ -14,8 +14,6 @@ RUN --mount=type=cache,target=/root/.cache go build -o /app/build/sourcehubd ./c
 FROM debian:bookworm-slim
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY docker/config.toml /etc/sourcehub/config.toml
-COPY docker/app.toml /etc/sourcehub/app.toml
 COPY docker/faucet-key.json /etc/sourcehub/faucet-key.json
 COPY --from=builder /app/build/sourcehubd /usr/local/bin/sourcehubd
 
