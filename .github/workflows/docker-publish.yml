@@ -8,8 +8,8 @@ name: Docker
 on:
   push:
     #branches: [ "dev" ]
-    tags:
-      - 'v*.*.*'
+    #tags:
+      #- 'v*.*.*'
 
 env:
   # Use docker.io for Docker Hub if empty
