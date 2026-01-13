@@ -1,12 +1,15 @@
-version: '3.8'
-
 services:
   sourcehub:
     build:
-      target: builder
-      args:
-        dev: 1
+      context: .
     ports:
-      - 1317
+      - 1317:1317
+      - 26656:26656
+      - 26657:26657
+      - 9090:9090
+    environment:
+      STANDALONE: 1
     volumes:
-      - .:/app
+      - data:/sourcehub
+volumes:
+  data:
