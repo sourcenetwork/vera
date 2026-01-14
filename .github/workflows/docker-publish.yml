@@ -7,9 +7,9 @@ name: Docker
 
 on:
   push:
-    branches: [ "dev" ]
-    tags:
-      - 'v*.*.*'
+    #branches: [ "dev" ]
+    #tags:
+      #- 'v*.*.*'
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -65,10 +65,6 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            # branch event
-            type=ref,event=branch
-            # tag event
-            type=ref,event=tag
             # full length commit sha
             type=sha,format=long
 
