@@ -19,7 +19,7 @@ if [ ! -d /sourcehub/.initialized ]; then
         MONIKER=$DEFAULT_MONIKER
     fi
 
-    sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 2>/dev/null
+    sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 
 
     # recover account mnemonic
     if [ -n "$MNEMONIC_PATH" ]; then
