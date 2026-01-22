@@ -27,6 +27,8 @@ message EventPostCreated {
   string creator_did = 3;
   // payload is the base64-encoded content of the post.
   string payload = 4;
+  // artifact is sent with a post call for tracking purposes 
+  string artifact = 5;
 }
 
 // EventCollaboratorAdded is emitted when a collaborator is added to a namespace.

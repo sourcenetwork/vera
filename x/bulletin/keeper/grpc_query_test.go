@@ -345,6 +345,7 @@ func TestPostQuery(t *testing.T) {
 	namespace := "ns1"
 	payload1 := []byte("post123")
 	proof1 := []byte("proof456")
+	artifact := "artifact"
 
 	postId1 := types.GeneratePostId(getNamespaceId(namespace), payload1)
 
@@ -362,6 +363,7 @@ func TestPostQuery(t *testing.T) {
 		Namespace: namespace,
 		Payload:   payload1,
 		Proof:     proof1,
+		Artifact: artifact,
 	})
 	require.NoError(t, err)
 
