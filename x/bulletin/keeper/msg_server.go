@@ -120,6 +120,7 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 		PostId:      postId,
 		CreatorDid:  creatorDID,
 		Payload:     b64Payload,
+		Artifact:    msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}

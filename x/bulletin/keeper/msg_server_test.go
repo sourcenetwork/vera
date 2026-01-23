@@ -205,7 +205,7 @@ func TestMsgCreatePost(t *testing.T) {
 		expErrMsg string
 	}{
 		{
-			name:      "create post (error: nvalid creator address)",
+			name:      "create post (error: invalid creator address)",
 			input:     &types.MsgCreatePost{},
 			setup:     func() {},
 			expErr:    true,
@@ -356,6 +356,48 @@ func TestMsgCreatePost(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMsgCreatePost_EmitsArtifactInEvent(t *testing.T) {
+	k, ctx := setupKeeper(t)
+	// given test policy and namespace
+	pubKey := secp256k1.GenPrivKey().PubKey()
+	addr := sdk.AccAddress(pubKey.Address())
+	baseAcc := authtypes.NewBaseAccount(addr, pubKey, 1, 1)
+	k.accountKeeper.SetAccount(ctx, baseAcc)
+	setupTestPolicy(t, ctx, k)
+	_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+		Creator:   baseAcc.Address,
+		Namespace: "ns1",
+	})
+	require.NoError(t, err)
+
+	// reset event manager
+	ctx = ctx.WithEventManager(sdk.NewEventManager())
+
+	// when i create post
+	post := types.MsgCreatePost{
+		Creator:   baseAcc.Address,
+		Namespace: "ns1",
+		Payload:   []byte("some payload"),
+		Proof:     []byte("some proof"),
+		Artifact:  "session-id",
+	}
+	_, err = k.CreatePost(ctx, &post)
+
+	// then post emit event with artifact
+	require.NoError(t, err)
+
+	evs := ctx.EventManager().Events()
+	require.Len(t, evs, 1)
+
+	creatorDid, err := k.acpKeeper.GetActorDID(ctx, baseAcc.Address)
+	require.NoError(t, err)
+	eventDid := "\"" + creatorDid + "\""
+	ev := evs[0]
+	require.Equal(t, `"session-id"`, ev.Attributes[0].Value)
+	require.Equal(t, eventDid, ev.Attributes[1].Value)
+	require.Equal(t, `"bulletin/ns1"`, ev.Attributes[2].Value)
 }
 
 func TestMsgAddCollaborator(t *testing.T) {
