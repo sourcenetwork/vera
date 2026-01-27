@@ -23,7 +23,7 @@ if [ ! -d /sourcehub/.initialized ]; then
 
     # copy the container specific default config files,
     # which overrides some settings such as listening address
-    cp /etc/sourcehubd/*.toml /sourcehubd/config/
+    cp /etc/sourcehub/*.toml /sourcehub/config/
 
     # recover account mnemonic
     if [ -n "$MNEMONIC_PATH" ]; then
