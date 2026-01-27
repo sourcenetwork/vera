@@ -16,6 +16,8 @@ FROM debian:bookworm-slim
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/faucet-key.json /etc/sourcehub/faucet-key.json
 COPY --from=builder /app/build/sourcehubd /usr/local/bin/sourcehubd
+# Copy the default config files to override the container with
+COPY docker/*.toml /etc/sourcehubd/ 
 
 RUN useradd --create-home --home-dir /home/node node && mkdir /sourcehub && chown node:node /sourcehub && ln -s /sourcehub /home/node/.sourcehub && chown node:node -R /home/node
 

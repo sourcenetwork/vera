@@ -21,6 +21,10 @@ if [ ! -d /sourcehub/.initialized ]; then
 
     sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 2>/dev/null
 
+    # copy the container specific default config files,
+    # which overrides some settings such as listening address
+    cp /etc/sourcehubd/*.toml /sourcehubd/config/
+
     # recover account mnemonic
     if [ -n "$MNEMONIC_PATH" ]; then
         echo "MNEMONIC_PATH set: recovering key"
