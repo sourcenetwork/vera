@@ -21,6 +21,10 @@ if [ ! -f /sourcehub/config/genesis.json ]; then
 
     sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 
 
+    # copy the container specific default config files,
+    # which overrides some settings such as listening address
+    cp /etc/sourcehub/*.toml /sourcehub/config/
+
     # recover account mnemonic
     if [ -n "$MNEMONIC_PATH" ]; then
         echo "MNEMONIC_PATH set: recovering key"
