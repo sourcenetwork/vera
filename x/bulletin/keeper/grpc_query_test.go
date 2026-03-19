@@ -8,6 +8,8 @@ import (
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -398,7 +400,7 @@ func TestBulletinPolicyIdQuery_InvalidRequest(t *testing.T) {
 
 	response, err := k.BulletinPolicyId(ctx, nil)
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "invalid request")
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
 	require.Nil(t, response)
 }
 
@@ -407,7 +409,7 @@ func TestBulletinPolicyIdQuery_PolicyNotSet(t *testing.T) {
 
 	response, err := k.BulletinPolicyId(ctx, &types.QueryBulletinPolicyIdRequest{})
 	require.Error(t, err)
-	require.Contains(t, err.Error(), types.ErrInvalidPolicyId.Error())
+	require.Equal(t, codes.NotFound, status.Code(err))
 	require.Nil(t, response)
 }
 
