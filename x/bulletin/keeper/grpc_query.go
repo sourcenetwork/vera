@@ -282,3 +282,18 @@ func (k *Keeper) getAllPostsPaginated(ctx context.Context, pageReq *query.PageRe
 
 	return posts, pageRes, nil
 }
+
+
+// BulletinPolicyId returns the bulletin module policy id.
+func (k *Keeper) BulletinPolicyId(ctx context.Context, req *types.QueryBulletinPolicyIdRequest) (*types.QueryBulletinPolicyIdResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	policyId := k.GetPolicyId(ctx)
+	if policyId == "" {
+		return nil, status.Error(codes.NotFound, types.ErrInvalidPolicyId.Error())
+	}
+
+	return &types.QueryBulletinPolicyIdResponse{PolicyId: policyId}, nil
+}

@@ -383,6 +383,34 @@ func TestPostQuery(t *testing.T) {
 	}, response)
 }
 
+func TestBulletinPolicyIdQuery(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	setupTestPolicy(t, ctx, k)
+
+	response, err := k.BulletinPolicyId(ctx, &types.QueryBulletinPolicyIdRequest{})
+	require.NoError(t, err)
+	require.Equal(t, k.GetPolicyId(ctx), response.PolicyId)
+}
+
+func TestBulletinPolicyIdQuery_InvalidRequest(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	response, err := k.BulletinPolicyId(ctx, nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "invalid request")
+	require.Nil(t, response)
+}
+
+func TestBulletinPolicyIdQuery_PolicyNotSet(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	response, err := k.BulletinPolicyId(ctx, &types.QueryBulletinPolicyIdRequest{})
+	require.Error(t, err)
+	require.Contains(t, err.Error(), types.ErrInvalidPolicyId.Error())
+	require.Nil(t, response)
+}
+
 func TestIterateGlob(t *testing.T) {
 	keeper, ctx := setupKeeper(t)
 

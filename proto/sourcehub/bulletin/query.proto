@@ -48,6 +48,11 @@ service Query {
   rpc IterateGlob(QueryIterateGlobRequest) returns (QueryIterateGlobResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/iterate_glob";
   }
+
+  // Queries the bulletin module policy id.
+  rpc BulletinPolicyId(QueryBulletinPolicyIdRequest) returns (QueryBulletinPolicyIdResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/bulletin/policy_id";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -115,6 +120,14 @@ message QueryPostsRequest {
 message QueryPostsResponse {
   repeated Post posts = 1 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryBulletinPolicyIdRequest is request type for the Query/BulletinPolicyId RPC method.
+message QueryBulletinPolicyIdRequest {}
+
+// QueryBulletinPolicyIdResponse is response type for the Query/BulletinPolicyId RPC method.
+message QueryBulletinPolicyIdResponse {
+  string policy_id = 1;
 }
 
 // QueryIterateGlobRequest
