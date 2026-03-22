@@ -21,6 +21,7 @@ func TestGogoProtoMarshalerRoundTrip(t *testing.T) {
 	decoded, err := marshaler.Unmarshal(bytes)
 	require.NoError(t, err)
 	require.Equal(t, original.PolicyCommandMaxExpirationDelta, decoded.PolicyCommandMaxExpirationDelta)
+	require.Equal(t, original.RegistrationsCommitmentValidity, decoded.RegistrationsCommitmentValidity)
 }
 
 func TestGogoProtoMarshalerUnmarshalInvalid(t *testing.T) {

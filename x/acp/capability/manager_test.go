@@ -18,12 +18,12 @@ import (
 
 func setupCapKeeper(t *testing.T) (sdk.Context, *capabilitykeeper.ScopedKeeper, *capabilitykeeper.ScopedKeeper) {
 	capStoreKey := storetypes.NewKVStoreKey("capkeeper")
-	capMemStoreKey := storetypes.NewKVStoreKey("capkeepermem")
+	capMemStoreKey := storetypes.NewMemoryStoreKey("capkeepermem")
 
 	db := dbm.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 	stateStore.MountStoreWithDB(capStoreKey, storetypes.StoreTypeDB, db)
-	stateStore.MountStoreWithDB(capMemStoreKey, storetypes.StoreTypeDB, db)
+	stateStore.MountStoreWithDB(capMemStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()

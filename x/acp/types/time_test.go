@@ -92,7 +92,7 @@ func TestTimestampIsAfterNilDurationPanics(t *testing.T) {
 	now := NewTimestamp(nil, 200)
 	duration := &Duration{Duration: nil}
 
-	require.Panics(t, func() {
+	require.PanicsWithValue(t, "invalid duration", func() {
 		ts.IsAfter(duration, now)
 	})
 }

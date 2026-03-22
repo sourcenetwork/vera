@@ -12,6 +12,7 @@ func TestProduceDID(t *testing.T) {
 	require.NotEmpty(t, did)
 	require.NotNil(t, signer)
 	require.Contains(t, did, "did:key:")
+	require.NoError(t, IsValidDID(did))
 }
 
 func TestProduceDIDUniqueness(t *testing.T) {
