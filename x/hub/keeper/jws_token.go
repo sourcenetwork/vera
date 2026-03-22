@@ -286,7 +286,7 @@ func (k *Keeper) CheckAndUpdateExpiredTokens(ctx context.Context) error {
 		}
 
 		// Check if token is expired
-		if record.ExpiresAt.Before(currentTime) {
+		if !record.ExpiresAt.After(currentTime) {
 			// Mark as invalid
 			if err := k.UpdateJWSTokenStatus(ctx, record.TokenHash, types.JWSTokenStatus_STATUS_INVALID, ""); err != nil {
 				k.Logger().Error("failed to update expired token status", "hash", record.TokenHash, "error", err)
