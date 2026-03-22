@@ -128,22 +128,11 @@ resources:
 }
 
 func Test_ModulePolicyCmdForActorAccount_ModuleCannotUsePolicyWithoutClaimingCapability(t *testing.T) {
-	ctx, k, accKeep, capK := setupKeeperWithCapability(t)
+	ctx, k, accKeep, _ := setupKeeperWithCapability(t)
 
-	// Given Policy created by module with a claimed capability
-	pol := `
-name: test
-resources:
-- name: file
-`
-	moduleName := "external"
-	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, moduleName)
-	require.NoError(t, err)
-
-	// And capability is claimed by external
-	scopedKeeper := capK.ScopeToModule(moduleName)
-	manager := capability.NewPolicyCapabilityManager(&scopedKeeper)
-	err = manager.Claim(ctx, cap)
+	// Given Policy created by module without a claimed capability
+	pol := "name: test"
+	_, cap, err := k.CreateModulePolicy(ctx, pol, coretypes.PolicyMarshalingType_YAML, "external")
 	require.NoError(t, err)
 
 	// When module issues a policy cmd to an actor acc
@@ -152,7 +141,7 @@ resources:
 	accAddr := accKeep.FirstAcc().GetAddress().String()
 	result, err := k.ModulePolicyCmdForActorAccount(ctx, cap, cmd, accAddr, signer)
 
-	// Then cmd is accepted
-	require.NoError(t, err)
-	require.NotNil(t, result)
+	// Then cmd is rejected because capability was not claimed
+	require.Nil(t, result)
+	require.ErrorIs(t, err, capability.ErrInvalidCapability)
 }
