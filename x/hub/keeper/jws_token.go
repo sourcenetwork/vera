@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -34,24 +35,24 @@ func (k *Keeper) jwsTokenByAccountStore(ctx context.Context) prefix.Store {
 // SetJWSToken stores a JWS token record and updates secondary indices.
 func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) error {
 	if record == nil {
-		return fmt.Errorf("JWS token record cannot be nil")
+		return errorsmod.Wrap(types.ErrInvalidInput, "JWS token record cannot be nil")
 	}
 
 	if record.TokenHash == "" {
-		return fmt.Errorf("token hash cannot be empty")
+		return errorsmod.Wrap(types.ErrInvalidInput, "token hash cannot be empty")
 	}
 
 	if record.IssuerDid == "" {
-		return fmt.Errorf("issuer DID cannot be empty")
+		return errorsmod.Wrap(types.ErrInvalidInput, "issuer DID cannot be empty")
 	}
 
 	// Validate authorized account if provided
 	if record.AuthorizedAccount != "" {
 		if _, err := sdk.AccAddressFromBech32(record.AuthorizedAccount); err != nil {
-			return fmt.Errorf("invalid authorized account address: %w", err)
+			return errorsmod.Wrap(types.ErrInvalidInput, "invalid authorized account address: "+err.Error())
 		}
 	} else if !k.GetChainConfig(ctx).IgnoreBearerAuth {
-		return fmt.Errorf("authorized account is required when bearer auth is enabled")
+		return errorsmod.Wrap(types.ErrInvalidInput, "authorized account is required when bearer auth is enabled")
 	}
 
 	bz, err := k.cdc.Marshal(record)
@@ -104,7 +105,7 @@ func (k *Keeper) DeleteJWSToken(ctx context.Context, tokenHash string) error {
 	// First, get the record to access DID and account for index cleanup
 	record, found := k.GetJWSToken(ctx, tokenHash)
 	if !found {
-		return fmt.Errorf("JWS token not found: %s", tokenHash)
+		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
 
 	// Delete from primary store
@@ -217,19 +218,19 @@ func (k *Keeper) GetAllJWSTokens(ctx context.Context) ([]*types.JWSTokenRecord, 
 // UpdateJWSTokenStatus updates the status of a JWS token.
 func (k *Keeper) UpdateJWSTokenStatus(ctx context.Context, tokenHash string, status types.JWSTokenStatus, invalidatedBy string) error {
 	if tokenHash == "" {
-		return fmt.Errorf("token hash cannot be empty")
+		return errorsmod.Wrap(types.ErrInvalidInput, "token hash cannot be empty")
 	}
 
 	record, found := k.GetJWSToken(ctx, tokenHash)
 	if !found {
-		return fmt.Errorf("JWS token not found: %s", tokenHash)
+		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
 
 	record.Status = status
 
 	if status == types.JWSTokenStatus_STATUS_INVALID {
-		now := time.Now()
-		record.InvalidatedAt = &now
+		blockTime := sdk.UnwrapSDKContext(ctx).BlockTime()
+		record.InvalidatedAt = &blockTime
 		if invalidatedBy != "" {
 			record.InvalidatedBy = invalidatedBy
 		}
@@ -241,19 +242,19 @@ func (k *Keeper) UpdateJWSTokenStatus(ctx context.Context, tokenHash string, sta
 // RecordJWSTokenUsage updates the last used timestamp for a JWS token.
 func (k *Keeper) RecordJWSTokenUsage(ctx context.Context, tokenHash string) error {
 	if tokenHash == "" {
-		return fmt.Errorf("token hash cannot be empty")
+		return errorsmod.Wrap(types.ErrInvalidInput, "token hash cannot be empty")
 	}
 
 	record, found := k.GetJWSToken(ctx, tokenHash)
 	if !found {
-		return fmt.Errorf("JWS token not found: %s", tokenHash)
+		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
 
-	now := time.Now()
+	blockTime := sdk.UnwrapSDKContext(ctx).BlockTime()
 	if record.FirstUsedAt == nil {
-		record.FirstUsedAt = &now
+		record.FirstUsedAt = &blockTime
 	}
-	record.LastUsedAt = &now
+	record.LastUsedAt = &blockTime
 
 	return k.SetJWSToken(ctx, record)
 }
@@ -302,11 +303,11 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 
 	// Validate that new tokens aren't already expired
 	if !expiresAt.IsZero() && expiresAt.Before(sdk.UnwrapSDKContext(ctx).BlockTime()) {
-		return fmt.Errorf("cannot create token with expiration time in the past")
+		return errorsmod.Wrap(types.ErrJWSTokenExpired, "cannot create token with expiration time in the past")
 	}
 
 	// Create new token record
-	now := time.Now()
+	blockTime := sdk.UnwrapSDKContext(ctx).BlockTime()
 	record := &types.JWSTokenRecord{
 		TokenHash:         tokenHash,
 		BearerToken:       bearerToken,
@@ -315,8 +316,8 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 		IssuedAt:          issuedAt,
 		ExpiresAt:         expiresAt,
 		Status:            types.JWSTokenStatus_STATUS_VALID,
-		FirstUsedAt:       &now,
-		LastUsedAt:        &now,
+		FirstUsedAt:       &blockTime,
+		LastUsedAt:        &blockTime,
 	}
 
 	return k.SetJWSToken(ctx, record)

@@ -69,7 +69,7 @@ func (s Sortable[T]) SortInPlace() {
 
 // Sort returns a sorted slice of the elements given originally
 func (s Sortable[T]) Sort() []T {
-	vals := make([]T, 0, len(s.ts))
+	vals := make([]T, len(s.ts))
 	copy(vals, s.ts)
 	sortable := Sortable[T]{
 		ts:         vals,
@@ -83,7 +83,6 @@ func (s Sortable[T]) Sort() []T {
 func SortSlice[T Ordered](elems []T) {
 	sortable := Sortable[T]{
 		ts: elems,
-		//comparator: comparator,
 		comparator: func(left T, right T) bool { return left < right },
 	}
 	sortable.SortInPlace()

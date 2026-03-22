@@ -66,7 +66,11 @@ func WithMsgSpan(ctx sdk.Context) sdk.Context {
 }
 
 func GetMsgSpan(ctx sdk.Context) *MsgSpan {
-	return ctx.Context().Value(spanCtxKey).(*MsgSpan)
+	span, ok := ctx.Context().Value(spanCtxKey).(*MsgSpan)
+	if !ok {
+		return nil
+	}
+	return span
 }
 
 // FinalizeSpan ends the span duration frame, transforms it into an SDK Event and emits it using the event manager
