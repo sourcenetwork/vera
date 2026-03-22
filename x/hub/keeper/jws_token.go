@@ -83,27 +83,30 @@ func (k *Keeper) SetJWSToken(ctx context.Context, record *types.JWSTokenRecord) 
 }
 
 // GetJWSToken retrieves a JWS token record by its hash.
-// Returns the record and true if found, or nil and false if not found or unmarshal fails.
-func (k *Keeper) GetJWSToken(ctx context.Context, tokenHash string) (*types.JWSTokenRecord, bool) {
+// Returns the record and true if found, or (nil, false, nil) if not found.
+// Returns a non-nil error if the record exists but cannot be decoded.
+func (k *Keeper) GetJWSToken(ctx context.Context, tokenHash string) (*types.JWSTokenRecord, bool, error) {
 	store := k.jwsTokenStore(ctx)
 	bz := store.Get([]byte(tokenHash))
 	if bz == nil {
-		return nil, false
+		return nil, false, nil
 	}
 
 	var record types.JWSTokenRecord
 	if err := k.cdc.Unmarshal(bz, &record); err != nil {
-		k.Logger().Error("failed to unmarshal JWS token record", "hash", tokenHash, "error", err)
-		return nil, false
+		return nil, false, fmt.Errorf("failed to unmarshal JWS token record %s: %w", tokenHash, err)
 	}
 
-	return &record, true
+	return &record, true, nil
 }
 
 // DeleteJWSToken removes a JWS token record and its indices.
 func (k *Keeper) DeleteJWSToken(ctx context.Context, tokenHash string) error {
 	// First, get the record to access DID and account for index cleanup
-	record, found := k.GetJWSToken(ctx, tokenHash)
+	record, found, err := k.GetJWSToken(ctx, tokenHash)
+	if err != nil {
+		return errorsmod.Wrap(err, "decoding JWS token")
+	}
 	if !found {
 		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
@@ -167,7 +170,10 @@ func (k *Keeper) GetJWSTokensByDID(ctx context.Context, did string) ([]*types.JW
 			continue
 		}
 
-		record, found := k.GetJWSToken(ctx, tokenHash)
+		record, found, err := k.GetJWSToken(ctx, tokenHash)
+		if err != nil {
+			return nil, err
+		}
 		if found {
 			records = append(records, record)
 		}
@@ -194,7 +200,10 @@ func (k *Keeper) GetJWSTokensByAccount(ctx context.Context, account string) ([]*
 			continue
 		}
 
-		record, found := k.GetJWSToken(ctx, tokenHash)
+		record, found, err := k.GetJWSToken(ctx, tokenHash)
+		if err != nil {
+			return nil, err
+		}
 		if found {
 			records = append(records, record)
 		}
@@ -221,7 +230,10 @@ func (k *Keeper) UpdateJWSTokenStatus(ctx context.Context, tokenHash string, sta
 		return errorsmod.Wrap(types.ErrInvalidInput, "token hash cannot be empty")
 	}
 
-	record, found := k.GetJWSToken(ctx, tokenHash)
+	record, found, err := k.GetJWSToken(ctx, tokenHash)
+	if err != nil {
+		return errorsmod.Wrap(err, "decoding JWS token")
+	}
 	if !found {
 		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
@@ -245,7 +257,10 @@ func (k *Keeper) RecordJWSTokenUsage(ctx context.Context, tokenHash string) erro
 		return errorsmod.Wrap(types.ErrInvalidInput, "token hash cannot be empty")
 	}
 
-	record, found := k.GetJWSToken(ctx, tokenHash)
+	record, found, err := k.GetJWSToken(ctx, tokenHash)
+	if err != nil {
+		return errorsmod.Wrap(err, "decoding JWS token")
+	}
 	if !found {
 		return errorsmod.Wrap(types.ErrJWSTokenNotFound, tokenHash)
 	}
@@ -295,14 +310,17 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 	tokenHash := types.HashJWSToken(bearerToken)
 
 	// Check if token already exists
-	_, found := k.GetJWSToken(ctx, tokenHash)
+	_, found, err := k.GetJWSToken(ctx, tokenHash)
+	if err != nil {
+		return errorsmod.Wrap(err, "decoding JWS token")
+	}
 	if found {
 		// Token exists, update usage timestamp
 		return k.RecordJWSTokenUsage(ctx, tokenHash)
 	}
 
 	// Validate that new tokens aren't already expired
-	if !expiresAt.IsZero() && expiresAt.Before(sdk.UnwrapSDKContext(ctx).BlockTime()) {
+	if !expiresAt.IsZero() && !expiresAt.After(sdk.UnwrapSDKContext(ctx).BlockTime()) {
 		return errorsmod.Wrap(types.ErrJWSTokenExpired, "cannot create token with expiration time in the past")
 	}
 

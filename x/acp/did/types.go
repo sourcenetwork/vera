@@ -42,6 +42,9 @@ func IssueDID(acc sdk.AccountI) (string, error) {
 
 // DIDFromPubKey constructs and returns a DID from a public key.
 func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
+	if pk == nil {
+		return "", fmt.Errorf("account public key is nil")
+	}
 	var keyType crypto.KeyType
 	switch t := pk.(type) {
 	case *secp256k1.PubKey:

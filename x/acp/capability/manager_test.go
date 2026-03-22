@@ -99,10 +99,8 @@ func TestValidateCapability(t *testing.T) {
 	err = otherMgr.Claim(ctx, cap)
 	require.NoError(t, err)
 
-	// validate from the other module's perspective
+	// validate from the other module's perspective — acp is an owner, so it passes
 	err = otherMgr.Validate(ctx, cap)
-	// Filter removes "acp", leaving ["other"]. len > 0 => returns true.
-	// So Validate passes, but for the wrong reason.
 	require.NoError(t, err)
 }
 
@@ -134,19 +132,14 @@ func TestGetOwnerModuleNoClaimer(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestIsOwnedByAcpModuleInvertedLogic(t *testing.T) {
-	// When only acp owns the capability, the filter removes "acp",
-	// leaving an empty list, so isOwnedByAcpModule returns false.
-	// This means Validate would fail for a legitimately issued capability
-	// if no other module has claimed it yet.
+func TestValidateAcpOnlyOwner(t *testing.T) {
 	ctx, acpScoped, _ := setupCapKeeper(t)
 	acpMgr := NewPolicyCapabilityManager(acpScoped)
 
 	cap, err := acpMgr.Issue(ctx, "policy-1")
 	require.NoError(t, err)
 
-	// Validate should pass since acp issued it, but due to the inverted logic,
-	// it returns ErrInvalidCapability
+	// Validate should pass since acp issued it
 	err = acpMgr.Validate(ctx, cap)
-	require.Error(t, err, "isOwnedByAcpModule incorrectly returns false when only acp owns capability")
+	require.NoError(t, err)
 }

@@ -130,12 +130,10 @@ func (m *PolicyCapabilityManager) isOwnedByAcpModule(ctx sdk.Context, capability
 		return false, fmt.Errorf("looking up capability owner: %v", err)
 	}
 
-	mods = utils.FilterSlice(mods, func(name string) bool {
-		return name != types.ModuleName
-	})
-
-	if len(mods) == 0 {
-		return false, nil
+	for _, mod := range mods {
+		if mod == types.ModuleName {
+			return true, nil
+		}
 	}
-	return true, nil
+	return false, nil
 }

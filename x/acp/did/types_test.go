@@ -40,10 +40,10 @@ func TestIssueDID(t *testing.T) {
 	require.Contains(t, did, "did:key:")
 }
 
-func TestDIDFromPubKeyNilPanics(t *testing.T) {
-	require.Panics(t, func() {
-		DIDFromPubKey(nil)
-	})
+func TestDIDFromPubKeyNilReturnsError(t *testing.T) {
+	_, err := DIDFromPubKey(nil)
+	require.Error(t, err)
+	require.Contains(t, err.Error(), "nil")
 }
 
 func TestIssueModuleDID(t *testing.T) {

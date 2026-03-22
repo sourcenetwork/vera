@@ -18,7 +18,10 @@ func (k *Keeper) InvalidateJWS(goCtx context.Context, req *types.MsgInvalidateJW
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// Get the JWS token record
-	record, found := k.GetJWSToken(goCtx, req.TokenHash)
+	record, found, err := k.GetJWSToken(goCtx, req.TokenHash)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "decoding JWS token")
+	}
 	if !found {
 		return nil, errorsmod.Wrapf(types.ErrJWSTokenNotFound, "token hash: %s", req.TokenHash)
 	}
