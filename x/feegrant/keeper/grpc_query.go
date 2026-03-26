@@ -225,30 +225,20 @@ func (q Keeper) DIDAllowancesByGranter(c context.Context, req *feegrant.QueryDID
 	store := q.storeService.OpenKVStore(ctx)
 	prefixStore := prefix.NewStore(runtime.KVStoreAdapter(store), feegrant.DIDFeeAllowanceKeyPrefix)
 
-	var grants []*feegrant.Grant
-
-	pageRes, err := query.Paginate(prefixStore, req.Pagination, func(key, value []byte) error {
-		var didGrant feegrant.DIDGrant
-		if err := q.cdc.Unmarshal(value, &didGrant); err != nil {
-			return err
-		}
-
-		// ParseGranterDIDFromFeeAllowanceKey expects the full key including the prefix.
+	grants, pageRes, err := query.GenericFilteredPaginate(q.cdc, prefixStore, req.Pagination, func(key []byte, didGrant *feegrant.DIDGrant) (*feegrant.Grant, error) {
 		granter, _ := feegrant.ParseGranterDIDFromFeeAllowanceKey(append(feegrant.DIDFeeAllowanceKeyPrefix, key...))
 		if !bytes.Equal(granter, granterAddr) {
-			return nil
+			return nil, nil
 		}
 
-		grant := &feegrant.Grant{
+		return &feegrant.Grant{
 			Granter:   didGrant.Granter,
 			Grantee:   didGrant.GranteeDid,
 			Allowance: didGrant.Allowance,
-		}
-		grants = append(grants, grant)
-
-		return nil
+		}, nil
+	}, func() *feegrant.DIDGrant {
+		return &feegrant.DIDGrant{}
 	})
-
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"bytes"
 	"context"
 
 	"cosmossdk.io/store/prefix"
@@ -212,13 +211,10 @@ func (k *Keeper) getNamespaceCollaboratorsPaginated(ctx context.Context, namespa
 
 	var collaborators []types.Collaborator
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.CollaboratorKeyPrefix))
+	nsPrefix := append(types.KeyPrefix(types.CollaboratorKeyPrefix), []byte(types.SanitizeKeyPart(namespaceId)+"/")...)
+	store := prefix.NewStore(storeAdapter, nsPrefix)
 
-	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
-			return nil
-		}
 		var collaborator types.Collaborator
 		k.cdc.MustUnmarshal(value, &collaborator)
 		collaborators = append(collaborators, collaborator)
@@ -239,13 +235,10 @@ func (k *Keeper) getNamespacePostsPaginated(ctx context.Context, namespaceId str
 
 	var posts []types.Post
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix))
+	nsPrefix := append(types.KeyPrefix(types.PostKeyPrefix), []byte(types.SanitizeKeyPart(namespaceId)+"/")...)
+	store := prefix.NewStore(storeAdapter, nsPrefix)
 
-	sanitizedPrefix := types.SanitizeKeyPart(namespaceId) + "/"
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, []byte(sanitizedPrefix)) {
-			return nil
-		}
 		var post types.Post
 		k.cdc.MustUnmarshal(value, &post)
 		posts = append(posts, post)
