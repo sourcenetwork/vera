@@ -13,7 +13,7 @@ var (
 	ErrInvalidInput     = errors.New("invalid input")
 	ErrDecisionNotFound = fmt.Errorf("decision not found: %w", ErrInvalidInput)
 
-	// ErrInvalidTicket flags that the provide AccessTicket is
+	// ErrInvalidTicket flags that the provided AccessTicket is
 	// invalid and will never be valid.
 	ErrInvalidTicket   error = errors.New("invalid AccessTicket")
 	ErrExpiredDecision       = fmt.Errorf("expired decision: %w", ErrInvalidTicket)

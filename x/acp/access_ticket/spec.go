@@ -40,7 +40,7 @@ func (s *AccessTicketSpec) Satisfies(ctx context.Context, ticket string) error {
 }
 
 // Satisfies inspects an AccessTicket and verifies whether it meets specification and is valid.
-// Returns a non-nill error if the Ticket is invalid
+// Returns a non-nil error if the Ticket is invalid
 func (s *AccessTicketSpec) SatisfiesRaw(ctx context.Context, ticket *types.AccessTicket) error {
 	err := s.verifyProof(ctx, ticket.DecisionId, ticket.DecisionProof)
 	if err != nil {
@@ -55,7 +55,7 @@ func (s *AccessTicketSpec) SatisfiesRaw(ctx context.Context, ticket *types.Acces
 		return err
 	}
 	if keytype != crypto.SECP256k1 {
-		return fmt.Errorf("unsuported key type: expected SECP256k1: got %v", keytype)
+		return fmt.Errorf("unsupported key type: expected SECP256k1: got %v", keytype)
 	}
 	pkey := &secp256k1.PubKey{
 		Key: pubBytes,

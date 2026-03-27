@@ -20,7 +20,7 @@ func newTxExecResult(result *rpctypes.ResultTx) *TxExecResult {
 }
 
 // TxExecResult models the outcome of a Tx evaluated by SourceHub.
-// The Tx was either successfuly included or an error happened while handling one of its Msgs.
+// The Tx was either successfully included or an error happened while handling one of its Msgs.
 type TxExecResult struct {
 	result *rpctypes.ResultTx
 	err    error
@@ -50,7 +50,7 @@ type ListenResult struct {
 	err    error
 }
 
-// Error return the error of the WaitResult, returns nil if sucessful
+// Error return the error of the ListenResult, returns nil if successful
 func (r *ListenResult) Error() error { return r.err }
 
 // GetTxResult returns the outcome of the executed Tx by SourceHub

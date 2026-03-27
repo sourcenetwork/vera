@@ -12,7 +12,7 @@ import (
 
 // AuthorizeMsg verifies whether the given MsgBearerPolicyCmd should be authorized
 // to execute.
-// If the validation is sucessful, returns the authenticated Actor DID or an error
+// If the validation is successful, returns the authenticated Actor DID or an error
 //
 // Note: an Authorized Msg means that the msg's Bearer token is well formed and valid (actor authentication)
 // and that the token is bound to the account that signed the Tx (msg authorization).

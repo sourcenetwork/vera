@@ -10,14 +10,14 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 )
 
-// HasTx produces a sha256 of a Tx bytes.
+// HashTx produces a sha256 of a Tx bytes.
 func HashTx(txBytes []byte) []byte {
 	hasher := sha256.New()
 	hasher.Write(txBytes)
 	return hasher.Sum(nil)
 }
 
-// InjectPrincipal injects an acp core  did principal in ctx and returns the new context.
+// InjectPrincipal injects an acp core did principal in ctx and returns the new context.
 func InjectPrincipal(ctx sdk.Context, actorDID string) (sdk.Context, error) {
 	principal, err := coretypes.NewDIDPrincipal(actorDID)
 	if err != nil {

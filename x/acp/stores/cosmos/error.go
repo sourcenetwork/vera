@@ -8,7 +8,7 @@ import (
 
 var ErrCosmosKV = errors.New("cosmossdk store")
 
-// wrapErr wraps an error with ErrCometDb
+// wrapErr wraps an error with ErrCosmosKV
 func wrapErr(err error) error {
 	return fmt.Errorf("%w: %w", ErrCosmosKV, err)
 }

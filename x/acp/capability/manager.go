@@ -11,7 +11,7 @@ import (
 )
 
 // Overall this would work and is a nice abstraction wrt to the capability name,
-// however it's not great because this wrapper essentially requries that acp
+// however it's not great because this wrapper essentially requires that acp
 // code has access to an external module's capability keeper -
 // consequently any capability that acp knows the name of -
 // which callers may not like.

@@ -65,7 +65,7 @@ func (s *abciService) GetCurrentHeight(ctx context.Context) (int64, error) {
 	return resp.Response.LastBlockHeight, nil
 }
 
-// GetCurrentHeight returns the current height of a node
+// GetBlockHeader returns the block header at the given height
 func (s *abciService) GetBlockHeader(ctx context.Context, height int64) (bfttypes.Header, error) {
 	resp, err := s.client.Block(ctx, &height)
 	if err != nil {

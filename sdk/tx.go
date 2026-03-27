@@ -39,7 +39,6 @@ type TxBuilder struct {
 
 func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	registry := cdctypes.NewInterfaceRegistry()
-	//acptypes.RegisterInterfaces(registry)
 	cfg := authtx.NewTxConfig(
 		codec.NewProtoCodec(registry),
 		[]signing.SignMode{
@@ -273,9 +272,6 @@ func WithMicroCredit() TxBuilderOpt {
 	}
 }
 
-// WithMainnetChainID specifies the ChainID to be SourceHub's main net
-//func WithMainnetChainID() Option {return nil }
-
 // WithTestnetChainID specifies the ChainID to be SourceHub's latest test net
 func WithTestnetChainID() TxBuilderOpt {
 	return func(b *TxBuilder) error {
@@ -300,7 +296,7 @@ func WithFeeToken(denom string) TxBuilderOpt {
 	}
 }
 
-// WithGasLimit configures the maxium
+// WithGasLimit configures the maximum
 func WithGasLimit(limit uint64) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.gasLimit = limit
@@ -353,7 +349,12 @@ func WithBearerToken(token string) TxBuilderOpt {
 	}
 }
 
-// FIXME what's a better way of doing this for a lib?
+// init calls app.SetConfig to configure the Cosmos SDK global config (e.g., Bech32 prefixes)
+// with sealing disabled (false). This is required for Tx signing and address encoding to work
+// correctly. The side effect is that importing the sdk package mutates global Cosmos SDK state.
+// This is a known limitation: Cosmos SDK relies on global config, and libraries that depend
+// on address encoding must initialize it early. Sealing is disabled to allow tests and
+// downstream consumers to override the config if needed.
 func init() {
 	app.SetConfig(false)
 }

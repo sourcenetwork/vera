@@ -14,9 +14,6 @@ const (
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
 
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_bulletin"
-
 	PolicyIdKey = "policy_id"
 
 	PostKeyPrefix = "post/"
@@ -95,7 +92,7 @@ func ParsePostKey(key []byte) (namespaceId string, postId string) {
 func ParseCollaboratorKey(key []byte) (namespaceId string, actorDID string) {
 	parts := bytes.Split(key, []byte{'/'})
 	if len(parts) != 2 {
-		panic("invalid post key format: expected format namespaceId/actorDID")
+		panic("invalid collaborator key format: expected format namespaceId/actorDID")
 	}
 
 	namespaceId = UnsanitizeKeyPart(string(parts[0]))

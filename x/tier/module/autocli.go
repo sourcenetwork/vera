@@ -32,7 +32,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{
 					RpcMethod:      "UnlockingLockup",
 					Use:            "unlocking-lockup [delegator-address] [validator-address] [creation-height]",
-					Short:          "Query an unlocking stake based on address and validator addres",
+					Short:          "Query an unlocking stake based on address and validator address",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "delegator_address"}, {ProtoField: "validator_address"}, {ProtoField: "creation_height"}},
 				},
 				{

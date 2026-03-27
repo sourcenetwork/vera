@@ -65,14 +65,14 @@ func ProofForObject(policyId string, actor *coretypes.Actor, idx int, objs []*co
 }
 
 // GenerateLeafValue produces a byte slice representing an individual object registration
-// which will be commited to.
+// which will be committed to.
 //
 // The leaf value is the concatenation of PolicyId, object resource, object id and actor Id
 func GenerateLeafValue(policyId string, actor *coretypes.Actor, o *coretypes.Object) []byte {
 	return []byte(policyId + o.Resource + o.Id + actor.Id)
 }
 
-// produceNodeHash hashes a Mertle Tree leaf as per RFC 6962
+// produceLeafHash hashes a Merkle Tree leaf as per RFC 6962
 // https://www.rfc-editor.org/rfc/rfc6962#section-2.1
 func produceLeafHash(policyId string, actor *coretypes.Actor, o *coretypes.Object) []byte {
 	merkleVal := GenerateLeafValue(policyId, actor, o)
@@ -148,7 +148,7 @@ func (t *RegistrationCommitmentTree) proofForIdx(idx int) (*types.RegistrationPr
 	}, nil
 }
 
-// finxIdx looks up the idx of obj in the current tree
+// findIdx looks up the idx of obj in the current tree
 func (t *RegistrationCommitmentTree) findIdx(obj *coretypes.Object) (int, error) {
 	i := slices.IndexFunc(t.objs, func(o *coretypes.Object) bool {
 		return objEq(obj, o)

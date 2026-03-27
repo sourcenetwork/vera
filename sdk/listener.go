@@ -25,14 +25,14 @@ type TxListener struct {
 	cleanupFn func()
 }
 
-// NewTxListener creates a new listenver from a comet client
+// NewTxListener creates a new listener from a comet client
 func NewTxListener(client cometclient.Client) TxListener {
 	return TxListener{
 		rpc: client,
 	}
 }
 
-// Event models a Cometbft Tx event with unmarsheled Msg responses
+// Event models a Cometbft Tx event with unmarshaled Msg responses
 type Event struct {
 	Height    int64     `json:"height"`
 	Index     uint32    `json:"index"`
@@ -110,11 +110,11 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 	return resultCh, errChn, err
 }
 
-// ListenAsync spawns a go routine and listens for txs asyncrhonously,
+// ListenAsync spawns a go routine and listens for txs asynchronously,
 // until the comet client closes the connection, the context is cancelled.
 // or the listener is closed.
 // Callback is called each time an event or an error is received
-// Returns an error if connection to commet fails
+// Returns an error if connection to comet fails
 func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) error {
 	evs, errs, err := l.ListenTxs(ctx)
 	if err != nil {

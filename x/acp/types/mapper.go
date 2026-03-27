@@ -40,9 +40,9 @@ func BuildACPSuppliedMetadata(ctx sdk.Context, actorDID string, msgCreator strin
 	}, nil
 }
 
-// BuildACPSuppliedMetadata returns an acp SuppliedMetadata
+// BuildACPSuppliedMetadataWithTime returns an acp SuppliedMetadata
 // object which embeds a SourceHub RecordMetadata
-// built from ctx, actorDID and msgCreator
+// built from ctx, ts, actorDID and msgCreator
 func BuildACPSuppliedMetadataWithTime(ctx sdk.Context, ts *Timestamp, actorDID string, msgCreator string) (*coretypes.SuppliedMetadata, error) {
 	metadata := &RecordMetadata{
 		CreationTs: ts,
@@ -71,7 +71,7 @@ func ExtractRecordMetadata(md *coretypes.RecordMetadata) (*RecordMetadata, error
 }
 
 // MapRelationshipRecord maps an acp_core RelationshipRecord
-// into a SourceHub RelationshpRecord
+// into a SourceHub RelationshipRecord
 func MapRelationshipRecord(rec *coretypes.RelationshipRecord) (*RelationshipRecord, error) {
 	metadata, err := ExtractRecordMetadata(rec.Metadata)
 	if err != nil {

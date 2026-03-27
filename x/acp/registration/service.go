@@ -127,7 +127,7 @@ func (s *RegistrationService) amendRegistration(ctx sdk.Context, commitment *typ
 	return result.Record, event, nil
 }
 
-// RevealRegistation attempts to register an object from a commitment opening.
+// RevealRegistration attempts to register an object from a commitment opening.
 // If the opening is valid, registers the object.
 // Returns an AmendmentEvent if the object registration was amended
 //
@@ -186,7 +186,7 @@ func (s *RegistrationService) FlagHijackEvent(ctx sdk.Context, eventId uint64, a
 	event := opt.GetValue()
 
 	if event.Metadata.OwnerDid != actor.Id {
-		return nil, errors.Wrap("event actor missmatch: actor must be event subject",
+		return nil, errors.Wrap("event actor mismatch: actor must be event subject",
 			errors.ErrorType_UNAUTHORIZED,
 			errors.Pair("event", fmt.Sprintf("%v", eventId)),
 			errors.Pair("expected_actor", actor.Id),

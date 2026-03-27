@@ -1,6 +1,6 @@
 package feegrant
 
-// evidence module events
+// feegrant module events
 const (
 	EventTypeUseFeeGrant       = "use_feegrant"
 	EventTypeUseDIDFeeGrant    = "use_did_feegrant"

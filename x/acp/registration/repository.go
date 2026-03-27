@@ -41,7 +41,7 @@ func NewAmendmentEventRepository(kv store.KVStore) (*AmendmentEventRepository, e
 	}, nil
 }
 
-// RegistrationEventRepsository exposes operations
+// AmendmentEventRepository exposes operations
 // to access and store AmendmentEvent records
 type AmendmentEventRepository struct {
 	t           *table.Table[*types.AmendmentEvent]
@@ -88,7 +88,7 @@ func (r *AmendmentEventRepository) ListHijackEventsByPolicy(ctx context.Context,
 	return iter, nil
 }
 
-// ListHijackEventsByPolicy returns all AmendmentEvents for a Policy
+// ListEventsByPolicy returns all AmendmentEvents for a Policy
 func (r *AmendmentEventRepository) ListEventsByPolicy(ctx context.Context, policyId string) (iterator.Iterator[*types.AmendmentEvent], error) {
 	keysIter, err := r.polIdx.IterateKeys(ctx, &policyId, store.NewOpenIterator())
 	if err != nil {

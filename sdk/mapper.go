@@ -26,7 +26,7 @@ func newMapper[T sdk.Msg](idx int, container T) Mapper[T] {
 func (e *Mapper[T]) Map(msg *comettypes.ResultTx) (T, error) {
 	var zero T
 
-	// prety sure this is an sdk response
+	// pretty sure this is an sdk response
 	data := msg.TxResult.Data
 	msgData := sdk.TxMsgData{}
 	err := msgData.Unmarshal(data)

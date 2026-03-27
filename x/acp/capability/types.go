@@ -5,7 +5,7 @@ import (
 )
 
 // PolicyCapability models a capability which grants
-// unrevokable access to any command within a policy
+// irrevocable access to any command within a policy
 type PolicyCapability struct {
 	policyId   string
 	capability *capabilitytypes.Capability

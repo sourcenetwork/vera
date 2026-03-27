@@ -21,7 +21,7 @@ const (
 
 const DefaultExpirationTime = time.Minute * 15
 
-// BearerToken contains the structured fields included the JWS Bearer Token
+// BearerToken contains the structured fields included in the JWS Bearer Token
 type BearerToken struct {
 	// IssuerID is the Actor ID for the Token signer
 	IssuerID string `json:"iss,omitempty"`

@@ -146,7 +146,7 @@ func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64
 		return nil, false, err
 	}
 	if opt.Empty() {
-		return nil, false, errors.Wrap("RegistrationsCommimtnet", errors.ErrorType_NOT_FOUND,
+		return nil, false, errors.Wrap("RegistrationsCommitment", errors.ErrorType_NOT_FOUND,
 			errors.Pair("id", fmt.Sprintf("%v", commitmentId)))
 	}
 
@@ -157,7 +157,7 @@ func (s *CommitmentService) ValidateOpening(ctx sdk.Context, commitmentId uint64
 	}
 	after, err := commitment.Metadata.CreationTs.IsAfter(commitment.Validity, now)
 	if err != nil {
-		return commitment, false, errors.NewWithCause("invalid timestmap format", err, errors.ErrorType_INTERNAL)
+		return commitment, false, errors.NewWithCause("invalid timestamp format", err, errors.ErrorType_INTERNAL)
 	}
 	if after {
 		return commitment, false, errors.Wrap("commitment expired", errors.ErrorType_OPERATION_FORBIDDEN,
