@@ -13,7 +13,7 @@ import (
 func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
-		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
+		handler := wrapMsgServerHandler(moduleName, method.MethodName,
 			SourcehubMsgSeconds, SourcehubMsgTotal, SourcehubMsgErrorsTotal,
 			method.Handler)
 		method.Handler = handler
@@ -27,7 +27,7 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.ServiceDesc {
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
-		handler := wrapMsgSeverHandler(moduleName, method.MethodName,
+		handler := wrapMsgServerHandler(moduleName, method.MethodName,
 			SourcehubQuerySeconds, SourcehubQueryTotal, SourcehubQueryErrorsTotal,
 			method.Handler)
 		method.Handler = handler
@@ -37,9 +37,9 @@ func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.S
 	return desc
 }
 
-// wrapMsgSeverHandler wraps an individual GRPC server method handler with metric collection logic.
+// wrapMsgServerHandler wraps an individual GRPC server method handler with metric collection logic.
 // It tracks the number of processed messages, error count, and message handling latency.
-func wrapMsgSeverHandler(
+func wrapMsgServerHandler(
 	moduleName, methodName string,
 	latencyMetricName, countMetricName, errMetricName []string,
 	handler grpc.MethodHandler,

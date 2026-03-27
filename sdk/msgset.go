@@ -36,7 +36,7 @@ func (b *MsgSet) WithEditPolicy(msg *acptypes.MsgEditPolicy) Mapper[*acptypes.Ms
 	return newMapper(idx, &acptypes.MsgEditPolicyResponse{})
 }
 
-// WithCheckAccess includes a MsgCheckAcces to the Tx
+// WithCheckAccess includes a MsgCheckAccess to the Tx
 func (b *MsgSet) WithCheckAccess(msg *acptypes.MsgCheckAccess) Mapper[*acptypes.MsgCheckAccessResponse] {
 	idx := b.addMsg(msg)
 	return newMapper(idx, &acptypes.MsgCheckAccessResponse{})

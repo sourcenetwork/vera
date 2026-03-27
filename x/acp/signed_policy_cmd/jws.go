@@ -32,7 +32,7 @@ type jwsVerifier struct {
 //
 // The verification extracts a VerificationMethod from the resolved Actor DID in the PolicyCmd.
 // The JOSE header attributes are ignored and only the key derived from the Actor DID is accepted.
-// This is done to assure no impersonation happens by thinkering the JOSE header in order to produce a valid
+// This is done to assure no impersonation happens by tinkering the JOSE header in order to produce a valid
 // JWS, signed by key different than that of the DID owner.
 func (s *jwsVerifier) Verify(ctx context.Context, jwsStr string) (*types.SignedPolicyCmdPayload, error) {
 	jws, err := jose.ParseSigned(jwsStr)
@@ -44,7 +44,7 @@ func (s *jwsVerifier) Verify(ctx context.Context, jwsStr string) (*types.SignedP
 	payload := &types.SignedPolicyCmdPayload{}
 	err = jsonpb.UnmarshalString(string(payloadBytes), payload)
 	if err != nil {
-		return nil, fmt.Errorf("failed unmarshaling PolcyCmd payload: %v", err)
+		return nil, fmt.Errorf("failed unmarshaling PolicyCmd payload: %v", err)
 	}
 
 	did := payload.Actor

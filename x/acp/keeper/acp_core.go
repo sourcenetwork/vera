@@ -11,7 +11,7 @@ import (
 var _ runtime.TimeService = (*SourceHubTimeProvider)(nil)
 
 // SourceHubTimeProvider implements acp_core's TimeService
-// in order to syncrhonize the block time with acp_core's engine time.
+// in order to synchronize the block time with acp_core's engine time.
 type SourceHubTimeProvider struct{}
 
 // GetNow implements TimeService

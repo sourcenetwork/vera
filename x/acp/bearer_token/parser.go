@@ -16,7 +16,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/did"
 )
 
-var requriedClaims = []string{
+var requiredClaims = []string{
 	IssuedAtClaim,
 	IssuerClaim,
 	AuthorizedAccountClaim,
@@ -84,9 +84,9 @@ func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS stri
 	return bearer, nil
 }
 
-// unmarshalJWSPayload unamrashals the JWS bytes into a BearerToken.
+// unmarshalJWSPayload unmarshals the JWS bytes into a BearerToken.
 //
-// The unarmshaling is strict, meaning that if the json object did not contain *all*
+// The unmarshaling is strict, meaning that if the json object did not contain *all*
 // required claims, it returns an error.
 func unmarshalJWSPayload(payload []byte) (BearerToken, error) {
 	obj := make(map[string]any)
@@ -95,7 +95,7 @@ func unmarshalJWSPayload(payload []byte) (BearerToken, error) {
 		return BearerToken{}, err
 	}
 
-	for _, claim := range requriedClaims {
+	for _, claim := range requiredClaims {
 		_, ok := obj[claim]
 		if !ok {
 			return BearerToken{}, newErrMissingClaim(claim)

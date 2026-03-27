@@ -67,7 +67,7 @@ func (c *EvaluateAccessRequestsCommand) validate() error {
 	}
 
 	if c.CurrentHeight == 0 {
-		return errors.New("invalid height: must be nonzero postive number", errors.ErrorType_BAD_INPUT)
+		return errors.New("invalid height: must be nonzero positive number", errors.ErrorType_BAD_INPUT)
 	}
 
 	return nil

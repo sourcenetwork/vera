@@ -104,7 +104,6 @@ func NewTxSignerFromAccountAddress(keyring keyring.Keyring, address string) (TxS
 type keyringTxSigner struct {
 	keyring keyring.Keyring
 	keyname string
-	record  keyring.Record
 	pubkey  cryptotypes.PubKey
 }
 
@@ -132,7 +131,7 @@ type keyringPKAdapter struct {
 }
 
 func (a *keyringPKAdapter) Bytes() []byte {
-	panic("dumping bytes from PrivKey in Keyring isn't not supported")
+	panic("dumping bytes from PrivKey in Keyring isn't supported")
 }
 
 func (a *keyringPKAdapter) Sign(msg []byte) ([]byte, error) {

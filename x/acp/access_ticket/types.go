@@ -13,10 +13,10 @@ import (
 
 const separator = "."
 
-// IAVL Store Querires expect the query to contain "key" as suffix to the Path
+// IAVL Store Queries expect the query to contain "key" as suffix to the Path
 const iavlQuerySuffix = "key"
 
-// Marshaler is responsible for marshaling and unamarshaling an AccessTicket to and from a string representation
+// Marshaler is responsible for marshaling and unmarshaling an AccessTicket to and from a string representation
 type Marshaler struct{}
 
 func (m *Marshaler) Marshal(ticket *types.AccessTicket) (string, error) {
@@ -75,9 +75,9 @@ func (b *keyBuilder) ABCIQueryPath() string {
 	// The request goes through to Tendermint and is sent straight to the application (ie cosmos base app),
 	// it then goes through a multiple store layers, each with requirements for the key and none of which are documented.
 	//
-	// The entrpoint in baseapp itself.
-	// The BaseApp can accept a set of prefixes and do different thigns with it,
-	// for store state proofs it expected a "/store" prefix.
+	// The entrypoint in baseapp itself.
+	// The BaseApp can accept a set of prefixes and do different things with it,
+	// for store state proofs it expects a "/store" prefix.
 	// see cosmos/cosmos-sdk/baseapp/abci.go
 	//
 	// The request is then dispatched to the commit multi store.

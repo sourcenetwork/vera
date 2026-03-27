@@ -8,7 +8,7 @@ import (
 )
 
 // LogicalClock models a Provider for logical timestamps.
-// Timestamps must be monotomically increasing and are used as reference
+// Timestamps must be monotonically increasing and are used as reference
 // for the total ordering of events in the system.
 //
 // This abstraction is general purpose but for the current context of SourceHub

@@ -13,7 +13,7 @@ var ErrMsgUnauthorized = errors.Wrap("bearer policy msg: authorized_account does
 var ErrInvalidIssuer = errors.Wrap("invalid issuer: expected did", ErrInvalidBearerToken)
 var ErrInvalidAuhtorizedAccount = errors.Wrap("invalid authorized_account: expects SourceHub address", ErrInvalidBearerToken)
 var ErrTokenExpired = errors.Wrap("token expired", ErrInvalidBearerToken)
-var ErrMissingClaim = errors.Wrap("requried claim not found", ErrInvalidBearerToken)
+var ErrMissingClaim = errors.Wrap("required claim not found", ErrInvalidBearerToken)
 var ErrJSONSerializationUnsupported = errors.Wrap("JWS JSON Serialization not supported", ErrInvalidBearerToken)
 
 func newErrTokenExpired(expiresUnix int64, nowUnix int64) error {

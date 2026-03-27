@@ -201,7 +201,7 @@ func validatePolicyCmd(cmd *types.PolicyCmd) error {
 	}
 }
 
-// CreationTimestamp sets the creation timestamp
+// IssuedAt sets the creation timestamp
 func (b *CmdBuilder) IssuedAt(ts *prototypes.Timestamp) {
 	b.cmd.IssuedAt = ts
 }

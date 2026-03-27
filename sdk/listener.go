@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
@@ -25,14 +26,14 @@ type TxListener struct {
 	cleanupFn func()
 }
 
-// NewTxListener creates a new listenver from a comet client
+// NewTxListener creates a new listener from a comet client
 func NewTxListener(client cometclient.Client) TxListener {
 	return TxListener{
 		rpc: client,
 	}
 }
 
-// Event models a Cometbft Tx event with unmarsheled Msg responses
+// Event models a Cometbft Tx event with unmarshaled Msg responses
 type Event struct {
 	Height    int64     `json:"height"`
 	Index     uint32    `json:"index"`
@@ -110,11 +111,11 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 	return resultCh, errChn, err
 }
 
-// ListenAsync spawns a go routine and listens for txs asyncrhonously,
+// ListenAsync spawns a go routine and listens for txs asynchronously,
 // until the comet client closes the connection, the context is cancelled.
 // or the listener is closed.
 // Callback is called each time an event or an error is received
-// Returns an error if connection to commet fails
+// Returns an error if connection to comet fails
 func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) error {
 	evs, errs, err := l.ListenTxs(ctx)
 	if err != nil {
@@ -130,9 +131,9 @@ func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) er
 				cb(nil, err)
 			case <-l.Done():
 				log.Printf("Listener closed: canceling loop")
-				break
+				return
 			case <-ctx.Done():
-				break
+				return
 			}
 		}
 	}()
@@ -155,17 +156,20 @@ func (l *TxListener) Close() {
 func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-chan U, errors <-chan error, closeFn func()) {
 	errCh := make(chan error, mapperBuffSize)
 	valCh := make(chan U, mapperBuffSize)
-	closeFn = func() {
+	var once sync.Once
+	doClose := func() {
 		close(errCh)
 		close(valCh)
 	}
+	closeFn = func() {
+		once.Do(doClose)
+	}
 	go func() {
+		defer once.Do(doClose)
 		for {
 			select {
 			case result, ok := <-ch:
 				if !ok {
-					close(errCh)
-					close(valCh)
 					return
 				}
 

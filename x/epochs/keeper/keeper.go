@@ -28,7 +28,7 @@ func NewKeeper(
 	}
 }
 
-// Set the gamm hooks.
+// Set the epoch hooks.
 func (k *Keeper) SetHooks(eh types.EpochHooks) *Keeper {
 	if k.hooks != nil {
 		panic("cannot set epochs hooks twice")

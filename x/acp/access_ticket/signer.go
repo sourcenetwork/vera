@@ -8,7 +8,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/acp/types"
 )
 
-// signer is responsible for generating a Ticket signature and veryfing it
+// signer is responsible for generating a Ticket signature and verifying it
 type signer struct{}
 
 func (s *signer) Sign(key cryptotypes.PrivKey, ticket *types.AccessTicket) ([]byte, error) {

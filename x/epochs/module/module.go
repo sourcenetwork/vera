@@ -48,14 +48,14 @@ var (
 // AppModuleBasic
 // ----------------------------------------------------------------------------
 
-// AppModuleBasic implements the AppModuleBasic interface for the capability module.
+// AppModuleBasic implements the AppModuleBasic interface for the epochs module.
 type AppModuleBasic struct{}
 
 func NewAppModuleBasic() AppModuleBasic {
 	return AppModuleBasic{}
 }
 
-// Name returns the capability module's name.
+// Name returns the epochs module's name.
 func (AppModuleBasic) Name() string {
 	return types.ModuleName
 }
@@ -66,12 +66,12 @@ func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {}
 // RegisterInterfaces registers the module's interface types.
 func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {}
 
-// DefaultGenesis returns the capability module's default genesis state.
+// DefaultGenesis returns the epochs module's default genesis state.
 func (AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 	return cdc.MustMarshalJSON(types.DefaultGenesis())
 }
 
-// ValidateGenesis performs genesis state validation for the capability module.
+// ValidateGenesis performs genesis state validation for the epochs module.
 func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
 	var genState types.GenesisState
 	if err := cdc.UnmarshalJSON(bz, &genState); err != nil {
@@ -89,7 +89,7 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 // AppModule
 // ----------------------------------------------------------------------------
 
-// AppModule implements the AppModule interface for the capability module.
+// AppModule implements the AppModule interface for the epochs module.
 type AppModule struct {
 	AppModuleBasic
 
@@ -103,12 +103,12 @@ func NewAppModule(keeper *keeper.Keeper) AppModule {
 	}
 }
 
-// Name returns the capability module's name.
+// Name returns the epochs module's name.
 func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
 }
 
-// QuerierRoute returns the capability module's query routing key.
+// QuerierRoute returns the epochs module's query routing key.
 func (AppModule) QuerierRoute() string { return types.QuerierRoute }
 
 // RegisterServices registers a GRPC query service to respond to the
@@ -117,10 +117,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper.NewQuerier(am.keeper))
 }
 
-// RegisterInvariants registers the capability module's invariants.
+// RegisterInvariants registers the epochs module's invariants.
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
-// InitGenesis performs the capability module's genesis initialization It returns
+// InitGenesis performs the epochs module's genesis initialization It returns
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
 	var genState types.GenesisState
@@ -132,7 +132,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	return []abci.ValidatorUpdate{}
 }
 
-// ExportGenesis returns the capability module's exported genesis state as raw JSON bytes.
+// ExportGenesis returns the epochs module's exported genesis state as raw JSON bytes.
 func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.RawMessage {
 	genState := am.keeper.ExportGenesis(ctx)
 	return cdc.MustMarshalJSON(genState)
@@ -230,7 +230,7 @@ func InvokeSetEpochsHooks(
 	for _, modName := range order {
 		hook, ok := epochsHooks[modName]
 		if !ok {
-			return fmt.Errorf("can't find staking hooks for module %s", modName)
+			return fmt.Errorf("can't find epoch hooks for module %s", modName)
 		}
 
 		multiHooks = append(multiHooks, hook)

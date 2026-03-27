@@ -27,7 +27,7 @@ const (
 
 var _ EpochHooks = MultiEpochHooks{}
 
-// combine multiple gamm hooks, all hook functions are run in array sequence.
+// combine multiple epoch hooks, all hook functions are run in array sequence.
 type MultiEpochHooks []EpochHooks
 
 // GetModuleName implements EpochHooks.
@@ -42,7 +42,7 @@ func NewMultiEpochHooks(hooks ...EpochHooks) MultiEpochHooks {
 // AfterEpochEnd is called when epoch is going to be ended, epochNumber is the number of epoch that is ending.
 func (h MultiEpochHooks) AfterEpochEnd(ctx context.Context, epochIdentifier string, epochNumber int64) error {
 	for _, hook := range h {
-		panicCatchingEpochHook(ctx, hook.AfterEpochEnd, epochIdentifier, epochNumber, h.GetModuleName(), !isBeforeEpoch)
+		panicCatchingEpochHook(ctx, hook.AfterEpochEnd, epochIdentifier, epochNumber, hook.GetModuleName(), !isBeforeEpoch)
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func panicCatchingEpochHook(
 	// TODO: Thread info for which hook this is, may be dependent on larger hook system refactoring
 	err := ApplyFuncIfNoError(ctx, wrappedHookFn)
 	if err != nil {
-		telemetry.IncrCounterWithLabels([]string{}, 1, []metrics.Label{
+		telemetry.IncrCounterWithLabels([]string{EpochHookFailedMetricName}, 1, []metrics.Label{
 			{
 				Name:  "module_name",
 				Value: moduleName,

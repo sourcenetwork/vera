@@ -38,7 +38,7 @@ func WithGRPCAddr(addr string) Opt {
 	}
 }
 
-// WithGRPCAddr sets the CometBFT RPC Address of a SourceHub node which the Client will connect to.
+// WithCometRPCAddr sets the CometBFT RPC Address of a SourceHub node which the Client will connect to.
 // If not set defaults to DefaultCometHTTPAddr
 func WithCometRPCAddr(addr string) Opt {
 	return func(c *Client) error {
@@ -64,10 +64,11 @@ func NewClient(opts ...Opt) (*Client, error) {
 	}
 
 	for _, opt := range opts {
-		opt(client)
+		if err := opt(client); err != nil {
+			return nil, fmt.Errorf("applying client option: %w", err)
+		}
 	}
 
-	//dialOpts := append()
 	dialOpts := make([]grpc.DialOption, 0, len(client.grpcOpts)+1)
 	dialOpts = append(dialOpts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	dialOpts = append(dialOpts, client.grpcOpts...)
@@ -132,7 +133,6 @@ func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxRe
 
 	response := grpcRes.TxResponse
 
-	//log.Printf("broadcast tx: %v", grpcRes)
 	if response.Code != 0 {
 		return response, fmt.Errorf("tx rejected: codespace %v: code %v: %v", response.Codespace, response.Code, response.RawLog)
 	}
