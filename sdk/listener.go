@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"sync"
 
 	abcitypes "github.com/cometbft/cometbft/abci/types"
 	cometclient "github.com/cometbft/cometbft/rpc/client"
@@ -131,9 +130,9 @@ func (l *TxListener) ListenAsync(ctx context.Context, cb func(*Event, error)) er
 				cb(nil, err)
 			case <-l.Done():
 				log.Printf("Listener closed: canceling loop")
-				return
+				break
 			case <-ctx.Done():
-				return
+				break
 			}
 		}
 	}()
@@ -156,20 +155,17 @@ func (l *TxListener) Close() {
 func channelMapper[T, U any](ch <-chan T, mapper func(T) (U, error)) (values <-chan U, errors <-chan error, closeFn func()) {
 	errCh := make(chan error, mapperBuffSize)
 	valCh := make(chan U, mapperBuffSize)
-	var once sync.Once
-	doClose := func() {
+	closeFn = func() {
 		close(errCh)
 		close(valCh)
 	}
-	closeFn = func() {
-		once.Do(doClose)
-	}
 	go func() {
-		defer once.Do(doClose)
 		for {
 			select {
 			case result, ok := <-ch:
 				if !ok {
+					close(errCh)
+					close(valCh)
 					return
 				}
 

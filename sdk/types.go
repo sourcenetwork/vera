@@ -50,7 +50,7 @@ type ListenResult struct {
 	err    error
 }
 
-// Error return the error of the WaitResult, returns nil if successful
+// Error return the error of the ListenResult, returns nil if successful
 func (r *ListenResult) Error() error { return r.err }
 
 // GetTxResult returns the outcome of the executed Tx by SourceHub
