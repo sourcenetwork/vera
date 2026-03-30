@@ -8,6 +8,8 @@ import (
 	query "github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
@@ -381,6 +383,34 @@ func TestPostQuery(t *testing.T) {
 			Proof:      proof1,
 		},
 	}, response)
+}
+
+func TestBulletinPolicyIdQuery(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	setupTestPolicy(t, ctx, k)
+
+	response, err := k.BulletinPolicyId(ctx, &types.QueryBulletinPolicyIdRequest{})
+	require.NoError(t, err)
+	require.Equal(t, k.GetPolicyId(ctx), response.PolicyId)
+}
+
+func TestBulletinPolicyIdQuery_InvalidRequest(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	response, err := k.BulletinPolicyId(ctx, nil)
+	require.Error(t, err)
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+	require.Nil(t, response)
+}
+
+func TestBulletinPolicyIdQuery_PolicyNotSet(t *testing.T) {
+	k, ctx := setupKeeper(t)
+
+	response, err := k.BulletinPolicyId(ctx, &types.QueryBulletinPolicyIdRequest{})
+	require.Error(t, err)
+	require.Equal(t, codes.NotFound, status.Code(err))
+	require.Nil(t, response)
 }
 
 func TestIterateGlob(t *testing.T) {
