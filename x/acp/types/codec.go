@@ -4,7 +4,6 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	// this line is used by starport scaffolding # 1
 )
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -26,8 +25,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgEditPolicy{},
 	)
-	// this line is used by starport scaffolding # 3
-
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgUpdateParams{},
 	)
@@ -46,6 +43,7 @@ func registerResponses(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCreatePolicyResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCheckAccessResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSignedPolicyCmdResponse{})
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgBearerPolicyCmdResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgDirectPolicyCmdResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgUpdateParamsResponse{})
 	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgEditPolicyResponse{})
