@@ -27,6 +27,7 @@ const (
 	Query_Post_FullMethodName                   = "/sourcehub.bulletin.Query/Post"
 	Query_Posts_FullMethodName                  = "/sourcehub.bulletin.Query/Posts"
 	Query_IterateGlob_FullMethodName            = "/sourcehub.bulletin.Query/IterateGlob"
+	Query_BulletinPolicyId_FullMethodName       = "/sourcehub.bulletin.Query/BulletinPolicyId"
 )
 
 // QueryClient is the client API for Query service.
@@ -51,6 +52,8 @@ type QueryClient interface {
 	Posts(ctx context.Context, in *QueryPostsRequest, opts ...grpc.CallOption) (*QueryPostsResponse, error)
 	// Glob iteration over a namespace
 	IterateGlob(ctx context.Context, in *QueryIterateGlobRequest, opts ...grpc.CallOption) (*QueryIterateGlobResponse, error)
+	// Queries the bulletin module policy id.
+	BulletinPolicyId(ctx context.Context, in *QueryBulletinPolicyIdRequest, opts ...grpc.CallOption) (*QueryBulletinPolicyIdResponse, error)
 }
 
 type queryClient struct {
@@ -141,6 +144,16 @@ func (c *queryClient) IterateGlob(ctx context.Context, in *QueryIterateGlobReque
 	return out, nil
 }
 
+func (c *queryClient) BulletinPolicyId(ctx context.Context, in *QueryBulletinPolicyIdRequest, opts ...grpc.CallOption) (*QueryBulletinPolicyIdResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryBulletinPolicyIdResponse)
+	err := c.cc.Invoke(ctx, Query_BulletinPolicyId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -163,6 +176,8 @@ type QueryServer interface {
 	Posts(context.Context, *QueryPostsRequest) (*QueryPostsResponse, error)
 	// Glob iteration over a namespace
 	IterateGlob(context.Context, *QueryIterateGlobRequest) (*QueryIterateGlobResponse, error)
+	// Queries the bulletin module policy id.
+	BulletinPolicyId(context.Context, *QueryBulletinPolicyIdRequest) (*QueryBulletinPolicyIdResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -196,6 +211,9 @@ func (UnimplementedQueryServer) Posts(context.Context, *QueryPostsRequest) (*Que
 }
 func (UnimplementedQueryServer) IterateGlob(context.Context, *QueryIterateGlobRequest) (*QueryIterateGlobResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method IterateGlob not implemented")
+}
+func (UnimplementedQueryServer) BulletinPolicyId(context.Context, *QueryBulletinPolicyIdRequest) (*QueryBulletinPolicyIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BulletinPolicyId not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -362,6 +380,24 @@ func _Query_IterateGlob_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_BulletinPolicyId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryBulletinPolicyIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).BulletinPolicyId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_BulletinPolicyId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).BulletinPolicyId(ctx, req.(*QueryBulletinPolicyIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -400,6 +436,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "IterateGlob",
 			Handler:    _Query_IterateGlob_Handler,
+		},
+		{
+			MethodName: "BulletinPolicyId",
+			Handler:    _Query_BulletinPolicyId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
