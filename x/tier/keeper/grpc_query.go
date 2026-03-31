@@ -1,9 +1,9 @@
 package keeper
 
 import (
-	"bytes"
 	"context"
 
+	"cosmossdk.io/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
@@ -42,7 +42,7 @@ func (k *Keeper) Lockup(ctx context.Context, req *types.LockupRequest) (*types.L
 
 	lockup := k.GetLockup(ctx, delAddr, valAddr)
 	if lockup == nil {
-		return nil, status.Error(codes.NotFound, "unlocking lockup does not exist")
+		return nil, status.Error(codes.NotFound, "lockup does not exist")
 	}
 
 	return &types.LockupResponse{Lockup: *lockup}, nil
@@ -158,11 +158,11 @@ func (k *Keeper) getLockupsPaginated(ctx context.Context, delAddr sdk.AccAddress
 	[]types.Lockup, *query.PageResponse, error) {
 
 	var lockups []types.Lockup
-	store := k.lockupStore(ctx, false)
+	baseStore := k.lockupStore(ctx, false)
+	addrPrefix := append(delAddr.Bytes(), '/')
+	store := prefix.NewStore(baseStore, addrPrefix)
+
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, delAddr.Bytes()) {
-			return nil
-		}
 		var lockup types.Lockup
 		k.cdc.MustUnmarshal(value, &lockup)
 		lockups = append(lockups, lockup)
@@ -182,11 +182,11 @@ func (k *Keeper) getUnlockingLockupsPaginated(ctx context.Context, delAddr sdk.A
 	[]types.UnlockingLockup, *query.PageResponse, error) {
 
 	var unlockingLockups []types.UnlockingLockup
-	store := k.lockupStore(ctx, true)
+	baseStore := k.lockupStore(ctx, true)
+	addrPrefix := append(delAddr.Bytes(), '/')
+	store := prefix.NewStore(baseStore, addrPrefix)
+
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, delAddr.Bytes()) {
-			return nil
-		}
 		var unlockingLockup types.UnlockingLockup
 		k.cdc.MustUnmarshal(value, &unlockingLockup)
 		unlockingLockups = append(unlockingLockups, unlockingLockup)
@@ -228,12 +228,11 @@ func (k *Keeper) getUserSubscriptionsPaginated(ctx context.Context, developerAdd
 	[]types.UserSubscription, *query.PageResponse, error) {
 
 	var userSubscriptions []types.UserSubscription
-	store := k.userSubscriptionStore(ctx)
+	baseStore := k.userSubscriptionStore(ctx)
+	addrPrefix := append(developerAddr.Bytes(), '/')
+	store := prefix.NewStore(baseStore, addrPrefix)
 
 	onResult := func(key []byte, value []byte) error {
-		if !bytes.HasPrefix(key, developerAddr.Bytes()) {
-			return nil
-		}
 		var userSubscription types.UserSubscription
 		k.cdc.MustUnmarshal(value, &userSubscription)
 		userSubscriptions = append(userSubscriptions, userSubscription)
