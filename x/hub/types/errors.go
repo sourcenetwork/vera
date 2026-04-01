@@ -9,7 +9,6 @@ import (
 // x/hub module sentinel errors.
 var (
 	ErrInvalidSigner            = sdkerrors.Register(ModuleName, 1100, "expected gov account as only signer for proposal message")
-	ErrSample                   = sdkerrors.Register(ModuleName, 1101, "sample error")
 	ErrInvalidInput             = sdkerrors.Register(ModuleName, 1102, "invalid input")
 	ErrJWSTokenNotFound         = sdkerrors.Register(ModuleName, 1103, "JWS token not found")
 	ErrJWSTokenAlreadyInvalid   = sdkerrors.Register(ModuleName, 1104, "JWS token is already invalid")

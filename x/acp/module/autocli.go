@@ -72,8 +72,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
 
-				// this line is used by ignite scaffolding # autocli/query
-			},
+				},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
 			Service:              modulev1.Msg_ServiceDesc.ServiceName,
@@ -83,8 +82,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
-				// this line is used by ignite scaffolding # autocli/tx
-			},
+				},
 		},
 	}
 }
