@@ -147,7 +147,6 @@ var (
 		// chain modules
 		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
-		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
 	}
@@ -168,7 +167,6 @@ var (
 		// chain modules
 		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
-		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
 	}
