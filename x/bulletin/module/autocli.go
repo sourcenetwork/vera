@@ -72,9 +72,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "CreatePost",
-					Use:            "create-post [namespace] [payload] [proof]",
+					Use:            "create-post [namespace] [payload]",
 					Short:          "Add a new post to the specified namespace",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}, {ProtoField: "proof"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}},
 				},
 				{
 					RpcMethod:      "RegisterNamespace",

@@ -110,7 +110,6 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 		Namespace:  namespaceId,
 		CreatorDid: creatorDID,
 		Payload:    msg.Payload,
-		Proof:      msg.Proof,
 	}
 	k.SetPost(goCtx, post)
 
