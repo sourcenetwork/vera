@@ -50,7 +50,6 @@ message MsgCreatePost {
   string creator = 1;
   string namespace = 2;
   bytes payload = 3;
-  bytes proof = 4;
   string artifact = 5;
 }
 

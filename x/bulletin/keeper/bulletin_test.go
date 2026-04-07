@@ -71,7 +71,6 @@ func TestGetPost(t *testing.T) {
 		Namespace:  namespaceId,
 		CreatorDid: did,
 		Payload:    []byte("payload123"),
-		Proof:      []byte("proof123"),
 	}
 	k.SetPost(ctx, post)
 
@@ -81,7 +80,6 @@ func TestGetPost(t *testing.T) {
 	require.Equal(t, post.Namespace, gotPost.Namespace)
 	require.Equal(t, post.CreatorDid, gotPost.CreatorDid)
 	require.Equal(t, post.Payload, gotPost.Payload)
-	require.Equal(t, post.Proof, gotPost.Proof)
 }
 
 func TestGetCollaborator(t *testing.T) {
@@ -178,7 +176,6 @@ func TestMustIteratePosts(t *testing.T) {
 		Namespace:  namespaceId,
 		CreatorDid: did,
 		Payload:    []byte("payload123"),
-		Proof:      []byte("proof123"),
 	}
 	k.SetPost(ctx, post1)
 
@@ -187,7 +184,6 @@ func TestMustIteratePosts(t *testing.T) {
 		Namespace:  namespaceId,
 		CreatorDid: did,
 		Payload:    []byte("payload456"),
-		Proof:      []byte("proof456"),
 	}
 	k.SetPost(ctx, post2)
 
@@ -212,7 +208,6 @@ func TestMustIterateNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload123"),
-		Proof:      []byte("proof123"),
 	}
 	k.SetPost(ctx, post1)
 
@@ -221,7 +216,6 @@ func TestMustIterateNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload456"),
-		Proof:      []byte("proof456"),
 	}
 	k.SetPost(ctx, post2)
 
@@ -230,7 +224,6 @@ func TestMustIterateNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId2,
 		CreatorDid: did,
 		Payload:    []byte("payload789"),
-		Proof:      []byte("proof789"),
 	}
 	k.SetPost(ctx, post3)
 

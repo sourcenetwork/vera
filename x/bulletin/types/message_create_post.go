@@ -8,12 +8,11 @@ import (
 
 var _ sdk.Msg = &MsgCreatePost{}
 
-func NewMsgCreatePost(creator string, namespace string, payload []byte, proof []byte) *MsgCreatePost {
+func NewMsgCreatePost(creator string, namespace string, payload []byte) *MsgCreatePost {
 	return &MsgCreatePost{
 		Creator:   creator,
 		Namespace: namespace,
 		Payload:   payload,
-		Proof:     proof,
 	}
 }
 
@@ -29,10 +28,6 @@ func (msg *MsgCreatePost) ValidateBasic() error {
 
 	if len(msg.Payload) == 0 {
 		return ErrInvalidPostPayload
-	}
-
-	if len(msg.Proof) == 0 {
-		return ErrInvalidPostProof
 	}
 
 	return nil

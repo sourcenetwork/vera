@@ -197,9 +197,7 @@ func TestNamespacePostsQuery(t *testing.T) {
 
 	namespace := "ns1"
 	payload1 := []byte("post123")
-	proof1 := []byte("proof456")
 	payload2 := []byte("post321")
-	proof2 := []byte("proof654")
 
 	postId1 := types.GeneratePostId(getNamespaceId(namespace), payload1)
 	postId2 := types.GeneratePostId(getNamespaceId(namespace), payload2)
@@ -217,7 +215,6 @@ func TestNamespacePostsQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace,
 		Payload:   payload1,
-		Proof:     proof1,
 	})
 	require.NoError(t, err)
 
@@ -225,7 +222,6 @@ func TestNamespacePostsQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace,
 		Payload:   payload2,
-		Proof:     proof2,
 	})
 	require.NoError(t, err)
 
@@ -240,14 +236,12 @@ func TestNamespacePostsQuery(t *testing.T) {
 				Namespace:  getNamespaceId(namespace),
 				CreatorDid: ownerDID,
 				Payload:    payload1,
-				Proof:      proof1,
 			},
 			{
 				Id:         postId2,
 				Namespace:  getNamespaceId(namespace),
 				CreatorDid: ownerDID,
 				Payload:    payload2,
-				Proof:      proof2,
 			},
 		},
 		Pagination: &query.PageResponse{
@@ -270,9 +264,7 @@ func TestPostsQuery(t *testing.T) {
 	namespace1 := "ns1"
 	namespace2 := "ns2"
 	payload1 := []byte("post123")
-	proof1 := []byte("proof456")
 	payload2 := []byte("post321")
-	proof2 := []byte("proof654")
 
 	postId1 := types.GeneratePostId(getNamespaceId(namespace1), payload1)
 	postId2 := types.GeneratePostId(getNamespaceId(namespace2), payload2)
@@ -296,7 +288,6 @@ func TestPostsQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace1,
 		Payload:   payload1,
-		Proof:     proof1,
 	})
 	require.NoError(t, err)
 
@@ -304,7 +295,6 @@ func TestPostsQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace2,
 		Payload:   payload2,
-		Proof:     proof2,
 	})
 	require.NoError(t, err)
 
@@ -317,14 +307,12 @@ func TestPostsQuery(t *testing.T) {
 				Namespace:  getNamespaceId(namespace1),
 				CreatorDid: ownerDID,
 				Payload:    payload1,
-				Proof:      proof1,
 			},
 			{
 				Id:         postId2,
 				Namespace:  getNamespaceId(namespace2),
 				CreatorDid: ownerDID,
 				Payload:    payload2,
-				Proof:      proof2,
 			},
 		},
 		Pagination: &query.PageResponse{
@@ -346,7 +334,6 @@ func TestPostQuery(t *testing.T) {
 
 	namespace := "ns1"
 	payload1 := []byte("post123")
-	proof1 := []byte("proof456")
 	artifact := "artifact"
 
 	postId1 := types.GeneratePostId(getNamespaceId(namespace), payload1)
@@ -364,7 +351,6 @@ func TestPostQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace,
 		Payload:   payload1,
-		Proof:     proof1,
 		Artifact: artifact,
 	})
 	require.NoError(t, err)
@@ -380,7 +366,6 @@ func TestPostQuery(t *testing.T) {
 			Namespace:  getNamespaceId(namespace),
 			CreatorDid: ownerDID,
 			Payload:    payload1,
-			Proof:      proof1,
 		},
 	}, response)
 }

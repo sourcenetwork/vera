@@ -9,5 +9,4 @@ message Post {
   string namespace = 2;
   string creator_did = 3;
   bytes payload = 4;
-  bytes proof = 5;
 }

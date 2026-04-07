@@ -216,7 +216,6 @@ func TestMsgCreatePost(t *testing.T) {
 			input: &types.MsgCreatePost{
 				Creator: baseAcc.Address,
 				Payload: []byte("post123"),
-				Proof:   []byte("proof456"),
 			},
 			setup:     func() {},
 			expErr:    true,
@@ -227,22 +226,10 @@ func TestMsgCreatePost(t *testing.T) {
 			input: &types.MsgCreatePost{
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
-				Proof:     []byte("proof456"),
 			},
 			setup:     func() {},
 			expErr:    true,
 			expErrMsg: "invalid post payload",
-		},
-		{
-			name: "create post (error: no proof)",
-			input: &types.MsgCreatePost{
-				Creator:   baseAcc.Address,
-				Namespace: namespace,
-				Payload:   []byte("post123"),
-			},
-			setup:     func() {},
-			expErr:    true,
-			expErrMsg: "invalid post proof",
 		},
 		{
 			name: "create post (error: no policy)",
@@ -250,7 +237,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 				Payload:   []byte("post123"),
-				Proof:     []byte("proof456"),
 			},
 			setup:     func() {},
 			expErr:    true,
@@ -262,7 +248,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 				Payload:   []byte("post123"),
-				Proof:     []byte("proof456"),
 			},
 			setup: func() {
 				k.SetPolicyId(ctx, "policy1")
@@ -276,7 +261,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 				Payload:   []byte("post123"),
-				Proof:     []byte("proof456"),
 			},
 			setup: func() {
 				setupTestPolicy(t, ctx, k)
@@ -295,7 +279,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 				Payload:   []byte("post123"),
-				Proof:     []byte("proof456"),
 			},
 			setup:     func() {},
 			expErr:    true,
@@ -307,7 +290,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc2.Address,
 				Namespace: namespace,
 				Payload:   []byte("post1234"),
-				Proof:     []byte("proof4567"),
 			},
 			setup:     func() {},
 			expErr:    true,
@@ -319,7 +301,6 @@ func TestMsgCreatePost(t *testing.T) {
 				Creator:   baseAcc2.Address,
 				Namespace: namespace,
 				Payload:   []byte("post1234"),
-				Proof:     []byte("proof4567"),
 			},
 			setup: func() {
 				_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
@@ -380,7 +361,6 @@ func TestMsgCreatePost_EmitsArtifactInEvent(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: "ns1",
 		Payload:   []byte("some payload"),
-		Proof:     []byte("some proof"),
 		Artifact:  "session-id",
 	}
 	_, err = k.CreatePost(ctx, &post)
