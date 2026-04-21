@@ -137,6 +137,84 @@ func TestMsgUpdatePost(t *testing.T) {
 		require.Equal(t, postId, stored.Id)
 		require.Equal(t, newPayload, stored.Payload)
 	})
+
+	t.Run("revoked collaborator can no longer update", func(t *testing.T) {
+		// collab was granted in the previous subtest; revoke it now
+		_, err := k.RemoveCollaborator(ctx, &types.MsgRemoveCollaborator{
+			Creator:      owner.Address,
+			Namespace:    namespace,
+			Collaborator: collab.Address,
+		})
+		require.NoError(t, err)
+
+		beforePayload := k.getPost(ctx, namespaceId, postId).Payload
+
+		_, err = k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   collab.Address,
+			Namespace: namespace,
+			PostId:    postId,
+			Payload:   []byte("should be rejected"),
+		})
+		require.ErrorIs(t, err, types.ErrInvalidPostUpdater)
+
+		stored := k.getPost(ctx, namespaceId, postId)
+		require.NotNil(t, stored)
+		require.Equal(t, beforePayload, stored.Payload)
+	})
+}
+
+// TestPolicy_CreatePostPermissionSurvives locks in that the `create_post`
+// permission remains queryable via ACP with the `collaborator` relation.
+// The keeper no longer gates CreatePost with this permission, but external
+// consumers may still query it — this guards against accidental removal
+// from the policy YAML.
+func TestPolicy_CreatePostPermissionSurvives(t *testing.T) {
+	k, ctx := setupKeeper(t)
+	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
+
+	ownerKey := secp256k1.GenPrivKey().PubKey()
+	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
+	k.accountKeeper.SetAccount(ctx, owner)
+
+	collabKey := secp256k1.GenPrivKey().PubKey()
+	collab := authtypes.NewBaseAccount(sdk.AccAddress(collabKey.Address()), collabKey, 2, 1)
+	k.accountKeeper.SetAccount(ctx, collab)
+
+	setupTestPolicy(t, ctx, k)
+
+	namespace := "ns-create-perm"
+	namespaceId := getNamespaceId(namespace)
+
+	_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+		Creator:   owner.Address,
+		Namespace: namespace,
+	})
+	require.NoError(t, err)
+
+	_, err = k.AddCollaborator(ctx, &types.MsgAddCollaborator{
+		Creator:      owner.Address,
+		Namespace:    namespace,
+		Collaborator: collab.Address,
+	})
+	require.NoError(t, err)
+
+	collabDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, collab.Address)
+	require.NoError(t, err)
+
+	allowed, err := hasPermission(ctx, &k, k.GetPolicyId(ctx), namespaceId, types.CreatePostPermission, collabDID, collab.Address)
+	require.NoError(t, err)
+	require.True(t, allowed, "create_post permission should resolve for a collaborator")
+
+	outsiderKey := secp256k1.GenPrivKey().PubKey()
+	outsider := authtypes.NewBaseAccount(sdk.AccAddress(outsiderKey.Address()), outsiderKey, 3, 1)
+	k.accountKeeper.SetAccount(ctx, outsider)
+
+	outsiderDID, err := k.GetAcpKeeper().IssueDIDFromAccountAddr(ctx, outsider.Address)
+	require.NoError(t, err)
+
+	allowed, err = hasPermission(ctx, &k, k.GetPolicyId(ctx), namespaceId, types.CreatePostPermission, outsiderDID, outsider.Address)
+	require.NoError(t, err)
+	require.False(t, allowed, "create_post permission should deny a non-collaborator")
 }
 
 func TestMsgServer(t *testing.T) {
