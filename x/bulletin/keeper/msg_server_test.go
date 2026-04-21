@@ -11,6 +11,134 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
 
+func TestMsgUpdatePost(t *testing.T) {
+	k, ctx := setupKeeper(t)
+	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
+
+	ownerKey := secp256k1.GenPrivKey().PubKey()
+	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
+	k.accountKeeper.SetAccount(ctx, owner)
+
+	outsiderKey := secp256k1.GenPrivKey().PubKey()
+	outsider := authtypes.NewBaseAccount(sdk.AccAddress(outsiderKey.Address()), outsiderKey, 2, 1)
+	k.accountKeeper.SetAccount(ctx, outsider)
+
+	collabKey := secp256k1.GenPrivKey().PubKey()
+	collab := authtypes.NewBaseAccount(sdk.AccAddress(collabKey.Address()), collabKey, 3, 1)
+	k.accountKeeper.SetAccount(ctx, collab)
+
+	setupTestPolicy(t, ctx, k)
+
+	namespace := "ns1"
+	namespaceId := getNamespaceId(namespace)
+	originalPayload := []byte("hello world")
+
+	_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
+		Creator:   owner.Address,
+		Namespace: namespace,
+	})
+	require.NoError(t, err)
+
+	_, err = k.CreatePost(ctx, &types.MsgCreatePost{
+		Creator:   owner.Address,
+		Namespace: namespace,
+		Payload:   originalPayload,
+	})
+	require.NoError(t, err)
+
+	postId := types.GeneratePostId(namespaceId, originalPayload)
+
+	t.Run("validate basic rejects empty fields", func(t *testing.T) {
+		cases := []struct {
+			msg    *types.MsgUpdatePost
+			errMsg string
+		}{
+			{&types.MsgUpdatePost{}, "invalid creator address"},
+			{&types.MsgUpdatePost{Creator: owner.Address}, "invalid namespace id"},
+			{&types.MsgUpdatePost{Creator: owner.Address, Namespace: namespace}, "post not found"},
+			{&types.MsgUpdatePost{Creator: owner.Address, Namespace: namespace, PostId: postId}, "invalid post payload"},
+		}
+		for _, c := range cases {
+			err := c.msg.ValidateBasic()
+			require.Error(t, err)
+			require.Contains(t, err.Error(), c.errMsg)
+		}
+	})
+
+	t.Run("namespace not found", func(t *testing.T) {
+		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   owner.Address,
+			Namespace: "does-not-exist",
+			PostId:    postId,
+			Payload:   []byte("new"),
+		})
+		require.ErrorIs(t, err, types.ErrNamespaceNotFound)
+	})
+
+	t.Run("post not found", func(t *testing.T) {
+		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   owner.Address,
+			Namespace: namespace,
+			PostId:    "nonexistent-post-id",
+			Payload:   []byte("new"),
+		})
+		require.ErrorIs(t, err, types.ErrPostNotFound)
+	})
+
+	t.Run("outsider without collaborator relation is rejected", func(t *testing.T) {
+		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   outsider.Address,
+			Namespace: namespace,
+			PostId:    postId,
+			Payload:   []byte("nope"),
+		})
+		require.ErrorIs(t, err, types.ErrInvalidPostUpdater)
+
+		stored := k.getPost(ctx, namespaceId, postId)
+		require.NotNil(t, stored)
+		require.Equal(t, originalPayload, stored.Payload)
+	})
+
+	t.Run("creator can update and post_id is preserved", func(t *testing.T) {
+		newPayload := []byte("hello mars")
+		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   owner.Address,
+			Namespace: namespace,
+			PostId:    postId,
+			Payload:   newPayload,
+		})
+		require.NoError(t, err)
+
+		stored := k.getPost(ctx, namespaceId, postId)
+		require.NotNil(t, stored)
+		require.Equal(t, postId, stored.Id)
+		require.Equal(t, newPayload, stored.Payload)
+	})
+
+	t.Run("collaborator can update via ACP policy", func(t *testing.T) {
+		_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
+			Creator:      owner.Address,
+			Namespace:    namespace,
+			Collaborator: collab.Address,
+		})
+		require.NoError(t, err)
+
+		newPayload := []byte("hello venus")
+		_, err = k.UpdatePost(ctx, &types.MsgUpdatePost{
+			Creator:   collab.Address,
+			Namespace: namespace,
+			PostId:    postId,
+			Payload:   newPayload,
+		})
+		require.NoError(t, err)
+
+		stored := k.getPost(ctx, namespaceId, postId)
+		require.NotNil(t, stored)
+		require.Equal(t, postId, stored.Id)
+		require.Equal(t, newPayload, stored.Payload)
+	})
+}
+
 func TestMsgServer(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	require.NotNil(t, ctx)
@@ -232,26 +360,13 @@ func TestMsgCreatePost(t *testing.T) {
 			expErrMsg: "invalid post payload",
 		},
 		{
-			name: "create post (error: no policy)",
+			name: "create post (error: namespace not found)",
 			input: &types.MsgCreatePost{
 				Creator:   baseAcc.Address,
 				Namespace: namespace,
 				Payload:   []byte("post123"),
 			},
 			setup:     func() {},
-			expErr:    true,
-			expErrMsg: "invalid policy id",
-		},
-		{
-			name: "create post (error: no namespace)",
-			input: &types.MsgCreatePost{
-				Creator:   baseAcc.Address,
-				Namespace: namespace,
-				Payload:   []byte("post123"),
-			},
-			setup: func() {
-				k.SetPolicyId(ctx, "policy1")
-			},
 			expErr:    true,
 			expErrMsg: "namespace not found",
 		},
@@ -285,31 +400,13 @@ func TestMsgCreatePost(t *testing.T) {
 			expErrMsg: "post already exists",
 		},
 		{
-			name: "create post (error: unauthorized)",
+			name: "create post from unrelated signer (no error: posting is open)",
 			input: &types.MsgCreatePost{
 				Creator:   baseAcc2.Address,
 				Namespace: namespace,
-				Payload:   []byte("post1234"),
+				Payload:   []byte("post-from-other"),
 			},
-			setup:     func() {},
-			expErr:    true,
-			expErrMsg: "expected authorized account as a post creator",
-		},
-		{
-			name: "create post from collaborator (no error)",
-			input: &types.MsgCreatePost{
-				Creator:   baseAcc2.Address,
-				Namespace: namespace,
-				Payload:   []byte("post1234"),
-			},
-			setup: func() {
-				_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
-					Creator:      baseAcc.Address,
-					Collaborator: baseAcc2.Address,
-					Namespace:    namespace,
-				})
-				require.NoError(t, err)
-			},
+			setup:  func() {},
 			expErr: false,
 		},
 	}
