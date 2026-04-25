@@ -77,6 +77,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}},
 				},
 				{
+					RpcMethod:      "UpdatePost",
+					Use:            "update-post [namespace] [post_id] [payload]",
+					Short:          "Update payload of an existing post while preserving its id",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}},
+				},
+				{
 					RpcMethod:      "RegisterNamespace",
 					Use:            "register-namespace [namespace]",
 					Short:          "Register a new namespace",

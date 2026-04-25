@@ -71,13 +71,10 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 }
 
 // CreatePost adds a new post to the specified (existing) namespace.
-// The signer must have permission to create posts in that namespace.
+// Post creation is unrestricted: any valid signer may create a post in any
+// registered namespace. Duplicate (namespace, payload) pairs are rejected
+// because post_id is derived from them.
 func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*types.MsgCreatePostResponse, error) {
-	policyId := k.GetPolicyId(goCtx)
-	if policyId == "" {
-		return nil, types.ErrInvalidPolicyId
-	}
-
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceId := getNamespaceId(msg.Namespace)
@@ -90,18 +87,9 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 		return nil, err
 	}
 
-	hasPermission, err := hasPermission(goCtx, k, policyId, namespaceId, types.CreatePostPermission, creatorDID, msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-	if !hasPermission {
-		return nil, types.ErrInvalidPostCreator
-	}
-
 	postId := types.GeneratePostId(namespaceId, msg.Payload)
 
-	existingPost := k.getPost(goCtx, namespaceId, postId)
-	if existingPost != nil {
+	if existing := k.getPost(goCtx, namespaceId, postId); existing != nil {
 		return nil, types.ErrPostAlreadyExists
 	}
 
@@ -125,6 +113,60 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	}
 
 	return &types.MsgCreatePostResponse{}, nil
+}
+
+// UpdatePost overwrites the payload of an existing post while preserving the
+// post_id. Authorization: the signer must either be the original creator, or
+// be a `collaborator` on the post's namespace (checked via the module's ACP
+// policy `update_post` permission).
+func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*types.MsgUpdatePostResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	policyId := k.GetPolicyId(goCtx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
+
+	namespaceId := getNamespaceId(msg.Namespace)
+	if !k.hasNamespace(goCtx, namespaceId) {
+		return nil, types.ErrNamespaceNotFound
+	}
+
+	existing := k.getPost(goCtx, namespaceId, msg.PostId)
+	if existing == nil {
+		return nil, types.ErrPostNotFound
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	if updaterDID != existing.CreatorDid {
+		allowed, err := hasPermission(goCtx, k, policyId, namespaceId, types.UpdatePostPermission, updaterDID, msg.Creator)
+		if err != nil {
+			return nil, err
+		}
+		if !allowed {
+			return nil, types.ErrInvalidPostUpdater
+		}
+	}
+
+	existing.Payload = msg.Payload
+	k.SetPost(goCtx, *existing)
+
+	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventPostUpdated{
+		NamespaceId: namespaceId,
+		PostId:      existing.Id,
+		UpdaterDid:  updaterDID,
+		Payload:     b64Payload,
+		Artifact:    msg.Artifact,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdatePostResponse{}, nil
 }
 
 // AddCollaborator adds a new collaborator to the specified namespace.

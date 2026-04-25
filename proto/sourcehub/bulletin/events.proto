@@ -31,6 +31,21 @@ message EventPostCreated {
   string artifact = 5;
 }
 
+// EventPostUpdated is emitted when an existing post's payload is updated.
+// The post_id is unchanged across updates.
+message EventPostUpdated {
+  // namespace_id is the namespace the post belongs to.
+  string namespace_id = 1;
+  // post_id is the unique identifier of the post (stable across updates).
+  string post_id = 2;
+  // updater_did is the DID of the actor that performed the update.
+  string updater_did = 3;
+  // payload is the base64-encoded new content of the post.
+  string payload = 4;
+  // artifact is sent with an update call for tracking purposes.
+  string artifact = 5;
+}
+
 // EventCollaboratorAdded is emitted when a collaborator is added to a namespace.
 message EventCollaboratorAdded {
   // namespace_id is the namespace the collaborator was added to.
