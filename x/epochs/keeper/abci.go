@@ -4,23 +4,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
-
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/sourcenetwork/sourcehub/x/epochs/types"
 )
 
-// BeginBlocker of epochs module.
-func (k Keeper) BeginBlocker(ctx sdk.Context) {
+// BeginBlocker iterates through each epoch and checks if it should start or end.
+func (k *Keeper) BeginBlocker(ctx sdk.Context) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 	k.IterateEpochInfo(ctx, func(index int64, epochInfo types.EpochInfo) (stop bool) {
 		logger := k.Logger()
 
-		// If blocktime < initial epoch start time, return
 		if ctx.BlockTime().Before(epochInfo.StartTime) {
 			return
 		}
-		// if epoch counting hasn't started, signal we need to start.
 		shouldInitialEpochStart := !epochInfo.EpochCountingStarted
 
 		epochEndTime := epochInfo.CurrentEpochStartTime.Add(epochInfo.Duration)
@@ -49,7 +47,6 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 			logger.Info(fmt.Sprintf("Starting epoch with identifier %s epoch number %d", epochInfo.Identifier, epochInfo.CurrentEpoch))
 		}
 
-		// emit new epoch start event, set epoch info, and run BeforeEpochStart hook
 		ctx.EventManager().EmitEvent(
 			sdk.NewEvent(
 				types.EventTypeEpochStart,
@@ -62,4 +59,5 @@ func (k Keeper) BeginBlocker(ctx sdk.Context) {
 
 		return false
 	})
+	return nil
 }
