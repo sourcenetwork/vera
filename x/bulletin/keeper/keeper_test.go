@@ -129,7 +129,6 @@ func TestGetNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload123"),
-		Proof:      []byte("proof123"),
 	}
 	k.SetPost(ctx, post1)
 
@@ -138,7 +137,6 @@ func TestGetNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload456"),
-		Proof:      []byte("proof456"),
 	}
 	k.SetPost(ctx, post2)
 
@@ -147,7 +145,6 @@ func TestGetNamespacePosts(t *testing.T) {
 		Namespace:  namespaceId2,
 		CreatorDid: did,
 		Payload:    []byte("payload789"),
-		Proof:      []byte("proof789"),
 	}
 	k.SetPost(ctx, post3)
 
@@ -174,7 +171,6 @@ func TestGetAllPosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload123"),
-		Proof:      []byte("proof123"),
 	}
 	k.SetPost(ctx, post1)
 
@@ -183,7 +179,6 @@ func TestGetAllPosts(t *testing.T) {
 		Namespace:  namespaceId1,
 		CreatorDid: did,
 		Payload:    []byte("payload456"),
-		Proof:      []byte("proof456"),
 	}
 	k.SetPost(ctx, post2)
 
@@ -192,7 +187,6 @@ func TestGetAllPosts(t *testing.T) {
 		Namespace:  namespaceId2,
 		CreatorDid: did,
 		Payload:    []byte("payload789"),
-		Proof:      []byte("proof789"),
 	}
 	k.SetPost(ctx, post3)
 

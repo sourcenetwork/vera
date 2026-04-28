@@ -5,6 +5,8 @@ const (
 	CollaboratorRelation = "collaborator"
 	// CreatePostPermission defines permission name for creating a post.
 	CreatePostPermission = "create_post"
+	// UpdatePostPermission defines permission name for updating a post.
+	UpdatePostPermission = "update_post"
 	// NamespaceIdPrefix is the common prefix for all bulletin module namespaces.
 	NamespaceIdPrefix = "bulletin/"
 	// NamespaceResource defines a resource name for the namespace.

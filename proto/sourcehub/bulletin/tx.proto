@@ -19,6 +19,7 @@ service Msg {
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreatePost(MsgCreatePost) returns (MsgCreatePostResponse);
+  rpc UpdatePost(MsgUpdatePost) returns (MsgUpdatePostResponse);
   rpc RegisterNamespace(MsgRegisterNamespace) returns (MsgRegisterNamespaceResponse);
   rpc AddCollaborator(MsgAddCollaborator) returns (MsgAddCollaboratorResponse);
   rpc RemoveCollaborator(MsgRemoveCollaborator) returns (MsgRemoveCollaboratorResponse);
@@ -50,11 +51,21 @@ message MsgCreatePost {
   string creator = 1;
   string namespace = 2;
   bytes payload = 3;
-  bytes proof = 4;
   string artifact = 5;
 }
 
 message MsgCreatePostResponse {}
+
+message MsgUpdatePost {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string post_id = 3;
+  bytes payload = 4;
+  string artifact = 5;
+}
+
+message MsgUpdatePostResponse {}
 
 message MsgRegisterNamespace {
   option (cosmos.msg.v1.signer) = "creator";

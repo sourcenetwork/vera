@@ -6,29 +6,29 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgCreatePost{}
+var _ sdk.Msg = &MsgUpdatePost{}
 
-func NewMsgCreatePost(creator string, namespace string, payload []byte) *MsgCreatePost {
-	return &MsgCreatePost{
+func NewMsgUpdatePost(creator, namespace, postId string, payload []byte) *MsgUpdatePost {
+	return &MsgUpdatePost{
 		Creator:   creator,
 		Namespace: namespace,
+		PostId:    postId,
 		Payload:   payload,
 	}
 }
 
-func (msg *MsgCreatePost) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
+func (msg *MsgUpdatePost) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-
 	if msg.Namespace == "" {
 		return ErrInvalidNamespaceId
 	}
-
+	if msg.PostId == "" {
+		return ErrPostNotFound
+	}
 	if len(msg.Payload) == 0 {
 		return ErrInvalidPostPayload
 	}
-
 	return nil
 }

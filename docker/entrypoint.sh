@@ -6,7 +6,7 @@ DEFAULT_CHAIN_ID="sourcehub"
 DEFAULT_MONIKER="node"
 DEV_FACUET_MNEMONIC="comic very pond victory suit tube ginger antique life then core warm loyal deliver iron fashion erupt husband weekend monster sunny artist empty uphold"
 
-if [ ! -d /sourcehub/.initialized ]; then
+if [ ! -f /sourcehub/config/genesis.json ]; then
     echo "Initializing SourceHub"
 
     if [ -z "$CHAIN_ID" ]; then 
@@ -19,7 +19,7 @@ if [ ! -d /sourcehub/.initialized ]; then
         MONIKER=$DEFAULT_MONIKER
     fi
 
-    sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 2>/dev/null
+    sourcehubd init "$MONIKER" --chain-id $CHAIN_ID --default-denom="uopen" 
 
     # copy the container specific default config files,
     # which overrides some settings such as listening address
