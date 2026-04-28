@@ -54,12 +54,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
 				{
-					RpcMethod: "BulletinPolicyId",
-					Use:       "policy-id",
-					Short:     "Query the bulletin module policy id",
+					RpcMethod:      "BulletinPolicyId",
+					Use:            "policy-id",
+					Short:          "Query the bulletin module policy id",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
-				// this line is used by ignite scaffolding # autocli/query
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
@@ -100,7 +99,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Remove existing collaborator from the specified namespace",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "collaborator"}},
 				},
-				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
 	}

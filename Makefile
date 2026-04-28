@@ -19,6 +19,7 @@ install:
 .PHONY: proto
 proto:
 	ignite generate proto-go
+	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.pulsar.yaml
 
 .PHONY: test
 test:
