@@ -285,6 +285,11 @@ func (k *Keeper) CheckAndUpdateExpiredTokens(ctx context.Context) error {
 			return false
 		}
 
+		// Skip non-expiring tokens (zero ExpiresAt means no expiration).
+		if record.ExpiresAt.IsZero() {
+			return false
+		}
+
 		// Check if token is expired
 		if !record.ExpiresAt.After(currentTime) {
 			// Mark as invalid
