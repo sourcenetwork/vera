@@ -20,6 +20,7 @@ service Msg {
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreatePost(MsgCreatePost) returns (MsgCreatePostResponse);
   rpc UpdatePost(MsgUpdatePost) returns (MsgUpdatePostResponse);
+  rpc UpdatePostByThresholdSignature(MsgUpdatePostByThresholdSignature) returns (MsgUpdatePostByThresholdSignatureResponse);
   rpc RegisterNamespace(MsgRegisterNamespace) returns (MsgRegisterNamespaceResponse);
   rpc AddCollaborator(MsgAddCollaborator) returns (MsgAddCollaboratorResponse);
   rpc RemoveCollaborator(MsgRemoveCollaborator) returns (MsgRemoveCollaboratorResponse);
@@ -66,6 +67,19 @@ message MsgUpdatePost {
 }
 
 message MsgUpdatePostResponse {}
+
+message MsgUpdatePostByThresholdSignature {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string post_id = 3;
+  bytes payload = 4;
+  string artifact = 5;
+  string signature_scheme = 6;
+  bytes signature = 7;
+}
+
+message MsgUpdatePostByThresholdSignatureResponse {}
 
 message MsgRegisterNamespace {
   option (cosmos.msg.v1.signer) = "creator";

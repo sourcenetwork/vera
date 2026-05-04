@@ -175,10 +175,8 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 // collaborator permission check used by UpdatePost.
 func (k *Keeper) UpdatePostByThresholdSignature(
 	goCtx context.Context,
-	msg *types.MsgUpdatePost,
-	signatureScheme string,
-	signature []byte,
-) (*types.MsgUpdatePostResponse, error) {
+	msg *types.MsgUpdatePostByThresholdSignature,
+) (*types.MsgUpdatePostByThresholdSignatureResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceId := getNamespaceId(msg.Namespace)
@@ -196,7 +194,7 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, msg.Payload, signatureScheme, signature); err != nil {
+	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, msg.Payload, msg.SignatureScheme, msg.Signature); err != nil {
 		return nil, err
 	}
 
@@ -214,7 +212,7 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	return &types.MsgUpdatePostResponse{}, nil
+	return &types.MsgUpdatePostByThresholdSignatureResponse{}, nil
 }
 
 // AddCollaborator adds a new collaborator to the specified namespace.

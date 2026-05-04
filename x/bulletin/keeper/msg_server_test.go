@@ -231,6 +231,41 @@ func TestMsgUpdatePost_DoesNotValidateRingPayload(t *testing.T) {
 	require.Equal(t, nextPayload, stored.Payload)
 }
 
+func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
+	k, ctx := setupKeeper(t)
+	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
+
+	ownerKey := secp256k1.GenPrivKey().PubKey()
+	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
+	k.accountKeeper.SetAccount(ctx, owner)
+
+	validMsg := &types.MsgUpdatePostByThresholdSignature{
+		Creator:         owner.Address,
+		Namespace:       "ns1",
+		PostId:          "post1",
+		Payload:         []byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
+		SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		Signature:       []byte("signature"),
+	}
+	require.NoError(t, validMsg.ValidateBasic())
+
+	cases := []struct {
+		msg    *types.MsgUpdatePostByThresholdSignature
+		errMsg string
+	}{
+		{&types.MsgUpdatePostByThresholdSignature{}, "invalid creator address"},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address}, "invalid namespace id"},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, "post not found"},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, "invalid post payload"},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1", Payload: []byte("payload")}, "invalid threshold signature"},
+	}
+	for _, c := range cases {
+		err := c.msg.ValidateBasic()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), c.errMsg)
+	}
+}
+
 func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
@@ -265,12 +300,13 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	}
 
 	for _, payload := range invalidPayloads {
-		_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePost{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   payload,
-		}, ThresholdSignatureSchemeBLS12381, nil)
+		_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+			Creator:         owner.Address,
+			Namespace:       namespace,
+			PostId:          postId,
+			Payload:         payload,
+			SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		})
 		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
 
 		stored := k.getPost(ctx, namespaceId, postId)
@@ -279,12 +315,14 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	}
 
 	nextPayload, signature := signedRingPayload(t, []string{"peer2"}, 1)
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePost{
-		Creator:   owner.Address,
-		Namespace: namespace,
-		PostId:    postId,
-		Payload:   nextPayload,
-	}, ThresholdSignatureSchemeBLS12381, signature)
+	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		Creator:         owner.Address,
+		Namespace:       namespace,
+		PostId:          postId,
+		Payload:         nextPayload,
+		SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		Signature:       signature,
+	})
 	require.NoError(t, err)
 
 	stored := k.getPost(ctx, namespaceId, postId)
@@ -329,36 +367,42 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	tamperedSignature[len(tamperedSignature)-1] ^= 0x01
 	attackerPayload, attackerSignature := signedRingPayloadWithSeed(t, "sourcehub-bulletin-bls-test-seed-0002", []string{"peer2"}, 1)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePost{
-		Creator:   updater.Address,
-		Namespace: namespace,
-		PostId:    postId,
-		Payload:   nextPayload,
-	}, ThresholdSignatureSchemeBLS12381, tamperedSignature)
+	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		Creator:         updater.Address,
+		Namespace:       namespace,
+		PostId:          postId,
+		Payload:         nextPayload,
+		SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		Signature:       tamperedSignature,
+	})
 	require.ErrorIs(t, err, types.ErrInvalidThresholdSignature)
 
 	stored := k.getPost(ctx, namespaceId, postId)
 	require.NotNil(t, stored)
 	require.Equal(t, originalPayload, stored.Payload)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePost{
-		Creator:   updater.Address,
-		Namespace: namespace,
-		PostId:    postId,
-		Payload:   attackerPayload,
-	}, ThresholdSignatureSchemeBLS12381, attackerSignature)
+	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		Creator:         updater.Address,
+		Namespace:       namespace,
+		PostId:          postId,
+		Payload:         attackerPayload,
+		SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		Signature:       attackerSignature,
+	})
 	require.ErrorIs(t, err, types.ErrInvalidThresholdSignature)
 
 	stored = k.getPost(ctx, namespaceId, postId)
 	require.NotNil(t, stored)
 	require.Equal(t, originalPayload, stored.Payload)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePost{
-		Creator:   updater.Address,
-		Namespace: namespace,
-		PostId:    postId,
-		Payload:   nextPayload,
-	}, ThresholdSignatureSchemeBLS12381, signature)
+	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		Creator:         updater.Address,
+		Namespace:       namespace,
+		PostId:          postId,
+		Payload:         nextPayload,
+		SignatureScheme: ThresholdSignatureSchemeBLS12381,
+		Signature:       signature,
+	})
 	require.NoError(t, err)
 
 	stored = k.getPost(ctx, namespaceId, postId)

@@ -82,6 +82,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}},
 				},
 				{
+					RpcMethod:      "UpdatePostByThresholdSignature",
+					Use:            "update-post-by-threshold-signature [namespace] [post_id] [payload] [signature]",
+					Short:          "Update payload of an existing post using a threshold signature",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}, {ProtoField: "signature"}},
+				},
+				{
 					RpcMethod:      "RegisterNamespace",
 					Use:            "register-namespace [namespace]",
 					Short:          "Register a new namespace",
