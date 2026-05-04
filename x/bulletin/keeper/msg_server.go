@@ -169,6 +169,54 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 	return &types.MsgUpdatePostResponse{}, nil
 }
 
+// UpdatePostByThresholdSignature overwrites a post after validating the current
+// and new payloads as Orbis ring payloads and verifying the threshold signature
+// against the current payload's ring_pk. This path does not perform the ACP
+// collaborator permission check used by UpdatePost.
+func (k *Keeper) UpdatePostByThresholdSignature(
+	goCtx context.Context,
+	msg *types.MsgUpdatePost,
+	signatureScheme string,
+	signature []byte,
+) (*types.MsgUpdatePostResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	namespaceId := getNamespaceId(msg.Namespace)
+	if !k.hasNamespace(goCtx, namespaceId) {
+		return nil, types.ErrNamespaceNotFound
+	}
+
+	existing := k.getPost(goCtx, namespaceId, msg.PostId)
+	if existing == nil {
+		return nil, types.ErrPostNotFound
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, msg.Payload, signatureScheme, signature); err != nil {
+		return nil, err
+	}
+
+	existing.Payload = msg.Payload
+	k.SetPost(goCtx, *existing)
+
+	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventPostUpdated{
+		NamespaceId: namespaceId,
+		PostId:      existing.Id,
+		UpdaterDid:  updaterDID,
+		Payload:     b64Payload,
+		Artifact:    msg.Artifact,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdatePostResponse{}, nil
+}
+
 // AddCollaborator adds a new collaborator to the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
 func (k *Keeper) AddCollaborator(goCtx context.Context, msg *types.MsgAddCollaborator) (*types.MsgAddCollaboratorResponse, error) {
