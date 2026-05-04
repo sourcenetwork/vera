@@ -12,7 +12,6 @@ func NewMsgUpdatePostByThresholdSignature(
 	creator string,
 	namespace string,
 	postId string,
-	payload []byte,
 	signatureScheme string,
 	signature []byte,
 ) *MsgUpdatePostByThresholdSignature {
@@ -20,7 +19,6 @@ func NewMsgUpdatePostByThresholdSignature(
 		Creator:         creator,
 		Namespace:       namespace,
 		PostId:          postId,
-		Payload:         payload,
 		SignatureScheme: signatureScheme,
 		Signature:       signature,
 	}
@@ -35,9 +33,6 @@ func (msg *MsgUpdatePostByThresholdSignature) ValidateBasic() error {
 	}
 	if msg.PostId == "" {
 		return ErrPostNotFound
-	}
-	if len(msg.Payload) == 0 {
-		return ErrInvalidPostPayload
 	}
 	if len(msg.Signature) == 0 {
 		return ErrInvalidThresholdSignature

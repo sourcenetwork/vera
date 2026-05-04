@@ -169,10 +169,12 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 	return &types.MsgUpdatePostResponse{}, nil
 }
 
-// UpdatePostByThresholdSignature overwrites a post after validating the current
-// and new payloads as Orbis ring payloads and verifying the threshold signature
-// against the current payload's ring_pk. This path does not perform the ACP
-// collaborator permission check used by UpdatePost.
+// UpdatePostByThresholdSignature finalizes a reshare using only the current
+// bulletin payload as state. It moves next_peer_ids/new_threshold into
+// peer_ids/threshold, clears the next_* fields, and verifies a threshold
+// signature over that finalized payload against the current payload's ring_pk.
+// This path does not perform the ACP collaborator permission check used by
+// UpdatePost.
 func (k *Keeper) UpdatePostByThresholdSignature(
 	goCtx context.Context,
 	msg *types.MsgUpdatePostByThresholdSignature,
@@ -194,11 +196,16 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, msg.Payload, msg.SignatureScheme, msg.Signature); err != nil {
+	finalizedPayload, err := finalizeRingPayloadReshare(existing.Payload)
+	if err != nil {
 		return nil, err
 	}
 
-	existing.Payload = msg.Payload
+	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, finalizedPayload, msg.SignatureScheme, msg.Signature); err != nil {
+		return nil, err
+	}
+
+	existing.Payload = finalizedPayload
 	k.SetPost(goCtx, *existing)
 
 	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)

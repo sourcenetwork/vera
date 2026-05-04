@@ -22,7 +22,7 @@ const (
 
 func verifyThresholdSignatureForRingPayloadUpdate(
 	currentPayload []byte,
-	nextPayload []byte,
+	message []byte,
 	scheme string,
 	signature []byte,
 ) error {
@@ -30,11 +30,8 @@ func verifyThresholdSignatureForRingPayloadUpdate(
 	if err != nil {
 		return err
 	}
-	if _, err := parseRingPayloadJSON(nextPayload); err != nil {
-		return err
-	}
 
-	return verifyThresholdSignature(scheme, *currentRingPayload.RingPK, nextPayload, signature)
+	return verifyThresholdSignature(scheme, *currentRingPayload.RingPK, message, signature)
 }
 
 func verifyThresholdSignature(scheme string, ringPK string, message []byte, signature []byte) error {

@@ -78,3 +78,23 @@ func TestValidateRingPayloadJSON(t *testing.T) {
 		})
 	}
 }
+
+func TestFinalizeRingPayloadReshare(t *testing.T) {
+	currentPayload := []byte(`{"ring_pk":"pk","next_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1}`)
+
+	finalizedPayload, err := finalizeRingPayloadReshare(currentPayload)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2}`, string(finalizedPayload))
+
+	_, err = finalizeRingPayloadReshare(
+		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
+	)
+	require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+	require.Contains(t, err.Error(), "missing next_peer_ids")
+
+	_, err = finalizeRingPayloadReshare(
+		[]byte(`{"ring_pk":"pk","next_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
+	)
+	require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+	require.Contains(t, err.Error(), "missing new_threshold")
+}
