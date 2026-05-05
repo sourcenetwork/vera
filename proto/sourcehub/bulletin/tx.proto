@@ -82,6 +82,16 @@ message MsgUpdatePostByThresholdSignature {
 
 message MsgUpdatePostByThresholdSignatureResponse {}
 
+message RingReshareFinalizeSignDoc {
+  string domain = 1;
+  string chain_id = 2;
+  string namespace = 3;
+  string post_id = 4;
+  string ring_pk = 5;
+  bytes current_payload_sha256 = 6;
+  bytes finalized_payload_sha256 = 7;
+}
+
 message MsgRegisterNamespace {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;

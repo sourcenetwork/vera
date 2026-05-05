@@ -34,6 +34,9 @@ func (msg *MsgUpdatePostByThresholdSignature) ValidateBasic() error {
 	if msg.PostId == "" {
 		return ErrPostNotFound
 	}
+	if msg.SignatureScheme == "" {
+		return ErrInvalidThresholdSignature
+	}
 	if len(msg.Signature) == 0 {
 		return ErrInvalidThresholdSignature
 	}

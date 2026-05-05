@@ -13,11 +13,11 @@ import (
 )
 
 const (
-	ThresholdSignatureSchemeBLS12381 = "bls12_381"
+	ThresholdSignatureSchemeBLS12381G1PKG2SigNUL = "bls12_381_g1_pk_g2_sig_nul"
 
 	bls12381PublicKeySize  = 48
 	bls12381SignatureSize  = 96
-	bls12381G2SignatureDST = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_"
+	bls12381G2SignatureDST = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_NUL_"
 )
 
 func verifyThresholdSignatureForRingPayloadUpdate(
@@ -36,7 +36,7 @@ func verifyThresholdSignatureForRingPayloadUpdate(
 
 func verifyThresholdSignature(scheme string, ringPK string, message []byte, signature []byte) error {
 	switch normalizeThresholdSignatureScheme(scheme) {
-	case ThresholdSignatureSchemeBLS12381:
+	case ThresholdSignatureSchemeBLS12381G1PKG2SigNUL:
 		return verifyBLS12381ThresholdSignature(ringPK, message, signature)
 	default:
 		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "unsupported threshold signature scheme %q", scheme)
@@ -44,12 +44,7 @@ func verifyThresholdSignature(scheme string, ringPK string, message []byte, sign
 }
 
 func normalizeThresholdSignatureScheme(scheme string) string {
-	switch strings.ToLower(strings.TrimSpace(scheme)) {
-	case "", "bls12_381", "bls12381", "bls12-381":
-		return ThresholdSignatureSchemeBLS12381
-	default:
-		return strings.ToLower(strings.TrimSpace(scheme))
-	}
+	return strings.ToLower(strings.TrimSpace(scheme))
 }
 
 func verifyBLS12381ThresholdSignature(ringPK string, message []byte, signature []byte) error {

@@ -86,6 +86,11 @@ func TestFinalizeRingPayloadReshare(t *testing.T) {
 	require.NoError(t, err)
 	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2}`, string(finalizedPayload))
 
+	currentPayloadWithPSSInterval := []byte(`{"ring_pk":"pk","next_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1,"pss_interval":60}`)
+	finalizedPayload, err = finalizeRingPayloadReshare(currentPayloadWithPSSInterval)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2,"pss_interval":60}`, string(finalizedPayload))
+
 	_, err = finalizeRingPayloadReshare(
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
 	)

@@ -3974,6 +3974,814 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) ProtoMethods(
 }
 
 var (
+	md_RingReshareFinalizeSignDoc                          protoreflect.MessageDescriptor
+	fd_RingReshareFinalizeSignDoc_domain                   protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_chain_id                 protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_namespace                protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_post_id                  protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_ring_pk                  protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_current_payload_sha256   protoreflect.FieldDescriptor
+	fd_RingReshareFinalizeSignDoc_finalized_payload_sha256 protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_bulletin_tx_proto_init()
+	md_RingReshareFinalizeSignDoc = File_sourcehub_bulletin_tx_proto.Messages().ByName("RingReshareFinalizeSignDoc")
+	fd_RingReshareFinalizeSignDoc_domain = md_RingReshareFinalizeSignDoc.Fields().ByName("domain")
+	fd_RingReshareFinalizeSignDoc_chain_id = md_RingReshareFinalizeSignDoc.Fields().ByName("chain_id")
+	fd_RingReshareFinalizeSignDoc_namespace = md_RingReshareFinalizeSignDoc.Fields().ByName("namespace")
+	fd_RingReshareFinalizeSignDoc_post_id = md_RingReshareFinalizeSignDoc.Fields().ByName("post_id")
+	fd_RingReshareFinalizeSignDoc_ring_pk = md_RingReshareFinalizeSignDoc.Fields().ByName("ring_pk")
+	fd_RingReshareFinalizeSignDoc_current_payload_sha256 = md_RingReshareFinalizeSignDoc.Fields().ByName("current_payload_sha256")
+	fd_RingReshareFinalizeSignDoc_finalized_payload_sha256 = md_RingReshareFinalizeSignDoc.Fields().ByName("finalized_payload_sha256")
+}
+
+var _ protoreflect.Message = (*fastReflection_RingReshareFinalizeSignDoc)(nil)
+
+type fastReflection_RingReshareFinalizeSignDoc RingReshareFinalizeSignDoc
+
+func (x *RingReshareFinalizeSignDoc) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_RingReshareFinalizeSignDoc)(x)
+}
+
+func (x *RingReshareFinalizeSignDoc) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_RingReshareFinalizeSignDoc_messageType fastReflection_RingReshareFinalizeSignDoc_messageType
+var _ protoreflect.MessageType = fastReflection_RingReshareFinalizeSignDoc_messageType{}
+
+type fastReflection_RingReshareFinalizeSignDoc_messageType struct{}
+
+func (x fastReflection_RingReshareFinalizeSignDoc_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_RingReshareFinalizeSignDoc)(nil)
+}
+func (x fastReflection_RingReshareFinalizeSignDoc_messageType) New() protoreflect.Message {
+	return new(fastReflection_RingReshareFinalizeSignDoc)
+}
+func (x fastReflection_RingReshareFinalizeSignDoc_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_RingReshareFinalizeSignDoc
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Descriptor() protoreflect.MessageDescriptor {
+	return md_RingReshareFinalizeSignDoc
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Type() protoreflect.MessageType {
+	return _fastReflection_RingReshareFinalizeSignDoc_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_RingReshareFinalizeSignDoc) New() protoreflect.Message {
+	return new(fastReflection_RingReshareFinalizeSignDoc)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Interface() protoreflect.ProtoMessage {
+	return (*RingReshareFinalizeSignDoc)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Domain != "" {
+		value := protoreflect.ValueOfString(x.Domain)
+		if !f(fd_RingReshareFinalizeSignDoc_domain, value) {
+			return
+		}
+	}
+	if x.ChainId != "" {
+		value := protoreflect.ValueOfString(x.ChainId)
+		if !f(fd_RingReshareFinalizeSignDoc_chain_id, value) {
+			return
+		}
+	}
+	if x.Namespace != "" {
+		value := protoreflect.ValueOfString(x.Namespace)
+		if !f(fd_RingReshareFinalizeSignDoc_namespace, value) {
+			return
+		}
+	}
+	if x.PostId != "" {
+		value := protoreflect.ValueOfString(x.PostId)
+		if !f(fd_RingReshareFinalizeSignDoc_post_id, value) {
+			return
+		}
+	}
+	if x.RingPk != "" {
+		value := protoreflect.ValueOfString(x.RingPk)
+		if !f(fd_RingReshareFinalizeSignDoc_ring_pk, value) {
+			return
+		}
+	}
+	if len(x.CurrentPayloadSha256) != 0 {
+		value := protoreflect.ValueOfBytes(x.CurrentPayloadSha256)
+		if !f(fd_RingReshareFinalizeSignDoc_current_payload_sha256, value) {
+			return
+		}
+	}
+	if len(x.FinalizedPayloadSha256) != 0 {
+		value := protoreflect.ValueOfBytes(x.FinalizedPayloadSha256)
+		if !f(fd_RingReshareFinalizeSignDoc_finalized_payload_sha256, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		return x.Domain != ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		return x.ChainId != ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		return x.Namespace != ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		return x.PostId != ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		return x.RingPk != ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		return len(x.CurrentPayloadSha256) != 0
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		return len(x.FinalizedPayloadSha256) != 0
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		x.Domain = ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		x.ChainId = ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		x.Namespace = ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		x.PostId = ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		x.RingPk = ""
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		x.CurrentPayloadSha256 = nil
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		x.FinalizedPayloadSha256 = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		value := x.Domain
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		value := x.ChainId
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		value := x.Namespace
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		value := x.PostId
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		value := x.RingPk
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		value := x.CurrentPayloadSha256
+		return protoreflect.ValueOfBytes(value)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		value := x.FinalizedPayloadSha256
+		return protoreflect.ValueOfBytes(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		x.Domain = value.Interface().(string)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		x.ChainId = value.Interface().(string)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		x.Namespace = value.Interface().(string)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		x.PostId = value.Interface().(string)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		x.RingPk = value.Interface().(string)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		x.CurrentPayloadSha256 = value.Bytes()
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		x.FinalizedPayloadSha256 = value.Bytes()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_RingReshareFinalizeSignDoc) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		panic(fmt.Errorf("field domain of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		panic(fmt.Errorf("field chain_id of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		panic(fmt.Errorf("field post_id of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		panic(fmt.Errorf("field ring_pk of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		panic(fmt.Errorf("field current_payload_sha256 of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		panic(fmt.Errorf("field finalized_payload_sha256 of message sourcehub.bulletin.RingReshareFinalizeSignDoc is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_RingReshareFinalizeSignDoc) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.domain":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.chain_id":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.namespace":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.post_id":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.ring_pk":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.current_payload_sha256":
+		return protoreflect.ValueOfBytes(nil)
+	case "sourcehub.bulletin.RingReshareFinalizeSignDoc.finalized_payload_sha256":
+		return protoreflect.ValueOfBytes(nil)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.RingReshareFinalizeSignDoc"))
+		}
+		panic(fmt.Errorf("message sourcehub.bulletin.RingReshareFinalizeSignDoc does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_RingReshareFinalizeSignDoc) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.RingReshareFinalizeSignDoc", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_RingReshareFinalizeSignDoc) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_RingReshareFinalizeSignDoc) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_RingReshareFinalizeSignDoc) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_RingReshareFinalizeSignDoc) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*RingReshareFinalizeSignDoc)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Domain)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ChainId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Namespace)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.PostId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.RingPk)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.CurrentPayloadSha256)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.FinalizedPayloadSha256)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*RingReshareFinalizeSignDoc)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.FinalizedPayloadSha256) > 0 {
+			i -= len(x.FinalizedPayloadSha256)
+			copy(dAtA[i:], x.FinalizedPayloadSha256)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.FinalizedPayloadSha256)))
+			i--
+			dAtA[i] = 0x3a
+		}
+		if len(x.CurrentPayloadSha256) > 0 {
+			i -= len(x.CurrentPayloadSha256)
+			copy(dAtA[i:], x.CurrentPayloadSha256)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.CurrentPayloadSha256)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if len(x.RingPk) > 0 {
+			i -= len(x.RingPk)
+			copy(dAtA[i:], x.RingPk)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RingPk)))
+			i--
+			dAtA[i] = 0x2a
+		}
+		if len(x.PostId) > 0 {
+			i -= len(x.PostId)
+			copy(dAtA[i:], x.PostId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PostId)))
+			i--
+			dAtA[i] = 0x22
+		}
+		if len(x.Namespace) > 0 {
+			i -= len(x.Namespace)
+			copy(dAtA[i:], x.Namespace)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Namespace)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.ChainId) > 0 {
+			i -= len(x.ChainId)
+			copy(dAtA[i:], x.ChainId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ChainId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Domain) > 0 {
+			i -= len(x.Domain)
+			copy(dAtA[i:], x.Domain)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Domain)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*RingReshareFinalizeSignDoc)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: RingReshareFinalizeSignDoc: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: RingReshareFinalizeSignDoc: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Domain", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Domain = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ChainId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ChainId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Namespace = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PostId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.PostId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.RingPk = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field CurrentPayloadSha256", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.CurrentPayloadSha256 = append(x.CurrentPayloadSha256[:0], dAtA[iNdEx:postIndex]...)
+				if x.CurrentPayloadSha256 == nil {
+					x.CurrentPayloadSha256 = []byte{}
+				}
+				iNdEx = postIndex
+			case 7:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field FinalizedPayloadSha256", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.FinalizedPayloadSha256 = append(x.FinalizedPayloadSha256[:0], dAtA[iNdEx:postIndex]...)
+				if x.FinalizedPayloadSha256 == nil {
+					x.FinalizedPayloadSha256 = []byte{}
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
 	md_MsgRegisterNamespace           protoreflect.MessageDescriptor
 	fd_MsgRegisterNamespace_creator   protoreflect.FieldDescriptor
 	fd_MsgRegisterNamespace_namespace protoreflect.FieldDescriptor
@@ -3995,7 +4803,7 @@ func (x *MsgRegisterNamespace) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRegisterNamespace) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[8]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4477,7 +5285,7 @@ func (x *MsgRegisterNamespaceResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRegisterNamespaceResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[9]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4916,7 +5724,7 @@ func (x *MsgAddCollaborator) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgAddCollaborator) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[10]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5460,7 +6268,7 @@ func (x *MsgAddCollaboratorResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgAddCollaboratorResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[11]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5884,7 +6692,7 @@ func (x *MsgRemoveCollaborator) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRemoveCollaborator) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[12]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[13]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -6428,7 +7236,7 @@ func (x *MsgRemoveCollaboratorResponse) ProtoReflect() protoreflect.Message {
 }
 
 func (x *MsgRemoveCollaboratorResponse) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[13]
+	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[14]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7194,6 +8002,89 @@ func (*MsgUpdatePostByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{7}
 }
 
+type RingReshareFinalizeSignDoc struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Domain                 string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
+	ChainId                string `protobuf:"bytes,2,opt,name=chain_id,json=chainId,proto3" json:"chain_id,omitempty"`
+	Namespace              string `protobuf:"bytes,3,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	PostId                 string `protobuf:"bytes,4,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
+	RingPk                 string `protobuf:"bytes,5,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	CurrentPayloadSha256   []byte `protobuf:"bytes,6,opt,name=current_payload_sha256,json=currentPayloadSha256,proto3" json:"current_payload_sha256,omitempty"`
+	FinalizedPayloadSha256 []byte `protobuf:"bytes,7,opt,name=finalized_payload_sha256,json=finalizedPayloadSha256,proto3" json:"finalized_payload_sha256,omitempty"`
+}
+
+func (x *RingReshareFinalizeSignDoc) Reset() {
+	*x = RingReshareFinalizeSignDoc{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *RingReshareFinalizeSignDoc) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RingReshareFinalizeSignDoc) ProtoMessage() {}
+
+// Deprecated: Use RingReshareFinalizeSignDoc.ProtoReflect.Descriptor instead.
+func (*RingReshareFinalizeSignDoc) Descriptor() ([]byte, []int) {
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *RingReshareFinalizeSignDoc) GetDomain() string {
+	if x != nil {
+		return x.Domain
+	}
+	return ""
+}
+
+func (x *RingReshareFinalizeSignDoc) GetChainId() string {
+	if x != nil {
+		return x.ChainId
+	}
+	return ""
+}
+
+func (x *RingReshareFinalizeSignDoc) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *RingReshareFinalizeSignDoc) GetPostId() string {
+	if x != nil {
+		return x.PostId
+	}
+	return ""
+}
+
+func (x *RingReshareFinalizeSignDoc) GetRingPk() string {
+	if x != nil {
+		return x.RingPk
+	}
+	return ""
+}
+
+func (x *RingReshareFinalizeSignDoc) GetCurrentPayloadSha256() []byte {
+	if x != nil {
+		return x.CurrentPayloadSha256
+	}
+	return nil
+}
+
+func (x *RingReshareFinalizeSignDoc) GetFinalizedPayloadSha256() []byte {
+	if x != nil {
+		return x.FinalizedPayloadSha256
+	}
+	return nil
+}
+
 type MsgRegisterNamespace struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -7206,7 +8097,7 @@ type MsgRegisterNamespace struct {
 func (x *MsgRegisterNamespace) Reset() {
 	*x = MsgRegisterNamespace{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[8]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7220,7 +8111,7 @@ func (*MsgRegisterNamespace) ProtoMessage() {}
 
 // Deprecated: Use MsgRegisterNamespace.ProtoReflect.Descriptor instead.
 func (*MsgRegisterNamespace) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{8}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *MsgRegisterNamespace) GetCreator() string {
@@ -7248,7 +8139,7 @@ type MsgRegisterNamespaceResponse struct {
 func (x *MsgRegisterNamespaceResponse) Reset() {
 	*x = MsgRegisterNamespaceResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[9]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7262,7 +8153,7 @@ func (*MsgRegisterNamespaceResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgRegisterNamespaceResponse.ProtoReflect.Descriptor instead.
 func (*MsgRegisterNamespaceResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{9}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *MsgRegisterNamespaceResponse) GetNamespace() *Namespace {
@@ -7285,7 +8176,7 @@ type MsgAddCollaborator struct {
 func (x *MsgAddCollaborator) Reset() {
 	*x = MsgAddCollaborator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[10]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7299,7 +8190,7 @@ func (*MsgAddCollaborator) ProtoMessage() {}
 
 // Deprecated: Use MsgAddCollaborator.ProtoReflect.Descriptor instead.
 func (*MsgAddCollaborator) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{10}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MsgAddCollaborator) GetCreator() string {
@@ -7334,7 +8225,7 @@ type MsgAddCollaboratorResponse struct {
 func (x *MsgAddCollaboratorResponse) Reset() {
 	*x = MsgAddCollaboratorResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[11]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7348,7 +8239,7 @@ func (*MsgAddCollaboratorResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgAddCollaboratorResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddCollaboratorResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{11}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MsgAddCollaboratorResponse) GetCollaboratorDid() string {
@@ -7371,7 +8262,7 @@ type MsgRemoveCollaborator struct {
 func (x *MsgRemoveCollaborator) Reset() {
 	*x = MsgRemoveCollaborator{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[12]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[13]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7385,7 +8276,7 @@ func (*MsgRemoveCollaborator) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveCollaborator.ProtoReflect.Descriptor instead.
 func (*MsgRemoveCollaborator) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{12}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *MsgRemoveCollaborator) GetCreator() string {
@@ -7420,7 +8311,7 @@ type MsgRemoveCollaboratorResponse struct {
 func (x *MsgRemoveCollaboratorResponse) Reset() {
 	*x = MsgRemoveCollaboratorResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[13]
+		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[14]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -7434,7 +8325,7 @@ func (*MsgRemoveCollaboratorResponse) ProtoMessage() {}
 
 // Deprecated: Use MsgRemoveCollaboratorResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveCollaboratorResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{13}
+	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *MsgRemoveCollaboratorResponse) GetCollaboratorDid() string {
@@ -7514,105 +8405,122 @@ var file_sourcehub_bulletin_tx_proto_rawDesc = []byte{
 	0x74, 0x6f, 0x72, 0x4a, 0x04, 0x08, 0x04, 0x10, 0x05, 0x22, 0x2b, 0x0a, 0x29, 0x4d, 0x73, 0x67,
 	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65,
 	0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x5c, 0x0a, 0x14, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x18,
-	0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65,
-	0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65,
-	0x61, 0x74, 0x6f, 0x72, 0x22, 0x5b, 0x0a, 0x1c, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73,
-	0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63,
-	0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63,
-	0x65, 0x22, 0x7e, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74,
-	0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12,
-	0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
-	0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
-	0x72, 0x22, 0x47, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f,
-	0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x22, 0x81, 0x01, 0x0a, 0x15, 0x4d,
-	0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72,
-	0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c,
-	0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x22, 0x0a, 0x0c,
-	0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72,
-	0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x4a,
-	0x0a, 0x1d, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f,
-	0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x32, 0x8f, 0x06, 0x0a, 0x03, 0x4d,
-	0x73, 0x67, 0x12, 0x60, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61,
-	0x6d, 0x73, 0x12, 0x23, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x2b, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5a, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f,
-	0x73, 0x74, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74,
-	0x65, 0x50, 0x6f, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
-	0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72,
-	0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x5a, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x21,
-	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65,
-	0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73,
-	0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x50, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x96, 0x01, 0x0a,
-	0x1e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72,
-	0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x12,
-	0x35, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f,
-	0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67,
-	0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x1a, 0x3d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55,
-	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73,
-	0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6f, 0x0a, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65,
-	0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x28, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e,
-	0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73,
-	0x70, 0x61, 0x63, 0x65, 0x1a, 0x30, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x8f, 0x02, 0x0a, 0x1a, 0x52, 0x69, 0x6e, 0x67, 0x52,
+	0x65, 0x73, 0x68, 0x61, 0x72, 0x65, 0x46, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x53, 0x69,
+	0x67, 0x6e, 0x44, 0x6f, 0x63, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12, 0x19, 0x0a,
+	0x08, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x49, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d,
+	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x69,
+	0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x6f, 0x73, 0x74, 0x49, 0x64, 0x12,
+	0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x70, 0x6b, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x50, 0x6b, 0x12, 0x34, 0x0a, 0x16, 0x63, 0x75, 0x72, 0x72,
+	0x65, 0x6e, 0x74, 0x5f, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x32,
+	0x35, 0x36, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x14, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e,
+	0x74, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x32, 0x35, 0x36, 0x12, 0x38,
+	0x0a, 0x18, 0x66, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x5f, 0x70, 0x61, 0x79, 0x6c,
+	0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x32, 0x35, 0x36, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x16, 0x66, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x50, 0x61, 0x79, 0x6c, 0x6f,
+	0x61, 0x64, 0x53, 0x68, 0x61, 0x32, 0x35, 0x36, 0x22, 0x5c, 0x0a, 0x14, 0x4d, 0x73, 0x67, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61,
+	0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e,
+	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63,
+	0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x5b, 0x0a, 0x1c, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
 	0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x69, 0x0a, 0x0f, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c,
-	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d,
-	0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x1a, 0x2e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
+	0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4e,
+	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
+	0x61, 0x63, 0x65, 0x22, 0x7e, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c,
+	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65,
+	0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61,
+	0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63,
+	0x65, 0x12, 0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f,
+	0x72, 0x61, 0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61,
+	0x74, 0x6f, 0x72, 0x22, 0x47, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c,
 	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x72, 0x0a, 0x12, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c,
+	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x22, 0x81, 0x01, 0x0a,
+	0x15, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62,
+	0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f,
+	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x22,
+	0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x22, 0x4a, 0x0a, 0x1d, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c,
+	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
+	0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c,
+	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x32, 0x8f, 0x06, 0x0a,
+	0x03, 0x4d, 0x73, 0x67, 0x12, 0x60, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61,
+	0x72, 0x61, 0x6d, 0x73, 0x12, 0x23, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x2b, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d,
+	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5a, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x50, 0x6f, 0x73, 0x74, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65,
+	0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
 	0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67,
-	0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74,
-	0x6f, 0x72, 0x1a, 0x31, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76,
-	0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xaf, 0x01, 0x0a,
-	0x16, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f,
-	0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,
-	0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02, 0x12,
-	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74,
-	0x69, 0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42,
-	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42,
-	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x5a, 0x0a, 0x0a, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74,
+	0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c,
+	0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50,
+	0x6f, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61,
+	0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x96,
+	0x01, 0x0a, 0x1e, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54,
+	0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72,
+	0x65, 0x12, 0x35, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
+	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53,
+	0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x1a, 0x3d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73,
+	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72,
+	0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6f, 0x0a, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73,
+	0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x28, 0x2e, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
+	0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d,
+	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x1a, 0x30, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x69, 0x0a, 0x0f, 0x41, 0x64, 0x64, 0x43,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x26, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
+	0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x1a, 0x2e, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
+	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a, 0x12, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c,
+	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d,
+	0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x1a, 0x31, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d,
+	0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xaf,
+	0x01, 0x0a, 0x16, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f,
+	0x74, 0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e,
+	0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa,
+	0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c,
+	0x65, 0x74, 0x69, 0x6e, 0xca, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47,
+	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -7627,7 +8535,7 @@ func file_sourcehub_bulletin_tx_proto_rawDescGZIP() []byte {
 	return file_sourcehub_bulletin_tx_proto_rawDescData
 }
 
-var file_sourcehub_bulletin_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_sourcehub_bulletin_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_sourcehub_bulletin_tx_proto_goTypes = []interface{}{
 	(*MsgUpdateParams)(nil),                           // 0: sourcehub.bulletin.MsgUpdateParams
 	(*MsgUpdateParamsResponse)(nil),                   // 1: sourcehub.bulletin.MsgUpdateParamsResponse
@@ -7637,32 +8545,33 @@ var file_sourcehub_bulletin_tx_proto_goTypes = []interface{}{
 	(*MsgUpdatePostResponse)(nil),                     // 5: sourcehub.bulletin.MsgUpdatePostResponse
 	(*MsgUpdatePostByThresholdSignature)(nil),         // 6: sourcehub.bulletin.MsgUpdatePostByThresholdSignature
 	(*MsgUpdatePostByThresholdSignatureResponse)(nil), // 7: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse
-	(*MsgRegisterNamespace)(nil),                      // 8: sourcehub.bulletin.MsgRegisterNamespace
-	(*MsgRegisterNamespaceResponse)(nil),              // 9: sourcehub.bulletin.MsgRegisterNamespaceResponse
-	(*MsgAddCollaborator)(nil),                        // 10: sourcehub.bulletin.MsgAddCollaborator
-	(*MsgAddCollaboratorResponse)(nil),                // 11: sourcehub.bulletin.MsgAddCollaboratorResponse
-	(*MsgRemoveCollaborator)(nil),                     // 12: sourcehub.bulletin.MsgRemoveCollaborator
-	(*MsgRemoveCollaboratorResponse)(nil),             // 13: sourcehub.bulletin.MsgRemoveCollaboratorResponse
-	(*Params)(nil),                                    // 14: sourcehub.bulletin.Params
-	(*Namespace)(nil),                                 // 15: sourcehub.bulletin.Namespace
+	(*RingReshareFinalizeSignDoc)(nil),                // 8: sourcehub.bulletin.RingReshareFinalizeSignDoc
+	(*MsgRegisterNamespace)(nil),                      // 9: sourcehub.bulletin.MsgRegisterNamespace
+	(*MsgRegisterNamespaceResponse)(nil),              // 10: sourcehub.bulletin.MsgRegisterNamespaceResponse
+	(*MsgAddCollaborator)(nil),                        // 11: sourcehub.bulletin.MsgAddCollaborator
+	(*MsgAddCollaboratorResponse)(nil),                // 12: sourcehub.bulletin.MsgAddCollaboratorResponse
+	(*MsgRemoveCollaborator)(nil),                     // 13: sourcehub.bulletin.MsgRemoveCollaborator
+	(*MsgRemoveCollaboratorResponse)(nil),             // 14: sourcehub.bulletin.MsgRemoveCollaboratorResponse
+	(*Params)(nil),                                    // 15: sourcehub.bulletin.Params
+	(*Namespace)(nil),                                 // 16: sourcehub.bulletin.Namespace
 }
 var file_sourcehub_bulletin_tx_proto_depIdxs = []int32{
-	14, // 0: sourcehub.bulletin.MsgUpdateParams.params:type_name -> sourcehub.bulletin.Params
-	15, // 1: sourcehub.bulletin.MsgRegisterNamespaceResponse.namespace:type_name -> sourcehub.bulletin.Namespace
+	15, // 0: sourcehub.bulletin.MsgUpdateParams.params:type_name -> sourcehub.bulletin.Params
+	16, // 1: sourcehub.bulletin.MsgRegisterNamespaceResponse.namespace:type_name -> sourcehub.bulletin.Namespace
 	0,  // 2: sourcehub.bulletin.Msg.UpdateParams:input_type -> sourcehub.bulletin.MsgUpdateParams
 	2,  // 3: sourcehub.bulletin.Msg.CreatePost:input_type -> sourcehub.bulletin.MsgCreatePost
 	4,  // 4: sourcehub.bulletin.Msg.UpdatePost:input_type -> sourcehub.bulletin.MsgUpdatePost
 	6,  // 5: sourcehub.bulletin.Msg.UpdatePostByThresholdSignature:input_type -> sourcehub.bulletin.MsgUpdatePostByThresholdSignature
-	8,  // 6: sourcehub.bulletin.Msg.RegisterNamespace:input_type -> sourcehub.bulletin.MsgRegisterNamespace
-	10, // 7: sourcehub.bulletin.Msg.AddCollaborator:input_type -> sourcehub.bulletin.MsgAddCollaborator
-	12, // 8: sourcehub.bulletin.Msg.RemoveCollaborator:input_type -> sourcehub.bulletin.MsgRemoveCollaborator
+	9,  // 6: sourcehub.bulletin.Msg.RegisterNamespace:input_type -> sourcehub.bulletin.MsgRegisterNamespace
+	11, // 7: sourcehub.bulletin.Msg.AddCollaborator:input_type -> sourcehub.bulletin.MsgAddCollaborator
+	13, // 8: sourcehub.bulletin.Msg.RemoveCollaborator:input_type -> sourcehub.bulletin.MsgRemoveCollaborator
 	1,  // 9: sourcehub.bulletin.Msg.UpdateParams:output_type -> sourcehub.bulletin.MsgUpdateParamsResponse
 	3,  // 10: sourcehub.bulletin.Msg.CreatePost:output_type -> sourcehub.bulletin.MsgCreatePostResponse
 	5,  // 11: sourcehub.bulletin.Msg.UpdatePost:output_type -> sourcehub.bulletin.MsgUpdatePostResponse
 	7,  // 12: sourcehub.bulletin.Msg.UpdatePostByThresholdSignature:output_type -> sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse
-	9,  // 13: sourcehub.bulletin.Msg.RegisterNamespace:output_type -> sourcehub.bulletin.MsgRegisterNamespaceResponse
-	11, // 14: sourcehub.bulletin.Msg.AddCollaborator:output_type -> sourcehub.bulletin.MsgAddCollaboratorResponse
-	13, // 15: sourcehub.bulletin.Msg.RemoveCollaborator:output_type -> sourcehub.bulletin.MsgRemoveCollaboratorResponse
+	10, // 13: sourcehub.bulletin.Msg.RegisterNamespace:output_type -> sourcehub.bulletin.MsgRegisterNamespaceResponse
+	12, // 14: sourcehub.bulletin.Msg.AddCollaborator:output_type -> sourcehub.bulletin.MsgAddCollaboratorResponse
+	14, // 15: sourcehub.bulletin.Msg.RemoveCollaborator:output_type -> sourcehub.bulletin.MsgRemoveCollaboratorResponse
 	9,  // [9:16] is the sub-list for method output_type
 	2,  // [2:9] is the sub-list for method input_type
 	2,  // [2:2] is the sub-list for extension type_name
@@ -7775,7 +8684,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterNamespace); i {
+			switch v := v.(*RingReshareFinalizeSignDoc); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7787,7 +8696,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRegisterNamespaceResponse); i {
+			switch v := v.(*MsgRegisterNamespace); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7799,7 +8708,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgAddCollaborator); i {
+			switch v := v.(*MsgRegisterNamespaceResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7811,7 +8720,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgAddCollaboratorResponse); i {
+			switch v := v.(*MsgAddCollaborator); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7823,7 +8732,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgRemoveCollaborator); i {
+			switch v := v.(*MsgAddCollaboratorResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7835,6 +8744,18 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MsgRemoveCollaborator); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_sourcehub_bulletin_tx_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MsgRemoveCollaboratorResponse); i {
 			case 0:
 				return &v.state
@@ -7853,7 +8774,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_bulletin_tx_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
