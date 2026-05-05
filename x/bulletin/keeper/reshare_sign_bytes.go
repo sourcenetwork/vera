@@ -6,7 +6,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
 
-const RingReshareFinalizeSignDocDomain = "orbis-ring-reshare-finalize-v1"
+const RingReshareFinalizeSignDocDomain = "orbis-ring-reshare-finalize"
 
 func ringReshareFinalizeSignBytes(
 	chainID string,

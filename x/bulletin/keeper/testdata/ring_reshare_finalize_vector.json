@@ -1,5 +1,5 @@
 {
-  "domain": "orbis-ring-reshare-finalize-v1",
+  "domain": "orbis-ring-reshare-finalize",
   "chain_id": "sourcehub-test",
   "namespace": "orbis/rings/ring1",
   "post_id": "ring1-post",
