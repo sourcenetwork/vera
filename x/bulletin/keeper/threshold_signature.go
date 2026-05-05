@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -48,7 +47,7 @@ func normalizeThresholdSignatureScheme(scheme string) string {
 }
 
 func verifyBLS12381ThresholdSignature(ringPK string, message []byte, signature []byte) error {
-	publicKey, err := decodeEncodedBytes(ringPK)
+	publicKey, err := decodeHexBytes(ringPK)
 	if err != nil {
 		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid bls12_381 public key encoding: %s", err)
 	}
@@ -73,31 +72,16 @@ func verifyBLS12381ThresholdSignature(ringPK string, message []byte, signature [
 	return nil
 }
 
-func decodeEncodedBytes(value string) ([]byte, error) {
+func decodeHexBytes(value string) ([]byte, error) {
 	value = strings.TrimSpace(value)
 	if value == "" {
 		return nil, fmt.Errorf("empty value")
 	}
 
-	if strings.HasPrefix(value, "0x") || strings.HasPrefix(value, "0X") {
-		return hex.DecodeString(value[2:])
+	decoded, err := hex.DecodeString(value)
+	if err != nil {
+		return nil, fmt.Errorf("expected plain hex: %w", err)
 	}
 
-	if decoded, err := hex.DecodeString(value); err == nil {
-		return decoded, nil
-	}
-	if decoded, err := base64.StdEncoding.DecodeString(value); err == nil {
-		return decoded, nil
-	}
-	if decoded, err := base64.RawStdEncoding.DecodeString(value); err == nil {
-		return decoded, nil
-	}
-	if decoded, err := base64.URLEncoding.DecodeString(value); err == nil {
-		return decoded, nil
-	}
-	if decoded, err := base64.RawURLEncoding.DecodeString(value); err == nil {
-		return decoded, nil
-	}
-
-	return nil, fmt.Errorf("expected hex or base64")
+	return decoded, nil
 }
