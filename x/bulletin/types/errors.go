@@ -21,4 +21,5 @@ var (
 	ErrCollaboratorNotFound      = sdkerrors.Register(ModuleName, 1112, "collaborator not found")
 	ErrCouldNotEnsurePolicy      = sdkerrors.Register(ModuleName, 1113, "could not ensure policy")
 	ErrInvalidThresholdSignature = sdkerrors.Register(ModuleName, 1114, "invalid threshold signature")
+	ErrInvalidPostId             = sdkerrors.Register(ModuleName, 1115, "invalid post id")
 )

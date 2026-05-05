@@ -32,7 +32,7 @@ func (msg *MsgUpdatePostByThresholdSignature) ValidateBasic() error {
 		return ErrInvalidNamespaceId
 	}
 	if msg.PostId == "" {
-		return ErrPostNotFound
+		return ErrInvalidPostId
 	}
 	if msg.SignatureScheme == "" {
 		return ErrInvalidThresholdSignature

@@ -255,7 +255,7 @@ func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
 	}{
 		{&types.MsgUpdatePostByThresholdSignature{}, "invalid creator address"},
 		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address}, "invalid namespace id"},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, "post not found"},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, "invalid post id"},
 		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, "invalid threshold signature"},
 	}
 	for _, c := range cases {
