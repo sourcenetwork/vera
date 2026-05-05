@@ -74,7 +74,7 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 	ringPayload, err := parseRingPayloadJSON(currentPayload)
 	require.NoError(t, err)
 	require.Equal(t, vector.RingPublicKeyHex, *ringPayload.RingPK)
-	require.Equal(t, vector.BlockNumberNonce, ringPayload.BlockNumberNonce)
+	require.Equal(t, vector.BlockNumberNonce, *ringPayload.BlockNumberNonce)
 
 	signature, err := hex.DecodeString(vector.SignatureHex)
 	require.NoError(t, err)

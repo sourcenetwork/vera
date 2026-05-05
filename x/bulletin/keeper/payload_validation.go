@@ -15,7 +15,7 @@ type ringPayloadJSON struct {
 	PeerIDs          *[]string `json:"peer_ids"`
 	Threshold        *uint32   `json:"threshold"`
 	PSSInterval      *uint64   `json:"pss_interval,omitempty"`
-	BlockNumberNonce uint64    `json:"block_number_nonce"`
+	BlockNumberNonce *uint64   `json:"block_number_nonce"`
 }
 
 func validateRingPayloadJSON(payload []byte) error {
@@ -36,6 +36,8 @@ func parseRingPayloadJSON(payload []byte) (*ringPayloadJSON, error) {
 		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing peer_ids")
 	case ringPayload.Threshold == nil:
 		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing threshold")
+	case ringPayload.BlockNumberNonce == nil:
+		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing block_number_nonce")
 	}
 
 	return &ringPayload, nil
@@ -47,15 +49,16 @@ func ringPayloadForReshareFinalization(currentPayload []byte) (*ringPayloadJSON,
 		return nil, err
 	}
 
-	if currentRingPayload.NewPeerIDs == nil {
-		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing new_peer_ids for reshare finalization")
-	}
-	if currentRingPayload.NewThreshold == nil {
-		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing new_threshold for reshare finalization")
+	if currentRingPayload.NewPeerIDs == nil && currentRingPayload.NewThreshold == nil {
+		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing new_peer_ids or new_threshold for reshare finalization")
 	}
 
-	currentRingPayload.PeerIDs = currentRingPayload.NewPeerIDs
-	currentRingPayload.Threshold = currentRingPayload.NewThreshold
+	if currentRingPayload.NewPeerIDs != nil {
+		currentRingPayload.PeerIDs = currentRingPayload.NewPeerIDs
+	}
+	if currentRingPayload.NewThreshold != nil {
+		currentRingPayload.Threshold = currentRingPayload.NewThreshold
+	}
 	currentRingPayload.NewPeerIDs = nil
 	currentRingPayload.NewThreshold = nil
 
@@ -82,7 +85,7 @@ func finalizeRingPayloadReshare(currentPayload []byte, blockNumberNonce uint64) 
 		return nil, err
 	}
 
-	currentRingPayload.BlockNumberNonce = blockNumberNonce
+	currentRingPayload.BlockNumberNonce = &blockNumberNonce
 
 	finalizedPayload, err := json.Marshal(currentRingPayload)
 	if err != nil {

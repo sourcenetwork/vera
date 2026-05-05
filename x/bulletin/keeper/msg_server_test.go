@@ -305,7 +305,6 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"]}`),
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":-1}`),
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
-		[]byte(`{"ring_pk":"pk","new_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
 	}
 
 	for i, payload := range invalidCurrentPayloads {
