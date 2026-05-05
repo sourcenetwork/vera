@@ -78,6 +78,6 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 
 	signature, err := hex.DecodeString(vector.SignatureHex)
 	require.NoError(t, err)
-	require.NoError(t, verifyThresholdSignature(vector.SignatureScheme, vector.RingPublicKeyHex, signBytes, signature))
 	require.Equal(t, vector.SignatureHex, hex.EncodeToString(signPayloadWithSeed(t, vector.SignerKeygenSeed, signBytes)))
+	require.NoError(t, verifyThresholdSignature(vector.SignatureScheme, vector.RingPublicKeyHex, signBytes, signature))
 }
