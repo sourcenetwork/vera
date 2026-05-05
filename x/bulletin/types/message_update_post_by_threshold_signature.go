@@ -12,6 +12,7 @@ func NewMsgUpdatePostByThresholdSignature(
 	creator string,
 	namespace string,
 	postId string,
+	artifact string,
 	signatureScheme string,
 	signature []byte,
 ) *MsgUpdatePostByThresholdSignature {
@@ -19,6 +20,7 @@ func NewMsgUpdatePostByThresholdSignature(
 		Creator:         creator,
 		Namespace:       namespace,
 		PostId:          postId,
+		Artifact:        artifact,
 		SignatureScheme: signatureScheme,
 		Signature:       signature,
 	}
