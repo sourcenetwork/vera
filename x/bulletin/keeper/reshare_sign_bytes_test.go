@@ -26,6 +26,7 @@ type ringReshareFinalizeVector struct {
 	FinalizedPayloadSHA256Hex string `json:"finalized_payload_sha256_hex"`
 	CanonicalSignBytesHex     string `json:"canonical_sign_bytes_hex"`
 	RingPublicKeyHex          string `json:"ring_public_key_hex"`
+	BlockNumberNonce          uint64 `json:"block_number_nonce"`
 	SignatureHex              string `json:"signature_hex"`
 }
 
@@ -40,7 +41,7 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 	require.Equal(t, bls12381G2SignatureDST, vector.BLSDST)
 
 	currentPayload := []byte(vector.CurrentPayload)
-	finalizedPayload, err := finalizeRingPayloadReshare(currentPayload)
+	finalizedPayload, err := deriveFinalizedRingPayloadReshare(currentPayload)
 	require.NoError(t, err)
 	require.Equal(t, vector.FinalizedPayload, string(finalizedPayload))
 
@@ -68,10 +69,12 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 	require.Equal(t, vector.RingPublicKeyHex, signDoc.RingPk)
 	require.Equal(t, currentPayloadHash[:], signDoc.CurrentPayloadSha256)
 	require.Equal(t, finalizedPayloadHash[:], signDoc.FinalizedPayloadSha256)
+	require.Equal(t, vector.BlockNumberNonce, signDoc.BlockNumberNonce)
 
 	ringPayload, err := parseRingPayloadJSON(currentPayload)
 	require.NoError(t, err)
 	require.Equal(t, vector.RingPublicKeyHex, *ringPayload.RingPK)
+	require.Equal(t, vector.BlockNumberNonce, ringPayload.BlockNumberNonce)
 
 	signature, err := hex.DecodeString(vector.SignatureHex)
 	require.NoError(t, err)

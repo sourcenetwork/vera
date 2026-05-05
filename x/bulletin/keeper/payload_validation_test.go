@@ -20,11 +20,11 @@ func TestValidateRingPayloadJSON(t *testing.T) {
 		},
 		{
 			name:    "valid payload with optional fields",
-			payload: []byte(`{"ring_pk":"pk","next_peer_ids":["peer3","peer4"],"new_threshold":2,"peer_ids":["peer1","peer2"],"threshold":1,"pss_interval":60}`),
+			payload: []byte(`{"ring_pk":"pk","new_peer_ids":["peer3","peer4"],"new_threshold":2,"peer_ids":["peer1","peer2"],"threshold":1,"pss_interval":60,"block_number_nonce":9}`),
 		},
 		{
 			name:    "valid payload with optional null fields",
-			payload: []byte(`{"ring_pk":"pk","next_peer_ids":null,"new_threshold":null,"peer_ids":["peer1"],"threshold":1,"pss_interval":null}`),
+			payload: []byte(`{"ring_pk":"pk","new_peer_ids":null,"new_threshold":null,"peer_ids":["peer1"],"threshold":1,"pss_interval":null}`),
 		},
 		{
 			name:    "unknown fields are accepted",
@@ -80,25 +80,31 @@ func TestValidateRingPayloadJSON(t *testing.T) {
 }
 
 func TestFinalizeRingPayloadReshare(t *testing.T) {
-	currentPayload := []byte(`{"ring_pk":"pk","next_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1}`)
+	currentPayload := []byte(`{"ring_pk":"pk","new_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1,"block_number_nonce":7}`)
 
-	finalizedPayload, err := finalizeRingPayloadReshare(currentPayload)
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(currentPayload)
 	require.NoError(t, err)
-	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2}`, string(finalizedPayload))
+	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2,"block_number_nonce":7}`, string(signDocFinalizedPayload))
 
-	currentPayloadWithPSSInterval := []byte(`{"ring_pk":"pk","next_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1,"pss_interval":60}`)
-	finalizedPayload, err = finalizeRingPayloadReshare(currentPayloadWithPSSInterval)
+	finalizedPayload, err := finalizeRingPayloadReshare(currentPayload, 42)
 	require.NoError(t, err)
-	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2,"pss_interval":60}`, string(finalizedPayload))
+	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2,"block_number_nonce":42}`, string(finalizedPayload))
+
+	currentPayloadWithPSSInterval := []byte(`{"ring_pk":"pk","new_peer_ids":["peer2","peer3"],"new_threshold":2,"peer_ids":["peer1"],"threshold":1,"pss_interval":60}`)
+	finalizedPayload, err = finalizeRingPayloadReshare(currentPayloadWithPSSInterval, 43)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"ring_pk":"pk","peer_ids":["peer2","peer3"],"threshold":2,"pss_interval":60,"block_number_nonce":43}`, string(finalizedPayload))
 
 	_, err = finalizeRingPayloadReshare(
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
+		44,
 	)
 	require.ErrorIs(t, err, types.ErrInvalidPostPayload)
-	require.Contains(t, err.Error(), "missing next_peer_ids")
+	require.Contains(t, err.Error(), "missing new_peer_ids")
 
 	_, err = finalizeRingPayloadReshare(
-		[]byte(`{"ring_pk":"pk","next_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
+		[]byte(`{"ring_pk":"pk","new_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
+		45,
 	)
 	require.ErrorIs(t, err, types.ErrInvalidPostPayload)
 	require.Contains(t, err.Error(), "missing new_threshold")

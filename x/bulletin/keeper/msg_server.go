@@ -170,10 +170,11 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 }
 
 // UpdatePostByThresholdSignature finalizes a reshare using only the current
-// bulletin payload as state. It moves next_peer_ids/new_threshold into
-// peer_ids/threshold, clears the next_* fields, and verifies a threshold
+// bulletin payload as state. It moves new_peer_ids/new_threshold into
+// peer_ids/threshold, clears the new_* fields, and verifies a threshold
 // signature over the canonical transition sign doc against the current
-// payload's ring_pk.
+// payload's ring_pk. Once accepted, the stored payload's block_number_nonce is
+// set to the current block height.
 // This path does not perform the ACP collaborator permission check used by
 // UpdatePost.
 func (k *Keeper) UpdatePostByThresholdSignature(
@@ -197,17 +198,22 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	finalizedPayload, err := finalizeRingPayloadReshare(existing.Payload)
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(existing.Payload)
 	if err != nil {
 		return nil, err
 	}
 
-	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), msg.Namespace, msg.PostId, existing.Payload, finalizedPayload)
+	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), msg.Namespace, msg.PostId, existing.Payload, signDocFinalizedPayload)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, signBytes, msg.SignatureScheme, msg.Signature); err != nil {
+		return nil, err
+	}
+
+	finalizedPayload, err := finalizeRingPayloadReshare(existing.Payload, uint64(ctx.BlockHeight()))
+	if err != nil {
 		return nil, err
 	}
 

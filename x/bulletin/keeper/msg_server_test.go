@@ -267,7 +267,7 @@ func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
 
 func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	ctx = ctx.WithChainID("sourcehub-test")
+	ctx = ctx.WithChainID("sourcehub-test").WithBlockHeight(101)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
 	ownerKey := secp256k1.GenPrivKey().PubKey()
@@ -305,7 +305,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"]}`),
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":-1}`),
 		[]byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`),
-		[]byte(`{"ring_pk":"pk","next_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
+		[]byte(`{"ring_pk":"pk","new_peer_ids":["peer2"],"peer_ids":["peer1"],"threshold":1}`),
 	}
 
 	for i, payload := range invalidCurrentPayloads {
@@ -330,7 +330,9 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		require.Equal(t, payload, stored.Payload)
 	}
 
-	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload)
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(originalPayload)
+	require.NoError(t, err)
+	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload, uint64(ctx.BlockHeight()))
 	require.NoError(t, err)
 	signature := signReshareFinalizePayload(
 		t,
@@ -338,7 +340,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		namespace,
 		postId,
 		originalPayload,
-		finalizedPayload,
+		signDocFinalizedPayload,
 		"sourcehub-bulletin-bls-test-seed-0001",
 	)
 	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
@@ -357,7 +359,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 
 func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T) {
 	k, ctx := setupKeeper(t)
-	ctx = ctx.WithChainID("sourcehub-test")
+	ctx = ctx.WithChainID("sourcehub-test").WithBlockHeight(202)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
 	ownerKey := secp256k1.GenPrivKey().PubKey()
@@ -395,7 +397,9 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	})
 	require.Empty(t, k.GetPolicyId(ctx))
 
-	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload)
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(originalPayload)
+	require.NoError(t, err)
+	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload, uint64(ctx.BlockHeight()))
 	require.NoError(t, err)
 	signature := signReshareFinalizePayload(
 		t,
@@ -403,7 +407,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		namespace,
 		postId,
 		originalPayload,
-		finalizedPayload,
+		signDocFinalizedPayload,
 		"sourcehub-bulletin-bls-test-seed-0001",
 	)
 	tamperedSignature := append([]byte(nil), signature...)
@@ -414,7 +418,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		namespace,
 		postId,
 		originalPayload,
-		finalizedPayload,
+		signDocFinalizedPayload,
 		"sourcehub-bulletin-bls-test-seed-0002",
 	)
 
@@ -504,6 +508,34 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	require.NotNil(t, stored)
 	require.Equal(t, staleCurrentPayload, stored.Payload)
 
+	staleNoncePayload := ringPayloadWithSeedAndNonce(
+		t,
+		"sourcehub-bulletin-bls-test-seed-0001",
+		[]string{"peer1"},
+		1,
+		[]string{"peer2"},
+		uint32Ptr(2),
+		9,
+	)
+	k.SetPost(ctx, types.Post{
+		Id:         postId,
+		Namespace:  namespaceId,
+		CreatorDid: ownerDID,
+		Payload:    staleNoncePayload,
+	})
+	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		Creator:         updater.Address,
+		Namespace:       namespace,
+		PostId:          postId,
+		SignatureScheme: ThresholdSignatureSchemeBLS12381G1PKG2SigNUL,
+		Signature:       signature,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidThresholdSignature)
+
+	stored = k.getPost(ctx, namespaceId, postId)
+	require.NotNil(t, stored)
+	require.Equal(t, staleNoncePayload, stored.Payload)
+
 	k.SetPost(ctx, types.Post{
 		Id:         postId,
 		Namespace:  namespaceId,
@@ -550,12 +582,13 @@ func signedRingPayloadWithSeed(t *testing.T, seed string, peerIDs []string, thre
 }
 
 type testRingPayload struct {
-	RingPK       string   `json:"ring_pk"`
-	NextPeerIDs  []string `json:"next_peer_ids,omitempty"`
-	NewThreshold *uint32  `json:"new_threshold,omitempty"`
-	PeerIDs      []string `json:"peer_ids"`
-	Threshold    uint32   `json:"threshold"`
-	PSSInterval  *uint64  `json:"pss_interval,omitempty"`
+	RingPK           string   `json:"ring_pk"`
+	NewPeerIDs       []string `json:"new_peer_ids,omitempty"`
+	NewThreshold     *uint32  `json:"new_threshold,omitempty"`
+	PeerIDs          []string `json:"peer_ids"`
+	Threshold        uint32   `json:"threshold"`
+	PSSInterval      *uint64  `json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64   `json:"block_number_nonce"`
 }
 
 func ringPayloadWithSeed(
@@ -563,8 +596,22 @@ func ringPayloadWithSeed(
 	seed string,
 	peerIDs []string,
 	threshold uint32,
-	nextPeerIDs []string,
+	newPeerIDs []string,
 	newThreshold *uint32,
+) []byte {
+	t.Helper()
+
+	return ringPayloadWithSeedAndNonce(t, seed, peerIDs, threshold, newPeerIDs, newThreshold, 0)
+}
+
+func ringPayloadWithSeedAndNonce(
+	t *testing.T,
+	seed string,
+	peerIDs []string,
+	threshold uint32,
+	newPeerIDs []string,
+	newThreshold *uint32,
+	blockNumberNonce uint64,
 ) []byte {
 	t.Helper()
 	require.NotEmpty(t, peerIDs)
@@ -574,11 +621,12 @@ func ringPayloadWithSeed(
 	publicKey := new(blst.P1Affine).From(secretKey)
 
 	payload, err := json.Marshal(testRingPayload{
-		RingPK:       hex.EncodeToString(publicKey.Compress()),
-		NextPeerIDs:  nextPeerIDs,
-		NewThreshold: newThreshold,
-		PeerIDs:      peerIDs,
-		Threshold:    threshold,
+		RingPK:           hex.EncodeToString(publicKey.Compress()),
+		NewPeerIDs:       newPeerIDs,
+		NewThreshold:     newThreshold,
+		PeerIDs:          peerIDs,
+		Threshold:        threshold,
+		BlockNumberNonce: blockNumberNonce,
 	})
 	require.NoError(t, err)
 

@@ -31,6 +31,7 @@ func ringReshareFinalizeSignBytes(
 		RingPk:                 *currentRingPayload.RingPK,
 		CurrentPayloadSha256:   currentPayloadHash[:],
 		FinalizedPayloadSha256: finalizedPayloadHash[:],
+		BlockNumberNonce:       currentRingPayload.BlockNumberNonce,
 	}
 
 	return signDoc.Marshal()

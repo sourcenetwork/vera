@@ -9,12 +9,13 @@ import (
 )
 
 type ringPayloadJSON struct {
-	RingPK       *string   `json:"ring_pk"`
-	NextPeerIDs  *[]string `json:"next_peer_ids,omitempty"`
-	NewThreshold *uint32   `json:"new_threshold,omitempty"`
-	PeerIDs      *[]string `json:"peer_ids"`
-	Threshold    *uint32   `json:"threshold"`
-	PSSInterval  *uint64   `json:"pss_interval,omitempty"`
+	RingPK           *string   `json:"ring_pk"`
+	NewPeerIDs       *[]string `json:"new_peer_ids,omitempty"`
+	NewThreshold     *uint32   `json:"new_threshold,omitempty"`
+	PeerIDs          *[]string `json:"peer_ids"`
+	Threshold        *uint32   `json:"threshold"`
+	PSSInterval      *uint64   `json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64    `json:"block_number_nonce"`
 }
 
 func validateRingPayloadJSON(payload []byte) error {
@@ -40,23 +41,48 @@ func parseRingPayloadJSON(payload []byte) (*ringPayloadJSON, error) {
 	return &ringPayload, nil
 }
 
-func finalizeRingPayloadReshare(currentPayload []byte) ([]byte, error) {
+func ringPayloadForReshareFinalization(currentPayload []byte) (*ringPayloadJSON, error) {
 	currentRingPayload, err := parseRingPayloadJSON(currentPayload)
 	if err != nil {
 		return nil, err
 	}
 
-	if currentRingPayload.NextPeerIDs == nil {
-		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing next_peer_ids for reshare finalization")
+	if currentRingPayload.NewPeerIDs == nil {
+		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing new_peer_ids for reshare finalization")
 	}
 	if currentRingPayload.NewThreshold == nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidPostPayload, "invalid ring payload: missing new_threshold for reshare finalization")
 	}
 
-	currentRingPayload.PeerIDs = currentRingPayload.NextPeerIDs
+	currentRingPayload.PeerIDs = currentRingPayload.NewPeerIDs
 	currentRingPayload.Threshold = currentRingPayload.NewThreshold
-	currentRingPayload.NextPeerIDs = nil
+	currentRingPayload.NewPeerIDs = nil
 	currentRingPayload.NewThreshold = nil
+
+	return currentRingPayload, nil
+}
+
+func deriveFinalizedRingPayloadReshare(currentPayload []byte) ([]byte, error) {
+	currentRingPayload, err := ringPayloadForReshareFinalization(currentPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	finalizedPayload, err := json.Marshal(currentRingPayload)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrInvalidPostPayload, "could not finalize ring payload: %s", err)
+	}
+
+	return finalizedPayload, nil
+}
+
+func finalizeRingPayloadReshare(currentPayload []byte, blockNumberNonce uint64) ([]byte, error) {
+	currentRingPayload, err := ringPayloadForReshareFinalization(currentPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	currentRingPayload.BlockNumberNonce = blockNumberNonce
 
 	finalizedPayload, err := json.Marshal(currentRingPayload)
 	if err != nil {
