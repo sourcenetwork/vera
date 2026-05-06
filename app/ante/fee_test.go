@@ -3,8 +3,8 @@ package ante
 import (
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"cosmossdk.io/math"
 
@@ -15,13 +15,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	oldgomock "github.com/golang/mock/gomock"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	test "github.com/sourcenetwork/sourcehub/testutil"
 )
 
 // createCustomDecoratorWithMockDIDKeeper creates a custom decorator with DID-based mock keeper
 func createCustomDecoratorWithMockDIDKeeper(t *testing.T, s *AnteTestSuite) (*CustomDeductFeeDecorator, *test.MockDIDFeegrantKeeper) {
-	ctrl := gomock.NewController(t)
+	ctrl := oldgomock.NewController(t)
 	mockKeeper := test.NewMockDIDFeegrantKeeper(ctrl)
 	decorator := NewCustomDeductFeeDecorator(s.accountKeeper, s.bankKeeper, mockKeeper, nil, nil)
 	return &decorator, mockKeeper

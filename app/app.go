@@ -303,6 +303,8 @@ func New(
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
+	app.ModuleManager.SetOrderPreBlockers(preBlockers...)
+
 	// Register ante interfaces for extension options
 	antetypes.RegisterInterfaces(app.interfaceRegistry)
 

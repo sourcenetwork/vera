@@ -6,13 +6,11 @@ import (
 	_ "cosmossdk.io/api/cosmos/bank/v1beta1"
 	_ "cosmossdk.io/api/cosmos/crypto/secp256k1"
 	storetypes "cosmossdk.io/store/types"
-	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
-	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	_ "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -25,11 +23,11 @@ import (
 	authtestutil "github.com/cosmos/cosmos-sdk/x/auth/testutil"
 	txtestutil "github.com/cosmos/cosmos-sdk/x/auth/tx/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/golang/mock/gomock"
 	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	test "github.com/sourcenetwork/sourcehub/testutil"
 	hubtypes "github.com/sourcenetwork/sourcehub/types"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 )
 
 // TestAccount represents a test account used in app/ante/fee_test.
@@ -100,8 +98,7 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	antetypes.RegisterInterfaces(suite.encCfg.InterfaceRegistry)
 
 	suite.clientCtx = client.Context{}.
-		WithTxConfig(suite.encCfg.TxConfig).
-		WithClient(clitestutil.NewMockCometRPC(abci.ResponseQuery{}))
+		WithTxConfig(suite.encCfg.TxConfig)
 
 	anteHandler, err := ante.NewAnteHandler(
 		ante.HandlerOptions{

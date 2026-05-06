@@ -173,6 +173,7 @@ var (
 
 	preBlockers = []string{
 		upgradetypes.ModuleName,
+		authtypes.ModuleName,
 	}
 
 	// module account permissions

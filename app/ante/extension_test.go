@@ -3,8 +3,8 @@ package ante
 import (
 	"testing"
 
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/mock/gomock"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
+	oldgomock "github.com/golang/mock/gomock"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
@@ -537,7 +538,7 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
 
 	// Create mock feegrant keeper with DID support
-	ctrl := gomock.NewController(t)
+	ctrl := oldgomock.NewController(t)
 	defer ctrl.Finish()
 	mockFeegrantKeeper := test.NewMockDIDFeegrantKeeper(ctrl)
 
@@ -583,7 +584,7 @@ func TestExtensionAndFeeDecorators_WithDID(t *testing.T) {
 	s.txBuilder.SetGasLimit(200000)
 
 	// Mock expectations for DID-based feegrant
-	mockFeegrantKeeper.EXPECT().UseFirstAvailableDIDGrant(gomock.Any(), userDID, validFee, gomock.Any()).Return(feeGranter, nil)
+	mockFeegrantKeeper.EXPECT().UseFirstAvailableDIDGrant(oldgomock.Any(), userDID, validFee, oldgomock.Any()).Return(feeGranter, nil)
 	// Fee deduction happens in the ante handler after feegrant validation
 	s.bankKeeper.EXPECT().SendCoinsFromAccountToModule(gomock.Any(), feeGranter, authtypes.FeeCollectorName, validFee).Return(nil)
 

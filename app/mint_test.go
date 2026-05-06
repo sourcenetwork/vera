@@ -7,8 +7,8 @@ import (
 
 	"cosmossdk.io/log"
 	"cosmossdk.io/math"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -19,6 +19,7 @@ import (
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttestutil "github.com/cosmos/cosmos-sdk/x/mint/testutil"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	oldgomock "github.com/golang/mock/gomock"
 	test "github.com/sourcenetwork/sourcehub/testutil"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 )
@@ -58,14 +59,15 @@ func (suite *MintTestSuite) SetupTest() {
 	suite.logBuffer = new(bytes.Buffer)
 	suite.logger = log.NewLogger(suite.logBuffer)
 
-	ctrl := gomock.NewController(suite.T())
+	ctrl := oldgomock.NewController(suite.T())
 	suite.bankKeeper = test.NewMockBankKeeper(ctrl)
 	suite.distrKeeper = test.NewMockDistributionKeeper(ctrl)
 	suite.stakingKeeper = test.NewMockStakingKeeper(ctrl)
 	suite.epochsKeeper = test.NewMockEpochsKeeper(ctrl)
 	suite.authorityAccount = sdk.AccAddress([]byte("authority"))
 
-	accountKeeper := minttestutil.NewMockAccountKeeper(ctrl)
+	sdkCtrl := gomock.NewController(suite.T())
+	accountKeeper := minttestutil.NewMockAccountKeeper(sdkCtrl)
 	accountKeeper.EXPECT().GetModuleAddress("mint").Return(sdk.AccAddress{})
 
 	suite.tierKeeper = tierkeeper.NewKeeper(
