@@ -14,12 +14,8 @@ func ringReshareFinalizeSignBytes(
 	postID string,
 	currentPayload []byte,
 	finalizedPayload []byte,
+	currentRingPayload *ringPayloadJSON,
 ) ([]byte, error) {
-	currentRingPayload, err := parseRingPayloadJSON(currentPayload)
-	if err != nil {
-		return nil, err
-	}
-
 	currentPayloadHash := sha256.Sum256(currentPayload)
 	finalizedPayloadHash := sha256.Sum256(finalizedPayload)
 

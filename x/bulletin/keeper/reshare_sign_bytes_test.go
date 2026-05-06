@@ -41,7 +41,9 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 	require.Equal(t, bls12381G2SignatureDST, vector.BLSDST)
 
 	currentPayload := []byte(vector.CurrentPayload)
-	finalizedPayload, err := deriveFinalizedRingPayloadReshare(currentPayload)
+	currentRingPayload, err := parseRingPayloadJSON(currentPayload)
+	require.NoError(t, err)
+	finalizedPayload, err := deriveFinalizedRingPayloadReshare(currentRingPayload)
 	require.NoError(t, err)
 	require.Equal(t, vector.FinalizedPayload, string(finalizedPayload))
 
@@ -56,6 +58,7 @@ func TestRingReshareFinalizeSignBytesVector(t *testing.T) {
 		vector.PostID,
 		currentPayload,
 		finalizedPayload,
+		currentRingPayload,
 	)
 	require.NoError(t, err)
 	require.Equal(t, vector.CanonicalSignBytesHex, hex.EncodeToString(signBytes))

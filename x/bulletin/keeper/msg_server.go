@@ -198,21 +198,26 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(existing.Payload)
+	currentRingPayload, err := parseRingPayloadJSON(existing.Payload)
 	if err != nil {
 		return nil, err
 	}
 
-	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), msg.Namespace, msg.PostId, existing.Payload, signDocFinalizedPayload)
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(currentRingPayload)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := verifyThresholdSignatureForRingPayloadUpdate(existing.Payload, signBytes, msg.SignatureScheme, msg.Signature); err != nil {
+	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), msg.Namespace, msg.PostId, existing.Payload, signDocFinalizedPayload, currentRingPayload)
+	if err != nil {
 		return nil, err
 	}
 
-	finalizedPayload, err := finalizeRingPayloadReshare(existing.Payload, uint64(ctx.BlockHeight()))
+	if err := verifyThresholdSignatureForRingPayloadUpdate(currentRingPayload, signBytes, msg.SignatureScheme, msg.Signature); err != nil {
+		return nil, err
+	}
+
+	finalizedPayload, err := finalizeRingPayloadReshare(currentRingPayload, uint64(ctx.BlockHeight()))
 	if err != nil {
 		return nil, err
 	}

@@ -37,10 +37,10 @@ func (msg *MsgUpdatePostByThresholdSignature) ValidateBasic() error {
 		return ErrInvalidPostId
 	}
 	if msg.SignatureScheme == "" {
-		return ErrInvalidThresholdSignature
+		return ErrInvalidSignatureScheme
 	}
 	if len(msg.Signature) == 0 {
-		return ErrInvalidThresholdSignature
+		return ErrInvalidSignaturePayload
 	}
 	return nil
 }

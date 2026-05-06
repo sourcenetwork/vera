@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 	blst "github.com/supranational/blst/bindings/go"
@@ -250,18 +251,18 @@ func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
 	require.NoError(t, validMsg.ValidateBasic())
 
 	cases := []struct {
-		msg    *types.MsgUpdatePostByThresholdSignature
-		errMsg string
+		msg     *types.MsgUpdatePostByThresholdSignature
+		wantErr error
 	}{
-		{&types.MsgUpdatePostByThresholdSignature{}, "invalid creator address"},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address}, "invalid namespace id"},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, "invalid post id"},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, "invalid threshold signature"},
+		{&types.MsgUpdatePostByThresholdSignature{}, sdkerrors.ErrInvalidAddress},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address}, types.ErrInvalidNamespaceId},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, types.ErrInvalidPostId},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, types.ErrInvalidSignatureScheme},
+		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1", SignatureScheme: ThresholdSignatureSchemeBLS12381G1PKG2SigNUL}, types.ErrInvalidSignaturePayload},
 	}
 	for _, c := range cases {
 		err := c.msg.ValidateBasic()
-		require.Error(t, err)
-		require.Contains(t, err.Error(), c.errMsg)
+		require.ErrorIs(t, err, c.wantErr)
 	}
 }
 
@@ -329,9 +330,11 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		require.Equal(t, payload, stored.Payload)
 	}
 
-	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(originalPayload)
+	currentRingPayload, err := parseRingPayloadJSON(originalPayload)
 	require.NoError(t, err)
-	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload, uint64(ctx.BlockHeight()))
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(currentRingPayload)
+	require.NoError(t, err)
+	finalizedPayload, err := finalizeRingPayloadReshare(currentRingPayload, uint64(ctx.BlockHeight()))
 	require.NoError(t, err)
 	signature := signReshareFinalizePayload(
 		t,
@@ -396,9 +399,11 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	})
 	require.Empty(t, k.GetPolicyId(ctx))
 
-	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(originalPayload)
+	currentRingPayload, err := parseRingPayloadJSON(originalPayload)
 	require.NoError(t, err)
-	finalizedPayload, err := finalizeRingPayloadReshare(originalPayload, uint64(ctx.BlockHeight()))
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(currentRingPayload)
+	require.NoError(t, err)
+	finalizedPayload, err := finalizeRingPayloadReshare(currentRingPayload, uint64(ctx.BlockHeight()))
 	require.NoError(t, err)
 	signature := signReshareFinalizePayload(
 		t,
@@ -653,7 +658,9 @@ func signReshareFinalizePayload(
 ) []byte {
 	t.Helper()
 
-	signBytes, err := ringReshareFinalizeSignBytes(chainID, namespace, postID, currentPayload, finalizedPayload)
+	currentRingPayload, err := parseRingPayloadJSON(currentPayload)
+	require.NoError(t, err)
+	signBytes, err := ringReshareFinalizeSignBytes(chainID, namespace, postID, currentPayload, finalizedPayload, currentRingPayload)
 	require.NoError(t, err)
 
 	return signPayloadWithSeed(t, seed, signBytes)
