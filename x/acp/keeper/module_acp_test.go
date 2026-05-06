@@ -141,7 +141,7 @@ func Test_ModulePolicyCmdForActorAccount_ModuleCannotUsePolicyWithoutClaimingCap
 	accAddr := accKeep.FirstAcc().GetAddress().String()
 	result, err := k.ModulePolicyCmdForActorAccount(ctx, cap, cmd, accAddr, signer)
 
-	// Then cmd is reject due to invalid capability
+	// Then cmd is rejected because capability was not claimed
 	require.Nil(t, result)
 	require.ErrorIs(t, err, capability.ErrInvalidCapability)
 }

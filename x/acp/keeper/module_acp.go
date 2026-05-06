@@ -130,7 +130,14 @@ func (k *Keeper) ModulePolicyCmdForActorDID(goCtx context.Context, capability *c
 func (k *Keeper) dispatchModulePolicyCmd(goCtx context.Context, capability *capability.PolicyCapability, cmd *types.PolicyCmd, actorDID string, txSigner string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	err := k.getPolicyCapabilityManager(ctx).Validate(ctx, capability)
+	capManager := k.getPolicyCapabilityManager(ctx)
+	err := capManager.Validate(ctx, capability)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify the capability was claimed by a module
+	_, err = capManager.GetOwnerModule(ctx, capability)
 	if err != nil {
 		return nil, err
 	}

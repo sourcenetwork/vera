@@ -212,7 +212,7 @@ func (k *Keeper) resetAllCredits(ctx context.Context, epochNumber int64) (err er
 		if err != nil {
 			return errorsmod.Wrapf(err, "mint %s ucredit to %s", credit, delAddr)
 		}
-		totalCredit.Add(credit)
+		totalCredit = totalCredit.Add(credit)
 	}
 
 	// Set total credit amount

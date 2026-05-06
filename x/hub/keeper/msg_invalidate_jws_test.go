@@ -93,7 +93,8 @@ func TestMsgInvalidateJWS(t *testing.T) {
 			expErr: false,
 			verifyFunc: func(t *testing.T, resp *types.MsgInvalidateJWSResponse) {
 				require.True(t, resp.Success)
-				record, found := k.GetJWSToken(sdkCtx, tokenHash1)
+				record, found, err := k.GetJWSToken(sdkCtx, tokenHash1)
+				require.NoError(t, err)
 				require.True(t, found)
 				require.Equal(t, types.JWSTokenStatus_STATUS_INVALID, record.Status)
 				require.Equal(t, authorizedAccount, record.InvalidatedBy)
@@ -112,7 +113,8 @@ func TestMsgInvalidateJWS(t *testing.T) {
 			expErr: false,
 			verifyFunc: func(t *testing.T, resp *types.MsgInvalidateJWSResponse) {
 				require.True(t, resp.Success)
-				record, found := k.GetJWSToken(sdkCtx, tokenHash2)
+				record, found, err := k.GetJWSToken(sdkCtx, tokenHash2)
+				require.NoError(t, err)
 				require.True(t, found)
 				require.Equal(t, types.JWSTokenStatus_STATUS_INVALID, record.Status)
 			},
