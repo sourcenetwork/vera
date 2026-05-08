@@ -73,11 +73,9 @@ message MsgUpdatePostByThresholdSignature {
   string creator = 1;
   string namespace = 2;
   string post_id = 3;
-  string artifact = 5;
-  string signature_scheme = 6;
-  bytes signature = 7;
-
-  reserved 4;
+  string artifact = 4;
+  string signature_scheme = 5;
+  bytes signature = 6;
 }
 
 message MsgUpdatePostByThresholdSignatureResponse {}
