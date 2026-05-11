@@ -169,6 +169,76 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 	return &types.MsgUpdatePostResponse{}, nil
 }
 
+// UpdatePostByThresholdSignature finalizes a reshare using only the current
+// bulletin payload as state. It moves new_peer_ids/new_threshold into
+// peer_ids/threshold, clears the new_* fields, and verifies a threshold
+// signature over the canonical transition sign doc against the current
+// payload's ring_pk. Once accepted, the stored payload's block_number_nonce is
+// set to the current block height.
+// This path does not perform the ACP collaborator permission check used by
+// UpdatePost.
+func (k *Keeper) UpdatePostByThresholdSignature(
+	goCtx context.Context,
+	msg *types.MsgUpdatePostByThresholdSignature,
+) (*types.MsgUpdatePostByThresholdSignatureResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	namespaceId := getNamespaceId(msg.Namespace)
+	if !k.hasNamespace(goCtx, namespaceId) {
+		return nil, types.ErrNamespaceNotFound
+	}
+
+	existing := k.getPost(goCtx, namespaceId, msg.PostId)
+	if existing == nil {
+		return nil, types.ErrPostNotFound
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	currentRingPayload, err := parseRingPayloadJSON(existing.Payload)
+	if err != nil {
+		return nil, err
+	}
+
+	signDocFinalizedPayload, err := deriveFinalizedRingPayloadReshare(currentRingPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), msg.Namespace, msg.PostId, existing.Payload, signDocFinalizedPayload, currentRingPayload)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := verifyThresholdSignatureForRingPayloadUpdate(currentRingPayload, signBytes, msg.SignatureScheme, msg.Signature); err != nil {
+		return nil, err
+	}
+
+	finalizedPayload, err := finalizeRingPayloadReshare(currentRingPayload, uint64(ctx.BlockHeight()))
+	if err != nil {
+		return nil, err
+	}
+
+	existing.Payload = finalizedPayload
+	k.SetPost(goCtx, *existing)
+
+	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventPostUpdated{
+		NamespaceId: namespaceId,
+		PostId:      existing.Id,
+		UpdaterDid:  updaterDID,
+		Payload:     b64Payload,
+		Artifact:    msg.Artifact,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdatePostByThresholdSignatureResponse{}, nil
+}
+
 // AddCollaborator adds a new collaborator to the specified namespace.
 // The signer must have permission to manage collaborators of that namespace object.
 func (k *Keeper) AddCollaborator(goCtx context.Context, msg *types.MsgAddCollaborator) (*types.MsgAddCollaboratorResponse, error) {

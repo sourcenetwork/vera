@@ -10,6 +10,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreatePost{},
 		&MsgUpdatePost{},
+		&MsgUpdatePostByThresholdSignature{},
 		&MsgRegisterNamespace{},
 		&MsgAddCollaborator{},
 		&MsgRemoveCollaborator{},

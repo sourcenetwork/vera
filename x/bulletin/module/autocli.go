@@ -82,6 +82,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}},
 				},
 				{
+					RpcMethod:      "UpdatePostByThresholdSignature",
+					Use:            "update-post-by-threshold-signature [namespace] [post_id] [signature_scheme] [signature]",
+					Short:          "Finalize a reshare using a threshold signature",
+					Long:           "Finalize a reshare using a threshold signature. The signature argument is a bytes field and must be base64-encoded.",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "signature_scheme"}, {ProtoField: "signature"}},
+				},
+				{
 					RpcMethod:      "RegisterNamespace",
 					Use:            "register-namespace [namespace]",
 					Short:          "Register a new namespace",
