@@ -19,8 +19,8 @@ service Msg {
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreatePost(MsgCreatePost) returns (MsgCreatePostResponse);
-  rpc UpdatePost(MsgUpdatePost) returns (MsgUpdatePostResponse);
-  rpc UpdatePostByThresholdSignature(MsgUpdatePostByThresholdSignature) returns (MsgUpdatePostByThresholdSignatureResponse);
+  rpc UpdateRingPostByAcp(MsgUpdateRingPostByAcp) returns (MsgUpdateRingPostByAcpResponse);
+  rpc UpdateRingPostByThresholdSignature(MsgUpdateRingPostByThresholdSignature) returns (MsgUpdateRingPostByThresholdSignatureResponse);
   rpc RegisterNamespace(MsgRegisterNamespace) returns (MsgRegisterNamespaceResponse);
   rpc AddCollaborator(MsgAddCollaborator) returns (MsgAddCollaboratorResponse);
   rpc RemoveCollaborator(MsgRemoveCollaborator) returns (MsgRemoveCollaboratorResponse);
@@ -57,7 +57,7 @@ message MsgCreatePost {
 
 message MsgCreatePostResponse {}
 
-message MsgUpdatePost {
+message MsgUpdateRingPostByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string namespace = 2;
@@ -66,9 +66,9 @@ message MsgUpdatePost {
   string artifact = 5;
 }
 
-message MsgUpdatePostResponse {}
+message MsgUpdateRingPostByAcpResponse {}
 
-message MsgUpdatePostByThresholdSignature {
+message MsgUpdateRingPostByThresholdSignature {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string namespace = 2;
@@ -78,7 +78,7 @@ message MsgUpdatePostByThresholdSignature {
   bytes signature = 6;
 }
 
-message MsgUpdatePostByThresholdSignatureResponse {}
+message MsgUpdateRingPostByThresholdSignatureResponse {}
 
 message RingReshareFinalizeSignDoc {
   string domain = 1;

@@ -16,6 +16,7 @@ type ringPayloadJSON struct {
 	Threshold        *uint32   `json:"threshold"`
 	PSSInterval      *uint64   `json:"pss_interval,omitempty"`
 	BlockNumberNonce *uint64   `json:"block_number_nonce"`
+	PolicyID         *string   `json:"policy_id,omitempty"`
 }
 
 func validateRingPayloadJSON(payload []byte) error {

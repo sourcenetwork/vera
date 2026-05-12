@@ -76,13 +76,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}},
 				},
 				{
-					RpcMethod:      "UpdatePost",
-					Use:            "update-post [namespace] [post_id] [payload]",
-					Short:          "Update payload of an existing post while preserving its id",
+					RpcMethod:      "UpdateRingPostByAcp",
+					Use:            "update-ring-post-by-acp [namespace] [post_id] [payload]",
+					Short:          "Update payload of a ring post authorized via the ring's ACP policy",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}},
 				},
 				{
-					RpcMethod:      "UpdatePostByThresholdSignature",
+					RpcMethod:      "UpdateRingPostByThresholdSignature",
 					Use:            "update-post-by-threshold-signature [namespace] [post_id] [signature_scheme] [signature]",
 					Short:          "Finalize a reshare using a threshold signature",
 					Long:           "Finalize a reshare using a threshold signature. The signature argument is a bytes field and must be base64-encoded.",

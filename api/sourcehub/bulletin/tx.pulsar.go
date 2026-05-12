@@ -1842,33 +1842,33 @@ func (x *fastReflection_MsgCreatePostResponse) ProtoMethods() *protoiface.Method
 }
 
 var (
-	md_MsgUpdatePost           protoreflect.MessageDescriptor
-	fd_MsgUpdatePost_creator   protoreflect.FieldDescriptor
-	fd_MsgUpdatePost_namespace protoreflect.FieldDescriptor
-	fd_MsgUpdatePost_post_id   protoreflect.FieldDescriptor
-	fd_MsgUpdatePost_payload   protoreflect.FieldDescriptor
-	fd_MsgUpdatePost_artifact  protoreflect.FieldDescriptor
+	md_MsgUpdateRingPostByAcp           protoreflect.MessageDescriptor
+	fd_MsgUpdateRingPostByAcp_creator   protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByAcp_namespace protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByAcp_post_id   protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByAcp_payload   protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByAcp_artifact  protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_bulletin_tx_proto_init()
-	md_MsgUpdatePost = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdatePost")
-	fd_MsgUpdatePost_creator = md_MsgUpdatePost.Fields().ByName("creator")
-	fd_MsgUpdatePost_namespace = md_MsgUpdatePost.Fields().ByName("namespace")
-	fd_MsgUpdatePost_post_id = md_MsgUpdatePost.Fields().ByName("post_id")
-	fd_MsgUpdatePost_payload = md_MsgUpdatePost.Fields().ByName("payload")
-	fd_MsgUpdatePost_artifact = md_MsgUpdatePost.Fields().ByName("artifact")
+	md_MsgUpdateRingPostByAcp = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdateRingPostByAcp")
+	fd_MsgUpdateRingPostByAcp_creator = md_MsgUpdateRingPostByAcp.Fields().ByName("creator")
+	fd_MsgUpdateRingPostByAcp_namespace = md_MsgUpdateRingPostByAcp.Fields().ByName("namespace")
+	fd_MsgUpdateRingPostByAcp_post_id = md_MsgUpdateRingPostByAcp.Fields().ByName("post_id")
+	fd_MsgUpdateRingPostByAcp_payload = md_MsgUpdateRingPostByAcp.Fields().ByName("payload")
+	fd_MsgUpdateRingPostByAcp_artifact = md_MsgUpdateRingPostByAcp.Fields().ByName("artifact")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgUpdatePost)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgUpdateRingPostByAcp)(nil)
 
-type fastReflection_MsgUpdatePost MsgUpdatePost
+type fastReflection_MsgUpdateRingPostByAcp MsgUpdateRingPostByAcp
 
-func (x *MsgUpdatePost) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePost)(x)
+func (x *MsgUpdateRingPostByAcp) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByAcp)(x)
 }
 
-func (x *MsgUpdatePost) slowProtoReflect() protoreflect.Message {
+func (x *MsgUpdateRingPostByAcp) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1880,43 +1880,43 @@ func (x *MsgUpdatePost) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgUpdatePost_messageType fastReflection_MsgUpdatePost_messageType
-var _ protoreflect.MessageType = fastReflection_MsgUpdatePost_messageType{}
+var _fastReflection_MsgUpdateRingPostByAcp_messageType fastReflection_MsgUpdateRingPostByAcp_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateRingPostByAcp_messageType{}
 
-type fastReflection_MsgUpdatePost_messageType struct{}
+type fastReflection_MsgUpdateRingPostByAcp_messageType struct{}
 
-func (x fastReflection_MsgUpdatePost_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePost)(nil)
+func (x fastReflection_MsgUpdateRingPostByAcp_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByAcp)(nil)
 }
-func (x fastReflection_MsgUpdatePost_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePost)
+func (x fastReflection_MsgUpdateRingPostByAcp_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByAcp)
 }
-func (x fastReflection_MsgUpdatePost_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePost
+func (x fastReflection_MsgUpdateRingPostByAcp_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByAcp
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgUpdatePost) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePost
+func (x *fastReflection_MsgUpdateRingPostByAcp) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByAcp
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgUpdatePost) Type() protoreflect.MessageType {
-	return _fastReflection_MsgUpdatePost_messageType
+func (x *fastReflection_MsgUpdateRingPostByAcp) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateRingPostByAcp_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgUpdatePost) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePost)
+func (x *fastReflection_MsgUpdateRingPostByAcp) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByAcp)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgUpdatePost) Interface() protoreflect.ProtoMessage {
-	return (*MsgUpdatePost)(x)
+func (x *fastReflection_MsgUpdateRingPostByAcp) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateRingPostByAcp)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -1924,34 +1924,34 @@ func (x *fastReflection_MsgUpdatePost) Interface() protoreflect.ProtoMessage {
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgUpdatePost) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Creator != "" {
 		value := protoreflect.ValueOfString(x.Creator)
-		if !f(fd_MsgUpdatePost_creator, value) {
+		if !f(fd_MsgUpdateRingPostByAcp_creator, value) {
 			return
 		}
 	}
 	if x.Namespace != "" {
 		value := protoreflect.ValueOfString(x.Namespace)
-		if !f(fd_MsgUpdatePost_namespace, value) {
+		if !f(fd_MsgUpdateRingPostByAcp_namespace, value) {
 			return
 		}
 	}
 	if x.PostId != "" {
 		value := protoreflect.ValueOfString(x.PostId)
-		if !f(fd_MsgUpdatePost_post_id, value) {
+		if !f(fd_MsgUpdateRingPostByAcp_post_id, value) {
 			return
 		}
 	}
 	if len(x.Payload) != 0 {
 		value := protoreflect.ValueOfBytes(x.Payload)
-		if !f(fd_MsgUpdatePost_payload, value) {
+		if !f(fd_MsgUpdateRingPostByAcp_payload, value) {
 			return
 		}
 	}
 	if x.Artifact != "" {
 		value := protoreflect.ValueOfString(x.Artifact)
-		if !f(fd_MsgUpdatePost_artifact, value) {
+		if !f(fd_MsgUpdateRingPostByAcp_artifact, value) {
 			return
 		}
 	}
@@ -1968,23 +1968,23 @@ func (x *fastReflection_MsgUpdatePost) Range(f func(protoreflect.FieldDescriptor
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgUpdatePost) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
 		return x.Creator != ""
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
 		return x.Namespace != ""
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
 		return x.PostId != ""
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
 		return len(x.Payload) != 0
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
 		return x.Artifact != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -1994,23 +1994,23 @@ func (x *fastReflection_MsgUpdatePost) Has(fd protoreflect.FieldDescriptor) bool
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePost) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
 		x.Creator = ""
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
 		x.Namespace = ""
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
 		x.PostId = ""
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
 		x.Payload = nil
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
 		x.Artifact = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2020,28 +2020,28 @@ func (x *fastReflection_MsgUpdatePost) Clear(fd protoreflect.FieldDescriptor) {
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgUpdatePost) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
 		value := x.Creator
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
 		value := x.Namespace
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
 		value := x.PostId
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
 		value := x.Payload
 		return protoreflect.ValueOfBytes(value)
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
 		value := x.Artifact
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2055,23 +2055,23 @@ func (x *fastReflection_MsgUpdatePost) Get(descriptor protoreflect.FieldDescript
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePost) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
 		x.Creator = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
 		x.Namespace = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
 		x.PostId = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
 		x.Payload = value.Bytes()
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
 		x.Artifact = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2085,56 +2085,56 @@ func (x *fastReflection_MsgUpdatePost) Set(fd protoreflect.FieldDescriptor, valu
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePost) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcp) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
-		panic(fmt.Errorf("field creator of message sourcehub.bulletin.MsgUpdatePost is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
-		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.MsgUpdatePost is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
-		panic(fmt.Errorf("field post_id of message sourcehub.bulletin.MsgUpdatePost is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
-		panic(fmt.Errorf("field payload of message sourcehub.bulletin.MsgUpdatePost is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
-		panic(fmt.Errorf("field artifact of message sourcehub.bulletin.MsgUpdatePost is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
+		panic(fmt.Errorf("field creator of message sourcehub.bulletin.MsgUpdateRingPostByAcp is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
+		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.MsgUpdateRingPostByAcp is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
+		panic(fmt.Errorf("field post_id of message sourcehub.bulletin.MsgUpdateRingPostByAcp is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
+		panic(fmt.Errorf("field payload of message sourcehub.bulletin.MsgUpdateRingPostByAcp is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
+		panic(fmt.Errorf("field artifact of message sourcehub.bulletin.MsgUpdateRingPostByAcp is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgUpdatePost) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcp) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePost.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.creator":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePost.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.namespace":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePost.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.post_id":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePost.payload":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.payload":
 		return protoreflect.ValueOfBytes(nil)
-	case "sourcehub.bulletin.MsgUpdatePost.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByAcp.artifact":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePost"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcp"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePost does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcp does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgUpdatePost) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgUpdateRingPostByAcp) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdatePost", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdateRingPostByAcp", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2142,7 +2142,7 @@ func (x *fastReflection_MsgUpdatePost) WhichOneof(d protoreflect.OneofDescriptor
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgUpdatePost) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgUpdateRingPostByAcp) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2153,7 +2153,7 @@ func (x *fastReflection_MsgUpdatePost) GetUnknown() protoreflect.RawFields {
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePost) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgUpdateRingPostByAcp) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2165,7 +2165,7 @@ func (x *fastReflection_MsgUpdatePost) SetUnknown(fields protoreflect.RawFields)
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgUpdatePost) IsValid() bool {
+func (x *fastReflection_MsgUpdateRingPostByAcp) IsValid() bool {
 	return x != nil
 }
 
@@ -2175,9 +2175,9 @@ func (x *fastReflection_MsgUpdatePost) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgUpdatePost) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgUpdateRingPostByAcp) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgUpdatePost)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcp)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2219,7 +2219,7 @@ func (x *fastReflection_MsgUpdatePost) ProtoMethods() *protoiface.Methods {
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePost)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcp)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2284,7 +2284,7 @@ func (x *fastReflection_MsgUpdatePost) ProtoMethods() *protoiface.Methods {
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePost)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcp)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2316,10 +2316,10 @@ func (x *fastReflection_MsgUpdatePost) ProtoMethods() *protoiface.Methods {
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePost: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByAcp: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePost: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -2520,23 +2520,23 @@ func (x *fastReflection_MsgUpdatePost) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_MsgUpdatePostResponse protoreflect.MessageDescriptor
+	md_MsgUpdateRingPostByAcpResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_sourcehub_bulletin_tx_proto_init()
-	md_MsgUpdatePostResponse = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdatePostResponse")
+	md_MsgUpdateRingPostByAcpResponse = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdateRingPostByAcpResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgUpdatePostResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgUpdateRingPostByAcpResponse)(nil)
 
-type fastReflection_MsgUpdatePostResponse MsgUpdatePostResponse
+type fastReflection_MsgUpdateRingPostByAcpResponse MsgUpdateRingPostByAcpResponse
 
-func (x *MsgUpdatePostResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostResponse)(x)
+func (x *MsgUpdateRingPostByAcpResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByAcpResponse)(x)
 }
 
-func (x *MsgUpdatePostResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgUpdateRingPostByAcpResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2548,43 +2548,43 @@ func (x *MsgUpdatePostResponse) slowProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgUpdatePostResponse_messageType fastReflection_MsgUpdatePostResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgUpdatePostResponse_messageType{}
+var _fastReflection_MsgUpdateRingPostByAcpResponse_messageType fastReflection_MsgUpdateRingPostByAcpResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateRingPostByAcpResponse_messageType{}
 
-type fastReflection_MsgUpdatePostResponse_messageType struct{}
+type fastReflection_MsgUpdateRingPostByAcpResponse_messageType struct{}
 
-func (x fastReflection_MsgUpdatePostResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostResponse)(nil)
+func (x fastReflection_MsgUpdateRingPostByAcpResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByAcpResponse)(nil)
 }
-func (x fastReflection_MsgUpdatePostResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostResponse)
+func (x fastReflection_MsgUpdateRingPostByAcpResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByAcpResponse)
 }
-func (x fastReflection_MsgUpdatePostResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostResponse
+func (x fastReflection_MsgUpdateRingPostByAcpResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByAcpResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgUpdatePostResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostResponse
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByAcpResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgUpdatePostResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgUpdatePostResponse_messageType
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateRingPostByAcpResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgUpdatePostResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostResponse)
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByAcpResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgUpdatePostResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgUpdatePostResponse)(x)
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateRingPostByAcpResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2592,7 +2592,7 @@ func (x *fastReflection_MsgUpdatePostResponse) Interface() protoreflect.ProtoMes
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgUpdatePostResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -2606,13 +2606,13 @@ func (x *fastReflection_MsgUpdatePostResponse) Range(f func(protoreflect.FieldDe
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgUpdatePostResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2622,13 +2622,13 @@ func (x *fastReflection_MsgUpdatePostResponse) Has(fd protoreflect.FieldDescript
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2638,13 +2638,13 @@ func (x *fastReflection_MsgUpdatePostResponse) Clear(fd protoreflect.FieldDescri
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgUpdatePostResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -2658,13 +2658,13 @@ func (x *fastReflection_MsgUpdatePostResponse) Get(descriptor protoreflect.Field
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -2678,36 +2678,36 @@ func (x *fastReflection_MsgUpdatePostResponse) Set(fd protoreflect.FieldDescript
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgUpdatePostResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByAcpResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgUpdatePostResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdatePostResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdateRingPostByAcpResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -2715,7 +2715,7 @@ func (x *fastReflection_MsgUpdatePostResponse) WhichOneof(d protoreflect.OneofDe
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgUpdatePostResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -2726,7 +2726,7 @@ func (x *fastReflection_MsgUpdatePostResponse) GetUnknown() protoreflect.RawFiel
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -2738,7 +2738,7 @@ func (x *fastReflection_MsgUpdatePostResponse) SetUnknown(fields protoreflect.Ra
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgUpdatePostResponse) IsValid() bool {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -2748,9 +2748,9 @@ func (x *fastReflection_MsgUpdatePostResponse) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgUpdatePostResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgUpdateRingPostByAcpResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgUpdatePostResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcpResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2772,7 +2772,7 @@ func (x *fastReflection_MsgUpdatePostResponse) ProtoMethods() *protoiface.Method
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcpResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2802,7 +2802,7 @@ func (x *fastReflection_MsgUpdatePostResponse) ProtoMethods() *protoiface.Method
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByAcpResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -2834,10 +2834,10 @@ func (x *fastReflection_MsgUpdatePostResponse) ProtoMethods() *protoiface.Method
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByAcpResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -2876,35 +2876,35 @@ func (x *fastReflection_MsgUpdatePostResponse) ProtoMethods() *protoiface.Method
 }
 
 var (
-	md_MsgUpdatePostByThresholdSignature                  protoreflect.MessageDescriptor
-	fd_MsgUpdatePostByThresholdSignature_creator          protoreflect.FieldDescriptor
-	fd_MsgUpdatePostByThresholdSignature_namespace        protoreflect.FieldDescriptor
-	fd_MsgUpdatePostByThresholdSignature_post_id          protoreflect.FieldDescriptor
-	fd_MsgUpdatePostByThresholdSignature_artifact         protoreflect.FieldDescriptor
-	fd_MsgUpdatePostByThresholdSignature_signature_scheme protoreflect.FieldDescriptor
-	fd_MsgUpdatePostByThresholdSignature_signature        protoreflect.FieldDescriptor
+	md_MsgUpdateRingPostByThresholdSignature                  protoreflect.MessageDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_creator          protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_namespace        protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_post_id          protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_artifact         protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_signature_scheme protoreflect.FieldDescriptor
+	fd_MsgUpdateRingPostByThresholdSignature_signature        protoreflect.FieldDescriptor
 )
 
 func init() {
 	file_sourcehub_bulletin_tx_proto_init()
-	md_MsgUpdatePostByThresholdSignature = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdatePostByThresholdSignature")
-	fd_MsgUpdatePostByThresholdSignature_creator = md_MsgUpdatePostByThresholdSignature.Fields().ByName("creator")
-	fd_MsgUpdatePostByThresholdSignature_namespace = md_MsgUpdatePostByThresholdSignature.Fields().ByName("namespace")
-	fd_MsgUpdatePostByThresholdSignature_post_id = md_MsgUpdatePostByThresholdSignature.Fields().ByName("post_id")
-	fd_MsgUpdatePostByThresholdSignature_artifact = md_MsgUpdatePostByThresholdSignature.Fields().ByName("artifact")
-	fd_MsgUpdatePostByThresholdSignature_signature_scheme = md_MsgUpdatePostByThresholdSignature.Fields().ByName("signature_scheme")
-	fd_MsgUpdatePostByThresholdSignature_signature = md_MsgUpdatePostByThresholdSignature.Fields().ByName("signature")
+	md_MsgUpdateRingPostByThresholdSignature = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdateRingPostByThresholdSignature")
+	fd_MsgUpdateRingPostByThresholdSignature_creator = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("creator")
+	fd_MsgUpdateRingPostByThresholdSignature_namespace = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("namespace")
+	fd_MsgUpdateRingPostByThresholdSignature_post_id = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("post_id")
+	fd_MsgUpdateRingPostByThresholdSignature_artifact = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("artifact")
+	fd_MsgUpdateRingPostByThresholdSignature_signature_scheme = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("signature_scheme")
+	fd_MsgUpdateRingPostByThresholdSignature_signature = md_MsgUpdateRingPostByThresholdSignature.Fields().ByName("signature")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgUpdatePostByThresholdSignature)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgUpdateRingPostByThresholdSignature)(nil)
 
-type fastReflection_MsgUpdatePostByThresholdSignature MsgUpdatePostByThresholdSignature
+type fastReflection_MsgUpdateRingPostByThresholdSignature MsgUpdateRingPostByThresholdSignature
 
-func (x *MsgUpdatePostByThresholdSignature) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostByThresholdSignature)(x)
+func (x *MsgUpdateRingPostByThresholdSignature) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByThresholdSignature)(x)
 }
 
-func (x *MsgUpdatePostByThresholdSignature) slowProtoReflect() protoreflect.Message {
+func (x *MsgUpdateRingPostByThresholdSignature) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2916,43 +2916,43 @@ func (x *MsgUpdatePostByThresholdSignature) slowProtoReflect() protoreflect.Mess
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgUpdatePostByThresholdSignature_messageType fastReflection_MsgUpdatePostByThresholdSignature_messageType
-var _ protoreflect.MessageType = fastReflection_MsgUpdatePostByThresholdSignature_messageType{}
+var _fastReflection_MsgUpdateRingPostByThresholdSignature_messageType fastReflection_MsgUpdateRingPostByThresholdSignature_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateRingPostByThresholdSignature_messageType{}
 
-type fastReflection_MsgUpdatePostByThresholdSignature_messageType struct{}
+type fastReflection_MsgUpdateRingPostByThresholdSignature_messageType struct{}
 
-func (x fastReflection_MsgUpdatePostByThresholdSignature_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostByThresholdSignature)(nil)
+func (x fastReflection_MsgUpdateRingPostByThresholdSignature_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByThresholdSignature)(nil)
 }
-func (x fastReflection_MsgUpdatePostByThresholdSignature_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostByThresholdSignature)
+func (x fastReflection_MsgUpdateRingPostByThresholdSignature_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByThresholdSignature)
 }
-func (x fastReflection_MsgUpdatePostByThresholdSignature_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostByThresholdSignature
+func (x fastReflection_MsgUpdateRingPostByThresholdSignature_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByThresholdSignature
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostByThresholdSignature
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByThresholdSignature
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Type() protoreflect.MessageType {
-	return _fastReflection_MsgUpdatePostByThresholdSignature_messageType
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateRingPostByThresholdSignature_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostByThresholdSignature)
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByThresholdSignature)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Interface() protoreflect.ProtoMessage {
-	return (*MsgUpdatePostByThresholdSignature)(x)
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateRingPostByThresholdSignature)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -2960,40 +2960,40 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Interface() protorefl
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 	if x.Creator != "" {
 		value := protoreflect.ValueOfString(x.Creator)
-		if !f(fd_MsgUpdatePostByThresholdSignature_creator, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_creator, value) {
 			return
 		}
 	}
 	if x.Namespace != "" {
 		value := protoreflect.ValueOfString(x.Namespace)
-		if !f(fd_MsgUpdatePostByThresholdSignature_namespace, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_namespace, value) {
 			return
 		}
 	}
 	if x.PostId != "" {
 		value := protoreflect.ValueOfString(x.PostId)
-		if !f(fd_MsgUpdatePostByThresholdSignature_post_id, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_post_id, value) {
 			return
 		}
 	}
 	if x.Artifact != "" {
 		value := protoreflect.ValueOfString(x.Artifact)
-		if !f(fd_MsgUpdatePostByThresholdSignature_artifact, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_artifact, value) {
 			return
 		}
 	}
 	if x.SignatureScheme != "" {
 		value := protoreflect.ValueOfString(x.SignatureScheme)
-		if !f(fd_MsgUpdatePostByThresholdSignature_signature_scheme, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_signature_scheme, value) {
 			return
 		}
 	}
 	if len(x.Signature) != 0 {
 		value := protoreflect.ValueOfBytes(x.Signature)
-		if !f(fd_MsgUpdatePostByThresholdSignature_signature, value) {
+		if !f(fd_MsgUpdateRingPostByThresholdSignature_signature, value) {
 			return
 		}
 	}
@@ -3010,25 +3010,25 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Range(f func(protoref
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
 		return x.Creator != ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
 		return x.Namespace != ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
 		return x.PostId != ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
 		return x.Artifact != ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
 		return x.SignatureScheme != ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
 		return len(x.Signature) != 0
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3038,25 +3038,25 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Has(fd protoreflect.F
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
 		x.Creator = ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
 		x.Namespace = ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
 		x.PostId = ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
 		x.Artifact = ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
 		x.SignatureScheme = ""
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
 		x.Signature = nil
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3066,31 +3066,31 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Clear(fd protoreflect
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
 		value := x.Creator
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
 		value := x.Namespace
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
 		value := x.PostId
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
 		value := x.Artifact
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
 		value := x.SignatureScheme
 		return protoreflect.ValueOfString(value)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
 		value := x.Signature
 		return protoreflect.ValueOfBytes(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3104,25 +3104,25 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Get(descriptor protor
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
 		x.Creator = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
 		x.Namespace = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
 		x.PostId = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
 		x.Artifact = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
 		x.SignatureScheme = value.Interface().(string)
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
 		x.Signature = value.Bytes()
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3136,60 +3136,60 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) Set(fd protoreflect.F
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
-		panic(fmt.Errorf("field creator of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
-		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
-		panic(fmt.Errorf("field post_id of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
-		panic(fmt.Errorf("field artifact of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
-		panic(fmt.Errorf("field signature_scheme of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
-		panic(fmt.Errorf("field signature of message sourcehub.bulletin.MsgUpdatePostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
+		panic(fmt.Errorf("field creator of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
+		panic(fmt.Errorf("field namespace of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
+		panic(fmt.Errorf("field post_id of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
+		panic(fmt.Errorf("field artifact of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
+		panic(fmt.Errorf("field signature_scheme of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
+		panic(fmt.Errorf("field signature of message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.creator":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.creator":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.namespace":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.namespace":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.post_id":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.post_id":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.artifact":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.artifact":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature_scheme":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature_scheme":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.bulletin.MsgUpdatePostByThresholdSignature.signature":
+	case "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature.signature":
 		return protoreflect.ValueOfBytes(nil)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignature"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignature does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdatePostByThresholdSignature", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3197,7 +3197,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) WhichOneof(d protoref
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3208,7 +3208,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) GetUnknown() protoref
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3220,7 +3220,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) SetUnknown(fields pro
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) IsValid() bool {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) IsValid() bool {
 	return x != nil
 }
 
@@ -3230,9 +3230,9 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) IsValid() bool {
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgUpdatePostByThresholdSignature) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignature) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignature)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignature)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3278,7 +3278,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) ProtoMethods() *proto
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignature)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignature)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3350,7 +3350,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) ProtoMethods() *proto
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignature)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignature)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3382,10 +3382,10 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) ProtoMethods() *proto
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostByThresholdSignature: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignature: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostByThresholdSignature: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignature: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			case 1:
@@ -3618,23 +3618,23 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignature) ProtoMethods() *proto
 }
 
 var (
-	md_MsgUpdatePostByThresholdSignatureResponse protoreflect.MessageDescriptor
+	md_MsgUpdateRingPostByThresholdSignatureResponse protoreflect.MessageDescriptor
 )
 
 func init() {
 	file_sourcehub_bulletin_tx_proto_init()
-	md_MsgUpdatePostByThresholdSignatureResponse = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdatePostByThresholdSignatureResponse")
+	md_MsgUpdateRingPostByThresholdSignatureResponse = File_sourcehub_bulletin_tx_proto.Messages().ByName("MsgUpdateRingPostByThresholdSignatureResponse")
 }
 
-var _ protoreflect.Message = (*fastReflection_MsgUpdatePostByThresholdSignatureResponse)(nil)
+var _ protoreflect.Message = (*fastReflection_MsgUpdateRingPostByThresholdSignatureResponse)(nil)
 
-type fastReflection_MsgUpdatePostByThresholdSignatureResponse MsgUpdatePostByThresholdSignatureResponse
+type fastReflection_MsgUpdateRingPostByThresholdSignatureResponse MsgUpdateRingPostByThresholdSignatureResponse
 
-func (x *MsgUpdatePostByThresholdSignatureResponse) ProtoReflect() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostByThresholdSignatureResponse)(x)
+func (x *MsgUpdateRingPostByThresholdSignatureResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByThresholdSignatureResponse)(x)
 }
 
-func (x *MsgUpdatePostByThresholdSignatureResponse) slowProtoReflect() protoreflect.Message {
+func (x *MsgUpdateRingPostByThresholdSignatureResponse) slowProtoReflect() protoreflect.Message {
 	mi := &file_sourcehub_bulletin_tx_proto_msgTypes[7]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -3646,43 +3646,43 @@ func (x *MsgUpdatePostByThresholdSignatureResponse) slowProtoReflect() protorefl
 	return mi.MessageOf(x)
 }
 
-var _fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType
-var _ protoreflect.MessageType = fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType{}
+var _fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType
+var _ protoreflect.MessageType = fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType{}
 
-type fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType struct{}
+type fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType struct{}
 
-func (x fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType) Zero() protoreflect.Message {
-	return (*fastReflection_MsgUpdatePostByThresholdSignatureResponse)(nil)
+func (x fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_MsgUpdateRingPostByThresholdSignatureResponse)(nil)
 }
-func (x fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostByThresholdSignatureResponse)
+func (x fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByThresholdSignatureResponse)
 }
-func (x fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostByThresholdSignatureResponse
+func (x fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByThresholdSignatureResponse
 }
 
 // Descriptor returns message descriptor, which contains only the protobuf
 // type information for the message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Descriptor() protoreflect.MessageDescriptor {
-	return md_MsgUpdatePostByThresholdSignatureResponse
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_MsgUpdateRingPostByThresholdSignatureResponse
 }
 
 // Type returns the message type, which encapsulates both Go and protobuf
 // type information. If the Go type information is not needed,
 // it is recommended that the message descriptor be used instead.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Type() protoreflect.MessageType {
-	return _fastReflection_MsgUpdatePostByThresholdSignatureResponse_messageType
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Type() protoreflect.MessageType {
+	return _fastReflection_MsgUpdateRingPostByThresholdSignatureResponse_messageType
 }
 
 // New returns a newly allocated and mutable empty message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) New() protoreflect.Message {
-	return new(fastReflection_MsgUpdatePostByThresholdSignatureResponse)
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) New() protoreflect.Message {
+	return new(fastReflection_MsgUpdateRingPostByThresholdSignatureResponse)
 }
 
 // Interface unwraps the message reflection interface and
 // returns the underlying ProtoMessage interface.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Interface() protoreflect.ProtoMessage {
-	return (*MsgUpdatePostByThresholdSignatureResponse)(x)
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Interface() protoreflect.ProtoMessage {
+	return (*MsgUpdateRingPostByThresholdSignatureResponse)(x)
 }
 
 // Range iterates over every populated field in an undefined order,
@@ -3690,7 +3690,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Interface() p
 // Range returns immediately if f returns false.
 // While iterating, mutating operations may only be performed
 // on the current field descriptor.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
 }
 
 // Has reports whether a field is populated.
@@ -3704,13 +3704,13 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Range(f func(
 // In other cases (aside from the nullable cases above),
 // a proto3 scalar field is populated if it contains a non-zero value, and
 // a repeated field is populated if it is non-empty.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Has(fd protoreflect.FieldDescriptor) bool {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3720,13 +3720,13 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Has(fd protor
 // associated with the given field number.
 //
 // Clear is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Clear(fd protoreflect.FieldDescriptor) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3736,13 +3736,13 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Clear(fd prot
 // the default value of a bytes scalar is guaranteed to be a copy.
 // For unpopulated composite types, it returns an empty, read-only view
 // of the value; to obtain a mutable reference, use Mutable.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -3756,13 +3756,13 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Get(descripto
 // empty, read-only value, then it panics.
 //
 // Set is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -3776,36 +3776,36 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Set(fd protor
 // It panics if the field does not contain a composite type.
 //
 // Mutable is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // NewField returns a new value that is assignable to the field
 // for the given descriptor. For scalars, this returns the default value.
 // For lists, maps, and messages, this returns a new, empty, mutable value.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse does not contain field %s", fd.FullName()))
 	}
 }
 
 // WhichOneof reports which field within the oneof is populated,
 // returning nil if none are populated.
 // It panics if the oneof descriptor does not belong to this message.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -3813,7 +3813,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) WhichOneof(d 
 // GetUnknown retrieves the entire list of unknown fields.
 // The caller may only mutate the contents of the RawFields
 // if the mutated bytes are stored back into the message with SetUnknown.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) GetUnknown() protoreflect.RawFields {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) GetUnknown() protoreflect.RawFields {
 	return x.unknownFields
 }
 
@@ -3824,7 +3824,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) GetUnknown() 
 // An empty RawFields may be passed to clear the fields.
 //
 // SetUnknown is a mutating operation and unsafe for concurrent use.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) SetUnknown(fields protoreflect.RawFields) {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) SetUnknown(fields protoreflect.RawFields) {
 	x.unknownFields = fields
 }
 
@@ -3836,7 +3836,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) SetUnknown(fi
 // message type, but the details are implementation dependent.
 // Validity is not part of the protobuf data model, and may not
 // be preserved in marshaling or other operations.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) IsValid() bool {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) IsValid() bool {
 	return x != nil
 }
 
@@ -3846,9 +3846,9 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) IsValid() boo
 // The returned methods type is identical to
 // "google.golang.org/protobuf/runtime/protoiface".Methods.
 // Consult the protoiface package documentation for details.
-func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) ProtoMethods() *protoiface.Methods {
+func (x *fastReflection_MsgUpdateRingPostByThresholdSignatureResponse) ProtoMethods() *protoiface.Methods {
 	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignatureResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignatureResponse)
 		if x == nil {
 			return protoiface.SizeOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3870,7 +3870,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) ProtoMethods(
 	}
 
 	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignatureResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignatureResponse)
 		if x == nil {
 			return protoiface.MarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3900,7 +3900,7 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) ProtoMethods(
 		}, nil
 	}
 	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
-		x := input.Message.Interface().(*MsgUpdatePostByThresholdSignatureResponse)
+		x := input.Message.Interface().(*MsgUpdateRingPostByThresholdSignatureResponse)
 		if x == nil {
 			return protoiface.UnmarshalOutput{
 				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
@@ -3932,10 +3932,10 @@ func (x *fastReflection_MsgUpdatePostByThresholdSignatureResponse) ProtoMethods(
 			fieldNum := int32(wire >> 3)
 			wireType := int(wire & 0x7)
 			if wireType == 4 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostByThresholdSignatureResponse: wiretype end group for non-group")
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignatureResponse: wiretype end group for non-group")
 			}
 			if fieldNum <= 0 {
-				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdatePostByThresholdSignatureResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignatureResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 			}
 			switch fieldNum {
 			default:
@@ -7856,7 +7856,7 @@ func (*MsgCreatePostResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{3}
 }
 
-type MsgUpdatePost struct {
+type MsgUpdateRingPostByAcp struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7868,8 +7868,8 @@ type MsgUpdatePost struct {
 	Artifact  string `protobuf:"bytes,5,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
-func (x *MsgUpdatePost) Reset() {
-	*x = MsgUpdatePost{}
+func (x *MsgUpdateRingPostByAcp) Reset() {
+	*x = MsgUpdateRingPostByAcp{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7877,60 +7877,60 @@ func (x *MsgUpdatePost) Reset() {
 	}
 }
 
-func (x *MsgUpdatePost) String() string {
+func (x *MsgUpdateRingPostByAcp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgUpdatePost) ProtoMessage() {}
+func (*MsgUpdateRingPostByAcp) ProtoMessage() {}
 
-// Deprecated: Use MsgUpdatePost.ProtoReflect.Descriptor instead.
-func (*MsgUpdatePost) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgUpdateRingPostByAcp.ProtoReflect.Descriptor instead.
+func (*MsgUpdateRingPostByAcp) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *MsgUpdatePost) GetCreator() string {
+func (x *MsgUpdateRingPostByAcp) GetCreator() string {
 	if x != nil {
 		return x.Creator
 	}
 	return ""
 }
 
-func (x *MsgUpdatePost) GetNamespace() string {
+func (x *MsgUpdateRingPostByAcp) GetNamespace() string {
 	if x != nil {
 		return x.Namespace
 	}
 	return ""
 }
 
-func (x *MsgUpdatePost) GetPostId() string {
+func (x *MsgUpdateRingPostByAcp) GetPostId() string {
 	if x != nil {
 		return x.PostId
 	}
 	return ""
 }
 
-func (x *MsgUpdatePost) GetPayload() []byte {
+func (x *MsgUpdateRingPostByAcp) GetPayload() []byte {
 	if x != nil {
 		return x.Payload
 	}
 	return nil
 }
 
-func (x *MsgUpdatePost) GetArtifact() string {
+func (x *MsgUpdateRingPostByAcp) GetArtifact() string {
 	if x != nil {
 		return x.Artifact
 	}
 	return ""
 }
 
-type MsgUpdatePostResponse struct {
+type MsgUpdateRingPostByAcpResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgUpdatePostResponse) Reset() {
-	*x = MsgUpdatePostResponse{}
+func (x *MsgUpdateRingPostByAcpResponse) Reset() {
+	*x = MsgUpdateRingPostByAcpResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7938,18 +7938,18 @@ func (x *MsgUpdatePostResponse) Reset() {
 	}
 }
 
-func (x *MsgUpdatePostResponse) String() string {
+func (x *MsgUpdateRingPostByAcpResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgUpdatePostResponse) ProtoMessage() {}
+func (*MsgUpdateRingPostByAcpResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgUpdatePostResponse.ProtoReflect.Descriptor instead.
-func (*MsgUpdatePostResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgUpdateRingPostByAcpResponse.ProtoReflect.Descriptor instead.
+func (*MsgUpdateRingPostByAcpResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{5}
 }
 
-type MsgUpdatePostByThresholdSignature struct {
+type MsgUpdateRingPostByThresholdSignature struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -7962,8 +7962,8 @@ type MsgUpdatePostByThresholdSignature struct {
 	Signature       []byte `protobuf:"bytes,6,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
-func (x *MsgUpdatePostByThresholdSignature) Reset() {
-	*x = MsgUpdatePostByThresholdSignature{}
+func (x *MsgUpdateRingPostByThresholdSignature) Reset() {
+	*x = MsgUpdateRingPostByThresholdSignature{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -7971,67 +7971,67 @@ func (x *MsgUpdatePostByThresholdSignature) Reset() {
 	}
 }
 
-func (x *MsgUpdatePostByThresholdSignature) String() string {
+func (x *MsgUpdateRingPostByThresholdSignature) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgUpdatePostByThresholdSignature) ProtoMessage() {}
+func (*MsgUpdateRingPostByThresholdSignature) ProtoMessage() {}
 
-// Deprecated: Use MsgUpdatePostByThresholdSignature.ProtoReflect.Descriptor instead.
-func (*MsgUpdatePostByThresholdSignature) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgUpdateRingPostByThresholdSignature.ProtoReflect.Descriptor instead.
+func (*MsgUpdateRingPostByThresholdSignature) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetCreator() string {
+func (x *MsgUpdateRingPostByThresholdSignature) GetCreator() string {
 	if x != nil {
 		return x.Creator
 	}
 	return ""
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetNamespace() string {
+func (x *MsgUpdateRingPostByThresholdSignature) GetNamespace() string {
 	if x != nil {
 		return x.Namespace
 	}
 	return ""
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetPostId() string {
+func (x *MsgUpdateRingPostByThresholdSignature) GetPostId() string {
 	if x != nil {
 		return x.PostId
 	}
 	return ""
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetArtifact() string {
+func (x *MsgUpdateRingPostByThresholdSignature) GetArtifact() string {
 	if x != nil {
 		return x.Artifact
 	}
 	return ""
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetSignatureScheme() string {
+func (x *MsgUpdateRingPostByThresholdSignature) GetSignatureScheme() string {
 	if x != nil {
 		return x.SignatureScheme
 	}
 	return ""
 }
 
-func (x *MsgUpdatePostByThresholdSignature) GetSignature() []byte {
+func (x *MsgUpdateRingPostByThresholdSignature) GetSignature() []byte {
 	if x != nil {
 		return x.Signature
 	}
 	return nil
 }
 
-type MsgUpdatePostByThresholdSignatureResponse struct {
+type MsgUpdateRingPostByThresholdSignatureResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 }
 
-func (x *MsgUpdatePostByThresholdSignatureResponse) Reset() {
-	*x = MsgUpdatePostByThresholdSignatureResponse{}
+func (x *MsgUpdateRingPostByThresholdSignatureResponse) Reset() {
+	*x = MsgUpdateRingPostByThresholdSignatureResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_sourcehub_bulletin_tx_proto_msgTypes[7]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -8039,14 +8039,14 @@ func (x *MsgUpdatePostByThresholdSignatureResponse) Reset() {
 	}
 }
 
-func (x *MsgUpdatePostByThresholdSignatureResponse) String() string {
+func (x *MsgUpdateRingPostByThresholdSignatureResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*MsgUpdatePostByThresholdSignatureResponse) ProtoMessage() {}
+func (*MsgUpdateRingPostByThresholdSignatureResponse) ProtoMessage() {}
 
-// Deprecated: Use MsgUpdatePostByThresholdSignatureResponse.ProtoReflect.Descriptor instead.
-func (*MsgUpdatePostByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use MsgUpdateRingPostByThresholdSignatureResponse.ProtoReflect.Descriptor instead.
+func (*MsgUpdateRingPostByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_bulletin_tx_proto_rawDescGZIP(), []int{7}
 }
 
@@ -8431,154 +8431,159 @@ var file_sourcehub_bulletin_tx_proto_rawDesc = []byte{
 	0x63, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61,
 	0x63, 0x74, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
 	0x22, 0x17, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xa4, 0x01, 0x0a, 0x0d, 0x4d, 0x73,
-	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xad, 0x01, 0x0a, 0x16, 0x4d, 0x73,
+	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42,
+	0x79, 0x41, 0x63, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c,
+	0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07,
+	0x70, 0x6f, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70,
+	0x6f, 0x73, 0x74, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64,
+	0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12,
+	0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x3a, 0x0c, 0x82, 0xe7, 0xb0,
+	0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x20, 0x0a, 0x1e, 0x4d, 0x73, 0x67,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79,
+	0x41, 0x63, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xeb, 0x01, 0x0a, 0x25,
+	0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73,
+	0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e,
+	0x61, 0x74, 0x75, 0x72, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12,
+	0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a,
+	0x07, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x70, 0x6f, 0x73, 0x74, 0x49, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61,
+	0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61,
+	0x63, 0x74, 0x12, 0x29, 0x0a, 0x10, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x5f,
+	0x73, 0x63, 0x68, 0x65, 0x6d, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x73, 0x69,
+	0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x65, 0x12, 0x1c, 0x0a,
+	0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c,
+	0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0,
+	0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x2f, 0x0a, 0x2d, 0x4d, 0x73, 0x67,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79,
+	0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75,
+	0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xbd, 0x02, 0x0a, 0x1a, 0x52,
+	0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x65, 0x46, 0x69, 0x6e, 0x61, 0x6c, 0x69,
+	0x7a, 0x65, 0x53, 0x69, 0x67, 0x6e, 0x44, 0x6f, 0x63, 0x12, 0x16, 0x0a, 0x06, 0x64, 0x6f, 0x6d,
+	0x61, 0x69, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69,
+	0x6e, 0x12, 0x19, 0x0a, 0x08, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x68, 0x61, 0x69, 0x6e, 0x49, 0x64, 0x12, 0x1c, 0x0a, 0x09,
+	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x70, 0x6f,
+	0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x6f, 0x73,
+	0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x70, 0x6b, 0x18, 0x05,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x50, 0x6b, 0x12, 0x34, 0x0a, 0x16,
+	0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x5f,
+	0x73, 0x68, 0x61, 0x32, 0x35, 0x36, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x14, 0x63, 0x75,
+	0x72, 0x72, 0x65, 0x6e, 0x74, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x32,
+	0x35, 0x36, 0x12, 0x38, 0x0a, 0x18, 0x66, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x5f,
+	0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x32, 0x35, 0x36, 0x18, 0x07,
+	0x20, 0x01, 0x28, 0x0c, 0x52, 0x16, 0x66, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x50,
+	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x32, 0x35, 0x36, 0x12, 0x2c, 0x0a, 0x12,
+	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x5f, 0x6e, 0x6f, 0x6e,
+	0x63, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x04, 0x52, 0x10, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x4e,
+	0x75, 0x6d, 0x62, 0x65, 0x72, 0x4e, 0x6f, 0x6e, 0x63, 0x65, 0x22, 0x5c, 0x0a, 0x14, 0x4d, 0x73,
+	0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61,
+	0x63, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09,
+	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a,
+	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x5b, 0x0a, 0x1c, 0x4d, 0x73, 0x67, 0x52,
+	0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
+	0x2e, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x22, 0x7e, 0x0a, 0x12, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63,
 	0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72,
 	0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61,
 	0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
-	0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x03,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x6f, 0x73, 0x74, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07,
-	0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70,
-	0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61,
-	0x63, 0x74, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61,
-	0x63, 0x74, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
-	0x22, 0x17, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73,
-	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0xe7, 0x01, 0x0a, 0x21, 0x4d, 0x73,
-	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72,
-	0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x12,
-	0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61,
-	0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x70, 0x6f, 0x73, 0x74, 0x5f,
-	0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x6f, 0x73, 0x74, 0x49, 0x64,
-	0x12, 0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x12, 0x29, 0x0a, 0x10,
-	0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x5f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x65,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72,
-	0x65, 0x53, 0x63, 0x68, 0x65, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61,
-	0x74, 0x75, 0x72, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e,
-	0x61, 0x74, 0x75, 0x72, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61,
-	0x74, 0x6f, 0x72, 0x22, 0x2b, 0x0a, 0x29, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53,
-	0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0xbd, 0x02, 0x0a, 0x1a, 0x52, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x65,
-	0x46, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x53, 0x69, 0x67, 0x6e, 0x44, 0x6f, 0x63, 0x12,
-	0x16, 0x0a, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12, 0x19, 0x0a, 0x08, 0x63, 0x68, 0x61, 0x69, 0x6e,
-	0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x68, 0x61, 0x69, 0x6e,
-	0x49, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18,
-	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
-	0x12, 0x17, 0x0a, 0x07, 0x70, 0x6f, 0x73, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x04, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x06, 0x70, 0x6f, 0x73, 0x74, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e,
-	0x67, 0x5f, 0x70, 0x6b, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67,
-	0x50, 0x6b, 0x12, 0x34, 0x0a, 0x16, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x70, 0x61,
-	0x79, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68, 0x61, 0x32, 0x35, 0x36, 0x18, 0x06, 0x20, 0x01,
-	0x28, 0x0c, 0x52, 0x14, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x50, 0x61, 0x79, 0x6c, 0x6f,
-	0x61, 0x64, 0x53, 0x68, 0x61, 0x32, 0x35, 0x36, 0x12, 0x38, 0x0a, 0x18, 0x66, 0x69, 0x6e, 0x61,
-	0x6c, 0x69, 0x7a, 0x65, 0x64, 0x5f, 0x70, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x5f, 0x73, 0x68,
-	0x61, 0x32, 0x35, 0x36, 0x18, 0x07, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x16, 0x66, 0x69, 0x6e, 0x61,
-	0x6c, 0x69, 0x7a, 0x65, 0x64, 0x50, 0x61, 0x79, 0x6c, 0x6f, 0x61, 0x64, 0x53, 0x68, 0x61, 0x32,
-	0x35, 0x36, 0x12, 0x2c, 0x0a, 0x12, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75, 0x6d, 0x62,
-	0x65, 0x72, 0x5f, 0x6e, 0x6f, 0x6e, 0x63, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x04, 0x52, 0x10,
-	0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x4e, 0x6f, 0x6e, 0x63, 0x65,
-	0x22, 0x5c, 0x0a, 0x14, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e,
-	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61,
+	0x61, 0x63, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61,
+	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x47, 0x0a, 0x1a, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x22, 0x81,
+	0x01, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c,
+	0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61,
 	0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18,
 	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
-	0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x5b,
-	0x0a, 0x1c, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x3b,
-	0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x1d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
-	0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x22, 0x7e, 0x0a, 0x12, 0x4d,
-	0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e,
-	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
-	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c,
-	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82,
-	0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x47, 0x0a, 0x1a, 0x4d,
-	0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c,
-	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x44, 0x69, 0x64, 0x22, 0x81, 0x01, 0x0a, 0x15, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f,
-	0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x18,
-	0x0a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65,
-	0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62,
-	0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f,
-	0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a,
-	0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x4a, 0x0a, 0x1d, 0x4d, 0x73, 0x67, 0x52,
-	0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c,
-	0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x0f, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x44, 0x69, 0x64, 0x32, 0x8f, 0x06, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x60, 0x0a, 0x0c,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x23, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x1a, 0x2b, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5a,
-	0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x21, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x1a,
-	0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f,
-	0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5a, 0x0a, 0x0a, 0x55, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73,
-	0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f,
+	0x12, 0x22, 0x0a, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0c, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74,
+	0x6f, 0x72, 0x22, 0x4a, 0x0a, 0x1d, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x29, 0x0a, 0x10, 0x63, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
+	0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x63,
+	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x32, 0xb6,
+	0x06, 0x0a, 0x03, 0x4d, 0x73, 0x67, 0x12, 0x60, 0x0a, 0x0c, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x23, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55,
+	0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x1a, 0x2b, 0x2e, 0x73, 0x6f,
 	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
-	0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x96, 0x01, 0x0a, 0x1e, 0x55, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64,
-	0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x12, 0x35, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5a, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x12, 0x21, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x1a, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72,
 	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d,
-	0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68,
-	0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65,
-	0x1a, 0x3d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c,
-	0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x50,
-	0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69,
-	0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x6f, 0x0a, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73,
-	0x70, 0x61, 0x63, 0x65, 0x12, 0x28, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67,
-	0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x1a, 0x30,
-	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65,
-	0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e,
-	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x69, 0x0a, 0x0f, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
-	0x74, 0x6f, 0x72, 0x12, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e,
-	0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43,
-	0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x2e, 0x2e, 0x73, 0x6f,
+	0x73, 0x67, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x50, 0x6f, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x75, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69,
+	0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x41, 0x63, 0x70, 0x12, 0x2a, 0x2e, 0x73, 0x6f,
 	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
-	0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61,
-	0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a, 0x12, 0x52,
-	0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f,
-	0x72, 0x12, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65,
-	0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x31, 0x2e, 0x73,
+	0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f,
+	0x73, 0x74, 0x42, 0x79, 0x41, 0x63, 0x70, 0x1a, 0x32, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79,
+	0x41, 0x63, 0x70, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0xa2, 0x01, 0x0a, 0x22,
+	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79,
+	0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75,
+	0x72, 0x65, 0x12, 0x39, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
+	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74,
+	0x65, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73,
+	0x68, 0x6f, 0x6c, 0x64, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x1a, 0x41, 0x2e,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67,
+	0x50, 0x6f, 0x73, 0x74, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x53,
+	0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x6f, 0x0a, 0x11, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x28, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65,
+	0x67, 0x69, 0x73, 0x74, 0x65, 0x72, 0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x1a,
+	0x30, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c,
+	0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x67, 0x69, 0x73, 0x74, 0x65, 0x72,
+	0x4e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x69, 0x0a, 0x0f, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x12, 0x26, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64,
+	0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x2e, 0x2e, 0x73,
 	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61,
-	0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a,
-	0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xaf, 0x01, 0x0a, 0x16, 0x63, 0x6f, 0x6d, 0x2e, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63, 0x6f,
-	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xca, 0x02, 0x12, 0x53,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
-	0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75,
-	0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a,
-	0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x41, 0x64, 0x64, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72,
+	0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a, 0x12,
+	0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74,
+	0x6f, 0x72, 0x12, 0x29, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62,
+	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76,
+	0x65, 0x43, 0x6f, 0x6c, 0x6c, 0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x1a, 0x31, 0x2e,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0x2e, 0x4d, 0x73, 0x67, 0x52, 0x65, 0x6d, 0x6f, 0x76, 0x65, 0x43, 0x6f, 0x6c, 0x6c,
+	0x61, 0x62, 0x6f, 0x72, 0x61, 0x74, 0x6f, 0x72, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x1a, 0x05, 0x80, 0xe7, 0xb0, 0x2a, 0x01, 0x42, 0xaf, 0x01, 0x0a, 0x16, 0x63, 0x6f, 0x6d, 0x2e,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0x42, 0x07, 0x54, 0x78, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x23, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x58, 0xaa, 0x02, 0x12, 0x53, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0xca, 0x02, 0x12,
+	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0xe2, 0x02, 0x1e, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42,
+	0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x13, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a,
+	0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x33,
 }
 
 var (
@@ -8595,38 +8600,38 @@ func file_sourcehub_bulletin_tx_proto_rawDescGZIP() []byte {
 
 var file_sourcehub_bulletin_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_sourcehub_bulletin_tx_proto_goTypes = []interface{}{
-	(*MsgUpdateParams)(nil),                           // 0: sourcehub.bulletin.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),                   // 1: sourcehub.bulletin.MsgUpdateParamsResponse
-	(*MsgCreatePost)(nil),                             // 2: sourcehub.bulletin.MsgCreatePost
-	(*MsgCreatePostResponse)(nil),                     // 3: sourcehub.bulletin.MsgCreatePostResponse
-	(*MsgUpdatePost)(nil),                             // 4: sourcehub.bulletin.MsgUpdatePost
-	(*MsgUpdatePostResponse)(nil),                     // 5: sourcehub.bulletin.MsgUpdatePostResponse
-	(*MsgUpdatePostByThresholdSignature)(nil),         // 6: sourcehub.bulletin.MsgUpdatePostByThresholdSignature
-	(*MsgUpdatePostByThresholdSignatureResponse)(nil), // 7: sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse
-	(*RingReshareFinalizeSignDoc)(nil),                // 8: sourcehub.bulletin.RingReshareFinalizeSignDoc
-	(*MsgRegisterNamespace)(nil),                      // 9: sourcehub.bulletin.MsgRegisterNamespace
-	(*MsgRegisterNamespaceResponse)(nil),              // 10: sourcehub.bulletin.MsgRegisterNamespaceResponse
-	(*MsgAddCollaborator)(nil),                        // 11: sourcehub.bulletin.MsgAddCollaborator
-	(*MsgAddCollaboratorResponse)(nil),                // 12: sourcehub.bulletin.MsgAddCollaboratorResponse
-	(*MsgRemoveCollaborator)(nil),                     // 13: sourcehub.bulletin.MsgRemoveCollaborator
-	(*MsgRemoveCollaboratorResponse)(nil),             // 14: sourcehub.bulletin.MsgRemoveCollaboratorResponse
-	(*Params)(nil),                                    // 15: sourcehub.bulletin.Params
-	(*Namespace)(nil),                                 // 16: sourcehub.bulletin.Namespace
+	(*MsgUpdateParams)(nil),                               // 0: sourcehub.bulletin.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),                       // 1: sourcehub.bulletin.MsgUpdateParamsResponse
+	(*MsgCreatePost)(nil),                                 // 2: sourcehub.bulletin.MsgCreatePost
+	(*MsgCreatePostResponse)(nil),                         // 3: sourcehub.bulletin.MsgCreatePostResponse
+	(*MsgUpdateRingPostByAcp)(nil),                        // 4: sourcehub.bulletin.MsgUpdateRingPostByAcp
+	(*MsgUpdateRingPostByAcpResponse)(nil),                // 5: sourcehub.bulletin.MsgUpdateRingPostByAcpResponse
+	(*MsgUpdateRingPostByThresholdSignature)(nil),         // 6: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature
+	(*MsgUpdateRingPostByThresholdSignatureResponse)(nil), // 7: sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse
+	(*RingReshareFinalizeSignDoc)(nil),                    // 8: sourcehub.bulletin.RingReshareFinalizeSignDoc
+	(*MsgRegisterNamespace)(nil),                          // 9: sourcehub.bulletin.MsgRegisterNamespace
+	(*MsgRegisterNamespaceResponse)(nil),                  // 10: sourcehub.bulletin.MsgRegisterNamespaceResponse
+	(*MsgAddCollaborator)(nil),                            // 11: sourcehub.bulletin.MsgAddCollaborator
+	(*MsgAddCollaboratorResponse)(nil),                    // 12: sourcehub.bulletin.MsgAddCollaboratorResponse
+	(*MsgRemoveCollaborator)(nil),                         // 13: sourcehub.bulletin.MsgRemoveCollaborator
+	(*MsgRemoveCollaboratorResponse)(nil),                 // 14: sourcehub.bulletin.MsgRemoveCollaboratorResponse
+	(*Params)(nil),                                        // 15: sourcehub.bulletin.Params
+	(*Namespace)(nil),                                     // 16: sourcehub.bulletin.Namespace
 }
 var file_sourcehub_bulletin_tx_proto_depIdxs = []int32{
 	15, // 0: sourcehub.bulletin.MsgUpdateParams.params:type_name -> sourcehub.bulletin.Params
 	16, // 1: sourcehub.bulletin.MsgRegisterNamespaceResponse.namespace:type_name -> sourcehub.bulletin.Namespace
 	0,  // 2: sourcehub.bulletin.Msg.UpdateParams:input_type -> sourcehub.bulletin.MsgUpdateParams
 	2,  // 3: sourcehub.bulletin.Msg.CreatePost:input_type -> sourcehub.bulletin.MsgCreatePost
-	4,  // 4: sourcehub.bulletin.Msg.UpdatePost:input_type -> sourcehub.bulletin.MsgUpdatePost
-	6,  // 5: sourcehub.bulletin.Msg.UpdatePostByThresholdSignature:input_type -> sourcehub.bulletin.MsgUpdatePostByThresholdSignature
+	4,  // 4: sourcehub.bulletin.Msg.UpdateRingPostByAcp:input_type -> sourcehub.bulletin.MsgUpdateRingPostByAcp
+	6,  // 5: sourcehub.bulletin.Msg.UpdateRingPostByThresholdSignature:input_type -> sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature
 	9,  // 6: sourcehub.bulletin.Msg.RegisterNamespace:input_type -> sourcehub.bulletin.MsgRegisterNamespace
 	11, // 7: sourcehub.bulletin.Msg.AddCollaborator:input_type -> sourcehub.bulletin.MsgAddCollaborator
 	13, // 8: sourcehub.bulletin.Msg.RemoveCollaborator:input_type -> sourcehub.bulletin.MsgRemoveCollaborator
 	1,  // 9: sourcehub.bulletin.Msg.UpdateParams:output_type -> sourcehub.bulletin.MsgUpdateParamsResponse
 	3,  // 10: sourcehub.bulletin.Msg.CreatePost:output_type -> sourcehub.bulletin.MsgCreatePostResponse
-	5,  // 11: sourcehub.bulletin.Msg.UpdatePost:output_type -> sourcehub.bulletin.MsgUpdatePostResponse
-	7,  // 12: sourcehub.bulletin.Msg.UpdatePostByThresholdSignature:output_type -> sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse
+	5,  // 11: sourcehub.bulletin.Msg.UpdateRingPostByAcp:output_type -> sourcehub.bulletin.MsgUpdateRingPostByAcpResponse
+	7,  // 12: sourcehub.bulletin.Msg.UpdateRingPostByThresholdSignature:output_type -> sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse
 	10, // 13: sourcehub.bulletin.Msg.RegisterNamespace:output_type -> sourcehub.bulletin.MsgRegisterNamespaceResponse
 	12, // 14: sourcehub.bulletin.Msg.AddCollaborator:output_type -> sourcehub.bulletin.MsgAddCollaboratorResponse
 	14, // 15: sourcehub.bulletin.Msg.RemoveCollaborator:output_type -> sourcehub.bulletin.MsgRemoveCollaboratorResponse
@@ -8694,7 +8699,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdatePost); i {
+			switch v := v.(*MsgUpdateRingPostByAcp); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8706,7 +8711,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdatePostResponse); i {
+			switch v := v.(*MsgUpdateRingPostByAcpResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8718,7 +8723,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdatePostByThresholdSignature); i {
+			switch v := v.(*MsgUpdateRingPostByThresholdSignature); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8730,7 +8735,7 @@ func file_sourcehub_bulletin_tx_proto_init() {
 			}
 		}
 		file_sourcehub_bulletin_tx_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MsgUpdatePostByThresholdSignatureResponse); i {
+			switch v := v.(*MsgUpdateRingPostByThresholdSignatureResponse); i {
 			case 0:
 				return &v.state
 			case 1:

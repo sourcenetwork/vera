@@ -228,7 +228,7 @@ func (m *MsgCreatePostResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePostResponse proto.InternalMessageInfo
 
-type MsgUpdatePost struct {
+type MsgUpdateRingPostByAcp struct {
 	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Namespace string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	PostId    string `protobuf:"bytes,3,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
@@ -236,18 +236,18 @@ type MsgUpdatePost struct {
 	Artifact  string `protobuf:"bytes,5,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
-func (m *MsgUpdatePost) Reset()         { *m = MsgUpdatePost{} }
-func (m *MsgUpdatePost) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdatePost) ProtoMessage()    {}
-func (*MsgUpdatePost) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateRingPostByAcp) Reset()         { *m = MsgUpdateRingPostByAcp{} }
+func (m *MsgUpdateRingPostByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateRingPostByAcp) ProtoMessage()    {}
+func (*MsgUpdateRingPostByAcp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0497d0f203b2b5e8, []int{4}
 }
-func (m *MsgUpdatePost) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateRingPostByAcp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdatePost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateRingPostByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdatePost.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateRingPostByAcp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -257,68 +257,68 @@ func (m *MsgUpdatePost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdatePost) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdatePost.Merge(m, src)
+func (m *MsgUpdateRingPostByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateRingPostByAcp.Merge(m, src)
 }
-func (m *MsgUpdatePost) XXX_Size() int {
+func (m *MsgUpdateRingPostByAcp) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdatePost) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdatePost.DiscardUnknown(m)
+func (m *MsgUpdateRingPostByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateRingPostByAcp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdatePost proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateRingPostByAcp proto.InternalMessageInfo
 
-func (m *MsgUpdatePost) GetCreator() string {
+func (m *MsgUpdateRingPostByAcp) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdatePost) GetNamespace() string {
+func (m *MsgUpdateRingPostByAcp) GetNamespace() string {
 	if m != nil {
 		return m.Namespace
 	}
 	return ""
 }
 
-func (m *MsgUpdatePost) GetPostId() string {
+func (m *MsgUpdateRingPostByAcp) GetPostId() string {
 	if m != nil {
 		return m.PostId
 	}
 	return ""
 }
 
-func (m *MsgUpdatePost) GetPayload() []byte {
+func (m *MsgUpdateRingPostByAcp) GetPayload() []byte {
 	if m != nil {
 		return m.Payload
 	}
 	return nil
 }
 
-func (m *MsgUpdatePost) GetArtifact() string {
+func (m *MsgUpdateRingPostByAcp) GetArtifact() string {
 	if m != nil {
 		return m.Artifact
 	}
 	return ""
 }
 
-type MsgUpdatePostResponse struct {
+type MsgUpdateRingPostByAcpResponse struct {
 }
 
-func (m *MsgUpdatePostResponse) Reset()         { *m = MsgUpdatePostResponse{} }
-func (m *MsgUpdatePostResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdatePostResponse) ProtoMessage()    {}
-func (*MsgUpdatePostResponse) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateRingPostByAcpResponse) Reset()         { *m = MsgUpdateRingPostByAcpResponse{} }
+func (m *MsgUpdateRingPostByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateRingPostByAcpResponse) ProtoMessage()    {}
+func (*MsgUpdateRingPostByAcpResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0497d0f203b2b5e8, []int{5}
 }
-func (m *MsgUpdatePostResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateRingPostByAcpResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdatePostResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateRingPostByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdatePostResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateRingPostByAcpResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -328,19 +328,19 @@ func (m *MsgUpdatePostResponse) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdatePostResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdatePostResponse.Merge(m, src)
+func (m *MsgUpdateRingPostByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateRingPostByAcpResponse.Merge(m, src)
 }
-func (m *MsgUpdatePostResponse) XXX_Size() int {
+func (m *MsgUpdateRingPostByAcpResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdatePostResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdatePostResponse.DiscardUnknown(m)
+func (m *MsgUpdateRingPostByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateRingPostByAcpResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdatePostResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateRingPostByAcpResponse proto.InternalMessageInfo
 
-type MsgUpdatePostByThresholdSignature struct {
+type MsgUpdateRingPostByThresholdSignature struct {
 	Creator         string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	Namespace       string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	PostId          string `protobuf:"bytes,3,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
@@ -349,18 +349,18 @@ type MsgUpdatePostByThresholdSignature struct {
 	Signature       []byte `protobuf:"bytes,6,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
-func (m *MsgUpdatePostByThresholdSignature) Reset()         { *m = MsgUpdatePostByThresholdSignature{} }
-func (m *MsgUpdatePostByThresholdSignature) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdatePostByThresholdSignature) ProtoMessage()    {}
-func (*MsgUpdatePostByThresholdSignature) Descriptor() ([]byte, []int) {
+func (m *MsgUpdateRingPostByThresholdSignature) Reset()         { *m = MsgUpdateRingPostByThresholdSignature{} }
+func (m *MsgUpdateRingPostByThresholdSignature) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateRingPostByThresholdSignature) ProtoMessage()    {}
+func (*MsgUpdateRingPostByThresholdSignature) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0497d0f203b2b5e8, []int{6}
 }
-func (m *MsgUpdatePostByThresholdSignature) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateRingPostByThresholdSignature) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdatePostByThresholdSignature) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateRingPostByThresholdSignature) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdatePostByThresholdSignature.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateRingPostByThresholdSignature.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -370,79 +370,79 @@ func (m *MsgUpdatePostByThresholdSignature) XXX_Marshal(b []byte, deterministic 
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdatePostByThresholdSignature) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdatePostByThresholdSignature.Merge(m, src)
+func (m *MsgUpdateRingPostByThresholdSignature) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateRingPostByThresholdSignature.Merge(m, src)
 }
-func (m *MsgUpdatePostByThresholdSignature) XXX_Size() int {
+func (m *MsgUpdateRingPostByThresholdSignature) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdatePostByThresholdSignature) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdatePostByThresholdSignature.DiscardUnknown(m)
+func (m *MsgUpdateRingPostByThresholdSignature) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateRingPostByThresholdSignature.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdatePostByThresholdSignature proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateRingPostByThresholdSignature proto.InternalMessageInfo
 
-func (m *MsgUpdatePostByThresholdSignature) GetCreator() string {
+func (m *MsgUpdateRingPostByThresholdSignature) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdatePostByThresholdSignature) GetNamespace() string {
+func (m *MsgUpdateRingPostByThresholdSignature) GetNamespace() string {
 	if m != nil {
 		return m.Namespace
 	}
 	return ""
 }
 
-func (m *MsgUpdatePostByThresholdSignature) GetPostId() string {
+func (m *MsgUpdateRingPostByThresholdSignature) GetPostId() string {
 	if m != nil {
 		return m.PostId
 	}
 	return ""
 }
 
-func (m *MsgUpdatePostByThresholdSignature) GetArtifact() string {
+func (m *MsgUpdateRingPostByThresholdSignature) GetArtifact() string {
 	if m != nil {
 		return m.Artifact
 	}
 	return ""
 }
 
-func (m *MsgUpdatePostByThresholdSignature) GetSignatureScheme() string {
+func (m *MsgUpdateRingPostByThresholdSignature) GetSignatureScheme() string {
 	if m != nil {
 		return m.SignatureScheme
 	}
 	return ""
 }
 
-func (m *MsgUpdatePostByThresholdSignature) GetSignature() []byte {
+func (m *MsgUpdateRingPostByThresholdSignature) GetSignature() []byte {
 	if m != nil {
 		return m.Signature
 	}
 	return nil
 }
 
-type MsgUpdatePostByThresholdSignatureResponse struct {
+type MsgUpdateRingPostByThresholdSignatureResponse struct {
 }
 
-func (m *MsgUpdatePostByThresholdSignatureResponse) Reset() {
-	*m = MsgUpdatePostByThresholdSignatureResponse{}
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) Reset() {
+	*m = MsgUpdateRingPostByThresholdSignatureResponse{}
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) String() string {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) String() string {
 	return proto.CompactTextString(m)
 }
-func (*MsgUpdatePostByThresholdSignatureResponse) ProtoMessage() {}
-func (*MsgUpdatePostByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
+func (*MsgUpdateRingPostByThresholdSignatureResponse) ProtoMessage() {}
+func (*MsgUpdateRingPostByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0497d0f203b2b5e8, []int{7}
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdatePostByThresholdSignatureResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateRingPostByThresholdSignatureResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -452,17 +452,17 @@ func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_Marshal(b []byte, determ
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdatePostByThresholdSignatureResponse.Merge(m, src)
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateRingPostByThresholdSignatureResponse.Merge(m, src)
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_Size() int {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdatePostByThresholdSignatureResponse.DiscardUnknown(m)
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateRingPostByThresholdSignatureResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdatePostByThresholdSignatureResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateRingPostByThresholdSignatureResponse proto.InternalMessageInfo
 
 type RingReshareFinalizeSignDoc struct {
 	Domain                 string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
@@ -873,10 +873,10 @@ func init() {
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "sourcehub.bulletin.MsgUpdateParamsResponse")
 	proto.RegisterType((*MsgCreatePost)(nil), "sourcehub.bulletin.MsgCreatePost")
 	proto.RegisterType((*MsgCreatePostResponse)(nil), "sourcehub.bulletin.MsgCreatePostResponse")
-	proto.RegisterType((*MsgUpdatePost)(nil), "sourcehub.bulletin.MsgUpdatePost")
-	proto.RegisterType((*MsgUpdatePostResponse)(nil), "sourcehub.bulletin.MsgUpdatePostResponse")
-	proto.RegisterType((*MsgUpdatePostByThresholdSignature)(nil), "sourcehub.bulletin.MsgUpdatePostByThresholdSignature")
-	proto.RegisterType((*MsgUpdatePostByThresholdSignatureResponse)(nil), "sourcehub.bulletin.MsgUpdatePostByThresholdSignatureResponse")
+	proto.RegisterType((*MsgUpdateRingPostByAcp)(nil), "sourcehub.bulletin.MsgUpdateRingPostByAcp")
+	proto.RegisterType((*MsgUpdateRingPostByAcpResponse)(nil), "sourcehub.bulletin.MsgUpdateRingPostByAcpResponse")
+	proto.RegisterType((*MsgUpdateRingPostByThresholdSignature)(nil), "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignature")
+	proto.RegisterType((*MsgUpdateRingPostByThresholdSignatureResponse)(nil), "sourcehub.bulletin.MsgUpdateRingPostByThresholdSignatureResponse")
 	proto.RegisterType((*RingReshareFinalizeSignDoc)(nil), "sourcehub.bulletin.RingReshareFinalizeSignDoc")
 	proto.RegisterType((*MsgRegisterNamespace)(nil), "sourcehub.bulletin.MsgRegisterNamespace")
 	proto.RegisterType((*MsgRegisterNamespaceResponse)(nil), "sourcehub.bulletin.MsgRegisterNamespaceResponse")
@@ -889,65 +889,66 @@ func init() {
 func init() { proto.RegisterFile("sourcehub/bulletin/tx.proto", fileDescriptor_0497d0f203b2b5e8) }
 
 var fileDescriptor_0497d0f203b2b5e8 = []byte{
-	// 926 bytes of a gzipped FileDescriptorProto
+	// 941 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x56, 0xcf, 0x6f, 0xdc, 0x44,
-	0x14, 0x8e, 0x93, 0x74, 0x93, 0x7d, 0x04, 0x25, 0x1d, 0x85, 0xac, 0x63, 0xda, 0x6d, 0x62, 0x10,
-	0xda, 0x4d, 0x61, 0x97, 0xa6, 0xb4, 0xa0, 0xa2, 0x1e, 0x9a, 0x56, 0xa0, 0x22, 0x6d, 0x14, 0x39,
-	0x70, 0x29, 0x48, 0x66, 0xd6, 0x9e, 0x7a, 0xad, 0xac, 0x3d, 0xd6, 0xcc, 0x6c, 0x69, 0x38, 0x20,
-	0xe0, 0x08, 0x07, 0x38, 0xf1, 0x17, 0x70, 0xe0, 0x98, 0x03, 0x57, 0x0e, 0xdc, 0x7a, 0xac, 0x38,
-	0x71, 0x42, 0x28, 0x39, 0xe4, 0xdf, 0x40, 0x63, 0xcf, 0xfa, 0xd7, 0x3a, 0x3f, 0x94, 0x22, 0xf5,
-	0x92, 0xec, 0x7b, 0xef, 0x7b, 0xef, 0x7d, 0xdf, 0xb3, 0xdf, 0x8c, 0xe1, 0x75, 0x4e, 0x47, 0xcc,
-	0x21, 0x83, 0x51, 0xbf, 0xdb, 0x1f, 0x0d, 0x87, 0x44, 0xf8, 0x61, 0x57, 0x3c, 0xed, 0x44, 0x8c,
-	0x0a, 0x8a, 0x50, 0x1a, 0xec, 0x8c, 0x83, 0xc6, 0x65, 0x1c, 0xf8, 0x21, 0xed, 0xc6, 0x7f, 0x13,
-	0x98, 0xd1, 0x70, 0x28, 0x0f, 0x28, 0xef, 0x06, 0xdc, 0xeb, 0x3e, 0xb9, 0x21, 0xff, 0xa9, 0xc0,
-	0x6a, 0x12, 0xb0, 0x63, 0xab, 0x9b, 0x18, 0x2a, 0xb4, 0xec, 0x51, 0x8f, 0x26, 0x7e, 0xf9, 0x4b,
-	0x79, 0xaf, 0x55, 0xb0, 0x89, 0x30, 0xc3, 0xc1, 0x38, 0xcd, 0xac, 0x00, 0x84, 0x38, 0x20, 0x3c,
-	0xc2, 0x0e, 0x49, 0x30, 0xe6, 0x9f, 0x1a, 0x2c, 0xf6, 0xb8, 0xf7, 0x59, 0xe4, 0x62, 0x41, 0x76,
-	0xe2, 0x6c, 0x74, 0x1b, 0xea, 0x78, 0x24, 0x06, 0x94, 0xf9, 0x62, 0x5f, 0xd7, 0xd6, 0xb4, 0x56,
-	0x7d, 0x4b, 0xff, 0xeb, 0xf7, 0x77, 0x96, 0x15, 0xa7, 0x7b, 0xae, 0xcb, 0x08, 0xe7, 0xbb, 0x82,
-	0xf9, 0xa1, 0x67, 0x65, 0x50, 0x74, 0x17, 0x6a, 0x49, 0x7f, 0x7d, 0x7a, 0x4d, 0x6b, 0xbd, 0xb2,
-	0x69, 0x74, 0x26, 0x47, 0xd2, 0x49, 0x7a, 0x6c, 0xd5, 0x9f, 0xfd, 0x73, 0x6d, 0xea, 0xb7, 0xe3,
-	0x83, 0x0d, 0xcd, 0x52, 0x49, 0x77, 0xde, 0xff, 0xfe, 0xf8, 0x60, 0x23, 0x2b, 0xf7, 0xc3, 0xf1,
-	0xc1, 0xc6, 0x9b, 0x99, 0x82, 0xa7, 0x99, 0x86, 0x12, 0x5f, 0x73, 0x15, 0x1a, 0x25, 0x97, 0x45,
-	0x78, 0x44, 0x43, 0x4e, 0xcc, 0x1f, 0x35, 0x78, 0xb5, 0xc7, 0xbd, 0xfb, 0x8c, 0xc8, 0x18, 0xe5,
-	0x02, 0xe9, 0x30, 0xe7, 0x48, 0x8b, 0xb2, 0x44, 0x9a, 0x35, 0x36, 0xd1, 0x15, 0xa8, 0xa7, 0xd3,
-	0x89, 0x15, 0xd4, 0xad, 0xcc, 0x21, 0xf3, 0x22, 0xbc, 0x3f, 0xa4, 0xd8, 0xd5, 0x67, 0xd6, 0xb4,
-	0xd6, 0x82, 0x35, 0x36, 0x91, 0x01, 0xf3, 0x98, 0x09, 0xff, 0x31, 0x76, 0x84, 0x7e, 0x29, 0x4e,
-	0x4b, 0xed, 0x3b, 0x0b, 0x52, 0xd3, 0xb8, 0x83, 0xd9, 0x80, 0xd7, 0x0a, 0x64, 0x52, 0x9a, 0xbf,
-	0x26, 0x34, 0x95, 0x84, 0x17, 0xa1, 0xd9, 0x80, 0xb9, 0x88, 0x72, 0x61, 0xfb, 0x09, 0xcd, 0xba,
-	0x55, 0x93, 0xe6, 0x43, 0x37, 0xcf, 0x7f, 0xf6, 0xc5, 0xf8, 0x67, 0x2c, 0x53, 0xfe, 0xc7, 0x1a,
-	0xac, 0x17, 0x22, 0x5b, 0xfb, 0x9f, 0x0e, 0x18, 0xe1, 0x03, 0x3a, 0x74, 0x77, 0x7d, 0x2f, 0xc4,
-	0x62, 0xc4, 0xc8, 0xff, 0xaf, 0x29, 0xcf, 0x7c, 0xb6, 0xc8, 0x1c, 0xb5, 0x61, 0x89, 0x8f, 0x3b,
-	0xdb, 0xdc, 0x19, 0x90, 0x80, 0x28, 0x75, 0x8b, 0xa9, 0x7f, 0x37, 0x76, 0xcb, 0xee, 0xa9, 0x4b,
-	0xaf, 0xc5, 0xc3, 0xc9, 0x1c, 0xa5, 0x11, 0x5c, 0x87, 0xf6, 0x99, 0x42, 0xd3, 0xb1, 0xfc, 0x31,
-	0x0d, 0x86, 0x25, 0x97, 0x84, 0xf0, 0x01, 0x66, 0xe4, 0x23, 0x3f, 0xc4, 0x43, 0xff, 0x6b, 0x22,
-	0x81, 0x0f, 0xa8, 0x83, 0x56, 0xa0, 0xe6, 0xd2, 0x00, 0xfb, 0xa1, 0x1a, 0x87, 0xb2, 0xd0, 0x2a,
-	0xcc, 0x3b, 0x03, 0xec, 0x87, 0x52, 0xf0, 0xb4, 0x1a, 0x94, 0xb4, 0x1f, 0xba, 0xc5, 0x41, 0xcd,
-	0x9c, 0x32, 0xa8, 0xd9, 0xc2, 0xa0, 0x1a, 0x30, 0x27, 0x97, 0xd5, 0x8e, 0xf6, 0xd4, 0x0c, 0x6a,
-	0xd2, 0xdc, 0xd9, 0x43, 0xef, 0xc1, 0x8a, 0x33, 0x62, 0x8c, 0x84, 0xc2, 0x56, 0xaf, 0x83, 0xcd,
-	0x07, 0x78, 0xf3, 0xd6, 0x6d, 0x35, 0x87, 0x65, 0x15, 0xdd, 0x49, 0x82, 0xbb, 0x71, 0x0c, 0x7d,
-	0x00, 0xfa, 0x63, 0xa5, 0xc5, 0x2d, 0xe7, 0xcd, 0xc5, 0x79, 0x2b, 0x69, 0xbc, 0x98, 0xf9, 0x36,
-	0xa0, 0xfe, 0x90, 0x3a, 0x7b, 0x76, 0x38, 0x0a, 0xfa, 0x84, 0xd9, 0x21, 0x0d, 0x1d, 0xa2, 0xcf,
-	0xaf, 0x69, 0xad, 0x59, 0x6b, 0x29, 0x8e, 0x6c, 0xc7, 0x81, 0x6d, 0xe9, 0x37, 0xbf, 0x80, 0xe5,
-	0x1e, 0xf7, 0x2c, 0xe2, 0xf9, 0x5c, 0x10, 0xb6, 0x9d, 0xdf, 0xc5, 0x8b, 0xbc, 0x48, 0xa5, 0x47,
-	0xf9, 0x39, 0x5c, 0xa9, 0xaa, 0x3e, 0x7e, 0x7a, 0xe8, 0xc3, 0x7c, 0x2d, 0x2d, 0x3e, 0xd1, 0xae,
-	0x56, 0x9d, 0x68, 0x59, 0x66, 0x86, 0x37, 0xbf, 0x01, 0xd4, 0xe3, 0xde, 0x3d, 0xd7, 0xbd, 0x4f,
-	0x87, 0x43, 0xdc, 0xa7, 0x2c, 0xa6, 0x77, 0xd1, 0x0d, 0x30, 0x61, 0xc1, 0xc9, 0xd5, 0x51, 0x4f,
-	0xbe, 0xe0, 0x2b, 0x89, 0xfb, 0x18, 0x8c, 0xc9, 0xfe, 0xa9, 0xb4, 0x36, 0x2c, 0xe5, 0x73, 0x6d,
-	0xd7, 0x77, 0x15, 0xa1, 0xc5, 0xbc, 0xff, 0x81, 0xef, 0x9a, 0xdf, 0x69, 0xf1, 0xd2, 0x5b, 0x24,
-	0xa0, 0x4f, 0xc8, 0x4b, 0x12, 0xf3, 0x09, 0x5c, 0xad, 0xa4, 0x70, 0x01, 0x3d, 0x9b, 0x3f, 0xd5,
-	0x60, 0xa6, 0xc7, 0x3d, 0xf4, 0x25, 0x2c, 0x14, 0x2e, 0xbd, 0x37, 0xaa, 0x1e, 0x6d, 0xe9, 0x5a,
-	0x31, 0xae, 0x9f, 0x03, 0x94, 0x92, 0x7a, 0x04, 0x90, 0xbb, 0x77, 0xd6, 0x4f, 0x48, 0xcd, 0x20,
-	0x46, 0xfb, 0x4c, 0x48, 0xbe, 0x76, 0xee, 0xb2, 0x58, 0x3f, 0x9d, 0xd6, 0x69, 0xb5, 0x27, 0x0f,
-	0x73, 0xf4, 0x8b, 0x06, 0xcd, 0x33, 0x4e, 0xf2, 0x5b, 0x67, 0x56, 0xab, 0x4a, 0x33, 0xee, 0x5e,
-	0x28, 0x2d, 0x25, 0x46, 0xe1, 0xf2, 0xe4, 0x59, 0xd0, 0x3a, 0xa1, 0xe6, 0x04, 0xd2, 0x78, 0xf7,
-	0xbc, 0xc8, 0xb4, 0xa1, 0x0f, 0x8b, 0xe5, 0x0d, 0x7e, 0xeb, 0x84, 0x22, 0x25, 0x9c, 0xd1, 0x39,
-	0x1f, 0x2e, 0x6d, 0xc5, 0x00, 0x55, 0xac, 0x58, 0xfb, 0x44, 0xca, 0x65, 0xa8, 0x71, 0xe3, 0xdc,
-	0xd0, 0x71, 0x4f, 0xe3, 0xd2, 0xb7, 0xf2, 0xfb, 0x6b, 0xab, 0xf7, 0xec, 0xb0, 0xa9, 0x3d, 0x3f,
-	0x6c, 0x6a, 0xff, 0x1e, 0x36, 0xb5, 0x9f, 0x8f, 0x9a, 0x53, 0xcf, 0x8f, 0x9a, 0x53, 0x7f, 0x1f,
-	0x35, 0xa7, 0x1e, 0xdd, 0xf4, 0x7c, 0x21, 0xeb, 0x39, 0x34, 0xe8, 0x26, 0xd5, 0x43, 0x22, 0xbe,
-	0xa2, 0x6c, 0xaf, 0x5b, 0xf9, 0x5d, 0x26, 0xf6, 0x23, 0xc2, 0xfb, 0xb5, 0xf8, 0xc3, 0xf2, 0xe6,
-	0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0xad, 0x28, 0x9d, 0xd0, 0x2d, 0x0b, 0x00, 0x00,
+	0x14, 0x8e, 0x93, 0x74, 0x93, 0x7d, 0x04, 0x25, 0x35, 0x21, 0xeb, 0x98, 0x76, 0xbb, 0x98, 0x1f,
+	0xda, 0x04, 0xba, 0xa6, 0x29, 0x14, 0x28, 0xe2, 0x90, 0xb4, 0x02, 0x15, 0x69, 0xa3, 0xc8, 0x81,
+	0x4b, 0x41, 0x32, 0xb3, 0xf6, 0xd4, 0x3b, 0xca, 0xda, 0x63, 0xcd, 0xcc, 0x96, 0x86, 0x03, 0x02,
+	0x8e, 0x70, 0xe1, 0x6f, 0xe0, 0xc4, 0x05, 0x29, 0x07, 0xc4, 0x8d, 0x03, 0xb7, 0x1e, 0x2b, 0x4e,
+	0x9c, 0x10, 0x4a, 0x0e, 0x39, 0xf0, 0x4f, 0xa0, 0xb1, 0xbd, 0xe3, 0x5d, 0xaf, 0x37, 0xac, 0x56,
+	0x48, 0xbd, 0x24, 0xfb, 0xde, 0xfb, 0xde, 0x7b, 0xdf, 0xf7, 0xc6, 0xf3, 0x03, 0x5e, 0xe0, 0xb4,
+	0xcf, 0x3c, 0xdc, 0xed, 0x77, 0xec, 0x4e, 0xbf, 0xd7, 0xc3, 0x82, 0x44, 0xb6, 0x78, 0xd4, 0x8a,
+	0x19, 0x15, 0x54, 0xd7, 0x55, 0xb0, 0x35, 0x08, 0x9a, 0x97, 0x51, 0x48, 0x22, 0x6a, 0x27, 0x7f,
+	0x53, 0x98, 0x59, 0xf3, 0x28, 0x0f, 0x29, 0xb7, 0x43, 0x1e, 0xd8, 0x0f, 0x6f, 0xc8, 0x7f, 0x59,
+	0x60, 0x33, 0x0d, 0xb8, 0x89, 0x65, 0xa7, 0x46, 0x16, 0x5a, 0x0f, 0x68, 0x40, 0x53, 0xbf, 0xfc,
+	0x95, 0x79, 0xaf, 0x95, 0xb0, 0x89, 0x11, 0x43, 0xe1, 0x20, 0xcd, 0x2a, 0x01, 0x44, 0x28, 0xc4,
+	0x3c, 0x46, 0x1e, 0x4e, 0x31, 0xd6, 0xef, 0x1a, 0xac, 0xb6, 0x79, 0xf0, 0x49, 0xec, 0x23, 0x81,
+	0x0f, 0x92, 0x6c, 0xfd, 0x16, 0x54, 0x51, 0x5f, 0x74, 0x29, 0x23, 0xe2, 0xd8, 0xd0, 0x1a, 0x5a,
+	0xb3, 0xba, 0x67, 0xfc, 0xf1, 0xcb, 0xf5, 0xf5, 0x8c, 0xd3, 0xae, 0xef, 0x33, 0xcc, 0xf9, 0xa1,
+	0x60, 0x24, 0x0a, 0x9c, 0x1c, 0xaa, 0xbf, 0x0f, 0x95, 0xb4, 0xbf, 0x31, 0xdf, 0xd0, 0x9a, 0xcf,
+	0xec, 0x98, 0xad, 0xf1, 0x91, 0xb4, 0xd2, 0x1e, 0x7b, 0xd5, 0xc7, 0x7f, 0x5d, 0x9b, 0xfb, 0xe9,
+	0xfc, 0x64, 0x5b, 0x73, 0xb2, 0xa4, 0xdb, 0x6f, 0x7f, 0x7b, 0x7e, 0xb2, 0x9d, 0x97, 0xfb, 0xee,
+	0xfc, 0x64, 0xfb, 0xe5, 0x5c, 0xc1, 0xa3, 0x5c, 0x43, 0x81, 0xaf, 0xb5, 0x09, 0xb5, 0x82, 0xcb,
+	0xc1, 0x3c, 0xa6, 0x11, 0xc7, 0xd6, 0xf7, 0x1a, 0x3c, 0xdb, 0xe6, 0xc1, 0x1d, 0x86, 0x65, 0x8c,
+	0x72, 0xa1, 0x1b, 0xb0, 0xe4, 0x49, 0x8b, 0xb2, 0x54, 0x9a, 0x33, 0x30, 0xf5, 0x2b, 0x50, 0x55,
+	0xd3, 0x49, 0x14, 0x54, 0x9d, 0xdc, 0x21, 0xf3, 0x62, 0x74, 0xdc, 0xa3, 0xc8, 0x37, 0x16, 0x1a,
+	0x5a, 0x73, 0xc5, 0x19, 0x98, 0xba, 0x09, 0xcb, 0x88, 0x09, 0xf2, 0x00, 0x79, 0xc2, 0xb8, 0x94,
+	0xa4, 0x29, 0xfb, 0xf6, 0x8a, 0xd4, 0x34, 0xe8, 0x60, 0xd5, 0xe0, 0xf9, 0x11, 0x32, 0x8a, 0xe6,
+	0xcf, 0x1a, 0x6c, 0x28, 0x09, 0x0e, 0x89, 0x02, 0x19, 0xdd, 0x3b, 0xde, 0xf5, 0xe2, 0x99, 0xf9,
+	0xd6, 0x60, 0x29, 0xa6, 0x5c, 0xb8, 0x24, 0xe5, 0x5b, 0x75, 0x2a, 0xd2, 0xbc, 0xe7, 0x0f, 0x0b,
+	0x59, 0x9c, 0x55, 0x48, 0x03, 0xea, 0xe5, 0x74, 0x95, 0xa2, 0x7f, 0x34, 0x78, 0xa5, 0x04, 0xf2,
+	0x71, 0x97, 0x61, 0xde, 0xa5, 0x3d, 0xff, 0x90, 0x04, 0x11, 0x12, 0x7d, 0x86, 0xff, 0x7f, 0x81,
+	0xc3, 0x32, 0x16, 0x47, 0x65, 0xe8, 0x5b, 0xb0, 0xc6, 0x07, 0x9d, 0x5d, 0xee, 0x75, 0x71, 0x88,
+	0x33, 0xa9, 0xab, 0xca, 0x7f, 0x98, 0xb8, 0x65, 0x77, 0xe5, 0x32, 0x2a, 0xc9, 0xa4, 0x72, 0x47,
+	0x61, 0x1e, 0x36, 0x5c, 0x9f, 0x4a, 0xac, 0x1a, 0xcf, 0x6f, 0xf3, 0x60, 0x4a, 0xa0, 0x83, 0x79,
+	0x17, 0x31, 0xfc, 0x01, 0x89, 0x50, 0x8f, 0x7c, 0x89, 0x25, 0xf0, 0x2e, 0xf5, 0xf4, 0x0d, 0xa8,
+	0xf8, 0x34, 0x44, 0x24, 0xca, 0x46, 0x92, 0x59, 0xfa, 0x26, 0x2c, 0x7b, 0x5d, 0x44, 0x22, 0x29,
+	0x7a, 0x3e, 0x1b, 0x96, 0xb4, 0xef, 0xf9, 0xa3, 0xc3, 0x5a, 0xb8, 0x60, 0x58, 0x8b, 0x23, 0xc3,
+	0xaa, 0xc1, 0x92, 0xdc, 0xc6, 0x6e, 0x7c, 0x94, 0xcd, 0xa1, 0x22, 0xcd, 0x83, 0x23, 0xfd, 0x4d,
+	0xd8, 0xf0, 0xfa, 0x8c, 0xe1, 0x48, 0xb8, 0xd9, 0xf7, 0xe1, 0xf2, 0x2e, 0xda, 0x79, 0xeb, 0x56,
+	0x36, 0x8b, 0xf5, 0x2c, 0x7a, 0x90, 0x06, 0x0f, 0x93, 0x98, 0xfe, 0x0e, 0x18, 0x0f, 0x32, 0x2d,
+	0x7e, 0x31, 0x6f, 0x29, 0xc9, 0xdb, 0x50, 0xf1, 0xd1, 0xcc, 0xd7, 0x41, 0xef, 0xf4, 0xa8, 0x77,
+	0xe4, 0x46, 0xfd, 0xb0, 0x83, 0x99, 0x1b, 0xd1, 0xc8, 0xc3, 0xc6, 0x72, 0x43, 0x6b, 0x2e, 0x3a,
+	0x6b, 0x49, 0x64, 0x3f, 0x09, 0xec, 0x4b, 0xbf, 0xf5, 0x19, 0xac, 0xb7, 0x79, 0xe0, 0xe0, 0x80,
+	0x70, 0x81, 0xd9, 0xfe, 0xf0, 0x2e, 0x9d, 0xe5, 0x63, 0x2a, 0x2c, 0xe7, 0xa7, 0x70, 0xa5, 0xac,
+	0xfa, 0x60, 0xf5, 0xf4, 0xf7, 0x86, 0x6b, 0x69, 0xc9, 0x59, 0x77, 0xb5, 0xec, 0xac, 0xcb, 0x33,
+	0x73, 0xbc, 0xf5, 0x15, 0xe8, 0x6d, 0x1e, 0xec, 0xfa, 0xfe, 0x1d, 0xda, 0xeb, 0xa1, 0x0e, 0x65,
+	0x09, 0xbd, 0x59, 0x77, 0x81, 0x05, 0x2b, 0xde, 0x50, 0x9d, 0x6c, 0xe5, 0x47, 0x7c, 0x05, 0x71,
+	0x1f, 0x82, 0x39, 0xde, 0x5f, 0x49, 0xdb, 0x82, 0xb5, 0xe1, 0x5c, 0xd7, 0x27, 0x7e, 0x46, 0x68,
+	0x75, 0xd8, 0x7f, 0x97, 0xf8, 0xd6, 0x37, 0x5a, 0x72, 0x9c, 0x39, 0x38, 0xa4, 0x0f, 0xf1, 0x53,
+	0x12, 0xf3, 0x11, 0x5c, 0x2d, 0xa5, 0x30, 0x83, 0x9e, 0x9d, 0x5f, 0x2b, 0xb0, 0xd0, 0xe6, 0x81,
+	0xfe, 0x39, 0xac, 0x8c, 0x5c, 0x87, 0x2f, 0x95, 0x2d, 0x6d, 0xe1, 0xc2, 0x31, 0x5f, 0x9b, 0x02,
+	0xa4, 0x48, 0xdd, 0x07, 0x18, 0xba, 0x91, 0x5e, 0x9c, 0x90, 0x9a, 0x43, 0xcc, 0xad, 0xff, 0x84,
+	0xa8, 0xda, 0x7d, 0x78, 0xae, 0xec, 0x1a, 0xd9, 0xbe, 0x90, 0xdf, 0x08, 0xd6, 0xdc, 0x99, 0x1e,
+	0xab, 0xda, 0xfe, 0xa8, 0x81, 0x35, 0xc5, 0x61, 0xff, 0xee, 0x94, 0xa5, 0xc7, 0x53, 0xcd, 0xdd,
+	0x99, 0x53, 0x15, 0x49, 0x0a, 0x97, 0xc7, 0x8f, 0x8c, 0xe6, 0x84, 0xba, 0x63, 0x48, 0xf3, 0x8d,
+	0x69, 0x91, 0xaa, 0x21, 0x81, 0xd5, 0xe2, 0x46, 0x7f, 0x75, 0x42, 0x91, 0x02, 0xce, 0x6c, 0x4d,
+	0x87, 0x53, 0xad, 0x18, 0xe8, 0x25, 0x3b, 0x71, 0x6b, 0x22, 0xe5, 0x22, 0xd4, 0xbc, 0x31, 0x35,
+	0x74, 0xd0, 0xd3, 0xbc, 0xf4, 0xb5, 0x7c, 0xc0, 0xed, 0xb5, 0x1f, 0x9f, 0xd6, 0xb5, 0x27, 0xa7,
+	0x75, 0xed, 0xef, 0xd3, 0xba, 0xf6, 0xc3, 0x59, 0x7d, 0xee, 0xc9, 0x59, 0x7d, 0xee, 0xcf, 0xb3,
+	0xfa, 0xdc, 0xfd, 0x9b, 0x01, 0x11, 0xb2, 0x9e, 0x47, 0x43, 0x3b, 0xad, 0x1e, 0x61, 0xf1, 0x05,
+	0x65, 0x47, 0x76, 0xe9, 0xc3, 0x4e, 0x1c, 0xc7, 0x98, 0x77, 0x2a, 0xc9, 0xcb, 0xf4, 0xe6, 0xbf,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0x27, 0xaa, 0x11, 0xa5, 0x6e, 0x0b, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -966,8 +967,8 @@ type MsgClient interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreatePost(ctx context.Context, in *MsgCreatePost, opts ...grpc.CallOption) (*MsgCreatePostResponse, error)
-	UpdatePost(ctx context.Context, in *MsgUpdatePost, opts ...grpc.CallOption) (*MsgUpdatePostResponse, error)
-	UpdatePostByThresholdSignature(ctx context.Context, in *MsgUpdatePostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdatePostByThresholdSignatureResponse, error)
+	UpdateRingPostByAcp(ctx context.Context, in *MsgUpdateRingPostByAcp, opts ...grpc.CallOption) (*MsgUpdateRingPostByAcpResponse, error)
+	UpdateRingPostByThresholdSignature(ctx context.Context, in *MsgUpdateRingPostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdateRingPostByThresholdSignatureResponse, error)
 	RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error)
 	AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error)
 	RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error)
@@ -999,18 +1000,18 @@ func (c *msgClient) CreatePost(ctx context.Context, in *MsgCreatePost, opts ...g
 	return out, nil
 }
 
-func (c *msgClient) UpdatePost(ctx context.Context, in *MsgUpdatePost, opts ...grpc.CallOption) (*MsgUpdatePostResponse, error) {
-	out := new(MsgUpdatePostResponse)
-	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/UpdatePost", in, out, opts...)
+func (c *msgClient) UpdateRingPostByAcp(ctx context.Context, in *MsgUpdateRingPostByAcp, opts ...grpc.CallOption) (*MsgUpdateRingPostByAcpResponse, error) {
+	out := new(MsgUpdateRingPostByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/UpdateRingPostByAcp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *msgClient) UpdatePostByThresholdSignature(ctx context.Context, in *MsgUpdatePostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdatePostByThresholdSignatureResponse, error) {
-	out := new(MsgUpdatePostByThresholdSignatureResponse)
-	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/UpdatePostByThresholdSignature", in, out, opts...)
+func (c *msgClient) UpdateRingPostByThresholdSignature(ctx context.Context, in *MsgUpdateRingPostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdateRingPostByThresholdSignatureResponse, error) {
+	out := new(MsgUpdateRingPostByThresholdSignatureResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.bulletin.Msg/UpdateRingPostByThresholdSignature", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1050,8 +1051,8 @@ type MsgServer interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error)
-	UpdatePost(context.Context, *MsgUpdatePost) (*MsgUpdatePostResponse, error)
-	UpdatePostByThresholdSignature(context.Context, *MsgUpdatePostByThresholdSignature) (*MsgUpdatePostByThresholdSignatureResponse, error)
+	UpdateRingPostByAcp(context.Context, *MsgUpdateRingPostByAcp) (*MsgUpdateRingPostByAcpResponse, error)
+	UpdateRingPostByThresholdSignature(context.Context, *MsgUpdateRingPostByThresholdSignature) (*MsgUpdateRingPostByThresholdSignatureResponse, error)
 	RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error)
 	AddCollaborator(context.Context, *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error)
 	RemoveCollaborator(context.Context, *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error)
@@ -1067,11 +1068,11 @@ func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateP
 func (*UnimplementedMsgServer) CreatePost(ctx context.Context, req *MsgCreatePost) (*MsgCreatePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
 }
-func (*UnimplementedMsgServer) UpdatePost(ctx context.Context, req *MsgUpdatePost) (*MsgUpdatePostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+func (*UnimplementedMsgServer) UpdateRingPostByAcp(ctx context.Context, req *MsgUpdateRingPostByAcp) (*MsgUpdateRingPostByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingPostByAcp not implemented")
 }
-func (*UnimplementedMsgServer) UpdatePostByThresholdSignature(ctx context.Context, req *MsgUpdatePostByThresholdSignature) (*MsgUpdatePostByThresholdSignatureResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdatePostByThresholdSignature not implemented")
+func (*UnimplementedMsgServer) UpdateRingPostByThresholdSignature(ctx context.Context, req *MsgUpdateRingPostByThresholdSignature) (*MsgUpdateRingPostByThresholdSignatureResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingPostByThresholdSignature not implemented")
 }
 func (*UnimplementedMsgServer) RegisterNamespace(ctx context.Context, req *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterNamespace not implemented")
@@ -1123,38 +1124,38 @@ func _Msg_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdatePost)
+func _Msg_UpdateRingPostByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateRingPostByAcp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdatePost(ctx, in)
+		return srv.(MsgServer).UpdateRingPostByAcp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sourcehub.bulletin.Msg/UpdatePost",
+		FullMethod: "/sourcehub.bulletin.Msg/UpdateRingPostByAcp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdatePost(ctx, req.(*MsgUpdatePost))
+		return srv.(MsgServer).UpdateRingPostByAcp(ctx, req.(*MsgUpdateRingPostByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdatePostByThresholdSignature_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdatePostByThresholdSignature)
+func _Msg_UpdateRingPostByThresholdSignature_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateRingPostByThresholdSignature)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdatePostByThresholdSignature(ctx, in)
+		return srv.(MsgServer).UpdateRingPostByThresholdSignature(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sourcehub.bulletin.Msg/UpdatePostByThresholdSignature",
+		FullMethod: "/sourcehub.bulletin.Msg/UpdateRingPostByThresholdSignature",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdatePostByThresholdSignature(ctx, req.(*MsgUpdatePostByThresholdSignature))
+		return srv.(MsgServer).UpdateRingPostByThresholdSignature(ctx, req.(*MsgUpdateRingPostByThresholdSignature))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1227,12 +1228,12 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreatePost_Handler,
 		},
 		{
-			MethodName: "UpdatePost",
-			Handler:    _Msg_UpdatePost_Handler,
+			MethodName: "UpdateRingPostByAcp",
+			Handler:    _Msg_UpdateRingPostByAcp_Handler,
 		},
 		{
-			MethodName: "UpdatePostByThresholdSignature",
-			Handler:    _Msg_UpdatePostByThresholdSignature_Handler,
+			MethodName: "UpdateRingPostByThresholdSignature",
+			Handler:    _Msg_UpdateRingPostByThresholdSignature_Handler,
 		},
 		{
 			MethodName: "RegisterNamespace",
@@ -1388,7 +1389,7 @@ func (m *MsgCreatePostResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdatePost) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateRingPostByAcp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1398,12 +1399,12 @@ func (m *MsgUpdatePost) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdatePost) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByAcp) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdatePost) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1446,7 +1447,7 @@ func (m *MsgUpdatePost) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdatePostResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateRingPostByAcpResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1456,12 +1457,12 @@ func (m *MsgUpdatePostResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdatePostResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdatePostResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1469,7 +1470,7 @@ func (m *MsgUpdatePostResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdatePostByThresholdSignature) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateRingPostByThresholdSignature) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1479,12 +1480,12 @@ func (m *MsgUpdatePostByThresholdSignature) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdatePostByThresholdSignature) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByThresholdSignature) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdatePostByThresholdSignature) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByThresholdSignature) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1534,7 +1535,7 @@ func (m *MsgUpdatePostByThresholdSignature) MarshalToSizedBuffer(dAtA []byte) (i
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdatePostByThresholdSignatureResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -1544,12 +1545,12 @@ func (m *MsgUpdatePostByThresholdSignatureResponse) Marshal() (dAtA []byte, err 
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdatePostByThresholdSignatureResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdatePostByThresholdSignatureResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1923,7 +1924,7 @@ func (m *MsgCreatePostResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdatePost) Size() (n int) {
+func (m *MsgUpdateRingPostByAcp) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1952,7 +1953,7 @@ func (m *MsgUpdatePost) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdatePostResponse) Size() (n int) {
+func (m *MsgUpdateRingPostByAcpResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1961,7 +1962,7 @@ func (m *MsgUpdatePostResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdatePostByThresholdSignature) Size() (n int) {
+func (m *MsgUpdateRingPostByThresholdSignature) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1994,7 +1995,7 @@ func (m *MsgUpdatePostByThresholdSignature) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdatePostByThresholdSignatureResponse) Size() (n int) {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2542,7 +2543,7 @@ func (m *MsgCreatePostResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdatePost) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateRingPostByAcp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2565,10 +2566,10 @@ func (m *MsgUpdatePost) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdatePost: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateRingPostByAcp: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdatePost: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateRingPostByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2754,7 +2755,7 @@ func (m *MsgUpdatePost) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdatePostResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateRingPostByAcpResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2777,10 +2778,10 @@ func (m *MsgUpdatePostResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdatePostResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateRingPostByAcpResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdatePostResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateRingPostByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -2804,7 +2805,7 @@ func (m *MsgUpdatePostResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdatePostByThresholdSignature) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateRingPostByThresholdSignature) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2827,10 +2828,10 @@ func (m *MsgUpdatePostByThresholdSignature) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdatePostByThresholdSignature: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignature: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdatePostByThresholdSignature: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignature: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -3048,7 +3049,7 @@ func (m *MsgUpdatePostByThresholdSignature) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdatePostByThresholdSignatureResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateRingPostByThresholdSignatureResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -3071,10 +3072,10 @@ func (m *MsgUpdatePostByThresholdSignatureResponse) Unmarshal(dAtA []byte) error
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdatePostByThresholdSignatureResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignatureResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdatePostByThresholdSignatureResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateRingPostByThresholdSignatureResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
