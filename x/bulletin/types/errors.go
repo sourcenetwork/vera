@@ -25,4 +25,5 @@ var (
 	ErrInvalidSignatureScheme      = sdkerrors.Register(ModuleName, 1116, "invalid signature scheme")
 	ErrInvalidSignaturePayload     = sdkerrors.Register(ModuleName, 1117, "invalid signature payload")
 	ErrRingPayloadMissingPolicyId  = sdkerrors.Register(ModuleName, 1118, "ring payload missing policy_id")
+	ErrReshareInProgress           = sdkerrors.Register(ModuleName, 1119, "reshare already in progress: finalize before changing reshare parameters")
 )

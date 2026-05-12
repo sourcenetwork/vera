@@ -161,7 +161,7 @@ func (k *Keeper) UpdateRingPostByAcp(goCtx context.Context, msg *types.MsgUpdate
 		v := msg.GetNewThreshold()
 		newThreshold = &v
 	}
-	if err := validateRingPostUpdate(msg.NewPeerIds, newThreshold); err != nil {
+	if err := validateRingPostUpdate(msg.NewPeerIds, newThreshold, ringPayload); err != nil {
 		return nil, err
 	}
 

@@ -191,12 +191,29 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		require.Equal(t, []string{"peer2", "peer3"}, *parsed.NewPeerIDs)
 	})
 
-	t.Run("new_threshold is updated when provided", func(t *testing.T) {
-		threshold := uint32(3)
+	t.Run("reshare in progress: changing new_threshold alone is rejected", func(t *testing.T) {
+		// post currently has new_peer_ids set from the previous test — reshare in progress
 		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
 			Creator:       collab.Address,
 			Namespace:     namespace,
 			PostId:        postId,
+			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 2},
+		})
+		require.ErrorIs(t, err, types.ErrReshareInProgress)
+	})
+
+	t.Run("new_threshold is updated when set alongside new_peer_ids", func(t *testing.T) {
+		// reset post to original so no reshare is in progress
+		original := k.getPost(ctx, namespaceId, postId)
+		original.Payload = ringPayloadBytes
+		k.SetPost(ctx, *original)
+
+		threshold := uint32(2)
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:       collab.Address,
+			Namespace:     namespace,
+			PostId:        postId,
+			NewPeerIds:    []string{"peer2", "peer3"},
 			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: threshold},
 		})
 		require.NoError(t, err)
@@ -204,6 +221,7 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		parsed, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
 		require.NoError(t, err)
 		require.Equal(t, threshold, *parsed.NewThreshold)
+		require.Equal(t, []string{"peer2", "peer3"}, *parsed.NewPeerIDs)
 	})
 
 	t.Run("pss_interval is updated when provided", func(t *testing.T) {
@@ -225,18 +243,21 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		before, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
 		require.NoError(t, err)
 		originalPeerIDs := *before.PeerIDs
+		originalNewThreshold := *before.NewThreshold
 
+		// pss_interval-only update is allowed even while a reshare is in progress
 		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:       collab.Address,
-			Namespace:     namespace,
-			PostId:        postId,
-			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 5},
+			Creator:      collab.Address,
+			Namespace:    namespace,
+			PostId:       postId,
+			XPssInterval: &types.MsgUpdateRingPostByAcp_PssInterval{PssInterval: 200},
 		})
 		require.NoError(t, err)
 
 		after, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
 		require.NoError(t, err)
 		require.Equal(t, originalPeerIDs, *after.PeerIDs)
+		require.Equal(t, originalNewThreshold, *after.NewThreshold)
 	})
 }
 
