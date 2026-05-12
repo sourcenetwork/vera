@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/docker/client"
 	"github.com/sourcenetwork/sourcehub/sdk"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
@@ -22,6 +23,7 @@ var (
 	genesisFileName      = "genesis.json"
 	mnemonicFileName     = "mnemonic"
 	containerBaseDir     = "/home/node"
+	sourcehubImage       = "ghcr.io/sourcenetwork/sourcehub:dev"
 )
 
 var (
@@ -38,6 +40,9 @@ var (
 // Test Docker containers correctly executes and produces blocks
 // The docker image should be previously built with `make docker“
 func Test_DockerContainer_Starts(t *testing.T) {
+	ctx := context.Background()
+	requireLocalImage(t, ctx, sourcehubImage)
+
 	// write the require state files
 	// (consensus key, p2p key, acc key, genesis)
 	tmpDir := t.TempDir()
@@ -67,10 +72,9 @@ func Test_DockerContainer_Starts(t *testing.T) {
 
 	// create test container for the default config
 	testLogger := tclog.TestLogger(t)
-	ctx := context.Background()
 	container, err := testcontainers.Run(
 		ctx,
-		"ghcr.io/sourcenetwork/sourcehub:dev",
+		sourcehubImage,
 		testcontainers.WithFiles(containerFiles...),
 		testcontainers.WithEnv(map[string]string{
 			"CHAIN_ID":            "test",
@@ -109,6 +113,20 @@ func Test_DockerContainer_Starts(t *testing.T) {
 	t.Logf("sourcehub endpoints: grpc=%v, rpc=%v", grpcEndpoint, rpcEndpoint)
 	err = waitForChain(t, grpcEndpoint, rpcEndpoint)
 	require.NoError(t, err)
+}
+
+func requireLocalImage(t testing.TB, ctx context.Context, image string) {
+	t.Helper()
+
+	dockerClient, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		t.Skipf("docker is unavailable: %v", err)
+	}
+	defer dockerClient.Close()
+
+	if _, err := dockerClient.ImageInspect(ctx, image); err != nil {
+		t.Skipf("%s is not available locally; run `make docker` before this smoke test: %v", image, err)
+	}
 }
 
 func waitForChain(t testing.TB, grpcEndpoint, cometRpcEndpoint string) error {
