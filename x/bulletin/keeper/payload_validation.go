@@ -44,6 +44,25 @@ func parseRingPayloadJSON(payload []byte) (*ringPayloadJSON, error) {
 	return &ringPayload, nil
 }
 
+// validateRingPostUpdate checks that the fields being set via UpdateRingPostByAcp
+// are internally consistent: new_peer_ids must have no duplicates, and
+// new_threshold (if provided) must be at least 1.
+func validateRingPostUpdate(newPeerIDs []string, newThreshold *uint32) error {
+	if len(newPeerIDs) > 0 {
+		seen := make(map[string]struct{}, len(newPeerIDs))
+		for _, id := range newPeerIDs {
+			if _, dup := seen[id]; dup {
+				return errorsmod.Wrapf(types.ErrInvalidPostPayload, "duplicate peer id in new_peer_ids: %q", id)
+			}
+			seen[id] = struct{}{}
+		}
+	}
+	if newThreshold != nil && *newThreshold < 1 {
+		return errorsmod.Wrap(types.ErrInvalidPostPayload, "new_threshold must be at least 1")
+	}
+	return nil
+}
+
 func ringPayloadForReshareFinalization(currentRingPayload *ringPayloadJSON) (*ringPayloadJSON, error) {
 	finalizedRingPayload := *currentRingPayload
 	if finalizedRingPayload.NewPeerIDs == nil && finalizedRingPayload.NewThreshold == nil {

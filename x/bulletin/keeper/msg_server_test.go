@@ -154,6 +154,26 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		})
 		require.NoError(t, err)
 
+		t.Run("duplicate new_peer_ids are rejected", func(t *testing.T) {
+			_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+				Creator:    collab.Address,
+				Namespace:  namespace,
+				PostId:     postId,
+				NewPeerIds: []string{"peer2", "peer2"},
+			})
+			require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		})
+
+		t.Run("new_threshold of zero is rejected", func(t *testing.T) {
+			_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+				Creator:       collab.Address,
+				Namespace:     namespace,
+				PostId:        postId,
+				XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 0},
+			})
+			require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		})
+
 		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
 			Creator:    collab.Address,
 			Namespace:  namespace,

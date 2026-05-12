@@ -119,6 +119,44 @@ func TestFinalizeRingPayloadReshare(t *testing.T) {
 	require.Contains(t, err.Error(), "missing new_peer_ids or new_threshold")
 }
 
+func TestValidateRingPostUpdate(t *testing.T) {
+	ptr := func(v uint32) *uint32 { return &v }
+
+	t.Run("empty inputs are valid", func(t *testing.T) {
+		require.NoError(t, validateRingPostUpdate(nil, nil))
+		require.NoError(t, validateRingPostUpdate([]string{}, nil))
+	})
+
+	t.Run("unique peer ids are valid", func(t *testing.T) {
+		require.NoError(t, validateRingPostUpdate([]string{"peer1", "peer2", "peer3"}, nil))
+	})
+
+	t.Run("duplicate peer ids are rejected", func(t *testing.T) {
+		err := validateRingPostUpdate([]string{"peer1", "peer2", "peer1"}, nil)
+		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		require.Contains(t, err.Error(), "duplicate peer id")
+	})
+
+	t.Run("threshold of 1 is valid", func(t *testing.T) {
+		require.NoError(t, validateRingPostUpdate(nil, ptr(1)))
+	})
+
+	t.Run("threshold above 1 is valid", func(t *testing.T) {
+		require.NoError(t, validateRingPostUpdate(nil, ptr(5)))
+	})
+
+	t.Run("threshold of 0 is rejected", func(t *testing.T) {
+		err := validateRingPostUpdate(nil, ptr(0))
+		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		require.Contains(t, err.Error(), "new_threshold must be at least 1")
+	})
+
+	t.Run("both rules enforced together", func(t *testing.T) {
+		err := validateRingPostUpdate([]string{"peer1", "peer1"}, ptr(0))
+		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+	})
+}
+
 func requireParsedRingPayload(t *testing.T, payload []byte) *ringPayloadJSON {
 	t.Helper()
 	ringPayload, err := parseRingPayloadJSON(payload)

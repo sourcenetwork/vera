@@ -156,12 +156,20 @@ func (k *Keeper) UpdateRingPostByAcp(goCtx context.Context, msg *types.MsgUpdate
 		return nil, types.ErrInvalidPostUpdater
 	}
 
+	var newThreshold *uint32
+	if msg.XNewThreshold != nil {
+		v := msg.GetNewThreshold()
+		newThreshold = &v
+	}
+	if err := validateRingPostUpdate(msg.NewPeerIds, newThreshold); err != nil {
+		return nil, err
+	}
+
 	if len(msg.NewPeerIds) > 0 {
 		ringPayload.NewPeerIDs = &msg.NewPeerIds
 	}
-	if msg.XNewThreshold != nil {
-		v := msg.GetNewThreshold()
-		ringPayload.NewThreshold = &v
+	if newThreshold != nil {
+		ringPayload.NewThreshold = newThreshold
 	}
 	if msg.XPssInterval != nil {
 		v := msg.GetPssInterval()
