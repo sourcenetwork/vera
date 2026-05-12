@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -115,9 +116,10 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	return &types.MsgCreatePostResponse{}, nil
 }
 
-// UpdateRingPostByAcp overwrites the payload of a ring post after verifying
-// that the existing payload is a valid ring payload and that the caller holds
-// the update_post permission in the policy embedded in that ring payload.
+// UpdateRingPostByAcp updates the new_peer_ids, new_threshold, and/or
+// pss_interval fields of a ring post. The existing post must be a valid ring
+// payload containing a policy_id. The caller must hold update_post permission
+// in that policy.
 func (k *Keeper) UpdateRingPostByAcp(goCtx context.Context, msg *types.MsgUpdateRingPostByAcp) (*types.MsgUpdateRingPostByAcpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -154,7 +156,24 @@ func (k *Keeper) UpdateRingPostByAcp(goCtx context.Context, msg *types.MsgUpdate
 		return nil, types.ErrInvalidPostUpdater
 	}
 
-	existing.Payload = msg.Payload
+	if len(msg.NewPeerIds) > 0 {
+		ringPayload.NewPeerIDs = &msg.NewPeerIds
+	}
+	if msg.XNewThreshold != nil {
+		v := msg.GetNewThreshold()
+		ringPayload.NewThreshold = &v
+	}
+	if msg.XPssInterval != nil {
+		v := msg.GetPssInterval()
+		ringPayload.PSSInterval = &v
+	}
+
+	updatedPayload, err := json.Marshal(ringPayload)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrInvalidPostPayload, "could not marshal updated ring payload: %s", err)
+	}
+
+	existing.Payload = updatedPayload
 	k.SetPost(goCtx, *existing)
 
 	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)

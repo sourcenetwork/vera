@@ -62,8 +62,10 @@ message MsgUpdateRingPostByAcp {
   string creator = 1;
   string namespace = 2;
   string post_id = 3;
-  bytes payload = 4;
-  string artifact = 5;
+  string artifact = 4;
+  repeated string new_peer_ids = 5;
+  optional uint32 new_threshold = 6;
+  optional uint64 pss_interval = 7;
 }
 
 message MsgUpdateRingPostByAcpResponse {}

@@ -24,17 +24,13 @@ func TestMsgUpdateRingPostByAcp_ValidateBasic(t *testing.T) {
 	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
 	k.accountKeeper.SetAccount(ctx, owner)
 
-	namespaceId := getNamespaceId("ns1")
-	postId := types.GeneratePostId(namespaceId, []byte("payload"))
-
 	cases := []struct {
 		msg    *types.MsgUpdateRingPostByAcp
 		errMsg string
 	}{
 		{&types.MsgUpdateRingPostByAcp{}, "invalid creator address"},
 		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address}, "invalid namespace id"},
-		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address, Namespace: "ns1"}, "post not found"},
-		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address, Namespace: "ns1", PostId: postId}, "invalid post payload"},
+		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address, Namespace: "ns1"}, "invalid post id"},
 	}
 	for _, c := range cases {
 		err := c.msg.ValidateBasic()
@@ -85,20 +81,20 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 
 	t.Run("namespace not found", func(t *testing.T) {
 		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   owner.Address,
-			Namespace: "does-not-exist",
-			PostId:    postId,
-			Payload:   []byte("new"),
+			Creator:    owner.Address,
+			Namespace:  "does-not-exist",
+			PostId:     postId,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrNamespaceNotFound)
 	})
 
 	t.Run("post not found", func(t *testing.T) {
 		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    "nonexistent-post-id",
-			Payload:   []byte("new"),
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     "nonexistent-post-id",
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrPostNotFound)
 	})
@@ -111,10 +107,10 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 			Payload:   []byte("not-ring-json"),
 		})
 		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    invalidPostID,
-			Payload:   []byte("new"),
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     invalidPostID,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
 	})
@@ -128,20 +124,20 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 			Payload:   noPolicyPayload,
 		})
 		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    noPolicyPostID,
-			Payload:   []byte("new"),
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     noPolicyPostID,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrRingPayloadMissingPolicyId)
 	})
 
 	t.Run("outsider without permission is rejected", func(t *testing.T) {
 		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   outsider.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   []byte("nope"),
+			Creator:    outsider.Address,
+			Namespace:  namespace,
+			PostId:     postId,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrInvalidPostUpdater)
 
@@ -150,7 +146,7 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		require.Equal(t, ringPayloadBytes, stored.Payload)
 	})
 
-	t.Run("collaborator with permission can update and post_id is preserved", func(t *testing.T) {
+	t.Run("collaborator can update new_peer_ids and post_id is preserved", func(t *testing.T) {
 		_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
 			Creator:      owner.Address,
 			Namespace:    namespace,
@@ -158,19 +154,69 @@ func TestMsgUpdateRingPostByAcp(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		newRingPayload := makeRingPayloadWithPolicy(t, policyId)
 		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
-			Creator:   collab.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   newRingPayload,
+			Creator:    collab.Address,
+			Namespace:  namespace,
+			PostId:     postId,
+			NewPeerIds: []string{"peer2", "peer3"},
 		})
 		require.NoError(t, err)
 
 		stored := k.getPost(ctx, namespaceId, postId)
 		require.NotNil(t, stored)
 		require.Equal(t, postId, stored.Id)
-		require.Equal(t, newRingPayload, stored.Payload)
+
+		parsed, err := parseRingPayloadJSON(stored.Payload)
+		require.NoError(t, err)
+		require.Equal(t, []string{"peer2", "peer3"}, *parsed.NewPeerIDs)
+	})
+
+	t.Run("new_threshold is updated when provided", func(t *testing.T) {
+		threshold := uint32(3)
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:       collab.Address,
+			Namespace:     namespace,
+			PostId:        postId,
+			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: threshold},
+		})
+		require.NoError(t, err)
+
+		parsed, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, threshold, *parsed.NewThreshold)
+	})
+
+	t.Run("pss_interval is updated when provided", func(t *testing.T) {
+		interval := uint64(100)
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:      collab.Address,
+			Namespace:    namespace,
+			PostId:       postId,
+			XPssInterval: &types.MsgUpdateRingPostByAcp_PssInterval{PssInterval: interval},
+		})
+		require.NoError(t, err)
+
+		parsed, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, interval, *parsed.PSSInterval)
+	})
+
+	t.Run("unspecified fields are not changed", func(t *testing.T) {
+		before, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		originalPeerIDs := *before.PeerIDs
+
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:       collab.Address,
+			Namespace:     namespace,
+			PostId:        postId,
+			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 5},
+		})
+		require.NoError(t, err)
+
+		after, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, originalPeerIDs, *after.PeerIDs)
 	})
 }
 

@@ -76,10 +76,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}},
 				},
 				{
-					RpcMethod:      "UpdateRingPostByAcp",
-					Use:            "update-ring-post-by-acp [namespace] [post_id] [payload]",
-					Short:          "Update payload of a ring post authorized via the ring's ACP policy",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "payload"}},
+					RpcMethod: "UpdateRingPostByAcp",
+					Use:       "update-ring-post-by-acp [namespace] [post_id]",
+					Short:     "Update new_peer_ids, new_threshold, and/or pss_interval of a ring post via ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "namespace"},
+						{ProtoField: "post_id"},
+					},
 				},
 				{
 					RpcMethod:      "UpdateRingPostByThresholdSignature",

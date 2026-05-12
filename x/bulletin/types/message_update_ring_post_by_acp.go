@@ -8,12 +8,11 @@ import (
 
 var _ sdk.Msg = &MsgUpdateRingPostByAcp{}
 
-func NewMsgUpdateRingPostByAcp(creator, namespace, postId string, payload []byte) *MsgUpdateRingPostByAcp {
+func NewMsgUpdateRingPostByAcp(creator, namespace, postId string) *MsgUpdateRingPostByAcp {
 	return &MsgUpdateRingPostByAcp{
 		Creator:   creator,
 		Namespace: namespace,
 		PostId:    postId,
-		Payload:   payload,
 	}
 }
 
@@ -25,10 +24,7 @@ func (msg *MsgUpdateRingPostByAcp) ValidateBasic() error {
 		return ErrInvalidNamespaceId
 	}
 	if msg.PostId == "" {
-		return ErrPostNotFound
-	}
-	if len(msg.Payload) == 0 {
-		return ErrInvalidPostPayload
+		return ErrInvalidPostId
 	}
 	return nil
 }
