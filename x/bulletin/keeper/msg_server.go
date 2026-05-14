@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -115,17 +116,12 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	return &types.MsgCreatePostResponse{}, nil
 }
 
-// UpdatePost overwrites the payload of an existing post while preserving the
-// post_id. Authorization: the signer must either be the original creator, or
-// be a `collaborator` on the post's namespace (checked via the module's ACP
-// policy `update_post` permission).
-func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*types.MsgUpdatePostResponse, error) {
+// UpdateRingPostByAcp updates the new_peer_ids, new_threshold, and/or
+// pss_interval fields of a ring post. The existing post must be a valid ring
+// payload containing a policy_id. The caller must hold update_post permission
+// in that policy.
+func (k *Keeper) UpdateRingPostByAcp(goCtx context.Context, msg *types.MsgUpdateRingPostByAcp) (*types.MsgUpdateRingPostByAcpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	policyId := k.GetPolicyId(goCtx)
-	if policyId == "" {
-		return nil, types.ErrInvalidPolicyId
-	}
 
 	namespaceId := getNamespaceId(msg.Namespace)
 	if !k.hasNamespace(goCtx, namespaceId) {
@@ -137,22 +133,55 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 		return nil, types.ErrPostNotFound
 	}
 
+	ringPayload, err := parseRingPayloadJSON(existing.Payload)
+	if err != nil {
+		return nil, err
+	}
+
+	if ringPayload.PolicyID == nil {
+		return nil, types.ErrRingPayloadMissingPolicyId
+	}
+	policyId := *ringPayload.PolicyID
+
 	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
-	if updaterDID != existing.CreatorDid {
-		allowed, err := hasPermission(goCtx, k, policyId, namespaceId, types.UpdatePostPermission, updaterDID, msg.Creator)
-		if err != nil {
-			return nil, err
-		}
-		if !allowed {
-			return nil, types.ErrInvalidPostUpdater
-		}
+	allowed, err := hasPermission(goCtx, k, policyId, namespaceId, types.UpdatePostPermission, updaterDID, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if !allowed {
+		return nil, types.ErrInvalidPostUpdater
 	}
 
-	existing.Payload = msg.Payload
+	var newThreshold *uint32
+	if msg.XNewThreshold != nil {
+		v := msg.GetNewThreshold()
+		newThreshold = &v
+	}
+	if err := validateRingPostUpdate(msg.NewPeerIds, newThreshold, ringPayload); err != nil {
+		return nil, err
+	}
+
+	if len(msg.NewPeerIds) > 0 {
+		ringPayload.NewPeerIDs = &msg.NewPeerIds
+	}
+	if newThreshold != nil {
+		ringPayload.NewThreshold = newThreshold
+	}
+	if msg.XPssInterval != nil {
+		v := msg.GetPssInterval()
+		ringPayload.PSSInterval = &v
+	}
+
+	updatedPayload, err := json.Marshal(ringPayload)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrInvalidPostPayload, "could not marshal updated ring payload: %s", err)
+	}
+
+	existing.Payload = updatedPayload
 	k.SetPost(goCtx, *existing)
 
 	b64Payload := base64.StdEncoding.EncodeToString(existing.Payload)
@@ -166,10 +195,10 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 		return nil, err
 	}
 
-	return &types.MsgUpdatePostResponse{}, nil
+	return &types.MsgUpdateRingPostByAcpResponse{}, nil
 }
 
-// UpdatePostByThresholdSignature finalizes a reshare using only the current
+// UpdateRingPostByThresholdSignature finalizes a reshare using only the current
 // bulletin payload as state. It moves new_peer_ids/new_threshold into
 // peer_ids/threshold, clears the new_* fields, and verifies a threshold
 // signature over the canonical transition sign doc against the current
@@ -177,10 +206,10 @@ func (k *Keeper) UpdatePost(goCtx context.Context, msg *types.MsgUpdatePost) (*t
 // set to the current block height.
 // This path does not perform the ACP collaborator permission check used by
 // UpdatePost.
-func (k *Keeper) UpdatePostByThresholdSignature(
+func (k *Keeper) UpdateRingPostByThresholdSignature(
 	goCtx context.Context,
-	msg *types.MsgUpdatePostByThresholdSignature,
-) (*types.MsgUpdatePostByThresholdSignatureResponse, error) {
+	msg *types.MsgUpdateRingPostByThresholdSignature,
+) (*types.MsgUpdateRingPostByThresholdSignatureResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceId := getNamespaceId(msg.Namespace)
@@ -236,7 +265,7 @@ func (k *Keeper) UpdatePostByThresholdSignature(
 		return nil, err
 	}
 
-	return &types.MsgUpdatePostByThresholdSignatureResponse{}, nil
+	return &types.MsgUpdateRingPostByThresholdSignatureResponse{}, nil
 }
 
 // AddCollaborator adds a new collaborator to the specified namespace.

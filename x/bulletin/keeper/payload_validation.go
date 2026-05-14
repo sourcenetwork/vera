@@ -16,6 +16,7 @@ type ringPayloadJSON struct {
 	Threshold        *uint32   `json:"threshold"`
 	PSSInterval      *uint64   `json:"pss_interval,omitempty"`
 	BlockNumberNonce *uint64   `json:"block_number_nonce"`
+	PolicyID         *string   `json:"policy_id,omitempty"`
 }
 
 func validateRingPayloadJSON(payload []byte) error {
@@ -41,6 +42,54 @@ func parseRingPayloadJSON(payload []byte) (*ringPayloadJSON, error) {
 	}
 
 	return &ringPayload, nil
+}
+
+// validateRingPostUpdate checks that the fields being set via UpdateRingPostByAcp
+// are internally consistent against the existing ring payload:
+//   - a reshare must not already be in progress when new_peer_ids or new_threshold are being changed
+//   - new_peer_ids must have no duplicates
+//   - new_threshold (if provided) must be at least 1
+//   - the effective new_peer_ids count must be >= the effective new_threshold
+//     (drawing from the existing payload for whichever side is not being updated)
+func validateRingPostUpdate(newPeerIDs []string, newThreshold *uint32, existing *ringPayloadJSON) error {
+	reshareInProgress := existing.NewPeerIDs != nil || existing.NewThreshold != nil
+	touchingReshareFields := len(newPeerIDs) > 0 || newThreshold != nil
+	if reshareInProgress && touchingReshareFields {
+		return types.ErrReshareInProgress
+	}
+
+	if len(newPeerIDs) > 0 {
+		seen := make(map[string]struct{}, len(newPeerIDs))
+		for _, id := range newPeerIDs {
+			if _, dup := seen[id]; dup {
+				return errorsmod.Wrapf(types.ErrInvalidPostPayload, "duplicate peer id in new_peer_ids: %q", id)
+			}
+			seen[id] = struct{}{}
+		}
+	}
+	if newThreshold != nil && *newThreshold < 1 {
+		return errorsmod.Wrap(types.ErrInvalidPostPayload, "new_threshold must be at least 1")
+	}
+
+	effectivePeerIDs := newPeerIDs
+	if len(effectivePeerIDs) == 0 && existing.NewPeerIDs != nil {
+		effectivePeerIDs = *existing.NewPeerIDs
+	}
+
+	effectiveThreshold := newThreshold
+	if effectiveThreshold == nil {
+		effectiveThreshold = existing.NewThreshold
+	}
+
+	if len(effectivePeerIDs) > 0 && effectiveThreshold != nil && uint32(len(effectivePeerIDs)) < *effectiveThreshold {
+		return errorsmod.Wrapf(
+			types.ErrInvalidPostPayload,
+			"new_peer_ids count (%d) is less than new_threshold (%d)",
+			len(effectivePeerIDs), *effectiveThreshold,
+		)
+	}
+
+	return nil
 }
 
 func ringPayloadForReshareFinalization(currentRingPayload *ringPayloadJSON) (*ringPayloadJSON, error) {

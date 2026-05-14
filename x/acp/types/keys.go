@@ -7,6 +7,9 @@ const (
 	// StoreKey defines the primary module store key
 	StoreKey = ModuleName
 
+	// MemStoreKey defines the in-memory store key
+	MemStoreKey = "mem_acp"
+
 	// AccessDecisionRepositoryKeyPrefix defines the namespace for Access Decisions
 	AccessDecisionRepositoryKeyPrefix = "access_decision/"
 

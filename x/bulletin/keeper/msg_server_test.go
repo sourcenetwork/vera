@@ -16,7 +16,30 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
 )
 
-func TestMsgUpdatePost(t *testing.T) {
+func TestMsgUpdateRingPostByAcp_ValidateBasic(t *testing.T) {
+	k, ctx := setupKeeper(t)
+	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
+
+	ownerKey := secp256k1.GenPrivKey().PubKey()
+	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
+	k.accountKeeper.SetAccount(ctx, owner)
+
+	cases := []struct {
+		msg    *types.MsgUpdateRingPostByAcp
+		errMsg string
+	}{
+		{&types.MsgUpdateRingPostByAcp{}, "invalid creator address"},
+		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address}, "invalid namespace id"},
+		{&types.MsgUpdateRingPostByAcp{Creator: owner.Address, Namespace: "ns1"}, "invalid post id"},
+	}
+	for _, c := range cases {
+		err := c.msg.ValidateBasic()
+		require.Error(t, err)
+		require.Contains(t, err.Error(), c.errMsg)
+	}
+}
+
+func TestMsgUpdateRingPostByAcp(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
@@ -36,7 +59,6 @@ func TestMsgUpdatePost(t *testing.T) {
 
 	namespace := "ns1"
 	namespaceId := getNamespaceId(namespace)
-	originalPayload := []byte("hello world")
 
 	_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
 		Creator:   owner.Address,
@@ -44,83 +66,87 @@ func TestMsgUpdatePost(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	policyId := k.GetPolicyId(ctx)
+	require.NotEmpty(t, policyId)
+
+	ringPayloadBytes := makeRingPayloadWithPolicy(t, policyId)
 	_, err = k.CreatePost(ctx, &types.MsgCreatePost{
 		Creator:   owner.Address,
 		Namespace: namespace,
-		Payload:   originalPayload,
+		Payload:   ringPayloadBytes,
 	})
 	require.NoError(t, err)
 
-	postId := types.GeneratePostId(namespaceId, originalPayload)
-
-	t.Run("validate basic rejects empty fields", func(t *testing.T) {
-		cases := []struct {
-			msg    *types.MsgUpdatePost
-			errMsg string
-		}{
-			{&types.MsgUpdatePost{}, "invalid creator address"},
-			{&types.MsgUpdatePost{Creator: owner.Address}, "invalid namespace id"},
-			{&types.MsgUpdatePost{Creator: owner.Address, Namespace: namespace}, "post not found"},
-			{&types.MsgUpdatePost{Creator: owner.Address, Namespace: namespace, PostId: postId}, "invalid post payload"},
-		}
-		for _, c := range cases {
-			err := c.msg.ValidateBasic()
-			require.Error(t, err)
-			require.Contains(t, err.Error(), c.errMsg)
-		}
-	})
+	postId := types.GeneratePostId(namespaceId, ringPayloadBytes)
 
 	t.Run("namespace not found", func(t *testing.T) {
-		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   owner.Address,
-			Namespace: "does-not-exist",
-			PostId:    postId,
-			Payload:   []byte("new"),
+		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    owner.Address,
+			Namespace:  "does-not-exist",
+			PostId:     postId,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrNamespaceNotFound)
 	})
 
 	t.Run("post not found", func(t *testing.T) {
-		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    "nonexistent-post-id",
-			Payload:   []byte("new"),
+		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     "nonexistent-post-id",
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrPostNotFound)
 	})
 
-	t.Run("outsider without collaborator relation is rejected", func(t *testing.T) {
-		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   outsider.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   []byte("nope"),
+	t.Run("non-ring payload is rejected", func(t *testing.T) {
+		invalidPostID := "invalid-ring-payload-post"
+		k.SetPost(ctx, types.Post{
+			Id:        invalidPostID,
+			Namespace: namespaceId,
+			Payload:   []byte("not-ring-json"),
+		})
+		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     invalidPostID,
+			NewPeerIds: []string{"peer2"},
+		})
+		require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+	})
+
+	t.Run("ring payload without policy_id is rejected", func(t *testing.T) {
+		noPolicyPostID := "no-policy-id-post"
+		noPolicyPayload := ringPayloadWithSeed(t, "sourcehub-bulletin-bls-test-seed-0003", []string{"peer1"}, 1, nil, nil)
+		k.SetPost(ctx, types.Post{
+			Id:        noPolicyPostID,
+			Namespace: namespaceId,
+			Payload:   noPolicyPayload,
+		})
+		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    owner.Address,
+			Namespace:  namespace,
+			PostId:     noPolicyPostID,
+			NewPeerIds: []string{"peer2"},
+		})
+		require.ErrorIs(t, err, types.ErrRingPayloadMissingPolicyId)
+	})
+
+	t.Run("outsider without permission is rejected", func(t *testing.T) {
+		_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    outsider.Address,
+			Namespace:  namespace,
+			PostId:     postId,
+			NewPeerIds: []string{"peer2"},
 		})
 		require.ErrorIs(t, err, types.ErrInvalidPostUpdater)
 
 		stored := k.getPost(ctx, namespaceId, postId)
 		require.NotNil(t, stored)
-		require.Equal(t, originalPayload, stored.Payload)
+		require.Equal(t, ringPayloadBytes, stored.Payload)
 	})
 
-	t.Run("creator can update and post_id is preserved", func(t *testing.T) {
-		newPayload := []byte("hello mars")
-		_, err := k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   owner.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   newPayload,
-		})
-		require.NoError(t, err)
-
-		stored := k.getPost(ctx, namespaceId, postId)
-		require.NotNil(t, stored)
-		require.Equal(t, postId, stored.Id)
-		require.Equal(t, newPayload, stored.Payload)
-	})
-
-	t.Run("collaborator can update via ACP policy", func(t *testing.T) {
+	t.Run("collaborator can update new_peer_ids and post_id is preserved", func(t *testing.T) {
 		_, err := k.AddCollaborator(ctx, &types.MsgAddCollaborator{
 			Creator:      owner.Address,
 			Namespace:    namespace,
@@ -128,44 +154,123 @@ func TestMsgUpdatePost(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		newPayload := []byte("hello venus")
-		_, err = k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   collab.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   newPayload,
+		t.Run("duplicate new_peer_ids are rejected", func(t *testing.T) {
+			_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+				Creator:    collab.Address,
+				Namespace:  namespace,
+				PostId:     postId,
+				NewPeerIds: []string{"peer2", "peer2"},
+			})
+			require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		})
+
+		t.Run("new_threshold of zero is rejected", func(t *testing.T) {
+			_, err := k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+				Creator:       collab.Address,
+				Namespace:     namespace,
+				PostId:        postId,
+				XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 0},
+			})
+			require.ErrorIs(t, err, types.ErrInvalidPostPayload)
+		})
+
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:    collab.Address,
+			Namespace:  namespace,
+			PostId:     postId,
+			NewPeerIds: []string{"peer2", "peer3"},
 		})
 		require.NoError(t, err)
 
 		stored := k.getPost(ctx, namespaceId, postId)
 		require.NotNil(t, stored)
 		require.Equal(t, postId, stored.Id)
-		require.Equal(t, newPayload, stored.Payload)
+
+		parsed, err := parseRingPayloadJSON(stored.Payload)
+		require.NoError(t, err)
+		require.Equal(t, []string{"peer2", "peer3"}, *parsed.NewPeerIDs)
 	})
 
-	t.Run("revoked collaborator can no longer update", func(t *testing.T) {
-		// collab was granted in the previous subtest; revoke it now
-		_, err := k.RemoveCollaborator(ctx, &types.MsgRemoveCollaborator{
-			Creator:      owner.Address,
-			Namespace:    namespace,
-			Collaborator: collab.Address,
+	t.Run("reshare in progress: changing new_threshold alone is rejected", func(t *testing.T) {
+		// post currently has new_peer_ids set from the previous test — reshare in progress
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:       collab.Address,
+			Namespace:     namespace,
+			PostId:        postId,
+			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: 2},
+		})
+		require.ErrorIs(t, err, types.ErrReshareInProgress)
+	})
+
+	t.Run("new_threshold is updated when set alongside new_peer_ids", func(t *testing.T) {
+		// reset post to original so no reshare is in progress
+		original := k.getPost(ctx, namespaceId, postId)
+		original.Payload = ringPayloadBytes
+		k.SetPost(ctx, *original)
+
+		threshold := uint32(2)
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:       collab.Address,
+			Namespace:     namespace,
+			PostId:        postId,
+			NewPeerIds:    []string{"peer2", "peer3"},
+			XNewThreshold: &types.MsgUpdateRingPostByAcp_NewThreshold{NewThreshold: threshold},
 		})
 		require.NoError(t, err)
 
-		beforePayload := k.getPost(ctx, namespaceId, postId).Payload
-
-		_, err = k.UpdatePost(ctx, &types.MsgUpdatePost{
-			Creator:   collab.Address,
-			Namespace: namespace,
-			PostId:    postId,
-			Payload:   []byte("should be rejected"),
-		})
-		require.ErrorIs(t, err, types.ErrInvalidPostUpdater)
-
-		stored := k.getPost(ctx, namespaceId, postId)
-		require.NotNil(t, stored)
-		require.Equal(t, beforePayload, stored.Payload)
+		parsed, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, threshold, *parsed.NewThreshold)
+		require.Equal(t, []string{"peer2", "peer3"}, *parsed.NewPeerIDs)
 	})
+
+	t.Run("pss_interval is updated when provided", func(t *testing.T) {
+		interval := uint64(100)
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:      collab.Address,
+			Namespace:    namespace,
+			PostId:       postId,
+			XPssInterval: &types.MsgUpdateRingPostByAcp_PssInterval{PssInterval: interval},
+		})
+		require.NoError(t, err)
+
+		parsed, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, interval, *parsed.PSSInterval)
+	})
+
+	t.Run("unspecified fields are not changed", func(t *testing.T) {
+		before, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		originalPeerIDs := *before.PeerIDs
+		originalNewThreshold := *before.NewThreshold
+
+		// pss_interval-only update is allowed even while a reshare is in progress
+		_, err = k.UpdateRingPostByAcp(ctx, &types.MsgUpdateRingPostByAcp{
+			Creator:      collab.Address,
+			Namespace:    namespace,
+			PostId:       postId,
+			XPssInterval: &types.MsgUpdateRingPostByAcp_PssInterval{PssInterval: 200},
+		})
+		require.NoError(t, err)
+
+		after, err := parseRingPayloadJSON(k.getPost(ctx, namespaceId, postId).Payload)
+		require.NoError(t, err)
+		require.Equal(t, originalPeerIDs, *after.PeerIDs)
+		require.Equal(t, originalNewThreshold, *after.NewThreshold)
+	})
+}
+
+func makeRingPayloadWithPolicy(t *testing.T, policyId string) []byte {
+	t.Helper()
+	payload := ringPayloadWithSeed(t, "sourcehub-bulletin-bls-test-seed-0001", []string{"peer1"}, 1, nil, nil)
+
+	var raw map[string]interface{}
+	require.NoError(t, json.Unmarshal(payload, &raw))
+	raw["policy_id"] = policyId
+	out, err := json.Marshal(raw)
+	require.NoError(t, err)
+	return out
 }
 
 func TestMsgCreatePost_DoesNotValidateRingPayload(t *testing.T) {
@@ -192,7 +297,8 @@ func TestMsgCreatePost_DoesNotValidateRingPayload(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestMsgUpdatePost_DoesNotValidateRingPayload(t *testing.T) {
+
+func TestMsgUpdateRingPostByThresholdSignature_ValidateBasic(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
@@ -200,48 +306,7 @@ func TestMsgUpdatePost_DoesNotValidateRingPayload(t *testing.T) {
 	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
 	k.accountKeeper.SetAccount(ctx, owner)
 
-	namespace := "orbis/rings/ring1"
-	namespaceId := getNamespaceId(namespace)
-	originalPayload := []byte(`{"ring_pk":"pk","peer_ids":["peer1"],"threshold":1}`)
-
-	_, err := k.RegisterNamespace(ctx, &types.MsgRegisterNamespace{
-		Creator:   owner.Address,
-		Namespace: namespace,
-	})
-	require.NoError(t, err)
-
-	_, err = k.CreatePost(ctx, &types.MsgCreatePost{
-		Creator:   owner.Address,
-		Namespace: namespace,
-		Payload:   originalPayload,
-	})
-	require.NoError(t, err)
-
-	postId := types.GeneratePostId(namespaceId, originalPayload)
-
-	nextPayload := []byte(`not-json`)
-	_, err = k.UpdatePost(ctx, &types.MsgUpdatePost{
-		Creator:   owner.Address,
-		Namespace: namespace,
-		PostId:    postId,
-		Payload:   nextPayload,
-	})
-	require.NoError(t, err)
-
-	stored := k.getPost(ctx, namespaceId, postId)
-	require.NotNil(t, stored)
-	require.Equal(t, nextPayload, stored.Payload)
-}
-
-func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
-	k, ctx := setupKeeper(t)
-	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
-
-	ownerKey := secp256k1.GenPrivKey().PubKey()
-	owner := authtypes.NewBaseAccount(sdk.AccAddress(ownerKey.Address()), ownerKey, 1, 1)
-	k.accountKeeper.SetAccount(ctx, owner)
-
-	validMsg := &types.MsgUpdatePostByThresholdSignature{
+	validMsg := &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         owner.Address,
 		Namespace:       "ns1",
 		PostId:          "post1",
@@ -251,14 +316,14 @@ func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
 	require.NoError(t, validMsg.ValidateBasic())
 
 	cases := []struct {
-		msg     *types.MsgUpdatePostByThresholdSignature
+		msg     *types.MsgUpdateRingPostByThresholdSignature
 		wantErr error
 	}{
-		{&types.MsgUpdatePostByThresholdSignature{}, sdkerrors.ErrInvalidAddress},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address}, types.ErrInvalidNamespaceId},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, types.ErrInvalidPostId},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, types.ErrInvalidSignatureScheme},
-		{&types.MsgUpdatePostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1", SignatureScheme: ThresholdSignatureSchemeBLS12381G1PKG2SigNUL}, types.ErrInvalidSignaturePayload},
+		{&types.MsgUpdateRingPostByThresholdSignature{}, sdkerrors.ErrInvalidAddress},
+		{&types.MsgUpdateRingPostByThresholdSignature{Creator: owner.Address}, types.ErrInvalidNamespaceId},
+		{&types.MsgUpdateRingPostByThresholdSignature{Creator: owner.Address, Namespace: "ns1"}, types.ErrInvalidPostId},
+		{&types.MsgUpdateRingPostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1"}, types.ErrInvalidSignatureScheme},
+		{&types.MsgUpdateRingPostByThresholdSignature{Creator: owner.Address, Namespace: "ns1", PostId: "post1", SignatureScheme: ThresholdSignatureSchemeBLS12381G1PKG2SigNUL}, types.ErrInvalidSignaturePayload},
 	}
 	for _, c := range cases {
 		err := c.msg.ValidateBasic()
@@ -266,7 +331,7 @@ func TestMsgUpdatePostByThresholdSignature_ValidateBasic(t *testing.T) {
 	}
 }
 
-func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
+func TestUpdateRingPostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	ctx = ctx.WithChainID("sourcehub-test").WithBlockHeight(101)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
@@ -317,7 +382,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 			Payload:    payload,
 		})
 
-		_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+		_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 			Creator:         owner.Address,
 			Namespace:       namespace,
 			PostId:          invalidPostID,
@@ -345,7 +410,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 		signDocFinalizedPayload,
 		"sourcehub-bulletin-bls-test-seed-0001",
 	)
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         owner.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -359,7 +424,7 @@ func TestUpdatePostByThresholdSignature_ValidatesRingPayload(t *testing.T) {
 	require.Equal(t, finalizedPayload, stored.Payload)
 }
 
-func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T) {
+func TestUpdateRingPostByThresholdSignature_VerifiesThresholdSignature(t *testing.T) {
 	k, ctx := setupKeeper(t)
 	ctx = ctx.WithChainID("sourcehub-test").WithBlockHeight(202)
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
@@ -426,7 +491,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		"sourcehub-bulletin-bls-test-seed-0002",
 	)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -439,7 +504,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	require.NotNil(t, stored)
 	require.Equal(t, originalPayload, stored.Payload)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -452,7 +517,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	require.NotNil(t, stored)
 	require.Equal(t, originalPayload, stored.Payload)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -472,7 +537,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		CreatorDid: ownerDID,
 		Payload:    originalPayload,
 	})
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          post2ID,
@@ -499,7 +564,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		CreatorDid: ownerDID,
 		Payload:    staleCurrentPayload,
 	})
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -527,7 +592,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		CreatorDid: ownerDID,
 		Payload:    staleNoncePayload,
 	})
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -547,7 +612,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 		Payload:    originalPayload,
 	})
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
@@ -560,7 +625,7 @@ func TestUpdatePostByThresholdSignature_VerifiesThresholdSignature(t *testing.T)
 	require.NotNil(t, stored)
 	require.Equal(t, finalizedPayload, stored.Payload)
 
-	_, err = k.UpdatePostByThresholdSignature(ctx, &types.MsgUpdatePostByThresholdSignature{
+	_, err = k.UpdateRingPostByThresholdSignature(ctx, &types.MsgUpdateRingPostByThresholdSignature{
 		Creator:         updater.Address,
 		Namespace:       namespace,
 		PostId:          postId,
