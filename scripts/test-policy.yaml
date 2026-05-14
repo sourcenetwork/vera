@@ -3,12 +3,9 @@ description: Base policy that defines permissions for bulletin namespaces
 resources:
 - name: namespace
   relations:
-  - owner:
-    types:
-    - actor
   - name: collaborator
     types: 
     - actor
   permissions:
   - name: create_post
-    expr: owner + collaborator
+    expr: collaborator
