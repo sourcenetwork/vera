@@ -4,7 +4,9 @@ import "cosmossdk.io/errors"
 
 // Codes for feegrant errors
 const (
-	DefaultCodespace = ModuleName
+	// set a different codespace for errors and these cause a panic
+	// if the original feegrant module is imported in some different context
+	DefaultCodespace = "source-feegrant"
 )
 
 var (
