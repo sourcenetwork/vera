@@ -45,6 +45,7 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
+	github.com/mizufinance/decaf377-go v0.1.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.2-0.20260515161012-1ff695ed0fa0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20260514175348-017fdf639300
@@ -53,6 +54,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.11.1
+	github.com/supranational/blst v0.3.16
 	github.com/tendermint/tendermint v0.35.9
 	github.com/testcontainers/testcontainers-go v0.41.0
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546
@@ -122,7 +124,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/go-netrc v0.0.0-20140422174119-9fd32a8b3d3d // indirect
 	github.com/bgentry/speakeasy v0.2.0 // indirect
-	github.com/bits-and-blooms/bitset v1.20.0 // indirect
+	github.com/bits-and-blooms/bitset v1.24.0 // indirect
 	github.com/bkielbasa/cyclop v1.2.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/blizzy78/varnamelen v0.8.0 // indirect
@@ -157,6 +159,7 @@ require (
 	github.com/cockroachdb/redact v1.1.6 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
+	github.com/consensys/gnark-crypto v0.19.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
@@ -380,7 +383,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/rs/cors v1.11.1 // indirect
-	github.com/rs/zerolog v1.33.0 // indirect
+	github.com/rs/zerolog v1.34.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ryancurrah/gomodguard v1.3.2 // indirect
 	github.com/ryanrolds/sqlclosecheck v0.5.1 // indirect

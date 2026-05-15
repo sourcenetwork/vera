@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Msg_UpdateParams_FullMethodName       = "/sourcehub.bulletin.Msg/UpdateParams"
-	Msg_CreatePost_FullMethodName         = "/sourcehub.bulletin.Msg/CreatePost"
-	Msg_UpdatePost_FullMethodName         = "/sourcehub.bulletin.Msg/UpdatePost"
-	Msg_RegisterNamespace_FullMethodName  = "/sourcehub.bulletin.Msg/RegisterNamespace"
-	Msg_AddCollaborator_FullMethodName    = "/sourcehub.bulletin.Msg/AddCollaborator"
-	Msg_RemoveCollaborator_FullMethodName = "/sourcehub.bulletin.Msg/RemoveCollaborator"
+	Msg_UpdateParams_FullMethodName                       = "/sourcehub.bulletin.Msg/UpdateParams"
+	Msg_CreatePost_FullMethodName                         = "/sourcehub.bulletin.Msg/CreatePost"
+	Msg_UpdateRingPostByAcp_FullMethodName                = "/sourcehub.bulletin.Msg/UpdateRingPostByAcp"
+	Msg_UpdateRingPostByThresholdSignature_FullMethodName = "/sourcehub.bulletin.Msg/UpdateRingPostByThresholdSignature"
+	Msg_RegisterNamespace_FullMethodName                  = "/sourcehub.bulletin.Msg/RegisterNamespace"
+	Msg_AddCollaborator_FullMethodName                    = "/sourcehub.bulletin.Msg/AddCollaborator"
+	Msg_RemoveCollaborator_FullMethodName                 = "/sourcehub.bulletin.Msg/RemoveCollaborator"
 )
 
 // MsgClient is the client API for Msg service.
@@ -37,7 +38,8 @@ type MsgClient interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreatePost(ctx context.Context, in *MsgCreatePost, opts ...grpc.CallOption) (*MsgCreatePostResponse, error)
-	UpdatePost(ctx context.Context, in *MsgUpdatePost, opts ...grpc.CallOption) (*MsgUpdatePostResponse, error)
+	UpdateRingPostByAcp(ctx context.Context, in *MsgUpdateRingPostByAcp, opts ...grpc.CallOption) (*MsgUpdateRingPostByAcpResponse, error)
+	UpdateRingPostByThresholdSignature(ctx context.Context, in *MsgUpdateRingPostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdateRingPostByThresholdSignatureResponse, error)
 	RegisterNamespace(ctx context.Context, in *MsgRegisterNamespace, opts ...grpc.CallOption) (*MsgRegisterNamespaceResponse, error)
 	AddCollaborator(ctx context.Context, in *MsgAddCollaborator, opts ...grpc.CallOption) (*MsgAddCollaboratorResponse, error)
 	RemoveCollaborator(ctx context.Context, in *MsgRemoveCollaborator, opts ...grpc.CallOption) (*MsgRemoveCollaboratorResponse, error)
@@ -71,10 +73,20 @@ func (c *msgClient) CreatePost(ctx context.Context, in *MsgCreatePost, opts ...g
 	return out, nil
 }
 
-func (c *msgClient) UpdatePost(ctx context.Context, in *MsgUpdatePost, opts ...grpc.CallOption) (*MsgUpdatePostResponse, error) {
+func (c *msgClient) UpdateRingPostByAcp(ctx context.Context, in *MsgUpdateRingPostByAcp, opts ...grpc.CallOption) (*MsgUpdateRingPostByAcpResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MsgUpdatePostResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdatePost_FullMethodName, in, out, cOpts...)
+	out := new(MsgUpdateRingPostByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateRingPostByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateRingPostByThresholdSignature(ctx context.Context, in *MsgUpdateRingPostByThresholdSignature, opts ...grpc.CallOption) (*MsgUpdateRingPostByThresholdSignatureResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgUpdateRingPostByThresholdSignatureResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateRingPostByThresholdSignature_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +133,8 @@ type MsgServer interface {
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error)
-	UpdatePost(context.Context, *MsgUpdatePost) (*MsgUpdatePostResponse, error)
+	UpdateRingPostByAcp(context.Context, *MsgUpdateRingPostByAcp) (*MsgUpdateRingPostByAcpResponse, error)
+	UpdateRingPostByThresholdSignature(context.Context, *MsgUpdateRingPostByThresholdSignature) (*MsgUpdateRingPostByThresholdSignatureResponse, error)
 	RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error)
 	AddCollaborator(context.Context, *MsgAddCollaborator) (*MsgAddCollaboratorResponse, error)
 	RemoveCollaborator(context.Context, *MsgRemoveCollaborator) (*MsgRemoveCollaboratorResponse, error)
@@ -141,8 +154,11 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 func (UnimplementedMsgServer) CreatePost(context.Context, *MsgCreatePost) (*MsgCreatePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePost not implemented")
 }
-func (UnimplementedMsgServer) UpdatePost(context.Context, *MsgUpdatePost) (*MsgUpdatePostResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+func (UnimplementedMsgServer) UpdateRingPostByAcp(context.Context, *MsgUpdateRingPostByAcp) (*MsgUpdateRingPostByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingPostByAcp not implemented")
+}
+func (UnimplementedMsgServer) UpdateRingPostByThresholdSignature(context.Context, *MsgUpdateRingPostByThresholdSignature) (*MsgUpdateRingPostByThresholdSignatureResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingPostByThresholdSignature not implemented")
 }
 func (UnimplementedMsgServer) RegisterNamespace(context.Context, *MsgRegisterNamespace) (*MsgRegisterNamespaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterNamespace not implemented")
@@ -210,20 +226,38 @@ func _Msg_CreatePost_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdatePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdatePost)
+func _Msg_UpdateRingPostByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateRingPostByAcp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdatePost(ctx, in)
+		return srv.(MsgServer).UpdateRingPostByAcp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_UpdatePost_FullMethodName,
+		FullMethod: Msg_UpdateRingPostByAcp_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdatePost(ctx, req.(*MsgUpdatePost))
+		return srv.(MsgServer).UpdateRingPostByAcp(ctx, req.(*MsgUpdateRingPostByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateRingPostByThresholdSignature_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateRingPostByThresholdSignature)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateRingPostByThresholdSignature(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateRingPostByThresholdSignature_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateRingPostByThresholdSignature(ctx, req.(*MsgUpdateRingPostByThresholdSignature))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -298,8 +332,12 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreatePost_Handler,
 		},
 		{
-			MethodName: "UpdatePost",
-			Handler:    _Msg_UpdatePost_Handler,
+			MethodName: "UpdateRingPostByAcp",
+			Handler:    _Msg_UpdateRingPostByAcp_Handler,
+		},
+		{
+			MethodName: "UpdateRingPostByThresholdSignature",
+			Handler:    _Msg_UpdateRingPostByThresholdSignature_Handler,
 		},
 		{
 			MethodName: "RegisterNamespace",
