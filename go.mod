@@ -46,8 +46,8 @@ require (
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
 	github.com/skip-mev/block-sdk/v2 v2.1.5
-	github.com/sourcenetwork/acp_core v0.8.1
-	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
+	github.com/sourcenetwork/acp_core v0.8.2-0.20260515161012-1ff695ed0fa0
+	github.com/sourcenetwork/raccoondb v0.2.1-0.20260514175348-017fdf639300
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
@@ -402,7 +402,7 @@ require (
 	github.com/sonatard/noctx v0.0.2 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/sourcegraph/go-diff v0.7.0 // indirect
-	github.com/sourcenetwork/zanzi v0.3.1-0.20251104182341-4b1bd0f7be5a // indirect
+	github.com/sourcenetwork/zanzi v0.3.1-0.20260514183406-33141096311f // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/ssgreg/nlreturn/v2 v2.2.1 // indirect
