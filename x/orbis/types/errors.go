@@ -1,0 +1,27 @@
+package types
+
+import sdkerrors "cosmossdk.io/errors"
+
+// x/orbis module sentinel errors.
+var (
+	ErrInvalidSigner              = sdkerrors.Register(ModuleName, 1200, "expected gov account as only signer for proposal message")
+	ErrInvalidNamespaceId         = sdkerrors.Register(ModuleName, 1201, "invalid namespace id")
+	ErrInvalidRingId              = sdkerrors.Register(ModuleName, 1202, "invalid ring id")
+	ErrInvalidDocumentId          = sdkerrors.Register(ModuleName, 1203, "invalid document id")
+	ErrInvalidKeyDerivationId     = sdkerrors.Register(ModuleName, 1204, "invalid key derivation id")
+	ErrInvalidRing                = sdkerrors.Register(ModuleName, 1205, "invalid ring")
+	ErrRingAlreadyExists          = sdkerrors.Register(ModuleName, 1206, "ring already exists")
+	ErrRingNotFound               = sdkerrors.Register(ModuleName, 1207, "ring not found")
+	ErrDocumentAlreadyExists      = sdkerrors.Register(ModuleName, 1208, "document already exists")
+	ErrDocumentNotFound           = sdkerrors.Register(ModuleName, 1209, "document not found")
+	ErrKeyDerivationAlreadyExists = sdkerrors.Register(ModuleName, 1210, "key derivation already exists")
+	ErrKeyDerivationNotFound      = sdkerrors.Register(ModuleName, 1211, "key derivation not found")
+	ErrInvalidDocument            = sdkerrors.Register(ModuleName, 1212, "invalid document")
+	ErrInvalidKeyDerivation       = sdkerrors.Register(ModuleName, 1213, "invalid key derivation")
+	ErrInvalidRingUpdater         = sdkerrors.Register(ModuleName, 1214, "expected authorized account as a ring updater")
+	ErrRingMissingPolicyId        = sdkerrors.Register(ModuleName, 1215, "ring missing policy_id")
+	ErrReshareInProgress          = sdkerrors.Register(ModuleName, 1216, "reshare already in progress: finalize before changing reshare parameters")
+	ErrInvalidThresholdSignature  = sdkerrors.Register(ModuleName, 1217, "invalid threshold signature")
+	ErrInvalidSignatureScheme     = sdkerrors.Register(ModuleName, 1218, "invalid signature scheme")
+	ErrInvalidSignaturePayload    = sdkerrors.Register(ModuleName, 1219, "invalid signature payload")
+)

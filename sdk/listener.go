@@ -14,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
 
@@ -60,6 +61,7 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 	registry := cdctypes.NewInterfaceRegistry()
 	acptypes.RegisterInterfaces(registry)
 	bulletintypes.RegisterInterfaces(registry)
+	orbistypes.RegisterInterfaces(registry)
 	tiertypes.RegisterInterfaces(registry)
 
 	mapper := func(in rpctypes.ResultEvent) (Event, error) {

@@ -82,6 +82,11 @@ func getPriorityGroup(tx sdk.Tx) string {
 			if minPriority > "2" {
 				minPriority = "2"
 			}
+		case strings.HasPrefix(msgType, "/sourcehub.orbis."):
+			// Reduce minPriority to 1 if orbis module message found
+			if minPriority > "1" {
+				minPriority = "1"
+			}
 		case strings.HasPrefix(msgType, "/sourcehub.bulletin."):
 			// Reduce minPriority to 1 if bulletin module message found
 			if minPriority > "1" {

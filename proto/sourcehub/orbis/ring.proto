@@ -1,0 +1,21 @@
+syntax = "proto3";
+package sourcehub.orbis;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// Ring stores the active and pending committee metadata for an Orbis ring.
+message Ring {
+  string id = 1;
+  string namespace = 2;
+  string creator_did = 3;
+  string ring_pk = 4;
+  repeated string peer_ids = 5;
+  uint32 threshold = 6;
+  repeated string new_peer_ids = 7;
+  uint32 new_threshold = 8;
+  bool has_new_threshold = 9;
+  uint64 pss_interval = 10;
+  bool has_pss_interval = 11;
+  uint64 block_number_nonce = 12;
+  string policy_id = 13;
+}

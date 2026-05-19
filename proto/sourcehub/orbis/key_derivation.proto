@@ -1,0 +1,16 @@
+syntax = "proto3";
+package sourcehub.orbis;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// KeyDerivation stores a signing derivation and its policy binding metadata.
+message KeyDerivation {
+  string id = 1;
+  string namespace = 2;
+  string creator_did = 3;
+  string ring_id = 4;
+  string derivation = 5;
+  string policy_id = 6;
+  string resource = 7;
+  string permission = 8;
+}

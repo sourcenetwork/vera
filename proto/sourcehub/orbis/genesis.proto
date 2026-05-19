@@ -1,0 +1,31 @@
+syntax = "proto3";
+package sourcehub.orbis;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "sourcehub/orbis/document.proto";
+import "sourcehub/orbis/key_derivation.proto";
+import "sourcehub/orbis/params.proto";
+import "sourcehub/orbis/ring.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// GenesisState defines the orbis module's genesis state.
+message GenesisState {
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Ring rings = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Document documents = 3 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated KeyDerivation key_derivations = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

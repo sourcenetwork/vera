@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package sourcehub.orbis;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "sourcehub/orbis/document.proto";
+import "sourcehub/orbis/key_derivation.proto";
+import "sourcehub/orbis/params.proto";
+import "sourcehub/orbis/ring.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/params";
+  }
+
+  // Ring queries a ring by id.
+  rpc Ring(QueryRingRequest) returns (QueryRingResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/ring/{id}";
+  }
+
+  // Rings queries rings, optionally filtered by namespace.
+  rpc Rings(QueryRingsRequest) returns (QueryRingsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/rings";
+  }
+
+  // Document queries an encrypted document by namespace and id.
+  rpc Document(QueryDocumentRequest) returns (QueryDocumentResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/document/{namespace}/{id}";
+  }
+
+  // Documents queries encrypted documents within a namespace.
+  rpc Documents(QueryDocumentsRequest) returns (QueryDocumentsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/documents/{namespace}";
+  }
+
+  // KeyDerivation queries a key derivation by namespace and id.
+  rpc KeyDerivation(QueryKeyDerivationRequest) returns (QueryKeyDerivationResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivation/{namespace}/{id}";
+  }
+
+  // KeyDerivations queries key derivations within a namespace.
+  rpc KeyDerivations(QueryKeyDerivationsRequest) returns (QueryKeyDerivationsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivations/{namespace}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+message QueryRingRequest {
+  string id = 1;
+}
+
+message QueryRingResponse {
+  Ring ring = 1;
+}
+
+message QueryRingsRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryRingsResponse {
+  repeated Ring rings = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryDocumentRequest {
+  string namespace = 1;
+  string id = 2;
+}
+
+message QueryDocumentResponse {
+  Document document = 1;
+}
+
+message QueryDocumentsRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryDocumentsResponse {
+  repeated Document documents = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryKeyDerivationRequest {
+  string namespace = 1;
+  string id = 2;
+}
+
+message QueryKeyDerivationResponse {
+  KeyDerivation key_derivation = 1;
+}
+
+message QueryKeyDerivationsRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryKeyDerivationsResponse {
+  repeated KeyDerivation key_derivations = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

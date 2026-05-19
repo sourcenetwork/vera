@@ -1,0 +1,130 @@
+syntax = "proto3";
+
+package sourcehub.orbis;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "sourcehub/orbis/params.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a governance operation for updating module parameters.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
+  rpc UpdateRingByAcp(MsgUpdateRingByAcp) returns (MsgUpdateRingByAcpResponse);
+  rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
+  rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
+  rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sourcehub/x/orbis/MsgUpdateParams";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for MsgUpdateParams.
+message MsgUpdateParamsResponse {}
+
+message MsgCreateRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string ring_pk = 3;
+  repeated string peer_ids = 4;
+  uint32 threshold = 5;
+  uint64 pss_interval = 6;
+  bool has_pss_interval = 7;
+  string policy_id = 8;
+  string artifact = 9;
+}
+
+message MsgCreateRingResponse {
+  string ring_id = 1;
+}
+
+message MsgUpdateRingByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string artifact = 3;
+  repeated string new_peer_ids = 4;
+  uint32 new_threshold = 5;
+  bool has_new_threshold = 6;
+  uint64 pss_interval = 7;
+  bool has_pss_interval = 8;
+}
+
+message MsgUpdateRingByAcpResponse {}
+
+message MsgFinalizeRingReshareByThresholdSignature {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string artifact = 3;
+  string signature_scheme = 4;
+  bytes signature = 5;
+}
+
+message MsgFinalizeRingReshareByThresholdSignatureResponse {}
+
+message RingReshareFinalizeSignDoc {
+  string domain = 1;
+  string chain_id = 2;
+  string namespace = 3;
+  string ring_id = 4;
+  string ring_pk = 5;
+  bytes current_ring_sha256 = 6;
+  bytes finalized_ring_sha256 = 7;
+  uint64 block_number_nonce = 8;
+}
+
+message MsgStoreDocument {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string ring_id = 3;
+  string document = 4;
+  string proof = 5;
+  string policy_id = 6;
+  string resource = 7;
+  string permission = 8;
+  string tier = 9;
+  bool has_tier = 10;
+  uint64 timestamp = 11;
+  bool has_timestamp = 12;
+  string artifact = 13;
+}
+
+message MsgStoreDocumentResponse {
+  string document_id = 1;
+}
+
+message MsgStoreKeyDerivation {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string namespace = 2;
+  string ring_id = 3;
+  string derivation = 4;
+  string policy_id = 5;
+  string resource = 6;
+  string permission = 7;
+  string artifact = 8;
+}
+
+message MsgStoreKeyDerivationResponse {
+  string key_derivation_id = 1;
+}
