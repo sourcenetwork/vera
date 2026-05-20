@@ -130,7 +130,6 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		Namespace:  ring.Namespace,
 		RingId:     ring.Id,
 		UpdaterDid: updaterDID,
-		Artifact:   msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}
@@ -184,7 +183,6 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 		Namespace:  finalizedRing.Namespace,
 		RingId:     finalizedRing.Id,
 		UpdaterDid: updaterDID,
-		Artifact:   msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}
@@ -250,7 +248,6 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 		Namespace:  namespaceID,
 		DocumentId: documentID,
 		CreatorDid: creatorDID,
-		Artifact:   msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}
@@ -296,7 +293,6 @@ func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKe
 		Namespace:       namespaceID,
 		KeyDerivationId: keyDerivationID,
 		CreatorDid:      creatorDID,
-		Artifact:        msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}

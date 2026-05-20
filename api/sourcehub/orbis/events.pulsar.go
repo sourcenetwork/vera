@@ -629,7 +629,6 @@ var (
 	fd_EventRingUpdated_namespace   protoreflect.FieldDescriptor
 	fd_EventRingUpdated_ring_id     protoreflect.FieldDescriptor
 	fd_EventRingUpdated_updater_did protoreflect.FieldDescriptor
-	fd_EventRingUpdated_artifact    protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -638,7 +637,6 @@ func init() {
 	fd_EventRingUpdated_namespace = md_EventRingUpdated.Fields().ByName("namespace")
 	fd_EventRingUpdated_ring_id = md_EventRingUpdated.Fields().ByName("ring_id")
 	fd_EventRingUpdated_updater_did = md_EventRingUpdated.Fields().ByName("updater_did")
-	fd_EventRingUpdated_artifact = md_EventRingUpdated.Fields().ByName("artifact")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventRingUpdated)(nil)
@@ -724,12 +722,6 @@ func (x *fastReflection_EventRingUpdated) Range(f func(protoreflect.FieldDescrip
 			return
 		}
 	}
-	if x.Artifact != "" {
-		value := protoreflect.ValueOfString(x.Artifact)
-		if !f(fd_EventRingUpdated_artifact, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -751,8 +743,6 @@ func (x *fastReflection_EventRingUpdated) Has(fd protoreflect.FieldDescriptor) b
 		return x.RingId != ""
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
 		return x.UpdaterDid != ""
-	case "sourcehub.orbis.EventRingUpdated.artifact":
-		return x.Artifact != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpdated"))
@@ -775,8 +765,6 @@ func (x *fastReflection_EventRingUpdated) Clear(fd protoreflect.FieldDescriptor)
 		x.RingId = ""
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
 		x.UpdaterDid = ""
-	case "sourcehub.orbis.EventRingUpdated.artifact":
-		x.Artifact = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpdated"))
@@ -801,9 +789,6 @@ func (x *fastReflection_EventRingUpdated) Get(descriptor protoreflect.FieldDescr
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
 		value := x.UpdaterDid
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.orbis.EventRingUpdated.artifact":
-		value := x.Artifact
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
@@ -831,8 +816,6 @@ func (x *fastReflection_EventRingUpdated) Set(fd protoreflect.FieldDescriptor, v
 		x.RingId = value.Interface().(string)
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
 		x.UpdaterDid = value.Interface().(string)
-	case "sourcehub.orbis.EventRingUpdated.artifact":
-		x.Artifact = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpdated"))
@@ -859,8 +842,6 @@ func (x *fastReflection_EventRingUpdated) Mutable(fd protoreflect.FieldDescripto
 		panic(fmt.Errorf("field ring_id of message sourcehub.orbis.EventRingUpdated is not mutable"))
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
 		panic(fmt.Errorf("field updater_did of message sourcehub.orbis.EventRingUpdated is not mutable"))
-	case "sourcehub.orbis.EventRingUpdated.artifact":
-		panic(fmt.Errorf("field artifact of message sourcehub.orbis.EventRingUpdated is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpdated"))
@@ -879,8 +860,6 @@ func (x *fastReflection_EventRingUpdated) NewField(fd protoreflect.FieldDescript
 	case "sourcehub.orbis.EventRingUpdated.ring_id":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.orbis.EventRingUpdated.updater_did":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.orbis.EventRingUpdated.artifact":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -963,10 +942,6 @@ func (x *fastReflection_EventRingUpdated) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Artifact)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -995,13 +970,6 @@ func (x *fastReflection_EventRingUpdated) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Artifact) > 0 {
-			i -= len(x.Artifact)
-			copy(dAtA[i:], x.Artifact)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Artifact)))
-			i--
-			dAtA[i] = 0x22
 		}
 		if len(x.UpdaterDid) > 0 {
 			i -= len(x.UpdaterDid)
@@ -1169,38 +1137,6 @@ func (x *fastReflection_EventRingUpdated) ProtoMethods() *protoiface.Methods {
 				}
 				x.UpdaterDid = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Artifact", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Artifact = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1241,7 +1177,6 @@ var (
 	fd_EventDocumentStored_namespace   protoreflect.FieldDescriptor
 	fd_EventDocumentStored_document_id protoreflect.FieldDescriptor
 	fd_EventDocumentStored_creator_did protoreflect.FieldDescriptor
-	fd_EventDocumentStored_artifact    protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -1250,7 +1185,6 @@ func init() {
 	fd_EventDocumentStored_namespace = md_EventDocumentStored.Fields().ByName("namespace")
 	fd_EventDocumentStored_document_id = md_EventDocumentStored.Fields().ByName("document_id")
 	fd_EventDocumentStored_creator_did = md_EventDocumentStored.Fields().ByName("creator_did")
-	fd_EventDocumentStored_artifact = md_EventDocumentStored.Fields().ByName("artifact")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventDocumentStored)(nil)
@@ -1336,12 +1270,6 @@ func (x *fastReflection_EventDocumentStored) Range(f func(protoreflect.FieldDesc
 			return
 		}
 	}
-	if x.Artifact != "" {
-		value := protoreflect.ValueOfString(x.Artifact)
-		if !f(fd_EventDocumentStored_artifact, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -1363,8 +1291,6 @@ func (x *fastReflection_EventDocumentStored) Has(fd protoreflect.FieldDescriptor
 		return x.DocumentId != ""
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
 		return x.CreatorDid != ""
-	case "sourcehub.orbis.EventDocumentStored.artifact":
-		return x.Artifact != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventDocumentStored"))
@@ -1387,8 +1313,6 @@ func (x *fastReflection_EventDocumentStored) Clear(fd protoreflect.FieldDescript
 		x.DocumentId = ""
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
 		x.CreatorDid = ""
-	case "sourcehub.orbis.EventDocumentStored.artifact":
-		x.Artifact = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventDocumentStored"))
@@ -1413,9 +1337,6 @@ func (x *fastReflection_EventDocumentStored) Get(descriptor protoreflect.FieldDe
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
 		value := x.CreatorDid
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.orbis.EventDocumentStored.artifact":
-		value := x.Artifact
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
@@ -1443,8 +1364,6 @@ func (x *fastReflection_EventDocumentStored) Set(fd protoreflect.FieldDescriptor
 		x.DocumentId = value.Interface().(string)
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
 		x.CreatorDid = value.Interface().(string)
-	case "sourcehub.orbis.EventDocumentStored.artifact":
-		x.Artifact = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventDocumentStored"))
@@ -1471,8 +1390,6 @@ func (x *fastReflection_EventDocumentStored) Mutable(fd protoreflect.FieldDescri
 		panic(fmt.Errorf("field document_id of message sourcehub.orbis.EventDocumentStored is not mutable"))
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
 		panic(fmt.Errorf("field creator_did of message sourcehub.orbis.EventDocumentStored is not mutable"))
-	case "sourcehub.orbis.EventDocumentStored.artifact":
-		panic(fmt.Errorf("field artifact of message sourcehub.orbis.EventDocumentStored is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventDocumentStored"))
@@ -1491,8 +1408,6 @@ func (x *fastReflection_EventDocumentStored) NewField(fd protoreflect.FieldDescr
 	case "sourcehub.orbis.EventDocumentStored.document_id":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.orbis.EventDocumentStored.creator_did":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.orbis.EventDocumentStored.artifact":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -1575,10 +1490,6 @@ func (x *fastReflection_EventDocumentStored) ProtoMethods() *protoiface.Methods 
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Artifact)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -1607,13 +1518,6 @@ func (x *fastReflection_EventDocumentStored) ProtoMethods() *protoiface.Methods 
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Artifact) > 0 {
-			i -= len(x.Artifact)
-			copy(dAtA[i:], x.Artifact)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Artifact)))
-			i--
-			dAtA[i] = 0x22
 		}
 		if len(x.CreatorDid) > 0 {
 			i -= len(x.CreatorDid)
@@ -1781,38 +1685,6 @@ func (x *fastReflection_EventDocumentStored) ProtoMethods() *protoiface.Methods 
 				}
 				x.CreatorDid = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Artifact", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Artifact = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1853,7 +1725,6 @@ var (
 	fd_EventKeyDerivationStored_namespace         protoreflect.FieldDescriptor
 	fd_EventKeyDerivationStored_key_derivation_id protoreflect.FieldDescriptor
 	fd_EventKeyDerivationStored_creator_did       protoreflect.FieldDescriptor
-	fd_EventKeyDerivationStored_artifact          protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -1862,7 +1733,6 @@ func init() {
 	fd_EventKeyDerivationStored_namespace = md_EventKeyDerivationStored.Fields().ByName("namespace")
 	fd_EventKeyDerivationStored_key_derivation_id = md_EventKeyDerivationStored.Fields().ByName("key_derivation_id")
 	fd_EventKeyDerivationStored_creator_did = md_EventKeyDerivationStored.Fields().ByName("creator_did")
-	fd_EventKeyDerivationStored_artifact = md_EventKeyDerivationStored.Fields().ByName("artifact")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventKeyDerivationStored)(nil)
@@ -1948,12 +1818,6 @@ func (x *fastReflection_EventKeyDerivationStored) Range(f func(protoreflect.Fiel
 			return
 		}
 	}
-	if x.Artifact != "" {
-		value := protoreflect.ValueOfString(x.Artifact)
-		if !f(fd_EventKeyDerivationStored_artifact, value) {
-			return
-		}
-	}
 }
 
 // Has reports whether a field is populated.
@@ -1975,8 +1839,6 @@ func (x *fastReflection_EventKeyDerivationStored) Has(fd protoreflect.FieldDescr
 		return x.KeyDerivationId != ""
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
 		return x.CreatorDid != ""
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
-		return x.Artifact != ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventKeyDerivationStored"))
@@ -1999,8 +1861,6 @@ func (x *fastReflection_EventKeyDerivationStored) Clear(fd protoreflect.FieldDes
 		x.KeyDerivationId = ""
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
 		x.CreatorDid = ""
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
-		x.Artifact = ""
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventKeyDerivationStored"))
@@ -2025,9 +1885,6 @@ func (x *fastReflection_EventKeyDerivationStored) Get(descriptor protoreflect.Fi
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
 		value := x.CreatorDid
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
-		value := x.Artifact
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
@@ -2055,8 +1912,6 @@ func (x *fastReflection_EventKeyDerivationStored) Set(fd protoreflect.FieldDescr
 		x.KeyDerivationId = value.Interface().(string)
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
 		x.CreatorDid = value.Interface().(string)
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
-		x.Artifact = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventKeyDerivationStored"))
@@ -2083,8 +1938,6 @@ func (x *fastReflection_EventKeyDerivationStored) Mutable(fd protoreflect.FieldD
 		panic(fmt.Errorf("field key_derivation_id of message sourcehub.orbis.EventKeyDerivationStored is not mutable"))
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
 		panic(fmt.Errorf("field creator_did of message sourcehub.orbis.EventKeyDerivationStored is not mutable"))
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
-		panic(fmt.Errorf("field artifact of message sourcehub.orbis.EventKeyDerivationStored is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventKeyDerivationStored"))
@@ -2103,8 +1956,6 @@ func (x *fastReflection_EventKeyDerivationStored) NewField(fd protoreflect.Field
 	case "sourcehub.orbis.EventKeyDerivationStored.key_derivation_id":
 		return protoreflect.ValueOfString("")
 	case "sourcehub.orbis.EventKeyDerivationStored.creator_did":
-		return protoreflect.ValueOfString("")
-	case "sourcehub.orbis.EventKeyDerivationStored.artifact":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
@@ -2187,10 +2038,6 @@ func (x *fastReflection_EventKeyDerivationStored) ProtoMethods() *protoiface.Met
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Artifact)
-		if l > 0 {
-			n += 1 + l + runtime.Sov(uint64(l))
-		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -2219,13 +2066,6 @@ func (x *fastReflection_EventKeyDerivationStored) ProtoMethods() *protoiface.Met
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
-		}
-		if len(x.Artifact) > 0 {
-			i -= len(x.Artifact)
-			copy(dAtA[i:], x.Artifact)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Artifact)))
-			i--
-			dAtA[i] = 0x22
 		}
 		if len(x.CreatorDid) > 0 {
 			i -= len(x.CreatorDid)
@@ -2393,38 +2233,6 @@ func (x *fastReflection_EventKeyDerivationStored) ProtoMethods() *protoiface.Met
 				}
 				x.CreatorDid = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
-				if wireType != 2 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Artifact", wireType)
-				}
-				var stringLen uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					stringLen |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				intStringLen := int(stringLen)
-				if intStringLen < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				postIndex := iNdEx + intStringLen
-				if postIndex < 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
-				}
-				if postIndex > l {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-				}
-				x.Artifact = string(dAtA[iNdEx:postIndex])
-				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -2542,7 +2350,6 @@ type EventRingUpdated struct {
 	Namespace  string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	RingId     string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
 	UpdaterDid string `protobuf:"bytes,3,opt,name=updater_did,json=updaterDid,proto3" json:"updater_did,omitempty"`
-	Artifact   string `protobuf:"bytes,4,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
 func (x *EventRingUpdated) Reset() {
@@ -2586,13 +2393,6 @@ func (x *EventRingUpdated) GetUpdaterDid() string {
 	return ""
 }
 
-func (x *EventRingUpdated) GetArtifact() string {
-	if x != nil {
-		return x.Artifact
-	}
-	return ""
-}
-
 // EventDocumentStored is emitted when an encrypted document is stored.
 type EventDocumentStored struct {
 	state         protoimpl.MessageState
@@ -2602,7 +2402,6 @@ type EventDocumentStored struct {
 	Namespace  string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	DocumentId string `protobuf:"bytes,2,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
 	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	Artifact   string `protobuf:"bytes,4,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
 func (x *EventDocumentStored) Reset() {
@@ -2646,13 +2445,6 @@ func (x *EventDocumentStored) GetCreatorDid() string {
 	return ""
 }
 
-func (x *EventDocumentStored) GetArtifact() string {
-	if x != nil {
-		return x.Artifact
-	}
-	return ""
-}
-
 // EventKeyDerivationStored is emitted when a key derivation is stored.
 type EventKeyDerivationStored struct {
 	state         protoimpl.MessageState
@@ -2662,7 +2454,6 @@ type EventKeyDerivationStored struct {
 	Namespace       string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
 	KeyDerivationId string `protobuf:"bytes,2,opt,name=key_derivation_id,json=keyDerivationId,proto3" json:"key_derivation_id,omitempty"`
 	CreatorDid      string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	Artifact        string `protobuf:"bytes,4,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
 func (x *EventKeyDerivationStored) Reset() {
@@ -2706,13 +2497,6 @@ func (x *EventKeyDerivationStored) GetCreatorDid() string {
 	return ""
 }
 
-func (x *EventKeyDerivationStored) GetArtifact() string {
-	if x != nil {
-		return x.Artifact
-	}
-	return ""
-}
-
 var File_sourcehub_orbis_events_proto protoreflect.FileDescriptor
 
 var file_sourcehub_orbis_events_proto_rawDesc = []byte{
@@ -2727,46 +2511,40 @@ var file_sourcehub_orbis_events_proto_rawDesc = []byte{
 	0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08,
 	0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08,
-	0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x22, 0x86, 0x01, 0x0a, 0x10, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1c, 0x0a,
-	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72,
-	0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69,
-	0x6e, 0x67, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x5f,
-	0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74,
-	0x65, 0x72, 0x44, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63,
-	0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63,
-	0x74, 0x22, 0x91, 0x01, 0x0a, 0x13, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x6f, 0x63, 0x75, 0x6d,
-	0x65, 0x6e, 0x74, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d,
-	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61,
-	0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x64, 0x6f, 0x63, 0x75, 0x6d,
-	0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x64, 0x6f,
-	0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x72, 0x65, 0x61,
-	0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63,
-	0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x61, 0x72, 0x74,
-	0x69, 0x66, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x61, 0x72, 0x74,
-	0x69, 0x66, 0x61, 0x63, 0x74, 0x22, 0xa1, 0x01, 0x0a, 0x18, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x4b,
-	0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x6f, 0x72,
-	0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65,
-	0x12, 0x2a, 0x0a, 0x11, 0x6b, 0x65, 0x79, 0x5f, 0x64, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69,
-	0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0f, 0x6b, 0x65, 0x79,
-	0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b,
-	0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x12, 0x1a, 0x0a,
-	0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x08, 0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63, 0x6f,
-	0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69,
-	0x73, 0x42, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01,
-	0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61,
-	0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62,
-	0x69, 0x73, 0xa2, 0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47,
-	0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x72, 0x74, 0x69, 0x66, 0x61, 0x63, 0x74, 0x22, 0x6a, 0x0a, 0x10, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x52, 0x69, 0x6e, 0x67, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09,
+	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69,
+	0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e,
+	0x67, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x72, 0x5f, 0x64,
+	0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x75, 0x70, 0x64, 0x61, 0x74, 0x65,
+	0x72, 0x44, 0x69, 0x64, 0x22, 0x75, 0x0a, 0x13, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x44, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e,
+	0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
+	0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b, 0x64, 0x6f, 0x63,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x72,
+	0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x44, 0x69, 0x64, 0x22, 0x85, 0x01, 0x0a, 0x18,
+	0x45, 0x76, 0x65, 0x6e, 0x74, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69,
+	0x6f, 0x6e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d,
+	0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x2a, 0x0a, 0x11, 0x6b, 0x65, 0x79, 0x5f, 0x64, 0x65,
+	0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0f, 0x6b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x5f, 0x64, 0x69,
+	0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
+	0x44, 0x69, 0x64, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0b, 0x45, 0x76, 0x65,
+	0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d,
+	0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x53,
+	0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f,
+	0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
+	0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

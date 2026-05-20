@@ -11,14 +11,12 @@ var _ sdk.Msg = &MsgFinalizeRingReshareByThresholdSignature{}
 func NewMsgFinalizeRingReshareByThresholdSignature(
 	creator string,
 	ringID string,
-	artifact string,
 	signatureScheme string,
 	signature []byte,
 ) *MsgFinalizeRingReshareByThresholdSignature {
 	return &MsgFinalizeRingReshareByThresholdSignature{
 		Creator:         creator,
 		RingId:          ringID,
-		Artifact:        artifact,
 		SignatureScheme: signatureScheme,
 		Signature:       signature,
 	}

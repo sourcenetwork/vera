@@ -17,7 +17,6 @@ message EventRingUpdated {
   string namespace = 1;
   string ring_id = 2;
   string updater_did = 3;
-  string artifact = 4;
 }
 
 // EventDocumentStored is emitted when an encrypted document is stored.
@@ -25,7 +24,6 @@ message EventDocumentStored {
   string namespace = 1;
   string document_id = 2;
   string creator_did = 3;
-  string artifact = 4;
 }
 
 // EventKeyDerivationStored is emitted when a key derivation is stored.
@@ -33,5 +31,4 @@ message EventKeyDerivationStored {
   string namespace = 1;
   string key_derivation_id = 2;
   string creator_did = 3;
-  string artifact = 4;
 }

@@ -34,6 +34,7 @@ require (
 	github.com/cosmos/ibc-go/v10 v10.1.1
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0
+	github.com/docker/docker v28.5.2+incompatible
 	github.com/go-jose/go-jose/v3 v3.0.5
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.4
@@ -185,7 +186,6 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v29.2.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v28.5.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/docker/go-connections v0.6.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
