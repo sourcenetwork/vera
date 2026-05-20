@@ -60,11 +60,11 @@ message MsgUpdateRingByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
-  repeated string new_peer_ids = 4;
-  uint32 new_threshold = 5;
-  bool has_new_threshold = 6;
-  uint64 pss_interval = 7;
-  bool has_pss_interval = 8;
+  repeated string new_peer_ids = 3;
+  uint32 new_threshold = 4;
+  bool has_new_threshold = 5;
+  uint64 pss_interval = 6;
+  bool has_pss_interval = 7;
 }
 
 message MsgUpdateRingByAcpResponse {}
@@ -73,8 +73,8 @@ message MsgFinalizeRingReshareByThresholdSignature {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
-  string signature_scheme = 4;
-  bytes signature = 5;
+  string signature_scheme = 3;
+  bytes signature = 4;
 }
 
 message MsgFinalizeRingReshareByThresholdSignatureResponse {}

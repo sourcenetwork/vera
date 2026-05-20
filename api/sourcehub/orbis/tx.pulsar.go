@@ -2241,49 +2241,49 @@ func (x *fastReflection_MsgCreateRingResponse) ProtoMethods() *protoiface.Method
 	}
 }
 
-var _ protoreflect.List = (*_MsgUpdateRingByAcp_4_list)(nil)
+var _ protoreflect.List = (*_MsgUpdateRingByAcp_3_list)(nil)
 
-type _MsgUpdateRingByAcp_4_list struct {
+type _MsgUpdateRingByAcp_3_list struct {
 	list *[]string
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) Len() int {
+func (x *_MsgUpdateRingByAcp_3_list) Len() int {
 	if x.list == nil {
 		return 0
 	}
 	return len(*x.list)
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) Get(i int) protoreflect.Value {
+func (x *_MsgUpdateRingByAcp_3_list) Get(i int) protoreflect.Value {
 	return protoreflect.ValueOfString((*x.list)[i])
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) Set(i int, value protoreflect.Value) {
+func (x *_MsgUpdateRingByAcp_3_list) Set(i int, value protoreflect.Value) {
 	valueUnwrapped := value.String()
 	concreteValue := valueUnwrapped
 	(*x.list)[i] = concreteValue
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) Append(value protoreflect.Value) {
+func (x *_MsgUpdateRingByAcp_3_list) Append(value protoreflect.Value) {
 	valueUnwrapped := value.String()
 	concreteValue := valueUnwrapped
 	*x.list = append(*x.list, concreteValue)
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) AppendMutable() protoreflect.Value {
+func (x *_MsgUpdateRingByAcp_3_list) AppendMutable() protoreflect.Value {
 	panic(fmt.Errorf("AppendMutable can not be called on message MsgUpdateRingByAcp at list field NewPeerIds as it is not of Message kind"))
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) Truncate(n int) {
+func (x *_MsgUpdateRingByAcp_3_list) Truncate(n int) {
 	*x.list = (*x.list)[:n]
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) NewElement() protoreflect.Value {
+func (x *_MsgUpdateRingByAcp_3_list) NewElement() protoreflect.Value {
 	v := ""
 	return protoreflect.ValueOfString(v)
 }
 
-func (x *_MsgUpdateRingByAcp_4_list) IsValid() bool {
+func (x *_MsgUpdateRingByAcp_3_list) IsValid() bool {
 	return x.list != nil
 }
 
@@ -2388,7 +2388,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) Range(f func(protoreflect.FieldDescr
 		}
 	}
 	if len(x.NewPeerIds) != 0 {
-		value := protoreflect.ValueOfList(&_MsgUpdateRingByAcp_4_list{list: &x.NewPeerIds})
+		value := protoreflect.ValueOfList(&_MsgUpdateRingByAcp_3_list{list: &x.NewPeerIds})
 		if !f(fd_MsgUpdateRingByAcp_new_peer_ids, value) {
 			return
 		}
@@ -2500,9 +2500,9 @@ func (x *fastReflection_MsgUpdateRingByAcp) Get(descriptor protoreflect.FieldDes
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_peer_ids":
 		if len(x.NewPeerIds) == 0 {
-			return protoreflect.ValueOfList(&_MsgUpdateRingByAcp_4_list{})
+			return protoreflect.ValueOfList(&_MsgUpdateRingByAcp_3_list{})
 		}
-		listValue := &_MsgUpdateRingByAcp_4_list{list: &x.NewPeerIds}
+		listValue := &_MsgUpdateRingByAcp_3_list{list: &x.NewPeerIds}
 		return protoreflect.ValueOfList(listValue)
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_threshold":
 		value := x.NewThreshold
@@ -2542,7 +2542,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) Set(fd protoreflect.FieldDescriptor,
 		x.RingId = value.Interface().(string)
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_peer_ids":
 		lv := value.List()
-		clv := lv.(*_MsgUpdateRingByAcp_4_list)
+		clv := lv.(*_MsgUpdateRingByAcp_3_list)
 		x.NewPeerIds = *clv.list
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_threshold":
 		x.NewThreshold = uint32(value.Uint())
@@ -2576,7 +2576,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) Mutable(fd protoreflect.FieldDescrip
 		if x.NewPeerIds == nil {
 			x.NewPeerIds = []string{}
 		}
-		value := &_MsgUpdateRingByAcp_4_list{list: &x.NewPeerIds}
+		value := &_MsgUpdateRingByAcp_3_list{list: &x.NewPeerIds}
 		return protoreflect.ValueOfList(value)
 	case "sourcehub.orbis.MsgUpdateRingByAcp.creator":
 		panic(fmt.Errorf("field creator of message sourcehub.orbis.MsgUpdateRingByAcp is not mutable"))
@@ -2609,7 +2609,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) NewField(fd protoreflect.FieldDescri
 		return protoreflect.ValueOfString("")
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_peer_ids":
 		list := []string{}
-		return protoreflect.ValueOfList(&_MsgUpdateRingByAcp_4_list{list: &list})
+		return protoreflect.ValueOfList(&_MsgUpdateRingByAcp_3_list{list: &list})
 	case "sourcehub.orbis.MsgUpdateRingByAcp.new_threshold":
 		return protoreflect.ValueOfUint32(uint32(0))
 	case "sourcehub.orbis.MsgUpdateRingByAcp.has_new_threshold":
@@ -2750,12 +2750,12 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 				dAtA[i] = 0
 			}
 			i--
-			dAtA[i] = 0x40
+			dAtA[i] = 0x38
 		}
 		if x.PssInterval != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.PssInterval))
 			i--
-			dAtA[i] = 0x38
+			dAtA[i] = 0x30
 		}
 		if x.HasNewThreshold {
 			i--
@@ -2765,12 +2765,12 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 				dAtA[i] = 0
 			}
 			i--
-			dAtA[i] = 0x30
+			dAtA[i] = 0x28
 		}
 		if x.NewThreshold != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.NewThreshold))
 			i--
-			dAtA[i] = 0x28
+			dAtA[i] = 0x20
 		}
 		if len(x.NewPeerIds) > 0 {
 			for iNdEx := len(x.NewPeerIds) - 1; iNdEx >= 0; iNdEx-- {
@@ -2778,7 +2778,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 				copy(dAtA[i:], x.NewPeerIds[iNdEx])
 				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.NewPeerIds[iNdEx])))
 				i--
-				dAtA[i] = 0x22
+				dAtA[i] = 0x1a
 			}
 		}
 		if len(x.RingId) > 0 {
@@ -2908,7 +2908,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 				}
 				x.RingId = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
+			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field NewPeerIds", wireType)
 				}
@@ -2940,7 +2940,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 				}
 				x.NewPeerIds = append(x.NewPeerIds, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
-			case 5:
+			case 4:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field NewThreshold", wireType)
 				}
@@ -2959,7 +2959,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 						break
 					}
 				}
-			case 6:
+			case 5:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasNewThreshold", wireType)
 				}
@@ -2979,7 +2979,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 					}
 				}
 				x.HasNewThreshold = bool(v != 0)
-			case 7:
+			case 6:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
 				}
@@ -2998,7 +2998,7 @@ func (x *fastReflection_MsgUpdateRingByAcp) ProtoMethods() *protoiface.Methods {
 						break
 					}
 				}
-			case 8:
+			case 7:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasPssInterval", wireType)
 				}
@@ -3786,14 +3786,14 @@ func (x *fastReflection_MsgFinalizeRingReshareByThresholdSignature) ProtoMethods
 			copy(dAtA[i:], x.Signature)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Signature)))
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 		}
 		if len(x.SignatureScheme) > 0 {
 			i -= len(x.SignatureScheme)
 			copy(dAtA[i:], x.SignatureScheme)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.SignatureScheme)))
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x1a
 		}
 		if len(x.RingId) > 0 {
 			i -= len(x.RingId)
@@ -3922,7 +3922,7 @@ func (x *fastReflection_MsgFinalizeRingReshareByThresholdSignature) ProtoMethods
 				}
 				x.RingId = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 4:
+			case 3:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field SignatureScheme", wireType)
 				}
@@ -3954,7 +3954,7 @@ func (x *fastReflection_MsgFinalizeRingReshareByThresholdSignature) ProtoMethods
 				}
 				x.SignatureScheme = string(dAtA[iNdEx:postIndex])
 				iNdEx = postIndex
-			case 5:
+			case 4:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Signature", wireType)
 				}
@@ -8192,11 +8192,11 @@ type MsgUpdateRingByAcp struct {
 
 	Creator         string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	RingId          string   `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	NewPeerIds      []string `protobuf:"bytes,4,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
-	NewThreshold    uint32   `protobuf:"varint,5,opt,name=new_threshold,json=newThreshold,proto3" json:"new_threshold,omitempty"`
-	HasNewThreshold bool     `protobuf:"varint,6,opt,name=has_new_threshold,json=hasNewThreshold,proto3" json:"has_new_threshold,omitempty"`
-	PssInterval     uint64   `protobuf:"varint,7,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
-	HasPssInterval  bool     `protobuf:"varint,8,opt,name=has_pss_interval,json=hasPssInterval,proto3" json:"has_pss_interval,omitempty"`
+	NewPeerIds      []string `protobuf:"bytes,3,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	NewThreshold    uint32   `protobuf:"varint,4,opt,name=new_threshold,json=newThreshold,proto3" json:"new_threshold,omitempty"`
+	HasNewThreshold bool     `protobuf:"varint,5,opt,name=has_new_threshold,json=hasNewThreshold,proto3" json:"has_new_threshold,omitempty"`
+	PssInterval     uint64   `protobuf:"varint,6,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
+	HasPssInterval  bool     `protobuf:"varint,7,opt,name=has_pss_interval,json=hasPssInterval,proto3" json:"has_pss_interval,omitempty"`
 }
 
 func (x *MsgUpdateRingByAcp) Reset() {
@@ -8301,8 +8301,8 @@ type MsgFinalizeRingReshareByThresholdSignature struct {
 
 	Creator         string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	RingId          string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	SignatureScheme string `protobuf:"bytes,4,opt,name=signature_scheme,json=signatureScheme,proto3" json:"signature_scheme,omitempty"`
-	Signature       []byte `protobuf:"bytes,5,opt,name=signature,proto3" json:"signature,omitempty"`
+	SignatureScheme string `protobuf:"bytes,3,opt,name=signature_scheme,json=signatureScheme,proto3" json:"signature_scheme,omitempty"`
+	Signature       []byte `protobuf:"bytes,4,opt,name=signature,proto3" json:"signature,omitempty"`
 }
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) Reset() {
@@ -8800,17 +8800,17 @@ var file_sourcehub_orbis_tx_proto_rawDesc = []byte{
 	0x74, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74,
 	0x6f, 0x72, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x20, 0x0a, 0x0c, 0x6e,
-	0x65, 0x77, 0x5f, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x04, 0x20, 0x03, 0x28,
+	0x65, 0x77, 0x5f, 0x70, 0x65, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28,
 	0x09, 0x52, 0x0a, 0x6e, 0x65, 0x77, 0x50, 0x65, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x23, 0x0a,
-	0x0d, 0x6e, 0x65, 0x77, 0x5f, 0x74, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x05,
+	0x0d, 0x6e, 0x65, 0x77, 0x5f, 0x74, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x04,
 	0x20, 0x01, 0x28, 0x0d, 0x52, 0x0c, 0x6e, 0x65, 0x77, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f,
 	0x6c, 0x64, 0x12, 0x2a, 0x0a, 0x11, 0x68, 0x61, 0x73, 0x5f, 0x6e, 0x65, 0x77, 0x5f, 0x74, 0x68,
-	0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x68,
+	0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x68,
 	0x61, 0x73, 0x4e, 0x65, 0x77, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x12, 0x21,
-	0x0a, 0x0c, 0x70, 0x73, 0x73, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x07,
+	0x0a, 0x0c, 0x70, 0x73, 0x73, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x06,
 	0x20, 0x01, 0x28, 0x04, 0x52, 0x0b, 0x70, 0x73, 0x73, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61,
 	0x6c, 0x12, 0x28, 0x0a, 0x10, 0x68, 0x61, 0x73, 0x5f, 0x70, 0x73, 0x73, 0x5f, 0x69, 0x6e, 0x74,
-	0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x08, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e, 0x68, 0x61, 0x73,
+	0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x07, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e, 0x68, 0x61, 0x73,
 	0x50, 0x73, 0x73, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x3a, 0x0c, 0x82, 0xe7, 0xb0,
 	0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72, 0x22, 0x1c, 0x0a, 0x1a, 0x4d, 0x73, 0x67,
 	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x52, 0x69, 0x6e, 0x67, 0x42, 0x79, 0x41, 0x63, 0x70, 0x52,
@@ -8821,10 +8821,10 @@ var file_sourcehub_orbis_tx_proto_rawDesc = []byte{
 	0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
 	0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x29, 0x0a, 0x10, 0x73, 0x69, 0x67,
-	0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x5f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x65, 0x18, 0x04, 0x20,
+	0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x5f, 0x73, 0x63, 0x68, 0x65, 0x6d, 0x65, 0x18, 0x03, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x0f, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x53, 0x63,
 	0x68, 0x65, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72,
-	0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75,
+	0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75,
 	0x72, 0x65, 0x3a, 0x0c, 0x82, 0xe7, 0xb0, 0x2a, 0x07, 0x63, 0x72, 0x65, 0x61, 0x74, 0x6f, 0x72,
 	0x22, 0x34, 0x0a, 0x32, 0x4d, 0x73, 0x67, 0x46, 0x69, 0x6e, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x52,
 	0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x68, 0x61, 0x72, 0x65, 0x42, 0x79, 0x54, 0x68, 0x72, 0x65,
