@@ -71,10 +71,12 @@ func (k *Keeper) RegisterNamespace(goCtx context.Context, msg *types.MsgRegister
 }
 
 // CreatePost adds a new post to the specified (existing) namespace.
-// Post creation is unrestricted: any valid signer may create a post in any
-// registered namespace. Duplicate (namespace, payload) pairs are rejected
-// because post_id is derived from them.
+// The signer must have permission to create posts in that namespace.
 func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*types.MsgCreatePostResponse, error) {
+	policyId := k.GetPolicyId(goCtx)
+	if policyId == "" {
+		return nil, types.ErrInvalidPolicyId
+	}
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceId := getNamespaceId(msg.Namespace)
@@ -85,6 +87,14 @@ func (k *Keeper) CreatePost(goCtx context.Context, msg *types.MsgCreatePost) (*t
 	creatorDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
+	}
+
+	hasPermission, err := hasPermission(goCtx, k, policyId, namespaceId, types.CreatePostPermission, creatorDID, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if !hasPermission {
+		return nil, types.ErrInvalidPostCreator
 	}
 
 	postId := types.GeneratePostId(namespaceId, msg.Payload)
