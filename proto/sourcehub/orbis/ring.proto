@@ -12,10 +12,10 @@ message Ring {
   repeated string peer_ids = 5;
   uint32 threshold = 6;
   repeated string new_peer_ids = 7;
-  uint32 new_threshold = 8;
-  bool has_new_threshold = 9;
-  uint64 pss_interval = 10;
-  bool has_pss_interval = 11;
-  uint64 block_number_nonce = 12;
-  string policy_id = 13;
+  // Absent means no pending threshold update.
+  optional uint32 new_threshold = 8;
+  // Absent means automatic PSS refresh is disabled.
+  optional uint64 pss_interval = 9;
+  uint64 block_number_nonce = 10;
+  string policy_id = 11;
 }

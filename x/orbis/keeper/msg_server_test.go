@@ -24,15 +24,16 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	pssInterval := uint64(600)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:        creator,
-		Namespace:      namespace,
-		RingPk:         "ring-pk",
-		PeerIds:        []string{"peer-1", "peer-2", "peer-3"},
-		Threshold:      2,
-		PssInterval:    pssInterval,
-		HasPssInterval: true,
-		PolicyId:       "policy-ring",
-		Artifact:       "ring-artifact",
+		Creator:   creator,
+		Namespace: namespace,
+		RingPk:    "ring-pk",
+		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
+		Threshold: 2,
+		XPssInterval: &types.MsgCreateRing_PssInterval{
+			PssInterval: pssInterval,
+		},
+		PolicyId: "policy-ring",
+		Artifact: "ring-artifact",
 	})
 	require.NoError(t, err)
 
@@ -43,36 +44,39 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.Equal(t, "ring-pk", ring.RingPk)
 	require.Equal(t, []string{"peer-1", "peer-2", "peer-3"}, ring.PeerIds)
 	require.Equal(t, uint32(2), ring.Threshold)
-	require.True(t, ring.HasPssInterval)
-	require.Equal(t, pssInterval, ring.PssInterval)
+	require.NotNil(t, ring.XPssInterval)
+	require.Equal(t, pssInterval, ring.GetPssInterval())
 
 	_, err = k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:        creator,
-		Namespace:      namespace,
-		RingPk:         "ring-pk",
-		PeerIds:        []string{"peer-1", "peer-2", "peer-3"},
-		Threshold:      2,
-		PssInterval:    pssInterval,
-		HasPssInterval: true,
-		PolicyId:       "policy-ring",
+		Creator:   creator,
+		Namespace: namespace,
+		RingPk:    "ring-pk",
+		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
+		Threshold: 2,
+		XPssInterval: &types.MsgCreateRing_PssInterval{
+			PssInterval: pssInterval,
+		},
+		PolicyId: "policy-ring",
 	})
 	require.ErrorIs(t, err, types.ErrRingAlreadyExists)
 
 	tier := "gold"
 	timestamp := uint64(42)
 	storeDocumentMsg := &types.MsgStoreDocument{
-		Creator:      creator,
-		Namespace:    namespace,
-		RingId:       createRingResp.RingId,
-		Document:     "ciphertext",
-		Proof:        "proof",
-		PolicyId:     "policy-doc",
-		Resource:     "secret",
-		Permission:   "decrypt",
-		Tier:         tier,
-		HasTier:      true,
-		Timestamp:    timestamp,
-		HasTimestamp: true,
+		Creator:    creator,
+		Namespace:  namespace,
+		RingId:     createRingResp.RingId,
+		Document:   "ciphertext",
+		Proof:      "proof",
+		PolicyId:   "policy-doc",
+		Resource:   "secret",
+		Permission: "decrypt",
+		XTier: &types.MsgStoreDocument_Tier{
+			Tier: tier,
+		},
+		XTimestamp: &types.MsgStoreDocument_Timestamp{
+			Timestamp: timestamp,
+		},
 	}
 	storeDocumentResp, err := k.StoreDocument(ctx, storeDocumentMsg)
 	require.NoError(t, err)
@@ -85,10 +89,10 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	document := k.GetDocument(ctx, namespaceID, storeDocumentResp.DocumentId)
 	require.NotNil(t, document)
 	require.Equal(t, testDID, document.CreatorDid)
-	require.True(t, document.HasTier)
-	require.Equal(t, tier, document.Tier)
-	require.True(t, document.HasTimestamp)
-	require.Equal(t, timestamp, document.Timestamp)
+	require.NotNil(t, document.XTier)
+	require.NotNil(t, document.XTimestamp)
+	require.Equal(t, tier, document.GetTier())
+	require.Equal(t, timestamp, document.GetTimestamp())
 
 	_, err = k.StoreDocument(ctx, storeDocumentMsg)
 	require.ErrorIs(t, err, types.ErrDocumentAlreadyExists)
@@ -119,6 +123,78 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrKeyDerivationAlreadyExists)
 }
 
+func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
+	k, ctx := keepertestutil.OrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creator := testAddress()
+	namespace := "vault"
+	namespaceID := types.GetNamespaceID(namespace)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:   creator,
+		Namespace: namespace,
+		RingPk:    "ring-pk",
+		PeerIds:   []string{"peer-1", "peer-2"},
+		Threshold: 1,
+	})
+	require.NoError(t, err)
+	require.Equal(
+		t,
+		types.GenerateRingID(namespaceID, "ring-pk", []string{"peer-1", "peer-2"}, 1, nil, ""),
+		createRingResp.RingId,
+	)
+
+	storeDocumentResp, err := k.StoreDocument(ctx, &types.MsgStoreDocument{
+		Creator:    creator,
+		Namespace:  namespace,
+		RingId:     createRingResp.RingId,
+		Document:   "ciphertext",
+		Proof:      "proof",
+		PolicyId:   "policy-doc",
+		Resource:   "secret",
+		Permission: "decrypt",
+	})
+	require.NoError(t, err)
+	require.Equal(
+		t,
+		types.GenerateDocumentID(namespaceID, createRingResp.RingId, "ciphertext", "proof", "policy-doc", "secret", "decrypt", nil, nil),
+		storeDocumentResp.DocumentId,
+	)
+}
+
+func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
+	k, ctx := keepertestutil.OrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creator := testAddress()
+	namespace := "vault"
+	namespaceID := types.GetNamespaceID(namespace)
+	pssInterval := uint64(0)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:   creator,
+		Namespace: namespace,
+		RingPk:    "ring-pk",
+		PeerIds:   []string{"peer-1", "peer-2"},
+		Threshold: 1,
+		XPssInterval: &types.MsgCreateRing_PssInterval{
+			PssInterval: pssInterval,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(
+		t,
+		types.GenerateRingID(namespaceID, "ring-pk", []string{"peer-1", "peer-2"}, 1, &pssInterval, ""),
+		createRingResp.RingId,
+	)
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.NotNil(t, ring)
+	require.NotNil(t, ring.XPssInterval)
+	require.Equal(t, pssInterval, ring.GetPssInterval())
+}
+
 func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	k, ctx := keepertestutil.OrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
@@ -133,11 +209,12 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	require.NoError(t, err)
 
 	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator:         testAddress(),
-		RingId:          createRingResp.RingId,
-		NewPeerIds:      []string{"peer-3", "peer-4"},
-		NewThreshold:    1,
-		HasNewThreshold: true,
+		Creator:    testAddress(),
+		RingId:     createRingResp.RingId,
+		NewPeerIds: []string{"peer-3", "peer-4"},
+		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+			NewThreshold: 1,
+		},
 	})
 	require.ErrorIs(t, err, types.ErrRingMissingPolicyId)
 }

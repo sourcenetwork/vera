@@ -46,10 +46,10 @@ message MsgCreateRing {
   string ring_pk = 3;
   repeated string peer_ids = 4;
   uint32 threshold = 5;
-  uint64 pss_interval = 6;
-  bool has_pss_interval = 7;
-  string policy_id = 8;
-  string artifact = 9;
+  // Absent means automatic PSS refresh is disabled.
+  optional uint64 pss_interval = 6;
+  string policy_id = 7;
+  string artifact = 8;
 }
 
 message MsgCreateRingResponse {
@@ -61,10 +61,10 @@ message MsgUpdateRingByAcp {
   string creator = 1;
   string ring_id = 2;
   repeated string new_peer_ids = 3;
-  uint32 new_threshold = 4;
-  bool has_new_threshold = 5;
-  uint64 pss_interval = 6;
-  bool has_pss_interval = 7;
+  // Absent means no pending threshold update.
+  optional uint32 new_threshold = 4;
+  // Absent means no PSS refresh interval update.
+  optional uint64 pss_interval = 5;
 }
 
 message MsgUpdateRingByAcpResponse {}
@@ -100,10 +100,10 @@ message MsgStoreDocument {
   string policy_id = 6;
   string resource = 7;
   string permission = 8;
-  string tier = 9;
-  bool has_tier = 10;
-  uint64 timestamp = 11;
-  bool has_timestamp = 12;
+  // Absent means no tier.
+  optional string tier = 9;
+  // Absent means no timestamp.
+  optional uint64 timestamp = 10;
 }
 
 message MsgStoreDocumentResponse {

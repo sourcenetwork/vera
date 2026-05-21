@@ -33,11 +33,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
-	var pssInterval *uint64
-	if msg.HasPssInterval {
-		v := msg.GetPssInterval()
-		pssInterval = &v
-	}
+	pssInterval := optionalCreateRingPSSInterval(msg)
 
 	ringID := types.GenerateRingID(namespaceID, msg.RingPk, msg.PeerIds, msg.Threshold, pssInterval, msg.PolicyId)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
@@ -54,10 +50,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
 	}
-	if pssInterval != nil {
-		ring.PssInterval = *pssInterval
-		ring.HasPssInterval = true
-	}
+	setRingPSSInterval(&ring, pssInterval)
 	if err := validateRing(&ring); err != nil {
 		return nil, err
 	}
@@ -100,11 +93,7 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		return nil, types.ErrInvalidRingUpdater
 	}
 
-	var newThreshold *uint32
-	if msg.HasNewThreshold {
-		v := msg.GetNewThreshold()
-		newThreshold = &v
-	}
+	newThreshold := optionalUpdateRingNewThreshold(msg)
 	if err := validateRingUpdate(msg.NewPeerIds, newThreshold, ring); err != nil {
 		return nil, err
 	}
@@ -113,12 +102,10 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		ring.NewPeerIds = append([]string(nil), msg.NewPeerIds...)
 	}
 	if newThreshold != nil {
-		ring.NewThreshold = *newThreshold
-		ring.HasNewThreshold = true
+		setRingNewThreshold(ring, newThreshold)
 	}
-	if msg.HasPssInterval {
-		ring.PssInterval = msg.GetPssInterval()
-		ring.HasPssInterval = true
+	if msg.XPssInterval != nil {
+		setRingPSSInterval(ring, optionalUpdateRingPSSInterval(msg))
 	}
 	if err := validateRing(ring); err != nil {
 		return nil, err
@@ -203,16 +190,8 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 		return nil, err
 	}
 
-	var tier *string
-	if msg.HasTier {
-		v := msg.GetTier()
-		tier = &v
-	}
-	var timestamp *uint64
-	if msg.HasTimestamp {
-		v := msg.GetTimestamp()
-		timestamp = &v
-	}
+	tier := optionalStoreDocumentTier(msg)
+	timestamp := optionalStoreDocumentTimestamp(msg)
 
 	documentID := types.GenerateDocumentID(namespaceID, msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
 	if existing := k.GetDocument(goCtx, namespaceID, documentID); existing != nil {
@@ -230,14 +209,8 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 		Resource:   msg.Resource,
 		Permission: msg.Permission,
 	}
-	if tier != nil {
-		document.Tier = *tier
-		document.HasTier = true
-	}
-	if timestamp != nil {
-		document.Timestamp = *timestamp
-		document.HasTimestamp = true
-	}
+	setDocumentTier(&document, tier)
+	setDocumentTimestamp(&document, timestamp)
 	if err := validateDocument(&document); err != nil {
 		return nil, err
 	}

@@ -14,8 +14,8 @@ message Document {
   string policy_id = 7;
   string resource = 8;
   string permission = 9;
-  string tier = 10;
-  bool has_tier = 11;
-  uint64 timestamp = 12;
-  bool has_timestamp = 13;
+  // Absent means no tier.
+  optional string tier = 10;
+  // Absent means no timestamp.
+  optional uint64 timestamp = 11;
 }

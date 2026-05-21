@@ -28,15 +28,15 @@ func validateRing(ring *types.Ring) error {
 			return err
 		}
 	}
-	if ring.HasNewThreshold && ring.NewThreshold == 0 {
+	if ring.XNewThreshold != nil && ring.GetNewThreshold() == 0 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
-	if len(ring.NewPeerIds) > 0 && ring.HasNewThreshold && uint32(len(ring.NewPeerIds)) < ring.NewThreshold {
+	if len(ring.NewPeerIds) > 0 && ring.XNewThreshold != nil && uint32(len(ring.NewPeerIds)) < ring.GetNewThreshold() {
 		return errorsmod.Wrapf(
 			types.ErrInvalidRing,
 			"new_peer_ids count (%d) is less than new_threshold (%d)",
 			len(ring.NewPeerIds),
-			ring.NewThreshold,
+			ring.GetNewThreshold(),
 		)
 	}
 
@@ -44,7 +44,7 @@ func validateRing(ring *types.Ring) error {
 }
 
 func validateRingUpdate(newPeerIDs []string, newThreshold *uint32, existing *types.Ring) error {
-	reshareInProgress := len(existing.NewPeerIds) > 0 || existing.HasNewThreshold
+	reshareInProgress := len(existing.NewPeerIds) > 0 || existing.XNewThreshold != nil
 	touchingReshareFields := len(newPeerIDs) > 0 || newThreshold != nil
 	if reshareInProgress && touchingReshareFields {
 		return types.ErrReshareInProgress
@@ -86,19 +86,18 @@ func validateUniquePeerIDs(peerIDs []string, fieldName string) error {
 
 func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	finalized := *currentRing
-	if len(finalized.NewPeerIds) == 0 && !finalized.HasNewThreshold {
+	if len(finalized.NewPeerIds) == 0 && finalized.XNewThreshold == nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidRing, "missing new_peer_ids or new_threshold for reshare finalization")
 	}
 
 	if len(finalized.NewPeerIds) > 0 {
 		finalized.PeerIds = append([]string(nil), finalized.NewPeerIds...)
 	}
-	if finalized.HasNewThreshold {
-		finalized.Threshold = finalized.NewThreshold
+	if finalized.XNewThreshold != nil {
+		finalized.Threshold = finalized.GetNewThreshold()
 	}
 	finalized.NewPeerIds = nil
-	finalized.NewThreshold = 0
-	finalized.HasNewThreshold = false
+	finalized.XNewThreshold = nil
 
 	if err := validateRing(&finalized); err != nil {
 		return nil, err

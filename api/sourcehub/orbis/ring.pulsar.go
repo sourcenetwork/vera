@@ -114,9 +114,7 @@ var (
 	fd_Ring_threshold          protoreflect.FieldDescriptor
 	fd_Ring_new_peer_ids       protoreflect.FieldDescriptor
 	fd_Ring_new_threshold      protoreflect.FieldDescriptor
-	fd_Ring_has_new_threshold  protoreflect.FieldDescriptor
 	fd_Ring_pss_interval       protoreflect.FieldDescriptor
-	fd_Ring_has_pss_interval   protoreflect.FieldDescriptor
 	fd_Ring_block_number_nonce protoreflect.FieldDescriptor
 	fd_Ring_policy_id          protoreflect.FieldDescriptor
 )
@@ -132,9 +130,7 @@ func init() {
 	fd_Ring_threshold = md_Ring.Fields().ByName("threshold")
 	fd_Ring_new_peer_ids = md_Ring.Fields().ByName("new_peer_ids")
 	fd_Ring_new_threshold = md_Ring.Fields().ByName("new_threshold")
-	fd_Ring_has_new_threshold = md_Ring.Fields().ByName("has_new_threshold")
 	fd_Ring_pss_interval = md_Ring.Fields().ByName("pss_interval")
-	fd_Ring_has_pss_interval = md_Ring.Fields().ByName("has_pss_interval")
 	fd_Ring_block_number_nonce = md_Ring.Fields().ByName("block_number_nonce")
 	fd_Ring_policy_id = md_Ring.Fields().ByName("policy_id")
 }
@@ -246,28 +242,24 @@ func (x *fastReflection_Ring) Range(f func(protoreflect.FieldDescriptor, protore
 			return
 		}
 	}
-	if x.NewThreshold != uint32(0) {
-		value := protoreflect.ValueOfUint32(x.NewThreshold)
-		if !f(fd_Ring_new_threshold, value) {
-			return
+	if x.XNewThreshold != nil {
+		switch o := x.XNewThreshold.(type) {
+		case *Ring_NewThreshold:
+			v := o.NewThreshold
+			value := protoreflect.ValueOfUint32(v)
+			if !f(fd_Ring_new_threshold, value) {
+				return
+			}
 		}
 	}
-	if x.HasNewThreshold != false {
-		value := protoreflect.ValueOfBool(x.HasNewThreshold)
-		if !f(fd_Ring_has_new_threshold, value) {
-			return
-		}
-	}
-	if x.PssInterval != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.PssInterval)
-		if !f(fd_Ring_pss_interval, value) {
-			return
-		}
-	}
-	if x.HasPssInterval != false {
-		value := protoreflect.ValueOfBool(x.HasPssInterval)
-		if !f(fd_Ring_has_pss_interval, value) {
-			return
+	if x.XPssInterval != nil {
+		switch o := x.XPssInterval.(type) {
+		case *Ring_PssInterval:
+			v := o.PssInterval
+			value := protoreflect.ValueOfUint64(v)
+			if !f(fd_Ring_pss_interval, value) {
+				return
+			}
 		}
 	}
 	if x.BlockNumberNonce != uint64(0) {
@@ -312,13 +304,21 @@ func (x *fastReflection_Ring) Has(fd protoreflect.FieldDescriptor) bool {
 	case "sourcehub.orbis.Ring.new_peer_ids":
 		return len(x.NewPeerIds) != 0
 	case "sourcehub.orbis.Ring.new_threshold":
-		return x.NewThreshold != uint32(0)
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		return x.HasNewThreshold != false
+		if x.XNewThreshold == nil {
+			return false
+		} else if _, ok := x.XNewThreshold.(*Ring_NewThreshold); ok {
+			return true
+		} else {
+			return false
+		}
 	case "sourcehub.orbis.Ring.pss_interval":
-		return x.PssInterval != uint64(0)
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		return x.HasPssInterval != false
+		if x.XPssInterval == nil {
+			return false
+		} else if _, ok := x.XPssInterval.(*Ring_PssInterval); ok {
+			return true
+		} else {
+			return false
+		}
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		return x.BlockNumberNonce != uint64(0)
 	case "sourcehub.orbis.Ring.policy_id":
@@ -354,13 +354,9 @@ func (x *fastReflection_Ring) Clear(fd protoreflect.FieldDescriptor) {
 	case "sourcehub.orbis.Ring.new_peer_ids":
 		x.NewPeerIds = nil
 	case "sourcehub.orbis.Ring.new_threshold":
-		x.NewThreshold = uint32(0)
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		x.HasNewThreshold = false
+		x.XNewThreshold = nil
 	case "sourcehub.orbis.Ring.pss_interval":
-		x.PssInterval = uint64(0)
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		x.HasPssInterval = false
+		x.XPssInterval = nil
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		x.BlockNumberNonce = uint64(0)
 	case "sourcehub.orbis.Ring.policy_id":
@@ -409,17 +405,21 @@ func (x *fastReflection_Ring) Get(descriptor protoreflect.FieldDescriptor) proto
 		listValue := &_Ring_7_list{list: &x.NewPeerIds}
 		return protoreflect.ValueOfList(listValue)
 	case "sourcehub.orbis.Ring.new_threshold":
-		value := x.NewThreshold
-		return protoreflect.ValueOfUint32(value)
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		value := x.HasNewThreshold
-		return protoreflect.ValueOfBool(value)
+		if x.XNewThreshold == nil {
+			return protoreflect.ValueOfUint32(uint32(0))
+		} else if v, ok := x.XNewThreshold.(*Ring_NewThreshold); ok {
+			return protoreflect.ValueOfUint32(v.NewThreshold)
+		} else {
+			return protoreflect.ValueOfUint32(uint32(0))
+		}
 	case "sourcehub.orbis.Ring.pss_interval":
-		value := x.PssInterval
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		value := x.HasPssInterval
-		return protoreflect.ValueOfBool(value)
+		if x.XPssInterval == nil {
+			return protoreflect.ValueOfUint64(uint64(0))
+		} else if v, ok := x.XPssInterval.(*Ring_PssInterval); ok {
+			return protoreflect.ValueOfUint64(v.PssInterval)
+		} else {
+			return protoreflect.ValueOfUint64(uint64(0))
+		}
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		value := x.BlockNumberNonce
 		return protoreflect.ValueOfUint64(value)
@@ -465,13 +465,11 @@ func (x *fastReflection_Ring) Set(fd protoreflect.FieldDescriptor, value protore
 		clv := lv.(*_Ring_7_list)
 		x.NewPeerIds = *clv.list
 	case "sourcehub.orbis.Ring.new_threshold":
-		x.NewThreshold = uint32(value.Uint())
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		x.HasNewThreshold = value.Bool()
+		cv := uint32(value.Uint())
+		x.XNewThreshold = &Ring_NewThreshold{NewThreshold: cv}
 	case "sourcehub.orbis.Ring.pss_interval":
-		x.PssInterval = value.Uint()
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		x.HasPssInterval = value.Bool()
+		cv := value.Uint()
+		x.XPssInterval = &Ring_PssInterval{PssInterval: cv}
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		x.BlockNumberNonce = value.Uint()
 	case "sourcehub.orbis.Ring.policy_id":
@@ -520,12 +518,8 @@ func (x *fastReflection_Ring) Mutable(fd protoreflect.FieldDescriptor) protorefl
 		panic(fmt.Errorf("field threshold of message sourcehub.orbis.Ring is not mutable"))
 	case "sourcehub.orbis.Ring.new_threshold":
 		panic(fmt.Errorf("field new_threshold of message sourcehub.orbis.Ring is not mutable"))
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		panic(fmt.Errorf("field has_new_threshold of message sourcehub.orbis.Ring is not mutable"))
 	case "sourcehub.orbis.Ring.pss_interval":
 		panic(fmt.Errorf("field pss_interval of message sourcehub.orbis.Ring is not mutable"))
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		panic(fmt.Errorf("field has_pss_interval of message sourcehub.orbis.Ring is not mutable"))
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		panic(fmt.Errorf("field block_number_nonce of message sourcehub.orbis.Ring is not mutable"))
 	case "sourcehub.orbis.Ring.policy_id":
@@ -561,12 +555,8 @@ func (x *fastReflection_Ring) NewField(fd protoreflect.FieldDescriptor) protoref
 		return protoreflect.ValueOfList(&_Ring_7_list{list: &list})
 	case "sourcehub.orbis.Ring.new_threshold":
 		return protoreflect.ValueOfUint32(uint32(0))
-	case "sourcehub.orbis.Ring.has_new_threshold":
-		return protoreflect.ValueOfBool(false)
 	case "sourcehub.orbis.Ring.pss_interval":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.orbis.Ring.has_pss_interval":
-		return protoreflect.ValueOfBool(false)
 	case "sourcehub.orbis.Ring.block_number_nonce":
 		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.orbis.Ring.policy_id":
@@ -584,6 +574,22 @@ func (x *fastReflection_Ring) NewField(fd protoreflect.FieldDescriptor) protoref
 // It panics if the oneof descriptor does not belong to this message.
 func (x *fastReflection_Ring) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
+	case "sourcehub.orbis.Ring._new_threshold":
+		if x.XNewThreshold == nil {
+			return nil
+		}
+		switch x.XNewThreshold.(type) {
+		case *Ring_NewThreshold:
+			return x.Descriptor().Fields().ByName("new_threshold")
+		}
+	case "sourcehub.orbis.Ring._pss_interval":
+		if x.XPssInterval == nil {
+			return nil
+		}
+		switch x.XPssInterval.(type) {
+		case *Ring_PssInterval:
+			return x.Descriptor().Fields().ByName("pss_interval")
+		}
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in sourcehub.orbis.Ring", d.FullName()))
 	}
@@ -671,17 +677,11 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
-		if x.NewThreshold != 0 {
-			n += 1 + runtime.Sov(uint64(x.NewThreshold))
+		if x.NewThreshold != nil {
+			n += 1 + runtime.Sov(uint64(*x.NewThreshold))
 		}
-		if x.HasNewThreshold {
-			n += 2
-		}
-		if x.PssInterval != 0 {
-			n += 1 + runtime.Sov(uint64(x.PssInterval))
-		}
-		if x.HasPssInterval {
-			n += 2
+		if x.PssInterval != nil {
+			n += 1 + runtime.Sov(uint64(*x.PssInterval))
 		}
 		if x.BlockNumberNonce != 0 {
 			n += 1 + runtime.Sov(uint64(x.BlockNumberNonce))
@@ -719,45 +719,37 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
+		switch x := x.XPssInterval.(type) {
+		case *Ring_PssInterval:
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.PssInterval))
+			i--
+			dAtA[i] = 0x48
+		}
+		switch x := x.XNewThreshold.(type) {
+		case *Ring_NewThreshold:
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.NewThreshold))
+			i--
+			dAtA[i] = 0x40
+		}
 		if len(x.PolicyId) > 0 {
 			i -= len(x.PolicyId)
 			copy(dAtA[i:], x.PolicyId)
 			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.PolicyId)))
 			i--
-			dAtA[i] = 0x6a
+			dAtA[i] = 0x5a
 		}
 		if x.BlockNumberNonce != 0 {
 			i = runtime.EncodeVarint(dAtA, i, uint64(x.BlockNumberNonce))
 			i--
-			dAtA[i] = 0x60
-		}
-		if x.HasPssInterval {
-			i--
-			if x.HasPssInterval {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x58
-		}
-		if x.PssInterval != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.PssInterval))
-			i--
 			dAtA[i] = 0x50
 		}
-		if x.HasNewThreshold {
-			i--
-			if x.HasNewThreshold {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
+		if x.PssInterval != nil {
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.PssInterval))
 			i--
 			dAtA[i] = 0x48
 		}
-		if x.NewThreshold != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.NewThreshold))
+		if x.NewThreshold != nil {
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.NewThreshold))
 			i--
 			dAtA[i] = 0x40
 		}
@@ -1076,7 +1068,7 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field NewThreshold", wireType)
 				}
-				x.NewThreshold = 0
+				var v uint32
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1086,36 +1078,17 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.NewThreshold |= uint32(b&0x7F) << shift
+					v |= uint32(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
+				x.NewThreshold = &v
 			case 9:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasNewThreshold", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.HasNewThreshold = bool(v != 0)
-			case 10:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
 				}
-				x.PssInterval = 0
+				var v uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1125,32 +1098,13 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.PssInterval |= uint64(b&0x7F) << shift
+					v |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-			case 11:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasPssInterval", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.HasPssInterval = bool(v != 0)
-			case 12:
+				x.PssInterval = &v
+			case 10:
 				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field BlockNumberNonce", wireType)
 				}
@@ -1169,7 +1123,7 @@ func (x *fastReflection_Ring) ProtoMethods() *protoiface.Methods {
 						break
 					}
 				}
-			case 13:
+			case 11:
 				if wireType != 2 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 				}
@@ -1255,19 +1209,19 @@ type Ring struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id               string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace        string   `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid       string   `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingPk           string   `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerIds          []string `protobuf:"bytes,5,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
-	Threshold        uint32   `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	NewPeerIds       []string `protobuf:"bytes,7,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
-	NewThreshold     uint32   `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3" json:"new_threshold,omitempty"`
-	HasNewThreshold  bool     `protobuf:"varint,9,opt,name=has_new_threshold,json=hasNewThreshold,proto3" json:"has_new_threshold,omitempty"`
-	PssInterval      uint64   `protobuf:"varint,10,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
-	HasPssInterval   bool     `protobuf:"varint,11,opt,name=has_pss_interval,json=hasPssInterval,proto3" json:"has_pss_interval,omitempty"`
-	BlockNumberNonce uint64   `protobuf:"varint,12,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
-	PolicyId         string   `protobuf:"bytes,13,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Id         string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Namespace  string   `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	CreatorDid string   `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingPk     string   `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerIds    []string `protobuf:"bytes,5,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
+	Threshold  uint32   `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerIds []string `protobuf:"bytes,7,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	// Absent means no pending threshold update.
+	NewThreshold *uint32 `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
+	// Absent means automatic PSS refresh is disabled.
+	PssInterval      *uint64 `protobuf:"varint,9,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64  `protobuf:"varint,10,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string  `protobuf:"bytes,11,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 }
 
 func (x *Ring) Reset() {
@@ -1340,31 +1294,17 @@ func (x *Ring) GetNewPeerIds() []string {
 }
 
 func (x *Ring) GetNewThreshold() uint32 {
-	if x != nil {
-		return x.NewThreshold
+	if x != nil && x.NewThreshold != nil {
+		return *x.NewThreshold
 	}
 	return 0
-}
-
-func (x *Ring) GetHasNewThreshold() bool {
-	if x != nil {
-		return x.HasNewThreshold
-	}
-	return false
 }
 
 func (x *Ring) GetPssInterval() uint64 {
-	if x != nil {
-		return x.PssInterval
+	if x != nil && x.PssInterval != nil {
+		return *x.PssInterval
 	}
 	return 0
-}
-
-func (x *Ring) GetHasPssInterval() bool {
-	if x != nil {
-		return x.HasPssInterval
-	}
-	return false
 }
 
 func (x *Ring) GetBlockNumberNonce() uint64 {
@@ -1386,7 +1326,7 @@ var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 var file_sourcehub_orbis_ring_proto_rawDesc = []byte{
 	0x0a, 0x1a, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69,
 	0x73, 0x2f, 0x72, 0x69, 0x6e, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x0f, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x22, 0xb2, 0x03,
+	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x22, 0x89, 0x03,
 	0x0a, 0x04, 0x52, 0x69, 0x6e, 0x67, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70,
 	0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73,
@@ -1399,32 +1339,30 @@ var file_sourcehub_orbis_ring_proto_rawDesc = []byte{
 	0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x09, 0x74, 0x68,
 	0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x12, 0x20, 0x0a, 0x0c, 0x6e, 0x65, 0x77, 0x5f, 0x70,
 	0x65, 0x65, 0x72, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x07, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x6e,
-	0x65, 0x77, 0x50, 0x65, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x23, 0x0a, 0x0d, 0x6e, 0x65, 0x77,
+	0x65, 0x77, 0x50, 0x65, 0x65, 0x72, 0x49, 0x64, 0x73, 0x12, 0x28, 0x0a, 0x0d, 0x6e, 0x65, 0x77,
 	0x5f, 0x74, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x18, 0x08, 0x20, 0x01, 0x28, 0x0d,
-	0x52, 0x0c, 0x6e, 0x65, 0x77, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x12, 0x2a,
-	0x0a, 0x11, 0x68, 0x61, 0x73, 0x5f, 0x6e, 0x65, 0x77, 0x5f, 0x74, 0x68, 0x72, 0x65, 0x73, 0x68,
-	0x6f, 0x6c, 0x64, 0x18, 0x09, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0f, 0x68, 0x61, 0x73, 0x4e, 0x65,
-	0x77, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x12, 0x21, 0x0a, 0x0c, 0x70, 0x73,
-	0x73, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x04,
-	0x52, 0x0b, 0x70, 0x73, 0x73, 0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x12, 0x28, 0x0a,
-	0x10, 0x68, 0x61, 0x73, 0x5f, 0x70, 0x73, 0x73, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61,
-	0x6c, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0e, 0x68, 0x61, 0x73, 0x50, 0x73, 0x73, 0x49,
-	0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x12, 0x2c, 0x0a, 0x12, 0x62, 0x6c, 0x6f, 0x63, 0x6b,
-	0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x5f, 0x6e, 0x6f, 0x6e, 0x63, 0x65, 0x18, 0x0c, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x10, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x4e, 0x75, 0x6d, 0x62, 0x65, 0x72,
-	0x4e, 0x6f, 0x6e, 0x63, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79, 0x5f,
-	0x69, 0x64, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f, 0x6c, 0x69, 0x63, 0x79,
-	0x49, 0x64, 0x42, 0x9f, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x09, 0x52, 0x69, 0x6e, 0x67,
-	0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73,
-	0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa,
-	0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69,
-	0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72,
-	0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c,
-	0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74,
-	0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f,
-	0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x48, 0x00, 0x52, 0x0c, 0x6e, 0x65, 0x77, 0x54, 0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64,
+	0x88, 0x01, 0x01, 0x12, 0x26, 0x0a, 0x0c, 0x70, 0x73, 0x73, 0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72,
+	0x76, 0x61, 0x6c, 0x18, 0x09, 0x20, 0x01, 0x28, 0x04, 0x48, 0x01, 0x52, 0x0b, 0x70, 0x73, 0x73,
+	0x49, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x88, 0x01, 0x01, 0x12, 0x2c, 0x0a, 0x12, 0x62,
+	0x6c, 0x6f, 0x63, 0x6b, 0x5f, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72, 0x5f, 0x6e, 0x6f, 0x6e, 0x63,
+	0x65, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x04, 0x52, 0x10, 0x62, 0x6c, 0x6f, 0x63, 0x6b, 0x4e, 0x75,
+	0x6d, 0x62, 0x65, 0x72, 0x4e, 0x6f, 0x6e, 0x63, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x70, 0x6f, 0x6c,
+	0x69, 0x63, 0x79, 0x5f, 0x69, 0x64, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x6f,
+	0x6c, 0x69, 0x63, 0x79, 0x49, 0x64, 0x42, 0x10, 0x0a, 0x0e, 0x5f, 0x6e, 0x65, 0x77, 0x5f, 0x74,
+	0x68, 0x72, 0x65, 0x73, 0x68, 0x6f, 0x6c, 0x64, 0x42, 0x0f, 0x0a, 0x0d, 0x5f, 0x70, 0x73, 0x73,
+	0x5f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x76, 0x61, 0x6c, 0x42, 0x9f, 0x01, 0x0a, 0x13, 0x63, 0x6f,
+	0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69,
+	0x73, 0x42, 0x09, 0x52, 0x69, 0x6e, 0x67, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20,
+	0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73,
+	0xa2, 0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
+	0x75, 0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42,
+	0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -1470,6 +1408,7 @@ func file_sourcehub_orbis_ring_proto_init() {
 			}
 		}
 	}
+	file_sourcehub_orbis_ring_proto_msgTypes[0].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

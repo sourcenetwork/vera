@@ -13,20 +13,18 @@ import (
 )
 
 var (
-	md_Document               protoreflect.MessageDescriptor
-	fd_Document_id            protoreflect.FieldDescriptor
-	fd_Document_namespace     protoreflect.FieldDescriptor
-	fd_Document_creator_did   protoreflect.FieldDescriptor
-	fd_Document_ring_id       protoreflect.FieldDescriptor
-	fd_Document_document      protoreflect.FieldDescriptor
-	fd_Document_proof         protoreflect.FieldDescriptor
-	fd_Document_policy_id     protoreflect.FieldDescriptor
-	fd_Document_resource      protoreflect.FieldDescriptor
-	fd_Document_permission    protoreflect.FieldDescriptor
-	fd_Document_tier          protoreflect.FieldDescriptor
-	fd_Document_has_tier      protoreflect.FieldDescriptor
-	fd_Document_timestamp     protoreflect.FieldDescriptor
-	fd_Document_has_timestamp protoreflect.FieldDescriptor
+	md_Document             protoreflect.MessageDescriptor
+	fd_Document_id          protoreflect.FieldDescriptor
+	fd_Document_namespace   protoreflect.FieldDescriptor
+	fd_Document_creator_did protoreflect.FieldDescriptor
+	fd_Document_ring_id     protoreflect.FieldDescriptor
+	fd_Document_document    protoreflect.FieldDescriptor
+	fd_Document_proof       protoreflect.FieldDescriptor
+	fd_Document_policy_id   protoreflect.FieldDescriptor
+	fd_Document_resource    protoreflect.FieldDescriptor
+	fd_Document_permission  protoreflect.FieldDescriptor
+	fd_Document_tier        protoreflect.FieldDescriptor
+	fd_Document_timestamp   protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -42,9 +40,7 @@ func init() {
 	fd_Document_resource = md_Document.Fields().ByName("resource")
 	fd_Document_permission = md_Document.Fields().ByName("permission")
 	fd_Document_tier = md_Document.Fields().ByName("tier")
-	fd_Document_has_tier = md_Document.Fields().ByName("has_tier")
 	fd_Document_timestamp = md_Document.Fields().ByName("timestamp")
-	fd_Document_has_timestamp = md_Document.Fields().ByName("has_timestamp")
 }
 
 var _ protoreflect.Message = (*fastReflection_Document)(nil)
@@ -166,28 +162,24 @@ func (x *fastReflection_Document) Range(f func(protoreflect.FieldDescriptor, pro
 			return
 		}
 	}
-	if x.Tier != "" {
-		value := protoreflect.ValueOfString(x.Tier)
-		if !f(fd_Document_tier, value) {
-			return
+	if x.XTier != nil {
+		switch o := x.XTier.(type) {
+		case *Document_Tier:
+			v := o.Tier
+			value := protoreflect.ValueOfString(v)
+			if !f(fd_Document_tier, value) {
+				return
+			}
 		}
 	}
-	if x.HasTier != false {
-		value := protoreflect.ValueOfBool(x.HasTier)
-		if !f(fd_Document_has_tier, value) {
-			return
-		}
-	}
-	if x.Timestamp != uint64(0) {
-		value := protoreflect.ValueOfUint64(x.Timestamp)
-		if !f(fd_Document_timestamp, value) {
-			return
-		}
-	}
-	if x.HasTimestamp != false {
-		value := protoreflect.ValueOfBool(x.HasTimestamp)
-		if !f(fd_Document_has_timestamp, value) {
-			return
+	if x.XTimestamp != nil {
+		switch o := x.XTimestamp.(type) {
+		case *Document_Timestamp:
+			v := o.Timestamp
+			value := protoreflect.ValueOfUint64(v)
+			if !f(fd_Document_timestamp, value) {
+				return
+			}
 		}
 	}
 }
@@ -224,13 +216,21 @@ func (x *fastReflection_Document) Has(fd protoreflect.FieldDescriptor) bool {
 	case "sourcehub.orbis.Document.permission":
 		return x.Permission != ""
 	case "sourcehub.orbis.Document.tier":
-		return x.Tier != ""
-	case "sourcehub.orbis.Document.has_tier":
-		return x.HasTier != false
+		if x.XTier == nil {
+			return false
+		} else if _, ok := x.XTier.(*Document_Tier); ok {
+			return true
+		} else {
+			return false
+		}
 	case "sourcehub.orbis.Document.timestamp":
-		return x.Timestamp != uint64(0)
-	case "sourcehub.orbis.Document.has_timestamp":
-		return x.HasTimestamp != false
+		if x.XTimestamp == nil {
+			return false
+		} else if _, ok := x.XTimestamp.(*Document_Timestamp); ok {
+			return true
+		} else {
+			return false
+		}
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -266,13 +266,9 @@ func (x *fastReflection_Document) Clear(fd protoreflect.FieldDescriptor) {
 	case "sourcehub.orbis.Document.permission":
 		x.Permission = ""
 	case "sourcehub.orbis.Document.tier":
-		x.Tier = ""
-	case "sourcehub.orbis.Document.has_tier":
-		x.HasTier = false
+		x.XTier = nil
 	case "sourcehub.orbis.Document.timestamp":
-		x.Timestamp = uint64(0)
-	case "sourcehub.orbis.Document.has_timestamp":
-		x.HasTimestamp = false
+		x.XTimestamp = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -317,17 +313,21 @@ func (x *fastReflection_Document) Get(descriptor protoreflect.FieldDescriptor) p
 		value := x.Permission
 		return protoreflect.ValueOfString(value)
 	case "sourcehub.orbis.Document.tier":
-		value := x.Tier
-		return protoreflect.ValueOfString(value)
-	case "sourcehub.orbis.Document.has_tier":
-		value := x.HasTier
-		return protoreflect.ValueOfBool(value)
+		if x.XTier == nil {
+			return protoreflect.ValueOfString("")
+		} else if v, ok := x.XTier.(*Document_Tier); ok {
+			return protoreflect.ValueOfString(v.Tier)
+		} else {
+			return protoreflect.ValueOfString("")
+		}
 	case "sourcehub.orbis.Document.timestamp":
-		value := x.Timestamp
-		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.orbis.Document.has_timestamp":
-		value := x.HasTimestamp
-		return protoreflect.ValueOfBool(value)
+		if x.XTimestamp == nil {
+			return protoreflect.ValueOfUint64(uint64(0))
+		} else if v, ok := x.XTimestamp.(*Document_Timestamp); ok {
+			return protoreflect.ValueOfUint64(v.Timestamp)
+		} else {
+			return protoreflect.ValueOfUint64(uint64(0))
+		}
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -367,13 +367,11 @@ func (x *fastReflection_Document) Set(fd protoreflect.FieldDescriptor, value pro
 	case "sourcehub.orbis.Document.permission":
 		x.Permission = value.Interface().(string)
 	case "sourcehub.orbis.Document.tier":
-		x.Tier = value.Interface().(string)
-	case "sourcehub.orbis.Document.has_tier":
-		x.HasTier = value.Bool()
+		cv := value.Interface().(string)
+		x.XTier = &Document_Tier{Tier: cv}
 	case "sourcehub.orbis.Document.timestamp":
-		x.Timestamp = value.Uint()
-	case "sourcehub.orbis.Document.has_timestamp":
-		x.HasTimestamp = value.Bool()
+		cv := value.Uint()
+		x.XTimestamp = &Document_Timestamp{Timestamp: cv}
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -414,12 +412,8 @@ func (x *fastReflection_Document) Mutable(fd protoreflect.FieldDescriptor) proto
 		panic(fmt.Errorf("field permission of message sourcehub.orbis.Document is not mutable"))
 	case "sourcehub.orbis.Document.tier":
 		panic(fmt.Errorf("field tier of message sourcehub.orbis.Document is not mutable"))
-	case "sourcehub.orbis.Document.has_tier":
-		panic(fmt.Errorf("field has_tier of message sourcehub.orbis.Document is not mutable"))
 	case "sourcehub.orbis.Document.timestamp":
 		panic(fmt.Errorf("field timestamp of message sourcehub.orbis.Document is not mutable"))
-	case "sourcehub.orbis.Document.has_timestamp":
-		panic(fmt.Errorf("field has_timestamp of message sourcehub.orbis.Document is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -453,12 +447,8 @@ func (x *fastReflection_Document) NewField(fd protoreflect.FieldDescriptor) prot
 		return protoreflect.ValueOfString("")
 	case "sourcehub.orbis.Document.tier":
 		return protoreflect.ValueOfString("")
-	case "sourcehub.orbis.Document.has_tier":
-		return protoreflect.ValueOfBool(false)
 	case "sourcehub.orbis.Document.timestamp":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.orbis.Document.has_timestamp":
-		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.Document"))
@@ -472,6 +462,22 @@ func (x *fastReflection_Document) NewField(fd protoreflect.FieldDescriptor) prot
 // It panics if the oneof descriptor does not belong to this message.
 func (x *fastReflection_Document) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
+	case "sourcehub.orbis.Document._tier":
+		if x.XTier == nil {
+			return nil
+		}
+		switch x.XTier.(type) {
+		case *Document_Tier:
+			return x.Descriptor().Fields().ByName("tier")
+		}
+	case "sourcehub.orbis.Document._timestamp":
+		if x.XTimestamp == nil {
+			return nil
+		}
+		switch x.XTimestamp.(type) {
+		case *Document_Timestamp:
+			return x.Descriptor().Fields().ByName("timestamp")
+		}
 	default:
 		panic(fmt.Errorf("%s is not a oneof field in sourcehub.orbis.Document", d.FullName()))
 	}
@@ -564,18 +570,12 @@ func (x *fastReflection_Document) ProtoMethods() *protoiface.Methods {
 		if l > 0 {
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		l = len(x.Tier)
-		if l > 0 {
+		if x.Tier != nil {
+			l = len(*x.Tier)
 			n += 1 + l + runtime.Sov(uint64(l))
 		}
-		if x.HasTier {
-			n += 2
-		}
-		if x.Timestamp != 0 {
-			n += 1 + runtime.Sov(uint64(x.Timestamp))
-		}
-		if x.HasTimestamp {
-			n += 2
+		if x.Timestamp != nil {
+			n += 1 + runtime.Sov(uint64(*x.Timestamp))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -606,35 +606,29 @@ func (x *fastReflection_Document) ProtoMethods() *protoiface.Methods {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.HasTimestamp {
-			i--
-			if x.HasTimestamp {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
-			i--
-			dAtA[i] = 0x68
-		}
-		if x.Timestamp != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.Timestamp))
-			i--
-			dAtA[i] = 0x60
-		}
-		if x.HasTier {
-			i--
-			if x.HasTier {
-				dAtA[i] = 1
-			} else {
-				dAtA[i] = 0
-			}
+		switch x := x.XTimestamp.(type) {
+		case *Document_Timestamp:
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.Timestamp))
 			i--
 			dAtA[i] = 0x58
 		}
-		if len(x.Tier) > 0 {
-			i -= len(x.Tier)
-			copy(dAtA[i:], x.Tier)
-			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Tier)))
+		switch x := x.XTier.(type) {
+		case *Document_Tier:
+			i -= len(*x.Tier)
+			copy(dAtA[i:], *x.Tier)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(*x.Tier)))
+			i--
+			dAtA[i] = 0x52
+		}
+		if x.Timestamp != nil {
+			i = runtime.EncodeVarint(dAtA, i, uint64(*x.Timestamp))
+			i--
+			dAtA[i] = 0x58
+		}
+		if x.Tier != nil {
+			i -= len(*x.Tier)
+			copy(dAtA[i:], *x.Tier)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(*x.Tier)))
 			i--
 			dAtA[i] = 0x52
 		}
@@ -1068,33 +1062,14 @@ func (x *fastReflection_Document) ProtoMethods() *protoiface.Methods {
 				if postIndex > l {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
 				}
-				x.Tier = string(dAtA[iNdEx:postIndex])
+				s := string(dAtA[iNdEx:postIndex])
+				x.Tier = &s
 				iNdEx = postIndex
 			case 11:
 				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasTier", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.HasTier = bool(v != 0)
-			case 12:
-				if wireType != 0 {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
 				}
-				x.Timestamp = 0
+				var v uint64
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -1104,31 +1079,12 @@ func (x *fastReflection_Document) ProtoMethods() *protoiface.Methods {
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.Timestamp |= uint64(b&0x7F) << shift
+					v |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
 				}
-			case 13:
-				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field HasTimestamp", wireType)
-				}
-				var v int
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
-					}
-					if iNdEx >= l {
-						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					v |= int(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				x.HasTimestamp = bool(v != 0)
+				x.Timestamp = &v
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -1183,19 +1139,19 @@ type Document struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace    string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid   string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingId       string `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	Document     string `protobuf:"bytes,5,opt,name=document,proto3" json:"document,omitempty"`
-	Proof        string `protobuf:"bytes,6,opt,name=proof,proto3" json:"proof,omitempty"`
-	PolicyId     string `protobuf:"bytes,7,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Resource     string `protobuf:"bytes,8,opt,name=resource,proto3" json:"resource,omitempty"`
-	Permission   string `protobuf:"bytes,9,opt,name=permission,proto3" json:"permission,omitempty"`
-	Tier         string `protobuf:"bytes,10,opt,name=tier,proto3" json:"tier,omitempty"`
-	HasTier      bool   `protobuf:"varint,11,opt,name=has_tier,json=hasTier,proto3" json:"has_tier,omitempty"`
-	Timestamp    uint64 `protobuf:"varint,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	HasTimestamp bool   `protobuf:"varint,13,opt,name=has_timestamp,json=hasTimestamp,proto3" json:"has_timestamp,omitempty"`
+	Id         string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingId     string `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Document   string `protobuf:"bytes,5,opt,name=document,proto3" json:"document,omitempty"`
+	Proof      string `protobuf:"bytes,6,opt,name=proof,proto3" json:"proof,omitempty"`
+	PolicyId   string `protobuf:"bytes,7,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Resource   string `protobuf:"bytes,8,opt,name=resource,proto3" json:"resource,omitempty"`
+	Permission string `protobuf:"bytes,9,opt,name=permission,proto3" json:"permission,omitempty"`
+	// Absent means no tier.
+	Tier *string `protobuf:"bytes,10,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
+	// Absent means no timestamp.
+	Timestamp *uint64 `protobuf:"varint,11,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
 }
 
 func (x *Document) Reset() {
@@ -1282,31 +1238,17 @@ func (x *Document) GetPermission() string {
 }
 
 func (x *Document) GetTier() string {
-	if x != nil {
-		return x.Tier
+	if x != nil && x.Tier != nil {
+		return *x.Tier
 	}
 	return ""
 }
 
-func (x *Document) GetHasTier() bool {
-	if x != nil {
-		return x.HasTier
-	}
-	return false
-}
-
 func (x *Document) GetTimestamp() uint64 {
-	if x != nil {
-		return x.Timestamp
+	if x != nil && x.Timestamp != nil {
+		return *x.Timestamp
 	}
 	return 0
-}
-
-func (x *Document) GetHasTimestamp() bool {
-	if x != nil {
-		return x.HasTimestamp
-	}
-	return false
 }
 
 var File_sourcehub_orbis_document_proto protoreflect.FileDescriptor
@@ -1315,7 +1257,7 @@ var file_sourcehub_orbis_document_proto_rawDesc = []byte{
 	0x0a, 0x1e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69,
 	0x73, 0x2f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 	0x12, 0x0f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69,
-	0x73, 0x22, 0xef, 0x02, 0x0a, 0x08, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x0e,
+	0x73, 0x22, 0xd0, 0x02, 0x0a, 0x08, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x0e,
 	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1c,
 	0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x1f, 0x0a, 0x0b,
@@ -1331,25 +1273,23 @@ var file_sourcehub_orbis_document_proto_rawDesc = []byte{
 	0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x72, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63,
 	0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x18,
 	0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x70, 0x65, 0x72, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f,
-	0x6e, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x65, 0x72, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x74, 0x69, 0x65, 0x72, 0x12, 0x19, 0x0a, 0x08, 0x68, 0x61, 0x73, 0x5f, 0x74, 0x69, 0x65,
-	0x72, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x08, 0x52, 0x07, 0x68, 0x61, 0x73, 0x54, 0x69, 0x65, 0x72,
-	0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x0c, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x23,
-	0x0a, 0x0d, 0x68, 0x61, 0x73, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18,
-	0x0d, 0x20, 0x01, 0x28, 0x08, 0x52, 0x0c, 0x68, 0x61, 0x73, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
-	0x61, 0x6d, 0x70, 0x42, 0xa3, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0d, 0x44, 0x6f, 0x63,
-	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63, 0x6f,
-	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02,
-	0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65,
-	0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x6e, 0x12, 0x17, 0x0a, 0x04, 0x74, 0x69, 0x65, 0x72, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x48,
+	0x00, 0x52, 0x04, 0x74, 0x69, 0x65, 0x72, 0x88, 0x01, 0x01, 0x12, 0x21, 0x0a, 0x09, 0x74, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x04, 0x48, 0x01, 0x52,
+	0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x88, 0x01, 0x01, 0x42, 0x07, 0x0a,
+	0x05, 0x5f, 0x74, 0x69, 0x65, 0x72, 0x42, 0x0c, 0x0a, 0x0a, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x42, 0xa3, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0d, 0x44, 0x6f,
+	0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2,
+	0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -1395,6 +1335,7 @@ func file_sourcehub_orbis_document_proto_init() {
 			}
 		}
 	}
+	file_sourcehub_orbis_document_proto_msgTypes[0].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
