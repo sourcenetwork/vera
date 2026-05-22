@@ -1,10 +1,12 @@
 package keeper_test
 
 import (
+	"encoding/hex"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
@@ -242,6 +244,202 @@ func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
 	require.ErrorContains(t, err, "missing new_peer_ids or new_threshold")
 }
 
+func TestMsgServer_CreateNodeInfo(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	_ = controllerAddr
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "12D3KooWExamplePeerID",
+		ControllerKey: controllerPubKeyHex,
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.NotNil(t, nodeInfo)
+	require.Equal(t, "12D3KooWExamplePeerID", nodeInfo.PeerId)
+	require.Equal(t, controllerPubKeyHex, nodeInfo.ControllerKey)
+	require.Empty(t, nodeInfo.WhitelistedNamespaces)
+	require.Empty(t, nodeInfo.WhitelistedRingIds)
+}
+
+func TestMsgServer_CreateNodeInfo_WithWhitelists(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:               nodeAddr,
+		PeerId:                "peer-1",
+		ControllerKey:         controllerPubKeyHex,
+		WhitelistedNamespaces: []string{"orbis/ns-a", "orbis/ns-b"},
+		WhitelistedRingIds:    []string{"ring-1"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.NotNil(t, nodeInfo)
+	require.Equal(t, []string{"orbis/ns-a", "orbis/ns-b"}, nodeInfo.WhitelistedNamespaces)
+	require.Equal(t, []string{"ring-1"}, nodeInfo.WhitelistedRingIds)
+}
+
+func TestMsgServer_CreateNodeInfo_AlreadyExists(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	msg := &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-1",
+		ControllerKey: controllerPubKeyHex,
+	}
+
+	_, err := k.CreateNodeInfo(ctx, msg)
+	require.NoError(t, err)
+
+	_, err = k.CreateNodeInfo(ctx, msg)
+	require.ErrorIs(t, err, types.ErrNodeInfoAlreadyExists)
+}
+
+func TestMsgServer_UpdateNodeInfo(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:               nodeAddr,
+		PeerId:                "peer-original",
+		ControllerKey:         controllerPubKeyHex,
+		WhitelistedNamespaces: []string{"orbis/ns-a"},
+	})
+	require.NoError(t, err)
+
+	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator:               controllerAddr,
+		NodeKey:               nodePubKeyHex,
+		WhitelistedNamespaces: []string{"orbis/ns-b", "orbis/ns-c"},
+		WhitelistedRingIds:    []string{"ring-1", "ring-2"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.NotNil(t, nodeInfo)
+	require.Equal(t, "peer-original", nodeInfo.PeerId)
+	require.Equal(t, []string{"orbis/ns-b", "orbis/ns-c"}, nodeInfo.WhitelistedNamespaces)
+	require.Equal(t, []string{"ring-1", "ring-2"}, nodeInfo.WhitelistedRingIds)
+}
+
+func TestMsgServer_UpdateNodeInfo_UpdatePeerId(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-original",
+		ControllerKey: controllerPubKeyHex,
+	})
+	require.NoError(t, err)
+
+	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		XPeerId: &types.MsgUpdateNodeInfo_PeerId{PeerId: "peer-updated"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.NotNil(t, nodeInfo)
+	require.Equal(t, "peer-updated", nodeInfo.PeerId)
+}
+
+func TestMsgServer_UpdateNodeInfo_AbsentPeerIdIsNotCleared(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-original",
+		ControllerKey: controllerPubKeyHex,
+	})
+	require.NoError(t, err)
+
+	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator:            controllerAddr,
+		NodeKey:            nodePubKeyHex,
+		WhitelistedRingIds: []string{"ring-1"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.Equal(t, "peer-original", nodeInfo.PeerId)
+}
+
+func TestMsgServer_UpdateNodeInfo_NotFound(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	controllerAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator: controllerAddr,
+		NodeKey: "nonexistent-key",
+	})
+	require.ErrorIs(t, err, types.ErrNodeInfoNotFound)
+}
+
+func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	wrongAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-1",
+		ControllerKey: controllerPubKeyHex,
+	})
+	require.NoError(t, err)
+
+	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator: wrongAddr,
+		NodeKey: nodePubKeyHex,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedNodeInfoUpdate)
+}
+
 func testAddress() string {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
+}
+
+// testAccountWithPubKey creates a secp256k1 keypair, registers the account in the auth keeper,
+// and returns the bech32 address and hex-encoded public key bytes.
+func testAccountWithPubKey(t *testing.T, ctx sdk.Context, ak authkeeper.AccountKeeper) (addr string, pubKeyHex string) {
+	t.Helper()
+	privKey := secp256k1.GenPrivKey()
+	pubKey := privKey.PubKey()
+	accAddr := sdk.AccAddress(pubKey.Address())
+	account := ak.NewAccountWithAddress(ctx, accAddr)
+	if err := account.SetPubKey(pubKey); err != nil {
+		t.Fatal(err)
+	}
+	ak.SetAccount(ctx, account)
+	return accAddr.String(), hex.EncodeToString(pubKey.Bytes())
 }

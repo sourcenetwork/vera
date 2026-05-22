@@ -29,6 +29,13 @@ import (
 )
 
 func OrbisKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
+	k, _, ctx := OrbisKeeperFull(t)
+	return k, ctx
+}
+
+// OrbisKeeperFull returns the keeper, the auth account keeper, and the context.
+// Use this when tests need to register accounts with known public keys.
+func OrbisKeeperFull(t testing.TB) (keeper.Keeper, authkeeper.AccountKeeper, sdk.Context) {
 	orbisStoreKey := storetypes.NewKVStoreKey(types.StoreKey)
 	acpStoreKey := storetypes.NewKVStoreKey(acptypes.StoreKey)
 	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
@@ -92,5 +99,5 @@ func OrbisKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
 	k.SetParams(ctx, types.DefaultParams())
 
-	return k, ctx
+	return k, accountKeeper, ctx
 }
