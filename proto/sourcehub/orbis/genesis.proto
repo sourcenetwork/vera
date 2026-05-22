@@ -5,6 +5,7 @@ import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 import "sourcehub/orbis/document.proto";
 import "sourcehub/orbis/key_derivation.proto";
+import "sourcehub/orbis/node_info.proto";
 import "sourcehub/orbis/params.proto";
 import "sourcehub/orbis/ring.proto";
 
@@ -25,6 +26,10 @@ message GenesisState {
     (amino.dont_omitempty) = true
   ];
   repeated KeyDerivation key_derivations = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated NodeInfoEntry node_infos = 5 [
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];

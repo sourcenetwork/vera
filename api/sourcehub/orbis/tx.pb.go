@@ -876,6 +876,231 @@ func (x *MsgStoreKeyDerivationResponse) GetKeyDerivationId() string {
 	return ""
 }
 
+type MsgCreateNodeInfo struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Creator               string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PeerId                string                 `protobuf:"bytes,2,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	ControllerKey         string                 `protobuf:"bytes,3,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
+	WhitelistedNamespaces []string               `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
+	WhitelistedRingIds    []string               `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *MsgCreateNodeInfo) Reset() {
+	*x = MsgCreateNodeInfo{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgCreateNodeInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgCreateNodeInfo) ProtoMessage() {}
+
+func (x *MsgCreateNodeInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgCreateNodeInfo.ProtoReflect.Descriptor instead.
+func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *MsgCreateNodeInfo) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
+}
+
+func (x *MsgCreateNodeInfo) GetPeerId() string {
+	if x != nil {
+		return x.PeerId
+	}
+	return ""
+}
+
+func (x *MsgCreateNodeInfo) GetControllerKey() string {
+	if x != nil {
+		return x.ControllerKey
+	}
+	return ""
+}
+
+func (x *MsgCreateNodeInfo) GetWhitelistedNamespaces() []string {
+	if x != nil {
+		return x.WhitelistedNamespaces
+	}
+	return nil
+}
+
+func (x *MsgCreateNodeInfo) GetWhitelistedRingIds() []string {
+	if x != nil {
+		return x.WhitelistedRingIds
+	}
+	return nil
+}
+
+type MsgCreateNodeInfoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MsgCreateNodeInfoResponse) Reset() {
+	*x = MsgCreateNodeInfoResponse{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgCreateNodeInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgCreateNodeInfoResponse) ProtoMessage() {}
+
+func (x *MsgCreateNodeInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgCreateNodeInfoResponse.ProtoReflect.Descriptor instead.
+func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{14}
+}
+
+type MsgUpdateNodeInfo struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Creator string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	NodeKey string                 `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	// Absent means no peer_id update.
+	PeerId                *string  `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
+	WhitelistedNamespaces []string `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
+	WhitelistedRingIds    []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *MsgUpdateNodeInfo) Reset() {
+	*x = MsgUpdateNodeInfo{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgUpdateNodeInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgUpdateNodeInfo) ProtoMessage() {}
+
+func (x *MsgUpdateNodeInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgUpdateNodeInfo.ProtoReflect.Descriptor instead.
+func (*MsgUpdateNodeInfo) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *MsgUpdateNodeInfo) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
+}
+
+func (x *MsgUpdateNodeInfo) GetNodeKey() string {
+	if x != nil {
+		return x.NodeKey
+	}
+	return ""
+}
+
+func (x *MsgUpdateNodeInfo) GetPeerId() string {
+	if x != nil && x.PeerId != nil {
+		return *x.PeerId
+	}
+	return ""
+}
+
+func (x *MsgUpdateNodeInfo) GetWhitelistedNamespaces() []string {
+	if x != nil {
+		return x.WhitelistedNamespaces
+	}
+	return nil
+}
+
+func (x *MsgUpdateNodeInfo) GetWhitelistedRingIds() []string {
+	if x != nil {
+		return x.WhitelistedRingIds
+	}
+	return nil
+}
+
+type MsgUpdateNodeInfoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MsgUpdateNodeInfoResponse) Reset() {
+	*x = MsgUpdateNodeInfoResponse{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgUpdateNodeInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgUpdateNodeInfoResponse) ProtoMessage() {}
+
+func (x *MsgUpdateNodeInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgUpdateNodeInfoResponse.ProtoReflect.Descriptor instead.
+func (*MsgUpdateNodeInfoResponse) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{16}
+}
+
 var File_sourcehub_orbis_tx_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_tx_proto_rawDesc = "" +
@@ -955,7 +1180,23 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"permission\x18\a \x01(\tR\n" +
 	"permission:\f\x82\xe7\xb0*\acreator\"K\n" +
 	"\x1dMsgStoreKeyDerivationResponse\x12*\n" +
-	"\x11key_derivation_id\x18\x01 \x01(\tR\x0fkeyDerivationId2\x9e\x05\n" +
+	"\x11key_derivation_id\x18\x01 \x01(\tR\x0fkeyDerivationId\"\xe4\x01\n" +
+	"\x11MsgCreateNodeInfo\x12\x18\n" +
+	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
+	"\apeer_id\x18\x02 \x01(\tR\x06peerId\x12%\n" +
+	"\x0econtroller_key\x18\x03 \x01(\tR\rcontrollerKey\x125\n" +
+	"\x16whitelisted_namespaces\x18\x04 \x03(\tR\x15whitelistedNamespaces\x120\n" +
+	"\x14whitelisted_ring_ids\x18\x05 \x03(\tR\x12whitelistedRingIds:\f\x82\xe7\xb0*\acreator\"\x1b\n" +
+	"\x19MsgCreateNodeInfoResponse\"\xe9\x01\n" +
+	"\x11MsgUpdateNodeInfo\x12\x18\n" +
+	"\acreator\x18\x01 \x01(\tR\acreator\x12\x19\n" +
+	"\bnode_key\x18\x02 \x01(\tR\anodeKey\x12\x1c\n" +
+	"\apeer_id\x18\x03 \x01(\tH\x00R\x06peerId\x88\x01\x01\x125\n" +
+	"\x16whitelisted_namespaces\x18\x04 \x03(\tR\x15whitelistedNamespaces\x120\n" +
+	"\x14whitelisted_ring_ids\x18\x05 \x03(\tR\x12whitelistedRingIds:\f\x82\xe7\xb0*\acreatorB\n" +
+	"\n" +
+	"\b_peer_id\"\x1b\n" +
+	"\x19MsgUpdateNodeInfoResponse2\xe2\x06\n" +
 	"\x03Msg\x12Z\n" +
 	"\fUpdateParams\x12 .sourcehub.orbis.MsgUpdateParams\x1a(.sourcehub.orbis.MsgUpdateParamsResponse\x12T\n" +
 	"\n" +
@@ -963,7 +1204,9 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fUpdateRingByAcp\x12#.sourcehub.orbis.MsgUpdateRingByAcp\x1a+.sourcehub.orbis.MsgUpdateRingByAcpResponse\x12\xab\x01\n" +
 	"'FinalizeRingReshareByThresholdSignature\x12;.sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature\x1aC.sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse\x12]\n" +
 	"\rStoreDocument\x12!.sourcehub.orbis.MsgStoreDocument\x1a).sourcehub.orbis.MsgStoreDocumentResponse\x12l\n" +
-	"\x12StoreKeyDerivation\x12&.sourcehub.orbis.MsgStoreKeyDerivation\x1a..sourcehub.orbis.MsgStoreKeyDerivationResponse\x1a\x05\x80\xe7\xb0*\x01B\x9d\x01\n" +
+	"\x12StoreKeyDerivation\x12&.sourcehub.orbis.MsgStoreKeyDerivation\x1a..sourcehub.orbis.MsgStoreKeyDerivationResponse\x12`\n" +
+	"\x0eCreateNodeInfo\x12\".sourcehub.orbis.MsgCreateNodeInfo\x1a*.sourcehub.orbis.MsgCreateNodeInfoResponse\x12`\n" +
+	"\x0eUpdateNodeInfo\x12\".sourcehub.orbis.MsgUpdateNodeInfo\x1a*.sourcehub.orbis.MsgUpdateNodeInfoResponse\x1a\x05\x80\xe7\xb0*\x01B\x9d\x01\n" +
 	"\x13com.sourcehub.orbisB\aTxProtoP\x01Z cosmossdk.io/api/sourcehub/orbis\xa2\x02\x03SOX\xaa\x02\x0fSourcehub.Orbis\xca\x02\x0fSourcehub\\Orbis\xe2\x02\x1bSourcehub\\Orbis\\GPBMetadata\xea\x02\x10Sourcehub::Orbisb\x06proto3"
 
 var (
@@ -978,7 +1221,7 @@ func file_sourcehub_orbis_tx_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_tx_proto_rawDescData
 }
 
-var file_sourcehub_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_sourcehub_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_sourcehub_orbis_tx_proto_goTypes = []any{
 	(*MsgUpdateParams)(nil),                                    // 0: sourcehub.orbis.MsgUpdateParams
 	(*MsgUpdateParamsResponse)(nil),                            // 1: sourcehub.orbis.MsgUpdateParamsResponse
@@ -993,24 +1236,32 @@ var file_sourcehub_orbis_tx_proto_goTypes = []any{
 	(*MsgStoreDocumentResponse)(nil),                           // 10: sourcehub.orbis.MsgStoreDocumentResponse
 	(*MsgStoreKeyDerivation)(nil),                              // 11: sourcehub.orbis.MsgStoreKeyDerivation
 	(*MsgStoreKeyDerivationResponse)(nil),                      // 12: sourcehub.orbis.MsgStoreKeyDerivationResponse
-	(*Params)(nil),                                             // 13: sourcehub.orbis.Params
+	(*MsgCreateNodeInfo)(nil),                                  // 13: sourcehub.orbis.MsgCreateNodeInfo
+	(*MsgCreateNodeInfoResponse)(nil),                          // 14: sourcehub.orbis.MsgCreateNodeInfoResponse
+	(*MsgUpdateNodeInfo)(nil),                                  // 15: sourcehub.orbis.MsgUpdateNodeInfo
+	(*MsgUpdateNodeInfoResponse)(nil),                          // 16: sourcehub.orbis.MsgUpdateNodeInfoResponse
+	(*Params)(nil),                                             // 17: sourcehub.orbis.Params
 }
 var file_sourcehub_orbis_tx_proto_depIdxs = []int32{
-	13, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
+	17, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
 	0,  // 1: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
 	2,  // 2: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
 	4,  // 3: sourcehub.orbis.Msg.UpdateRingByAcp:input_type -> sourcehub.orbis.MsgUpdateRingByAcp
 	6,  // 4: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
 	9,  // 5: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
 	11, // 6: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
-	1,  // 7: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
-	3,  // 8: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
-	5,  // 9: sourcehub.orbis.Msg.UpdateRingByAcp:output_type -> sourcehub.orbis.MsgUpdateRingByAcpResponse
-	7,  // 10: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	10, // 11: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
-	12, // 12: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
-	7,  // [7:13] is the sub-list for method output_type
-	1,  // [1:7] is the sub-list for method input_type
+	13, // 7: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
+	15, // 8: sourcehub.orbis.Msg.UpdateNodeInfo:input_type -> sourcehub.orbis.MsgUpdateNodeInfo
+	1,  // 9: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
+	3,  // 10: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
+	5,  // 11: sourcehub.orbis.Msg.UpdateRingByAcp:output_type -> sourcehub.orbis.MsgUpdateRingByAcpResponse
+	7,  // 12: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	10, // 13: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
+	12, // 14: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
+	14, // 15: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
+	16, // 16: sourcehub.orbis.Msg.UpdateNodeInfo:output_type -> sourcehub.orbis.MsgUpdateNodeInfoResponse
+	9,  // [9:17] is the sub-list for method output_type
+	1,  // [1:9] is the sub-list for method input_type
 	1,  // [1:1] is the sub-list for extension type_name
 	1,  // [1:1] is the sub-list for extension extendee
 	0,  // [0:1] is the sub-list for field type_name
@@ -1025,13 +1276,14 @@ func file_sourcehub_orbis_tx_proto_init() {
 	file_sourcehub_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
 	file_sourcehub_orbis_tx_proto_msgTypes[4].OneofWrappers = []any{}
 	file_sourcehub_orbis_tx_proto_msgTypes[9].OneofWrappers = []any{}
+	file_sourcehub_orbis_tx_proto_msgTypes[15].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_tx_proto_rawDesc), len(file_sourcehub_orbis_tx_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

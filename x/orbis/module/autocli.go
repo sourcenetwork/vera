@@ -82,6 +82,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Store an Orbis key derivation",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "ring_id"}, {ProtoField: "derivation"}, {ProtoField: "policy_id"}, {ProtoField: "resource"}, {ProtoField: "permission"}},
 				},
+				{
+					RpcMethod:      "CreateNodeInfo",
+					Use:            "create-node-info [peer_id] [controller_key]",
+					Short:          "Create a node info record (store key derived from signing key)",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "peer_id"}, {ProtoField: "controller_key"}},
+				},
+				{
+					RpcMethod:      "UpdateNodeInfo",
+					Use:            "update-node-info [node_key]",
+					Short:          "Update a node info record (signer must match stored controller key)",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
+				},
 			},
 		},
 	}

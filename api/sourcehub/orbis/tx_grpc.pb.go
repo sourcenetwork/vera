@@ -25,6 +25,8 @@ const (
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
 	Msg_StoreDocument_FullMethodName                           = "/sourcehub.orbis.Msg/StoreDocument"
 	Msg_StoreKeyDerivation_FullMethodName                      = "/sourcehub.orbis.Msg/StoreKeyDerivation"
+	Msg_CreateNodeInfo_FullMethodName                          = "/sourcehub.orbis.Msg/CreateNodeInfo"
+	Msg_UpdateNodeInfo_FullMethodName                          = "/sourcehub.orbis.Msg/UpdateNodeInfo"
 )
 
 // MsgClient is the client API for Msg service.
@@ -40,6 +42,8 @@ type MsgClient interface {
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDerivation, opts ...grpc.CallOption) (*MsgStoreKeyDerivationResponse, error)
+	CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error)
+	UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error)
 }
 
 type msgClient struct {
@@ -110,6 +114,26 @@ func (c *msgClient) StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDeriv
 	return out, nil
 }
 
+func (c *msgClient) CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgCreateNodeInfoResponse)
+	err := c.cc.Invoke(ctx, Msg_CreateNodeInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgUpdateNodeInfoResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateNodeInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -123,6 +147,8 @@ type MsgServer interface {
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error)
+	CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error)
+	UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -150,6 +176,12 @@ func (UnimplementedMsgServer) StoreDocument(context.Context, *MsgStoreDocument) 
 }
 func (UnimplementedMsgServer) StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreKeyDerivation not implemented")
+}
+func (UnimplementedMsgServer) CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNodeInfo not implemented")
+}
+func (UnimplementedMsgServer) UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeInfo not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -280,6 +312,42 @@ func _Msg_StoreKeyDerivation_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateNodeInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CreateNodeInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateNodeInfo(ctx, req.(*MsgCreateNodeInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateNodeInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_UpdateNodeInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateNodeInfo(ctx, req.(*MsgUpdateNodeInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -310,6 +378,14 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StoreKeyDerivation",
 			Handler:    _Msg_StoreKeyDerivation_Handler,
+		},
+		{
+			MethodName: "CreateNodeInfo",
+			Handler:    _Msg_CreateNodeInfo_Handler,
+		},
+		{
+			MethodName: "UpdateNodeInfo",
+			Handler:    _Msg_UpdateNodeInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

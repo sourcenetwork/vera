@@ -139,3 +139,13 @@ func validateKeyDerivation(keyDerivation *types.KeyDerivation) error {
 	}
 	return nil
 }
+
+func validateNodeInfo(nodeInfo *types.NodeInfo) error {
+	switch {
+	case nodeInfo.PeerId == "":
+		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
+	case nodeInfo.ControllerKey == "":
+		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
+	}
+	return nil
+}

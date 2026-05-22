@@ -14,6 +14,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgFinalizeRingReshareByThresholdSignature{},
 		&MsgStoreDocument{},
 		&MsgStoreKeyDerivation{},
+		&MsgCreateNodeInfo{},
+		&MsgUpdateNodeInfo{},
 		&MsgUpdateParams{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

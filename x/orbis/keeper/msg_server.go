@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/hex"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -226,6 +227,96 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	}
 
 	return &types.MsgStoreDocumentResponse{DocumentId: documentID}, nil
+}
+
+func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeInfo) (*types.MsgCreateNodeInfoResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nodeKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	if existing := k.GetNodeInfo(goCtx, nodeKey); existing != nil {
+		return nil, types.ErrNodeInfoAlreadyExists
+	}
+
+	nodeInfo := types.NodeInfo{
+		PeerId:                msg.PeerId,
+		ControllerKey:         msg.ControllerKey,
+		WhitelistedNamespaces: append([]string(nil), msg.WhitelistedNamespaces...),
+		WhitelistedRingIds:    append([]string(nil), msg.WhitelistedRingIds...),
+	}
+	if err := validateNodeInfo(&nodeInfo); err != nil {
+		return nil, err
+	}
+
+	k.SetNodeInfo(goCtx, nodeKey, nodeInfo)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoCreated{
+		PeerId:        nodeInfo.PeerId,
+		ControllerKey: nodeInfo.ControllerKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateNodeInfoResponse{}, nil
+}
+
+func (k *Keeper) UpdateNodeInfo(goCtx context.Context, msg *types.MsgUpdateNodeInfo) (*types.MsgUpdateNodeInfoResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
+	if nodeInfo == nil {
+		return nil, types.ErrNodeInfoNotFound
+	}
+
+	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if signerKey != nodeInfo.ControllerKey {
+		return nil, types.ErrUnauthorizedNodeInfoUpdate
+	}
+
+	if msg.XPeerId != nil {
+		nodeInfo.PeerId = msg.GetPeerId()
+	}
+	nodeInfo.WhitelistedNamespaces = append([]string(nil), msg.WhitelistedNamespaces...)
+	nodeInfo.WhitelistedRingIds = append([]string(nil), msg.WhitelistedRingIds...)
+
+	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoUpdated{
+		PeerId:        nodeInfo.PeerId,
+		ControllerKey: nodeInfo.ControllerKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateNodeInfoResponse{}, nil
+}
+
+// signerPublicKeyHex returns the hex-encoded compressed public key for a bech32 address.
+// The ante handler populates the account's public key before message handlers run,
+// so it is guaranteed non-nil for the transaction signer.
+func signerPublicKeyHex(ctx sdk.Context, k *Keeper, address string) (string, error) {
+	addr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "invalid signer address: %s", err)
+	}
+
+	account := k.accountKeeper.GetAccount(ctx, addr)
+	if account == nil {
+		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "account not found for address %s", address)
+	}
+
+	pubKey := account.GetPubKey()
+	if pubKey == nil {
+		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "public key not set for account %s", address)
+	}
+
+	return hex.EncodeToString(pubKey.Bytes()), nil
 }
 
 func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKeyDerivation) (*types.MsgStoreKeyDerivationResponse, error) {

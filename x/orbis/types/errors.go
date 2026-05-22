@@ -24,4 +24,8 @@ var (
 	ErrInvalidThresholdSignature  = sdkerrors.Register(ModuleName, 1217, "invalid threshold signature")
 	ErrInvalidSignatureScheme     = sdkerrors.Register(ModuleName, 1218, "invalid signature scheme")
 	ErrInvalidSignaturePayload    = sdkerrors.Register(ModuleName, 1219, "invalid signature payload")
+	ErrNodeInfoAlreadyExists      = sdkerrors.Register(ModuleName, 1220, "node info already exists")
+	ErrNodeInfoNotFound           = sdkerrors.Register(ModuleName, 1221, "node info not found")
+	ErrInvalidNodeInfo            = sdkerrors.Register(ModuleName, 1222, "invalid node info")
+	ErrUnauthorizedNodeInfoUpdate = sdkerrors.Register(ModuleName, 1223, "tx signer does not match controller key")
 )
