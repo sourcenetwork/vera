@@ -44,6 +44,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query key derivations within a namespace",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}},
 				},
+				{
+					RpcMethod:      "NodeInfo",
+					Use:            "node-info [node_key]",
+					Short:          "Query node info by node key",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{

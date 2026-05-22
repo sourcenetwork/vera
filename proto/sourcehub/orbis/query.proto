@@ -8,6 +8,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "sourcehub/orbis/document.proto";
 import "sourcehub/orbis/key_derivation.proto";
+import "sourcehub/orbis/node_info.proto";
 import "sourcehub/orbis/params.proto";
 import "sourcehub/orbis/ring.proto";
 
@@ -48,6 +49,11 @@ service Query {
   // KeyDerivations queries key derivations within a namespace.
   rpc KeyDerivations(QueryKeyDerivationsRequest) returns (QueryKeyDerivationsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivations/{namespace}";
+  }
+
+  // NodeInfo queries node info by node key.
+  rpc NodeInfo(QueryNodeInfoRequest) returns (QueryNodeInfoResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/node_info/{node_key}";
   }
 }
 
@@ -125,4 +131,12 @@ message QueryKeyDerivationsResponse {
     (amino.dont_omitempty) = true
   ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryNodeInfoRequest {
+  string node_key = 1;
+}
+
+message QueryNodeInfoResponse {
+  NodeInfo node_info = 1;
 }
