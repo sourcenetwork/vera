@@ -146,6 +146,8 @@ message MsgUpdateNodeInfo {
   optional string peer_id = 3;
   repeated string whitelisted_namespaces = 4;
   repeated string whitelisted_ring_ids = 5;
+  // Absent means no controller_key update.
+  optional string controller_key = 6;
 }
 
 message MsgUpdateNodeInfoResponse {}

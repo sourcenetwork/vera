@@ -996,8 +996,10 @@ type MsgUpdateNodeInfo struct {
 	PeerId                *string  `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
 	WhitelistedNamespaces []string `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
 	WhitelistedRingIds    []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
-	unknownFields         protoimpl.UnknownFields
-	sizeCache             protoimpl.SizeCache
+	// Absent means no controller_key update.
+	ControllerKey *string `protobuf:"bytes,6,opt,name=controller_key,json=controllerKey,proto3,oneof" json:"controller_key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MsgUpdateNodeInfo) Reset() {
@@ -1063,6 +1065,13 @@ func (x *MsgUpdateNodeInfo) GetWhitelistedRingIds() []string {
 		return x.WhitelistedRingIds
 	}
 	return nil
+}
+
+func (x *MsgUpdateNodeInfo) GetControllerKey() string {
+	if x != nil && x.ControllerKey != nil {
+		return *x.ControllerKey
+	}
+	return ""
 }
 
 type MsgUpdateNodeInfoResponse struct {
@@ -1187,15 +1196,17 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0econtroller_key\x18\x03 \x01(\tR\rcontrollerKey\x125\n" +
 	"\x16whitelisted_namespaces\x18\x04 \x03(\tR\x15whitelistedNamespaces\x120\n" +
 	"\x14whitelisted_ring_ids\x18\x05 \x03(\tR\x12whitelistedRingIds:\f\x82\xe7\xb0*\acreator\"\x1b\n" +
-	"\x19MsgCreateNodeInfoResponse\"\xe9\x01\n" +
+	"\x19MsgCreateNodeInfoResponse\"\xa8\x02\n" +
 	"\x11MsgUpdateNodeInfo\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x19\n" +
 	"\bnode_key\x18\x02 \x01(\tR\anodeKey\x12\x1c\n" +
 	"\apeer_id\x18\x03 \x01(\tH\x00R\x06peerId\x88\x01\x01\x125\n" +
 	"\x16whitelisted_namespaces\x18\x04 \x03(\tR\x15whitelistedNamespaces\x120\n" +
-	"\x14whitelisted_ring_ids\x18\x05 \x03(\tR\x12whitelistedRingIds:\f\x82\xe7\xb0*\acreatorB\n" +
+	"\x14whitelisted_ring_ids\x18\x05 \x03(\tR\x12whitelistedRingIds\x12*\n" +
+	"\x0econtroller_key\x18\x06 \x01(\tH\x01R\rcontrollerKey\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\n" +
 	"\n" +
-	"\b_peer_id\"\x1b\n" +
+	"\b_peer_idB\x11\n" +
+	"\x0f_controller_key\"\x1b\n" +
 	"\x19MsgUpdateNodeInfoResponse2\xe2\x06\n" +
 	"\x03Msg\x12Z\n" +
 	"\fUpdateParams\x12 .sourcehub.orbis.MsgUpdateParams\x1a(.sourcehub.orbis.MsgUpdateParamsResponse\x12T\n" +

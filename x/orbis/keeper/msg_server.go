@@ -282,8 +282,14 @@ func (k *Keeper) UpdateNodeInfo(goCtx context.Context, msg *types.MsgUpdateNodeI
 	if msg.XPeerId != nil {
 		nodeInfo.PeerId = msg.GetPeerId()
 	}
+	if msg.XControllerKey != nil {
+		nodeInfo.ControllerKey = msg.GetControllerKey()
+	}
 	nodeInfo.WhitelistedNamespaces = append([]string(nil), msg.WhitelistedNamespaces...)
 	nodeInfo.WhitelistedRingIds = append([]string(nil), msg.WhitelistedRingIds...)
+	if err := validateNodeInfo(nodeInfo); err != nil {
+		return nil, err
+	}
 
 	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
 
