@@ -270,11 +270,13 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
+	_, peer4Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer4")
 	outsiderAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator:    outsiderAddr,
-		RingId:     createRingResp.RingId,
-		NewPeerIds: []string{"peer-3", "peer-4"},
+		Creator:        outsiderAddr,
+		RingId:         createRingResp.RingId,
+		NewPeerNodeKeys: []string{peer3Key, peer4Key},
 		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
@@ -308,7 +310,7 @@ func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
 		Signature:       []byte("signature"),
 	})
 	require.ErrorIs(t, err, types.ErrInvalidRing)
-	require.ErrorContains(t, err, "missing new_peer_ids or new_threshold")
+	require.ErrorContains(t, err, "missing new_peer_node_keys or new_threshold")
 }
 
 func TestMsgServer_CreateNodeInfo(t *testing.T) {

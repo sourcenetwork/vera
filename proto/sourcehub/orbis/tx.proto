@@ -71,7 +71,7 @@ message MsgUpdateRingByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
-  repeated string new_peer_ids = 3;
+  repeated string new_peer_node_keys = 3;
   // Absent means no pending threshold update.
   optional uint32 new_threshold = 4;
   // Absent means no PSS refresh interval update.

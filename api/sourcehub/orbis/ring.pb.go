@@ -23,14 +23,14 @@ const (
 
 // Ring stores the active and pending committee metadata for an Orbis ring.
 type Ring struct {
-	state        protoimpl.MessageState `protogen:"open.v1"`
-	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace    string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid   string                 `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingPk       string                 `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerNodeKeys []string               `protobuf:"bytes,5,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
-	Threshold    uint32                 `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	NewPeerIds   []string               `protobuf:"bytes,7,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Namespace       string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	CreatorDid      string                 `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingPk          string                 `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerNodeKeys    []string               `protobuf:"bytes,5,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold       uint32                 `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerNodeKeys []string               `protobuf:"bytes,7,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Absent means no pending threshold update.
 	NewThreshold *uint32 `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Absent means automatic PSS refresh is disabled.
@@ -113,9 +113,9 @@ func (x *Ring) GetThreshold() uint32 {
 	return 0
 }
 
-func (x *Ring) GetNewPeerIds() []string {
+func (x *Ring) GetNewPeerNodeKeys() []string {
 	if x != nil {
-		return x.NewPeerIds
+		return x.NewPeerNodeKeys
 	}
 	return nil
 }
@@ -152,7 +152,7 @@ var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\n" +
-	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\x94\x03\n" +
+	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\x9f\x03\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
 	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x1f\n" +
@@ -160,9 +160,8 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"creatorDid\x12\x17\n" +
 	"\aring_pk\x18\x04 \x01(\tR\x06ringPk\x12$\n" +
 	"\x0epeer_node_keys\x18\x05 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
-	"\tthreshold\x18\x06 \x01(\rR\tthreshold\x12 \n" +
-	"\fnew_peer_ids\x18\a \x03(\tR\n" +
-	"newPeerIds\x12(\n" +
+	"\tthreshold\x18\x06 \x01(\rR\tthreshold\x12+\n" +
+	"\x12new_peer_node_keys\x18\a \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
 	"\rnew_threshold\x18\b \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
 	"\fpss_interval\x18\t \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
 	"\x12block_number_nonce\x18\n" +

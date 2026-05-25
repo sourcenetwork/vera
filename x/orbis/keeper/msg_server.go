@@ -161,12 +161,12 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	}
 
 	newThreshold := optionalUpdateRingNewThreshold(msg)
-	if err := validateRingUpdate(msg.NewPeerIds, newThreshold, ring); err != nil {
+	if err := validateRingUpdate(msg.NewPeerNodeKeys, newThreshold, ring); err != nil {
 		return nil, err
 	}
 
-	if len(msg.NewPeerIds) > 0 {
-		ring.NewPeerIds = append([]string(nil), msg.NewPeerIds...)
+	if len(msg.NewPeerNodeKeys) > 0 {
+		ring.NewPeerNodeKeys = append([]string(nil), msg.NewPeerNodeKeys...)
 	}
 	if newThreshold != nil {
 		setRingNewThreshold(ring, newThreshold)

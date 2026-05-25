@@ -349,10 +349,10 @@ func (*MsgFinalizeRingResponse) Descriptor() ([]byte, []int) {
 }
 
 type MsgUpdateRingByAcp struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Creator    string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	RingId     string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	NewPeerIds []string               `protobuf:"bytes,3,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Creator         string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId          string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	NewPeerNodeKeys []string               `protobuf:"bytes,3,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Absent means no pending threshold update.
 	NewThreshold *uint32 `protobuf:"varint,4,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Absent means no PSS refresh interval update.
@@ -405,9 +405,9 @@ func (x *MsgUpdateRingByAcp) GetRingId() string {
 	return ""
 }
 
-func (x *MsgUpdateRingByAcp) GetNewPeerIds() []string {
+func (x *MsgUpdateRingByAcp) GetNewPeerNodeKeys() []string {
 	if x != nil {
-		return x.NewPeerIds
+		return x.NewPeerNodeKeys
 	}
 	return nil
 }
@@ -1222,12 +1222,11 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x17\n" +
 	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"\x19\n" +
-	"\x17MsgFinalizeRingResponse\"\xec\x01\n" +
+	"\x17MsgFinalizeRingResponse\"\xf7\x01\n" +
 	"\x12MsgUpdateRingByAcp\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
-	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12 \n" +
-	"\fnew_peer_ids\x18\x03 \x03(\tR\n" +
-	"newPeerIds\x12(\n" +
+	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12+\n" +
+	"\x12new_peer_node_keys\x18\x03 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
 	"\rnew_threshold\x18\x04 \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
 	"\fpss_interval\x18\x05 \x01(\x04H\x01R\vpssInterval\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x10\n" +
 	"\x0e_new_thresholdB\x0f\n" +

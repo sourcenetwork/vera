@@ -11,7 +11,7 @@ message Ring {
   string ring_pk = 4;
   repeated string peer_node_keys = 5;
   uint32 threshold = 6;
-  repeated string new_peer_ids = 7;
+  repeated string new_peer_node_keys = 7;
   // Absent means no pending threshold update.
   optional uint32 new_threshold = 8;
   // Absent means automatic PSS refresh is disabled.

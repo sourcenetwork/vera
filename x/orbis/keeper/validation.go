@@ -24,19 +24,19 @@ func validateRing(ring *types.Ring) error {
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
 		return err
 	}
-	if len(ring.NewPeerIds) > 0 {
-		if err := validateUniquePeerIDs(ring.NewPeerIds, "new_peer_ids"); err != nil {
+	if len(ring.NewPeerNodeKeys) > 0 {
+		if err := validateUniquePeerNodeKeys(ring.NewPeerNodeKeys); err != nil {
 			return err
 		}
 	}
 	if ring.XNewThreshold != nil && ring.GetNewThreshold() == 0 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
-	if len(ring.NewPeerIds) > 0 && ring.XNewThreshold != nil && uint32(len(ring.NewPeerIds)) < ring.GetNewThreshold() {
+	if len(ring.NewPeerNodeKeys) > 0 && ring.XNewThreshold != nil && uint32(len(ring.NewPeerNodeKeys)) < ring.GetNewThreshold() {
 		return errorsmod.Wrapf(
 			types.ErrInvalidRing,
-			"new_peer_ids count (%d) is less than new_threshold (%d)",
-			len(ring.NewPeerIds),
+			"new_peer_node_keys count (%d) is less than new_threshold (%d)",
+			len(ring.NewPeerNodeKeys),
 			ring.GetNewThreshold(),
 		)
 	}
@@ -44,26 +44,26 @@ func validateRing(ring *types.Ring) error {
 	return nil
 }
 
-func validateRingUpdate(newPeerIDs []string, newThreshold *uint32, existing *types.Ring) error {
-	reshareInProgress := len(existing.NewPeerIds) > 0 || existing.XNewThreshold != nil
-	touchingReshareFields := len(newPeerIDs) > 0 || newThreshold != nil
+func validateRingUpdate(newPeerNodeKeys []string, newThreshold *uint32, existing *types.Ring) error {
+	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
+	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold != nil
 	if reshareInProgress && touchingReshareFields {
 		return types.ErrReshareInProgress
 	}
 
-	if len(newPeerIDs) > 0 {
-		if err := validateUniquePeerIDs(newPeerIDs, "new_peer_ids"); err != nil {
+	if len(newPeerNodeKeys) > 0 {
+		if err := validateUniquePeerNodeKeys(newPeerNodeKeys); err != nil {
 			return err
 		}
 	}
 	if newThreshold != nil && *newThreshold < 1 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
-	if len(newPeerIDs) > 0 && newThreshold != nil && uint32(len(newPeerIDs)) < *newThreshold {
+	if len(newPeerNodeKeys) > 0 && newThreshold != nil && uint32(len(newPeerNodeKeys)) < *newThreshold {
 		return errorsmod.Wrapf(
 			types.ErrInvalidRing,
-			"new_peer_ids count (%d) is less than new_threshold (%d)",
-			len(newPeerIDs),
+			"new_peer_node_keys count (%d) is less than new_threshold (%d)",
+			len(newPeerNodeKeys),
 			*newThreshold,
 		)
 	}
@@ -99,34 +99,20 @@ func validatePeerNodeKeyFormat(key string) error {
 	return nil
 }
 
-// validateUniquePeerIDs is kept for new_peer_ids (reshare flow, out of scope for node key migration).
-func validateUniquePeerIDs(peerIDs []string, fieldName string) error {
-	seen := make(map[string]struct{}, len(peerIDs))
-	for _, id := range peerIDs {
-		if id == "" {
-			return errorsmod.Wrapf(types.ErrInvalidRing, "empty peer id in %s", fieldName)
-		}
-		if _, dup := seen[id]; dup {
-			return errorsmod.Wrapf(types.ErrInvalidRing, "duplicate peer id in %s: %q", fieldName, id)
-		}
-		seen[id] = struct{}{}
-	}
-	return nil
-}
 
 func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	finalized := *currentRing
-	if len(finalized.NewPeerIds) == 0 && finalized.XNewThreshold == nil {
-		return nil, errorsmod.Wrap(types.ErrInvalidRing, "missing new_peer_ids or new_threshold for reshare finalization")
+	if len(finalized.NewPeerNodeKeys) == 0 && finalized.XNewThreshold == nil {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "missing new_peer_node_keys or new_threshold for reshare finalization")
 	}
 
-	if len(finalized.NewPeerIds) > 0 {
-		finalized.PeerNodeKeys = append([]string(nil), finalized.NewPeerIds...)
+	if len(finalized.NewPeerNodeKeys) > 0 {
+		finalized.PeerNodeKeys = append([]string(nil), finalized.NewPeerNodeKeys...)
 	}
 	if finalized.XNewThreshold != nil {
 		finalized.Threshold = finalized.GetNewThreshold()
 	}
-	finalized.NewPeerIds = nil
+	finalized.NewPeerNodeKeys = nil
 	finalized.XNewThreshold = nil
 
 	if err := validateRing(&finalized); err != nil {
