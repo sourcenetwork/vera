@@ -34,9 +34,21 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
+	modulePolicyId, err := k.EnsurePolicy(ctx)
+	if err != nil {
+		return nil, err
+	}
+	allowed, err := hasCreateRingPermission(goCtx, k, modulePolicyId, namespaceID, creatorDID)
+	if err != nil {
+		return nil, err
+	}
+	if !allowed {
+		return nil, types.ErrInvalidRingCreator
+	}
+
 	pssInterval := optionalCreateRingPSSInterval(msg)
 
-	ringID := types.GenerateRingID(namespaceID, msg.RingPk, msg.PeerIds, msg.Threshold, pssInterval, msg.PolicyId)
+	ringID := types.GenerateRingID(namespaceID, msg.PeerIds, msg.Threshold, pssInterval, msg.PolicyId)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -45,7 +57,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		Id:               ringID,
 		Namespace:        namespaceID,
 		CreatorDid:       creatorDID,
-		RingPk:           msg.RingPk,
 		PeerIds:          append([]string(nil), msg.PeerIds...),
 		Threshold:        msg.Threshold,
 		PolicyId:         msg.PolicyId,
@@ -68,6 +79,40 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	}
 
 	return &types.MsgCreateRingResponse{RingId: ringID}, nil
+}
+
+func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing) (*types.MsgFinalizeRingResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if ring.RingPk != "" {
+		return nil, types.ErrRingAlreadyFinalized
+	}
+
+	finalizerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	ring.RingPk = msg.RingPk
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		Namespace:  ring.Namespace,
+		RingId:     ring.Id,
+		UpdaterDid: finalizerDID,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgFinalizeRingResponse{}, nil
 }
 
 func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRingByAcp) (*types.MsgUpdateRingByAcpResponse, error) {

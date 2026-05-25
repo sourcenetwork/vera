@@ -15,8 +15,6 @@ func validateRing(ring *types.Ring) error {
 		return types.ErrInvalidRingId
 	case ring.Namespace == "":
 		return types.ErrInvalidNamespaceId
-	case ring.RingPk == "":
-		return errorsmod.Wrap(types.ErrInvalidRing, "missing ring_pk")
 	case len(ring.PeerIds) == 0:
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing peer_ids")
 	case ring.Threshold == 0 || int(ring.Threshold) > len(ring.PeerIds):

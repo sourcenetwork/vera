@@ -9,8 +9,12 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/stretchr/testify/require"
 
+	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	keepertestutil "github.com/sourcenetwork/sourcehub/testutil/keeper"
+	"github.com/sourcenetwork/sourcehub/x/acp/capability"
+	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/sourcehub/x/orbis/keeper"
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
@@ -23,18 +27,17 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	creator := testAddress()
 	namespace := "vault"
 	namespaceID := types.GetNamespaceID(namespace)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
 	pssInterval := uint64(600)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:   creator,
 		Namespace: namespace,
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
 		Threshold: 2,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
-		PolicyId: "policy-ring",
 		Artifact: "ring-artifact",
 	})
 	require.NoError(t, err)
@@ -43,22 +46,35 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.NotNil(t, ring)
 	require.Equal(t, namespaceID, ring.Namespace)
 	require.Equal(t, testDID, ring.CreatorDid)
-	require.Equal(t, "ring-pk", ring.RingPk)
+	require.Empty(t, ring.RingPk)
 	require.Equal(t, []string{"peer-1", "peer-2", "peer-3"}, ring.PeerIds)
 	require.Equal(t, uint32(2), ring.Threshold)
 	require.NotNil(t, ring.XPssInterval)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: creator,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.NoError(t, err)
+	require.Equal(t, "ring-pk", k.GetRing(ctx, createRingResp.RingId).RingPk)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: creator,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk-2",
+	})
+	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
+
 	_, err = k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:   creator,
 		Namespace: namespace,
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
 		Threshold: 2,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
-		PolicyId: "policy-ring",
 	})
 	require.ErrorIs(t, err, types.ErrRingAlreadyExists)
 
@@ -132,18 +148,18 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	creator := testAddress()
 	namespace := "vault"
 	namespaceID := types.GetNamespaceID(namespace)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:   creator,
 		Namespace: namespace,
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2"},
 		Threshold: 1,
 	})
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID(namespaceID, "ring-pk", []string{"peer-1", "peer-2"}, 1, nil, ""),
+		types.GenerateRingID(namespaceID, []string{"peer-1", "peer-2"}, 1, nil, ""),
 		createRingResp.RingId,
 	)
 
@@ -172,12 +188,12 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	creator := testAddress()
 	namespace := "vault"
 	namespaceID := types.GetNamespaceID(namespace)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
 	pssInterval := uint64(0)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:   creator,
 		Namespace: namespace,
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2"},
 		Threshold: 1,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
@@ -187,7 +203,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID(namespaceID, "ring-pk", []string{"peer-1", "peer-2"}, 1, &pssInterval, ""),
+		types.GenerateRingID(namespaceID, []string{"peer-1", "peer-2"}, 1, &pssInterval, ""),
 		createRingResp.RingId,
 	)
 
@@ -201,10 +217,12 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	k, ctx := keepertestutil.OrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
+	creator := testAddress()
+	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creator)
+
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   testAddress(),
+		Creator:   creator,
 		Namespace: "vault",
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2"},
 		Threshold: 1,
 	})
@@ -225,10 +243,12 @@ func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
 	k, ctx := keepertestutil.OrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
+	creator := testAddress()
+	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creator)
+
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   testAddress(),
+		Creator:   creator,
 		Namespace: "vault",
-		RingPk:    "ring-pk",
 		PeerIds:   []string{"peer-1", "peer-2"},
 		Threshold: 1,
 	})
@@ -427,6 +447,28 @@ func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
 
 func testAddress() string {
 	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
+}
+
+// setupNamespaceWithMember creates the orbis module policy, registers namespaceID as an object,
+// and grants actorDID the member relation so CreateRing passes the ACP check.
+func setupNamespaceWithMember(t *testing.T, k keeper.Keeper, ctx sdk.Context, namespaceID, actorDID, signerAddr string) {
+	t.Helper()
+
+	policyId, err := k.EnsurePolicy(ctx)
+	require.NoError(t, err)
+
+	manager := capability.NewPolicyCapabilityManager(k.GetScopedKeeper())
+	polCap, err := manager.Fetch(ctx, policyId)
+	require.NoError(t, err)
+
+	registerCmd := acptypes.NewRegisterObjectCmd(coretypes.NewObject(types.NamespaceResource, namespaceID))
+	_, err = k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, registerCmd, actorDID, signerAddr)
+	require.NoError(t, err)
+
+	memberRel := coretypes.NewActorRelationship(types.NamespaceResource, namespaceID, "member", actorDID)
+	setRelCmd := acptypes.NewSetRelationshipCmd(memberRel)
+	_, err = k.GetAcpKeeper().ModulePolicyCmdForActorDID(ctx, polCap, setRelCmd, actorDID, signerAddr)
+	require.NoError(t, err)
 }
 
 // testAccountWithPubKey creates a secp256k1 keypair, registers the account in the auth keeper,

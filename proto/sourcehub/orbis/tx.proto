@@ -17,6 +17,7 @@ service Msg {
   // UpdateParams defines a governance operation for updating module parameters.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
+  rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
   rpc UpdateRingByAcp(MsgUpdateRingByAcp) returns (MsgUpdateRingByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
@@ -45,7 +46,6 @@ message MsgCreateRing {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string namespace = 2;
-  string ring_pk = 3;
   repeated string peer_ids = 4;
   uint32 threshold = 5;
   // Absent means automatic PSS refresh is disabled.
@@ -57,6 +57,15 @@ message MsgCreateRing {
 message MsgCreateRingResponse {
   string ring_id = 1;
 }
+
+message MsgFinalizeRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string ring_pk = 3;
+}
+
+message MsgFinalizeRingResponse {}
 
 message MsgUpdateRingByAcp {
   option (cosmos.msg.v1.signer) = "creator";

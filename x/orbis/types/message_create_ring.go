@@ -8,11 +8,10 @@ import (
 
 var _ sdk.Msg = &MsgCreateRing{}
 
-func NewMsgCreateRing(creator, namespace, ringPK string, peerIDs []string, threshold uint32) *MsgCreateRing {
+func NewMsgCreateRing(creator, namespace string, peerIDs []string, threshold uint32) *MsgCreateRing {
 	return &MsgCreateRing{
 		Creator:   creator,
 		Namespace: namespace,
-		RingPk:    ringPK,
 		PeerIds:   peerIDs,
 		Threshold: threshold,
 	}
@@ -24,9 +23,6 @@ func (msg *MsgCreateRing) ValidateBasic() error {
 	}
 	if msg.Namespace == "" {
 		return ErrInvalidNamespaceId
-	}
-	if msg.RingPk == "" {
-		return errorsmod.Wrap(ErrInvalidRing, "missing ring_pk")
 	}
 	if len(msg.PeerIds) == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "missing peer_ids")

@@ -74,6 +74,7 @@ import (
 	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
 	hubkeeper "github.com/sourcenetwork/sourcehub/x/hub/keeper"
 	orbiskeeper "github.com/sourcenetwork/sourcehub/x/orbis/keeper"
+	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
@@ -321,6 +322,10 @@ func New(
 	// Initialize capability keeper for the bulletin module
 	bulletinKeeper := app.GetCapabilityScopedKeeper(bulletintypes.ModuleName)
 	app.BulletinKeeper.InitializeCapabilityKeeper(&bulletinKeeper)
+
+	// Initialize capability keeper for the orbis module
+	orbisCapKeeper := app.GetCapabilityScopedKeeper(orbistypes.ModuleName)
+	app.OrbisKeeper.InitializeCapabilityKeeper(&orbisCapKeeper)
 
 	// Register streaming services
 	if err := app.RegisterStreamingServices(appOpts, app.kvStoreKeys()); err != nil {

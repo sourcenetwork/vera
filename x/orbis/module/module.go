@@ -149,6 +149,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		authority.String(),
 		in.AccountKeeper,
 		in.AcpKeeper,
+		nil,
 	)
 	m := NewAppModule(in.Cdc, &k)
 
