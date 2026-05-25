@@ -279,6 +279,49 @@ func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrDuplicateConfirmation)
 }
 
+func TestMsgServer_RingNotFinalizedGuard(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespaceID := types.GetNamespaceID("vault")
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+	})
+	require.NoError(t, err)
+	ringID := createRingResp.RingId
+
+	_, err = k.StoreDocument(ctx, &types.MsgStoreDocument{
+		Creator:    creatorAddr,
+		Namespace:  "vault",
+		RingId:     ringID,
+		Document:   "ciphertext",
+		Proof:      "proof",
+		PolicyId:   "p",
+		Resource:   "r",
+		Permission: "read",
+	})
+	require.ErrorIs(t, err, types.ErrRingNotFinalized)
+
+	_, err = k.StoreKeyDerivation(ctx, &types.MsgStoreKeyDerivation{
+		Creator:    creatorAddr,
+		Namespace:  "vault",
+		RingId:     ringID,
+		Derivation: "m/0/1",
+		PolicyId:   "p",
+		Resource:   "r",
+		Permission: "derive",
+	})
+	require.ErrorIs(t, err, types.ErrRingNotFinalized)
+}
+
 func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
@@ -288,7 +331,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	namespaceID := types.GetNamespaceID(namespace)
 	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
 
-	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -303,6 +346,13 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 		types.GenerateRingID(namespaceID, []string{peer1Key, peer2Key}, 1, nil, ""),
 		createRingResp.RingId,
 	)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer1Addr,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.NoError(t, err)
 
 	storeDocumentResp, err := k.StoreDocument(ctx, &types.MsgStoreDocument{
 		Creator:    creatorAddr,
@@ -364,7 +414,7 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creatorAddr)
 
-	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -375,12 +425,19 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer1Addr,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.NoError(t, err)
+
 	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 	_, peer4Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer4")
 	outsiderAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator:        outsiderAddr,
-		RingId:         createRingResp.RingId,
+		Creator:         outsiderAddr,
+		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key, peer4Key},
 		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
 			NewThreshold: 1,

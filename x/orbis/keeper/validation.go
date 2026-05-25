@@ -9,6 +9,13 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
+func requireRingFinalized(ring *types.Ring) error {
+	if ring.RingPk == "" {
+		return types.ErrRingNotFinalized
+	}
+	return nil
+}
+
 func validateRing(ring *types.Ring) error {
 	switch {
 	case ring.Id == "":

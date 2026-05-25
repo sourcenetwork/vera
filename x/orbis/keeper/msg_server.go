@@ -175,6 +175,9 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	if ring == nil {
 		return nil, types.ErrRingNotFound
 	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
 	if ring.PolicyId == "" {
 		return nil, types.ErrRingMissingPolicyId
 	}
@@ -280,8 +283,12 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceID := namespaceID(msg.Namespace)
-	if k.GetRing(goCtx, msg.RingId) == nil {
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
 		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
 	}
 
 	creatorDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
@@ -427,8 +434,12 @@ func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKe
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	namespaceID := namespaceID(msg.Namespace)
-	if k.GetRing(goCtx, msg.RingId) == nil {
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
 		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
 	}
 
 	creatorDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)

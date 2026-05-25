@@ -33,4 +33,5 @@ var (
 	ErrInvalidRingFinalizer    = sdkerrors.Register(ModuleName, 1226, "tx signer is not a member of the ring's peer set")
 	ErrDuplicateConfirmation   = sdkerrors.Register(ModuleName, 1227, "node has already submitted a finalize confirmation")
 	ErrRingPkConflict          = sdkerrors.Register(ModuleName, 1228, "submitted ring_pk conflicts with existing confirmation; ring deleted")
+	ErrRingNotFinalized        = sdkerrors.Register(ModuleName, 1229, "ring is not finalized")
 )
