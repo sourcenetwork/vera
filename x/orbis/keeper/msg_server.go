@@ -113,12 +113,44 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, types.ErrInvalidRingFinalizer
 	}
 
+	// Check for a conflicting ring_pk from a prior confirmation.
+	for _, c := range ring.Confirmations {
+		if c.RingPk != msg.RingPk {
+			_ = ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
+				Namespace: ring.Namespace,
+				RingId:    ring.Id,
+				Reason:    "ring_pk_conflict",
+			})
+			k.DeleteRing(goCtx, ring.Id)
+			return nil, types.ErrRingPkConflict
+		}
+	}
+
+	// Reject double confirmations from the same node.
+	for _, c := range ring.Confirmations {
+		if c.NodeKey == signerKey {
+			return nil, types.ErrDuplicateConfirmation
+		}
+	}
+
+	ring.Confirmations = append(ring.Confirmations, &types.RingConfirmation{
+		NodeKey: signerKey,
+		RingPk:  msg.RingPk,
+	})
+
+	if len(ring.Confirmations) < int(ring.Threshold) {
+		k.SetRing(goCtx, *ring)
+		return &types.MsgFinalizeRingResponse{}, nil
+	}
+
+	// Threshold reached — finalize.
 	finalizerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
 
 	ring.RingPk = msg.RingPk
+	ring.Confirmations = nil
 	if err := validateRing(ring); err != nil {
 		return nil, err
 	}

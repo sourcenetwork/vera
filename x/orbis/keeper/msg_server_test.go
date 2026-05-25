@@ -31,7 +31,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 
 	pssInterval := uint64(600)
@@ -57,8 +57,18 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.NotNil(t, ring.XPssInterval)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 
+	// peer1 submits first confirmation; threshold=2 so not finalized yet
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
 		Creator: peer1Addr,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.NoError(t, err)
+	require.Empty(t, k.GetRing(ctx, createRingResp.RingId).RingPk)
+
+	// peer2 submits second confirmation; threshold met → finalized
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer2Addr,
 		RingId:  createRingResp.RingId,
 		RingPk:  "ring-pk",
 	})
@@ -172,6 +182,101 @@ func TestMsgServer_FinalizeRing_UnauthorizedNonPeer(t *testing.T) {
 		RingPk:  "ring-pk",
 	})
 	require.ErrorIs(t, err, types.ErrInvalidRingFinalizer)
+}
+
+func TestMsgServer_FinalizeRing_ThresholdRequiresMultiple(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespaceID := types.GetNamespaceID("vault")
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key, peer3Key},
+		Threshold:    2,
+	})
+	require.NoError(t, err)
+	ringID := createRingResp.RingId
+
+	// first confirmation — not finalized yet
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "agreed-pk"})
+	require.NoError(t, err)
+	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
+	require.Len(t, k.GetRing(ctx, ringID).Confirmations, 1)
+
+	// second confirmation — threshold=2 met → finalized, confirmations cleared
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "agreed-pk"})
+	require.NoError(t, err)
+	ring := k.GetRing(ctx, ringID)
+	require.Equal(t, "agreed-pk", ring.RingPk)
+	require.Empty(t, ring.Confirmations)
+
+	// third peer cannot confirm a finalized ring
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: ringID, RingPk: "agreed-pk"})
+	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
+}
+
+func TestMsgServer_FinalizeRing_PkConflictDeletesRing(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespaceID := types.GetNamespaceID("vault")
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+	})
+	require.NoError(t, err)
+	ringID := createRingResp.RingId
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "pk-version-A"})
+	require.NoError(t, err)
+
+	// peer2 disagrees on the ring_pk → conflict, ring deleted
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "pk-version-B"})
+	require.ErrorIs(t, err, types.ErrRingPkConflict)
+	require.Nil(t, k.GetRing(ctx, ringID))
+}
+
+func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespaceID := types.GetNamespaceID("vault")
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+	})
+	require.NoError(t, err)
+	ringID := createRingResp.RingId
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "ring-pk"})
+	require.ErrorIs(t, err, types.ErrDuplicateConfirmation)
 }
 
 func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {

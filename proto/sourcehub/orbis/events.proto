@@ -44,3 +44,10 @@ message EventNodeInfoUpdated {
   string peer_id = 1;
   string controller_key = 2;
 }
+
+// EventRingDeleted is emitted when a ring is removed from state.
+message EventRingDeleted {
+  string namespace = 1;
+  string ring_id   = 2;
+  string reason    = 3;
+}

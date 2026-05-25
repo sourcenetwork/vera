@@ -3236,6 +3236,554 @@ func (x *fastReflection_EventNodeInfoUpdated) ProtoMethods() *protoiface.Methods
 	}
 }
 
+var (
+	md_EventRingDeleted           protoreflect.MessageDescriptor
+	fd_EventRingDeleted_namespace protoreflect.FieldDescriptor
+	fd_EventRingDeleted_ring_id   protoreflect.FieldDescriptor
+	fd_EventRingDeleted_reason    protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_sourcehub_orbis_events_proto_init()
+	md_EventRingDeleted = File_sourcehub_orbis_events_proto.Messages().ByName("EventRingDeleted")
+	fd_EventRingDeleted_namespace = md_EventRingDeleted.Fields().ByName("namespace")
+	fd_EventRingDeleted_ring_id = md_EventRingDeleted.Fields().ByName("ring_id")
+	fd_EventRingDeleted_reason = md_EventRingDeleted.Fields().ByName("reason")
+}
+
+var _ protoreflect.Message = (*fastReflection_EventRingDeleted)(nil)
+
+type fastReflection_EventRingDeleted EventRingDeleted
+
+func (x *EventRingDeleted) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_EventRingDeleted)(x)
+}
+
+func (x *EventRingDeleted) slowProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_events_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_EventRingDeleted_messageType fastReflection_EventRingDeleted_messageType
+var _ protoreflect.MessageType = fastReflection_EventRingDeleted_messageType{}
+
+type fastReflection_EventRingDeleted_messageType struct{}
+
+func (x fastReflection_EventRingDeleted_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_EventRingDeleted)(nil)
+}
+func (x fastReflection_EventRingDeleted_messageType) New() protoreflect.Message {
+	return new(fastReflection_EventRingDeleted)
+}
+func (x fastReflection_EventRingDeleted_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_EventRingDeleted
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_EventRingDeleted) Descriptor() protoreflect.MessageDescriptor {
+	return md_EventRingDeleted
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_EventRingDeleted) Type() protoreflect.MessageType {
+	return _fastReflection_EventRingDeleted_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_EventRingDeleted) New() protoreflect.Message {
+	return new(fastReflection_EventRingDeleted)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_EventRingDeleted) Interface() protoreflect.ProtoMessage {
+	return (*EventRingDeleted)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_EventRingDeleted) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Namespace != "" {
+		value := protoreflect.ValueOfString(x.Namespace)
+		if !f(fd_EventRingDeleted_namespace, value) {
+			return
+		}
+	}
+	if x.RingId != "" {
+		value := protoreflect.ValueOfString(x.RingId)
+		if !f(fd_EventRingDeleted_ring_id, value) {
+			return
+		}
+	}
+	if x.Reason != "" {
+		value := protoreflect.ValueOfString(x.Reason)
+		if !f(fd_EventRingDeleted_reason, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_EventRingDeleted) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		return x.Namespace != ""
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		return x.RingId != ""
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		return x.Reason != ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_EventRingDeleted) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		x.Namespace = ""
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		x.RingId = ""
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		x.Reason = ""
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_EventRingDeleted) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		value := x.Namespace
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		value := x.RingId
+		return protoreflect.ValueOfString(value)
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		value := x.Reason
+		return protoreflect.ValueOfString(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_EventRingDeleted) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		x.Namespace = value.Interface().(string)
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		x.RingId = value.Interface().(string)
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		x.Reason = value.Interface().(string)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_EventRingDeleted) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		panic(fmt.Errorf("field namespace of message sourcehub.orbis.EventRingDeleted is not mutable"))
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		panic(fmt.Errorf("field ring_id of message sourcehub.orbis.EventRingDeleted is not mutable"))
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		panic(fmt.Errorf("field reason of message sourcehub.orbis.EventRingDeleted is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_EventRingDeleted) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "sourcehub.orbis.EventRingDeleted.namespace":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.orbis.EventRingDeleted.ring_id":
+		return protoreflect.ValueOfString("")
+	case "sourcehub.orbis.EventRingDeleted.reason":
+		return protoreflect.ValueOfString("")
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingDeleted"))
+		}
+		panic(fmt.Errorf("message sourcehub.orbis.EventRingDeleted does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_EventRingDeleted) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in sourcehub.orbis.EventRingDeleted", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_EventRingDeleted) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_EventRingDeleted) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_EventRingDeleted) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_EventRingDeleted) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*EventRingDeleted)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.Namespace)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.RingId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.Reason)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*EventRingDeleted)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.Reason) > 0 {
+			i -= len(x.Reason)
+			copy(dAtA[i:], x.Reason)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Reason)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.RingId) > 0 {
+			i -= len(x.RingId)
+			copy(dAtA[i:], x.RingId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RingId)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.Namespace) > 0 {
+			i -= len(x.Namespace)
+			copy(dAtA[i:], x.Namespace)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.Namespace)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*EventRingDeleted)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventRingDeleted: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: EventRingDeleted: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Namespace = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.RingId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.Reason = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -3553,6 +4101,58 @@ func (x *EventNodeInfoUpdated) GetControllerKey() string {
 	return ""
 }
 
+// EventRingDeleted is emitted when a ring is removed from state.
+type EventRingDeleted struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	RingId    string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Reason    string `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+}
+
+func (x *EventRingDeleted) Reset() {
+	*x = EventRingDeleted{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_sourcehub_orbis_events_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *EventRingDeleted) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EventRingDeleted) ProtoMessage() {}
+
+// Deprecated: Use EventRingDeleted.ProtoReflect.Descriptor instead.
+func (*EventRingDeleted) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_events_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *EventRingDeleted) GetNamespace() string {
+	if x != nil {
+		return x.Namespace
+	}
+	return ""
+}
+
+func (x *EventRingDeleted) GetRingId() string {
+	if x != nil {
+		return x.RingId
+	}
+	return ""
+}
+
+func (x *EventRingDeleted) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
 var File_sourcehub_orbis_events_proto protoreflect.FileDescriptor
 
 var file_sourcehub_orbis_events_proto_rawDesc = []byte{
@@ -3601,17 +4201,24 @@ var file_sourcehub_orbis_events_proto_rawDesc = []byte{
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x70, 0x65, 0x65, 0x72, 0x49, 0x64, 0x12, 0x25, 0x0a, 0x0e,
 	0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x63, 0x6f, 0x6e, 0x74, 0x72, 0x6f, 0x6c, 0x6c, 0x65, 0x72,
-	0x4b, 0x65, 0x79, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0b, 0x45, 0x76, 0x65,
-	0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d,
-	0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x53,
-	0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f,
-	0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68,
-	0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
-	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62,
-	0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x4b, 0x65, 0x79, 0x22, 0x61, 0x0a, 0x10, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67,
+	0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x6e, 0x61, 0x6d, 0x65, 0x73,
+	0x70, 0x61, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6e, 0x61, 0x6d, 0x65,
+	0x73, 0x70, 0x61, 0x63, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x16,
+	0x0a, 0x06, 0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x72, 0x65, 0x61, 0x73, 0x6f, 0x6e, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0b,
+	0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63,
+	0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2,
+	0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d,
+	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -3626,7 +4233,7 @@ func file_sourcehub_orbis_events_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_events_proto_rawDescData
 }
 
-var file_sourcehub_orbis_events_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_sourcehub_orbis_events_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_sourcehub_orbis_events_proto_goTypes = []interface{}{
 	(*EventRingCreated)(nil),         // 0: sourcehub.orbis.EventRingCreated
 	(*EventRingUpdated)(nil),         // 1: sourcehub.orbis.EventRingUpdated
@@ -3634,6 +4241,7 @@ var file_sourcehub_orbis_events_proto_goTypes = []interface{}{
 	(*EventKeyDerivationStored)(nil), // 3: sourcehub.orbis.EventKeyDerivationStored
 	(*EventNodeInfoCreated)(nil),     // 4: sourcehub.orbis.EventNodeInfoCreated
 	(*EventNodeInfoUpdated)(nil),     // 5: sourcehub.orbis.EventNodeInfoUpdated
+	(*EventRingDeleted)(nil),         // 6: sourcehub.orbis.EventRingDeleted
 }
 var file_sourcehub_orbis_events_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -3721,6 +4329,18 @@ func file_sourcehub_orbis_events_proto_init() {
 				return nil
 			}
 		}
+		file_sourcehub_orbis_events_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*EventRingDeleted); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -3728,7 +4348,7 @@ func file_sourcehub_orbis_events_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_sourcehub_orbis_events_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

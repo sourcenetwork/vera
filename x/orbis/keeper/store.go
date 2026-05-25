@@ -31,6 +31,12 @@ func (k *Keeper) GetRing(ctx context.Context, ringID string) *types.Ring {
 	return &ring
 }
 
+func (k *Keeper) DeleteRing(ctx context.Context, ringID string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.RingKeyPrefix))
+	store.Delete([]byte(ringID))
+}
+
 func (k *Keeper) GetAllRings(ctx sdk.Context) []types.Ring {
 	var rings []types.Ring
 	k.mustIterateRings(ctx, func(ring types.Ring) {

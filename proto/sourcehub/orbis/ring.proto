@@ -18,4 +18,11 @@ message Ring {
   optional uint64 pss_interval = 9;
   uint64 block_number_nonce = 10;
   string policy_id = 11;
+  repeated RingConfirmation confirmations = 12;
+}
+
+// RingConfirmation records a single peer's agreement on the ring public key.
+message RingConfirmation {
+  string node_key = 1;
+  string ring_pk  = 2;
 }
