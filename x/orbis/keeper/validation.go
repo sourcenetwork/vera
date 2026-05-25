@@ -1,6 +1,9 @@
 package keeper
 
 import (
+	"encoding/hex"
+	"strings"
+
 	errorsmod "cosmossdk.io/errors"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
@@ -136,6 +139,24 @@ func validateKeyDerivation(keyDerivation *types.KeyDerivation) error {
 		return errorsmod.Wrap(types.ErrInvalidKeyDerivation, "missing derivation")
 	case keyDerivation.PolicyId == "" || keyDerivation.Resource == "" || keyDerivation.Permission == "":
 		return errorsmod.Wrap(types.ErrInvalidKeyDerivation, "missing policy binding")
+	}
+	return nil
+}
+
+// secp256k1 compressed public key length in bytes
+const compressedPubKeyLen = 33
+
+func validateNodeInfo(nodeInfo *types.NodeInfo) error {
+	switch {
+	case nodeInfo.PeerId == "":
+		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
+	case nodeInfo.ControllerKey == "":
+		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
+	}
+	keyHex := strings.TrimPrefix(nodeInfo.ControllerKey, "0x")
+	decoded, err := hex.DecodeString(keyHex)
+	if err != nil || len(decoded) != compressedPubKeyLen {
+		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "invalid controller_key encoding")
 	}
 	return nil
 }

@@ -26,6 +26,7 @@ const (
 	Query_Documents_FullMethodName      = "/sourcehub.orbis.Query/Documents"
 	Query_KeyDerivation_FullMethodName  = "/sourcehub.orbis.Query/KeyDerivation"
 	Query_KeyDerivations_FullMethodName = "/sourcehub.orbis.Query/KeyDerivations"
+	Query_NodeInfo_FullMethodName       = "/sourcehub.orbis.Query/NodeInfo"
 )
 
 // QueryClient is the client API for Query service.
@@ -48,6 +49,8 @@ type QueryClient interface {
 	KeyDerivation(ctx context.Context, in *QueryKeyDerivationRequest, opts ...grpc.CallOption) (*QueryKeyDerivationResponse, error)
 	// KeyDerivations queries key derivations within a namespace.
 	KeyDerivations(ctx context.Context, in *QueryKeyDerivationsRequest, opts ...grpc.CallOption) (*QueryKeyDerivationsResponse, error)
+	// NodeInfo queries node info by node key.
+	NodeInfo(ctx context.Context, in *QueryNodeInfoRequest, opts ...grpc.CallOption) (*QueryNodeInfoResponse, error)
 }
 
 type queryClient struct {
@@ -128,6 +131,16 @@ func (c *queryClient) KeyDerivations(ctx context.Context, in *QueryKeyDerivation
 	return out, nil
 }
 
+func (c *queryClient) NodeInfo(ctx context.Context, in *QueryNodeInfoRequest, opts ...grpc.CallOption) (*QueryNodeInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryNodeInfoResponse)
+	err := c.cc.Invoke(ctx, Query_NodeInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -148,6 +161,8 @@ type QueryServer interface {
 	KeyDerivation(context.Context, *QueryKeyDerivationRequest) (*QueryKeyDerivationResponse, error)
 	// KeyDerivations queries key derivations within a namespace.
 	KeyDerivations(context.Context, *QueryKeyDerivationsRequest) (*QueryKeyDerivationsResponse, error)
+	// NodeInfo queries node info by node key.
+	NodeInfo(context.Context, *QueryNodeInfoRequest) (*QueryNodeInfoResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -178,6 +193,9 @@ func (UnimplementedQueryServer) KeyDerivation(context.Context, *QueryKeyDerivati
 }
 func (UnimplementedQueryServer) KeyDerivations(context.Context, *QueryKeyDerivationsRequest) (*QueryKeyDerivationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method KeyDerivations not implemented")
+}
+func (UnimplementedQueryServer) NodeInfo(context.Context, *QueryNodeInfoRequest) (*QueryNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NodeInfo not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -326,6 +344,24 @@ func _Query_KeyDerivations_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_NodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryNodeInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).NodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_NodeInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).NodeInfo(ctx, req.(*QueryNodeInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -360,6 +396,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "KeyDerivations",
 			Handler:    _Query_KeyDerivations_Handler,
+		},
+		{
+			MethodName: "NodeInfo",
+			Handler:    _Query_NodeInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

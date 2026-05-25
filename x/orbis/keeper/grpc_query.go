@@ -130,6 +130,19 @@ func (k *Keeper) KeyDerivation(ctx context.Context, req *types.QueryKeyDerivatio
 	return &types.QueryKeyDerivationResponse{KeyDerivation: keyDerivation}, nil
 }
 
+func (k *Keeper) NodeInfo(ctx context.Context, req *types.QueryNodeInfoRequest) (*types.QueryNodeInfoResponse, error) {
+	if req == nil || req.NodeKey == "" {
+		return nil, status.Error(codes.InvalidArgument, "node_key is required")
+	}
+
+	nodeInfo := k.GetNodeInfo(ctx, req.NodeKey)
+	if nodeInfo == nil {
+		return nil, status.Error(codes.NotFound, types.ErrNodeInfoNotFound.Error())
+	}
+
+	return &types.QueryNodeInfoResponse{NodeInfo: nodeInfo}, nil
+}
+
 func (k *Keeper) KeyDerivations(ctx context.Context, req *types.QueryKeyDerivationsRequest) (*types.QueryKeyDerivationsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

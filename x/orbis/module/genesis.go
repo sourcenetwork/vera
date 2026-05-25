@@ -22,6 +22,11 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 	for _, keyDerivation := range genState.KeyDerivations {
 		k.SetKeyDerivation(ctx, keyDerivation)
 	}
+	for _, entry := range genState.NodeInfos {
+		if entry.NodeInfo != nil {
+			k.SetNodeInfo(ctx, entry.NodeKey, *entry.NodeInfo)
+		}
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -31,5 +36,6 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper) *types.GenesisState {
 	genesis.Rings = k.GetAllRings(ctx)
 	genesis.Documents = k.GetAllDocuments(ctx)
 	genesis.KeyDerivations = k.GetAllKeyDerivations(ctx)
+	genesis.NodeInfos = k.GetAllNodeInfos(ctx)
 	return genesis
 }

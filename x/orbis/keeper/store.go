@@ -133,3 +133,44 @@ func (k *Keeper) mustIterateKeyDerivations(ctx context.Context, cb func(keyDeriv
 		cb(keyDerivation)
 	}
 }
+
+func (k *Keeper) SetNodeInfo(ctx context.Context, nodeKey string, nodeInfo types.NodeInfo) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeInfoKeyPrefix))
+	bz := k.cdc.MustMarshal(&nodeInfo)
+	store.Set([]byte(nodeKey), bz)
+}
+
+func (k *Keeper) GetNodeInfo(ctx context.Context, nodeKey string) *types.NodeInfo {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeInfoKeyPrefix))
+	bz := store.Get([]byte(nodeKey))
+	if bz == nil {
+		return nil
+	}
+
+	var nodeInfo types.NodeInfo
+	k.cdc.MustUnmarshal(bz, &nodeInfo)
+	return &nodeInfo
+}
+
+func (k *Keeper) GetAllNodeInfos(ctx context.Context) []types.NodeInfoEntry {
+	var entries []types.NodeInfoEntry
+	k.mustIterateNodeInfos(ctx, func(nodeKey string, nodeInfo types.NodeInfo) {
+		entries = append(entries, types.NodeInfoEntry{NodeKey: nodeKey, NodeInfo: &nodeInfo})
+	})
+	return entries
+}
+
+func (k *Keeper) mustIterateNodeInfos(ctx context.Context, cb func(nodeKey string, nodeInfo types.NodeInfo)) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeInfoKeyPrefix))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var nodeInfo types.NodeInfo
+		k.cdc.MustUnmarshal(iterator.Value(), &nodeInfo)
+		cb(string(iterator.Key()), nodeInfo)
+	}
+}

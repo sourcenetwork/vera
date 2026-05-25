@@ -1009,6 +1009,286 @@ func (m *MsgStoreKeyDerivationResponse) GetKeyDerivationId() string {
 	return ""
 }
 
+type MsgCreateNodeInfo struct {
+	Creator               string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PeerId                string   `protobuf:"bytes,2,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	ControllerKey         string   `protobuf:"bytes,3,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
+	WhitelistedNamespaces []string `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
+	WhitelistedRingIds    []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+}
+
+func (m *MsgCreateNodeInfo) Reset()         { *m = MsgCreateNodeInfo{} }
+func (m *MsgCreateNodeInfo) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateNodeInfo) ProtoMessage()    {}
+func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{13}
+}
+func (m *MsgCreateNodeInfo) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateNodeInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateNodeInfo.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateNodeInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateNodeInfo.Merge(m, src)
+}
+func (m *MsgCreateNodeInfo) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateNodeInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateNodeInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateNodeInfo proto.InternalMessageInfo
+
+func (m *MsgCreateNodeInfo) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCreateNodeInfo) GetPeerId() string {
+	if m != nil {
+		return m.PeerId
+	}
+	return ""
+}
+
+func (m *MsgCreateNodeInfo) GetControllerKey() string {
+	if m != nil {
+		return m.ControllerKey
+	}
+	return ""
+}
+
+func (m *MsgCreateNodeInfo) GetWhitelistedNamespaces() []string {
+	if m != nil {
+		return m.WhitelistedNamespaces
+	}
+	return nil
+}
+
+func (m *MsgCreateNodeInfo) GetWhitelistedRingIds() []string {
+	if m != nil {
+		return m.WhitelistedRingIds
+	}
+	return nil
+}
+
+type MsgCreateNodeInfoResponse struct {
+}
+
+func (m *MsgCreateNodeInfoResponse) Reset()         { *m = MsgCreateNodeInfoResponse{} }
+func (m *MsgCreateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateNodeInfoResponse) ProtoMessage()    {}
+func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{14}
+}
+func (m *MsgCreateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateNodeInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateNodeInfoResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateNodeInfoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateNodeInfoResponse.Merge(m, src)
+}
+func (m *MsgCreateNodeInfoResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateNodeInfoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateNodeInfoResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateNodeInfoResponse proto.InternalMessageInfo
+
+type MsgUpdateNodeInfo struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	NodeKey string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	// Types that are valid to be assigned to XPeerId:
+	//
+	//	*MsgUpdateNodeInfo_PeerId
+	XPeerId               isMsgUpdateNodeInfo_XPeerId `protobuf_oneof:"_peer_id"`
+	WhitelistedNamespaces []string                    `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
+	WhitelistedRingIds    []string                    `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	// Types that are valid to be assigned to XControllerKey:
+	//
+	//	*MsgUpdateNodeInfo_ControllerKey
+	XControllerKey isMsgUpdateNodeInfo_XControllerKey `protobuf_oneof:"_controller_key"`
+}
+
+func (m *MsgUpdateNodeInfo) Reset()         { *m = MsgUpdateNodeInfo{} }
+func (m *MsgUpdateNodeInfo) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateNodeInfo) ProtoMessage()    {}
+func (*MsgUpdateNodeInfo) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{15}
+}
+func (m *MsgUpdateNodeInfo) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateNodeInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateNodeInfo.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateNodeInfo) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateNodeInfo.Merge(m, src)
+}
+func (m *MsgUpdateNodeInfo) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateNodeInfo) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateNodeInfo.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateNodeInfo proto.InternalMessageInfo
+
+type isMsgUpdateNodeInfo_XPeerId interface {
+	isMsgUpdateNodeInfo_XPeerId()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+type isMsgUpdateNodeInfo_XControllerKey interface {
+	isMsgUpdateNodeInfo_XControllerKey()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type MsgUpdateNodeInfo_PeerId struct {
+	PeerId string `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
+}
+type MsgUpdateNodeInfo_ControllerKey struct {
+	ControllerKey string `protobuf:"bytes,6,opt,name=controller_key,json=controllerKey,proto3,oneof" json:"controller_key,omitempty"`
+}
+
+func (*MsgUpdateNodeInfo_PeerId) isMsgUpdateNodeInfo_XPeerId()               {}
+func (*MsgUpdateNodeInfo_ControllerKey) isMsgUpdateNodeInfo_XControllerKey() {}
+
+func (m *MsgUpdateNodeInfo) GetXPeerId() isMsgUpdateNodeInfo_XPeerId {
+	if m != nil {
+		return m.XPeerId
+	}
+	return nil
+}
+func (m *MsgUpdateNodeInfo) GetXControllerKey() isMsgUpdateNodeInfo_XControllerKey {
+	if m != nil {
+		return m.XControllerKey
+	}
+	return nil
+}
+
+func (m *MsgUpdateNodeInfo) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgUpdateNodeInfo) GetNodeKey() string {
+	if m != nil {
+		return m.NodeKey
+	}
+	return ""
+}
+
+func (m *MsgUpdateNodeInfo) GetPeerId() string {
+	if x, ok := m.GetXPeerId().(*MsgUpdateNodeInfo_PeerId); ok {
+		return x.PeerId
+	}
+	return ""
+}
+
+func (m *MsgUpdateNodeInfo) GetWhitelistedNamespaces() []string {
+	if m != nil {
+		return m.WhitelistedNamespaces
+	}
+	return nil
+}
+
+func (m *MsgUpdateNodeInfo) GetWhitelistedRingIds() []string {
+	if m != nil {
+		return m.WhitelistedRingIds
+	}
+	return nil
+}
+
+func (m *MsgUpdateNodeInfo) GetControllerKey() string {
+	if x, ok := m.GetXControllerKey().(*MsgUpdateNodeInfo_ControllerKey); ok {
+		return x.ControllerKey
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*MsgUpdateNodeInfo) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*MsgUpdateNodeInfo_PeerId)(nil),
+		(*MsgUpdateNodeInfo_ControllerKey)(nil),
+	}
+}
+
+type MsgUpdateNodeInfoResponse struct {
+}
+
+func (m *MsgUpdateNodeInfoResponse) Reset()         { *m = MsgUpdateNodeInfoResponse{} }
+func (m *MsgUpdateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateNodeInfoResponse) ProtoMessage()    {}
+func (*MsgUpdateNodeInfoResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{16}
+}
+func (m *MsgUpdateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateNodeInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateNodeInfoResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateNodeInfoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateNodeInfoResponse.Merge(m, src)
+}
+func (m *MsgUpdateNodeInfoResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateNodeInfoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateNodeInfoResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateNodeInfoResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "sourcehub.orbis.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "sourcehub.orbis.MsgUpdateParamsResponse")
@@ -1023,82 +1303,98 @@ func init() {
 	proto.RegisterType((*MsgStoreDocumentResponse)(nil), "sourcehub.orbis.MsgStoreDocumentResponse")
 	proto.RegisterType((*MsgStoreKeyDerivation)(nil), "sourcehub.orbis.MsgStoreKeyDerivation")
 	proto.RegisterType((*MsgStoreKeyDerivationResponse)(nil), "sourcehub.orbis.MsgStoreKeyDerivationResponse")
+	proto.RegisterType((*MsgCreateNodeInfo)(nil), "sourcehub.orbis.MsgCreateNodeInfo")
+	proto.RegisterType((*MsgCreateNodeInfoResponse)(nil), "sourcehub.orbis.MsgCreateNodeInfoResponse")
+	proto.RegisterType((*MsgUpdateNodeInfo)(nil), "sourcehub.orbis.MsgUpdateNodeInfo")
+	proto.RegisterType((*MsgUpdateNodeInfoResponse)(nil), "sourcehub.orbis.MsgUpdateNodeInfoResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/orbis/tx.proto", fileDescriptor_7711ae63507074e0) }
 
 var fileDescriptor_7711ae63507074e0 = []byte{
-	// 1115 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x56, 0xcf, 0x6f, 0x1b, 0x45,
-	0x14, 0xf6, 0x26, 0xb1, 0x1d, 0xbf, 0x3a, 0x38, 0xdd, 0xb6, 0x64, 0xb3, 0x04, 0xd7, 0x31, 0x52,
-	0x70, 0x03, 0xd8, 0x25, 0x94, 0x1e, 0xd2, 0x53, 0xdd, 0x08, 0xc5, 0x54, 0xa9, 0xa2, 0x4d, 0xb9,
-	0x54, 0x42, 0xab, 0xcd, 0xee, 0x64, 0x3d, 0xb2, 0x77, 0x67, 0x35, 0x33, 0x4e, 0x6a, 0x4e, 0x88,
-	0x13, 0xe2, 0xc4, 0x95, 0x0b, 0x67, 0x24, 0x2e, 0x41, 0x42, 0x5c, 0xf8, 0x07, 0x7a, 0xa3, 0xe2,
-	0xc4, 0x09, 0xa1, 0xe4, 0x90, 0x0b, 0x12, 0xff, 0x02, 0x9a, 0xd9, 0x5f, 0xde, 0x75, 0x92, 0x46,
-	0x94, 0x4b, 0xe2, 0xf7, 0x7d, 0xef, 0xbd, 0x79, 0xef, 0x9b, 0x7d, 0x6f, 0x17, 0x34, 0x46, 0x46,
-	0xd4, 0x46, 0xfd, 0xd1, 0x7e, 0x87, 0xd0, 0x7d, 0xcc, 0x3a, 0xfc, 0x79, 0x3b, 0xa0, 0x84, 0x13,
-	0xb5, 0x96, 0x30, 0x6d, 0xc9, 0xe8, 0xd7, 0x2d, 0x0f, 0xfb, 0xa4, 0x23, 0xff, 0x86, 0x3e, 0xfa,
-	0x92, 0x4d, 0x98, 0x47, 0x58, 0xc7, 0x63, 0x6e, 0xe7, 0xf0, 0x43, 0xf1, 0x2f, 0x22, 0x96, 0x43,
-	0xc2, 0x94, 0x56, 0x27, 0x34, 0x22, 0xea, 0xa6, 0x4b, 0x5c, 0x12, 0xe2, 0xe2, 0x57, 0x84, 0xae,
-	0xe4, 0xeb, 0x08, 0x2c, 0x6a, 0x79, 0x51, 0x4c, 0xf3, 0x57, 0x05, 0x6a, 0x3b, 0xcc, 0xfd, 0x2c,
-	0x70, 0x2c, 0x8e, 0x76, 0x25, 0xa3, 0xde, 0x87, 0x8a, 0x35, 0xe2, 0x7d, 0x42, 0x31, 0x1f, 0x6b,
-	0x4a, 0x43, 0x69, 0x55, 0xba, 0xda, 0xef, 0x3f, 0x7f, 0x70, 0x33, 0x3a, 0xec, 0xa1, 0xe3, 0x50,
-	0xc4, 0xd8, 0x1e, 0xa7, 0xd8, 0x77, 0x8d, 0xd4, 0x55, 0xdd, 0x84, 0x52, 0x98, 0x5b, 0x9b, 0x69,
-	0x28, 0xad, 0x6b, 0x1b, 0x4b, 0xed, 0x5c, 0xa3, 0xed, 0xf0, 0x80, 0x6e, 0xe5, 0xc5, 0x9f, 0xb7,
-	0x0b, 0x3f, 0x9c, 0x1d, 0xaf, 0x2b, 0x46, 0x14, 0xb1, 0x79, 0xef, 0xab, 0xb3, 0xe3, 0xf5, 0x34,
-	0xd7, 0x37, 0x67, 0xc7, 0xeb, 0xab, 0x69, 0xe1, 0xcf, 0xa3, 0xd2, 0x73, 0x95, 0x36, 0x97, 0x61,
-	0x29, 0x07, 0x19, 0x88, 0x05, 0xc4, 0x67, 0xa8, 0xf9, 0xdd, 0x0c, 0x2c, 0xec, 0x30, 0xf7, 0x11,
-	0x45, 0x16, 0x47, 0x06, 0xf6, 0x5d, 0x55, 0x83, 0xb2, 0x2d, 0x2c, 0x42, 0xc3, 0xa6, 0x8c, 0xd8,
-	0x54, 0x57, 0xa0, 0xe2, 0x5b, 0x1e, 0x62, 0x81, 0x65, 0x23, 0x59, 0x7b, 0xc5, 0x48, 0x01, 0x75,
-	0x09, 0xca, 0xa2, 0x53, 0x33, 0x18, 0x68, 0xb3, 0x92, 0x2b, 0x09, 0x73, 0x77, 0xa0, 0x2e, 0xc3,
-	0x7c, 0x80, 0x10, 0x35, 0xb1, 0xc3, 0xb4, 0xb9, 0xc6, 0xac, 0xc8, 0x28, 0xec, 0x9e, 0xc3, 0x44,
-	0x46, 0xde, 0xa7, 0x88, 0xf5, 0xc9, 0xd0, 0xd1, 0x8a, 0x0d, 0xa5, 0xb5, 0x60, 0xa4, 0x80, 0xba,
-	0x06, 0xd5, 0x80, 0x31, 0x13, 0xfb, 0x1c, 0xd1, 0x43, 0x6b, 0xa8, 0x95, 0x1a, 0x4a, 0x6b, 0x6e,
-	0xbb, 0x60, 0x5c, 0x0b, 0x18, 0xeb, 0x45, 0xe0, 0xd7, 0x8a, 0xa2, 0xbe, 0x05, 0x95, 0x80, 0x0c,
-	0xb1, 0x3d, 0x36, 0xb1, 0xa3, 0x95, 0xe5, 0xd9, 0xf3, 0x21, 0xd0, 0x73, 0x54, 0x1d, 0xe6, 0x2d,
-	0xca, 0xf1, 0x81, 0x65, 0x73, 0x6d, 0x3e, 0xe4, 0x62, 0x7b, 0xb3, 0x2a, 0xd4, 0x8c, 0xdb, 0xeb,
-	0xd6, 0x60, 0xc1, 0x9c, 0x3c, 0xaf, 0x79, 0x17, 0x6e, 0x65, 0xa4, 0x89, 0x45, 0x4b, 0x5a, 0xc5,
-	0x4e, 0x24, 0x91, 0x6c, 0xb5, 0xe7, 0x34, 0xff, 0x56, 0x40, 0x4d, 0x94, 0x16, 0x21, 0xdd, 0xf1,
-	0x43, 0x3b, 0xb8, 0x44, 0xd2, 0x89, 0x4c, 0x33, 0x93, 0x99, 0xd4, 0x06, 0x54, 0x7d, 0x74, 0x64,
-	0x26, 0xc2, 0xcd, 0x4a, 0xe1, 0xc0, 0x47, 0x47, 0xbb, 0x91, 0x76, 0x2d, 0x58, 0x10, 0x1e, 0xa9,
-	0x7e, 0x73, 0x42, 0xbf, 0xed, 0x82, 0x21, 0x02, 0x9f, 0xc6, 0xa8, 0xd0, 0x27, 0xaf, 0x63, 0x51,
-	0xea, 0xa8, 0xe4, 0x75, 0xcc, 0xc9, 0xb1, 0x08, 0x6f, 0x98, 0x99, 0x03, 0xa6, 0x05, 0x5a, 0x01,
-	0x7d, 0xba, 0xdb, 0xe4, 0xd1, 0xfa, 0x45, 0x81, 0xf5, 0x1d, 0xe6, 0x7e, 0x82, 0x7d, 0x6b, 0x88,
-	0xbf, 0x88, 0x15, 0xec, 0x5b, 0x14, 0x75, 0xc7, 0x49, 0x7d, 0x7b, 0xd8, 0xf5, 0x2d, 0x3e, 0xa2,
-	0xe8, 0xbf, 0x88, 0x74, 0x07, 0x16, 0x59, 0x1c, 0x6f, 0x32, 0xbb, 0x8f, 0x3c, 0x14, 0x3d, 0x7b,
-	0xb5, 0x04, 0xdf, 0x93, 0xb0, 0x78, 0xd2, 0x12, 0x48, 0x2a, 0x55, 0x35, 0x52, 0x20, 0xdb, 0x79,
-	0xf3, 0x1e, 0x6c, 0x5c, 0xbd, 0xee, 0xa4, 0xdd, 0x9f, 0x66, 0x40, 0x9f, 0xf0, 0x8d, 0xc3, 0x85,
-	0xe3, 0x16, 0xb1, 0xd5, 0x37, 0xa1, 0xe4, 0x10, 0xcf, 0xc2, 0x7e, 0xfc, 0xc8, 0x84, 0x96, 0x98,
-	0x0e, 0xbb, 0x6f, 0x61, 0x3f, 0xed, 0xae, 0x2c, 0xed, 0x9e, 0x93, 0x9d, 0xb7, 0xd9, 0x8b, 0xe6,
-	0x0d, 0x87, 0x37, 0x9f, 0xaa, 0x32, 0x31, 0x88, 0xc5, 0xcc, 0x20, 0xb6, 0xe1, 0x86, 0x3d, 0xa2,
-	0x14, 0xf9, 0xdc, 0x94, 0x0e, 0xac, 0x6f, 0x6d, 0x7c, 0x7c, 0x5f, 0x8e, 0x55, 0xd5, 0xb8, 0x1e,
-	0x51, 0xa2, 0x85, 0x3d, 0x49, 0xa8, 0x1b, 0x70, 0xeb, 0x20, 0xea, 0xc2, 0xc9, 0x44, 0x94, 0x65,
-	0xc4, 0x8d, 0x84, 0x9c, 0x88, 0x79, 0x1f, 0xd4, 0xfd, 0x21, 0xb1, 0x07, 0xa6, 0x3f, 0xf2, 0xf6,
-	0x11, 0x35, 0x7d, 0xe2, 0xdb, 0x48, 0x0e, 0xde, 0x9c, 0xb1, 0x28, 0x99, 0x27, 0x92, 0x78, 0x22,
-	0xf0, 0xe6, 0x6f, 0x33, 0xb0, 0xb8, 0xc3, 0xdc, 0x3d, 0x4e, 0x28, 0xda, 0x22, 0xf6, 0xc8, 0x43,
-	0x3e, 0x7f, 0xed, 0x05, 0x84, 0x9d, 0xc9, 0x05, 0x14, 0xae, 0x00, 0x27, 0x4a, 0x1e, 0x49, 0x95,
-	0xd8, 0xea, 0x4d, 0x28, 0x06, 0x94, 0x90, 0x83, 0x48, 0xaa, 0xd0, 0xc8, 0x6e, 0x94, 0xd2, 0xf4,
-	0x46, 0xa1, 0x28, 0x5c, 0xba, 0xf1, 0xb6, 0x89, 0x6d, 0xb5, 0x0e, 0x10, 0x20, 0xea, 0x61, 0xc6,
-	0x30, 0xf1, 0xa3, 0x7d, 0x33, 0x81, 0xa8, 0x4b, 0x30, 0xc7, 0x31, 0xa2, 0x5a, 0x45, 0x30, 0xdb,
-	0x05, 0x43, 0x5a, 0x62, 0x46, 0x57, 0xa1, 0xc2, 0xb1, 0x87, 0x18, 0xb7, 0xbc, 0x40, 0x83, 0x68,
-	0x40, 0x53, 0x68, 0x7a, 0x3c, 0xcb, 0x50, 0x34, 0x45, 0x70, 0xb7, 0x0a, 0x60, 0x26, 0x7e, 0xcd,
-	0x07, 0xa0, 0xe5, 0x05, 0x4d, 0xd6, 0xd6, 0x6d, 0xb8, 0x16, 0xf7, 0x9d, 0xae, 0x2e, 0x88, 0xa1,
-	0x9e, 0xd3, 0xfc, 0x47, 0x91, 0x1b, 0x4f, 0x46, 0x3f, 0x46, 0xe3, 0x2d, 0x44, 0xf1, 0xa1, 0xc5,
-	0x45, 0xdd, 0xff, 0xfb, 0x9d, 0xd4, 0x01, 0x9c, 0x24, 0x7d, 0x74, 0x2b, 0x13, 0x48, 0xf6, 0x06,
-	0x8a, 0x97, 0xdc, 0x40, 0xe9, 0xd2, 0x1b, 0x28, 0xe7, 0x6f, 0x20, 0x37, 0xea, 0x8f, 0xe1, 0xed,
-	0x73, 0x1b, 0x4e, 0x34, 0x5b, 0x87, 0xeb, 0x03, 0x34, 0x36, 0xd3, 0xca, 0x52, 0xe5, 0x6a, 0x83,
-	0xc9, 0x88, 0x9e, 0xb3, 0xf1, 0x7d, 0x11, 0x66, 0x77, 0x98, 0xab, 0x3e, 0x83, 0x6a, 0xe6, 0x43,
-	0xa1, 0x31, 0xf5, 0x82, 0xcf, 0xbd, 0x8d, 0xf5, 0xd6, 0xab, 0x3c, 0x92, 0x7a, 0x9e, 0x02, 0x4c,
-	0xbc, 0xab, 0xeb, 0xe7, 0xc5, 0xa5, 0xbc, 0xbe, 0x76, 0x39, 0x9f, 0x64, 0xb5, 0xa1, 0x96, 0x7f,
-	0x67, 0xbd, 0x73, 0x71, 0x49, 0x89, 0x93, 0xfe, 0xde, 0x15, 0x9c, 0x92, 0x43, 0x7e, 0x54, 0xe0,
-	0xdd, 0xab, 0xbe, 0x0c, 0x1e, 0x9c, 0x97, 0xf8, 0x8a, 0xc1, 0xfa, 0xa3, 0xd7, 0x08, 0x4e, 0xaa,
-	0xfd, 0x1c, 0x16, 0xb2, 0x6b, 0x69, 0xf5, 0xbc, 0xac, 0x19, 0x17, 0xfd, 0xce, 0x2b, 0x5d, 0x92,
-	0xf4, 0x43, 0x50, 0xcf, 0x19, 0xb3, 0xb5, 0x0b, 0x13, 0x64, 0xfc, 0xf4, 0xf6, 0xd5, 0xfc, 0xe2,
-	0xd3, 0xf4, 0xe2, 0x97, 0xe2, 0x2b, 0xb2, 0xfb, 0xe9, 0x8b, 0x93, 0xba, 0xf2, 0xf2, 0xa4, 0xae,
-	0xfc, 0x75, 0x52, 0x57, 0xbe, 0x3d, 0xad, 0x17, 0x5e, 0x9e, 0xd6, 0x0b, 0x7f, 0x9c, 0xd6, 0x0b,
-	0xcf, 0xee, 0xba, 0x98, 0x8b, 0x64, 0x36, 0xf1, 0x3a, 0x61, 0x6a, 0x1f, 0xf1, 0x23, 0x42, 0x07,
-	0x9d, 0xe9, 0xaf, 0x4b, 0x3e, 0x0e, 0x10, 0xdb, 0x2f, 0xc9, 0x0f, 0xe3, 0x8f, 0xfe, 0x0d, 0x00,
-	0x00, 0xff, 0xff, 0xc6, 0x2e, 0x0e, 0xcb, 0xc0, 0x0b, 0x00, 0x00,
+	// 1303 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
+	0x14, 0xf7, 0x26, 0xb1, 0x1d, 0xbf, 0x3a, 0x75, 0xb2, 0x4d, 0x9b, 0x8d, 0x1b, 0x5c, 0xd7, 0x88,
+	0x92, 0x1a, 0x88, 0x4b, 0x68, 0x7b, 0x68, 0x4f, 0x75, 0x2b, 0x14, 0x53, 0x25, 0xaa, 0x36, 0xe5,
+	0x52, 0x09, 0x2d, 0x9b, 0xdd, 0x89, 0x3d, 0xb2, 0x77, 0x67, 0x35, 0xb3, 0x6e, 0x6a, 0x4e, 0x88,
+	0x13, 0xe2, 0xc4, 0x95, 0x6f, 0x50, 0x89, 0x4b, 0x91, 0x10, 0x17, 0xbe, 0x40, 0x6f, 0x54, 0x9c,
+	0x38, 0x21, 0x94, 0x22, 0xf5, 0x82, 0xc4, 0x57, 0x40, 0x33, 0x3b, 0x3b, 0xfb, 0xc7, 0x49, 0x1a,
+	0x51, 0xc4, 0x25, 0xf1, 0xfb, 0xff, 0xde, 0xef, 0xcd, 0x7b, 0x33, 0x0b, 0x06, 0x23, 0x63, 0xea,
+	0xa0, 0xc1, 0x78, 0xaf, 0x43, 0xe8, 0x1e, 0x66, 0x9d, 0xf0, 0xc9, 0x46, 0x40, 0x49, 0x48, 0xf4,
+	0x9a, 0x92, 0x6c, 0x08, 0x49, 0x7d, 0xc9, 0xf6, 0xb0, 0x4f, 0x3a, 0xe2, 0x6f, 0xa4, 0x53, 0x5f,
+	0x71, 0x08, 0xf3, 0x08, 0xeb, 0x78, 0xac, 0xdf, 0x79, 0xfc, 0x21, 0xff, 0x27, 0x05, 0xab, 0x91,
+	0xc0, 0x12, 0x54, 0x27, 0x22, 0xa4, 0x68, 0xb9, 0x4f, 0xfa, 0x24, 0xe2, 0xf3, 0x5f, 0x92, 0xbb,
+	0x96, 0xcf, 0x23, 0xb0, 0xa9, 0xed, 0x49, 0x9b, 0xd6, 0xcf, 0x1a, 0xd4, 0xb6, 0x59, 0xff, 0xd3,
+	0xc0, 0xb5, 0x43, 0xf4, 0x40, 0x48, 0xf4, 0x9b, 0x50, 0xb1, 0xc7, 0xe1, 0x80, 0x50, 0x1c, 0x4e,
+	0x0c, 0xad, 0xa9, 0xad, 0x57, 0xba, 0xc6, 0xaf, 0x3f, 0x7e, 0xb0, 0x2c, 0x83, 0xdd, 0x71, 0x5d,
+	0x8a, 0x18, 0xdb, 0x0d, 0x29, 0xf6, 0xfb, 0x66, 0xa2, 0xaa, 0xdf, 0x82, 0x52, 0xe4, 0xdb, 0x98,
+	0x69, 0x6a, 0xeb, 0x67, 0x36, 0x57, 0x36, 0x72, 0x85, 0x6e, 0x44, 0x01, 0xba, 0x95, 0xe7, 0xbf,
+	0x5f, 0x2a, 0x3c, 0x7d, 0xf5, 0xac, 0xad, 0x99, 0xd2, 0xe2, 0xd6, 0xf5, 0xaf, 0x5e, 0x3d, 0x6b,
+	0x27, 0xbe, 0xbe, 0x79, 0xf5, 0xac, 0x7d, 0x39, 0x49, 0xfc, 0x89, 0x4c, 0x3d, 0x97, 0x69, 0x6b,
+	0x15, 0x56, 0x72, 0x2c, 0x13, 0xb1, 0x80, 0xf8, 0x0c, 0xb5, 0xbe, 0x9b, 0x81, 0x85, 0x6d, 0xd6,
+	0xbf, 0x4b, 0x91, 0x1d, 0x22, 0x13, 0xfb, 0x7d, 0xdd, 0x80, 0xb2, 0xc3, 0x29, 0x42, 0xa3, 0xa2,
+	0xcc, 0x98, 0xd4, 0xd7, 0xa0, 0xe2, 0xdb, 0x1e, 0x62, 0x81, 0xed, 0x20, 0x91, 0x7b, 0xc5, 0x4c,
+	0x18, 0xfa, 0x0a, 0x94, 0x79, 0xa5, 0x56, 0x30, 0x34, 0x66, 0x85, 0xac, 0xc4, 0xc9, 0x07, 0x43,
+	0x7d, 0x15, 0xe6, 0x03, 0x84, 0xa8, 0x85, 0x5d, 0x66, 0xcc, 0x35, 0x67, 0xb9, 0x47, 0x4e, 0xf7,
+	0x5c, 0xc6, 0x3d, 0x86, 0x03, 0x8a, 0xd8, 0x80, 0x8c, 0x5c, 0xa3, 0xd8, 0xd4, 0xd6, 0x17, 0xcc,
+	0x84, 0xa1, 0x5f, 0x81, 0x6a, 0xc0, 0x98, 0x85, 0xfd, 0x10, 0xd1, 0xc7, 0xf6, 0xc8, 0x28, 0x35,
+	0xb5, 0xf5, 0xb9, 0xad, 0x82, 0x79, 0x26, 0x60, 0xac, 0x27, 0x99, 0x5f, 0x6b, 0x9a, 0x7e, 0x11,
+	0x2a, 0x01, 0x19, 0x61, 0x67, 0x62, 0x61, 0xd7, 0x28, 0x8b, 0xd8, 0xf3, 0x11, 0xa3, 0xe7, 0xea,
+	0x75, 0x98, 0xb7, 0x69, 0x88, 0xf7, 0x6d, 0x27, 0x34, 0xe6, 0x23, 0x59, 0x4c, 0xdf, 0xaa, 0x72,
+	0x34, 0xe3, 0xf2, 0xba, 0x35, 0x58, 0xb0, 0xd2, 0xf1, 0x5a, 0xd7, 0xe0, 0x7c, 0x06, 0x9a, 0x18,
+	0x34, 0x55, 0x2a, 0x76, 0x25, 0x44, 0xa2, 0xd4, 0x9e, 0xdb, 0xfa, 0x4b, 0x03, 0x5d, 0x21, 0xcd,
+	0x4d, 0xba, 0x93, 0x3b, 0x4e, 0x70, 0x02, 0xa4, 0x29, 0x4f, 0x33, 0x69, 0x4f, 0x7a, 0x13, 0xaa,
+	0x3e, 0x3a, 0xb0, 0x14, 0x70, 0xb3, 0x02, 0x38, 0xf0, 0xd1, 0xc1, 0x03, 0x89, 0xdd, 0x3a, 0x2c,
+	0x70, 0x8d, 0x04, 0xbf, 0x39, 0x8e, 0xdf, 0x56, 0xc1, 0xe4, 0x86, 0x0f, 0x63, 0x2e, 0xc7, 0x27,
+	0x8f, 0x63, 0x51, 0xe0, 0xa8, 0xe5, 0x71, 0xcc, 0xc1, 0xb1, 0x08, 0x67, 0xad, 0x4c, 0x80, 0x69,
+	0x80, 0xd6, 0xa0, 0x3e, 0x5d, 0xad, 0x3a, 0x5a, 0x3f, 0x69, 0xd0, 0xde, 0x66, 0xfd, 0x8f, 0xb1,
+	0x6f, 0x8f, 0xf0, 0x17, 0x31, 0x82, 0x03, 0x9b, 0xa2, 0xee, 0x44, 0xe5, 0xb7, 0x8b, 0xfb, 0xbe,
+	0x1d, 0x8e, 0x29, 0xfa, 0x37, 0x20, 0x5d, 0x85, 0x45, 0x16, 0xdb, 0x5b, 0xcc, 0x19, 0x20, 0x0f,
+	0xc9, 0xb3, 0x57, 0x53, 0xfc, 0x5d, 0xc1, 0xe6, 0x27, 0x4d, 0xb1, 0x04, 0x52, 0x55, 0x33, 0x61,
+	0x64, 0x2b, 0x6f, 0x5d, 0x87, 0xcd, 0xd3, 0xe7, 0xad, 0xca, 0xfd, 0x61, 0x06, 0xea, 0x29, 0xdd,
+	0xd8, 0x9c, 0x2b, 0xde, 0x23, 0x8e, 0x7e, 0x01, 0x4a, 0x2e, 0xf1, 0x6c, 0xec, 0xc7, 0x47, 0x26,
+	0xa2, 0xf8, 0x74, 0x38, 0x03, 0x1b, 0xfb, 0x49, 0x75, 0x65, 0x41, 0xf7, 0xdc, 0xec, 0xbc, 0xcd,
+	0x1e, 0x37, 0x6f, 0x38, 0xea, 0x7c, 0x82, 0x4a, 0x6a, 0x10, 0x8b, 0x99, 0x41, 0xdc, 0x80, 0x73,
+	0xce, 0x98, 0x52, 0xe4, 0x87, 0x96, 0x50, 0x60, 0x03, 0x7b, 0xf3, 0xc6, 0x4d, 0x31, 0x56, 0x55,
+	0x73, 0x49, 0x8a, 0x78, 0x09, 0xbb, 0x42, 0xa0, 0x6f, 0xc2, 0xf9, 0x7d, 0x59, 0x85, 0x9b, 0xb1,
+	0x28, 0x0b, 0x8b, 0x73, 0x4a, 0x98, 0xb2, 0x79, 0x1f, 0xf4, 0xbd, 0x11, 0x71, 0x86, 0x96, 0x3f,
+	0xf6, 0xf6, 0x10, 0xb5, 0x7c, 0xe2, 0x3b, 0x48, 0x0c, 0xde, 0x9c, 0xb9, 0x28, 0x24, 0x3b, 0x42,
+	0xb0, 0xc3, 0xf9, 0xad, 0x5f, 0x66, 0x60, 0x71, 0x9b, 0xf5, 0x77, 0x43, 0x42, 0xd1, 0x3d, 0xe2,
+	0x8c, 0x3d, 0xe4, 0x87, 0x6f, 0xbc, 0x80, 0xb0, 0x9b, 0x5e, 0x40, 0xd1, 0x0a, 0x70, 0xa5, 0x73,
+	0x09, 0x95, 0xa2, 0xf5, 0x65, 0x28, 0x06, 0x94, 0x90, 0x7d, 0x09, 0x55, 0x44, 0x64, 0x37, 0x4a,
+	0x69, 0x7a, 0xa3, 0x50, 0x14, 0x2d, 0xdd, 0x78, 0xdb, 0xc4, 0xb4, 0xde, 0x00, 0x08, 0x10, 0xf5,
+	0x30, 0x63, 0x98, 0xf8, 0x72, 0xdf, 0xa4, 0x38, 0xfa, 0x0a, 0xcc, 0x85, 0x18, 0x51, 0xa3, 0xc2,
+	0x25, 0x5b, 0x05, 0x53, 0x50, 0x7c, 0x46, 0x2f, 0x43, 0x25, 0xc4, 0x1e, 0x62, 0xa1, 0xed, 0x05,
+	0x06, 0xc8, 0x01, 0x4d, 0x58, 0xd3, 0xe3, 0x59, 0x86, 0xa2, 0xc5, 0x8d, 0xbb, 0x55, 0x00, 0x4b,
+	0xe9, 0xb5, 0x6e, 0x83, 0x91, 0x07, 0x54, 0xad, 0xad, 0x4b, 0x70, 0x26, 0xae, 0x3b, 0x59, 0x5d,
+	0x10, 0xb3, 0x7a, 0x6e, 0xeb, 0x6f, 0x4d, 0x6c, 0x3c, 0x61, 0x7d, 0x1f, 0x4d, 0xee, 0x21, 0x8a,
+	0x1f, 0xdb, 0x21, 0xcf, 0xfb, 0x3f, 0xef, 0x49, 0x03, 0xc0, 0x55, 0xee, 0x65, 0x57, 0x52, 0x9c,
+	0x6c, 0x07, 0x8a, 0x27, 0x74, 0xa0, 0x74, 0x62, 0x07, 0xca, 0xf9, 0x0e, 0xe4, 0x46, 0xfd, 0x3e,
+	0xbc, 0x75, 0x64, 0xc1, 0x0a, 0xb3, 0x36, 0x2c, 0x0d, 0xd1, 0xc4, 0x4a, 0x32, 0x4b, 0x90, 0xab,
+	0x0d, 0xd3, 0x16, 0x3d, 0xb7, 0xf5, 0xa7, 0x06, 0x4b, 0xea, 0xc2, 0xd8, 0x21, 0x2e, 0xea, 0xf9,
+	0xfb, 0xe4, 0xe4, 0xbd, 0x26, 0xf7, 0x7b, 0xbc, 0xd7, 0xa2, 0x7b, 0x51, 0x7f, 0x07, 0xce, 0x3a,
+	0xc4, 0x0f, 0x29, 0x19, 0x8d, 0x10, 0xb5, 0x86, 0x68, 0x22, 0xc1, 0x5b, 0x48, 0xb8, 0xf7, 0xd1,
+	0x44, 0xbf, 0x01, 0x17, 0x0e, 0x06, 0x38, 0x44, 0x23, 0xcc, 0x42, 0xe4, 0x5a, 0x0a, 0xf5, 0xf8,
+	0x9a, 0x3d, 0x9f, 0x92, 0xee, 0x28, 0xa1, 0x7e, 0x0d, 0x96, 0xd3, 0x66, 0xb2, 0x3f, 0xcc, 0x28,
+	0x0a, 0x23, 0x3d, 0x25, 0x33, 0x45, 0xaf, 0x58, 0x0e, 0xb3, 0x8b, 0xb0, 0x3a, 0x55, 0xa5, 0xda,
+	0x82, 0x4f, 0x67, 0x04, 0x06, 0xd1, 0x9d, 0x70, 0x0a, 0x0c, 0x56, 0x61, 0xde, 0x27, 0x2e, 0x12,
+	0x45, 0xca, 0xf5, 0xc7, 0x69, 0x5e, 0xde, 0x5a, 0x02, 0xcf, 0xac, 0x1c, 0x17, 0x09, 0x10, 0x1f,
+	0x98, 0xff, 0xab, 0x78, 0xbd, 0x3d, 0xd5, 0x0c, 0x71, 0xe4, 0xb6, 0xb4, 0x5c, 0x3b, 0xa6, 0x47,
+	0x14, 0x60, 0x3e, 0xbe, 0xc0, 0xbb, 0x4b, 0x50, 0xb3, 0xb2, 0x6e, 0x24, 0x8e, 0x59, 0xa4, 0x62,
+	0x1c, 0x37, 0x0f, 0x4b, 0x30, 0xbb, 0xcd, 0xfa, 0xfa, 0x23, 0xa8, 0x66, 0x1e, 0x9d, 0xcd, 0xa9,
+	0xc7, 0x62, 0xee, 0x65, 0x57, 0x5f, 0x7f, 0x9d, 0x86, 0x3a, 0xdb, 0x0f, 0x01, 0x52, 0xef, 0xbe,
+	0xc6, 0x51, 0x76, 0x89, 0xbc, 0x7e, 0xe5, 0x64, 0xb9, 0xf2, 0xea, 0x40, 0x2d, 0xff, 0xfe, 0x79,
+	0xfb, 0xf8, 0x94, 0x94, 0x52, 0xfd, 0xbd, 0x53, 0x28, 0xa9, 0x20, 0xdf, 0x6b, 0xf0, 0xee, 0x69,
+	0x1f, 0x16, 0xb7, 0x8f, 0x72, 0x7c, 0x4a, 0xe3, 0xfa, 0xdd, 0x37, 0x30, 0x56, 0xd9, 0x7e, 0x06,
+	0x0b, 0xd9, 0x2b, 0xee, 0xf2, 0x51, 0x5e, 0x33, 0x2a, 0xf5, 0xab, 0xaf, 0x55, 0x51, 0xee, 0x47,
+	0xa0, 0x1f, 0xb1, 0xb2, 0xaf, 0x1c, 0xeb, 0x20, 0xa3, 0x57, 0xdf, 0x38, 0x9d, 0x9e, 0x8a, 0xf6,
+	0x39, 0x9c, 0xcd, 0x6d, 0xb8, 0xd6, 0xf1, 0x27, 0x23, 0xd6, 0xa9, 0xb7, 0x5f, 0xaf, 0x93, 0x8e,
+	0x90, 0xdb, 0x1f, 0xad, 0xe3, 0xcf, 0xc6, 0xc9, 0x11, 0x8e, 0x9e, 0xae, 0x7a, 0xf1, 0x4b, 0xfe,
+	0x55, 0xd5, 0xfd, 0xe4, 0xf9, 0x61, 0x43, 0x7b, 0x71, 0xd8, 0xd0, 0xfe, 0x38, 0x6c, 0x68, 0xdf,
+	0xbe, 0x6c, 0x14, 0x5e, 0xbc, 0x6c, 0x14, 0x7e, 0x7b, 0xd9, 0x28, 0x3c, 0xba, 0xd6, 0xc7, 0x21,
+	0x77, 0xe4, 0x10, 0xaf, 0x13, 0xb9, 0xf5, 0x51, 0x78, 0x40, 0xe8, 0xb0, 0x33, 0xfd, 0xb5, 0x15,
+	0x4e, 0x02, 0xc4, 0xf6, 0x4a, 0xe2, 0x43, 0xf1, 0xa3, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x75,
+	0xef, 0x0a, 0xa7, 0xd0, 0x0e, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1120,6 +1416,8 @@ type MsgClient interface {
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDerivation, opts ...grpc.CallOption) (*MsgStoreKeyDerivationResponse, error)
+	CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error)
+	UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error)
 }
 
 type msgClient struct {
@@ -1184,6 +1482,24 @@ func (c *msgClient) StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDeriv
 	return out, nil
 }
 
+func (c *msgClient) CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error) {
+	out := new(MsgCreateNodeInfoResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/CreateNodeInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error) {
+	out := new(MsgUpdateNodeInfoResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/UpdateNodeInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a governance operation for updating module parameters.
@@ -1193,6 +1509,8 @@ type MsgServer interface {
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error)
+	CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error)
+	UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1216,6 +1534,12 @@ func (*UnimplementedMsgServer) StoreDocument(ctx context.Context, req *MsgStoreD
 }
 func (*UnimplementedMsgServer) StoreKeyDerivation(ctx context.Context, req *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreKeyDerivation not implemented")
+}
+func (*UnimplementedMsgServer) CreateNodeInfo(ctx context.Context, req *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateNodeInfo not implemented")
+}
+func (*UnimplementedMsgServer) UpdateNodeInfo(ctx context.Context, req *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeInfo not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1330,6 +1654,42 @@ func _Msg_StoreKeyDerivation_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateNodeInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/CreateNodeInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateNodeInfo(ctx, req.(*MsgCreateNodeInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateNodeInfo)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateNodeInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/UpdateNodeInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateNodeInfo(ctx, req.(*MsgUpdateNodeInfo))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sourcehub.orbis.Msg",
@@ -1358,6 +1718,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StoreKeyDerivation",
 			Handler:    _Msg_StoreKeyDerivation_Handler,
+		},
+		{
+			MethodName: "CreateNodeInfo",
+			Handler:    _Msg_CreateNodeInfo_Handler,
+		},
+		{
+			MethodName: "UpdateNodeInfo",
+			Handler:    _Msg_UpdateNodeInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -2067,6 +2435,215 @@ func (m *MsgStoreKeyDerivationResponse) MarshalToSizedBuffer(dAtA []byte) (int, 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateNodeInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateNodeInfo) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.WhitelistedRingIds) > 0 {
+		for iNdEx := len(m.WhitelistedRingIds) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedRingIds[iNdEx])
+			copy(dAtA[i:], m.WhitelistedRingIds[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedRingIds[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.WhitelistedNamespaces) > 0 {
+		for iNdEx := len(m.WhitelistedNamespaces) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedNamespaces[iNdEx])
+			copy(dAtA[i:], m.WhitelistedNamespaces[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedNamespaces[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ControllerKey) > 0 {
+		i -= len(m.ControllerKey)
+		copy(dAtA[i:], m.ControllerKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerKey)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.PeerId) > 0 {
+		i -= len(m.PeerId)
+		copy(dAtA[i:], m.PeerId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PeerId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateNodeInfoResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateNodeInfoResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateNodeInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateNodeInfo) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateNodeInfo) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XControllerKey != nil {
+		{
+			size := m.XControllerKey.Size()
+			i -= size
+			if _, err := m.XControllerKey.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.WhitelistedRingIds) > 0 {
+		for iNdEx := len(m.WhitelistedRingIds) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedRingIds[iNdEx])
+			copy(dAtA[i:], m.WhitelistedRingIds[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedRingIds[iNdEx])))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.WhitelistedNamespaces) > 0 {
+		for iNdEx := len(m.WhitelistedNamespaces) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedNamespaces[iNdEx])
+			copy(dAtA[i:], m.WhitelistedNamespaces[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedNamespaces[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if m.XPeerId != nil {
+		{
+			size := m.XPeerId.Size()
+			i -= size
+			if _, err := m.XPeerId.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.NodeKey) > 0 {
+		i -= len(m.NodeKey)
+		copy(dAtA[i:], m.NodeKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodeKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateNodeInfo_PeerId) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateNodeInfo_PeerId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.PeerId)
+	copy(dAtA[i:], m.PeerId)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.PeerId)))
+	i--
+	dAtA[i] = 0x1a
+	return len(dAtA) - i, nil
+}
+func (m *MsgUpdateNodeInfo_ControllerKey) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateNodeInfo_ControllerKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.ControllerKey)
+	copy(dAtA[i:], m.ControllerKey)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerKey)))
+	i--
+	dAtA[i] = 0x32
+	return len(dAtA) - i, nil
+}
+func (m *MsgUpdateNodeInfoResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateNodeInfoResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateNodeInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -2421,6 +2998,112 @@ func (m *MsgStoreKeyDerivationResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	return n
+}
+
+func (m *MsgCreateNodeInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.PeerId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ControllerKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.WhitelistedNamespaces) > 0 {
+		for _, s := range m.WhitelistedNamespaces {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.WhitelistedRingIds) > 0 {
+		for _, s := range m.WhitelistedRingIds {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgCreateNodeInfoResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateNodeInfo) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodeKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.XPeerId != nil {
+		n += m.XPeerId.Size()
+	}
+	if len(m.WhitelistedNamespaces) > 0 {
+		for _, s := range m.WhitelistedNamespaces {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.WhitelistedRingIds) > 0 {
+		for _, s := range m.WhitelistedRingIds {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.XControllerKey != nil {
+		n += m.XControllerKey.Size()
+	}
+	return n
+}
+
+func (m *MsgUpdateNodeInfo_PeerId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PeerId)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+func (m *MsgUpdateNodeInfo_ControllerKey) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.ControllerKey)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+func (m *MsgUpdateNodeInfoResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -4496,6 +5179,558 @@ func (m *MsgStoreKeyDerivationResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.KeyDerivationId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateNodeInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateNodeInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateNodeInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PeerId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ControllerKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedNamespaces", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistedNamespaces = append(m.WhitelistedNamespaces, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedRingIds", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistedRingIds = append(m.WhitelistedRingIds, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateNodeInfoResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateNodeInfoResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateNodeInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateNodeInfo: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateNodeInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XPeerId = &MsgUpdateNodeInfo_PeerId{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedNamespaces", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistedNamespaces = append(m.WhitelistedNamespaces, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedRingIds", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistedRingIds = append(m.WhitelistedRingIds, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ControllerKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XControllerKey = &MsgUpdateNodeInfo_ControllerKey{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateNodeInfoResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateNodeInfoResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateNodeInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

@@ -32,3 +32,15 @@ message EventKeyDerivationStored {
   string key_derivation_id = 2;
   string creator_did = 3;
 }
+
+// EventNodeInfoCreated is emitted when a node info record is created.
+message EventNodeInfoCreated {
+  string peer_id = 1;
+  string controller_key = 2;
+}
+
+// EventNodeInfoUpdated is emitted when a node info record is updated.
+message EventNodeInfoUpdated {
+  string peer_id = 1;
+  string controller_key = 2;
+}

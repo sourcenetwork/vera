@@ -21,6 +21,8 @@ service Msg {
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
   rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
+  rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
+  rpc UpdateNodeInfo(MsgUpdateNodeInfo) returns (MsgUpdateNodeInfoResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -124,3 +126,28 @@ message MsgStoreKeyDerivation {
 message MsgStoreKeyDerivationResponse {
   string key_derivation_id = 1;
 }
+
+message MsgCreateNodeInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string peer_id = 2;
+  string controller_key = 3;
+  repeated string whitelisted_namespaces = 4;
+  repeated string whitelisted_ring_ids = 5;
+}
+
+message MsgCreateNodeInfoResponse {}
+
+message MsgUpdateNodeInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  // Absent means no peer_id update.
+  optional string peer_id = 3;
+  repeated string whitelisted_namespaces = 4;
+  repeated string whitelisted_ring_ids = 5;
+  // Absent means no controller_key update.
+  optional string controller_key = 6;
+}
+
+message MsgUpdateNodeInfoResponse {}

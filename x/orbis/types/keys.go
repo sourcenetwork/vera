@@ -17,6 +17,7 @@ const (
 	RingKeyPrefix          = "ring/"
 	DocumentKeyPrefix      = "document/"
 	KeyDerivationKeyPrefix = "key_derivation/"
+	NodeInfoKeyPrefix      = "node_info/"
 
 	NamespaceIDPrefix = "orbis/"
 
