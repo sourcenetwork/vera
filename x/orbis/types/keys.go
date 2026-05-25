@@ -59,10 +59,10 @@ func NamespacePrefix(namespaceID string) []byte {
 }
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
-func GenerateRingID(namespaceID string, peerIDs []string, threshold uint32, pssInterval *uint64, policyID string) string {
+func GenerateRingID(namespaceID string, peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string) string {
 	h := newIDHasher("orbis/ring/v1")
 	h.writeString(namespaceID)
-	h.writeStringSlice(peerIDs)
+	h.writeStringSlice(peerNodeKeys)
 	h.writeUint32(threshold)
 	h.writeOptionalUint64(pssInterval)
 	h.writeString(policyID)

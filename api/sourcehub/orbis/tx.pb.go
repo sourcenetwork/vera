@@ -116,11 +116,11 @@ func (*MsgUpdateParamsResponse) Descriptor() ([]byte, []int) {
 }
 
 type MsgCreateRing struct {
-	state     protoimpl.MessageState `protogen:"open.v1"`
-	Creator   string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Namespace string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	PeerIds   []string               `protobuf:"bytes,4,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
-	Threshold uint32                 `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	Creator      string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Namespace    string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
+	PeerNodeKeys []string               `protobuf:"bytes,4,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold    uint32                 `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
 	// Absent means automatic PSS refresh is disabled.
 	PssInterval   *uint64 `protobuf:"varint,6,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
 	PolicyId      string  `protobuf:"bytes,7,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
@@ -173,9 +173,9 @@ func (x *MsgCreateRing) GetNamespace() string {
 	return ""
 }
 
-func (x *MsgCreateRing) GetPeerIds() []string {
+func (x *MsgCreateRing) GetPeerNodeKeys() []string {
 	if x != nil {
-		return x.PeerIds
+		return x.PeerNodeKeys
 	}
 	return nil
 }
@@ -1206,11 +1206,11 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x12:\n" +
 	"\x06params\x18\x02 \x01(\v2\x17.sourcehub.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:4\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*!sourcehub/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\x80\x02\n" +
+	"\x17MsgUpdateParamsResponse\"\x8b\x02\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x19\n" +
-	"\bpeer_ids\x18\x04 \x03(\tR\apeerIds\x12\x1c\n" +
+	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12$\n" +
+	"\x0epeer_node_keys\x18\x04 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
 	"\tthreshold\x18\x05 \x01(\rR\tthreshold\x12&\n" +
 	"\fpss_interval\x18\x06 \x01(\x04H\x00R\vpssInterval\x88\x01\x01\x12\x1b\n" +
 	"\tpolicy_id\x18\a \x01(\tR\bpolicyId\x12\x1a\n" +

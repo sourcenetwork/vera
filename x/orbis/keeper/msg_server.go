@@ -48,7 +48,13 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 
 	pssInterval := optionalCreateRingPSSInterval(msg)
 
-	ringID := types.GenerateRingID(namespaceID, msg.PeerIds, msg.Threshold, pssInterval, msg.PolicyId)
+	for _, nodeKey := range msg.PeerNodeKeys {
+		if k.GetNodeInfo(goCtx, nodeKey) == nil {
+			return nil, errorsmod.Wrapf(types.ErrInvalidRing, "peer_node_key %q has no registered node info", nodeKey)
+		}
+	}
+
+	ringID := types.GenerateRingID(namespaceID, msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -57,7 +63,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		Id:               ringID,
 		Namespace:        namespaceID,
 		CreatorDid:       creatorDID,
-		PeerIds:          append([]string(nil), msg.PeerIds...),
+		PeerNodeKeys:     append([]string(nil), msg.PeerNodeKeys...),
 		Threshold:        msg.Threshold,
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
@@ -90,6 +96,21 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	}
 	if ring.RingPk != "" {
 		return nil, types.ErrRingAlreadyFinalized
+	}
+
+	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	authorized := false
+	for _, nodeKey := range ring.PeerNodeKeys {
+		if nodeKey == signerKey {
+			authorized = true
+			break
+		}
+	}
+	if !authorized {
+		return nil, types.ErrInvalidRingFinalizer
 	}
 
 	finalizerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)

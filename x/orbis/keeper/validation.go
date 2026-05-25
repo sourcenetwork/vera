@@ -15,13 +15,13 @@ func validateRing(ring *types.Ring) error {
 		return types.ErrInvalidRingId
 	case ring.Namespace == "":
 		return types.ErrInvalidNamespaceId
-	case len(ring.PeerIds) == 0:
-		return errorsmod.Wrap(types.ErrInvalidRing, "missing peer_ids")
-	case ring.Threshold == 0 || int(ring.Threshold) > len(ring.PeerIds):
-		return errorsmod.Wrapf(types.ErrInvalidRing, "threshold %d is invalid for committee size %d", ring.Threshold, len(ring.PeerIds))
+	case len(ring.PeerNodeKeys) == 0:
+		return errorsmod.Wrap(types.ErrInvalidRing, "missing peer_node_keys")
+	case ring.Threshold == 0 || int(ring.Threshold) > len(ring.PeerNodeKeys):
+		return errorsmod.Wrapf(types.ErrInvalidRing, "threshold %d is invalid for committee size %d", ring.Threshold, len(ring.PeerNodeKeys))
 	}
 
-	if err := validateUniquePeerIDs(ring.PeerIds, "peer_ids"); err != nil {
+	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
 		return err
 	}
 	if len(ring.NewPeerIds) > 0 {
@@ -71,6 +71,35 @@ func validateRingUpdate(newPeerIDs []string, newThreshold *uint32, existing *typ
 	return nil
 }
 
+// validateUniquePeerNodeKeys checks that each node key is a unique, validly-encoded
+// 33-byte compressed secp256k1 public key.
+func validateUniquePeerNodeKeys(nodeKeys []string) error {
+	seen := make(map[string]struct{}, len(nodeKeys))
+	for _, key := range nodeKeys {
+		if err := validatePeerNodeKeyFormat(key); err != nil {
+			return err
+		}
+		if _, dup := seen[key]; dup {
+			return errorsmod.Wrapf(types.ErrInvalidRing, "duplicate peer_node_key: %q", key)
+		}
+		seen[key] = struct{}{}
+	}
+	return nil
+}
+
+func validatePeerNodeKeyFormat(key string) error {
+	if key == "" {
+		return errorsmod.Wrap(types.ErrInvalidRing, "empty peer_node_key")
+	}
+	keyHex := strings.TrimPrefix(key, "0x")
+	decoded, err := hex.DecodeString(keyHex)
+	if err != nil || len(decoded) != compressedPubKeyLen {
+		return errorsmod.Wrapf(types.ErrInvalidRing, "invalid peer_node_key encoding: %q", key)
+	}
+	return nil
+}
+
+// validateUniquePeerIDs is kept for new_peer_ids (reshare flow, out of scope for node key migration).
 func validateUniquePeerIDs(peerIDs []string, fieldName string) error {
 	seen := make(map[string]struct{}, len(peerIDs))
 	for _, id := range peerIDs {
@@ -92,7 +121,7 @@ func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	}
 
 	if len(finalized.NewPeerIds) > 0 {
-		finalized.PeerIds = append([]string(nil), finalized.NewPeerIds...)
+		finalized.PeerNodeKeys = append([]string(nil), finalized.NewPeerIds...)
 	}
 	if finalized.XNewThreshold != nil {
 		finalized.Threshold = finalized.GetNewThreshold()

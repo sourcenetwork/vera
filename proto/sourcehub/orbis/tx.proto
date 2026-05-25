@@ -46,7 +46,7 @@ message MsgCreateRing {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string namespace = 2;
-  repeated string peer_ids = 4;
+  repeated string peer_node_keys = 4;
   uint32 threshold = 5;
   // Absent means automatic PSS refresh is disabled.
   optional uint64 pss_interval = 6;

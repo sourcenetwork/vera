@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	"encoding/hex"
+	"fmt"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -21,20 +22,24 @@ import (
 const testDID = "did:example:orbis-creator"
 
 func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
-	k, ctx := keepertestutil.OrbisKeeper(t)
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	creator := testAddress()
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	namespace := "vault"
 	namespaceID := types.GetNamespaceID(namespace)
-	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
-	pssInterval := uint64(600)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
 
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
+
+	pssInterval := uint64(600)
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: namespace,
-		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
-		Threshold: 2,
+		Creator:      creatorAddr,
+		Namespace:    namespace,
+		PeerNodeKeys: []string{peer1Key, peer2Key, peer3Key},
+		Threshold:    2,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
@@ -47,13 +52,13 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.Equal(t, namespaceID, ring.Namespace)
 	require.Equal(t, testDID, ring.CreatorDid)
 	require.Empty(t, ring.RingPk)
-	require.Equal(t, []string{"peer-1", "peer-2", "peer-3"}, ring.PeerIds)
+	require.Equal(t, []string{peer1Key, peer2Key, peer3Key}, ring.PeerNodeKeys)
 	require.Equal(t, uint32(2), ring.Threshold)
 	require.NotNil(t, ring.XPssInterval)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: creator,
+		Creator: peer1Addr,
 		RingId:  createRingResp.RingId,
 		RingPk:  "ring-pk",
 	})
@@ -61,17 +66,17 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.Equal(t, "ring-pk", k.GetRing(ctx, createRingResp.RingId).RingPk)
 
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: creator,
+		Creator: peer1Addr,
 		RingId:  createRingResp.RingId,
 		RingPk:  "ring-pk-2",
 	})
 	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
 
 	_, err = k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: namespace,
-		PeerIds:   []string{"peer-1", "peer-2", "peer-3"},
-		Threshold: 2,
+		Creator:      creatorAddr,
+		Namespace:    namespace,
+		PeerNodeKeys: []string{peer1Key, peer2Key, peer3Key},
+		Threshold:    2,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
@@ -81,7 +86,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	tier := "gold"
 	timestamp := uint64(42)
 	storeDocumentMsg := &types.MsgStoreDocument{
-		Creator:    creator,
+		Creator:    creatorAddr,
 		Namespace:  namespace,
 		RingId:     createRingResp.RingId,
 		Document:   "ciphertext",
@@ -116,7 +121,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrDocumentAlreadyExists)
 
 	storeKeyDerivationMsg := &types.MsgStoreKeyDerivation{
-		Creator:    creator,
+		Creator:    creatorAddr,
 		Namespace:  namespace,
 		RingId:     createRingResp.RingId,
 		Derivation: "m/0/1",
@@ -141,30 +146,61 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrKeyDerivationAlreadyExists)
 }
 
-func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
-	k, ctx := keepertestutil.OrbisKeeper(t)
+func TestMsgServer_FinalizeRing_UnauthorizedNonPeer(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	creator := testAddress()
-	namespace := "vault"
-	namespaceID := types.GetNamespaceID(namespace)
-	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespaceID := types.GetNamespaceID("vault")
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: namespace,
-		PeerIds:   []string{"peer-1", "peer-2"},
-		Threshold: 1,
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+	})
+	require.NoError(t, err)
+
+	outsiderAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: outsiderAddr,
+		RingId:  createRingResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRingFinalizer)
+}
+
+func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	namespace := "vault"
+	namespaceID := types.GetNamespaceID(namespace)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		Namespace:    namespace,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
 	})
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID(namespaceID, []string{"peer-1", "peer-2"}, 1, nil, ""),
+		types.GenerateRingID(namespaceID, []string{peer1Key, peer2Key}, 1, nil, ""),
 		createRingResp.RingId,
 	)
 
 	storeDocumentResp, err := k.StoreDocument(ctx, &types.MsgStoreDocument{
-		Creator:    creator,
+		Creator:    creatorAddr,
 		Namespace:  namespace,
 		RingId:     createRingResp.RingId,
 		Document:   "ciphertext",
@@ -182,20 +218,23 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 }
 
 func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
-	k, ctx := keepertestutil.OrbisKeeper(t)
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	creator := testAddress()
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	namespace := "vault"
 	namespaceID := types.GetNamespaceID(namespace)
-	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creator)
+	setupNamespaceWithMember(t, k, ctx, namespaceID, testDID, creatorAddr)
 	pssInterval := uint64(0)
 
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: namespace,
-		PeerIds:   []string{"peer-1", "peer-2"},
-		Threshold: 1,
+		Creator:      creatorAddr,
+		Namespace:    namespace,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
@@ -203,7 +242,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID(namespaceID, []string{"peer-1", "peer-2"}, 1, &pssInterval, ""),
+		types.GenerateRingID(namespaceID, []string{peer1Key, peer2Key}, 1, &pssInterval, ""),
 		createRingResp.RingId,
 	)
 
@@ -214,22 +253,26 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
-	k, ctx := keepertestutil.OrbisKeeper(t)
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	creator := testAddress()
-	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creator)
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creatorAddr)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: "vault",
-		PeerIds:   []string{"peer-1", "peer-2"},
-		Threshold: 1,
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
 	})
 	require.NoError(t, err)
 
+	outsiderAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator:    testAddress(),
+		Creator:    outsiderAddr,
 		RingId:     createRingResp.RingId,
 		NewPeerIds: []string{"peer-3", "peer-4"},
 		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
@@ -240,22 +283,26 @@ func TestMsgServer_UpdateRingByAcpRequiresPolicy(t *testing.T) {
 }
 
 func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
-	k, ctx := keepertestutil.OrbisKeeper(t)
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	creator := testAddress()
-	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creator)
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	setupNamespaceWithMember(t, k, ctx, types.GetNamespaceID("vault"), testDID, creatorAddr)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:   creator,
-		Namespace: "vault",
-		PeerIds:   []string{"peer-1", "peer-2"},
-		Threshold: 1,
+		Creator:      creatorAddr,
+		Namespace:    "vault",
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
 	})
 	require.NoError(t, err)
 
+	outsiderAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err = k.FinalizeRingReshareByThresholdSignature(ctx, &types.MsgFinalizeRingReshareByThresholdSignature{
-		Creator:         testAddress(),
+		Creator:         outsiderAddr,
 		RingId:          createRingResp.RingId,
 		SignatureScheme: "bls12_381",
 		Signature:       []byte("signature"),
@@ -269,8 +316,7 @@ func TestMsgServer_CreateNodeInfo(t *testing.T) {
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	_ = controllerAddr
+	_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
 
 	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
 		Creator:       nodeAddr,
@@ -445,8 +491,18 @@ func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrUnauthorizedNodeInfoUpdate)
 }
 
-func testAddress() string {
-	return sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address()).String()
+// setupPeerWithNodeInfo registers an account and creates a NodeInfo entry for it.
+// Returns the account bech32 address and its hex-encoded public key (the node_key used in rings).
+func setupPeerWithNodeInfo(t *testing.T, k keeper.Keeper, ak authkeeper.AccountKeeper, ctx sdk.Context, networkID string) (addr string, nodeKey string) {
+	t.Helper()
+	addr, nodeKey = testAccountWithPubKey(t, ctx, ak)
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       addr,
+		PeerId:        networkID,
+		ControllerKey: nodeKey,
+	})
+	require.NoError(t, err)
+	return addr, nodeKey
 }
 
 // setupNamespaceWithMember creates the orbis module policy, registers namespaceID as an object,
@@ -484,4 +540,9 @@ func testAccountWithPubKey(t *testing.T, ctx sdk.Context, ak authkeeper.AccountK
 	}
 	ak.SetAccount(ctx, account)
 	return accAddr.String(), hex.EncodeToString(pubKey.Bytes())
+}
+
+// testPeerID returns a unique libp2p-style peer ID string for use in tests.
+func testPeerID(n int) string {
+	return fmt.Sprintf("12D3KooWTestPeer%d", n)
 }

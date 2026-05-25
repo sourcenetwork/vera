@@ -28,6 +28,7 @@ var (
 	ErrNodeInfoNotFound           = sdkerrors.Register(ModuleName, 1221, "node info not found")
 	ErrInvalidNodeInfo            = sdkerrors.Register(ModuleName, 1222, "invalid node info")
 	ErrUnauthorizedNodeInfoUpdate = sdkerrors.Register(ModuleName, 1223, "tx signer does not match controller key")
-	ErrInvalidRingCreator  = sdkerrors.Register(ModuleName, 1224, "expected authorized account as ring creator")
+	ErrInvalidRingCreator   = sdkerrors.Register(ModuleName, 1224, "expected authorized account as ring creator")
 	ErrRingAlreadyFinalized = sdkerrors.Register(ModuleName, 1225, "ring already has a public key set")
+	ErrInvalidRingFinalizer = sdkerrors.Register(ModuleName, 1226, "tx signer is not a member of the ring's peer set")
 )
