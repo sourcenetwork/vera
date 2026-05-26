@@ -121,9 +121,11 @@ type MsgCreateRing struct {
 	PeerNodeKeys []string               `protobuf:"bytes,2,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
 	Threshold    uint32                 `protobuf:"varint,3,opt,name=threshold,proto3" json:"threshold,omitempty"`
 	// Absent means automatic PSS refresh is disabled.
-	PssInterval   *uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
-	PolicyId      string  `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Artifact      string  `protobuf:"bytes,6,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	PssInterval *uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	PolicyId    string  `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Artifact    string  `protobuf:"bytes,6,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	// Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
+	Nonce         *string `protobuf:"bytes,7,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -196,6 +198,13 @@ func (x *MsgCreateRing) GetPolicyId() string {
 func (x *MsgCreateRing) GetArtifact() string {
 	if x != nil {
 		return x.Artifact
+	}
+	return ""
+}
+
+func (x *MsgCreateRing) GetNonce() string {
+	if x != nil && x.Nonce != nil {
+		return *x.Nonce
 	}
 	return ""
 }
@@ -1174,15 +1183,17 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x12:\n" +
 	"\x06params\x18\x02 \x01(\v2\x17.sourcehub.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:4\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*!sourcehub/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xed\x01\n" +
+	"\x17MsgUpdateParamsResponse\"\x92\x02\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
 	"\tthreshold\x18\x03 \x01(\rR\tthreshold\x12&\n" +
 	"\fpss_interval\x18\x04 \x01(\x04H\x00R\vpssInterval\x88\x01\x01\x12\x1b\n" +
 	"\tpolicy_id\x18\x05 \x01(\tR\bpolicyId\x12\x1a\n" +
-	"\bartifact\x18\x06 \x01(\tR\bartifact:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
-	"\r_pss_interval\"0\n" +
+	"\bartifact\x18\x06 \x01(\tR\bartifact\x12\x19\n" +
+	"\x05nonce\x18\a \x01(\tH\x01R\x05nonce\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
+	"\r_pss_intervalB\b\n" +
+	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
 	"\aring_id\x18\x01 \x01(\tR\x06ringId\"k\n" +
 	"\x0fMsgFinalizeRing\x12\x18\n" +

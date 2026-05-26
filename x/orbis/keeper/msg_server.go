@@ -34,6 +34,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	}
 
 	pssInterval := optionalCreateRingPSSInterval(msg)
+	nonce := optionalCreateRingNonce(msg)
 
 	for _, nodeKey := range msg.PeerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -41,7 +42,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId)
+	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}

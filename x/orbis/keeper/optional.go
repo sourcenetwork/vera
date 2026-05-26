@@ -10,6 +10,14 @@ func optionalCreateRingPSSInterval(msg *types.MsgCreateRing) *uint64 {
 	return &value
 }
 
+func optionalCreateRingNonce(msg *types.MsgCreateRing) *string {
+	if msg.XNonce == nil {
+		return nil
+	}
+	value := msg.GetNonce()
+	return &value
+}
+
 func optionalUpdateRingNewThreshold(msg *types.MsgUpdateRingByAcp) *uint32 {
 	if msg.XNewThreshold == nil {
 		return nil

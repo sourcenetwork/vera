@@ -28,12 +28,13 @@ func KeyPrefix(p string) []byte {
 }
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
-func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string) string {
+func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string, nonce *string) string {
 	h := newIDHasher("orbis/ring/v1")
 	h.writeStringSlice(peerNodeKeys)
 	h.writeUint32(threshold)
 	h.writeOptionalUint64(pssInterval)
 	h.writeString(policyID)
+	h.writeOptionalString(nonce)
 	return h.sum()
 }
 

@@ -51,6 +51,8 @@ message MsgCreateRing {
   optional uint64 pss_interval = 4;
   string policy_id = 5;
   string artifact = 6;
+  // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
+  optional string nonce = 7;
 }
 
 message MsgCreateRingResponse {
