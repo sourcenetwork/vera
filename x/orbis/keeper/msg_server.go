@@ -130,12 +130,12 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		RingPk:  msg.RingPk,
 	})
 
-	if len(ring.Confirmations) < int(ring.Threshold) {
+	if len(ring.Confirmations) < len(ring.PeerNodeKeys) {
 		k.SetRing(goCtx, *ring)
 		return &types.MsgFinalizeRingResponse{}, nil
 	}
 
-	// Threshold reached — finalize.
+	// All nodes confirmed — finalize.
 	finalizerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err

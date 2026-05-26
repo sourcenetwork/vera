@@ -59,7 +59,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
-	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
+	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	pssInterval := uint64(600)
@@ -85,21 +85,16 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.NotNil(t, ring.XPssInterval)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 
-	// peer1 submits first confirmation; threshold=2 so not finalized yet
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	// all three nodes must confirm; ring not finalized until the last one
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 	require.Empty(t, k.GetRing(ctx, createRingResp.RingId).RingPk)
 
-	// peer2 submits second confirmation; threshold met → finalized
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: peer2Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	require.Empty(t, k.GetRing(ctx, createRingResp.RingId).RingPk)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 	require.Equal(t, "ring-pk", k.GetRing(ctx, createRingResp.RingId).RingPk)
 
@@ -359,7 +354,7 @@ func TestMsgServer_FinalizeRing_UnauthorizedNonPeer(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidRingFinalizer)
 }
 
-func TestMsgServer_FinalizeRing_ThresholdRequiresMultiple(t *testing.T) {
+func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
 	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
@@ -379,21 +374,27 @@ func TestMsgServer_FinalizeRing_ThresholdRequiresMultiple(t *testing.T) {
 	require.NoError(t, err)
 	ringID := createRingResp.RingId
 
-	// first confirmation — not finalized yet
+	// first confirmation — not finalized
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.NoError(t, err)
 	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
 	require.Len(t, k.GetRing(ctx, ringID).Confirmations, 1)
 
-	// second confirmation — threshold=2 met → finalized, confirmations cleared
+	// second confirmation — threshold=2 is met but not all nodes, so still not finalized
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "agreed-pk"})
+	require.NoError(t, err)
+	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
+	require.Len(t, k.GetRing(ctx, ringID).Confirmations, 2)
+
+	// third confirmation — all nodes confirmed → finalized, confirmations cleared
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.NoError(t, err)
 	ring := k.GetRing(ctx, ringID)
 	require.Equal(t, "agreed-pk", ring.RingPk)
 	require.Empty(t, ring.Confirmations)
 
-	// third peer cannot confirm a finalized ring
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: ringID, RingPk: "agreed-pk"})
+	// any further confirmation must fail
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
 }
 
@@ -498,7 +499,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -514,11 +515,9 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 		createRingResp.RingId,
 	)
 
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
 	storeDocumentResp, err := k.StoreDocument(ctx, &types.MsgStoreDocument{
@@ -578,7 +577,7 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -589,11 +588,9 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
 	pssInterval := uint64(900)
@@ -621,7 +618,7 @@ func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, creatorCtx, authKeeper)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, creatorCtx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
@@ -632,11 +629,9 @@ func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
 	outsiderAddr, _ := testAccountWithPubKey(t, outsiderCtx, authKeeper)
@@ -663,7 +658,7 @@ func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, creatorCtx, authKeeper)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, creatorCtx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
@@ -674,11 +669,9 @@ func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
 	operatorAddr, _ := testAccountWithPubKey(t, operatorCtx, authKeeper)
@@ -721,7 +714,7 @@ func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, creatorCtx, authKeeper)
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer1")
-	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, creatorCtx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
@@ -732,11 +725,9 @@ func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{
-		Creator: peer1Addr,
-		RingId:  createRingResp.RingId,
-		RingPk:  "ring-pk",
-	})
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(peerCtx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
 	operatorAddr, _ := testAccountWithPubKey(t, operatorCtx, authKeeper)
