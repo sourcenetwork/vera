@@ -25,19 +25,18 @@ const (
 type Ring struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace       string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid      string                 `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingPk          string                 `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerNodeKeys    []string               `protobuf:"bytes,5,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
-	Threshold       uint32                 `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	NewPeerNodeKeys []string               `protobuf:"bytes,7,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
+	CreatorDid      string                 `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingPk          string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerNodeKeys    []string               `protobuf:"bytes,4,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold       uint32                 `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerNodeKeys []string               `protobuf:"bytes,6,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Absent means no pending threshold update.
-	NewThreshold *uint32 `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
+	NewThreshold *uint32 `protobuf:"varint,7,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Absent means automatic PSS refresh is disabled.
-	PssInterval      *uint64             `protobuf:"varint,9,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
-	BlockNumberNonce uint64              `protobuf:"varint,10,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
-	PolicyId         string              `protobuf:"bytes,11,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Confirmations    []*RingConfirmation `protobuf:"bytes,12,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
+	PssInterval      *uint64             `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -75,13 +74,6 @@ func (*Ring) Descriptor() ([]byte, []int) {
 func (x *Ring) GetId() string {
 	if x != nil {
 		return x.Id
-	}
-	return ""
-}
-
-func (x *Ring) GetNamespace() string {
-	if x != nil {
-		return x.Namespace
 	}
 	return ""
 }
@@ -213,22 +205,21 @@ var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\n" +
-	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\xe8\x03\n" +
+	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\xca\x03\n" +
 	"\x04Ring\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x1f\n" +
-	"\vcreator_did\x18\x03 \x01(\tR\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\vcreator_did\x18\x02 \x01(\tR\n" +
 	"creatorDid\x12\x17\n" +
-	"\aring_pk\x18\x04 \x01(\tR\x06ringPk\x12$\n" +
-	"\x0epeer_node_keys\x18\x05 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
-	"\tthreshold\x18\x06 \x01(\rR\tthreshold\x12+\n" +
-	"\x12new_peer_node_keys\x18\a \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
-	"\rnew_threshold\x18\b \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
-	"\fpss_interval\x18\t \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
-	"\x12block_number_nonce\x18\n" +
-	" \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
-	"\tpolicy_id\x18\v \x01(\tR\bpolicyId\x12G\n" +
-	"\rconfirmations\x18\f \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmationsB\x10\n" +
+	"\aring_pk\x18\x03 \x01(\tR\x06ringPk\x12$\n" +
+	"\x0epeer_node_keys\x18\x04 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
+	"\tthreshold\x18\x05 \x01(\rR\tthreshold\x12+\n" +
+	"\x12new_peer_node_keys\x18\x06 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
+	"\rnew_threshold\x18\a \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
+	"\fpss_interval\x18\b \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
+	"\x12block_number_nonce\x18\t \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
+	"\tpolicy_id\x18\n" +
+	" \x01(\tR\bpolicyId\x12G\n" +
+	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmationsB\x10\n" +
 	"\x0e_new_thresholdB\x0f\n" +
 	"\r_pss_interval\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +

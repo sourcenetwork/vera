@@ -76,7 +76,6 @@ func OrbisKeeperFull(t testing.TB) (keeper.Keeper, authkeeper.AccountKeeper, sdk
 
 	capKeeper := capabilitykeeper.NewKeeper(cdc, capabilityStoreKey, capabilityMemStoreKey)
 	acpCapKeeper := capKeeper.ScopeToModule(acptypes.ModuleName)
-	orbisCapKeeper := capKeeper.ScopeToModule(types.ModuleName)
 
 	acpKeeper := acpkeeper.NewKeeper(
 		cdc,
@@ -95,7 +94,6 @@ func OrbisKeeperFull(t testing.TB) (keeper.Keeper, authkeeper.AccountKeeper, sdk
 		authority.String(),
 		accountKeeper,
 		&acpKeeper,
-		&orbisCapKeeper,
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

@@ -28,22 +28,9 @@ func (k *Keeper) UpdateParams(ctx context.Context, req *types.MsgUpdateParams) (
 func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*types.MsgCreateRingResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	namespaceID := namespaceID(msg.Namespace)
 	creatorDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-
-	modulePolicyId, err := k.EnsurePolicy(ctx)
-	if err != nil {
-		return nil, err
-	}
-	allowed, err := hasCreateRingPermission(goCtx, k, modulePolicyId, namespaceID, creatorDID)
-	if err != nil {
-		return nil, err
-	}
-	if !allowed {
-		return nil, types.ErrInvalidRingCreator
 	}
 
 	pssInterval := optionalCreateRingPSSInterval(msg)
@@ -54,14 +41,13 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(namespaceID, msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId)
+	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
 
 	ring := types.Ring{
 		Id:               ringID,
-		Namespace:        namespaceID,
 		CreatorDid:       creatorDID,
 		PeerNodeKeys:     append([]string(nil), msg.PeerNodeKeys...),
 		Threshold:        msg.Threshold,
@@ -76,7 +62,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	k.SetRing(goCtx, ring)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingCreated{
-		Namespace:  namespaceID,
 		RingId:     ringID,
 		CreatorDid: creatorDID,
 		Artifact:   msg.Artifact,
@@ -117,9 +102,8 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	for _, c := range ring.Confirmations {
 		if c.RingPk != msg.RingPk {
 			_ = ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
-				Namespace: ring.Namespace,
-				RingId:    ring.Id,
-				Reason:    "ring_pk_conflict",
+				RingId: ring.Id,
+				Reason: "ring_pk_conflict",
 			})
 			k.DeleteRing(goCtx, ring.Id)
 			return nil, types.ErrRingPkConflict
@@ -158,7 +142,6 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	k.SetRing(goCtx, *ring)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
-		Namespace:  ring.Namespace,
 		RingId:     ring.Id,
 		UpdaterDid: finalizerDID,
 	}); err != nil {
@@ -178,21 +161,10 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	if err := requireRingFinalized(ring); err != nil {
 		return nil, err
 	}
-	if ring.PolicyId == "" {
-		return nil, types.ErrRingMissingPolicyId
-	}
 
 	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-
-	allowed, err := hasRingUpdatePermission(goCtx, k, ring, updaterDID)
-	if err != nil {
-		return nil, err
-	}
-	if !allowed {
-		return nil, types.ErrInvalidRingUpdater
 	}
 
 	newThreshold := optionalUpdateRingNewThreshold(msg)
@@ -216,7 +188,6 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	k.SetRing(goCtx, *ring)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
-		Namespace:  ring.Namespace,
 		RingId:     ring.Id,
 		UpdaterDid: updaterDID,
 	}); err != nil {
@@ -269,7 +240,6 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 	k.SetRing(goCtx, finalizedRing)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
-		Namespace:  finalizedRing.Namespace,
 		RingId:     finalizedRing.Id,
 		UpdaterDid: updaterDID,
 	}); err != nil {
@@ -282,7 +252,6 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocument) (*types.MsgStoreDocumentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	namespaceID := namespaceID(msg.Namespace)
 	ring := k.GetRing(goCtx, msg.RingId)
 	if ring == nil {
 		return nil, types.ErrRingNotFound
@@ -299,14 +268,13 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	tier := optionalStoreDocumentTier(msg)
 	timestamp := optionalStoreDocumentTimestamp(msg)
 
-	documentID := types.GenerateDocumentID(namespaceID, msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
-	if existing := k.GetDocument(goCtx, namespaceID, documentID); existing != nil {
+	documentID := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
+	if existing := k.GetDocument(goCtx, documentID); existing != nil {
 		return nil, types.ErrDocumentAlreadyExists
 	}
 
 	document := types.Document{
 		Id:         documentID,
-		Namespace:  namespaceID,
 		CreatorDid: creatorDID,
 		RingId:     msg.RingId,
 		Document:   msg.Document,
@@ -324,7 +292,6 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	k.SetDocument(goCtx, document)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventDocumentStored{
-		Namespace:  namespaceID,
 		DocumentId: documentID,
 		CreatorDid: creatorDID,
 	}); err != nil {
@@ -347,10 +314,10 @@ func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeI
 	}
 
 	nodeInfo := types.NodeInfo{
-		PeerId:                msg.PeerId,
-		ControllerKey:         msg.ControllerKey,
-		WhitelistedNamespaces: append([]string(nil), msg.WhitelistedNamespaces...),
-		WhitelistedRingIds:    append([]string(nil), msg.WhitelistedRingIds...),
+		PeerId:               msg.PeerId,
+		ControllerKey:        msg.ControllerKey,
+		WhitelistedPolicyIds: append([]string(nil), msg.WhitelistedPolicyIds...),
+		WhitelistedRingIds:   append([]string(nil), msg.WhitelistedRingIds...),
 	}
 	if err := validateNodeInfo(&nodeInfo); err != nil {
 		return nil, err
@@ -390,7 +357,7 @@ func (k *Keeper) UpdateNodeInfo(goCtx context.Context, msg *types.MsgUpdateNodeI
 	if msg.XControllerKey != nil {
 		nodeInfo.ControllerKey = msg.GetControllerKey()
 	}
-	nodeInfo.WhitelistedNamespaces = append([]string(nil), msg.WhitelistedNamespaces...)
+	nodeInfo.WhitelistedPolicyIds = append([]string(nil), msg.WhitelistedPolicyIds...)
 	nodeInfo.WhitelistedRingIds = append([]string(nil), msg.WhitelistedRingIds...)
 	if err := validateNodeInfo(nodeInfo); err != nil {
 		return nil, err
@@ -433,7 +400,6 @@ func signerPublicKeyHex(ctx sdk.Context, k *Keeper, address string) (string, err
 func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKeyDerivation) (*types.MsgStoreKeyDerivationResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	namespaceID := namespaceID(msg.Namespace)
 	ring := k.GetRing(goCtx, msg.RingId)
 	if ring == nil {
 		return nil, types.ErrRingNotFound
@@ -447,14 +413,13 @@ func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKe
 		return nil, err
 	}
 
-	keyDerivationID := types.GenerateKeyDerivationID(namespaceID, msg.RingId, msg.Derivation, msg.PolicyId, msg.Resource, msg.Permission)
-	if existing := k.GetKeyDerivation(goCtx, namespaceID, keyDerivationID); existing != nil {
+	keyDerivationID := types.GenerateKeyDerivationID(msg.RingId, msg.Derivation, msg.PolicyId, msg.Resource, msg.Permission)
+	if existing := k.GetKeyDerivation(goCtx, keyDerivationID); existing != nil {
 		return nil, types.ErrKeyDerivationAlreadyExists
 	}
 
 	keyDerivation := types.KeyDerivation{
 		Id:         keyDerivationID,
-		Namespace:  namespaceID,
 		CreatorDid: creatorDID,
 		RingId:     msg.RingId,
 		Derivation: msg.Derivation,
@@ -469,7 +434,6 @@ func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKe
 	k.SetKeyDerivation(goCtx, keyDerivation)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventKeyDerivationStored{
-		Namespace:       namespaceID,
 		KeyDerivationId: keyDerivationID,
 		CreatorDid:      creatorDID,
 	}); err != nil {

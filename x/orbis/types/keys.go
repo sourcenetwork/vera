@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
-	"strings"
 )
 
 const (
@@ -18,14 +17,6 @@ const (
 	DocumentKeyPrefix      = "document/"
 	KeyDerivationKeyPrefix = "key_derivation/"
 	NodeInfoKeyPrefix      = "node_info/"
-
-	NamespaceIDPrefix = "orbis/"
-
-	PolicyIdKey = "policy_id"
-
-	NamespaceResource    = "namespace"
-	CreateRingPermission = "create_ring"
-	UpdateRingPermission = "update_ring"
 )
 
 var (
@@ -36,32 +27,9 @@ func KeyPrefix(p string) []byte {
 	return []byte(p)
 }
 
-// GetNamespaceID adds the Orbis namespace prefix unless it is already present.
-func GetNamespaceID(namespace string) string {
-	if strings.HasPrefix(namespace, NamespaceIDPrefix) {
-		return namespace
-	}
-	return NamespaceIDPrefix + namespace
-}
-
-func DocumentKey(namespaceID, documentID string) []byte {
-	key := appendLengthPrefixedKeyPart(nil, namespaceID)
-	return appendLengthPrefixedKeyPart(key, documentID)
-}
-
-func KeyDerivationKey(namespaceID, keyDerivationID string) []byte {
-	key := appendLengthPrefixedKeyPart(nil, namespaceID)
-	return appendLengthPrefixedKeyPart(key, keyDerivationID)
-}
-
-func NamespacePrefix(namespaceID string) []byte {
-	return appendLengthPrefixedKeyPart(nil, namespaceID)
-}
-
 // GenerateRingID returns the stable ID for a ring's creation parameters.
-func GenerateRingID(namespaceID string, peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string) string {
+func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string) string {
 	h := newIDHasher("orbis/ring/v1")
-	h.writeString(namespaceID)
 	h.writeStringSlice(peerNodeKeys)
 	h.writeUint32(threshold)
 	h.writeOptionalUint64(pssInterval)
@@ -71,7 +39,6 @@ func GenerateRingID(namespaceID string, peerNodeKeys []string, threshold uint32,
 
 // GenerateDocumentID returns the stable ID for an encrypted document.
 func GenerateDocumentID(
-	namespaceID string,
 	ringID string,
 	document string,
 	proof string,
@@ -82,7 +49,6 @@ func GenerateDocumentID(
 	timestamp *uint64,
 ) string {
 	h := newIDHasher("orbis/document/v1")
-	h.writeString(namespaceID)
 	h.writeString(ringID)
 	h.writeString(document)
 	h.writeString(proof)
@@ -95,9 +61,8 @@ func GenerateDocumentID(
 }
 
 // GenerateKeyDerivationID returns the stable ID for a key derivation.
-func GenerateKeyDerivationID(namespaceID, ringID, derivation, policyID, resource, permission string) string {
+func GenerateKeyDerivationID(ringID, derivation, policyID, resource, permission string) string {
 	h := newIDHasher("orbis/key_derivation/v1")
-	h.writeString(namespaceID)
 	h.writeString(ringID)
 	h.writeString(derivation)
 	h.writeString(policyID)
@@ -165,11 +130,4 @@ func (h *idHasher) writeBytes(value []byte) {
 func (h *idHasher) sum() string {
 	hash := sha256.Sum256(h.bytes)
 	return hex.EncodeToString(hash[:])
-}
-
-func appendLengthPrefixedKeyPart(dst []byte, value string) []byte {
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], uint32(len(value)))
-	dst = append(dst, buf[:]...)
-	return append(dst, value...)
 }

@@ -24,10 +24,9 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // EventRingCreated is emitted when a ring is created.
 type EventRingCreated struct {
-	Namespace  string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId     string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	Artifact   string `protobuf:"bytes,4,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	RingId     string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	CreatorDid string `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	Artifact   string `protobuf:"bytes,3,opt,name=artifact,proto3" json:"artifact,omitempty"`
 }
 
 func (m *EventRingCreated) Reset()         { *m = EventRingCreated{} }
@@ -63,13 +62,6 @@ func (m *EventRingCreated) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EventRingCreated proto.InternalMessageInfo
 
-func (m *EventRingCreated) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *EventRingCreated) GetRingId() string {
 	if m != nil {
 		return m.RingId
@@ -93,9 +85,8 @@ func (m *EventRingCreated) GetArtifact() string {
 
 // EventRingUpdated is emitted when a ring is updated in place.
 type EventRingUpdated struct {
-	Namespace  string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId     string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	UpdaterDid string `protobuf:"bytes,3,opt,name=updater_did,json=updaterDid,proto3" json:"updater_did,omitempty"`
+	RingId     string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	UpdaterDid string `protobuf:"bytes,2,opt,name=updater_did,json=updaterDid,proto3" json:"updater_did,omitempty"`
 }
 
 func (m *EventRingUpdated) Reset()         { *m = EventRingUpdated{} }
@@ -131,13 +122,6 @@ func (m *EventRingUpdated) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EventRingUpdated proto.InternalMessageInfo
 
-func (m *EventRingUpdated) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *EventRingUpdated) GetRingId() string {
 	if m != nil {
 		return m.RingId
@@ -154,9 +138,8 @@ func (m *EventRingUpdated) GetUpdaterDid() string {
 
 // EventDocumentStored is emitted when an encrypted document is stored.
 type EventDocumentStored struct {
-	Namespace  string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	DocumentId string `protobuf:"bytes,2,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
-	CreatorDid string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	DocumentId string `protobuf:"bytes,1,opt,name=document_id,json=documentId,proto3" json:"document_id,omitempty"`
+	CreatorDid string `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
 }
 
 func (m *EventDocumentStored) Reset()         { *m = EventDocumentStored{} }
@@ -192,13 +175,6 @@ func (m *EventDocumentStored) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EventDocumentStored proto.InternalMessageInfo
 
-func (m *EventDocumentStored) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *EventDocumentStored) GetDocumentId() string {
 	if m != nil {
 		return m.DocumentId
@@ -215,9 +191,8 @@ func (m *EventDocumentStored) GetCreatorDid() string {
 
 // EventKeyDerivationStored is emitted when a key derivation is stored.
 type EventKeyDerivationStored struct {
-	Namespace       string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	KeyDerivationId string `protobuf:"bytes,2,opt,name=key_derivation_id,json=keyDerivationId,proto3" json:"key_derivation_id,omitempty"`
-	CreatorDid      string `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	KeyDerivationId string `protobuf:"bytes,1,opt,name=key_derivation_id,json=keyDerivationId,proto3" json:"key_derivation_id,omitempty"`
+	CreatorDid      string `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
 }
 
 func (m *EventKeyDerivationStored) Reset()         { *m = EventKeyDerivationStored{} }
@@ -252,13 +227,6 @@ func (m *EventKeyDerivationStored) XXX_DiscardUnknown() {
 }
 
 var xxx_messageInfo_EventKeyDerivationStored proto.InternalMessageInfo
-
-func (m *EventKeyDerivationStored) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
 
 func (m *EventKeyDerivationStored) GetKeyDerivationId() string {
 	if m != nil {
@@ -382,9 +350,8 @@ func (m *EventNodeInfoUpdated) GetControllerKey() string {
 
 // EventRingDeleted is emitted when a ring is removed from state.
 type EventRingDeleted struct {
-	Namespace string `protobuf:"bytes,1,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId    string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	Reason    string `protobuf:"bytes,3,opt,name=reason,proto3" json:"reason,omitempty"`
+	RingId string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Reason string `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 }
 
 func (m *EventRingDeleted) Reset()         { *m = EventRingDeleted{} }
@@ -420,13 +387,6 @@ func (m *EventRingDeleted) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_EventRingDeleted proto.InternalMessageInfo
 
-func (m *EventRingDeleted) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *EventRingDeleted) GetRingId() string {
 	if m != nil {
 		return m.RingId
@@ -454,32 +414,30 @@ func init() {
 func init() { proto.RegisterFile("sourcehub/orbis/events.proto", fileDescriptor_cb68216cf0ba47d2) }
 
 var fileDescriptor_cb68216cf0ba47d2 = []byte{
-	// 397 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x53, 0xc1, 0x4e, 0xdb, 0x40,
-	0x14, 0x8c, 0xdb, 0xca, 0x69, 0x5e, 0xd4, 0xa6, 0x75, 0xab, 0xc6, 0xaa, 0x22, 0xa7, 0xb2, 0x54,
-	0x09, 0x71, 0x88, 0x91, 0xf8, 0x03, 0x30, 0x87, 0x10, 0x89, 0x43, 0x10, 0x1c, 0xb8, 0x58, 0x1b,
-	0xef, 0x4b, 0x58, 0x9c, 0xec, 0x5a, 0xeb, 0x75, 0xc0, 0x1f, 0x00, 0x67, 0x3e, 0x8b, 0x63, 0x8e,
-	0x1c, 0x51, 0xf2, 0x23, 0xc8, 0x1b, 0x27, 0x0e, 0xe2, 0x40, 0xa4, 0x1c, 0xdf, 0xcc, 0x7a, 0x66,
-	0xbc, 0xfb, 0x06, 0x5a, 0x89, 0x48, 0x65, 0x88, 0xd7, 0xe9, 0xc0, 0x13, 0x72, 0xc0, 0x12, 0x0f,
-	0xa7, 0xc8, 0x55, 0xd2, 0x89, 0xa5, 0x50, 0xc2, 0x6a, 0xac, 0xd9, 0x8e, 0x66, 0xdd, 0x07, 0x03,
-	0x7e, 0x9c, 0xe4, 0x27, 0xfa, 0x8c, 0x8f, 0x8e, 0x25, 0x12, 0x85, 0xd4, 0x6a, 0x41, 0x8d, 0x93,
-	0x09, 0x26, 0x31, 0x09, 0xd1, 0x36, 0xfe, 0x19, 0x7b, 0xb5, 0x7e, 0x09, 0x58, 0x4d, 0xa8, 0x4a,
-	0xc6, 0x47, 0x01, 0xa3, 0xf6, 0x27, 0xcd, 0x99, 0xf9, 0xd8, 0xa5, 0x56, 0x1b, 0xea, 0x61, 0xae,
-	0x20, 0x64, 0x40, 0x19, 0xb5, 0x3f, 0x6b, 0x12, 0x0a, 0xc8, 0x67, 0xd4, 0xfa, 0x0b, 0x5f, 0x89,
-	0x54, 0x6c, 0x48, 0x42, 0x65, 0x7f, 0xd1, 0xec, 0x7a, 0x76, 0x6f, 0x36, 0x72, 0x5c, 0xc4, 0x74,
-	0xc7, 0x1c, 0xa9, 0x56, 0x78, 0x93, 0xa3, 0x80, 0x7c, 0x46, 0xdd, 0x14, 0x7e, 0x69, 0x2f, 0x5f,
-	0x84, 0xe9, 0x04, 0xb9, 0x3a, 0x57, 0x42, 0x7e, 0x68, 0xd7, 0x86, 0x3a, 0x2d, 0xce, 0x97, 0x96,
-	0xb0, 0x82, 0xb6, 0xf8, 0x7d, 0xf7, 0xde, 0x00, 0x5b, 0xfb, 0xf6, 0x30, 0xf3, 0x51, 0xb2, 0x29,
-	0x51, 0x4c, 0xf0, 0xad, 0xcc, 0xf7, 0xe1, 0x67, 0x84, 0x59, 0x40, 0xd7, 0x5f, 0x95, 0x11, 0x1a,
-	0xd1, 0xa6, 0xda, 0x36, 0x39, 0x2e, 0xe1, 0xb7, 0x8e, 0x71, 0x26, 0x28, 0x76, 0xf9, 0x50, 0xac,
-	0x9e, 0xbd, 0x09, 0xd5, 0x18, 0x51, 0xe6, 0xd2, 0xcb, 0x00, 0x66, 0x3e, 0x76, 0xa9, 0xf5, 0x1f,
-	0xbe, 0x87, 0x82, 0x2b, 0x29, 0xc6, 0x63, 0x94, 0x41, 0x84, 0x59, 0x61, 0xfd, 0xad, 0x44, 0x7b,
-	0x98, 0xbd, 0xd3, 0x5d, 0x3d, 0xe3, 0xae, 0xba, 0x64, 0x63, 0x35, 0x7c, 0x1c, 0xe3, 0x0e, 0xab,
-	0xf1, 0x07, 0x4c, 0x89, 0x24, 0x11, 0xbc, 0xb8, 0x96, 0x62, 0x3a, 0x3a, 0x7d, 0x9a, 0x3b, 0xc6,
-	0x6c, 0xee, 0x18, 0x2f, 0x73, 0xc7, 0x78, 0x5c, 0x38, 0x95, 0xd9, 0xc2, 0xa9, 0x3c, 0x2f, 0x9c,
-	0xca, 0xd5, 0xc1, 0x88, 0xa9, 0xbc, 0x2e, 0xa1, 0x98, 0x78, 0xcb, 0xf2, 0x70, 0x54, 0xb7, 0x42,
-	0x46, 0x5e, 0x59, 0xb4, 0xbb, 0xa2, 0x6a, 0x2a, 0x8b, 0x31, 0x19, 0x98, 0xba, 0x6a, 0x87, 0xaf,
-	0x01, 0x00, 0x00, 0xff, 0xff, 0xca, 0x91, 0xe1, 0x9a, 0x8a, 0x03, 0x00, 0x00,
+	// 364 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x92, 0xc1, 0x4a, 0xf3, 0x40,
+	0x14, 0x85, 0x9b, 0xff, 0x87, 0xaa, 0x23, 0x5a, 0x8d, 0xa2, 0x41, 0x24, 0x4a, 0x40, 0x10, 0x17,
+	0x8d, 0xe0, 0x1b, 0xd8, 0xb8, 0xa8, 0x15, 0x17, 0x15, 0x15, 0xdc, 0x84, 0x34, 0x73, 0x9b, 0x0e,
+	0x69, 0xe7, 0x86, 0xc9, 0xa4, 0x9a, 0xb7, 0xf0, 0xb1, 0x5c, 0x76, 0xe9, 0x52, 0xda, 0x17, 0x91,
+	0x8c, 0x63, 0x13, 0x11, 0xb4, 0xe0, 0xf2, 0x9e, 0x7b, 0xf2, 0x1d, 0x72, 0xe7, 0x90, 0xfd, 0x14,
+	0x33, 0x11, 0xc2, 0x20, 0xeb, 0xb9, 0x28, 0x7a, 0x2c, 0x75, 0x61, 0x0c, 0x5c, 0xa6, 0xcd, 0x44,
+	0xa0, 0x44, 0xb3, 0x31, 0xdf, 0x36, 0xd5, 0xd6, 0x19, 0x90, 0x8d, 0x8b, 0xc2, 0xd0, 0x65, 0x3c,
+	0x6a, 0x09, 0x08, 0x24, 0x50, 0x73, 0x97, 0x2c, 0x09, 0xc6, 0x23, 0x9f, 0x51, 0xcb, 0x38, 0x34,
+	0x8e, 0x57, 0xba, 0xf5, 0x62, 0x6c, 0x53, 0xf3, 0x80, 0xac, 0x86, 0x85, 0x07, 0x85, 0x4f, 0x19,
+	0xb5, 0xfe, 0xa9, 0x25, 0xd1, 0x92, 0xc7, 0xa8, 0xb9, 0x47, 0x96, 0x03, 0x21, 0x59, 0x3f, 0x08,
+	0xa5, 0xf5, 0x5f, 0x6d, 0xe7, 0xb3, 0x73, 0x55, 0x49, 0xba, 0x4d, 0xe8, 0xaf, 0x49, 0x99, 0xf2,
+	0x7c, 0x49, 0xd2, 0x92, 0xc7, 0xa8, 0x73, 0x4f, 0xb6, 0x14, 0xcd, 0xc3, 0x30, 0x1b, 0x01, 0x97,
+	0x37, 0x12, 0x05, 0xa8, 0xef, 0xa8, 0x56, 0x4a, 0x28, 0xf9, 0x94, 0x16, 0xf8, 0x05, 0x27, 0x22,
+	0x96, 0x02, 0x77, 0x20, 0xf7, 0x40, 0xb0, 0x71, 0x20, 0x19, 0x72, 0x4d, 0x3f, 0x21, 0x9b, 0x31,
+	0xe4, 0x3e, 0x9d, 0xeb, 0x65, 0x46, 0x23, 0xae, 0xfa, 0x17, 0x09, 0xba, 0x23, 0xdb, 0x2a, 0xe8,
+	0x1a, 0x29, 0xb4, 0x79, 0x1f, 0x2b, 0xd7, 0x4f, 0x00, 0x44, 0xe5, 0x26, 0xc5, 0xd8, 0xa6, 0xe6,
+	0x11, 0x59, 0x0f, 0x91, 0x4b, 0x81, 0xc3, 0x21, 0x08, 0x3f, 0x86, 0x5c, 0x43, 0xd7, 0x4a, 0xb5,
+	0x03, 0xf9, 0x37, 0x6e, 0xe5, 0xd6, 0x7f, 0xe2, 0xb6, 0x2a, 0xef, 0xe7, 0xc1, 0x10, 0x7e, 0x7c,
+	0xbf, 0x1d, 0x52, 0x17, 0x10, 0xa4, 0xc8, 0x35, 0x4b, 0x4f, 0xe7, 0x97, 0x2f, 0x53, 0xdb, 0x98,
+	0x4c, 0x6d, 0xe3, 0x6d, 0x6a, 0x1b, 0xcf, 0x33, 0xbb, 0x36, 0x99, 0xd9, 0xb5, 0xd7, 0x99, 0x5d,
+	0x7b, 0x38, 0x8d, 0x98, 0x2c, 0x6a, 0x19, 0xe2, 0xc8, 0xfd, 0x28, 0x29, 0x07, 0xf9, 0x88, 0x22,
+	0x76, 0xcb, 0x42, 0x3f, 0xe9, 0x4a, 0xcb, 0x3c, 0x81, 0xb4, 0x57, 0x57, 0x95, 0x3e, 0x7b, 0x0f,
+	0x00, 0x00, 0xff, 0xff, 0x15, 0xf7, 0x8e, 0x19, 0xf2, 0x02, 0x00, 0x00,
 }
 
 func (m *EventRingCreated) Marshal() (dAtA []byte, err error) {
@@ -507,26 +465,19 @@ func (m *EventRingCreated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Artifact)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.Artifact)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.CreatorDid) > 0 {
 		i -= len(m.CreatorDid)
 		copy(dAtA[i:], m.CreatorDid)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.CreatorDid)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -558,19 +509,12 @@ func (m *EventRingUpdated) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.UpdaterDid)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.UpdaterDid)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -602,19 +546,12 @@ func (m *EventDocumentStored) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.CreatorDid)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.CreatorDid)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.DocumentId) > 0 {
 		i -= len(m.DocumentId)
 		copy(dAtA[i:], m.DocumentId)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.DocumentId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -646,19 +583,12 @@ func (m *EventKeyDerivationStored) MarshalToSizedBuffer(dAtA []byte) (int, error
 		copy(dAtA[i:], m.CreatorDid)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.CreatorDid)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.KeyDerivationId) > 0 {
 		i -= len(m.KeyDerivationId)
 		copy(dAtA[i:], m.KeyDerivationId)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.KeyDerivationId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -764,19 +694,12 @@ func (m *EventRingDeleted) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Reason)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.Reason)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x12
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintEvents(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintEvents(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -800,10 +723,6 @@ func (m *EventRingCreated) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvents(uint64(l))
-	}
 	l = len(m.RingId)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
@@ -825,10 +744,6 @@ func (m *EventRingUpdated) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvents(uint64(l))
-	}
 	l = len(m.RingId)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
@@ -846,10 +761,6 @@ func (m *EventDocumentStored) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvents(uint64(l))
-	}
 	l = len(m.DocumentId)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
@@ -867,10 +778,6 @@ func (m *EventKeyDerivationStored) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvents(uint64(l))
-	}
 	l = len(m.KeyDerivationId)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
@@ -922,10 +829,6 @@ func (m *EventRingDeleted) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovEvents(uint64(l))
-	}
 	l = len(m.RingId)
 	if l > 0 {
 		n += 1 + l + sovEvents(uint64(l))
@@ -974,38 +877,6 @@ func (m *EventRingCreated) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvents
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvents
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvents
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -1036,7 +907,7 @@ func (m *EventRingCreated) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
 			}
@@ -1068,7 +939,7 @@ func (m *EventRingCreated) Unmarshal(dAtA []byte) error {
 			}
 			m.CreatorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Artifact", wireType)
 			}
@@ -1152,38 +1023,6 @@ func (m *EventRingUpdated) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvents
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvents
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvents
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -1214,7 +1053,7 @@ func (m *EventRingUpdated) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdaterDid", wireType)
 			}
@@ -1298,38 +1137,6 @@ func (m *EventDocumentStored) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvents
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvents
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvents
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DocumentId", wireType)
 			}
 			var stringLen uint64
@@ -1360,7 +1167,7 @@ func (m *EventDocumentStored) Unmarshal(dAtA []byte) error {
 			}
 			m.DocumentId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
 			}
@@ -1444,38 +1251,6 @@ func (m *EventKeyDerivationStored) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvents
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvents
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvents
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field KeyDerivationId", wireType)
 			}
 			var stringLen uint64
@@ -1506,7 +1281,7 @@ func (m *EventKeyDerivationStored) Unmarshal(dAtA []byte) error {
 			}
 			m.KeyDerivationId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
 			}
@@ -1818,38 +1593,6 @@ func (m *EventRingDeleted) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowEvents
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvents
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvents
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -1880,7 +1623,7 @@ func (m *EventRingDeleted) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 3:
+		case 2:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Reason", wireType)
 			}

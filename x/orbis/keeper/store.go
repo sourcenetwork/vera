@@ -49,13 +49,13 @@ func (k *Keeper) SetDocument(ctx context.Context, document types.Document) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.DocumentKeyPrefix))
 	bz := k.cdc.MustMarshal(&document)
-	store.Set(types.DocumentKey(document.Namespace, document.Id), bz)
+	store.Set([]byte(document.Id), bz)
 }
 
-func (k *Keeper) GetDocument(ctx context.Context, namespaceID, documentID string) *types.Document {
+func (k *Keeper) GetDocument(ctx context.Context, documentID string) *types.Document {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.DocumentKeyPrefix))
-	bz := store.Get(types.DocumentKey(namespaceID, documentID))
+	bz := store.Get([]byte(documentID))
 	if bz == nil {
 		return nil
 	}
@@ -77,13 +77,13 @@ func (k *Keeper) SetKeyDerivation(ctx context.Context, keyDerivation types.KeyDe
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.KeyDerivationKeyPrefix))
 	bz := k.cdc.MustMarshal(&keyDerivation)
-	store.Set(types.KeyDerivationKey(keyDerivation.Namespace, keyDerivation.Id), bz)
+	store.Set([]byte(keyDerivation.Id), bz)
 }
 
-func (k *Keeper) GetKeyDerivation(ctx context.Context, namespaceID, keyDerivationID string) *types.KeyDerivation {
+func (k *Keeper) GetKeyDerivation(ctx context.Context, keyDerivationID string) *types.KeyDerivation {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.KeyDerivationKeyPrefix))
-	bz := store.Get(types.KeyDerivationKey(namespaceID, keyDerivationID))
+	bz := store.Get([]byte(keyDerivationID))
 	if bz == nil {
 		return nil
 	}

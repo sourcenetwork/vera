@@ -45,13 +45,12 @@ message MsgUpdateParamsResponse {}
 message MsgCreateRing {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
-  string namespace = 2;
-  repeated string peer_node_keys = 4;
-  uint32 threshold = 5;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
   // Absent means automatic PSS refresh is disabled.
-  optional uint64 pss_interval = 6;
-  string policy_id = 7;
-  string artifact = 8;
+  optional uint64 pss_interval = 4;
+  string policy_id = 5;
+  string artifact = 6;
 }
 
 message MsgCreateRingResponse {
@@ -93,28 +92,26 @@ message MsgFinalizeRingReshareByThresholdSignatureResponse {}
 message RingReshareFinalizeSignDoc {
   string domain = 1;
   string chain_id = 2;
-  string namespace = 3;
-  string ring_id = 4;
-  string ring_pk = 5;
-  bytes current_ring_sha256 = 6;
-  bytes finalized_ring_sha256 = 7;
-  uint64 block_number_nonce = 8;
+  string ring_id = 3;
+  string ring_pk = 4;
+  bytes current_ring_sha256 = 5;
+  bytes finalized_ring_sha256 = 6;
+  uint64 block_number_nonce = 7;
 }
 
 message MsgStoreDocument {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
-  string namespace = 2;
-  string ring_id = 3;
-  string document = 4;
-  string proof = 5;
-  string policy_id = 6;
-  string resource = 7;
-  string permission = 8;
+  string ring_id = 2;
+  string document = 3;
+  string proof = 4;
+  string policy_id = 5;
+  string resource = 6;
+  string permission = 7;
   // Absent means no tier.
-  optional string tier = 9;
+  optional string tier = 8;
   // Absent means no timestamp.
-  optional uint64 timestamp = 10;
+  optional uint64 timestamp = 9;
 }
 
 message MsgStoreDocumentResponse {
@@ -124,12 +121,11 @@ message MsgStoreDocumentResponse {
 message MsgStoreKeyDerivation {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
-  string namespace = 2;
-  string ring_id = 3;
-  string derivation = 4;
-  string policy_id = 5;
-  string resource = 6;
-  string permission = 7;
+  string ring_id = 2;
+  string derivation = 3;
+  string policy_id = 4;
+  string resource = 5;
+  string permission = 6;
 }
 
 message MsgStoreKeyDerivationResponse {
@@ -141,7 +137,7 @@ message MsgCreateNodeInfo {
   string creator = 1;
   string peer_id = 2;
   string controller_key = 3;
-  repeated string whitelisted_namespaces = 4;
+  repeated string whitelisted_policy_ids = 4;
   repeated string whitelisted_ring_ids = 5;
 }
 
@@ -153,7 +149,7 @@ message MsgUpdateNodeInfo {
   string node_key = 2;
   // Absent means no peer_id update.
   optional string peer_id = 3;
-  repeated string whitelisted_namespaces = 4;
+  repeated string whitelisted_policy_ids = 4;
   repeated string whitelisted_ring_ids = 5;
   // Absent means no controller_key update.
   optional string controller_key = 6;

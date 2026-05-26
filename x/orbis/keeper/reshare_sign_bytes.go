@@ -20,7 +20,6 @@ func ringReshareFinalizeSignBytes(
 	signDoc := types.RingReshareFinalizeSignDoc{
 		Domain:              RingReshareFinalizeSignDocDomain,
 		ChainId:             chainID,
-		Namespace:           currentRing.Namespace,
 		RingId:              currentRing.Id,
 		RingPk:              currentRing.RingPk,
 		CurrentRingSha256:   currentRingHash[:],

@@ -20,8 +20,6 @@ func validateRing(ring *types.Ring) error {
 	switch {
 	case ring.Id == "":
 		return types.ErrInvalidRingId
-	case ring.Namespace == "":
-		return types.ErrInvalidNamespaceId
 	case len(ring.PeerNodeKeys) == 0:
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing peer_node_keys")
 	case ring.Threshold == 0 || int(ring.Threshold) > len(ring.PeerNodeKeys):
@@ -106,7 +104,6 @@ func validatePeerNodeKeyFormat(key string) error {
 	return nil
 }
 
-
 func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	finalized := *currentRing
 	if len(finalized.NewPeerNodeKeys) == 0 && finalized.XNewThreshold == nil {
@@ -133,8 +130,6 @@ func validateDocument(document *types.Document) error {
 	switch {
 	case document.Id == "":
 		return types.ErrInvalidDocumentId
-	case document.Namespace == "":
-		return types.ErrInvalidNamespaceId
 	case document.RingId == "":
 		return types.ErrInvalidRingId
 	case document.Document == "":
@@ -151,8 +146,6 @@ func validateKeyDerivation(keyDerivation *types.KeyDerivation) error {
 	switch {
 	case keyDerivation.Id == "":
 		return types.ErrInvalidKeyDerivationId
-	case keyDerivation.Namespace == "":
-		return types.ErrInvalidNamespaceId
 	case keyDerivation.RingId == "":
 		return types.ErrInvalidRingId
 	case keyDerivation.Derivation == "":

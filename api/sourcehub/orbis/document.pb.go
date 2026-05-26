@@ -25,18 +25,17 @@ const (
 type Document struct {
 	state      protoimpl.MessageState `protogen:"open.v1"`
 	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace  string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid string                 `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingId     string                 `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	Document   string                 `protobuf:"bytes,5,opt,name=document,proto3" json:"document,omitempty"`
-	Proof      string                 `protobuf:"bytes,6,opt,name=proof,proto3" json:"proof,omitempty"`
-	PolicyId   string                 `protobuf:"bytes,7,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Resource   string                 `protobuf:"bytes,8,opt,name=resource,proto3" json:"resource,omitempty"`
-	Permission string                 `protobuf:"bytes,9,opt,name=permission,proto3" json:"permission,omitempty"`
+	CreatorDid string                 `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingId     string                 `protobuf:"bytes,3,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Document   string                 `protobuf:"bytes,4,opt,name=document,proto3" json:"document,omitempty"`
+	Proof      string                 `protobuf:"bytes,5,opt,name=proof,proto3" json:"proof,omitempty"`
+	PolicyId   string                 `protobuf:"bytes,6,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Resource   string                 `protobuf:"bytes,7,opt,name=resource,proto3" json:"resource,omitempty"`
+	Permission string                 `protobuf:"bytes,8,opt,name=permission,proto3" json:"permission,omitempty"`
 	// Absent means no tier.
-	Tier *string `protobuf:"bytes,10,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
+	Tier *string `protobuf:"bytes,9,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
 	// Absent means no timestamp.
-	Timestamp     *uint64 `protobuf:"varint,11,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	Timestamp     *uint64 `protobuf:"varint,10,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,13 +73,6 @@ func (*Document) Descriptor() ([]byte, []int) {
 func (x *Document) GetId() string {
 	if x != nil {
 		return x.Id
-	}
-	return ""
-}
-
-func (x *Document) GetNamespace() string {
-	if x != nil {
-		return x.Namespace
 	}
 	return ""
 }
@@ -152,23 +144,22 @@ var File_sourcehub_orbis_document_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_document_proto_rawDesc = "" +
 	"\n" +
-	"\x1esourcehub/orbis/document.proto\x12\x0fsourcehub.orbis\"\xd0\x02\n" +
+	"\x1esourcehub/orbis/document.proto\x12\x0fsourcehub.orbis\"\xb2\x02\n" +
 	"\bDocument\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x1f\n" +
-	"\vcreator_did\x18\x03 \x01(\tR\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\vcreator_did\x18\x02 \x01(\tR\n" +
 	"creatorDid\x12\x17\n" +
-	"\aring_id\x18\x04 \x01(\tR\x06ringId\x12\x1a\n" +
-	"\bdocument\x18\x05 \x01(\tR\bdocument\x12\x14\n" +
-	"\x05proof\x18\x06 \x01(\tR\x05proof\x12\x1b\n" +
-	"\tpolicy_id\x18\a \x01(\tR\bpolicyId\x12\x1a\n" +
-	"\bresource\x18\b \x01(\tR\bresource\x12\x1e\n" +
+	"\aring_id\x18\x03 \x01(\tR\x06ringId\x12\x1a\n" +
+	"\bdocument\x18\x04 \x01(\tR\bdocument\x12\x14\n" +
+	"\x05proof\x18\x05 \x01(\tR\x05proof\x12\x1b\n" +
+	"\tpolicy_id\x18\x06 \x01(\tR\bpolicyId\x12\x1a\n" +
+	"\bresource\x18\a \x01(\tR\bresource\x12\x1e\n" +
 	"\n" +
-	"permission\x18\t \x01(\tR\n" +
+	"permission\x18\b \x01(\tR\n" +
 	"permission\x12\x17\n" +
-	"\x04tier\x18\n" +
-	" \x01(\tH\x00R\x04tier\x88\x01\x01\x12!\n" +
-	"\ttimestamp\x18\v \x01(\x04H\x01R\ttimestamp\x88\x01\x01B\a\n" +
+	"\x04tier\x18\t \x01(\tH\x00R\x04tier\x88\x01\x01\x12!\n" +
+	"\ttimestamp\x18\n" +
+	" \x01(\x04H\x01R\ttimestamp\x88\x01\x01B\a\n" +
 	"\x05_tierB\f\n" +
 	"\n" +
 	"_timestampB\xa3\x01\n" +

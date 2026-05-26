@@ -7,7 +7,7 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 message NodeInfo {
   string peer_id = 1;
   string controller_key = 2;
-  repeated string whitelisted_namespaces = 3;
+  repeated string whitelisted_policy_ids = 3;
   repeated string whitelisted_ring_ids = 4;
 }
 

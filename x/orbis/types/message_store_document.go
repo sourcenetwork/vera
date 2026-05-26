@@ -8,10 +8,9 @@ import (
 
 var _ sdk.Msg = &MsgStoreDocument{}
 
-func NewMsgStoreDocument(creator, namespace, ringID, document, proof, policyID, resource, permission string) *MsgStoreDocument {
+func NewMsgStoreDocument(creator, ringID, document, proof, policyID, resource, permission string) *MsgStoreDocument {
 	return &MsgStoreDocument{
 		Creator:    creator,
-		Namespace:  namespace,
 		RingId:     ringID,
 		Document:   document,
 		Proof:      proof,
@@ -24,9 +23,6 @@ func NewMsgStoreDocument(creator, namespace, ringID, document, proof, policyID, 
 func (msg *MsgStoreDocument) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-	if msg.Namespace == "" {
-		return ErrInvalidNamespaceId
 	}
 	if msg.RingId == "" {
 		return ErrInvalidRingId
