@@ -8,11 +8,12 @@ import (
 
 var _ sdk.Msg = &MsgCreateRing{}
 
-func NewMsgCreateRing(creator string, peerNodeKeys []string, threshold uint32) *MsgCreateRing {
+func NewMsgCreateRing(creator string, peerNodeKeys []string, threshold uint32, policyID string) *MsgCreateRing {
 	return &MsgCreateRing{
 		Creator:      creator,
 		PeerNodeKeys: peerNodeKeys,
 		Threshold:    threshold,
+		PolicyId:     policyID,
 	}
 }
 
@@ -25,6 +26,9 @@ func (msg *MsgCreateRing) ValidateBasic() error {
 	}
 	if msg.Threshold == 0 || int(msg.Threshold) > len(msg.PeerNodeKeys) {
 		return errorsmod.Wrapf(ErrInvalidRing, "threshold %d is invalid for committee size %d", msg.Threshold, len(msg.PeerNodeKeys))
+	}
+	if msg.PolicyId == "" {
+		return errorsmod.Wrap(ErrInvalidRing, "missing policy_id")
 	}
 	return nil
 }

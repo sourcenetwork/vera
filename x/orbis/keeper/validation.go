@@ -24,6 +24,8 @@ func validateRing(ring *types.Ring) error {
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing peer_node_keys")
 	case ring.Threshold == 0 || int(ring.Threshold) > len(ring.PeerNodeKeys):
 		return errorsmod.Wrapf(types.ErrInvalidRing, "threshold %d is invalid for committee size %d", ring.Threshold, len(ring.PeerNodeKeys))
+	case ring.PolicyId == "":
+		return errorsmod.Wrap(types.ErrInvalidRing, "missing policy_id")
 	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {

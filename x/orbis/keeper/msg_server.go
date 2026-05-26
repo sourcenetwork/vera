@@ -59,6 +59,14 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
+	if err := k.ensureRingCreatePermission(goCtx, msg.PolicyId, creatorDID); err != nil {
+		return nil, err
+	}
+
+	if err := k.registerRingACPObject(goCtx, msg.Creator, msg.PolicyId, ringID); err != nil {
+		return nil, err
+	}
+
 	k.SetRing(goCtx, ring)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingCreated{
@@ -164,6 +172,9 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 
 	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
 	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
 		return nil, err
 	}
 

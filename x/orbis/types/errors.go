@@ -30,4 +30,6 @@ var (
 	ErrDuplicateConfirmation      = sdkerrors.Register(ModuleName, 1227, "node has already submitted a finalize confirmation")
 	ErrRingPkConflict             = sdkerrors.Register(ModuleName, 1228, "submitted ring_pk conflicts with existing confirmation; ring deleted")
 	ErrRingNotFinalized           = sdkerrors.Register(ModuleName, 1229, "ring is not finalized")
+	ErrUnauthorizedRingUpdate     = sdkerrors.Register(ModuleName, 1230, "actor is not authorized to update ring")
+	ErrUnauthorizedRingCreate     = sdkerrors.Register(ModuleName, 1231, "actor is not authorized to create ring")
 )

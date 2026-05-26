@@ -57,9 +57,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{RpcMethod: "UpdateParams", Skip: true},
 				{
 					RpcMethod:      "CreateRing",
-					Use:            "create-ring [threshold]",
+					Use:            "create-ring [threshold] [policy_id]",
 					Short:          "Create an Orbis ring",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "policy_id"}},
 				},
 				{
 					RpcMethod:      "UpdateRingByAcp",
