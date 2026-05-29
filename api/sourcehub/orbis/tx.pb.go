@@ -123,9 +123,8 @@ type MsgCreateRing struct {
 	// Absent means automatic PSS refresh is disabled.
 	PssInterval *uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
 	PolicyId    string  `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Artifact    string  `protobuf:"bytes,6,opt,name=artifact,proto3" json:"artifact,omitempty"`
 	// Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
-	Nonce         *string `protobuf:"bytes,7,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
+	Nonce         *string `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -191,13 +190,6 @@ func (x *MsgCreateRing) GetPssInterval() uint64 {
 func (x *MsgCreateRing) GetPolicyId() string {
 	if x != nil {
 		return x.PolicyId
-	}
-	return ""
-}
-
-func (x *MsgCreateRing) GetArtifact() string {
-	if x != nil {
-		return x.Artifact
 	}
 	return ""
 }
@@ -1153,14 +1145,24 @@ func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{17}
 }
 
+// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
+// The signer must be the current controller_key holder.
+//
+// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
+// full, not merged. To add a single entry you must re-send the complete desired
+// list. Sending an empty repeated field clears the whitelist entirely.
 type MsgUpdateNodeInfo struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Creator string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	NodeKey string                 `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
 	// Absent means no peer_id update.
-	PeerId               *string  `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
+	PeerId *string `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
+	// Replaces the full policy whitelist. Send the complete desired list on every
+	// update; an empty field clears all whitelisted policies.
 	WhitelistedPolicyIds []string `protobuf:"bytes,4,rep,name=whitelisted_policy_ids,json=whitelistedPolicyIds,proto3" json:"whitelisted_policy_ids,omitempty"`
-	WhitelistedRingIds   []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	// Replaces the full ring whitelist. Send the complete desired list on every
+	// update; an empty field clears all whitelisted rings.
+	WhitelistedRingIds []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
 	// Absent means no controller_key update.
 	ControllerKey *string `protobuf:"bytes,6,opt,name=controller_key,json=controllerKey,proto3,oneof" json:"controller_key,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -1283,15 +1285,14 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x12:\n" +
 	"\x06params\x18\x02 \x01(\v2\x17.sourcehub.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:4\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*!sourcehub/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\x92\x02\n" +
+	"\x17MsgUpdateParamsResponse\"\xf6\x01\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
 	"\tthreshold\x18\x03 \x01(\rR\tthreshold\x12&\n" +
 	"\fpss_interval\x18\x04 \x01(\x04H\x00R\vpssInterval\x88\x01\x01\x12\x1b\n" +
-	"\tpolicy_id\x18\x05 \x01(\tR\bpolicyId\x12\x1a\n" +
-	"\bartifact\x18\x06 \x01(\tR\bartifact\x12\x19\n" +
-	"\x05nonce\x18\a \x01(\tH\x01R\x05nonce\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
+	"\tpolicy_id\x18\x05 \x01(\tR\bpolicyId\x12\x19\n" +
+	"\x05nonce\x18\x06 \x01(\tH\x01R\x05nonce\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
 	"\r_pss_intervalB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +

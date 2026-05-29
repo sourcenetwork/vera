@@ -8,7 +8,6 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 message EventRingCreated {
   string ring_id = 1;
   string creator_did = 2;
-  string artifact = 3;
 }
 
 // EventRingUpdated is emitted when a ring is updated in place.

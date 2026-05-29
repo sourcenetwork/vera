@@ -73,7 +73,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingCreated{
 		RingId:     ringID,
 		CreatorDid: creatorDID,
-		Artifact:   msg.Artifact,
 	}); err != nil {
 		return nil, err
 	}
@@ -107,7 +106,18 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, types.ErrInvalidRingFinalizer
 	}
 
-	// Check for a conflicting ring_pk from a prior confirmation.
+	// Reject double confirmations from the same node before checking for
+	// pk conflicts. Without this ordering a node that already confirmed
+	// correctly could delete the ring by re-submitting with a different
+	// ring_pk — the conflict check would fire first and wipe the ring.
+	for _, c := range ring.Confirmations {
+		if c.NodeKey == signerKey {
+			return nil, types.ErrDuplicateConfirmation
+		}
+	}
+
+	// Check for a conflicting ring_pk from a prior confirmation by a
+	// different node. This is a genuine BFT violation — delete the ring.
 	for _, c := range ring.Confirmations {
 		if c.RingPk != msg.RingPk {
 			_ = ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
@@ -116,13 +126,6 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 			})
 			k.DeleteRing(goCtx, ring.Id)
 			return nil, types.ErrRingPkConflict
-		}
-	}
-
-	// Reject double confirmations from the same node.
-	for _, c := range ring.Confirmations {
-		if c.NodeKey == signerKey {
-			return nil, types.ErrDuplicateConfirmation
 		}
 	}
 

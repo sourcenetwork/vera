@@ -50,9 +50,8 @@ message MsgCreateRing {
   // Absent means automatic PSS refresh is disabled.
   optional uint64 pss_interval = 4;
   string policy_id = 5;
-  string artifact = 6;
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
-  optional string nonce = 7;
+  optional string nonce = 6;
 }
 
 message MsgCreateRingResponse {
@@ -156,13 +155,23 @@ message MsgCreateNodeInfo {
 
 message MsgCreateNodeInfoResponse {}
 
+// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
+// The signer must be the current controller_key holder.
+//
+// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
+// full, not merged. To add a single entry you must re-send the complete desired
+// list. Sending an empty repeated field clears the whitelist entirely.
 message MsgUpdateNodeInfo {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string node_key = 2;
   // Absent means no peer_id update.
   optional string peer_id = 3;
+  // Replaces the full policy whitelist. Send the complete desired list on every
+  // update; an empty field clears all whitelisted policies.
   repeated string whitelisted_policy_ids = 4;
+  // Replaces the full ring whitelist. Send the complete desired list on every
+  // update; an empty field clears all whitelisted rings.
   repeated string whitelisted_ring_ids = 5;
   // Absent means no controller_key update.
   optional string controller_key = 6;

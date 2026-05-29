@@ -71,7 +71,6 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 		XPssInterval: &types.MsgCreateRing_PssInterval{
 			PssInterval: pssInterval,
 		},
-		Artifact: "ring-artifact",
 	})
 	require.NoError(t, err)
 

@@ -6,7 +6,6 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -37,7 +36,7 @@ func (k *Keeper) DeleteRing(ctx context.Context, ringID string) {
 	store.Delete([]byte(ringID))
 }
 
-func (k *Keeper) GetAllRings(ctx sdk.Context) []types.Ring {
+func (k *Keeper) GetAllRings(ctx context.Context) []types.Ring {
 	var rings []types.Ring
 	k.mustIterateRings(ctx, func(ring types.Ring) {
 		rings = append(rings, ring)
