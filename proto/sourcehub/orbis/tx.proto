@@ -101,6 +101,17 @@ message RingReshareFinalizeSignDoc {
   uint64 block_number_nonce = 7;
 }
 
+message RingReshareSignState {
+  string ring_pk = 1;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
+  repeated string new_peer_node_keys = 4;
+  optional uint32 new_threshold = 5;
+  optional uint64 pss_interval = 6;
+  uint64 block_number_nonce = 7;
+  string policy_id = 8;
+}
+
 message MsgStoreDocument {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;

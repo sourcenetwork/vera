@@ -225,21 +225,12 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 		return nil, err
 	}
 
-	currentRingBytes, err := k.RingBytes(*ring)
-	if err != nil {
-		return nil, errorsmod.Wrapf(types.ErrInvalidRing, "could not marshal current ring: %s", err)
-	}
-
 	signDocFinalizedRing, err := ringForReshareFinalization(ring)
 	if err != nil {
 		return nil, err
 	}
-	signDocFinalizedRingBytes, err := k.RingBytes(*signDocFinalizedRing)
-	if err != nil {
-		return nil, errorsmod.Wrapf(types.ErrInvalidRing, "could not marshal finalized ring: %s", err)
-	}
 
-	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), ring, currentRingBytes, signDocFinalizedRingBytes)
+	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), ring, signDocFinalizedRing)
 	if err != nil {
 		return nil, err
 	}
