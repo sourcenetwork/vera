@@ -443,7 +443,7 @@ func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
 }
 
-func TestMsgServer_FinalizeRing_PkConflictDeletesRing(t *testing.T) {
+func TestMsgServer_FinalizeRing_PkConflictRejected(t *testing.T) {
 	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
@@ -465,10 +465,10 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRing(t *testing.T) {
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "pk-version-A"})
 	require.NoError(t, err)
 
-	// peer2 disagrees on the ring_pk → conflict, ring deleted
+	// peer2 disagrees on the ring_pk -> conflict rejected, ring remains
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "pk-version-B"})
 	require.ErrorIs(t, err, types.ErrRingPkConflict)
-	require.Nil(t, k.GetRing(ctx, ringID))
+	require.NotNil(t, k.GetRing(ctx, ringID))
 }
 
 func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
