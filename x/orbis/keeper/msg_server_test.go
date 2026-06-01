@@ -654,6 +654,44 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 }
 
+func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {
+	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+			NewThreshold: 3,
+		},
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "new_threshold (3) cannot exceed existing committee size (2)")
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.NotNil(t, ring)
+	require.Nil(t, ring.XNewThreshold)
+}
+
 func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
 	creatorCtx := ctxWithDID(ctx, testDID)

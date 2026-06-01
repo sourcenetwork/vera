@@ -66,6 +66,14 @@ func validateRingUpdate(newPeerNodeKeys []string, newThreshold *uint32, existing
 	if newThreshold != nil && *newThreshold < 1 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
+	if len(newPeerNodeKeys) == 0 && newThreshold != nil && *newThreshold > uint32(len(existing.PeerNodeKeys)) {
+		return errorsmod.Wrapf(
+			types.ErrInvalidRing,
+			"new_threshold (%d) cannot exceed existing committee size (%d)",
+			*newThreshold,
+			len(existing.PeerNodeKeys),
+		)
+	}
 	if len(newPeerNodeKeys) > 0 && newThreshold != nil && uint32(len(newPeerNodeKeys)) < *newThreshold {
 		return errorsmod.Wrapf(
 			types.ErrInvalidRing,
