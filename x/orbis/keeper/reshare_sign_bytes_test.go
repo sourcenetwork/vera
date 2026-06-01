@@ -70,4 +70,20 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 	require.NoError(t, err)
 
 	require.Equal(t, signBytes, sameSignStateBytes)
+
+	distinctSignState := *current
+	distinctSignState.XNewThreshold = &types.Ring_NewThreshold{
+		NewThreshold: 2,
+	}
+	distinctSignStateFinalized, err := ringForReshareFinalization(&distinctSignState)
+	require.NoError(t, err)
+
+	distinctSignStateBytes, err := ringReshareFinalizeSignBytes(
+		"sourcehub-test",
+		&distinctSignState,
+		distinctSignStateFinalized,
+	)
+	require.NoError(t, err)
+
+	require.NotEqual(t, signBytes, distinctSignStateBytes)
 }
