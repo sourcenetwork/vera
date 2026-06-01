@@ -6,16 +6,22 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 // Ring stores the active and pending committee metadata for an Orbis ring.
 message Ring {
   string id = 1;
-  string namespace = 2;
-  string creator_did = 3;
-  string ring_pk = 4;
-  repeated string peer_ids = 5;
-  uint32 threshold = 6;
-  repeated string new_peer_ids = 7;
+  string creator_did = 2;
+  string ring_pk = 3;
+  repeated string peer_node_keys = 4;
+  uint32 threshold = 5;
+  repeated string new_peer_node_keys = 6;
   // Absent means no pending threshold update.
-  optional uint32 new_threshold = 8;
+  optional uint32 new_threshold = 7;
   // Absent means automatic PSS refresh is disabled.
-  optional uint64 pss_interval = 9;
-  uint64 block_number_nonce = 10;
-  string policy_id = 11;
+  optional uint64 pss_interval = 8;
+  uint64 block_number_nonce = 9;
+  string policy_id = 10;
+  repeated RingConfirmation confirmations = 11;
+}
+
+// RingConfirmation records a single peer's agreement on the ring public key.
+message RingConfirmation {
+  string node_key = 1;
+  string ring_pk = 2;
 }

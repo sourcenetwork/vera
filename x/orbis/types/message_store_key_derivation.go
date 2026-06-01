@@ -8,10 +8,9 @@ import (
 
 var _ sdk.Msg = &MsgStoreKeyDerivation{}
 
-func NewMsgStoreKeyDerivation(creator, namespace, ringID, derivation, policyID, resource, permission string) *MsgStoreKeyDerivation {
+func NewMsgStoreKeyDerivation(creator, ringID, derivation, policyID, resource, permission string) *MsgStoreKeyDerivation {
 	return &MsgStoreKeyDerivation{
 		Creator:    creator,
-		Namespace:  namespace,
 		RingId:     ringID,
 		Derivation: derivation,
 		PolicyId:   policyID,
@@ -23,9 +22,6 @@ func NewMsgStoreKeyDerivation(creator, namespace, ringID, derivation, policyID, 
 func (msg *MsgStoreKeyDerivation) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-	if msg.Namespace == "" {
-		return ErrInvalidNamespaceId
 	}
 	if msg.RingId == "" {
 		return ErrInvalidRingId

@@ -122,16 +122,16 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
 type MsgCreateRing struct {
-	Creator   string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Namespace string   `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingPk    string   `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerIds   []string `protobuf:"bytes,4,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
-	Threshold uint32   `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	Creator      string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PeerNodeKeys []string `protobuf:"bytes,2,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold    uint32   `protobuf:"varint,3,opt,name=threshold,proto3" json:"threshold,omitempty"`
 	// Types that are valid to be assigned to XPssInterval:
 	//	*MsgCreateRing_PssInterval
 	XPssInterval isMsgCreateRing_XPssInterval `protobuf_oneof:"_pss_interval"`
-	PolicyId     string                       `protobuf:"bytes,7,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Artifact     string                       `protobuf:"bytes,8,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	PolicyId     string                       `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	// Types that are valid to be assigned to XNonce:
+	//	*MsgCreateRing_Nonce
+	XNonce isMsgCreateRing_XNonce `protobuf_oneof:"_nonce"`
 }
 
 func (m *MsgCreateRing) Reset()         { *m = MsgCreateRing{} }
@@ -172,16 +172,31 @@ type isMsgCreateRing_XPssInterval interface {
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
+type isMsgCreateRing_XNonce interface {
+	isMsgCreateRing_XNonce()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
 
 type MsgCreateRing_PssInterval struct {
-	PssInterval uint64 `protobuf:"varint,6,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	PssInterval uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+}
+type MsgCreateRing_Nonce struct {
+	Nonce string `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
 }
 
 func (*MsgCreateRing_PssInterval) isMsgCreateRing_XPssInterval() {}
+func (*MsgCreateRing_Nonce) isMsgCreateRing_XNonce()             {}
 
 func (m *MsgCreateRing) GetXPssInterval() isMsgCreateRing_XPssInterval {
 	if m != nil {
 		return m.XPssInterval
+	}
+	return nil
+}
+func (m *MsgCreateRing) GetXNonce() isMsgCreateRing_XNonce {
+	if m != nil {
+		return m.XNonce
 	}
 	return nil
 }
@@ -193,23 +208,9 @@ func (m *MsgCreateRing) GetCreator() string {
 	return ""
 }
 
-func (m *MsgCreateRing) GetNamespace() string {
+func (m *MsgCreateRing) GetPeerNodeKeys() []string {
 	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-func (m *MsgCreateRing) GetRingPk() string {
-	if m != nil {
-		return m.RingPk
-	}
-	return ""
-}
-
-func (m *MsgCreateRing) GetPeerIds() []string {
-	if m != nil {
-		return m.PeerIds
+		return m.PeerNodeKeys
 	}
 	return nil
 }
@@ -235,9 +236,9 @@ func (m *MsgCreateRing) GetPolicyId() string {
 	return ""
 }
 
-func (m *MsgCreateRing) GetArtifact() string {
-	if m != nil {
-		return m.Artifact
+func (m *MsgCreateRing) GetNonce() string {
+	if x, ok := m.GetXNonce().(*MsgCreateRing_Nonce); ok {
+		return x.Nonce
 	}
 	return ""
 }
@@ -246,6 +247,7 @@ func (m *MsgCreateRing) GetArtifact() string {
 func (*MsgCreateRing) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
 		(*MsgCreateRing_PssInterval)(nil),
+		(*MsgCreateRing_Nonce)(nil),
 	}
 }
 
@@ -293,10 +295,106 @@ func (m *MsgCreateRingResponse) GetRingId() string {
 	return ""
 }
 
+type MsgFinalizeRing struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId  string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	RingPk  string `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+}
+
+func (m *MsgFinalizeRing) Reset()         { *m = MsgFinalizeRing{} }
+func (m *MsgFinalizeRing) String() string { return proto.CompactTextString(m) }
+func (*MsgFinalizeRing) ProtoMessage()    {}
+func (*MsgFinalizeRing) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{4}
+}
+func (m *MsgFinalizeRing) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgFinalizeRing) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgFinalizeRing.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgFinalizeRing) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFinalizeRing.Merge(m, src)
+}
+func (m *MsgFinalizeRing) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgFinalizeRing) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFinalizeRing.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgFinalizeRing proto.InternalMessageInfo
+
+func (m *MsgFinalizeRing) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgFinalizeRing) GetRingId() string {
+	if m != nil {
+		return m.RingId
+	}
+	return ""
+}
+
+func (m *MsgFinalizeRing) GetRingPk() string {
+	if m != nil {
+		return m.RingPk
+	}
+	return ""
+}
+
+type MsgFinalizeRingResponse struct {
+}
+
+func (m *MsgFinalizeRingResponse) Reset()         { *m = MsgFinalizeRingResponse{} }
+func (m *MsgFinalizeRingResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgFinalizeRingResponse) ProtoMessage()    {}
+func (*MsgFinalizeRingResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{5}
+}
+func (m *MsgFinalizeRingResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgFinalizeRingResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgFinalizeRingResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgFinalizeRingResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFinalizeRingResponse.Merge(m, src)
+}
+func (m *MsgFinalizeRingResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgFinalizeRingResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFinalizeRingResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgFinalizeRingResponse proto.InternalMessageInfo
+
 type MsgUpdateRingByAcp struct {
-	Creator    string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	RingId     string   `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	NewPeerIds []string `protobuf:"bytes,3,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	Creator         string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId          string   `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	NewPeerNodeKeys []string `protobuf:"bytes,3,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Types that are valid to be assigned to XNewThreshold:
 	//
 	//	*MsgUpdateRingByAcp_NewThreshold
@@ -311,7 +409,7 @@ func (m *MsgUpdateRingByAcp) Reset()         { *m = MsgUpdateRingByAcp{} }
 func (m *MsgUpdateRingByAcp) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateRingByAcp) ProtoMessage()    {}
 func (*MsgUpdateRingByAcp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{4}
+	return fileDescriptor_7711ae63507074e0, []int{6}
 }
 func (m *MsgUpdateRingByAcp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -388,9 +486,9 @@ func (m *MsgUpdateRingByAcp) GetRingId() string {
 	return ""
 }
 
-func (m *MsgUpdateRingByAcp) GetNewPeerIds() []string {
+func (m *MsgUpdateRingByAcp) GetNewPeerNodeKeys() []string {
 	if m != nil {
-		return m.NewPeerIds
+		return m.NewPeerNodeKeys
 	}
 	return nil
 }
@@ -424,7 +522,7 @@ func (m *MsgUpdateRingByAcpResponse) Reset()         { *m = MsgUpdateRingByAcpRe
 func (m *MsgUpdateRingByAcpResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateRingByAcpResponse) ProtoMessage()    {}
 func (*MsgUpdateRingByAcpResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{5}
+	return fileDescriptor_7711ae63507074e0, []int{7}
 }
 func (m *MsgUpdateRingByAcpResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -468,7 +566,7 @@ func (m *MsgFinalizeRingReshareByThresholdSignature) String() string {
 }
 func (*MsgFinalizeRingReshareByThresholdSignature) ProtoMessage() {}
 func (*MsgFinalizeRingReshareByThresholdSignature) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{6}
+	return fileDescriptor_7711ae63507074e0, []int{8}
 }
 func (m *MsgFinalizeRingReshareByThresholdSignature) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -536,7 +634,7 @@ func (m *MsgFinalizeRingReshareByThresholdSignatureResponse) String() string {
 }
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoMessage() {}
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{7}
+	return fileDescriptor_7711ae63507074e0, []int{9}
 }
 func (m *MsgFinalizeRingReshareByThresholdSignatureResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -568,19 +666,18 @@ var xxx_messageInfo_MsgFinalizeRingReshareByThresholdSignatureResponse proto.Int
 type RingReshareFinalizeSignDoc struct {
 	Domain              string `protobuf:"bytes,1,opt,name=domain,proto3" json:"domain,omitempty"`
 	ChainId             string `protobuf:"bytes,2,opt,name=chain_id,json=chainId,proto3" json:"chain_id,omitempty"`
-	Namespace           string `protobuf:"bytes,3,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId              string `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	RingPk              string `protobuf:"bytes,5,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	CurrentRingSha256   []byte `protobuf:"bytes,6,opt,name=current_ring_sha256,json=currentRingSha256,proto3" json:"current_ring_sha256,omitempty"`
-	FinalizedRingSha256 []byte `protobuf:"bytes,7,opt,name=finalized_ring_sha256,json=finalizedRingSha256,proto3" json:"finalized_ring_sha256,omitempty"`
-	BlockNumberNonce    uint64 `protobuf:"varint,8,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	RingId              string `protobuf:"bytes,3,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	RingPk              string `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	CurrentRingSha256   []byte `protobuf:"bytes,5,opt,name=current_ring_sha256,json=currentRingSha256,proto3" json:"current_ring_sha256,omitempty"`
+	FinalizedRingSha256 []byte `protobuf:"bytes,6,opt,name=finalized_ring_sha256,json=finalizedRingSha256,proto3" json:"finalized_ring_sha256,omitempty"`
+	BlockNumberNonce    uint64 `protobuf:"varint,7,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
 }
 
 func (m *RingReshareFinalizeSignDoc) Reset()         { *m = RingReshareFinalizeSignDoc{} }
 func (m *RingReshareFinalizeSignDoc) String() string { return proto.CompactTextString(m) }
 func (*RingReshareFinalizeSignDoc) ProtoMessage()    {}
 func (*RingReshareFinalizeSignDoc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{8}
+	return fileDescriptor_7711ae63507074e0, []int{10}
 }
 func (m *RingReshareFinalizeSignDoc) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -623,13 +720,6 @@ func (m *RingReshareFinalizeSignDoc) GetChainId() string {
 	return ""
 }
 
-func (m *RingReshareFinalizeSignDoc) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *RingReshareFinalizeSignDoc) GetRingId() string {
 	if m != nil {
 		return m.RingId
@@ -665,15 +755,162 @@ func (m *RingReshareFinalizeSignDoc) GetBlockNumberNonce() uint64 {
 	return 0
 }
 
+type RingReshareSignState struct {
+	RingPk          string   `protobuf:"bytes,1,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerNodeKeys    []string `protobuf:"bytes,2,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold       uint32   `protobuf:"varint,3,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerNodeKeys []string `protobuf:"bytes,4,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
+	// Types that are valid to be assigned to XNewThreshold:
+	//
+	//	*RingReshareSignState_NewThreshold
+	XNewThreshold isRingReshareSignState_XNewThreshold `protobuf_oneof:"_new_threshold"`
+	// Types that are valid to be assigned to XPssInterval:
+	//
+	//	*RingReshareSignState_PssInterval
+	XPssInterval     isRingReshareSignState_XPssInterval `protobuf_oneof:"_pss_interval"`
+	BlockNumberNonce uint64                              `protobuf:"varint,7,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string                              `protobuf:"bytes,8,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+}
+
+func (m *RingReshareSignState) Reset()         { *m = RingReshareSignState{} }
+func (m *RingReshareSignState) String() string { return proto.CompactTextString(m) }
+func (*RingReshareSignState) ProtoMessage()    {}
+func (*RingReshareSignState) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{11}
+}
+func (m *RingReshareSignState) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RingReshareSignState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RingReshareSignState.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RingReshareSignState) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RingReshareSignState.Merge(m, src)
+}
+func (m *RingReshareSignState) XXX_Size() int {
+	return m.Size()
+}
+func (m *RingReshareSignState) XXX_DiscardUnknown() {
+	xxx_messageInfo_RingReshareSignState.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RingReshareSignState proto.InternalMessageInfo
+
+type isRingReshareSignState_XNewThreshold interface {
+	isRingReshareSignState_XNewThreshold()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+type isRingReshareSignState_XPssInterval interface {
+	isRingReshareSignState_XPssInterval()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type RingReshareSignState_NewThreshold struct {
+	NewThreshold uint32 `protobuf:"varint,5,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
+}
+type RingReshareSignState_PssInterval struct {
+	PssInterval uint64 `protobuf:"varint,6,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+}
+
+func (*RingReshareSignState_NewThreshold) isRingReshareSignState_XNewThreshold() {}
+func (*RingReshareSignState_PssInterval) isRingReshareSignState_XPssInterval()   {}
+
+func (m *RingReshareSignState) GetXNewThreshold() isRingReshareSignState_XNewThreshold {
+	if m != nil {
+		return m.XNewThreshold
+	}
+	return nil
+}
+func (m *RingReshareSignState) GetXPssInterval() isRingReshareSignState_XPssInterval {
+	if m != nil {
+		return m.XPssInterval
+	}
+	return nil
+}
+
+func (m *RingReshareSignState) GetRingPk() string {
+	if m != nil {
+		return m.RingPk
+	}
+	return ""
+}
+
+func (m *RingReshareSignState) GetPeerNodeKeys() []string {
+	if m != nil {
+		return m.PeerNodeKeys
+	}
+	return nil
+}
+
+func (m *RingReshareSignState) GetThreshold() uint32 {
+	if m != nil {
+		return m.Threshold
+	}
+	return 0
+}
+
+func (m *RingReshareSignState) GetNewPeerNodeKeys() []string {
+	if m != nil {
+		return m.NewPeerNodeKeys
+	}
+	return nil
+}
+
+func (m *RingReshareSignState) GetNewThreshold() uint32 {
+	if x, ok := m.GetXNewThreshold().(*RingReshareSignState_NewThreshold); ok {
+		return x.NewThreshold
+	}
+	return 0
+}
+
+func (m *RingReshareSignState) GetPssInterval() uint64 {
+	if x, ok := m.GetXPssInterval().(*RingReshareSignState_PssInterval); ok {
+		return x.PssInterval
+	}
+	return 0
+}
+
+func (m *RingReshareSignState) GetBlockNumberNonce() uint64 {
+	if m != nil {
+		return m.BlockNumberNonce
+	}
+	return 0
+}
+
+func (m *RingReshareSignState) GetPolicyId() string {
+	if m != nil {
+		return m.PolicyId
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*RingReshareSignState) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*RingReshareSignState_NewThreshold)(nil),
+		(*RingReshareSignState_PssInterval)(nil),
+	}
+}
+
 type MsgStoreDocument struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId     string `protobuf:"bytes,3,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	Document   string `protobuf:"bytes,4,opt,name=document,proto3" json:"document,omitempty"`
-	Proof      string `protobuf:"bytes,5,opt,name=proof,proto3" json:"proof,omitempty"`
-	PolicyId   string `protobuf:"bytes,6,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Resource   string `protobuf:"bytes,7,opt,name=resource,proto3" json:"resource,omitempty"`
-	Permission string `protobuf:"bytes,8,opt,name=permission,proto3" json:"permission,omitempty"`
+	RingId     string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Document   string `protobuf:"bytes,3,opt,name=document,proto3" json:"document,omitempty"`
+	Proof      string `protobuf:"bytes,4,opt,name=proof,proto3" json:"proof,omitempty"`
+	PolicyId   string `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Resource   string `protobuf:"bytes,6,opt,name=resource,proto3" json:"resource,omitempty"`
+	Permission string `protobuf:"bytes,7,opt,name=permission,proto3" json:"permission,omitempty"`
 	// Types that are valid to be assigned to XTier:
 	//
 	//	*MsgStoreDocument_Tier
@@ -688,7 +925,7 @@ func (m *MsgStoreDocument) Reset()         { *m = MsgStoreDocument{} }
 func (m *MsgStoreDocument) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreDocument) ProtoMessage()    {}
 func (*MsgStoreDocument) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{9}
+	return fileDescriptor_7711ae63507074e0, []int{12}
 }
 func (m *MsgStoreDocument) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -729,10 +966,10 @@ type isMsgStoreDocument_XTimestamp interface {
 }
 
 type MsgStoreDocument_Tier struct {
-	Tier string `protobuf:"bytes,9,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
+	Tier string `protobuf:"bytes,8,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
 }
 type MsgStoreDocument_Timestamp struct {
-	Timestamp uint64 `protobuf:"varint,10,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	Timestamp uint64 `protobuf:"varint,9,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
 }
 
 func (*MsgStoreDocument_Tier) isMsgStoreDocument_XTier()           {}
@@ -754,13 +991,6 @@ func (m *MsgStoreDocument) GetXTimestamp() isMsgStoreDocument_XTimestamp {
 func (m *MsgStoreDocument) GetCreator() string {
 	if m != nil {
 		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgStoreDocument) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
 	}
 	return ""
 }
@@ -837,7 +1067,7 @@ func (m *MsgStoreDocumentResponse) Reset()         { *m = MsgStoreDocumentRespon
 func (m *MsgStoreDocumentResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreDocumentResponse) ProtoMessage()    {}
 func (*MsgStoreDocumentResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{10}
+	return fileDescriptor_7711ae63507074e0, []int{13}
 }
 func (m *MsgStoreDocumentResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -875,19 +1105,18 @@ func (m *MsgStoreDocumentResponse) GetDocumentId() string {
 
 type MsgStoreKeyDerivation struct {
 	Creator    string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Namespace  string `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	RingId     string `protobuf:"bytes,3,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	Derivation string `protobuf:"bytes,4,opt,name=derivation,proto3" json:"derivation,omitempty"`
-	PolicyId   string `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Resource   string `protobuf:"bytes,6,opt,name=resource,proto3" json:"resource,omitempty"`
-	Permission string `protobuf:"bytes,7,opt,name=permission,proto3" json:"permission,omitempty"`
+	RingId     string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	Derivation string `protobuf:"bytes,3,opt,name=derivation,proto3" json:"derivation,omitempty"`
+	PolicyId   string `protobuf:"bytes,4,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Resource   string `protobuf:"bytes,5,opt,name=resource,proto3" json:"resource,omitempty"`
+	Permission string `protobuf:"bytes,6,opt,name=permission,proto3" json:"permission,omitempty"`
 }
 
 func (m *MsgStoreKeyDerivation) Reset()         { *m = MsgStoreKeyDerivation{} }
 func (m *MsgStoreKeyDerivation) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreKeyDerivation) ProtoMessage()    {}
 func (*MsgStoreKeyDerivation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{11}
+	return fileDescriptor_7711ae63507074e0, []int{14}
 }
 func (m *MsgStoreKeyDerivation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -919,13 +1148,6 @@ var xxx_messageInfo_MsgStoreKeyDerivation proto.InternalMessageInfo
 func (m *MsgStoreKeyDerivation) GetCreator() string {
 	if m != nil {
 		return m.Creator
-	}
-	return ""
-}
-
-func (m *MsgStoreKeyDerivation) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
 	}
 	return ""
 }
@@ -973,7 +1195,7 @@ func (m *MsgStoreKeyDerivationResponse) Reset()         { *m = MsgStoreKeyDeriva
 func (m *MsgStoreKeyDerivationResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreKeyDerivationResponse) ProtoMessage()    {}
 func (*MsgStoreKeyDerivationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{12}
+	return fileDescriptor_7711ae63507074e0, []int{15}
 }
 func (m *MsgStoreKeyDerivationResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1010,18 +1232,18 @@ func (m *MsgStoreKeyDerivationResponse) GetKeyDerivationId() string {
 }
 
 type MsgCreateNodeInfo struct {
-	Creator               string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	PeerId                string   `protobuf:"bytes,2,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
-	ControllerKey         string   `protobuf:"bytes,3,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
-	WhitelistedNamespaces []string `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
-	WhitelistedRingIds    []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	Creator              string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	PeerId               string   `protobuf:"bytes,2,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	ControllerKey        string   `protobuf:"bytes,3,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
+	WhitelistedPolicyIds []string `protobuf:"bytes,4,rep,name=whitelisted_policy_ids,json=whitelistedPolicyIds,proto3" json:"whitelisted_policy_ids,omitempty"`
+	WhitelistedRingIds   []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
 }
 
 func (m *MsgCreateNodeInfo) Reset()         { *m = MsgCreateNodeInfo{} }
 func (m *MsgCreateNodeInfo) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateNodeInfo) ProtoMessage()    {}
 func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{13}
+	return fileDescriptor_7711ae63507074e0, []int{16}
 }
 func (m *MsgCreateNodeInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1071,9 +1293,9 @@ func (m *MsgCreateNodeInfo) GetControllerKey() string {
 	return ""
 }
 
-func (m *MsgCreateNodeInfo) GetWhitelistedNamespaces() []string {
+func (m *MsgCreateNodeInfo) GetWhitelistedPolicyIds() []string {
 	if m != nil {
-		return m.WhitelistedNamespaces
+		return m.WhitelistedPolicyIds
 	}
 	return nil
 }
@@ -1092,7 +1314,7 @@ func (m *MsgCreateNodeInfoResponse) Reset()         { *m = MsgCreateNodeInfoResp
 func (m *MsgCreateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateNodeInfoResponse) ProtoMessage()    {}
 func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{14}
+	return fileDescriptor_7711ae63507074e0, []int{17}
 }
 func (m *MsgCreateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1121,15 +1343,25 @@ func (m *MsgCreateNodeInfoResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateNodeInfoResponse proto.InternalMessageInfo
 
+// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
+// The signer must be the current controller_key holder.
+//
+// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
+// full, not merged. To add a single entry you must re-send the complete desired
+// list. Sending an empty repeated field clears the whitelist entirely.
 type MsgUpdateNodeInfo struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	NodeKey string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
 	// Types that are valid to be assigned to XPeerId:
 	//
 	//	*MsgUpdateNodeInfo_PeerId
-	XPeerId               isMsgUpdateNodeInfo_XPeerId `protobuf_oneof:"_peer_id"`
-	WhitelistedNamespaces []string                    `protobuf:"bytes,4,rep,name=whitelisted_namespaces,json=whitelistedNamespaces,proto3" json:"whitelisted_namespaces,omitempty"`
-	WhitelistedRingIds    []string                    `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
+	XPeerId isMsgUpdateNodeInfo_XPeerId `protobuf_oneof:"_peer_id"`
+	// Replaces the full policy whitelist. Send the complete desired list on every
+	// update; an empty field clears all whitelisted policies.
+	WhitelistedPolicyIds []string `protobuf:"bytes,4,rep,name=whitelisted_policy_ids,json=whitelistedPolicyIds,proto3" json:"whitelisted_policy_ids,omitempty"`
+	// Replaces the full ring whitelist. Send the complete desired list on every
+	// update; an empty field clears all whitelisted rings.
+	WhitelistedRingIds []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
 	// Types that are valid to be assigned to XControllerKey:
 	//
 	//	*MsgUpdateNodeInfo_ControllerKey
@@ -1140,7 +1372,7 @@ func (m *MsgUpdateNodeInfo) Reset()         { *m = MsgUpdateNodeInfo{} }
 func (m *MsgUpdateNodeInfo) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateNodeInfo) ProtoMessage()    {}
 func (*MsgUpdateNodeInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{15}
+	return fileDescriptor_7711ae63507074e0, []int{18}
 }
 func (m *MsgUpdateNodeInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1224,9 +1456,9 @@ func (m *MsgUpdateNodeInfo) GetPeerId() string {
 	return ""
 }
 
-func (m *MsgUpdateNodeInfo) GetWhitelistedNamespaces() []string {
+func (m *MsgUpdateNodeInfo) GetWhitelistedPolicyIds() []string {
 	if m != nil {
-		return m.WhitelistedNamespaces
+		return m.WhitelistedPolicyIds
 	}
 	return nil
 }
@@ -1260,7 +1492,7 @@ func (m *MsgUpdateNodeInfoResponse) Reset()         { *m = MsgUpdateNodeInfoResp
 func (m *MsgUpdateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgUpdateNodeInfoResponse) ProtoMessage()    {}
 func (*MsgUpdateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{16}
+	return fileDescriptor_7711ae63507074e0, []int{19}
 }
 func (m *MsgUpdateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1294,11 +1526,14 @@ func init() {
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "sourcehub.orbis.MsgUpdateParamsResponse")
 	proto.RegisterType((*MsgCreateRing)(nil), "sourcehub.orbis.MsgCreateRing")
 	proto.RegisterType((*MsgCreateRingResponse)(nil), "sourcehub.orbis.MsgCreateRingResponse")
+	proto.RegisterType((*MsgFinalizeRing)(nil), "sourcehub.orbis.MsgFinalizeRing")
+	proto.RegisterType((*MsgFinalizeRingResponse)(nil), "sourcehub.orbis.MsgFinalizeRingResponse")
 	proto.RegisterType((*MsgUpdateRingByAcp)(nil), "sourcehub.orbis.MsgUpdateRingByAcp")
 	proto.RegisterType((*MsgUpdateRingByAcpResponse)(nil), "sourcehub.orbis.MsgUpdateRingByAcpResponse")
 	proto.RegisterType((*MsgFinalizeRingReshareByThresholdSignature)(nil), "sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature")
 	proto.RegisterType((*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), "sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse")
 	proto.RegisterType((*RingReshareFinalizeSignDoc)(nil), "sourcehub.orbis.RingReshareFinalizeSignDoc")
+	proto.RegisterType((*RingReshareSignState)(nil), "sourcehub.orbis.RingReshareSignState")
 	proto.RegisterType((*MsgStoreDocument)(nil), "sourcehub.orbis.MsgStoreDocument")
 	proto.RegisterType((*MsgStoreDocumentResponse)(nil), "sourcehub.orbis.MsgStoreDocumentResponse")
 	proto.RegisterType((*MsgStoreKeyDerivation)(nil), "sourcehub.orbis.MsgStoreKeyDerivation")
@@ -1312,89 +1547,93 @@ func init() {
 func init() { proto.RegisterFile("sourcehub/orbis/tx.proto", fileDescriptor_7711ae63507074e0) }
 
 var fileDescriptor_7711ae63507074e0 = []byte{
-	// 1303 bytes of a gzipped FileDescriptorProto
+	// 1365 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xf7, 0x26, 0xb1, 0x1d, 0xbf, 0x3a, 0x75, 0xb2, 0x4d, 0x9b, 0x8d, 0x1b, 0x5c, 0xd7, 0x88,
-	0x92, 0x1a, 0x88, 0x4b, 0x68, 0x7b, 0x68, 0x4f, 0x75, 0x2b, 0x14, 0x53, 0x25, 0xaa, 0x36, 0xe5,
-	0x52, 0x09, 0x2d, 0x9b, 0xdd, 0x89, 0x3d, 0xb2, 0x77, 0x67, 0x35, 0xb3, 0x6e, 0x6a, 0x4e, 0x88,
-	0x13, 0xe2, 0xc4, 0x95, 0x6f, 0x50, 0x89, 0x4b, 0x91, 0x10, 0x17, 0xbe, 0x40, 0x6f, 0x54, 0x9c,
-	0x38, 0x21, 0x94, 0x22, 0xf5, 0x82, 0xc4, 0x57, 0x40, 0x33, 0x3b, 0x3b, 0xfb, 0xc7, 0x49, 0x1a,
-	0x51, 0xc4, 0x25, 0xf1, 0xfb, 0xff, 0xde, 0xef, 0xcd, 0x7b, 0x33, 0x0b, 0x06, 0x23, 0x63, 0xea,
-	0xa0, 0xc1, 0x78, 0xaf, 0x43, 0xe8, 0x1e, 0x66, 0x9d, 0xf0, 0xc9, 0x46, 0x40, 0x49, 0x48, 0xf4,
-	0x9a, 0x92, 0x6c, 0x08, 0x49, 0x7d, 0xc9, 0xf6, 0xb0, 0x4f, 0x3a, 0xe2, 0x6f, 0xa4, 0x53, 0x5f,
-	0x71, 0x08, 0xf3, 0x08, 0xeb, 0x78, 0xac, 0xdf, 0x79, 0xfc, 0x21, 0xff, 0x27, 0x05, 0xab, 0x91,
-	0xc0, 0x12, 0x54, 0x27, 0x22, 0xa4, 0x68, 0xb9, 0x4f, 0xfa, 0x24, 0xe2, 0xf3, 0x5f, 0x92, 0xbb,
-	0x96, 0xcf, 0x23, 0xb0, 0xa9, 0xed, 0x49, 0x9b, 0xd6, 0xcf, 0x1a, 0xd4, 0xb6, 0x59, 0xff, 0xd3,
-	0xc0, 0xb5, 0x43, 0xf4, 0x40, 0x48, 0xf4, 0x9b, 0x50, 0xb1, 0xc7, 0xe1, 0x80, 0x50, 0x1c, 0x4e,
-	0x0c, 0xad, 0xa9, 0xad, 0x57, 0xba, 0xc6, 0xaf, 0x3f, 0x7e, 0xb0, 0x2c, 0x83, 0xdd, 0x71, 0x5d,
-	0x8a, 0x18, 0xdb, 0x0d, 0x29, 0xf6, 0xfb, 0x66, 0xa2, 0xaa, 0xdf, 0x82, 0x52, 0xe4, 0xdb, 0x98,
-	0x69, 0x6a, 0xeb, 0x67, 0x36, 0x57, 0x36, 0x72, 0x85, 0x6e, 0x44, 0x01, 0xba, 0x95, 0xe7, 0xbf,
-	0x5f, 0x2a, 0x3c, 0x7d, 0xf5, 0xac, 0xad, 0x99, 0xd2, 0xe2, 0xd6, 0xf5, 0xaf, 0x5e, 0x3d, 0x6b,
-	0x27, 0xbe, 0xbe, 0x79, 0xf5, 0xac, 0x7d, 0x39, 0x49, 0xfc, 0x89, 0x4c, 0x3d, 0x97, 0x69, 0x6b,
-	0x15, 0x56, 0x72, 0x2c, 0x13, 0xb1, 0x80, 0xf8, 0x0c, 0xb5, 0xbe, 0x9b, 0x81, 0x85, 0x6d, 0xd6,
-	0xbf, 0x4b, 0x91, 0x1d, 0x22, 0x13, 0xfb, 0x7d, 0xdd, 0x80, 0xb2, 0xc3, 0x29, 0x42, 0xa3, 0xa2,
-	0xcc, 0x98, 0xd4, 0xd7, 0xa0, 0xe2, 0xdb, 0x1e, 0x62, 0x81, 0xed, 0x20, 0x91, 0x7b, 0xc5, 0x4c,
-	0x18, 0xfa, 0x0a, 0x94, 0x79, 0xa5, 0x56, 0x30, 0x34, 0x66, 0x85, 0xac, 0xc4, 0xc9, 0x07, 0x43,
-	0x7d, 0x15, 0xe6, 0x03, 0x84, 0xa8, 0x85, 0x5d, 0x66, 0xcc, 0x35, 0x67, 0xb9, 0x47, 0x4e, 0xf7,
-	0x5c, 0xc6, 0x3d, 0x86, 0x03, 0x8a, 0xd8, 0x80, 0x8c, 0x5c, 0xa3, 0xd8, 0xd4, 0xd6, 0x17, 0xcc,
-	0x84, 0xa1, 0x5f, 0x81, 0x6a, 0xc0, 0x98, 0x85, 0xfd, 0x10, 0xd1, 0xc7, 0xf6, 0xc8, 0x28, 0x35,
-	0xb5, 0xf5, 0xb9, 0xad, 0x82, 0x79, 0x26, 0x60, 0xac, 0x27, 0x99, 0x5f, 0x6b, 0x9a, 0x7e, 0x11,
-	0x2a, 0x01, 0x19, 0x61, 0x67, 0x62, 0x61, 0xd7, 0x28, 0x8b, 0xd8, 0xf3, 0x11, 0xa3, 0xe7, 0xea,
-	0x75, 0x98, 0xb7, 0x69, 0x88, 0xf7, 0x6d, 0x27, 0x34, 0xe6, 0x23, 0x59, 0x4c, 0xdf, 0xaa, 0x72,
-	0x34, 0xe3, 0xf2, 0xba, 0x35, 0x58, 0xb0, 0xd2, 0xf1, 0x5a, 0xd7, 0xe0, 0x7c, 0x06, 0x9a, 0x18,
-	0x34, 0x55, 0x2a, 0x76, 0x25, 0x44, 0xa2, 0xd4, 0x9e, 0xdb, 0xfa, 0x4b, 0x03, 0x5d, 0x21, 0xcd,
-	0x4d, 0xba, 0x93, 0x3b, 0x4e, 0x70, 0x02, 0xa4, 0x29, 0x4f, 0x33, 0x69, 0x4f, 0x7a, 0x13, 0xaa,
-	0x3e, 0x3a, 0xb0, 0x14, 0x70, 0xb3, 0x02, 0x38, 0xf0, 0xd1, 0xc1, 0x03, 0x89, 0xdd, 0x3a, 0x2c,
-	0x70, 0x8d, 0x04, 0xbf, 0x39, 0x8e, 0xdf, 0x56, 0xc1, 0xe4, 0x86, 0x0f, 0x63, 0x2e, 0xc7, 0x27,
-	0x8f, 0x63, 0x51, 0xe0, 0xa8, 0xe5, 0x71, 0xcc, 0xc1, 0xb1, 0x08, 0x67, 0xad, 0x4c, 0x80, 0x69,
-	0x80, 0xd6, 0xa0, 0x3e, 0x5d, 0xad, 0x3a, 0x5a, 0x3f, 0x69, 0xd0, 0xde, 0x66, 0xfd, 0x8f, 0xb1,
-	0x6f, 0x8f, 0xf0, 0x17, 0x31, 0x82, 0x03, 0x9b, 0xa2, 0xee, 0x44, 0xe5, 0xb7, 0x8b, 0xfb, 0xbe,
-	0x1d, 0x8e, 0x29, 0xfa, 0x37, 0x20, 0x5d, 0x85, 0x45, 0x16, 0xdb, 0x5b, 0xcc, 0x19, 0x20, 0x0f,
-	0xc9, 0xb3, 0x57, 0x53, 0xfc, 0x5d, 0xc1, 0xe6, 0x27, 0x4d, 0xb1, 0x04, 0x52, 0x55, 0x33, 0x61,
-	0x64, 0x2b, 0x6f, 0x5d, 0x87, 0xcd, 0xd3, 0xe7, 0xad, 0xca, 0xfd, 0x61, 0x06, 0xea, 0x29, 0xdd,
-	0xd8, 0x9c, 0x2b, 0xde, 0x23, 0x8e, 0x7e, 0x01, 0x4a, 0x2e, 0xf1, 0x6c, 0xec, 0xc7, 0x47, 0x26,
-	0xa2, 0xf8, 0x74, 0x38, 0x03, 0x1b, 0xfb, 0x49, 0x75, 0x65, 0x41, 0xf7, 0xdc, 0xec, 0xbc, 0xcd,
-	0x1e, 0x37, 0x6f, 0x38, 0xea, 0x7c, 0x82, 0x4a, 0x6a, 0x10, 0x8b, 0x99, 0x41, 0xdc, 0x80, 0x73,
-	0xce, 0x98, 0x52, 0xe4, 0x87, 0x96, 0x50, 0x60, 0x03, 0x7b, 0xf3, 0xc6, 0x4d, 0x31, 0x56, 0x55,
-	0x73, 0x49, 0x8a, 0x78, 0x09, 0xbb, 0x42, 0xa0, 0x6f, 0xc2, 0xf9, 0x7d, 0x59, 0x85, 0x9b, 0xb1,
-	0x28, 0x0b, 0x8b, 0x73, 0x4a, 0x98, 0xb2, 0x79, 0x1f, 0xf4, 0xbd, 0x11, 0x71, 0x86, 0x96, 0x3f,
-	0xf6, 0xf6, 0x10, 0xb5, 0x7c, 0xe2, 0x3b, 0x48, 0x0c, 0xde, 0x9c, 0xb9, 0x28, 0x24, 0x3b, 0x42,
-	0xb0, 0xc3, 0xf9, 0xad, 0x5f, 0x66, 0x60, 0x71, 0x9b, 0xf5, 0x77, 0x43, 0x42, 0xd1, 0x3d, 0xe2,
-	0x8c, 0x3d, 0xe4, 0x87, 0x6f, 0xbc, 0x80, 0xb0, 0x9b, 0x5e, 0x40, 0xd1, 0x0a, 0x70, 0xa5, 0x73,
-	0x09, 0x95, 0xa2, 0xf5, 0x65, 0x28, 0x06, 0x94, 0x90, 0x7d, 0x09, 0x55, 0x44, 0x64, 0x37, 0x4a,
-	0x69, 0x7a, 0xa3, 0x50, 0x14, 0x2d, 0xdd, 0x78, 0xdb, 0xc4, 0xb4, 0xde, 0x00, 0x08, 0x10, 0xf5,
-	0x30, 0x63, 0x98, 0xf8, 0x72, 0xdf, 0xa4, 0x38, 0xfa, 0x0a, 0xcc, 0x85, 0x18, 0x51, 0xa3, 0xc2,
-	0x25, 0x5b, 0x05, 0x53, 0x50, 0x7c, 0x46, 0x2f, 0x43, 0x25, 0xc4, 0x1e, 0x62, 0xa1, 0xed, 0x05,
-	0x06, 0xc8, 0x01, 0x4d, 0x58, 0xd3, 0xe3, 0x59, 0x86, 0xa2, 0xc5, 0x8d, 0xbb, 0x55, 0x00, 0x4b,
-	0xe9, 0xb5, 0x6e, 0x83, 0x91, 0x07, 0x54, 0xad, 0xad, 0x4b, 0x70, 0x26, 0xae, 0x3b, 0x59, 0x5d,
-	0x10, 0xb3, 0x7a, 0x6e, 0xeb, 0x6f, 0x4d, 0x6c, 0x3c, 0x61, 0x7d, 0x1f, 0x4d, 0xee, 0x21, 0x8a,
-	0x1f, 0xdb, 0x21, 0xcf, 0xfb, 0x3f, 0xef, 0x49, 0x03, 0xc0, 0x55, 0xee, 0x65, 0x57, 0x52, 0x9c,
-	0x6c, 0x07, 0x8a, 0x27, 0x74, 0xa0, 0x74, 0x62, 0x07, 0xca, 0xf9, 0x0e, 0xe4, 0x46, 0xfd, 0x3e,
-	0xbc, 0x75, 0x64, 0xc1, 0x0a, 0xb3, 0x36, 0x2c, 0x0d, 0xd1, 0xc4, 0x4a, 0x32, 0x4b, 0x90, 0xab,
-	0x0d, 0xd3, 0x16, 0x3d, 0xb7, 0xf5, 0xa7, 0x06, 0x4b, 0xea, 0xc2, 0xd8, 0x21, 0x2e, 0xea, 0xf9,
-	0xfb, 0xe4, 0xe4, 0xbd, 0x26, 0xf7, 0x7b, 0xbc, 0xd7, 0xa2, 0x7b, 0x51, 0x7f, 0x07, 0xce, 0x3a,
-	0xc4, 0x0f, 0x29, 0x19, 0x8d, 0x10, 0xb5, 0x86, 0x68, 0x22, 0xc1, 0x5b, 0x48, 0xb8, 0xf7, 0xd1,
-	0x44, 0xbf, 0x01, 0x17, 0x0e, 0x06, 0x38, 0x44, 0x23, 0xcc, 0x42, 0xe4, 0x5a, 0x0a, 0xf5, 0xf8,
-	0x9a, 0x3d, 0x9f, 0x92, 0xee, 0x28, 0xa1, 0x7e, 0x0d, 0x96, 0xd3, 0x66, 0xb2, 0x3f, 0xcc, 0x28,
-	0x0a, 0x23, 0x3d, 0x25, 0x33, 0x45, 0xaf, 0x58, 0x0e, 0xb3, 0x8b, 0xb0, 0x3a, 0x55, 0xa5, 0xda,
-	0x82, 0x4f, 0x67, 0x04, 0x06, 0xd1, 0x9d, 0x70, 0x0a, 0x0c, 0x56, 0x61, 0xde, 0x27, 0x2e, 0x12,
-	0x45, 0xca, 0xf5, 0xc7, 0x69, 0x5e, 0xde, 0x5a, 0x02, 0xcf, 0xac, 0x1c, 0x17, 0x09, 0x10, 0x1f,
-	0x98, 0xff, 0xab, 0x78, 0xbd, 0x3d, 0xd5, 0x0c, 0x71, 0xe4, 0xb6, 0xb4, 0x5c, 0x3b, 0xa6, 0x47,
-	0x14, 0x60, 0x3e, 0xbe, 0xc0, 0xbb, 0x4b, 0x50, 0xb3, 0xb2, 0x6e, 0x24, 0x8e, 0x59, 0xa4, 0x62,
-	0x1c, 0x37, 0x0f, 0x4b, 0x30, 0xbb, 0xcd, 0xfa, 0xfa, 0x23, 0xa8, 0x66, 0x1e, 0x9d, 0xcd, 0xa9,
-	0xc7, 0x62, 0xee, 0x65, 0x57, 0x5f, 0x7f, 0x9d, 0x86, 0x3a, 0xdb, 0x0f, 0x01, 0x52, 0xef, 0xbe,
-	0xc6, 0x51, 0x76, 0x89, 0xbc, 0x7e, 0xe5, 0x64, 0xb9, 0xf2, 0xea, 0x40, 0x2d, 0xff, 0xfe, 0x79,
-	0xfb, 0xf8, 0x94, 0x94, 0x52, 0xfd, 0xbd, 0x53, 0x28, 0xa9, 0x20, 0xdf, 0x6b, 0xf0, 0xee, 0x69,
-	0x1f, 0x16, 0xb7, 0x8f, 0x72, 0x7c, 0x4a, 0xe3, 0xfa, 0xdd, 0x37, 0x30, 0x56, 0xd9, 0x7e, 0x06,
-	0x0b, 0xd9, 0x2b, 0xee, 0xf2, 0x51, 0x5e, 0x33, 0x2a, 0xf5, 0xab, 0xaf, 0x55, 0x51, 0xee, 0x47,
-	0xa0, 0x1f, 0xb1, 0xb2, 0xaf, 0x1c, 0xeb, 0x20, 0xa3, 0x57, 0xdf, 0x38, 0x9d, 0x9e, 0x8a, 0xf6,
-	0x39, 0x9c, 0xcd, 0x6d, 0xb8, 0xd6, 0xf1, 0x27, 0x23, 0xd6, 0xa9, 0xb7, 0x5f, 0xaf, 0x93, 0x8e,
-	0x90, 0xdb, 0x1f, 0xad, 0xe3, 0xcf, 0xc6, 0xc9, 0x11, 0x8e, 0x9e, 0xae, 0x7a, 0xf1, 0x4b, 0xfe,
-	0x55, 0xd5, 0xfd, 0xe4, 0xf9, 0x61, 0x43, 0x7b, 0x71, 0xd8, 0xd0, 0xfe, 0x38, 0x6c, 0x68, 0xdf,
-	0xbe, 0x6c, 0x14, 0x5e, 0xbc, 0x6c, 0x14, 0x7e, 0x7b, 0xd9, 0x28, 0x3c, 0xba, 0xd6, 0xc7, 0x21,
-	0x77, 0xe4, 0x10, 0xaf, 0x13, 0xb9, 0xf5, 0x51, 0x78, 0x40, 0xe8, 0xb0, 0x33, 0xfd, 0xb5, 0x15,
-	0x4e, 0x02, 0xc4, 0xf6, 0x4a, 0xe2, 0x43, 0xf1, 0xa3, 0x7f, 0x02, 0x00, 0x00, 0xff, 0xff, 0x75,
-	0xef, 0x0a, 0xa7, 0xd0, 0x0e, 0x00, 0x00,
+	0x14, 0xf7, 0x26, 0xb1, 0x63, 0xbf, 0xda, 0x71, 0x32, 0x4d, 0x1b, 0x67, 0x1b, 0xdc, 0xd4, 0x40,
+	0x71, 0x5d, 0x88, 0x4b, 0x28, 0x3d, 0xb4, 0xa7, 0xba, 0x15, 0x8a, 0x89, 0x52, 0x45, 0x9b, 0x72,
+	0xa9, 0x84, 0x96, 0xcd, 0xee, 0xd4, 0x5e, 0xd9, 0xde, 0x59, 0xed, 0xac, 0x9b, 0x9a, 0x13, 0xe2,
+	0x54, 0x71, 0x42, 0xe2, 0x43, 0x80, 0xc4, 0xa5, 0x48, 0x88, 0x0b, 0x12, 0xe7, 0x1e, 0x0b, 0x27,
+	0x4e, 0xa8, 0x6a, 0x0e, 0xf9, 0x06, 0x70, 0x45, 0x33, 0x3b, 0x3b, 0xfb, 0xc7, 0x4e, 0x62, 0x02,
+	0xe2, 0x92, 0xf8, 0xfd, 0x9d, 0xf7, 0x7e, 0xef, 0xbd, 0x79, 0xb3, 0x50, 0xa1, 0x64, 0xe8, 0x99,
+	0xb8, 0x3b, 0xdc, 0x6f, 0x12, 0x6f, 0xdf, 0xa6, 0x4d, 0xff, 0xe9, 0x86, 0xeb, 0x11, 0x9f, 0xa0,
+	0xb2, 0x94, 0x6c, 0x70, 0x89, 0xba, 0x64, 0x0c, 0x6c, 0x87, 0x34, 0xf9, 0xdf, 0x40, 0x47, 0x5d,
+	0x31, 0x09, 0x1d, 0x10, 0xda, 0x1c, 0xd0, 0x4e, 0xf3, 0xc9, 0xfb, 0xec, 0x9f, 0x10, 0xac, 0x06,
+	0x02, 0x9d, 0x53, 0xcd, 0x80, 0x10, 0xa2, 0xe5, 0x0e, 0xe9, 0x90, 0x80, 0xcf, 0x7e, 0x09, 0xee,
+	0x5a, 0x3a, 0x0e, 0xd7, 0xf0, 0x8c, 0x81, 0xb0, 0xa9, 0xfd, 0xac, 0x40, 0x79, 0x87, 0x76, 0x3e,
+	0x71, 0x2d, 0xc3, 0xc7, 0xbb, 0x5c, 0x82, 0x6e, 0x41, 0xc1, 0x18, 0xfa, 0x5d, 0xe2, 0xd9, 0xfe,
+	0xa8, 0xa2, 0xac, 0x2b, 0xf5, 0x42, 0xab, 0xf2, 0xdb, 0x8f, 0xef, 0x2d, 0x8b, 0xc3, 0xee, 0x5a,
+	0x96, 0x87, 0x29, 0xdd, 0xf3, 0x3d, 0xdb, 0xe9, 0x68, 0x91, 0x2a, 0xba, 0x0d, 0xb9, 0xc0, 0x77,
+	0x65, 0x66, 0x5d, 0xa9, 0x9f, 0xdb, 0x5c, 0xd9, 0x48, 0x25, 0xba, 0x11, 0x1c, 0xd0, 0x2a, 0xbc,
+	0xf8, 0xe3, 0x72, 0xe6, 0xbb, 0xa3, 0xe7, 0x0d, 0x45, 0x13, 0x16, 0xb7, 0x6f, 0x7e, 0x79, 0xf4,
+	0xbc, 0x11, 0xf9, 0xfa, 0xea, 0xe8, 0x79, 0xe3, 0x4a, 0x14, 0xf8, 0x53, 0x11, 0x7a, 0x2a, 0xd2,
+	0xda, 0x2a, 0xac, 0xa4, 0x58, 0x1a, 0xa6, 0x2e, 0x71, 0x28, 0xae, 0xfd, 0xa9, 0x40, 0x69, 0x87,
+	0x76, 0xee, 0x79, 0xd8, 0xf0, 0xb1, 0x66, 0x3b, 0x1d, 0x54, 0x81, 0x79, 0x93, 0x51, 0xc4, 0x0b,
+	0x92, 0xd2, 0x42, 0x12, 0xbd, 0x05, 0x0b, 0x2e, 0xc6, 0x9e, 0xee, 0x10, 0x0b, 0xeb, 0x3d, 0x3c,
+	0x62, 0x09, 0xcc, 0xd6, 0x0b, 0x5a, 0x91, 0x71, 0x1f, 0x10, 0x0b, 0x6f, 0xe3, 0x11, 0x45, 0x6b,
+	0x50, 0xf0, 0xbb, 0x1e, 0xa6, 0x5d, 0xd2, 0xb7, 0x2a, 0xb3, 0xeb, 0x4a, 0xbd, 0xa4, 0x45, 0x0c,
+	0x74, 0x15, 0x8a, 0x2e, 0xa5, 0xba, 0xed, 0xf8, 0xd8, 0x7b, 0x62, 0xf4, 0x2b, 0x73, 0xeb, 0x4a,
+	0x7d, 0x6e, 0x2b, 0xa3, 0x9d, 0x73, 0x29, 0x6d, 0x0b, 0xe6, 0x33, 0x45, 0x41, 0x97, 0xa0, 0xe0,
+	0x92, 0xbe, 0x6d, 0x8e, 0x74, 0xdb, 0xaa, 0x64, 0x79, 0x1c, 0xf9, 0x80, 0xd1, 0xb6, 0xd0, 0x2a,
+	0x64, 0x1d, 0xe2, 0x98, 0xb8, 0x92, 0x63, 0x82, 0x2d, 0x45, 0x0b, 0xc8, 0x67, 0x8a, 0x72, 0xbb,
+	0xc8, 0x00, 0x0a, 0x23, 0x6e, 0x95, 0xa1, 0xa4, 0xc7, 0x8f, 0x6b, 0xe5, 0x21, 0xa7, 0x73, 0xdd,
+	0xda, 0x0d, 0xb8, 0x90, 0xc8, 0x3b, 0x44, 0x04, 0xad, 0xc0, 0x3c, 0xab, 0x18, 0x3b, 0x37, 0xc8,
+	0x3f, 0xc7, 0xc8, 0xb6, 0x55, 0xeb, 0xf1, 0x16, 0xf8, 0xc8, 0x76, 0x8c, 0xbe, 0xfd, 0xf9, 0x69,
+	0x58, 0xc5, 0xbc, 0xcc, 0xc4, 0xbd, 0x48, 0x81, 0xdb, 0xe3, 0xe0, 0x08, 0xc1, 0x6e, 0x2f, 0x19,
+	0xb9, 0x28, 0x59, 0xfc, 0x30, 0x59, 0xb2, 0xbf, 0x14, 0x40, 0xb2, 0x9c, 0x4c, 0xd2, 0x1a, 0xdd,
+	0x35, 0xdd, 0xb3, 0xc4, 0x72, 0x1d, 0x90, 0x83, 0x0f, 0xf4, 0x54, 0x51, 0x67, 0x79, 0x51, 0xcb,
+	0x0e, 0x3e, 0xd8, 0x8d, 0xd7, 0xb5, 0x0e, 0x25, 0xa6, 0x1c, 0xd5, 0x96, 0x95, 0xae, 0xb4, 0x95,
+	0xd1, 0x8a, 0x0e, 0x3e, 0x78, 0x18, 0x72, 0x59, 0xed, 0xd2, 0x35, 0xce, 0xf2, 0x1a, 0x2b, 0xe9,
+	0x1a, 0xa7, 0x6a, 0xb5, 0x08, 0x0b, 0x7a, 0xe2, 0x80, 0xb1, 0xea, 0xd5, 0xd6, 0x40, 0x1d, 0x4f,
+	0x5c, 0xe2, 0xf2, 0x93, 0x02, 0x8d, 0x71, 0xcc, 0xba, 0x86, 0x87, 0x5b, 0x23, 0x19, 0xdf, 0x9e,
+	0xdd, 0x71, 0x0c, 0x7f, 0xe8, 0xe1, 0xb3, 0xe0, 0x75, 0x0d, 0x16, 0x69, 0x68, 0xaf, 0x53, 0xb3,
+	0x8b, 0x07, 0x58, 0x14, 0xb1, 0x2c, 0xf9, 0x7b, 0x9c, 0xcd, 0xa6, 0x40, 0xb2, 0x38, 0x52, 0x45,
+	0x2d, 0x62, 0xa4, 0x6a, 0x7d, 0x13, 0x36, 0xa7, 0x8f, 0x5b, 0xa6, 0xfb, 0xcd, 0x0c, 0xa8, 0x31,
+	0xdd, 0xd0, 0x9c, 0x29, 0xde, 0x27, 0x26, 0xba, 0x08, 0x39, 0x8b, 0x0c, 0x0c, 0xdb, 0x09, 0xbb,
+	0x38, 0xa0, 0xd0, 0x2a, 0xe4, 0xcd, 0xae, 0x61, 0x3b, 0x51, 0x76, 0xf3, 0x9c, 0x8e, 0xb5, 0xa6,
+	0x6d, 0xc5, 0x5b, 0x33, 0xd9, 0xb3, 0x73, 0xf1, 0x9e, 0x45, 0x1b, 0x70, 0xde, 0x1c, 0x7a, 0x1e,
+	0x76, 0x7c, 0x9d, 0x2b, 0xd0, 0xae, 0xb1, 0xf9, 0xe1, 0x2d, 0x5e, 0xf0, 0xa2, 0xb6, 0x24, 0x44,
+	0x2c, 0xc8, 0x3d, 0x2e, 0x40, 0x9b, 0x70, 0xe1, 0xb1, 0x88, 0xd3, 0x4a, 0x58, 0xe4, 0xb8, 0xc5,
+	0x79, 0x29, 0x8c, 0xd9, 0xbc, 0x0b, 0x68, 0xbf, 0x4f, 0xcc, 0x9e, 0xee, 0x0c, 0x07, 0xfb, 0xbc,
+	0x51, 0xd9, 0xe4, 0xcf, 0xb3, 0x9e, 0xd2, 0x16, 0xb9, 0xe4, 0x01, 0x17, 0x3c, 0xe0, 0x63, 0xfd,
+	0x6a, 0x06, 0x96, 0x63, 0xa8, 0x30, 0x34, 0xf6, 0x7c, 0xc3, 0xc7, 0xf1, 0x1c, 0x94, 0x44, 0x0e,
+	0xff, 0xc5, 0xad, 0x36, 0x79, 0x90, 0xe6, 0xa6, 0x1c, 0xa4, 0xec, 0xb4, 0x83, 0x94, 0x9b, 0x3c,
+	0x48, 0xff, 0x0c, 0xa2, 0xe4, 0xd5, 0x9a, 0x4f, 0x5e, 0xad, 0xd3, 0x4c, 0xe1, 0x0f, 0x33, 0xb0,
+	0xb8, 0x43, 0x3b, 0x7b, 0x3e, 0xf1, 0xf0, 0x7d, 0x62, 0x0e, 0x07, 0xd8, 0xf1, 0xcf, 0x32, 0x4d,
+	0x2a, 0xe4, 0x2d, 0x61, 0x2e, 0xfa, 0x4d, 0xd2, 0x68, 0x19, 0xb2, 0xae, 0x47, 0xc8, 0x63, 0xd1,
+	0x6f, 0x01, 0x71, 0xf2, 0x52, 0x50, 0x21, 0xef, 0xe1, 0x60, 0x17, 0x06, 0x7b, 0x41, 0x93, 0x34,
+	0xaa, 0x02, 0xb8, 0xd8, 0x1b, 0xd8, 0x94, 0xda, 0xc4, 0xe1, 0xc0, 0x14, 0xb4, 0x18, 0x07, 0xad,
+	0xc0, 0x9c, 0x6f, 0x63, 0x2f, 0x40, 0x63, 0x2b, 0xa3, 0x71, 0x8a, 0x21, 0x7b, 0x05, 0x0a, 0xbe,
+	0x3d, 0xc0, 0xd4, 0x37, 0x06, 0x6e, 0xa5, 0x20, 0xe0, 0x8f, 0x58, 0xe3, 0xb7, 0xd8, 0x3c, 0x64,
+	0x75, 0x66, 0xdc, 0x2a, 0x02, 0xe8, 0x52, 0xaf, 0x76, 0x07, 0x2a, 0x69, 0xc8, 0xe4, 0xc2, 0xb9,
+	0x0c, 0xe7, 0xc2, 0xbc, 0xa3, 0xa5, 0x03, 0x21, 0xab, 0x6d, 0xd5, 0x7e, 0x55, 0xf8, 0xae, 0xe2,
+	0xd6, 0xdb, 0x78, 0x74, 0x1f, 0x7b, 0xf6, 0x13, 0xc3, 0x67, 0x71, 0x9f, 0x01, 0xf5, 0x2a, 0x80,
+	0x25, 0x1d, 0x08, 0xdc, 0x63, 0x9c, 0x24, 0xc6, 0x73, 0x27, 0x60, 0x9c, 0x3d, 0x11, 0xe3, 0x5c,
+	0x1a, 0xe3, 0xd4, 0x9d, 0xb7, 0x0d, 0x6f, 0x4c, 0x4c, 0x49, 0xa2, 0xd2, 0x80, 0xa5, 0x1e, 0x1e,
+	0xe9, 0x51, 0x64, 0x11, 0x36, 0xe5, 0x5e, 0xdc, 0xa2, 0x6d, 0xd5, 0x0e, 0x15, 0x58, 0x92, 0xcb,
+	0x9c, 0xcd, 0x59, 0xdb, 0x79, 0x4c, 0x4e, 0x06, 0x87, 0x8f, 0x6a, 0x04, 0x0e, 0x23, 0xdb, 0x16,
+	0x7a, 0x1b, 0x16, 0x4c, 0xe2, 0xf8, 0x1e, 0xe9, 0xf7, 0xb1, 0xc7, 0x86, 0x58, 0x00, 0x54, 0x8a,
+	0xb8, 0xdb, 0x78, 0x84, 0x6e, 0xc2, 0xc5, 0x83, 0xae, 0xed, 0xe3, 0xbe, 0x4d, 0x7d, 0x6c, 0xe9,
+	0x12, 0xaf, 0x70, 0xe4, 0x97, 0x63, 0xd2, 0x5d, 0x81, 0x1d, 0x45, 0x37, 0x20, 0xce, 0xd7, 0x45,
+	0x79, 0x68, 0x25, 0xcb, 0x6d, 0x50, 0x4c, 0xa6, 0xf1, 0x52, 0xd1, 0x14, 0x64, 0x97, 0x60, 0x75,
+	0x2c, 0x49, 0xb9, 0x0d, 0xbe, 0x9d, 0xe1, 0x10, 0x04, 0xbb, 0x71, 0x0a, 0x08, 0x56, 0x21, 0x1f,
+	0x5e, 0x54, 0xe1, 0x1a, 0x70, 0x82, 0x0b, 0x0a, 0xad, 0x45, 0xe8, 0xcc, 0x8a, 0x79, 0x10, 0xf8,
+	0xb0, 0x89, 0xf8, 0x9f, 0x72, 0x47, 0x8d, 0xb1, 0x52, 0x84, 0x8f, 0xbd, 0x64, 0x31, 0xc6, 0x47,
+	0x10, 0x20, 0xaf, 0x8b, 0x04, 0x5a, 0x4b, 0x50, 0xd6, 0x93, 0x6e, 0x04, 0x8c, 0x49, 0xa0, 0x42,
+	0x18, 0x37, 0x7f, 0x99, 0x87, 0xd9, 0x1d, 0xda, 0x41, 0x8f, 0xa0, 0x98, 0x78, 0xeb, 0xaf, 0x8f,
+	0xbd, 0xd1, 0x53, 0x0f, 0x6a, 0xb5, 0x7e, 0x9a, 0x86, 0xec, 0xec, 0x87, 0x00, 0xb1, 0xe7, 0x76,
+	0x75, 0x92, 0x5d, 0x24, 0x57, 0xaf, 0x9e, 0x2c, 0x97, 0x5e, 0x1f, 0x41, 0x31, 0xf1, 0x34, 0x9d,
+	0x18, 0x71, 0x5c, 0x63, 0x72, 0xc4, 0x93, 0x5e, 0x9c, 0xc8, 0x84, 0x72, 0xfa, 0xb5, 0xf9, 0xe6,
+	0xf1, 0xe9, 0x4a, 0x25, 0xf5, 0xfa, 0x14, 0x4a, 0xf2, 0x90, 0xef, 0x15, 0x78, 0x67, 0xda, 0xb7,
+	0xdb, 0x9d, 0x29, 0x42, 0x3f, 0xce, 0x58, 0xbd, 0xf7, 0x2f, 0x8c, 0x65, 0xb4, 0x9f, 0x42, 0x29,
+	0xb9, 0x00, 0xaf, 0x4c, 0xf2, 0x9a, 0x50, 0x51, 0xaf, 0x9d, 0xaa, 0x22, 0xdd, 0xf7, 0x01, 0x4d,
+	0xb8, 0xee, 0xaf, 0x1e, 0xeb, 0x20, 0xa1, 0xa7, 0x6e, 0x4c, 0xa7, 0x27, 0x4f, 0xfb, 0x0c, 0x16,
+	0x52, 0x77, 0x67, 0xed, 0xf8, 0xae, 0x0b, 0x75, 0xd4, 0xc6, 0xe9, 0x3a, 0xf1, 0x13, 0x52, 0x57,
+	0x53, 0xed, 0xf8, 0xde, 0x38, 0xf9, 0x84, 0xc9, 0x93, 0xab, 0x66, 0xbf, 0x60, 0x1f, 0xca, 0xad,
+	0x8f, 0x5f, 0xbc, 0xae, 0x2a, 0x2f, 0x5f, 0x57, 0x95, 0x57, 0xaf, 0xab, 0xca, 0xd7, 0x87, 0xd5,
+	0xcc, 0xcb, 0xc3, 0x6a, 0xe6, 0xf7, 0xc3, 0x6a, 0xe6, 0xd1, 0x8d, 0x8e, 0xed, 0x33, 0x47, 0x26,
+	0x19, 0x34, 0x03, 0xb7, 0x0e, 0xf6, 0x0f, 0x88, 0xd7, 0x6b, 0x8e, 0x7f, 0x40, 0xfb, 0x23, 0x17,
+	0xd3, 0xfd, 0x1c, 0xff, 0xf6, 0xff, 0xe0, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0x17, 0xc8, 0xba,
+	0xd6, 0xa3, 0x10, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1412,6 +1651,7 @@ type MsgClient interface {
 	// UpdateParams defines a governance operation for updating module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreateRing(ctx context.Context, in *MsgCreateRing, opts ...grpc.CallOption) (*MsgCreateRingResponse, error)
+	FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error)
 	UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
@@ -1440,6 +1680,15 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 func (c *msgClient) CreateRing(ctx context.Context, in *MsgCreateRing, opts ...grpc.CallOption) (*MsgCreateRingResponse, error) {
 	out := new(MsgCreateRingResponse)
 	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/CreateRing", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error) {
+	out := new(MsgFinalizeRingResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/FinalizeRing", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1505,6 +1754,7 @@ type MsgServer interface {
 	// UpdateParams defines a governance operation for updating module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreateRing(context.Context, *MsgCreateRing) (*MsgCreateRingResponse, error)
+	FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error)
 	UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
@@ -1522,6 +1772,9 @@ func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateP
 }
 func (*UnimplementedMsgServer) CreateRing(ctx context.Context, req *MsgCreateRing) (*MsgCreateRingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRing not implemented")
+}
+func (*UnimplementedMsgServer) FinalizeRing(ctx context.Context, req *MsgFinalizeRing) (*MsgFinalizeRingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRing not implemented")
 }
 func (*UnimplementedMsgServer) UpdateRingByAcp(ctx context.Context, req *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingByAcp not implemented")
@@ -1578,6 +1831,24 @@ func _Msg_CreateRing_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateRing(ctx, req.(*MsgCreateRing))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_FinalizeRing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgFinalizeRing)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).FinalizeRing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/FinalizeRing",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).FinalizeRing(ctx, req.(*MsgFinalizeRing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1704,6 +1975,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateRing_Handler,
 		},
 		{
+			MethodName: "FinalizeRing",
+			Handler:    _Msg_FinalizeRing_Handler,
+		},
+		{
 			MethodName: "UpdateRingByAcp",
 			Handler:    _Msg_UpdateRingByAcp_Handler,
 		},
@@ -1815,19 +2090,21 @@ func (m *MsgCreateRing) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Artifact) > 0 {
-		i -= len(m.Artifact)
-		copy(dAtA[i:], m.Artifact)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Artifact)))
-		i--
-		dAtA[i] = 0x42
+	if m.XNonce != nil {
+		{
+			size := m.XNonce.Size()
+			i -= size
+			if _, err := m.XNonce.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
 	}
 	if len(m.PolicyId) > 0 {
 		i -= len(m.PolicyId)
 		copy(dAtA[i:], m.PolicyId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x2a
 	}
 	if m.XPssInterval != nil {
 		{
@@ -1841,30 +2118,16 @@ func (m *MsgCreateRing) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	if m.Threshold != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.Threshold))
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x18
 	}
-	if len(m.PeerIds) > 0 {
-		for iNdEx := len(m.PeerIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.PeerIds[iNdEx])
-			copy(dAtA[i:], m.PeerIds[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.PeerIds[iNdEx])))
+	if len(m.PeerNodeKeys) > 0 {
+		for iNdEx := len(m.PeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.PeerNodeKeys[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.PeerNodeKeys[iNdEx])))
 			i--
-			dAtA[i] = 0x22
+			dAtA[i] = 0x12
 		}
-	}
-	if len(m.RingPk) > 0 {
-		i -= len(m.RingPk)
-		copy(dAtA[i:], m.RingPk)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.RingPk)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
-		i--
-		dAtA[i] = 0x12
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -1885,7 +2148,21 @@ func (m *MsgCreateRing_PssInterval) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	i := len(dAtA)
 	i = encodeVarintTx(dAtA, i, uint64(m.PssInterval))
 	i--
-	dAtA[i] = 0x30
+	dAtA[i] = 0x20
+	return len(dAtA) - i, nil
+}
+func (m *MsgCreateRing_Nonce) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateRing_Nonce) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.Nonce)
+	copy(dAtA[i:], m.Nonce)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.Nonce)))
+	i--
+	dAtA[i] = 0x32
 	return len(dAtA) - i, nil
 }
 func (m *MsgCreateRingResponse) Marshal() (dAtA []byte, err error) {
@@ -1915,6 +2192,73 @@ func (m *MsgCreateRingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0xa
 	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgFinalizeRing) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgFinalizeRing) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgFinalizeRing) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RingPk) > 0 {
+		i -= len(m.RingPk)
+		copy(dAtA[i:], m.RingPk)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingPk)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.RingId) > 0 {
+		i -= len(m.RingId)
+		copy(dAtA[i:], m.RingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgFinalizeRingResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgFinalizeRingResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgFinalizeRingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	return len(dAtA) - i, nil
 }
 
@@ -1956,11 +2300,11 @@ func (m *MsgUpdateRingByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			}
 		}
 	}
-	if len(m.NewPeerIds) > 0 {
-		for iNdEx := len(m.NewPeerIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.NewPeerIds[iNdEx])
-			copy(dAtA[i:], m.NewPeerIds[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.NewPeerIds[iNdEx])))
+	if len(m.NewPeerNodeKeys) > 0 {
+		for iNdEx := len(m.NewPeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.NewPeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.NewPeerNodeKeys[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.NewPeerNodeKeys[iNdEx])))
 			i--
 			dAtA[i] = 0x1a
 		}
@@ -2126,40 +2470,33 @@ func (m *RingReshareFinalizeSignDoc) MarshalToSizedBuffer(dAtA []byte) (int, err
 	if m.BlockNumberNonce != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.BlockNumberNonce))
 		i--
-		dAtA[i] = 0x40
+		dAtA[i] = 0x38
 	}
 	if len(m.FinalizedRingSha256) > 0 {
 		i -= len(m.FinalizedRingSha256)
 		copy(dAtA[i:], m.FinalizedRingSha256)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.FinalizedRingSha256)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x32
 	}
 	if len(m.CurrentRingSha256) > 0 {
 		i -= len(m.CurrentRingSha256)
 		copy(dAtA[i:], m.CurrentRingSha256)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.CurrentRingSha256)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x2a
 	}
 	if len(m.RingPk) > 0 {
 		i -= len(m.RingPk)
 		copy(dAtA[i:], m.RingPk)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.RingPk)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -2180,6 +2517,113 @@ func (m *RingReshareFinalizeSignDoc) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *RingReshareSignState) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RingReshareSignState) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RingReshareSignState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PolicyId) > 0 {
+		i -= len(m.PolicyId)
+		copy(dAtA[i:], m.PolicyId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.BlockNumberNonce != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.BlockNumberNonce))
+		i--
+		dAtA[i] = 0x38
+	}
+	if m.XPssInterval != nil {
+		{
+			size := m.XPssInterval.Size()
+			i -= size
+			if _, err := m.XPssInterval.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if m.XNewThreshold != nil {
+		{
+			size := m.XNewThreshold.Size()
+			i -= size
+			if _, err := m.XNewThreshold.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.NewPeerNodeKeys) > 0 {
+		for iNdEx := len(m.NewPeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.NewPeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.NewPeerNodeKeys[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.NewPeerNodeKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if m.Threshold != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Threshold))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.PeerNodeKeys) > 0 {
+		for iNdEx := len(m.PeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.PeerNodeKeys[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.PeerNodeKeys[iNdEx])))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.RingPk) > 0 {
+		i -= len(m.RingPk)
+		copy(dAtA[i:], m.RingPk)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingPk)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RingReshareSignState_NewThreshold) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RingReshareSignState_NewThreshold) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintTx(dAtA, i, uint64(m.NewThreshold))
+	i--
+	dAtA[i] = 0x28
+	return len(dAtA) - i, nil
+}
+func (m *RingReshareSignState_PssInterval) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RingReshareSignState_PssInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i = encodeVarintTx(dAtA, i, uint64(m.PssInterval))
+	i--
+	dAtA[i] = 0x30
+	return len(dAtA) - i, nil
+}
 func (m *MsgStoreDocument) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -2223,47 +2667,40 @@ func (m *MsgStoreDocument) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Permission)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Permission)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x3a
 	}
 	if len(m.Resource) > 0 {
 		i -= len(m.Resource)
 		copy(dAtA[i:], m.Resource)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Resource)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x32
 	}
 	if len(m.PolicyId) > 0 {
 		i -= len(m.PolicyId)
 		copy(dAtA[i:], m.PolicyId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x2a
 	}
 	if len(m.Proof) > 0 {
 		i -= len(m.Proof)
 		copy(dAtA[i:], m.Proof)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Proof)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if len(m.Document) > 0 {
 		i -= len(m.Document)
 		copy(dAtA[i:], m.Document)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Document)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -2288,7 +2725,7 @@ func (m *MsgStoreDocument_Tier) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	copy(dAtA[i:], m.Tier)
 	i = encodeVarintTx(dAtA, i, uint64(len(m.Tier)))
 	i--
-	dAtA[i] = 0x4a
+	dAtA[i] = 0x42
 	return len(dAtA) - i, nil
 }
 func (m *MsgStoreDocument_Timestamp) MarshalTo(dAtA []byte) (int, error) {
@@ -2300,7 +2737,7 @@ func (m *MsgStoreDocument_Timestamp) MarshalToSizedBuffer(dAtA []byte) (int, err
 	i := len(dAtA)
 	i = encodeVarintTx(dAtA, i, uint64(m.Timestamp))
 	i--
-	dAtA[i] = 0x50
+	dAtA[i] = 0x48
 	return len(dAtA) - i, nil
 }
 func (m *MsgStoreDocumentResponse) Marshal() (dAtA []byte, err error) {
@@ -2358,40 +2795,33 @@ func (m *MsgStoreKeyDerivation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.Permission)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Permission)))
 		i--
-		dAtA[i] = 0x3a
+		dAtA[i] = 0x32
 	}
 	if len(m.Resource) > 0 {
 		i -= len(m.Resource)
 		copy(dAtA[i:], m.Resource)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Resource)))
 		i--
-		dAtA[i] = 0x32
+		dAtA[i] = 0x2a
 	}
 	if len(m.PolicyId) > 0 {
 		i -= len(m.PolicyId)
 		copy(dAtA[i:], m.PolicyId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x22
 	}
 	if len(m.Derivation) > 0 {
 		i -= len(m.Derivation)
 		copy(dAtA[i:], m.Derivation)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.Derivation)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.RingId) > 0 {
 		i -= len(m.RingId)
 		copy(dAtA[i:], m.RingId)
 		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -2464,11 +2894,11 @@ func (m *MsgCreateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.WhitelistedNamespaces) > 0 {
-		for iNdEx := len(m.WhitelistedNamespaces) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.WhitelistedNamespaces[iNdEx])
-			copy(dAtA[i:], m.WhitelistedNamespaces[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedNamespaces[iNdEx])))
+	if len(m.WhitelistedPolicyIds) > 0 {
+		for iNdEx := len(m.WhitelistedPolicyIds) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedPolicyIds[iNdEx])
+			copy(dAtA[i:], m.WhitelistedPolicyIds[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedPolicyIds[iNdEx])))
 			i--
 			dAtA[i] = 0x22
 		}
@@ -2558,11 +2988,11 @@ func (m *MsgUpdateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x2a
 		}
 	}
-	if len(m.WhitelistedNamespaces) > 0 {
-		for iNdEx := len(m.WhitelistedNamespaces) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.WhitelistedNamespaces[iNdEx])
-			copy(dAtA[i:], m.WhitelistedNamespaces[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedNamespaces[iNdEx])))
+	if len(m.WhitelistedPolicyIds) > 0 {
+		for iNdEx := len(m.WhitelistedPolicyIds) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.WhitelistedPolicyIds[iNdEx])
+			copy(dAtA[i:], m.WhitelistedPolicyIds[iNdEx])
+			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedPolicyIds[iNdEx])))
 			i--
 			dAtA[i] = 0x22
 		}
@@ -2689,16 +3119,8 @@ func (m *MsgCreateRing) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.RingPk)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	if len(m.PeerIds) > 0 {
-		for _, s := range m.PeerIds {
+	if len(m.PeerNodeKeys) > 0 {
+		for _, s := range m.PeerNodeKeys {
 			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2713,9 +3135,8 @@ func (m *MsgCreateRing) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Artifact)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
+	if m.XNonce != nil {
+		n += m.XNonce.Size()
 	}
 	return n
 }
@@ -2729,6 +3150,16 @@ func (m *MsgCreateRing_PssInterval) Size() (n int) {
 	n += 1 + sovTx(uint64(m.PssInterval))
 	return n
 }
+func (m *MsgCreateRing_Nonce) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Nonce)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
 func (m *MsgCreateRingResponse) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2739,6 +3170,36 @@ func (m *MsgCreateRingResponse) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
+	return n
+}
+
+func (m *MsgFinalizeRing) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingPk)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgFinalizeRingResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -2756,8 +3217,8 @@ func (m *MsgUpdateRingByAcp) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.NewPeerIds) > 0 {
-		for _, s := range m.NewPeerIds {
+	if len(m.NewPeerNodeKeys) > 0 {
+		for _, s := range m.NewPeerNodeKeys {
 			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2846,10 +3307,6 @@ func (m *RingReshareFinalizeSignDoc) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	l = len(m.RingId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -2872,6 +3329,65 @@ func (m *RingReshareFinalizeSignDoc) Size() (n int) {
 	return n
 }
 
+func (m *RingReshareSignState) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RingPk)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.PeerNodeKeys) > 0 {
+		for _, s := range m.PeerNodeKeys {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.Threshold != 0 {
+		n += 1 + sovTx(uint64(m.Threshold))
+	}
+	if len(m.NewPeerNodeKeys) > 0 {
+		for _, s := range m.NewPeerNodeKeys {
+			l = len(s)
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.XNewThreshold != nil {
+		n += m.XNewThreshold.Size()
+	}
+	if m.XPssInterval != nil {
+		n += m.XPssInterval.Size()
+	}
+	if m.BlockNumberNonce != 0 {
+		n += 1 + sovTx(uint64(m.BlockNumberNonce))
+	}
+	l = len(m.PolicyId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *RingReshareSignState_NewThreshold) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovTx(uint64(m.NewThreshold))
+	return n
+}
+func (m *RingReshareSignState_PssInterval) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	n += 1 + sovTx(uint64(m.PssInterval))
+	return n
+}
 func (m *MsgStoreDocument) Size() (n int) {
 	if m == nil {
 		return 0
@@ -2879,10 +3395,6 @@ func (m *MsgStoreDocument) Size() (n int) {
 	var l int
 	_ = l
 	l = len(m.Creator)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
-	l = len(m.Namespace)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
@@ -2961,10 +3473,6 @@ func (m *MsgStoreKeyDerivation) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovTx(uint64(l))
-	}
 	l = len(m.RingId)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
@@ -3019,8 +3527,8 @@ func (m *MsgCreateNodeInfo) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if len(m.WhitelistedNamespaces) > 0 {
-		for _, s := range m.WhitelistedNamespaces {
+	if len(m.WhitelistedPolicyIds) > 0 {
+		for _, s := range m.WhitelistedPolicyIds {
 			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -3060,8 +3568,8 @@ func (m *MsgUpdateNodeInfo) Size() (n int) {
 	if m.XPeerId != nil {
 		n += m.XPeerId.Size()
 	}
-	if len(m.WhitelistedNamespaces) > 0 {
-		for _, s := range m.WhitelistedNamespaces {
+	if len(m.WhitelistedPolicyIds) > 0 {
+		for _, s := range m.WhitelistedPolicyIds {
 			l = len(s)
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -3341,7 +3849,7 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerNodeKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3369,73 +3877,9 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
+			m.PeerNodeKeys = append(m.PeerNodeKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RingPk = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PeerIds", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.PeerIds = append(m.PeerIds, string(dAtA[iNdEx:postIndex]))
-			iNdEx = postIndex
-		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Threshold", wireType)
 			}
@@ -3454,7 +3898,7 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 6:
+		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
 			}
@@ -3474,7 +3918,7 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.XPssInterval = &MsgCreateRing_PssInterval{v}
-		case 7:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
@@ -3506,9 +3950,9 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 			}
 			m.PolicyId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Artifact", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Nonce", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3536,7 +3980,7 @@ func (m *MsgCreateRing) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Artifact = string(dAtA[iNdEx:postIndex])
+			m.XNonce = &MsgCreateRing_Nonce{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3620,6 +4064,202 @@ func (m *MsgCreateRingResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgFinalizeRing) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgFinalizeRing: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgFinalizeRing: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingPk = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgFinalizeRingResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgFinalizeRingResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgFinalizeRingResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3736,7 +4376,7 @@ func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NewPeerIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NewPeerNodeKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -3764,7 +4404,7 @@ func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.NewPeerIds = append(m.NewPeerIds, string(dAtA[iNdEx:postIndex]))
+			m.NewPeerNodeKeys = append(m.NewPeerNodeKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
@@ -4202,38 +4842,6 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -4264,7 +4872,7 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
 			}
@@ -4296,7 +4904,7 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 			}
 			m.RingPk = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CurrentRingSha256", wireType)
 			}
@@ -4330,7 +4938,7 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 				m.CurrentRingSha256 = []byte{}
 			}
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FinalizedRingSha256", wireType)
 			}
@@ -4364,7 +4972,7 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 				m.FinalizedRingSha256 = []byte{}
 			}
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BlockNumberNonce", wireType)
 			}
@@ -4383,6 +4991,262 @@ func (m *RingReshareFinalizeSignDoc) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RingReshareSignState) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RingReshareSignState: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RingReshareSignState: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingPk = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerNodeKeys", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PeerNodeKeys = append(m.PeerNodeKeys, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Threshold", wireType)
+			}
+			m.Threshold = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Threshold |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NewPeerNodeKeys", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NewPeerNodeKeys = append(m.NewPeerNodeKeys, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NewThreshold", wireType)
+			}
+			var v uint32
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.XNewThreshold = &RingReshareSignState_NewThreshold{v}
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
+			}
+			var v uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.XPssInterval = &RingReshareSignState_PssInterval{v}
+		case 7:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BlockNumberNonce", wireType)
+			}
+			m.BlockNumberNonce = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BlockNumberNonce |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PolicyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -4467,38 +5331,6 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -4529,7 +5361,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Document", wireType)
 			}
@@ -4561,7 +5393,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.Document = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Proof", wireType)
 			}
@@ -4593,7 +5425,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.Proof = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
@@ -4625,7 +5457,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.PolicyId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
 			}
@@ -4657,7 +5489,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.Resource = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Permission", wireType)
 			}
@@ -4689,7 +5521,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.Permission = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 9:
+		case 8:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Tier", wireType)
 			}
@@ -4721,7 +5553,7 @@ func (m *MsgStoreDocument) Unmarshal(dAtA []byte) error {
 			}
 			m.XTier = &MsgStoreDocument_Tier{string(dAtA[iNdEx:postIndex])}
 			iNdEx = postIndex
-		case 10:
+		case 9:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
 			}
@@ -4907,38 +5739,6 @@ func (m *MsgStoreKeyDerivation) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
 			}
 			var stringLen uint64
@@ -4969,7 +5769,7 @@ func (m *MsgStoreKeyDerivation) Unmarshal(dAtA []byte) error {
 			}
 			m.RingId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Derivation", wireType)
 			}
@@ -5001,7 +5801,7 @@ func (m *MsgStoreKeyDerivation) Unmarshal(dAtA []byte) error {
 			}
 			m.Derivation = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
@@ -5033,7 +5833,7 @@ func (m *MsgStoreKeyDerivation) Unmarshal(dAtA []byte) error {
 			}
 			m.PolicyId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Resource", wireType)
 			}
@@ -5065,7 +5865,7 @@ func (m *MsgStoreKeyDerivation) Unmarshal(dAtA []byte) error {
 			}
 			m.Resource = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 7:
+		case 6:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Permission", wireType)
 			}
@@ -5327,7 +6127,7 @@ func (m *MsgCreateNodeInfo) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedNamespaces", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedPolicyIds", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5355,7 +6155,7 @@ func (m *MsgCreateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WhitelistedNamespaces = append(m.WhitelistedNamespaces, string(dAtA[iNdEx:postIndex]))
+			m.WhitelistedPolicyIds = append(m.WhitelistedPolicyIds, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -5587,7 +6387,7 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedNamespaces", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedPolicyIds", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -5615,7 +6415,7 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WhitelistedNamespaces = append(m.WhitelistedNamespaces, string(dAtA[iNdEx:postIndex]))
+			m.WhitelistedPolicyIds = append(m.WhitelistedPolicyIds, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {

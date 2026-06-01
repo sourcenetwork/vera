@@ -26,29 +26,29 @@ service Query {
     option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/ring/{id}";
   }
 
-  // Rings queries rings, optionally filtered by namespace.
+  // Rings queries rings.
   rpc Rings(QueryRingsRequest) returns (QueryRingsResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/rings";
   }
 
-  // Document queries an encrypted document by namespace and id.
+  // Document queries an encrypted document by id.
   rpc Document(QueryDocumentRequest) returns (QueryDocumentResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/document/{namespace}/{id}";
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/document/{id}";
   }
 
-  // Documents queries encrypted documents within a namespace.
+  // Documents queries encrypted documents.
   rpc Documents(QueryDocumentsRequest) returns (QueryDocumentsResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/documents/{namespace}";
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/documents";
   }
 
-  // KeyDerivation queries a key derivation by namespace and id.
+  // KeyDerivation queries a key derivation by id.
   rpc KeyDerivation(QueryKeyDerivationRequest) returns (QueryKeyDerivationResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivation/{namespace}/{id}";
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivation/{id}";
   }
 
-  // KeyDerivations queries key derivations within a namespace.
+  // KeyDerivations queries key derivations.
   rpc KeyDerivations(QueryKeyDerivationsRequest) returns (QueryKeyDerivationsResponse) {
-    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivations/{namespace}";
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/key_derivations";
   }
 
   // NodeInfo queries node info by node key.
@@ -77,8 +77,7 @@ message QueryRingResponse {
 }
 
 message QueryRingsRequest {
-  string namespace = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryRingsResponse {
@@ -90,8 +89,7 @@ message QueryRingsResponse {
 }
 
 message QueryDocumentRequest {
-  string namespace = 1;
-  string id = 2;
+  string id = 1;
 }
 
 message QueryDocumentResponse {
@@ -99,8 +97,7 @@ message QueryDocumentResponse {
 }
 
 message QueryDocumentsRequest {
-  string namespace = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryDocumentsResponse {
@@ -112,8 +109,7 @@ message QueryDocumentsResponse {
 }
 
 message QueryKeyDerivationRequest {
-  string namespace = 1;
-  string id = 2;
+  string id = 1;
 }
 
 message QueryKeyDerivationResponse {
@@ -121,8 +117,7 @@ message QueryKeyDerivationResponse {
 }
 
 message QueryKeyDerivationsRequest {
-  string namespace = 1;
-  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryKeyDerivationsResponse {

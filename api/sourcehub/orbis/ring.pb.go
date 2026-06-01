@@ -23,20 +23,20 @@ const (
 
 // Ring stores the active and pending committee metadata for an Orbis ring.
 type Ring struct {
-	state      protoimpl.MessageState `protogen:"open.v1"`
-	Id         string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace  string                 `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid string                 `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingPk     string                 `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerIds    []string               `protobuf:"bytes,5,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
-	Threshold  uint32                 `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	NewPeerIds []string               `protobuf:"bytes,7,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatorDid      string                 `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingPk          string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerNodeKeys    []string               `protobuf:"bytes,4,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold       uint32                 `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerNodeKeys []string               `protobuf:"bytes,6,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Absent means no pending threshold update.
-	NewThreshold *uint32 `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
+	NewThreshold *uint32 `protobuf:"varint,7,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Absent means automatic PSS refresh is disabled.
-	PssInterval      *uint64 `protobuf:"varint,9,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
-	BlockNumberNonce uint64  `protobuf:"varint,10,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
-	PolicyId         string  `protobuf:"bytes,11,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	PssInterval      *uint64             `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -78,13 +78,6 @@ func (x *Ring) GetId() string {
 	return ""
 }
 
-func (x *Ring) GetNamespace() string {
-	if x != nil {
-		return x.Namespace
-	}
-	return ""
-}
-
 func (x *Ring) GetCreatorDid() string {
 	if x != nil {
 		return x.CreatorDid
@@ -99,9 +92,9 @@ func (x *Ring) GetRingPk() string {
 	return ""
 }
 
-func (x *Ring) GetPeerIds() []string {
+func (x *Ring) GetPeerNodeKeys() []string {
 	if x != nil {
-		return x.PeerIds
+		return x.PeerNodeKeys
 	}
 	return nil
 }
@@ -113,9 +106,9 @@ func (x *Ring) GetThreshold() uint32 {
 	return 0
 }
 
-func (x *Ring) GetNewPeerIds() []string {
+func (x *Ring) GetNewPeerNodeKeys() []string {
 	if x != nil {
-		return x.NewPeerIds
+		return x.NewPeerNodeKeys
 	}
 	return nil
 }
@@ -148,28 +141,90 @@ func (x *Ring) GetPolicyId() string {
 	return ""
 }
 
+func (x *Ring) GetConfirmations() []*RingConfirmation {
+	if x != nil {
+		return x.Confirmations
+	}
+	return nil
+}
+
+// RingConfirmation records a single peer's agreement on the ring public key.
+type RingConfirmation struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeKey       string                 `protobuf:"bytes,1,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	RingPk        string                 `protobuf:"bytes,2,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RingConfirmation) Reset() {
+	*x = RingConfirmation{}
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RingConfirmation) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RingConfirmation) ProtoMessage() {}
+
+func (x *RingConfirmation) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RingConfirmation.ProtoReflect.Descriptor instead.
+func (*RingConfirmation) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *RingConfirmation) GetNodeKey() string {
+	if x != nil {
+		return x.NodeKey
+	}
+	return ""
+}
+
+func (x *RingConfirmation) GetRingPk() string {
+	if x != nil {
+		return x.RingPk
+	}
+	return ""
+}
+
 var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\n" +
-	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\x89\x03\n" +
+	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\xca\x03\n" +
 	"\x04Ring\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1c\n" +
-	"\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x1f\n" +
-	"\vcreator_did\x18\x03 \x01(\tR\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
+	"\vcreator_did\x18\x02 \x01(\tR\n" +
 	"creatorDid\x12\x17\n" +
-	"\aring_pk\x18\x04 \x01(\tR\x06ringPk\x12\x19\n" +
-	"\bpeer_ids\x18\x05 \x03(\tR\apeerIds\x12\x1c\n" +
-	"\tthreshold\x18\x06 \x01(\rR\tthreshold\x12 \n" +
-	"\fnew_peer_ids\x18\a \x03(\tR\n" +
-	"newPeerIds\x12(\n" +
-	"\rnew_threshold\x18\b \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
-	"\fpss_interval\x18\t \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
-	"\x12block_number_nonce\x18\n" +
-	" \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
-	"\tpolicy_id\x18\v \x01(\tR\bpolicyIdB\x10\n" +
+	"\aring_pk\x18\x03 \x01(\tR\x06ringPk\x12$\n" +
+	"\x0epeer_node_keys\x18\x04 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
+	"\tthreshold\x18\x05 \x01(\rR\tthreshold\x12+\n" +
+	"\x12new_peer_node_keys\x18\x06 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
+	"\rnew_threshold\x18\a \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
+	"\fpss_interval\x18\b \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
+	"\x12block_number_nonce\x18\t \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
+	"\tpolicy_id\x18\n" +
+	" \x01(\tR\bpolicyId\x12G\n" +
+	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmationsB\x10\n" +
 	"\x0e_new_thresholdB\x0f\n" +
-	"\r_pss_intervalB\x9f\x01\n" +
+	"\r_pss_interval\"F\n" +
+	"\x10RingConfirmation\x12\x19\n" +
+	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +
+	"\aring_pk\x18\x02 \x01(\tR\x06ringPkB\x9f\x01\n" +
 	"\x13com.sourcehub.orbisB\tRingProtoP\x01Z cosmossdk.io/api/sourcehub/orbis\xa2\x02\x03SOX\xaa\x02\x0fSourcehub.Orbis\xca\x02\x0fSourcehub\\Orbis\xe2\x02\x1bSourcehub\\Orbis\\GPBMetadata\xea\x02\x10Sourcehub::Orbisb\x06proto3"
 
 var (
@@ -184,16 +239,18 @@ func file_sourcehub_orbis_ring_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_ring_proto_rawDescData
 }
 
-var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_sourcehub_orbis_ring_proto_goTypes = []any{
-	(*Ring)(nil), // 0: sourcehub.orbis.Ring
+	(*Ring)(nil),             // 0: sourcehub.orbis.Ring
+	(*RingConfirmation)(nil), // 1: sourcehub.orbis.RingConfirmation
 }
 var file_sourcehub_orbis_ring_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: sourcehub.orbis.Ring.confirmations:type_name -> sourcehub.orbis.RingConfirmation
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_orbis_ring_proto_init() }
@@ -208,7 +265,7 @@ func file_sourcehub_orbis_ring_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_ring_proto_rawDesc), len(file_sourcehub_orbis_ring_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -57,10 +57,6 @@ func (k *Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func namespaceID(namespace string) string {
-	return types.GetNamespaceID(namespace)
-}
-
 func (k *Keeper) RingBytes(ring types.Ring) ([]byte, error) {
 	return k.cdc.Marshal(&ring)
 }

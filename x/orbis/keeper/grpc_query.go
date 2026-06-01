@@ -43,11 +43,6 @@ func (k *Keeper) Rings(ctx context.Context, req *types.QueryRingsRequest) (*type
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	namespaceFilter := ""
-	if req.Namespace != "" {
-		namespaceFilter = namespaceID(req.Namespace)
-	}
-
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.RingKeyPrefix))
 	var rings []types.Ring
@@ -55,9 +50,7 @@ func (k *Keeper) Rings(ctx context.Context, req *types.QueryRingsRequest) (*type
 	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
 		var ring types.Ring
 		k.cdc.MustUnmarshal(value, &ring)
-		if namespaceFilter == "" || ring.Namespace == namespaceFilter {
-			rings = append(rings, ring)
-		}
+		rings = append(rings, ring)
 		return nil
 	})
 	if err != nil {
@@ -71,14 +64,11 @@ func (k *Keeper) Document(ctx context.Context, req *types.QueryDocumentRequest) 
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	if req.Namespace == "" {
-		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidNamespaceId.Error())
-	}
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidDocumentId.Error())
 	}
 
-	document := k.GetDocument(ctx, namespaceID(req.Namespace), req.Id)
+	document := k.GetDocument(ctx, req.Id)
 	if document == nil {
 		return nil, status.Error(codes.NotFound, types.ErrDocumentNotFound.Error())
 	}
@@ -90,12 +80,9 @@ func (k *Keeper) Documents(ctx context.Context, req *types.QueryDocumentsRequest
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	if req.Namespace == "" {
-		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidNamespaceId.Error())
-	}
 
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, append(types.KeyPrefix(types.DocumentKeyPrefix), types.NamespacePrefix(namespaceID(req.Namespace))...))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.DocumentKeyPrefix))
 	var documents []types.Document
 
 	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
@@ -115,14 +102,11 @@ func (k *Keeper) KeyDerivation(ctx context.Context, req *types.QueryKeyDerivatio
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	if req.Namespace == "" {
-		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidNamespaceId.Error())
-	}
 	if req.Id == "" {
 		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidKeyDerivationId.Error())
 	}
 
-	keyDerivation := k.GetKeyDerivation(ctx, namespaceID(req.Namespace), req.Id)
+	keyDerivation := k.GetKeyDerivation(ctx, req.Id)
 	if keyDerivation == nil {
 		return nil, status.Error(codes.NotFound, types.ErrKeyDerivationNotFound.Error())
 	}
@@ -147,12 +131,9 @@ func (k *Keeper) KeyDerivations(ctx context.Context, req *types.QueryKeyDerivati
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	if req.Namespace == "" {
-		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidNamespaceId.Error())
-	}
 
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, append(types.KeyPrefix(types.KeyDerivationKeyPrefix), types.NamespacePrefix(namespaceID(req.Namespace))...))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.KeyDerivationKeyPrefix))
 	var keyDerivations []types.KeyDerivation
 
 	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {

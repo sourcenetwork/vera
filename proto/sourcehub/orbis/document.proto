@@ -6,16 +6,15 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 // Document stores an encrypted Orbis document and its policy binding metadata.
 message Document {
   string id = 1;
-  string namespace = 2;
-  string creator_did = 3;
-  string ring_id = 4;
-  string document = 5;
-  string proof = 6;
-  string policy_id = 7;
-  string resource = 8;
-  string permission = 9;
+  string creator_did = 2;
+  string ring_id = 3;
+  string document = 4;
+  string proof = 5;
+  string policy_id = 6;
+  string resource = 7;
+  string permission = 8;
   // Absent means no tier.
-  optional string tier = 10;
+  optional string tier = 9;
   // Absent means no timestamp.
-  optional uint64 timestamp = 11;
+  optional uint64 timestamp = 10;
 }

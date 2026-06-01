@@ -24,21 +24,21 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // Ring stores the active and pending committee metadata for an Orbis ring.
 type Ring struct {
-	Id         string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Namespace  string   `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	CreatorDid string   `protobuf:"bytes,3,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
-	RingPk     string   `protobuf:"bytes,4,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
-	PeerIds    []string `protobuf:"bytes,5,rep,name=peer_ids,json=peerIds,proto3" json:"peer_ids,omitempty"`
-	Threshold  uint32   `protobuf:"varint,6,opt,name=threshold,proto3" json:"threshold,omitempty"`
-	NewPeerIds []string `protobuf:"bytes,7,rep,name=new_peer_ids,json=newPeerIds,proto3" json:"new_peer_ids,omitempty"`
+	Id              string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CreatorDid      string   `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3" json:"creator_did,omitempty"`
+	RingPk          string   `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	PeerNodeKeys    []string `protobuf:"bytes,4,rep,name=peer_node_keys,json=peerNodeKeys,proto3" json:"peer_node_keys,omitempty"`
+	Threshold       uint32   `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	NewPeerNodeKeys []string `protobuf:"bytes,6,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Types that are valid to be assigned to XNewThreshold:
 	//	*Ring_NewThreshold
 	XNewThreshold isRing_XNewThreshold `protobuf_oneof:"_new_threshold"`
 	// Types that are valid to be assigned to XPssInterval:
 	//	*Ring_PssInterval
 	XPssInterval     isRing_XPssInterval `protobuf_oneof:"_pss_interval"`
-	BlockNumberNonce uint64              `protobuf:"varint,10,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
-	PolicyId         string              `protobuf:"bytes,11,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
 }
 
 func (m *Ring) Reset()         { *m = Ring{} }
@@ -86,10 +86,10 @@ type isRing_XPssInterval interface {
 }
 
 type Ring_NewThreshold struct {
-	NewThreshold uint32 `protobuf:"varint,8,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
+	NewThreshold uint32 `protobuf:"varint,7,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 }
 type Ring_PssInterval struct {
-	PssInterval uint64 `protobuf:"varint,9,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	PssInterval uint64 `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
 }
 
 func (*Ring_NewThreshold) isRing_XNewThreshold() {}
@@ -115,13 +115,6 @@ func (m *Ring) GetId() string {
 	return ""
 }
 
-func (m *Ring) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
 func (m *Ring) GetCreatorDid() string {
 	if m != nil {
 		return m.CreatorDid
@@ -136,9 +129,9 @@ func (m *Ring) GetRingPk() string {
 	return ""
 }
 
-func (m *Ring) GetPeerIds() []string {
+func (m *Ring) GetPeerNodeKeys() []string {
 	if m != nil {
-		return m.PeerIds
+		return m.PeerNodeKeys
 	}
 	return nil
 }
@@ -150,9 +143,9 @@ func (m *Ring) GetThreshold() uint32 {
 	return 0
 }
 
-func (m *Ring) GetNewPeerIds() []string {
+func (m *Ring) GetNewPeerNodeKeys() []string {
 	if m != nil {
-		return m.NewPeerIds
+		return m.NewPeerNodeKeys
 	}
 	return nil
 }
@@ -185,6 +178,13 @@ func (m *Ring) GetPolicyId() string {
 	return ""
 }
 
+func (m *Ring) GetConfirmations() []*RingConfirmation {
+	if m != nil {
+		return m.Confirmations
+	}
+	return nil
+}
+
 // XXX_OneofWrappers is for the internal use of the proto package.
 func (*Ring) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
@@ -193,38 +193,95 @@ func (*Ring) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+// RingConfirmation records a single peer's agreement on the ring public key.
+type RingConfirmation struct {
+	NodeKey string `protobuf:"bytes,1,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	RingPk  string `protobuf:"bytes,2,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+}
+
+func (m *RingConfirmation) Reset()         { *m = RingConfirmation{} }
+func (m *RingConfirmation) String() string { return proto.CompactTextString(m) }
+func (*RingConfirmation) ProtoMessage()    {}
+func (*RingConfirmation) Descriptor() ([]byte, []int) {
+	return fileDescriptor_be6c219726da9c21, []int{1}
+}
+func (m *RingConfirmation) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RingConfirmation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RingConfirmation.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RingConfirmation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RingConfirmation.Merge(m, src)
+}
+func (m *RingConfirmation) XXX_Size() int {
+	return m.Size()
+}
+func (m *RingConfirmation) XXX_DiscardUnknown() {
+	xxx_messageInfo_RingConfirmation.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RingConfirmation proto.InternalMessageInfo
+
+func (m *RingConfirmation) GetNodeKey() string {
+	if m != nil {
+		return m.NodeKey
+	}
+	return ""
+}
+
+func (m *RingConfirmation) GetRingPk() string {
+	if m != nil {
+		return m.RingPk
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Ring)(nil), "sourcehub.orbis.Ring")
+	proto.RegisterType((*RingConfirmation)(nil), "sourcehub.orbis.RingConfirmation")
 }
 
 func init() { proto.RegisterFile("sourcehub/orbis/ring.proto", fileDescriptor_be6c219726da9c21) }
 
 var fileDescriptor_be6c219726da9c21 = []byte{
-	// 376 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x54, 0x91, 0xbf, 0xae, 0xd3, 0x30,
-	0x14, 0xc6, 0xe3, 0xb6, 0xb4, 0xcd, 0xe9, 0xed, 0xbd, 0x57, 0x5e, 0x30, 0x7f, 0x14, 0x22, 0x06,
-	0x94, 0x01, 0x35, 0x48, 0xbc, 0x41, 0xc5, 0xd0, 0x32, 0x54, 0x55, 0xc4, 0xc4, 0x62, 0x25, 0xb1,
-	0xd5, 0x5a, 0x49, 0x6d, 0xcb, 0x4e, 0x29, 0x7d, 0x03, 0xd8, 0x78, 0x2c, 0xc6, 0x8e, 0x8c, 0xa8,
-	0x7d, 0x11, 0x64, 0x37, 0x34, 0x30, 0xfa, 0xf7, 0x7d, 0xdf, 0x39, 0xc7, 0xfa, 0xe0, 0xb9, 0x55,
-	0x7b, 0x53, 0xf2, 0xed, 0xbe, 0x48, 0x95, 0x29, 0x84, 0x4d, 0x8d, 0x90, 0x9b, 0x99, 0x36, 0xaa,
-	0x51, 0xf8, 0xe1, 0xa6, 0xcd, 0xbc, 0xf6, 0xfa, 0x7b, 0x1f, 0x06, 0x99, 0x90, 0x1b, 0x7c, 0x0f,
-	0x3d, 0xc1, 0x08, 0x8a, 0x51, 0x12, 0x66, 0x3d, 0xc1, 0xf0, 0x4b, 0x08, 0x65, 0xbe, 0xe3, 0x56,
-	0xe7, 0x25, 0x27, 0x3d, 0x8f, 0x3b, 0x80, 0x5f, 0xc1, 0xa4, 0x34, 0x3c, 0x6f, 0x94, 0xa1, 0x4c,
-	0x30, 0xd2, 0xf7, 0x3a, 0xb4, 0xe8, 0x83, 0x60, 0xf8, 0x29, 0x8c, 0xdc, 0x5a, 0xaa, 0x2b, 0x32,
-	0xf0, 0xe2, 0xd0, 0x3d, 0xd7, 0x15, 0x7e, 0x06, 0x63, 0xcd, 0xb9, 0xa1, 0x82, 0x59, 0xf2, 0x24,
-	0xee, 0x27, 0x61, 0x36, 0x72, 0xef, 0x25, 0xb3, 0x6e, 0x65, 0xb3, 0x35, 0xdc, 0x6e, 0x55, 0xcd,
-	0xc8, 0x30, 0x46, 0xc9, 0x34, 0xeb, 0x00, 0x8e, 0xe1, 0x4e, 0xf2, 0x03, 0xbd, 0x85, 0x47, 0x3e,
-	0x0c, 0x92, 0x1f, 0xd6, 0x6d, 0x3e, 0x81, 0xa9, 0x73, 0x74, 0x33, 0xc6, 0x6e, 0xc6, 0x22, 0xc8,
-	0x5c, 0xf0, 0xd3, 0x5f, 0xfa, 0x0d, 0x21, 0xfc, 0x06, 0xee, 0xb4, 0xb5, 0x54, 0xc8, 0x86, 0x9b,
-	0x2f, 0x79, 0x4d, 0xc2, 0x18, 0x25, 0x83, 0x05, 0xca, 0x26, 0xda, 0xda, 0x65, 0x0b, 0x9d, 0xef,
-	0x2d, 0xe0, 0xa2, 0x56, 0x65, 0x45, 0xe5, 0x7e, 0x57, 0x70, 0x43, 0xa5, 0x92, 0x25, 0x27, 0xe0,
-	0xdc, 0xd9, 0xa3, 0x57, 0x56, 0x5e, 0x58, 0x39, 0x8e, 0x5f, 0x40, 0xa8, 0x55, 0x2d, 0xca, 0x23,
-	0x15, 0x8c, 0x4c, 0xfc, 0xaf, 0xc7, 0x57, 0xb0, 0x64, 0xf3, 0x47, 0xb8, 0xa7, 0xff, 0x5d, 0x37,
-	0x7f, 0x80, 0x29, 0xfd, 0xf7, 0x8a, 0xf9, 0xc7, 0x9f, 0xe7, 0x08, 0x9d, 0xce, 0x11, 0xfa, 0x7d,
-	0x8e, 0xd0, 0x8f, 0x4b, 0x14, 0x9c, 0x2e, 0x51, 0xf0, 0xeb, 0x12, 0x05, 0x9f, 0xdf, 0x6d, 0x44,
-	0xe3, 0x3a, 0x2b, 0xd5, 0x2e, 0xbd, 0x36, 0x28, 0x79, 0x73, 0x50, 0xa6, 0x4a, 0xbb, 0xae, 0xbf,
-	0xb6, 0x6d, 0x37, 0x47, 0xcd, 0x6d, 0x31, 0xf4, 0x7d, 0xbf, 0xff, 0x13, 0x00, 0x00, 0xff, 0xff,
-	0xc3, 0x8c, 0xf7, 0x86, 0x0d, 0x02, 0x00, 0x00,
+	// 430 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x5c, 0x92, 0xcd, 0x8e, 0xd3, 0x30,
+	0x14, 0x85, 0xeb, 0xb6, 0xb4, 0xcd, 0xed, 0xaf, 0xbc, 0xc1, 0xfc, 0x28, 0x84, 0x11, 0x42, 0x91,
+	0x40, 0x2d, 0x82, 0x37, 0x28, 0x08, 0x66, 0x40, 0xaa, 0x46, 0x11, 0x2b, 0x36, 0x56, 0x13, 0x9b,
+	0xd6, 0x4a, 0x6b, 0x47, 0xb6, 0x4b, 0xe9, 0x1b, 0xb0, 0xe4, 0xb1, 0x10, 0xab, 0x59, 0xb2, 0x44,
+	0xed, 0x8b, 0x20, 0xbb, 0x19, 0x9a, 0xe9, 0x32, 0xe7, 0x9c, 0x7c, 0xf2, 0xbd, 0xe7, 0xc2, 0x43,
+	0xa3, 0x36, 0x3a, 0xe3, 0xcb, 0x4d, 0x3a, 0x51, 0x3a, 0x15, 0x66, 0xa2, 0x85, 0x5c, 0x8c, 0x0b,
+	0xad, 0xac, 0xc2, 0xc3, 0xff, 0xde, 0xd8, 0x7b, 0x17, 0xbf, 0x1b, 0xd0, 0x4c, 0x84, 0x5c, 0xe0,
+	0x01, 0xd4, 0x05, 0x23, 0x28, 0x42, 0x71, 0x90, 0xd4, 0x05, 0xc3, 0x4f, 0xa0, 0x9b, 0x69, 0x3e,
+	0xb7, 0x4a, 0x53, 0x26, 0x18, 0xa9, 0x7b, 0x03, 0x4a, 0xe9, 0x9d, 0x60, 0xf8, 0x3e, 0xb4, 0x1d,
+	0x98, 0x16, 0x39, 0x69, 0x78, 0xb3, 0xe5, 0x3e, 0xaf, 0x73, 0xfc, 0x0c, 0x06, 0x05, 0xe7, 0x9a,
+	0x4a, 0xc5, 0x38, 0xcd, 0xf9, 0xce, 0x90, 0x66, 0xd4, 0x88, 0x83, 0xa4, 0xe7, 0xd4, 0x99, 0x62,
+	0xfc, 0x13, 0xdf, 0x19, 0xfc, 0x18, 0x02, 0xbb, 0xd4, 0xdc, 0x2c, 0xd5, 0x8a, 0x91, 0x7b, 0x11,
+	0x8a, 0xfb, 0xc9, 0x49, 0xc0, 0x2f, 0x00, 0x4b, 0xbe, 0xa5, 0x67, 0x9c, 0x96, 0xe7, 0x0c, 0x25,
+	0xdf, 0x5e, 0x57, 0x51, 0x31, 0xf4, 0x5d, 0xf8, 0x84, 0x6b, 0x3b, 0xdc, 0x65, 0x2d, 0xe9, 0x49,
+	0xbe, 0xfd, 0x7c, 0xab, 0xfe, 0x40, 0x08, 0x3f, 0x87, 0x5e, 0x61, 0x0c, 0x15, 0xd2, 0x72, 0xfd,
+	0x6d, 0xbe, 0x22, 0x9d, 0x08, 0xc5, 0xcd, 0x4b, 0x94, 0x74, 0x0b, 0x63, 0xae, 0x4a, 0xd1, 0xe5,
+	0x5e, 0x02, 0x4e, 0x57, 0x2a, 0xcb, 0xa9, 0xdc, 0xac, 0x53, 0xff, 0x04, 0x99, 0x71, 0x12, 0xb8,
+	0x74, 0x32, 0xf2, 0xce, 0xcc, 0x1b, 0x33, 0xa7, 0xe3, 0x47, 0x10, 0x14, 0x6a, 0x25, 0xb2, 0x1d,
+	0x15, 0x8c, 0x80, 0xdf, 0x45, 0xe7, 0x28, 0x5c, 0x31, 0xfc, 0x01, 0xfa, 0x99, 0x92, 0x5f, 0x85,
+	0x5e, 0xcf, 0xad, 0x50, 0xd2, 0x90, 0x6e, 0xd4, 0x88, 0xbb, 0xaf, 0x9f, 0x8e, 0xcf, 0x9a, 0x18,
+	0xbb, 0x16, 0xde, 0x56, 0x92, 0xc9, 0xdd, 0xff, 0xa6, 0x23, 0x18, 0xd0, 0x3b, 0x63, 0x4e, 0x87,
+	0xd0, 0xa7, 0xd5, 0x71, 0x2e, 0xde, 0xc3, 0xe8, 0x9c, 0x82, 0x1f, 0x40, 0xe7, 0x76, 0x81, 0x65,
+	0xbb, 0x6d, 0x79, 0x5c, 0x5c, 0xb5, 0xc1, 0x7a, 0xb5, 0xc1, 0xe9, 0xc7, 0x5f, 0xfb, 0x10, 0xdd,
+	0xec, 0x43, 0xf4, 0x77, 0x1f, 0xa2, 0x9f, 0x87, 0xb0, 0x76, 0x73, 0x08, 0x6b, 0x7f, 0x0e, 0x61,
+	0xed, 0xcb, 0xab, 0x85, 0xb0, 0xee, 0xc9, 0x99, 0x5a, 0x4f, 0x8e, 0x03, 0x48, 0x6e, 0xb7, 0x4a,
+	0xe7, 0x93, 0xd3, 0xd1, 0x7d, 0x2f, 0xcf, 0xce, 0xee, 0x0a, 0x6e, 0xd2, 0x96, 0x3f, 0xbc, 0x37,
+	0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0xf6, 0x3c, 0x85, 0xb8, 0x96, 0x02, 0x00, 0x00,
 }
 
 func (m *Ring) Marshal() (dAtA []byte, err error) {
@@ -247,17 +304,31 @@ func (m *Ring) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Confirmations) > 0 {
+		for iNdEx := len(m.Confirmations) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Confirmations[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintRing(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.PolicyId) > 0 {
 		i -= len(m.PolicyId)
 		copy(dAtA[i:], m.PolicyId)
 		i = encodeVarintRing(dAtA, i, uint64(len(m.PolicyId)))
 		i--
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x52
 	}
 	if m.BlockNumberNonce != 0 {
 		i = encodeVarintRing(dAtA, i, uint64(m.BlockNumberNonce))
 		i--
-		dAtA[i] = 0x50
+		dAtA[i] = 0x48
 	}
 	if m.XPssInterval != nil {
 		{
@@ -277,27 +348,27 @@ func (m *Ring) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			}
 		}
 	}
-	if len(m.NewPeerIds) > 0 {
-		for iNdEx := len(m.NewPeerIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.NewPeerIds[iNdEx])
-			copy(dAtA[i:], m.NewPeerIds[iNdEx])
-			i = encodeVarintRing(dAtA, i, uint64(len(m.NewPeerIds[iNdEx])))
+	if len(m.NewPeerNodeKeys) > 0 {
+		for iNdEx := len(m.NewPeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.NewPeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.NewPeerNodeKeys[iNdEx])
+			i = encodeVarintRing(dAtA, i, uint64(len(m.NewPeerNodeKeys[iNdEx])))
 			i--
-			dAtA[i] = 0x3a
+			dAtA[i] = 0x32
 		}
 	}
 	if m.Threshold != 0 {
 		i = encodeVarintRing(dAtA, i, uint64(m.Threshold))
 		i--
-		dAtA[i] = 0x30
+		dAtA[i] = 0x28
 	}
-	if len(m.PeerIds) > 0 {
-		for iNdEx := len(m.PeerIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.PeerIds[iNdEx])
-			copy(dAtA[i:], m.PeerIds[iNdEx])
-			i = encodeVarintRing(dAtA, i, uint64(len(m.PeerIds[iNdEx])))
+	if len(m.PeerNodeKeys) > 0 {
+		for iNdEx := len(m.PeerNodeKeys) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.PeerNodeKeys[iNdEx])
+			copy(dAtA[i:], m.PeerNodeKeys[iNdEx])
+			i = encodeVarintRing(dAtA, i, uint64(len(m.PeerNodeKeys[iNdEx])))
 			i--
-			dAtA[i] = 0x2a
+			dAtA[i] = 0x22
 		}
 	}
 	if len(m.RingPk) > 0 {
@@ -305,19 +376,12 @@ func (m *Ring) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		copy(dAtA[i:], m.RingPk)
 		i = encodeVarintRing(dAtA, i, uint64(len(m.RingPk)))
 		i--
-		dAtA[i] = 0x22
+		dAtA[i] = 0x1a
 	}
 	if len(m.CreatorDid) > 0 {
 		i -= len(m.CreatorDid)
 		copy(dAtA[i:], m.CreatorDid)
 		i = encodeVarintRing(dAtA, i, uint64(len(m.CreatorDid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Namespace) > 0 {
-		i -= len(m.Namespace)
-		copy(dAtA[i:], m.Namespace)
-		i = encodeVarintRing(dAtA, i, uint64(len(m.Namespace)))
 		i--
 		dAtA[i] = 0x12
 	}
@@ -340,7 +404,7 @@ func (m *Ring_NewThreshold) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i = encodeVarintRing(dAtA, i, uint64(m.NewThreshold))
 	i--
-	dAtA[i] = 0x40
+	dAtA[i] = 0x38
 	return len(dAtA) - i, nil
 }
 func (m *Ring_PssInterval) MarshalTo(dAtA []byte) (int, error) {
@@ -352,9 +416,46 @@ func (m *Ring_PssInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i = encodeVarintRing(dAtA, i, uint64(m.PssInterval))
 	i--
-	dAtA[i] = 0x48
+	dAtA[i] = 0x40
 	return len(dAtA) - i, nil
 }
+func (m *RingConfirmation) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RingConfirmation) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RingConfirmation) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RingPk) > 0 {
+		i -= len(m.RingPk)
+		copy(dAtA[i:], m.RingPk)
+		i = encodeVarintRing(dAtA, i, uint64(len(m.RingPk)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.NodeKey) > 0 {
+		i -= len(m.NodeKey)
+		copy(dAtA[i:], m.NodeKey)
+		i = encodeVarintRing(dAtA, i, uint64(len(m.NodeKey)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintRing(dAtA []byte, offset int, v uint64) int {
 	offset -= sovRing(v)
 	base := offset
@@ -376,10 +477,6 @@ func (m *Ring) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovRing(uint64(l))
 	}
-	l = len(m.Namespace)
-	if l > 0 {
-		n += 1 + l + sovRing(uint64(l))
-	}
 	l = len(m.CreatorDid)
 	if l > 0 {
 		n += 1 + l + sovRing(uint64(l))
@@ -388,8 +485,8 @@ func (m *Ring) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovRing(uint64(l))
 	}
-	if len(m.PeerIds) > 0 {
-		for _, s := range m.PeerIds {
+	if len(m.PeerNodeKeys) > 0 {
+		for _, s := range m.PeerNodeKeys {
 			l = len(s)
 			n += 1 + l + sovRing(uint64(l))
 		}
@@ -397,8 +494,8 @@ func (m *Ring) Size() (n int) {
 	if m.Threshold != 0 {
 		n += 1 + sovRing(uint64(m.Threshold))
 	}
-	if len(m.NewPeerIds) > 0 {
-		for _, s := range m.NewPeerIds {
+	if len(m.NewPeerNodeKeys) > 0 {
+		for _, s := range m.NewPeerNodeKeys {
 			l = len(s)
 			n += 1 + l + sovRing(uint64(l))
 		}
@@ -415,6 +512,12 @@ func (m *Ring) Size() (n int) {
 	l = len(m.PolicyId)
 	if l > 0 {
 		n += 1 + l + sovRing(uint64(l))
+	}
+	if len(m.Confirmations) > 0 {
+		for _, e := range m.Confirmations {
+			l = e.Size()
+			n += 1 + l + sovRing(uint64(l))
+		}
 	}
 	return n
 }
@@ -435,6 +538,22 @@ func (m *Ring_PssInterval) Size() (n int) {
 	var l int
 	_ = l
 	n += 1 + sovRing(uint64(m.PssInterval))
+	return n
+}
+func (m *RingConfirmation) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.NodeKey)
+	if l > 0 {
+		n += 1 + l + sovRing(uint64(l))
+	}
+	l = len(m.RingPk)
+	if l > 0 {
+		n += 1 + l + sovRing(uint64(l))
+	}
 	return n
 }
 
@@ -507,38 +626,6 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Namespace", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowRing
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthRing
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthRing
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Namespace = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreatorDid", wireType)
 			}
 			var stringLen uint64
@@ -569,7 +656,7 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 			}
 			m.CreatorDid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
 			}
@@ -601,9 +688,9 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 			}
 			m.RingPk = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PeerIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PeerNodeKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -631,9 +718,9 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.PeerIds = append(m.PeerIds, string(dAtA[iNdEx:postIndex]))
+			m.PeerNodeKeys = append(m.PeerNodeKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 6:
+		case 5:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Threshold", wireType)
 			}
@@ -652,9 +739,9 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 7:
+		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NewPeerIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NewPeerNodeKeys", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -682,9 +769,9 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.NewPeerIds = append(m.NewPeerIds, string(dAtA[iNdEx:postIndex]))
+			m.NewPeerNodeKeys = append(m.NewPeerNodeKeys, string(dAtA[iNdEx:postIndex]))
 			iNdEx = postIndex
-		case 8:
+		case 7:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field NewThreshold", wireType)
 			}
@@ -704,7 +791,7 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.XNewThreshold = &Ring_NewThreshold{v}
-		case 9:
+		case 8:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
 			}
@@ -724,7 +811,7 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.XPssInterval = &Ring_PssInterval{v}
-		case 10:
+		case 9:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BlockNumberNonce", wireType)
 			}
@@ -743,7 +830,7 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 11:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
 			}
@@ -774,6 +861,154 @@ func (m *Ring) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.PolicyId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Confirmations", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRing
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthRing
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthRing
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Confirmations = append(m.Confirmations, &RingConfirmation{})
+			if err := m.Confirmations[len(m.Confirmations)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipRing(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthRing
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RingConfirmation) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowRing
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RingConfirmation: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RingConfirmation: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRing
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRing
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRing
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingPk", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowRing
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthRing
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthRing
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingPk = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

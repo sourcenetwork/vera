@@ -39,15 +39,15 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Ring queries a ring by id.
 	Ring(ctx context.Context, in *QueryRingRequest, opts ...grpc.CallOption) (*QueryRingResponse, error)
-	// Rings queries rings, optionally filtered by namespace.
+	// Rings queries rings.
 	Rings(ctx context.Context, in *QueryRingsRequest, opts ...grpc.CallOption) (*QueryRingsResponse, error)
-	// Document queries an encrypted document by namespace and id.
+	// Document queries an encrypted document by id.
 	Document(ctx context.Context, in *QueryDocumentRequest, opts ...grpc.CallOption) (*QueryDocumentResponse, error)
-	// Documents queries encrypted documents within a namespace.
+	// Documents queries encrypted documents.
 	Documents(ctx context.Context, in *QueryDocumentsRequest, opts ...grpc.CallOption) (*QueryDocumentsResponse, error)
-	// KeyDerivation queries a key derivation by namespace and id.
+	// KeyDerivation queries a key derivation by id.
 	KeyDerivation(ctx context.Context, in *QueryKeyDerivationRequest, opts ...grpc.CallOption) (*QueryKeyDerivationResponse, error)
-	// KeyDerivations queries key derivations within a namespace.
+	// KeyDerivations queries key derivations.
 	KeyDerivations(ctx context.Context, in *QueryKeyDerivationsRequest, opts ...grpc.CallOption) (*QueryKeyDerivationsResponse, error)
 	// NodeInfo queries node info by node key.
 	NodeInfo(ctx context.Context, in *QueryNodeInfoRequest, opts ...grpc.CallOption) (*QueryNodeInfoResponse, error)
@@ -151,15 +151,15 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Ring queries a ring by id.
 	Ring(context.Context, *QueryRingRequest) (*QueryRingResponse, error)
-	// Rings queries rings, optionally filtered by namespace.
+	// Rings queries rings.
 	Rings(context.Context, *QueryRingsRequest) (*QueryRingsResponse, error)
-	// Document queries an encrypted document by namespace and id.
+	// Document queries an encrypted document by id.
 	Document(context.Context, *QueryDocumentRequest) (*QueryDocumentResponse, error)
-	// Documents queries encrypted documents within a namespace.
+	// Documents queries encrypted documents.
 	Documents(context.Context, *QueryDocumentsRequest) (*QueryDocumentsResponse, error)
-	// KeyDerivation queries a key derivation by namespace and id.
+	// KeyDerivation queries a key derivation by id.
 	KeyDerivation(context.Context, *QueryKeyDerivationRequest) (*QueryKeyDerivationResponse, error)
-	// KeyDerivations queries key derivations within a namespace.
+	// KeyDerivations queries key derivations.
 	KeyDerivations(context.Context, *QueryKeyDerivationsRequest) (*QueryKeyDerivationsResponse, error)
 	// NodeInfo queries node info by node key.
 	NodeInfo(context.Context, *QueryNodeInfoRequest) (*QueryNodeInfoResponse, error)

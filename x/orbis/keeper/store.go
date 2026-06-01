@@ -6,7 +6,6 @@ import (
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -31,7 +30,13 @@ func (k *Keeper) GetRing(ctx context.Context, ringID string) *types.Ring {
 	return &ring
 }
 
-func (k *Keeper) GetAllRings(ctx sdk.Context) []types.Ring {
+func (k *Keeper) DeleteRing(ctx context.Context, ringID string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.RingKeyPrefix))
+	store.Delete([]byte(ringID))
+}
+
+func (k *Keeper) GetAllRings(ctx context.Context) []types.Ring {
 	var rings []types.Ring
 	k.mustIterateRings(ctx, func(ring types.Ring) {
 		rings = append(rings, ring)
@@ -43,13 +48,13 @@ func (k *Keeper) SetDocument(ctx context.Context, document types.Document) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.DocumentKeyPrefix))
 	bz := k.cdc.MustMarshal(&document)
-	store.Set(types.DocumentKey(document.Namespace, document.Id), bz)
+	store.Set([]byte(document.Id), bz)
 }
 
-func (k *Keeper) GetDocument(ctx context.Context, namespaceID, documentID string) *types.Document {
+func (k *Keeper) GetDocument(ctx context.Context, documentID string) *types.Document {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.DocumentKeyPrefix))
-	bz := store.Get(types.DocumentKey(namespaceID, documentID))
+	bz := store.Get([]byte(documentID))
 	if bz == nil {
 		return nil
 	}
@@ -71,13 +76,13 @@ func (k *Keeper) SetKeyDerivation(ctx context.Context, keyDerivation types.KeyDe
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.KeyDerivationKeyPrefix))
 	bz := k.cdc.MustMarshal(&keyDerivation)
-	store.Set(types.KeyDerivationKey(keyDerivation.Namespace, keyDerivation.Id), bz)
+	store.Set([]byte(keyDerivation.Id), bz)
 }
 
-func (k *Keeper) GetKeyDerivation(ctx context.Context, namespaceID, keyDerivationID string) *types.KeyDerivation {
+func (k *Keeper) GetKeyDerivation(ctx context.Context, keyDerivationID string) *types.KeyDerivation {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.KeyDerivationKeyPrefix))
-	bz := store.Get(types.KeyDerivationKey(namespaceID, keyDerivationID))
+	bz := store.Get([]byte(keyDerivationID))
 	if bz == nil {
 		return nil
 	}

@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	Msg_UpdateParams_FullMethodName                            = "/sourcehub.orbis.Msg/UpdateParams"
 	Msg_CreateRing_FullMethodName                              = "/sourcehub.orbis.Msg/CreateRing"
+	Msg_FinalizeRing_FullMethodName                            = "/sourcehub.orbis.Msg/FinalizeRing"
 	Msg_UpdateRingByAcp_FullMethodName                         = "/sourcehub.orbis.Msg/UpdateRingByAcp"
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
 	Msg_StoreDocument_FullMethodName                           = "/sourcehub.orbis.Msg/StoreDocument"
@@ -38,6 +39,7 @@ type MsgClient interface {
 	// UpdateParams defines a governance operation for updating module parameters.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreateRing(ctx context.Context, in *MsgCreateRing, opts ...grpc.CallOption) (*MsgCreateRingResponse, error)
+	FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error)
 	UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
@@ -68,6 +70,16 @@ func (c *msgClient) CreateRing(ctx context.Context, in *MsgCreateRing, opts ...g
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgCreateRingResponse)
 	err := c.cc.Invoke(ctx, Msg_CreateRing_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgFinalizeRingResponse)
+	err := c.cc.Invoke(ctx, Msg_FinalizeRing_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -143,6 +155,7 @@ type MsgServer interface {
 	// UpdateParams defines a governance operation for updating module parameters.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreateRing(context.Context, *MsgCreateRing) (*MsgCreateRingResponse, error)
+	FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error)
 	UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
@@ -164,6 +177,9 @@ func (UnimplementedMsgServer) UpdateParams(context.Context, *MsgUpdateParams) (*
 }
 func (UnimplementedMsgServer) CreateRing(context.Context, *MsgCreateRing) (*MsgCreateRingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateRing not implemented")
+}
+func (UnimplementedMsgServer) FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRing not implemented")
 }
 func (UnimplementedMsgServer) UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingByAcp not implemented")
@@ -236,6 +252,24 @@ func _Msg_CreateRing_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CreateRing(ctx, req.(*MsgCreateRing))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_FinalizeRing_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgFinalizeRing)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).FinalizeRing(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_FinalizeRing_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).FinalizeRing(ctx, req.(*MsgFinalizeRing))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -362,6 +396,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateRing",
 			Handler:    _Msg_CreateRing_Handler,
+		},
+		{
+			MethodName: "FinalizeRing",
+			Handler:    _Msg_FinalizeRing_Handler,
 		},
 		{
 			MethodName: "UpdateRingByAcp",
