@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"encoding/hex"
+	"slices"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -181,6 +182,21 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	if err := validateRingUpdate(msg.NewPeerNodeKeys, newThreshold, ring); err != nil {
 		return nil, err
 	}
+	for _, nodeKey := range msg.NewPeerNodeKeys {
+		nodeInfo := k.GetNodeInfo(goCtx, nodeKey)
+		if nodeInfo == nil {
+			return nil, errorsmod.Wrapf(types.ErrInvalidRing, "peer_node_key %q has no registered node info", nodeKey)
+		}
+		if !nodeInfoAllowsRing(nodeInfo, ring) {
+			return nil, errorsmod.Wrapf(
+				types.ErrInvalidRing,
+				"peer_node_key %q is not whitelisted for policy_id %q or ring_id %q",
+				nodeKey,
+				ring.PolicyId,
+				ring.Id,
+			)
+		}
+	}
 
 	if len(msg.NewPeerNodeKeys) > 0 {
 		ring.NewPeerNodeKeys = append([]string(nil), msg.NewPeerNodeKeys...)
@@ -205,6 +221,11 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	}
 
 	return &types.MsgUpdateRingByAcpResponse{}, nil
+}
+
+func nodeInfoAllowsRing(nodeInfo *types.NodeInfo, ring *types.Ring) bool {
+	return slices.Contains(nodeInfo.WhitelistedPolicyIds, ring.PolicyId) ||
+		slices.Contains(nodeInfo.WhitelistedRingIds, ring.Id)
 }
 
 func (k *Keeper) FinalizeRingReshareByThresholdSignature(
