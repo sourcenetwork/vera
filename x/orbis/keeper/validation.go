@@ -39,13 +39,18 @@ func validateRing(ring *types.Ring) error {
 	if ring.XNewThreshold != nil && ring.GetNewThreshold() == 0 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
-	if len(ring.NewPeerNodeKeys) > 0 && ring.XNewThreshold != nil && uint32(len(ring.NewPeerNodeKeys)) < ring.GetNewThreshold() {
-		return errorsmod.Wrapf(
-			types.ErrInvalidRing,
-			"new_peer_node_keys count (%d) is less than new_threshold (%d)",
-			len(ring.NewPeerNodeKeys),
-			ring.GetNewThreshold(),
-		)
+	if len(ring.NewPeerNodeKeys) > 0 || ring.XNewThreshold != nil {
+		targetCommitteeSize := len(ring.PeerNodeKeys)
+		if len(ring.NewPeerNodeKeys) > 0 {
+			targetCommitteeSize = len(ring.NewPeerNodeKeys)
+		}
+		targetThreshold := ring.Threshold
+		if ring.XNewThreshold != nil {
+			targetThreshold = ring.GetNewThreshold()
+		}
+		if err := validateEffectiveReshareThreshold(targetThreshold, targetCommitteeSize); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -74,15 +79,28 @@ func validateRingUpdate(newPeerNodeKeys []string, newThreshold *uint32, existing
 			len(existing.PeerNodeKeys),
 		)
 	}
-	if len(newPeerNodeKeys) > 0 && newThreshold != nil && uint32(len(newPeerNodeKeys)) < *newThreshold {
-		return errorsmod.Wrapf(
-			types.ErrInvalidRing,
-			"new_peer_node_keys count (%d) is less than new_threshold (%d)",
-			len(newPeerNodeKeys),
-			*newThreshold,
-		)
+	if len(newPeerNodeKeys) > 0 {
+		targetThreshold := existing.Threshold
+		if newThreshold != nil {
+			targetThreshold = *newThreshold
+		}
+		if err := validateEffectiveReshareThreshold(targetThreshold, len(newPeerNodeKeys)); err != nil {
+			return err
+		}
 	}
 
+	return nil
+}
+
+func validateEffectiveReshareThreshold(threshold uint32, committeeSize int) error {
+	if threshold > uint32(committeeSize) {
+		return errorsmod.Wrapf(
+			types.ErrInvalidRing,
+			"effective new_threshold (%d) cannot exceed target committee size (%d)",
+			threshold,
+			committeeSize,
+		)
+	}
 	return nil
 }
 

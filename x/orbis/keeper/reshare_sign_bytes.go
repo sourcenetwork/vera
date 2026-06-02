@@ -61,11 +61,6 @@ func ringReshareSignState(ring *types.Ring) types.RingReshareSignState {
 			NewThreshold: ring.GetNewThreshold(),
 		}
 	}
-	if ring.XPssInterval != nil {
-		signState.XPssInterval = &types.RingReshareSignState_PssInterval{
-			PssInterval: ring.GetPssInterval(),
-		}
-	}
 
 	return signState
 }
