@@ -195,10 +195,11 @@ func validateNodeInfo(nodeInfo *types.NodeInfo) error {
 	case nodeInfo.ControllerKey == "":
 		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
 	}
-	keyHex := strings.TrimPrefix(nodeInfo.ControllerKey, "0x")
+	keyHex := strings.ToLower(strings.TrimPrefix(nodeInfo.ControllerKey, "0x"))
 	decoded, err := hex.DecodeString(keyHex)
 	if err != nil || len(decoded) != compressedPubKeyLen {
 		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "invalid controller_key encoding")
 	}
+	nodeInfo.ControllerKey = keyHex
 	return nil
 }

@@ -3,6 +3,7 @@ package keeper
 import (
 	"encoding/hex"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
@@ -1182,6 +1183,32 @@ func TestMsgServer_CreateNodeInfo_WithWhitelists(t *testing.T) {
 	require.NotNil(t, nodeInfo)
 	require.Equal(t, []string{"policy-a", "policy-b"}, nodeInfo.WhitelistedPolicyIds)
 	require.Equal(t, []string{"ring-1"}, nodeInfo.WhitelistedRingIds)
+}
+
+func TestMsgServer_CreateNodeInfo_CanonicalizesControllerKey(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-1",
+		ControllerKey: "0x" + strings.ToUpper(controllerPubKeyHex),
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.NotNil(t, nodeInfo)
+	require.Equal(t, controllerPubKeyHex, nodeInfo.ControllerKey)
+
+	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+		Creator:            controllerAddr,
+		NodeKey:            nodePubKeyHex,
+		WhitelistedRingIds: []string{"ring-1"},
+	})
+	require.NoError(t, err)
 }
 
 func TestMsgServer_CreateNodeInfo_AlreadyExists(t *testing.T) {
