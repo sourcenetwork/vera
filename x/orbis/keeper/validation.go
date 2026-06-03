@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
+	"github.com/sourcenetwork/immutable"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -56,9 +57,9 @@ func validateRing(ring *types.Ring) error {
 	return nil
 }
 
-func validateRingUpdate(newPeerNodeKeys []string, newThreshold *uint32, existing *types.Ring) error {
+func validateRingUpdate(newPeerNodeKeys []string, newThreshold immutable.Option[uint32], existing *types.Ring) error {
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
-	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold != nil
+	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold.HasValue()
 	if reshareInProgress && touchingReshareFields {
 		return types.ErrReshareInProgress
 	}
@@ -68,21 +69,21 @@ func validateRingUpdate(newPeerNodeKeys []string, newThreshold *uint32, existing
 			return err
 		}
 	}
-	if newThreshold != nil && *newThreshold < 1 {
+	if newThreshold.HasValue() && newThreshold.Value() < 1 {
 		return errorsmod.Wrap(types.ErrInvalidRing, "new_threshold must be at least 1")
 	}
-	if len(newPeerNodeKeys) == 0 && newThreshold != nil && *newThreshold > uint32(len(existing.PeerNodeKeys)) {
+	if len(newPeerNodeKeys) == 0 && newThreshold.HasValue() && newThreshold.Value() > uint32(len(existing.PeerNodeKeys)) {
 		return errorsmod.Wrapf(
 			types.ErrInvalidRing,
 			"new_threshold (%d) cannot exceed existing committee size (%d)",
-			*newThreshold,
+			newThreshold.Value(),
 			len(existing.PeerNodeKeys),
 		)
 	}
 	if len(newPeerNodeKeys) > 0 {
 		targetThreshold := existing.Threshold
-		if newThreshold != nil {
-			targetThreshold = *newThreshold
+		if newThreshold.HasValue() {
+			targetThreshold = newThreshold.Value()
 		}
 		if err := validateEffectiveReshareThreshold(targetThreshold, len(newPeerNodeKeys)); err != nil {
 			return err

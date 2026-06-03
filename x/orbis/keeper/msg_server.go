@@ -202,7 +202,7 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	if len(msg.NewPeerNodeKeys) > 0 {
 		ring.NewPeerNodeKeys = append([]string(nil), msg.NewPeerNodeKeys...)
 	}
-	if newThreshold != nil {
+	if newThreshold.HasValue() {
 		setRingNewThreshold(ring, newThreshold)
 	}
 	if msg.XPssInterval != nil {

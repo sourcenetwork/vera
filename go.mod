@@ -49,6 +49,7 @@ require (
 	github.com/mizufinance/decaf377-go v0.1.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.1
+	github.com/sourcenetwork/immutable v0.3.0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.10.1

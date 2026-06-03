@@ -1,83 +1,87 @@
 package keeper
 
-import "github.com/sourcenetwork/sourcehub/x/orbis/types"
+import (
+	"github.com/sourcenetwork/immutable"
 
-func optionalCreateRingPSSInterval(msg *types.MsgCreateRing) *uint64 {
+	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+)
+
+func optionalCreateRingPSSInterval(msg *types.MsgCreateRing) immutable.Option[uint64] {
 	if msg.XPssInterval == nil {
-		return nil
+		return immutable.None[uint64]()
 	}
 	value := msg.GetPssInterval()
-	return &value
+	return immutable.Some(value)
 }
 
-func optionalCreateRingNonce(msg *types.MsgCreateRing) *string {
+func optionalCreateRingNonce(msg *types.MsgCreateRing) immutable.Option[string] {
 	if msg.XNonce == nil {
-		return nil
+		return immutable.None[string]()
 	}
 	value := msg.GetNonce()
-	return &value
+	return immutable.Some(value)
 }
 
-func optionalUpdateRingNewThreshold(msg *types.MsgUpdateRingByAcp) *uint32 {
+func optionalUpdateRingNewThreshold(msg *types.MsgUpdateRingByAcp) immutable.Option[uint32] {
 	if msg.XNewThreshold == nil {
-		return nil
+		return immutable.None[uint32]()
 	}
 	value := msg.GetNewThreshold()
-	return &value
+	return immutable.Some(value)
 }
 
-func optionalUpdateRingPSSInterval(msg *types.MsgUpdateRingByAcp) *uint64 {
+func optionalUpdateRingPSSInterval(msg *types.MsgUpdateRingByAcp) immutable.Option[uint64] {
 	if msg.XPssInterval == nil {
-		return nil
+		return immutable.None[uint64]()
 	}
 	value := msg.GetPssInterval()
-	return &value
+	return immutable.Some(value)
 }
 
-func optionalStoreDocumentTier(msg *types.MsgStoreDocument) *string {
+func optionalStoreDocumentTier(msg *types.MsgStoreDocument) immutable.Option[string] {
 	if msg.XTier == nil {
-		return nil
+		return immutable.None[string]()
 	}
 	value := msg.GetTier()
-	return &value
+	return immutable.Some(value)
 }
 
-func optionalStoreDocumentTimestamp(msg *types.MsgStoreDocument) *uint64 {
+func optionalStoreDocumentTimestamp(msg *types.MsgStoreDocument) immutable.Option[uint64] {
 	if msg.XTimestamp == nil {
-		return nil
+		return immutable.None[uint64]()
 	}
 	value := msg.GetTimestamp()
-	return &value
+	return immutable.Some(value)
 }
 
-func setRingNewThreshold(ring *types.Ring, value *uint32) {
-	if value == nil {
+func setRingNewThreshold(ring *types.Ring, value immutable.Option[uint32]) {
+	if !value.HasValue() {
 		ring.XNewThreshold = nil
 		return
 	}
-	ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: *value}
+	ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: value.Value()}
 }
 
-func setRingPSSInterval(ring *types.Ring, value *uint64) {
-	if value == nil {
+func setRingPSSInterval(ring *types.Ring, value immutable.Option[uint64]) {
+	if !value.HasValue() {
 		ring.XPssInterval = nil
 		return
 	}
-	ring.XPssInterval = &types.Ring_PssInterval{PssInterval: *value}
+	ring.XPssInterval = &types.Ring_PssInterval{PssInterval: value.Value()}
 }
 
-func setDocumentTier(document *types.Document, value *string) {
-	if value == nil {
+func setDocumentTier(document *types.Document, value immutable.Option[string]) {
+	if !value.HasValue() {
 		document.XTier = nil
 		return
 	}
-	document.XTier = &types.Document_Tier{Tier: *value}
+	document.XTier = &types.Document_Tier{Tier: value.Value()}
 }
 
-func setDocumentTimestamp(document *types.Document, value *uint64) {
-	if value == nil {
+func setDocumentTimestamp(document *types.Document, value immutable.Option[uint64]) {
+	if !value.HasValue() {
 		document.XTimestamp = nil
 		return
 	}
-	document.XTimestamp = &types.Document_Timestamp{Timestamp: *value}
+	document.XTimestamp = &types.Document_Timestamp{Timestamp: value.Value()}
 }

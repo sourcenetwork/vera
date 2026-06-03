@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"sort"
+
+	"github.com/sourcenetwork/immutable"
 )
 
 const (
@@ -30,7 +32,7 @@ func KeyPrefix(p string) []byte {
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
 // peerNodeKeys are sorted before hashing so the ID is order-independent.
-func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string, nonce *string) string {
+func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutable.Option[uint64], policyID string, nonce immutable.Option[string]) string {
 	sorted := make([]string, len(peerNodeKeys))
 	copy(sorted, peerNodeKeys)
 	sort.Strings(sorted)
@@ -52,8 +54,8 @@ func GenerateDocumentID(
 	policyID string,
 	resource string,
 	permission string,
-	tier *string,
-	timestamp *uint64,
+	tier immutable.Option[string],
+	timestamp immutable.Option[uint64],
 ) string {
 	h := newIDHasher("orbis/document/v1")
 	h.writeString(ringID)
@@ -92,13 +94,13 @@ func (h *idHasher) writeString(value string) {
 	h.writeBytes([]byte(value))
 }
 
-func (h *idHasher) writeOptionalString(value *string) {
-	if value == nil {
+func (h *idHasher) writeOptionalString(value immutable.Option[string]) {
+	if !value.HasValue() {
 		h.bytes = append(h.bytes, 0)
 		return
 	}
 	h.bytes = append(h.bytes, 1)
-	h.writeString(*value)
+	h.writeString(value.Value())
 }
 
 func (h *idHasher) writeStringSlice(values []string) {
@@ -116,14 +118,14 @@ func (h *idHasher) writeUint32(value uint32) {
 	h.bytes = append(h.bytes, buf[:]...)
 }
 
-func (h *idHasher) writeOptionalUint64(value *uint64) {
-	if value == nil {
+func (h *idHasher) writeOptionalUint64(value immutable.Option[uint64]) {
+	if !value.HasValue() {
 		h.bytes = append(h.bytes, 0)
 		return
 	}
 	h.bytes = append(h.bytes, 1)
 	var buf [8]byte
-	binary.BigEndian.PutUint64(buf[:], *value)
+	binary.BigEndian.PutUint64(buf[:], value.Value())
 	h.bytes = append(h.bytes, buf[:]...)
 }
 
