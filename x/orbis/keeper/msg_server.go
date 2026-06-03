@@ -118,9 +118,10 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	}
 
 	// Check for a conflicting ring_pk from a prior confirmation by a
-	// different node. This is a genuine BFT violation.
+	// different node. This is a genuine BFT violation — delete the ring.
 	for _, c := range ring.Confirmations {
 		if c.RingPk != msg.RingPk {
+			k.DeleteRing(goCtx, ring.Id)
 			return nil, types.ErrRingPkConflict
 		}
 	}

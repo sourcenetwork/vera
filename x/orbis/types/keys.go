@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"sort"
 )
 
 const (
@@ -28,9 +29,14 @@ func KeyPrefix(p string) []byte {
 }
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
+// peerNodeKeys are sorted before hashing so the ID is order-independent.
 func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval *uint64, policyID string, nonce *string) string {
+	sorted := make([]string, len(peerNodeKeys))
+	copy(sorted, peerNodeKeys)
+	sort.Strings(sorted)
+
 	h := newIDHasher("orbis/ring/v1")
-	h.writeStringSlice(peerNodeKeys)
+	h.writeStringSlice(sorted)
 	h.writeUint32(threshold)
 	h.writeOptionalUint64(pssInterval)
 	h.writeString(policyID)

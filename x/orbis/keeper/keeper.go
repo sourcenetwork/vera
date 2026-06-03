@@ -56,7 +56,3 @@ func (k *Keeper) GetAcpKeeper() *acpkeeper.Keeper {
 func (k *Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
-
-func (k *Keeper) RingBytes(ring types.Ring) ([]byte, error) {
-	return k.cdc.Marshal(&ring)
-}

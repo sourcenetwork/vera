@@ -1,4 +1,4 @@
-package keeper_test
+package keeper
 
 import (
 	"encoding/hex"
@@ -12,9 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	keepertestutil "github.com/sourcenetwork/sourcehub/testutil/keeper"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/orbis/keeper"
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
@@ -52,7 +50,7 @@ resources:
 `
 
 func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -177,7 +175,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 }
 
 func TestMsgServer_CreateRing_NonceDisambiguatesIdenticalSettings(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -222,8 +220,29 @@ func TestMsgServer_CreateRing_NonceDisambiguatesIdenticalSettings(t *testing.T) 
 	require.NotEqual(t, resp2.RingId, resp3.RingId)
 }
 
+func TestMsgServer_CreateRing_PeerKeyOrderDoesNotAffectRingID(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer2Key, peer1Key},
+		Threshold:    1,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	// GenerateRingID with keys in the opposite order must produce the same ID
+	require.Equal(t, types.GenerateRingID([]string{peer1Key, peer2Key}, 1, nil, policyID, nil), resp.RingId)
+}
+
 func TestMsgServer_CreateRingRequiresPolicyID(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -239,7 +258,7 @@ func TestMsgServer_CreateRingRequiresPolicyID(t *testing.T) {
 }
 
 func TestMsgServer_CreateRingRequiresExistingRingPolicy(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -257,7 +276,7 @@ func TestMsgServer_CreateRingRequiresExistingRingPolicy(t *testing.T) {
 }
 
 func TestMsgServer_CreateRingRequiresRegisteredRingPolicyControlObject(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -276,7 +295,7 @@ func TestMsgServer_CreateRingRequiresRegisteredRingPolicyControlObject(t *testin
 }
 
 func TestMsgServer_CreateRingRequiresPolicyWithRingResource(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -295,7 +314,7 @@ func TestMsgServer_CreateRingRequiresPolicyWithRingResource(t *testing.T) {
 }
 
 func TestMsgServer_CreateRingRejectsActorWithoutCreatePermission(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	policyOwnerCtx := ctxWithDID(ctx, testPolicyOwnerDID)
 	creatorCtx := ctxWithDID(ctx, testDID)
 
@@ -316,7 +335,7 @@ func TestMsgServer_CreateRingRejectsActorWithoutCreatePermission(t *testing.T) {
 }
 
 func TestMsgServer_CreateRingAllowsRingCreatorRelation(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	policyOwnerCtx := ctxWithDID(ctx, testPolicyOwnerDID)
 	creatorCtx := ctxWithDID(ctx, testDID)
 
@@ -348,7 +367,7 @@ func TestMsgServer_CreateRingAllowsRingCreatorRelation(t *testing.T) {
 }
 
 func TestMsgServer_CreateRingRegistersACPObject(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -373,7 +392,7 @@ func TestMsgServer_CreateRingRegistersACPObject(t *testing.T) {
 }
 
 func TestMsgServer_FinalizeRing_UnauthorizedNonPeer(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -400,7 +419,7 @@ func TestMsgServer_FinalizeRing_UnauthorizedNonPeer(t *testing.T) {
 }
 
 func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -444,7 +463,7 @@ func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
 }
 
 func TestMsgServer_FinalizeRing_PkConflictRejected(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -465,14 +484,14 @@ func TestMsgServer_FinalizeRing_PkConflictRejected(t *testing.T) {
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "pk-version-A"})
 	require.NoError(t, err)
 
-	// peer2 disagrees on the ring_pk -> conflict rejected, ring remains
+	// peer2 disagrees on the ring_pk -> BFT violation, ring is deleted
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "pk-version-B"})
 	require.ErrorIs(t, err, types.ErrRingPkConflict)
-	require.NotNil(t, k.GetRing(ctx, ringID))
+	require.Nil(t, k.GetRing(ctx, ringID))
 }
 
 func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -498,7 +517,7 @@ func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
 }
 
 func TestMsgServer_RingNotFinalizedGuard(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -538,7 +557,7 @@ func TestMsgServer_RingNotFinalizedGuard(t *testing.T) {
 }
 
 func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -583,7 +602,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 }
 
 func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -616,7 +635,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -655,7 +674,7 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -693,7 +712,7 @@ func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize
 }
 
 func TestMsgServer_UpdateRingByAcpRejectsCommitteeOnlyReshareWhenExistingThresholdExceedsTargetCommitteeSize(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -732,7 +751,7 @@ func TestMsgServer_UpdateRingByAcpRejectsCommitteeOnlyReshareWhenExistingThresho
 }
 
 func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThresholdFitsSingleNodeTarget(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -770,7 +789,7 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThreshol
 }
 
 func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThresholdFitsSameSizeTarget(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -810,7 +829,7 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThreshol
 }
 
 func TestMsgServer_UpdateRingByAcpAllowsCommitteeReshareWithLowerExplicitThreshold(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -851,7 +870,7 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeReshareWithLowerExplicitThresho
 }
 
 func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -892,7 +911,7 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutRingWhitelist(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -937,7 +956,7 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutRingWhitelist(t *testing.
 }
 
 func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
 	outsiderCtx := ctxWithDID(ctx, testOutsiderDID)
@@ -977,7 +996,7 @@ func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
 	operatorCtx := ctxWithDID(ctx, testOperatorDID)
@@ -1033,7 +1052,7 @@ func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
 }
 
 func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
 	operatorCtx := ctxWithDID(ctx, testOperatorDID)
@@ -1092,7 +1111,7 @@ func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
 }
 
 func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1121,7 +1140,7 @@ func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
 }
 
 func TestMsgServer_CreateNodeInfo(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1143,7 +1162,7 @@ func TestMsgServer_CreateNodeInfo(t *testing.T) {
 }
 
 func TestMsgServer_CreateNodeInfo_WithWhitelists(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1165,7 +1184,7 @@ func TestMsgServer_CreateNodeInfo_WithWhitelists(t *testing.T) {
 }
 
 func TestMsgServer_CreateNodeInfo_AlreadyExists(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1185,7 +1204,7 @@ func TestMsgServer_CreateNodeInfo_AlreadyExists(t *testing.T) {
 }
 
 func TestMsgServer_UpdateNodeInfo(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1215,7 +1234,7 @@ func TestMsgServer_UpdateNodeInfo(t *testing.T) {
 }
 
 func TestMsgServer_UpdateNodeInfo_UpdatePeerId(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1241,7 +1260,7 @@ func TestMsgServer_UpdateNodeInfo_UpdatePeerId(t *testing.T) {
 }
 
 func TestMsgServer_UpdateNodeInfo_AbsentPeerIdIsNotCleared(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1266,7 +1285,7 @@ func TestMsgServer_UpdateNodeInfo_AbsentPeerIdIsNotCleared(t *testing.T) {
 }
 
 func TestMsgServer_UpdateNodeInfo_NotFound(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	controllerAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1279,7 +1298,7 @@ func TestMsgServer_UpdateNodeInfo_NotFound(t *testing.T) {
 }
 
 func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
-	k, authKeeper, ctx := keepertestutil.OrbisKeeperFull(t)
+	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
@@ -1302,7 +1321,7 @@ func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
 
 // setupPeerWithNodeInfo registers an account and creates a NodeInfo entry for it.
 // Returns the account bech32 address and its hex-encoded public key (the node_key used in rings).
-func setupPeerWithNodeInfo(t *testing.T, k keeper.Keeper, ak authkeeper.AccountKeeper, ctx sdk.Context, networkID string) (addr string, nodeKey string) {
+func setupPeerWithNodeInfo(t *testing.T, k Keeper, ak authkeeper.AccountKeeper, ctx sdk.Context, networkID string) (addr string, nodeKey string) {
 	t.Helper()
 	addr, nodeKey = testAccountWithPubKey(t, ctx, ak)
 	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
@@ -1316,7 +1335,7 @@ func setupPeerWithNodeInfo(t *testing.T, k keeper.Keeper, ak authkeeper.AccountK
 
 func updatePeerNodeWhitelists(
 	t *testing.T,
-	k keeper.Keeper,
+	k Keeper,
 	ctx sdk.Context,
 	creator string,
 	nodeKey string,
@@ -1333,14 +1352,14 @@ func updatePeerNodeWhitelists(
 	require.NoError(t, err)
 }
 
-func createOrbisRingPolicy(t *testing.T, k keeper.Keeper, ctx sdk.Context, creator string) string {
+func createOrbisRingPolicy(t *testing.T, k Keeper, ctx sdk.Context, creator string) string {
 	t.Helper()
 	policyID := createACPPolicy(t, k, ctx, creator, testOrbisRingPolicy)
 	registerRingPolicyControlObject(t, k, ctx, creator, policyID)
 	return policyID
 }
 
-func createACPPolicy(t *testing.T, k keeper.Keeper, ctx sdk.Context, creator string, policy string) string {
+func createACPPolicy(t *testing.T, k Keeper, ctx sdk.Context, creator string, policy string) string {
 	t.Helper()
 	resp, err := k.GetAcpKeeper().CreatePolicy(ctx, &acptypes.MsgCreatePolicy{
 		Creator:     creator,
@@ -1351,7 +1370,7 @@ func createACPPolicy(t *testing.T, k keeper.Keeper, ctx sdk.Context, creator str
 	return resp.Record.Policy.Id
 }
 
-func registerRingPolicyControlObject(t *testing.T, k keeper.Keeper, ctx sdk.Context, creator string, policyID string) {
+func registerRingPolicyControlObject(t *testing.T, k Keeper, ctx sdk.Context, creator string, policyID string) {
 	t.Helper()
 	_, err := k.GetAcpKeeper().DirectPolicyCmd(ctx, &acptypes.MsgDirectPolicyCmd{
 		Creator:  creator,
@@ -1361,7 +1380,7 @@ func registerRingPolicyControlObject(t *testing.T, k keeper.Keeper, ctx sdk.Cont
 	require.NoError(t, err)
 }
 
-func grantRingCreator(t *testing.T, k keeper.Keeper, ctx sdk.Context, creator string, policyID string, actorDID string) {
+func grantRingCreator(t *testing.T, k Keeper, ctx sdk.Context, creator string, policyID string, actorDID string) {
 	t.Helper()
 	_, err := k.GetAcpKeeper().DirectPolicyCmd(ctx, &acptypes.MsgDirectPolicyCmd{
 		Creator:  creator,
@@ -1393,9 +1412,4 @@ func testAccountWithPubKey(t *testing.T, ctx sdk.Context, ak authkeeper.AccountK
 	}
 	ak.SetAccount(ctx, account)
 	return accAddr.String(), hex.EncodeToString(pubKey.Bytes())
-}
-
-// testPeerID returns a unique libp2p-style peer ID string for use in tests.
-func testPeerID(n int) string {
-	return fmt.Sprintf("12D3KooWTestPeer%d", n)
 }
