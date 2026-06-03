@@ -1262,7 +1262,9 @@ type NodeInfo struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	PeerId               string   `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	// peer_id is the node's p2p network identity key.
+	PeerId string `protobuf:"bytes,1,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
+	// controller_key is the node's signing key changing node info. Lives outside the node
 	ControllerKey        string   `protobuf:"bytes,2,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
 	WhitelistedPolicyIds []string `protobuf:"bytes,3,rep,name=whitelisted_policy_ids,json=whitelistedPolicyIds,proto3" json:"whitelisted_policy_ids,omitempty"`
 	WhitelistedRingIds   []string `protobuf:"bytes,4,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
@@ -1322,6 +1324,7 @@ type NodeInfoEntry struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// Node key lives inside the node and is for identification of the node
 	NodeKey  string    `protobuf:"bytes,1,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
 	NodeInfo *NodeInfo `protobuf:"bytes,2,opt,name=node_info,json=nodeInfo,proto3" json:"node_info,omitempty"`
 }
