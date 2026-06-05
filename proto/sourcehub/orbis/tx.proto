@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+package sourcehub.orbis;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "sourcehub/orbis/params.proto";
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a governance operation for updating module parameters.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
+  rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
+  rpc UpdateRingByAcp(MsgUpdateRingByAcp) returns (MsgUpdateRingByAcpResponse);
+  rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
+  rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
+  rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
+  rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
+  rpc UpdateNodeInfo(MsgUpdateNodeInfo) returns (MsgUpdateNodeInfoResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "sourcehub/x/orbis/MsgUpdateParams";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for MsgUpdateParams.
+message MsgUpdateParamsResponse {}
+
+message MsgCreateRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
+  // Absent means automatic PSS refresh is disabled.
+  optional uint64 pss_interval = 4;
+  string policy_id = 5;
+  // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
+  optional string nonce = 6;
+}
+
+message MsgCreateRingResponse {
+  string ring_id = 1;
+}
+
+message MsgFinalizeRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string ring_pk = 3;
+}
+
+message MsgFinalizeRingResponse {}
+
+message MsgUpdateRingByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  repeated string new_peer_node_keys = 3;
+  // Absent means no pending threshold update.
+  optional uint32 new_threshold = 4;
+  // Absent means no PSS refresh interval update.
+  optional uint64 pss_interval = 5;
+}
+
+message MsgUpdateRingByAcpResponse {}
+
+message MsgFinalizeRingReshareByThresholdSignature {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string signature_scheme = 3;
+  bytes signature = 4;
+}
+
+message MsgFinalizeRingReshareByThresholdSignatureResponse {}
+
+message RingReshareFinalizeSignDoc {
+  string domain = 1;
+  string chain_id = 2;
+  string ring_id = 3;
+  string ring_pk = 4;
+  bytes current_ring_sha256 = 5;
+  bytes finalized_ring_sha256 = 6;
+  uint64 block_number_nonce = 7;
+}
+
+message RingReshareSignState {
+  string ring_pk = 1;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
+  repeated string new_peer_node_keys = 4;
+  optional uint32 new_threshold = 5;
+  optional uint64 pss_interval = 6;
+  uint64 block_number_nonce = 7;
+  string policy_id = 8;
+}
+
+message MsgStoreDocument {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string document = 3;
+  string proof = 4;
+  string policy_id = 5;
+  string resource = 6;
+  string permission = 7;
+  // Absent means no tier.
+  optional string tier = 8;
+  // Absent means no timestamp.
+  optional uint64 timestamp = 9;
+}
+
+message MsgStoreDocumentResponse {
+  string document_id = 1;
+}
+
+message MsgStoreKeyDerivation {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string derivation = 3;
+  string policy_id = 4;
+  string resource = 5;
+  string permission = 6;
+}
+
+message MsgStoreKeyDerivationResponse {
+  string key_derivation_id = 1;
+}
+
+message MsgCreateNodeInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string peer_id = 2;
+  string controller_key = 3;
+  repeated string whitelisted_policy_ids = 4;
+  repeated string whitelisted_ring_ids = 5;
+}
+
+message MsgCreateNodeInfoResponse {}
+
+// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
+// The signer must be the current controller_key holder.
+//
+// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
+// full, not merged. To add a single entry you must re-send the complete desired
+// list. Sending an empty repeated field clears the whitelist entirely.
+message MsgUpdateNodeInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  // Absent means no peer_id update.
+  optional string peer_id = 3;
+  // Replaces the full policy whitelist. Send the complete desired list on every
+  // update; an empty field clears all whitelisted policies.
+  repeated string whitelisted_policy_ids = 4;
+  // Replaces the full ring whitelist. Send the complete desired list on every
+  // update; an empty field clears all whitelisted rings.
+  repeated string whitelisted_ring_ids = 5;
+  // Absent means no controller_key update.
+  optional string controller_key = 6;
+}
+
+message MsgUpdateNodeInfoResponse {}

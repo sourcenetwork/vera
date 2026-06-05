@@ -10,7 +10,7 @@ import (
 	"github.com/mizufinance/decaf377-go/orbisfrost"
 	blst "github.com/supranational/blst/bindings/go"
 
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
 const (
@@ -24,13 +24,8 @@ const (
 	decaf377SignatureSize  = decaf377.ElementSize + decaf377.ScalarSize
 )
 
-func verifyThresholdSignatureForRingPayloadUpdate(
-	currentRingPayload *ringPayloadJSON,
-	message []byte,
-	scheme string,
-	signature []byte,
-) error {
-	return verifyThresholdSignature(scheme, *currentRingPayload.RingPK, message, signature)
+func verifyThresholdSignatureForRingUpdate(ring *types.Ring, message []byte, scheme string, signature []byte) error {
+	return verifyThresholdSignature(scheme, ring.RingPk, message, signature)
 }
 
 func verifyThresholdSignature(scheme string, ringPK string, message []byte, signature []byte) error {

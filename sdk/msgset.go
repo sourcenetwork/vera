@@ -3,6 +3,7 @@ package sdk
 import (
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -52,6 +53,24 @@ func (b *MsgSet) WithSignedPolicyCmd(msg *acptypes.MsgSignedPolicyCmd) Mapper[*a
 func (b *MsgSet) WithCreatePost(msg *bulletintypes.MsgCreatePost) Mapper[*bulletintypes.MsgCreatePostResponse] {
 	idx := b.addMsg(msg)
 	return newMapper(idx, &bulletintypes.MsgCreatePostResponse{})
+}
+
+// WithCreateRing includes a MsgCreateRing to the Tx.
+func (b *MsgSet) WithCreateRing(msg *orbistypes.MsgCreateRing) Mapper[*orbistypes.MsgCreateRingResponse] {
+	idx := b.addMsg(msg)
+	return newMapper(idx, &orbistypes.MsgCreateRingResponse{})
+}
+
+// WithStoreDocument includes a MsgStoreDocument to the Tx.
+func (b *MsgSet) WithStoreDocument(msg *orbistypes.MsgStoreDocument) Mapper[*orbistypes.MsgStoreDocumentResponse] {
+	idx := b.addMsg(msg)
+	return newMapper(idx, &orbistypes.MsgStoreDocumentResponse{})
+}
+
+// WithStoreKeyDerivation includes a MsgStoreKeyDerivation to the Tx.
+func (b *MsgSet) WithStoreKeyDerivation(msg *orbistypes.MsgStoreKeyDerivation) Mapper[*orbistypes.MsgStoreKeyDerivationResponse] {
+	idx := b.addMsg(msg)
+	return newMapper(idx, &orbistypes.MsgStoreKeyDerivationResponse{})
 }
 
 func (b *MsgSet) WithBearerPolicyCmd(msg *acptypes.MsgBearerPolicyCmd) Mapper[*acptypes.MsgBearerPolicyCmdResponse] {

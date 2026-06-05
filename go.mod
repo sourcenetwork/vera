@@ -34,6 +34,7 @@ require (
 	github.com/cosmos/ibc-go/v10 v10.1.1
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.4.0
+	github.com/docker/docker v28.5.2+incompatible
 	github.com/go-jose/go-jose/v3 v3.0.5
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.4
@@ -48,6 +49,7 @@ require (
 	github.com/mizufinance/decaf377-go v0.1.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.1
+	github.com/sourcenetwork/immutable v0.3.0
 	github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8
 	github.com/sourcenetwork/raccoondb/v2 v2.0.0
 	github.com/spf13/cobra v1.10.1
@@ -185,7 +187,6 @@ require (
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/docker/cli v29.2.0+incompatible // indirect
 	github.com/docker/distribution v2.8.3+incompatible // indirect
-	github.com/docker/docker v28.5.2+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.9.3 // indirect
 	github.com/docker/go-connections v0.6.0 // indirect
 	github.com/docker/go-units v0.5.0 // indirect

@@ -72,6 +72,7 @@ import (
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
 	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
 	hubmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
+	orbismodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis/module"
 	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
@@ -81,6 +82,8 @@ import (
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	_ "github.com/sourcenetwork/sourcehub/x/hub/module"
 	hubmoduletypes "github.com/sourcenetwork/sourcehub/x/hub/types"
+	_ "github.com/sourcenetwork/sourcehub/x/orbis/module" // import for side-effects
+	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
 	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 )
@@ -120,6 +123,7 @@ var (
 		// chain modules
 		hubmoduletypes.ModuleName,
 		acptypes.ModuleName,
+		orbistypes.ModuleName,
 		bulletintypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
@@ -324,6 +328,10 @@ var (
 			{
 				Name:   acptypes.ModuleName,
 				Config: appconfig.WrapAny(&acpmodulev1.Module{}),
+			},
+			{
+				Name:   orbistypes.ModuleName,
+				Config: appconfig.WrapAny(&orbismodulev1.Module{}),
 			},
 			{
 				Name:   bulletintypes.ModuleName,

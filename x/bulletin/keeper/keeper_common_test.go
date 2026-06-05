@@ -92,8 +92,8 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
-
-	k.SetParams(ctx, types.DefaultParams())
+	
+	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
 	return k, ctx
 }
