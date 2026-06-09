@@ -3401,11 +3401,11 @@ func (x *fastReflection_EventRingDeleted) ProtoMethods() *protoiface.Methods {
 }
 
 var (
-	md_EventRingUpgradeScheduled                   protoreflect.MessageDescriptor
-	fd_EventRingUpgradeScheduled_ring_id           protoreflect.FieldDescriptor
-	fd_EventRingUpgradeScheduled_current_version   protoreflect.FieldDescriptor
-	fd_EventRingUpgradeScheduled_next_version      protoreflect.FieldDescriptor
-	fd_EventRingUpgradeScheduled_activation_height protoreflect.FieldDescriptor
+	md_EventRingUpgradeScheduled                 protoreflect.MessageDescriptor
+	fd_EventRingUpgradeScheduled_ring_id         protoreflect.FieldDescriptor
+	fd_EventRingUpgradeScheduled_current_version protoreflect.FieldDescriptor
+	fd_EventRingUpgradeScheduled_next_version    protoreflect.FieldDescriptor
+	fd_EventRingUpgradeScheduled_activation_time protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -3414,7 +3414,7 @@ func init() {
 	fd_EventRingUpgradeScheduled_ring_id = md_EventRingUpgradeScheduled.Fields().ByName("ring_id")
 	fd_EventRingUpgradeScheduled_current_version = md_EventRingUpgradeScheduled.Fields().ByName("current_version")
 	fd_EventRingUpgradeScheduled_next_version = md_EventRingUpgradeScheduled.Fields().ByName("next_version")
-	fd_EventRingUpgradeScheduled_activation_height = md_EventRingUpgradeScheduled.Fields().ByName("activation_height")
+	fd_EventRingUpgradeScheduled_activation_time = md_EventRingUpgradeScheduled.Fields().ByName("activation_time")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventRingUpgradeScheduled)(nil)
@@ -3500,9 +3500,9 @@ func (x *fastReflection_EventRingUpgradeScheduled) Range(f func(protoreflect.Fie
 			return
 		}
 	}
-	if x.ActivationHeight != int64(0) {
-		value := protoreflect.ValueOfInt64(x.ActivationHeight)
-		if !f(fd_EventRingUpgradeScheduled_activation_height, value) {
+	if x.ActivationTime != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.ActivationTime)
+		if !f(fd_EventRingUpgradeScheduled_activation_time, value) {
 			return
 		}
 	}
@@ -3527,8 +3527,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) Has(fd protoreflect.FieldDesc
 		return x.CurrentVersion != uint64(0)
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		return x.NextVersion != uint64(0)
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		return x.ActivationHeight != int64(0)
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		return x.ActivationTime != uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3551,8 +3551,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) Clear(fd protoreflect.FieldDe
 		x.CurrentVersion = uint64(0)
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		x.NextVersion = uint64(0)
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		x.ActivationHeight = int64(0)
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		x.ActivationTime = uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3578,9 +3578,9 @@ func (x *fastReflection_EventRingUpgradeScheduled) Get(descriptor protoreflect.F
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		value := x.NextVersion
 		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		value := x.ActivationHeight
-		return protoreflect.ValueOfInt64(value)
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		value := x.ActivationTime
+		return protoreflect.ValueOfUint64(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3607,8 +3607,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) Set(fd protoreflect.FieldDesc
 		x.CurrentVersion = value.Uint()
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		x.NextVersion = value.Uint()
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		x.ActivationHeight = value.Int()
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		x.ActivationTime = value.Uint()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3635,8 +3635,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) Mutable(fd protoreflect.Field
 		panic(fmt.Errorf("field current_version of message sourcehub.orbis.EventRingUpgradeScheduled is not mutable"))
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		panic(fmt.Errorf("field next_version of message sourcehub.orbis.EventRingUpgradeScheduled is not mutable"))
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		panic(fmt.Errorf("field activation_height of message sourcehub.orbis.EventRingUpgradeScheduled is not mutable"))
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		panic(fmt.Errorf("field activation_time of message sourcehub.orbis.EventRingUpgradeScheduled is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3656,8 +3656,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) NewField(fd protoreflect.Fiel
 		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.orbis.EventRingUpgradeScheduled.next_version":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_height":
-		return protoreflect.ValueOfInt64(int64(0))
+	case "sourcehub.orbis.EventRingUpgradeScheduled.activation_time":
+		return protoreflect.ValueOfUint64(uint64(0))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeScheduled"))
@@ -3737,8 +3737,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) ProtoMethods() *protoiface.Me
 		if x.NextVersion != 0 {
 			n += 1 + runtime.Sov(uint64(x.NextVersion))
 		}
-		if x.ActivationHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.ActivationHeight))
+		if x.ActivationTime != 0 {
+			n += 1 + runtime.Sov(uint64(x.ActivationTime))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -3769,8 +3769,8 @@ func (x *fastReflection_EventRingUpgradeScheduled) ProtoMethods() *protoiface.Me
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.ActivationHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.ActivationHeight))
+		if x.ActivationTime != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.ActivationTime))
 			i--
 			dAtA[i] = 0x20
 		}
@@ -3912,9 +3912,9 @@ func (x *fastReflection_EventRingUpgradeScheduled) ProtoMethods() *protoiface.Me
 				}
 			case 4:
 				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ActivationHeight", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ActivationTime", wireType)
 				}
-				x.ActivationHeight = 0
+				x.ActivationTime = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -3924,7 +3924,7 @@ func (x *fastReflection_EventRingUpgradeScheduled) ProtoMethods() *protoiface.Me
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.ActivationHeight |= int64(b&0x7F) << shift
+					x.ActivationTime |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -4433,11 +4433,11 @@ func (x *fastReflection_EventRingUpgradeCancelled) ProtoMethods() *protoiface.Me
 }
 
 var (
-	md_EventRingUpgradeNormalized                   protoreflect.MessageDescriptor
-	fd_EventRingUpgradeNormalized_ring_id           protoreflect.FieldDescriptor
-	fd_EventRingUpgradeNormalized_previous_version  protoreflect.FieldDescriptor
-	fd_EventRingUpgradeNormalized_current_version   protoreflect.FieldDescriptor
-	fd_EventRingUpgradeNormalized_activation_height protoreflect.FieldDescriptor
+	md_EventRingUpgradeNormalized                  protoreflect.MessageDescriptor
+	fd_EventRingUpgradeNormalized_ring_id          protoreflect.FieldDescriptor
+	fd_EventRingUpgradeNormalized_previous_version protoreflect.FieldDescriptor
+	fd_EventRingUpgradeNormalized_current_version  protoreflect.FieldDescriptor
+	fd_EventRingUpgradeNormalized_activation_time  protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -4446,7 +4446,7 @@ func init() {
 	fd_EventRingUpgradeNormalized_ring_id = md_EventRingUpgradeNormalized.Fields().ByName("ring_id")
 	fd_EventRingUpgradeNormalized_previous_version = md_EventRingUpgradeNormalized.Fields().ByName("previous_version")
 	fd_EventRingUpgradeNormalized_current_version = md_EventRingUpgradeNormalized.Fields().ByName("current_version")
-	fd_EventRingUpgradeNormalized_activation_height = md_EventRingUpgradeNormalized.Fields().ByName("activation_height")
+	fd_EventRingUpgradeNormalized_activation_time = md_EventRingUpgradeNormalized.Fields().ByName("activation_time")
 }
 
 var _ protoreflect.Message = (*fastReflection_EventRingUpgradeNormalized)(nil)
@@ -4532,9 +4532,9 @@ func (x *fastReflection_EventRingUpgradeNormalized) Range(f func(protoreflect.Fi
 			return
 		}
 	}
-	if x.ActivationHeight != int64(0) {
-		value := protoreflect.ValueOfInt64(x.ActivationHeight)
-		if !f(fd_EventRingUpgradeNormalized_activation_height, value) {
+	if x.ActivationTime != uint64(0) {
+		value := protoreflect.ValueOfUint64(x.ActivationTime)
+		if !f(fd_EventRingUpgradeNormalized_activation_time, value) {
 			return
 		}
 	}
@@ -4559,8 +4559,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) Has(fd protoreflect.FieldDes
 		return x.PreviousVersion != uint64(0)
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		return x.CurrentVersion != uint64(0)
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		return x.ActivationHeight != int64(0)
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		return x.ActivationTime != uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4583,8 +4583,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) Clear(fd protoreflect.FieldD
 		x.PreviousVersion = uint64(0)
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		x.CurrentVersion = uint64(0)
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		x.ActivationHeight = int64(0)
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		x.ActivationTime = uint64(0)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4610,9 +4610,9 @@ func (x *fastReflection_EventRingUpgradeNormalized) Get(descriptor protoreflect.
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		value := x.CurrentVersion
 		return protoreflect.ValueOfUint64(value)
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		value := x.ActivationHeight
-		return protoreflect.ValueOfInt64(value)
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		value := x.ActivationTime
+		return protoreflect.ValueOfUint64(value)
 	default:
 		if descriptor.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4639,8 +4639,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) Set(fd protoreflect.FieldDes
 		x.PreviousVersion = value.Uint()
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		x.CurrentVersion = value.Uint()
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		x.ActivationHeight = value.Int()
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		x.ActivationTime = value.Uint()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4667,8 +4667,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) Mutable(fd protoreflect.Fiel
 		panic(fmt.Errorf("field previous_version of message sourcehub.orbis.EventRingUpgradeNormalized is not mutable"))
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		panic(fmt.Errorf("field current_version of message sourcehub.orbis.EventRingUpgradeNormalized is not mutable"))
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		panic(fmt.Errorf("field activation_height of message sourcehub.orbis.EventRingUpgradeNormalized is not mutable"))
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		panic(fmt.Errorf("field activation_time of message sourcehub.orbis.EventRingUpgradeNormalized is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4688,8 +4688,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) NewField(fd protoreflect.Fie
 		return protoreflect.ValueOfUint64(uint64(0))
 	case "sourcehub.orbis.EventRingUpgradeNormalized.current_version":
 		return protoreflect.ValueOfUint64(uint64(0))
-	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_height":
-		return protoreflect.ValueOfInt64(int64(0))
+	case "sourcehub.orbis.EventRingUpgradeNormalized.activation_time":
+		return protoreflect.ValueOfUint64(uint64(0))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.orbis.EventRingUpgradeNormalized"))
@@ -4769,8 +4769,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) ProtoMethods() *protoiface.M
 		if x.CurrentVersion != 0 {
 			n += 1 + runtime.Sov(uint64(x.CurrentVersion))
 		}
-		if x.ActivationHeight != 0 {
-			n += 1 + runtime.Sov(uint64(x.ActivationHeight))
+		if x.ActivationTime != 0 {
+			n += 1 + runtime.Sov(uint64(x.ActivationTime))
 		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
@@ -4801,8 +4801,8 @@ func (x *fastReflection_EventRingUpgradeNormalized) ProtoMethods() *protoiface.M
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
 		}
-		if x.ActivationHeight != 0 {
-			i = runtime.EncodeVarint(dAtA, i, uint64(x.ActivationHeight))
+		if x.ActivationTime != 0 {
+			i = runtime.EncodeVarint(dAtA, i, uint64(x.ActivationTime))
 			i--
 			dAtA[i] = 0x20
 		}
@@ -4944,9 +4944,9 @@ func (x *fastReflection_EventRingUpgradeNormalized) ProtoMethods() *protoiface.M
 				}
 			case 4:
 				if wireType != 0 {
-					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ActivationHeight", wireType)
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ActivationTime", wireType)
 				}
-				x.ActivationHeight = 0
+				x.ActivationTime = 0
 				for shift := uint(0); ; shift += 7 {
 					if shift >= 64 {
 						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
@@ -4956,7 +4956,7 @@ func (x *fastReflection_EventRingUpgradeNormalized) ProtoMethods() *protoiface.M
 					}
 					b := dAtA[iNdEx]
 					iNdEx++
-					x.ActivationHeight |= int64(b&0x7F) << shift
+					x.ActivationTime |= uint64(b&0x7F) << shift
 					if b < 0x80 {
 						break
 					}
@@ -5322,10 +5322,10 @@ type EventRingUpgradeScheduled struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RingId           string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	CurrentVersion   uint64 `protobuf:"varint,2,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
-	NextVersion      uint64 `protobuf:"varint,3,opt,name=next_version,json=nextVersion,proto3" json:"next_version,omitempty"`
-	ActivationHeight int64  `protobuf:"varint,4,opt,name=activation_height,json=activationHeight,proto3" json:"activation_height,omitempty"`
+	RingId         string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	CurrentVersion uint64 `protobuf:"varint,2,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	NextVersion    uint64 `protobuf:"varint,3,opt,name=next_version,json=nextVersion,proto3" json:"next_version,omitempty"`
+	ActivationTime uint64 `protobuf:"varint,4,opt,name=activation_time,json=activationTime,proto3" json:"activation_time,omitempty"`
 }
 
 func (x *EventRingUpgradeScheduled) Reset() {
@@ -5369,9 +5369,9 @@ func (x *EventRingUpgradeScheduled) GetNextVersion() uint64 {
 	return 0
 }
 
-func (x *EventRingUpgradeScheduled) GetActivationHeight() int64 {
+func (x *EventRingUpgradeScheduled) GetActivationTime() uint64 {
 	if x != nil {
-		return x.ActivationHeight
+		return x.ActivationTime
 	}
 	return 0
 }
@@ -5424,10 +5424,10 @@ type EventRingUpgradeNormalized struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	RingId           string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	PreviousVersion  uint64 `protobuf:"varint,2,opt,name=previous_version,json=previousVersion,proto3" json:"previous_version,omitempty"`
-	CurrentVersion   uint64 `protobuf:"varint,3,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
-	ActivationHeight int64  `protobuf:"varint,4,opt,name=activation_height,json=activationHeight,proto3" json:"activation_height,omitempty"`
+	RingId          string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	PreviousVersion uint64 `protobuf:"varint,2,opt,name=previous_version,json=previousVersion,proto3" json:"previous_version,omitempty"`
+	CurrentVersion  uint64 `protobuf:"varint,3,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	ActivationTime  uint64 `protobuf:"varint,4,opt,name=activation_time,json=activationTime,proto3" json:"activation_time,omitempty"`
 }
 
 func (x *EventRingUpgradeNormalized) Reset() {
@@ -5471,9 +5471,9 @@ func (x *EventRingUpgradeNormalized) GetCurrentVersion() uint64 {
 	return 0
 }
 
-func (x *EventRingUpgradeNormalized) GetActivationHeight() int64 {
+func (x *EventRingUpgradeNormalized) GetActivationTime() uint64 {
 	if x != nil {
-		return x.ActivationHeight
+		return x.ActivationTime
 	}
 	return 0
 }
@@ -5521,7 +5521,7 @@ var file_sourcehub_orbis_events_proto_rawDesc = []byte{
 	0x64, 0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65,
 	0x61, 0x73, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x65, 0x61, 0x73,
-	0x6f, 0x6e, 0x22, 0xad, 0x01, 0x0a, 0x19, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67,
+	0x6f, 0x6e, 0x22, 0xa9, 0x01, 0x0a, 0x19, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67,
 	0x55, 0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x53, 0x63, 0x68, 0x65, 0x64, 0x75, 0x6c, 0x65, 0x64,
 	0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x75, 0x72,
@@ -5529,38 +5529,37 @@ var file_sourcehub_orbis_events_proto_rawDesc = []byte{
 	0x28, 0x04, 0x52, 0x0e, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69,
 	0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x6e, 0x65, 0x78, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69,
 	0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0b, 0x6e, 0x65, 0x78, 0x74, 0x56, 0x65,
-	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2b, 0x0a, 0x11, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74,
-	0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67, 0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03,
-	0x52, 0x10, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67,
-	0x68, 0x74, 0x22, 0x5d, 0x0a, 0x19, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67, 0x55,
-	0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x43, 0x61, 0x6e, 0x63, 0x65, 0x6c, 0x6c, 0x65, 0x64, 0x12,
-	0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x75, 0x72, 0x72,
-	0x65, 0x6e, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x04, 0x52, 0x0e, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f,
-	0x6e, 0x22, 0xb6, 0x01, 0x0a, 0x1a, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67, 0x55,
-	0x70, 0x67, 0x72, 0x61, 0x64, 0x65, 0x4e, 0x6f, 0x72, 0x6d, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64,
-	0x12, 0x17, 0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x29, 0x0a, 0x10, 0x70, 0x72, 0x65,
-	0x76, 0x69, 0x6f, 0x75, 0x73, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x04, 0x52, 0x0f, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x56, 0x65, 0x72,
-	0x73, 0x69, 0x6f, 0x6e, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f,
-	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e, 0x63,
-	0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2b, 0x0a,
-	0x11, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x68, 0x65, 0x69, 0x67,
-	0x68, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x10, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x48, 0x65, 0x69, 0x67, 0x68, 0x74, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63,
-	0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62,
-	0x69, 0x73, 0x42, 0x0b, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f,
-	0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72,
-	0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x53, 0x4f, 0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b,
-	0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c,
-	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x27, 0x0a, 0x0f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e,
+	0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69, 0x6d, 0x65, 0x22, 0x5d,
+	0x0a, 0x19, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67, 0x55, 0x70, 0x67, 0x72, 0x61,
+	0x64, 0x65, 0x43, 0x61, 0x6e, 0x63, 0x65, 0x6c, 0x6c, 0x65, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x72,
+	0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x69,
+	0x6e, 0x67, 0x49, 0x64, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f,
+	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e, 0x63,
+	0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x22, 0xb2, 0x01,
+	0x0a, 0x1a, 0x45, 0x76, 0x65, 0x6e, 0x74, 0x52, 0x69, 0x6e, 0x67, 0x55, 0x70, 0x67, 0x72, 0x61,
+	0x64, 0x65, 0x4e, 0x6f, 0x72, 0x6d, 0x61, 0x6c, 0x69, 0x7a, 0x65, 0x64, 0x12, 0x17, 0x0a, 0x07,
+	0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72,
+	0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x29, 0x0a, 0x10, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75,
+	0x73, 0x5f, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04, 0x52,
+	0x0f, 0x70, 0x72, 0x65, 0x76, 0x69, 0x6f, 0x75, 0x73, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e,
+	0x12, 0x27, 0x0a, 0x0f, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x74, 0x5f, 0x76, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x04, 0x52, 0x0e, 0x63, 0x75, 0x72, 0x72, 0x65,
+	0x6e, 0x74, 0x56, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x27, 0x0a, 0x0f, 0x61, 0x63, 0x74,
+	0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x0e, 0x61, 0x63, 0x74, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x54, 0x69,
+	0x6d, 0x65, 0x42, 0xa1, 0x01, 0x0a, 0x13, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x68, 0x75, 0x62, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0b, 0x45, 0x76, 0x65, 0x6e,
+	0x74, 0x73, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x53, 0x4f,
+	0x58, 0xaa, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x4f, 0x72,
+	0x62, 0x69, 0x73, 0xca, 0x02, 0x0f, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c,
+	0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
+	0x62, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64,
+	0x61, 0x74, 0x61, 0xea, 0x02, 0x10, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x3a,
+	0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (

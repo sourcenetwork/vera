@@ -17,8 +17,8 @@ func TestGenesisRingUpgradeInfoRoundTrips(t *testing.T) {
 					XNextVersion: &UpgradeInfo_NextVersion{
 						NextVersion: 2,
 					},
-					XActivationHeight: &UpgradeInfo_ActivationHeight{
-						ActivationHeight: 500,
+					XActivationTime: &UpgradeInfo_ActivationTime{
+						ActivationTime: 500,
 					},
 				},
 			},
@@ -33,5 +33,5 @@ func TestGenesisRingUpgradeInfoRoundTrips(t *testing.T) {
 	require.Len(t, decoded.Rings, 1)
 	require.Equal(t, uint64(1), decoded.Rings[0].UpgradeInfo.CurrentVersion)
 	require.Equal(t, uint64(2), decoded.Rings[0].UpgradeInfo.GetNextVersion())
-	require.Equal(t, int64(500), decoded.Rings[0].UpgradeInfo.GetActivationHeight())
+	require.Equal(t, uint64(500), decoded.Rings[0].UpgradeInfo.GetActivationTime())
 }

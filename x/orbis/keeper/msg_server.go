@@ -184,16 +184,24 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 
 	newThreshold := optionalUpdateRingNewThreshold(msg)
 	nextVersion := optionalUpdateRingNextVersion(msg)
-	activationHeight := optionalUpdateRingActivationHeight(msg)
-	normalized, previousVersion, normalizedActivationHeight := normalizeRingUpgrade(ring, ctx.BlockHeight())
+	activationTime := optionalUpdateRingActivationTime(msg)
+	currentTime := uint64(0)
+	if ring.UpgradeInfo.XNextVersion != nil || nextVersion.HasValue() {
+		blockUnixTime := ctx.BlockTime().Unix()
+		if blockUnixTime < 0 {
+			return nil, errorsmod.Wrap(types.ErrInvalidRing, "current block time is before the Unix epoch")
+		}
+		currentTime = uint64(blockUnixTime)
+	}
+	normalized, previousVersion, normalizedActivationTime := normalizeRingUpgrade(ring, currentTime)
 	hadPendingUpgrade := ring.UpgradeInfo.XNextVersion != nil
 	if err := validateRingUpdate(
 		msg.NewPeerNodeKeys,
 		newThreshold,
 		nextVersion,
-		activationHeight,
+		activationTime,
 		msg.ClearUpgrade,
-		ctx.BlockHeight(),
+		currentTime,
 		ring,
 	); err != nil {
 		return nil, err
@@ -227,7 +235,7 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		clearRingUpgrade(ring)
 	}
 	if nextVersion.HasValue() {
-		setRingUpgrade(ring, nextVersion.Value(), activationHeight.Value())
+		setRingUpgrade(ring, nextVersion.Value(), activationTime.Value())
 	}
 	if err := validateRing(ring); err != nil {
 		return nil, err
@@ -243,20 +251,20 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	}
 	if normalized {
 		if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeNormalized{
-			RingId:           ring.Id,
-			PreviousVersion:  previousVersion,
-			CurrentVersion:   ring.UpgradeInfo.CurrentVersion,
-			ActivationHeight: normalizedActivationHeight,
+			RingId:          ring.Id,
+			PreviousVersion: previousVersion,
+			CurrentVersion:  ring.UpgradeInfo.CurrentVersion,
+			ActivationTime:  normalizedActivationTime,
 		}); err != nil {
 			return nil, err
 		}
 	}
 	if nextVersion.HasValue() {
 		if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeScheduled{
-			RingId:           ring.Id,
-			CurrentVersion:   ring.UpgradeInfo.CurrentVersion,
-			NextVersion:      nextVersion.Value(),
-			ActivationHeight: activationHeight.Value(),
+			RingId:         ring.Id,
+			CurrentVersion: ring.UpgradeInfo.CurrentVersion,
+			NextVersion:    nextVersion.Value(),
+			ActivationTime: activationTime.Value(),
 		}); err != nil {
 			return nil, err
 		}

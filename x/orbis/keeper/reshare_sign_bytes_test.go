@@ -35,8 +35,8 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 			XNextVersion: &types.UpgradeInfo_NextVersion{
 				NextVersion: 2,
 			},
-			XActivationHeight: &types.UpgradeInfo_ActivationHeight{
-				ActivationHeight: 100,
+			XActivationTime: &types.UpgradeInfo_ActivationTime{
+				ActivationTime: 100,
 			},
 		},
 		Confirmations: []*types.RingConfirmation{
@@ -70,8 +70,8 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 			XNextVersion: &types.UpgradeInfo_NextVersion{
 				NextVersion: 8,
 			},
-			XActivationHeight: &types.UpgradeInfo_ActivationHeight{
-				ActivationHeight: 900,
+			XActivationTime: &types.UpgradeInfo_ActivationTime{
+				ActivationTime: 900,
 			},
 		},
 		Confirmations: []*types.RingConfirmation{

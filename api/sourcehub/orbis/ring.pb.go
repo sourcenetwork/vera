@@ -24,12 +24,13 @@ const (
 
 // UpgradeInfo stores the active protocol epoch and an optional pending upgrade.
 type UpgradeInfo struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	CurrentVersion   uint64                 `protobuf:"varint,1,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
-	NextVersion      *uint64                `protobuf:"varint,2,opt,name=next_version,json=nextVersion,proto3,oneof" json:"next_version,omitempty"`
-	ActivationHeight *int64                 `protobuf:"varint,3,opt,name=activation_height,json=activationHeight,proto3,oneof" json:"activation_height,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	CurrentVersion uint64                 `protobuf:"varint,1,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	NextVersion    *uint64                `protobuf:"varint,2,opt,name=next_version,json=nextVersion,proto3,oneof" json:"next_version,omitempty"`
+	// Unix timestamp in seconds when next_version becomes effective.
+	ActivationTime *uint64 `protobuf:"varint,3,opt,name=activation_time,json=activationTime,proto3,oneof" json:"activation_time,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *UpgradeInfo) Reset() {
@@ -76,9 +77,9 @@ func (x *UpgradeInfo) GetNextVersion() uint64 {
 	return 0
 }
 
-func (x *UpgradeInfo) GetActivationHeight() int64 {
-	if x != nil && x.ActivationHeight != nil {
-		return *x.ActivationHeight
+func (x *UpgradeInfo) GetActivationTime() uint64 {
+	if x != nil && x.ActivationTime != nil {
+		return *x.ActivationTime
 	}
 	return 0
 }
@@ -275,13 +276,13 @@ var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\n" +
-	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\x1a\x14gogoproto/gogo.proto\"\xb7\x01\n" +
+	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\x1a\x14gogoproto/gogo.proto\"\xb1\x01\n" +
 	"\vUpgradeInfo\x12'\n" +
 	"\x0fcurrent_version\x18\x01 \x01(\x04R\x0ecurrentVersion\x12&\n" +
-	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x120\n" +
-	"\x11activation_height\x18\x03 \x01(\x03H\x01R\x10activationHeight\x88\x01\x01B\x0f\n" +
-	"\r_next_versionB\x14\n" +
-	"\x12_activation_height\"\x91\x04\n" +
+	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x12,\n" +
+	"\x0factivation_time\x18\x03 \x01(\x04H\x01R\x0eactivationTime\x88\x01\x01B\x0f\n" +
+	"\r_next_versionB\x12\n" +
+	"\x10_activation_time\"\x91\x04\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +

@@ -10,7 +10,7 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
-const MinRingUpgradeLeadBlocks int64 = 100
+const MinRingUpgradeLeadSeconds uint64 = 600
 
 func requireRingFinalized(ring *types.Ring) error {
 	if ring.RingPk == "" {
@@ -66,9 +66,9 @@ func validateRingUpdate(
 	newPeerNodeKeys []string,
 	newThreshold immutable.Option[uint32],
 	nextVersion immutable.Option[uint64],
-	activationHeight immutable.Option[int64],
+	activationTime immutable.Option[uint64],
 	clearUpgrade bool,
-	currentHeight int64,
+	currentTime uint64,
 	existing *types.Ring,
 ) error {
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
@@ -102,8 +102,8 @@ func validateRingUpdate(
 			return err
 		}
 	}
-	if nextVersion.HasValue() != activationHeight.HasValue() {
-		return errorsmod.Wrap(types.ErrInvalidRing, "next_version and activation_height must be supplied together")
+	if nextVersion.HasValue() != activationTime.HasValue() {
+		return errorsmod.Wrap(types.ErrInvalidRing, "next_version and activation_time must be supplied together")
 	}
 	if clearUpgrade && nextVersion.HasValue() {
 		return errorsmod.Wrap(types.ErrInvalidRing, "clear_upgrade cannot be combined with a new upgrade schedule")
@@ -117,13 +117,16 @@ func validateRingUpdate(
 				existing.UpgradeInfo.CurrentVersion,
 			)
 		}
-		minimumActivationHeight := currentHeight + MinRingUpgradeLeadBlocks
-		if activationHeight.Value() < minimumActivationHeight {
+		if currentTime > ^uint64(0)-MinRingUpgradeLeadSeconds {
+			return errorsmod.Wrap(types.ErrInvalidRing, "current block time is too large to schedule an upgrade")
+		}
+		minimumActivationTime := currentTime + MinRingUpgradeLeadSeconds
+		if activationTime.Value() < minimumActivationTime {
 			return errorsmod.Wrapf(
 				types.ErrInvalidRing,
-				"activation_height (%d) must be at least %d",
-				activationHeight.Value(),
-				minimumActivationHeight,
+				"activation_time (%d) must be at least %d",
+				activationTime.Value(),
+				minimumActivationTime,
 			)
 		}
 	}
@@ -132,42 +135,42 @@ func validateRingUpdate(
 }
 
 func validateUpgradeInfo(info *types.UpgradeInfo) error {
-	if (info.XNextVersion == nil) != (info.XActivationHeight == nil) {
-		return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version and activation_height must both be set or both be absent")
+	if (info.XNextVersion == nil) != (info.XActivationTime == nil) {
+		return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version and activation_time must both be set or both be absent")
 	}
 	if info.XNextVersion != nil {
 		if info.GetNextVersion() <= info.CurrentVersion {
 			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version must be greater than current_version")
 		}
-		if info.GetActivationHeight() <= 0 {
-			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade activation_height must be positive")
+		if info.GetActivationTime() == 0 {
+			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade activation_time must be positive")
 		}
 	}
 	return nil
 }
 
-func normalizeRingUpgrade(ring *types.Ring, currentHeight int64) (bool, uint64, int64) {
-	if ring.UpgradeInfo.XNextVersion == nil || ring.UpgradeInfo.XActivationHeight == nil {
+func normalizeRingUpgrade(ring *types.Ring, currentTime uint64) (bool, uint64, uint64) {
+	if ring.UpgradeInfo.XNextVersion == nil || ring.UpgradeInfo.XActivationTime == nil {
 		return false, 0, 0
 	}
-	activationHeight := ring.UpgradeInfo.GetActivationHeight()
-	if currentHeight < activationHeight {
+	activationTime := ring.UpgradeInfo.GetActivationTime()
+	if currentTime < activationTime {
 		return false, 0, 0
 	}
 	previousVersion := ring.UpgradeInfo.CurrentVersion
 	ring.UpgradeInfo.CurrentVersion = ring.UpgradeInfo.GetNextVersion()
 	clearRingUpgrade(ring)
-	return true, previousVersion, activationHeight
+	return true, previousVersion, activationTime
 }
 
 func clearRingUpgrade(ring *types.Ring) {
 	ring.UpgradeInfo.XNextVersion = nil
-	ring.UpgradeInfo.XActivationHeight = nil
+	ring.UpgradeInfo.XActivationTime = nil
 }
 
-func setRingUpgrade(ring *types.Ring, nextVersion uint64, activationHeight int64) {
+func setRingUpgrade(ring *types.Ring, nextVersion uint64, activationTime uint64) {
 	ring.UpgradeInfo.XNextVersion = &types.UpgradeInfo_NextVersion{NextVersion: nextVersion}
-	ring.UpgradeInfo.XActivationHeight = &types.UpgradeInfo_ActivationHeight{ActivationHeight: activationHeight}
+	ring.UpgradeInfo.XActivationTime = &types.UpgradeInfo_ActivationTime{ActivationTime: activationTime}
 }
 
 func validateEffectiveReshareThreshold(threshold uint32, committeeSize int) error {

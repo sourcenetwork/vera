@@ -23,9 +23,9 @@ func (msg *MsgUpdateRingByAcp) ValidateBasic() error {
 		return ErrInvalidRingId
 	}
 	hasNextVersion := msg.XNextVersion != nil
-	hasActivationHeight := msg.XActivationHeight != nil
-	if hasNextVersion != hasActivationHeight {
-		return errorsmod.Wrap(ErrInvalidRing, "next_version and activation_height must be supplied together")
+	hasActivationTime := msg.XActivationTime != nil
+	if hasNextVersion != hasActivationTime {
+		return errorsmod.Wrap(ErrInvalidRing, "next_version and activation_time must be supplied together")
 	}
 	if msg.ClearUpgrade && hasNextVersion {
 		return errorsmod.Wrap(ErrInvalidRing, "clear_upgrade cannot be combined with a new upgrade schedule")

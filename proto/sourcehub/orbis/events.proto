@@ -50,7 +50,7 @@ message EventRingUpgradeScheduled {
   string ring_id = 1;
   uint64 current_version = 2;
   uint64 next_version = 3;
-  int64 activation_height = 4;
+  uint64 activation_time = 4;
 }
 
 message EventRingUpgradeCancelled {
@@ -62,5 +62,5 @@ message EventRingUpgradeNormalized {
   string ring_id = 1;
   uint64 previous_version = 2;
   uint64 current_version = 3;
-  int64 activation_height = 4;
+  uint64 activation_time = 4;
 }

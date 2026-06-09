@@ -45,11 +45,11 @@ func optionalUpdateRingNextVersion(msg *types.MsgUpdateRingByAcp) immutable.Opti
 	return immutable.Some(msg.GetNextVersion())
 }
 
-func optionalUpdateRingActivationHeight(msg *types.MsgUpdateRingByAcp) immutable.Option[int64] {
-	if msg.XActivationHeight == nil {
-		return immutable.None[int64]()
+func optionalUpdateRingActivationTime(msg *types.MsgUpdateRingByAcp) immutable.Option[uint64] {
+	if msg.XActivationTime == nil {
+		return immutable.None[uint64]()
 	}
-	return immutable.Some(msg.GetActivationHeight())
+	return immutable.Some(msg.GetActivationTime())
 }
 
 func optionalStoreDocumentTier(msg *types.MsgStoreDocument) immutable.Option[string] {

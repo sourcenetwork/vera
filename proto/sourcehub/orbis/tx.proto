@@ -77,9 +77,10 @@ message MsgUpdateRingByAcp {
   optional uint32 new_threshold = 4;
   // Absent means no PSS refresh interval update.
   optional uint64 pss_interval = 5;
-  // next_version and activation_height must be supplied together.
+  // next_version and activation_time must be supplied together.
   optional uint64 next_version = 6;
-  optional int64 activation_height = 7;
+  // Unix timestamp in seconds. Must be at least 10 minutes in the future.
+  optional uint64 activation_time = 7;
   // Clears a pending upgrade before activation. Mutually exclusive with a new schedule.
   bool clear_upgrade = 8;
 }

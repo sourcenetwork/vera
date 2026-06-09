@@ -3,6 +3,7 @@ package keeper
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -12,7 +13,10 @@ import (
 
 func TestRingUpgradeLifecycle(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
-	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID).WithBlockHeight(10)
+	const baseTime uint64 = 1_800_000_000
+	ctx = ctx.
+		WithValue(appparams.ExtractedDIDContextKey, testDID).
+		WithBlockTime(time.Unix(int64(baseTime), 0))
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	peerAddr, peerKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWUpgradePeer")
@@ -61,11 +65,11 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
 			NextVersion: 1,
 		},
-		XActivationHeight: &types.MsgUpdateRingByAcp_ActivationHeight{
-			ActivationHeight: 109,
+		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+			ActivationTime: baseTime + 599,
 		},
 	})
-	require.ErrorContains(t, err, "must be at least 110")
+	require.ErrorContains(t, err, "must be at least 1800000600")
 
 	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
 		Creator: creatorAddr,
@@ -73,8 +77,8 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
 			NextVersion: 0,
 		},
-		XActivationHeight: &types.MsgUpdateRingByAcp_ActivationHeight{
-			ActivationHeight: 110,
+		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+			ActivationTime: baseTime + 600,
 		},
 	})
 	require.ErrorContains(t, err, "must be greater than current_version")
@@ -86,40 +90,40 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
 			NextVersion: 1,
 		},
-		XActivationHeight: &types.MsgUpdateRingByAcp_ActivationHeight{
-			ActivationHeight: 110,
+		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+			ActivationTime: baseTime + 600,
 		},
 	})
 	require.ErrorContains(t, err, "cannot be combined")
 
-	schedule := func(atHeight int64, nextVersion uint64, activationHeight int64) {
+	schedule := func(atTime uint64, nextVersion uint64, activationTime uint64) {
 		t.Helper()
-		updateCtx := ctx.WithBlockHeight(atHeight)
+		updateCtx := ctx.WithBlockTime(time.Unix(int64(atTime), 0))
 		_, updateErr := k.UpdateRingByAcp(updateCtx, &types.MsgUpdateRingByAcp{
 			Creator: creatorAddr,
 			RingId:  createVersionZero.RingId,
 			XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
 				NextVersion: nextVersion,
 			},
-			XActivationHeight: &types.MsgUpdateRingByAcp_ActivationHeight{
-				ActivationHeight: activationHeight,
+			XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+				ActivationTime: activationTime,
 			},
 		})
 		require.NoError(t, updateErr)
 	}
 
-	schedule(10, 1, 110)
+	schedule(baseTime, 1, baseTime+600)
 	ring := k.GetRing(ctx, createVersionZero.RingId)
 	require.Equal(t, uint64(0), ring.UpgradeInfo.CurrentVersion)
 	require.Equal(t, uint64(1), ring.UpgradeInfo.GetNextVersion())
-	require.Equal(t, int64(110), ring.UpgradeInfo.GetActivationHeight())
+	require.Equal(t, baseTime+600, ring.UpgradeInfo.GetActivationTime())
 
-	schedule(11, 2, 111)
+	schedule(baseTime+1, 2, baseTime+601)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
 	require.Equal(t, uint64(2), ring.UpgradeInfo.GetNextVersion())
-	require.Equal(t, int64(111), ring.UpgradeInfo.GetActivationHeight())
+	require.Equal(t, baseTime+601, ring.UpgradeInfo.GetActivationTime())
 
-	_, err = k.UpdateRingByAcp(ctx.WithBlockHeight(12), &types.MsgUpdateRingByAcp{
+	_, err = k.UpdateRingByAcp(ctx.WithBlockTime(time.Unix(int64(baseTime+2), 0)), &types.MsgUpdateRingByAcp{
 		Creator:      creatorAddr,
 		RingId:       createVersionZero.RingId,
 		ClearUpgrade: true,
@@ -127,10 +131,10 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.NoError(t, err)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
-	require.Nil(t, ring.UpgradeInfo.XActivationHeight)
+	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 
-	schedule(12, 1, 112)
-	_, err = k.UpdateRingByAcp(ctx.WithBlockHeight(112), &types.MsgUpdateRingByAcp{
+	schedule(baseTime+2, 1, baseTime+602)
+	_, err = k.UpdateRingByAcp(ctx.WithBlockTime(time.Unix(int64(baseTime+602), 0)), &types.MsgUpdateRingByAcp{
 		Creator:      creatorAddr,
 		RingId:       createVersionZero.RingId,
 		ClearUpgrade: true,
@@ -139,13 +143,13 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	ring = k.GetRing(ctx, createVersionZero.RingId)
 	require.Equal(t, uint64(1), ring.UpgradeInfo.CurrentVersion)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
-	require.Nil(t, ring.UpgradeInfo.XActivationHeight)
+	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 
-	schedule(112, 2, 212)
+	schedule(baseTime+602, 2, baseTime+1202)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
 	require.Equal(t, uint64(1), ring.UpgradeInfo.CurrentVersion)
 	require.Equal(t, uint64(2), ring.UpgradeInfo.GetNextVersion())
-	require.Equal(t, int64(212), ring.UpgradeInfo.GetActivationHeight())
+	require.Equal(t, baseTime+1202, ring.UpgradeInfo.GetActivationTime())
 
 	seenEvent := func(suffix string) bool {
 		for _, event := range ctx.EventManager().Events() {
