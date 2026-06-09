@@ -32,18 +32,25 @@ func KeyPrefix(p string) []byte {
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
 // peerNodeKeys are sorted before hashing so the ID is order-independent.
-func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutable.Option[uint64], policyID string, nonce immutable.Option[string]) string {
+func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutable.Option[uint64], policyID string, nonce immutable.Option[string], currentVersion uint64) string {
 	sorted := make([]string, len(peerNodeKeys))
 	copy(sorted, peerNodeKeys)
 	sort.Strings(sorted)
 
-	h := newIDHasher("orbis/ring/v1")
+	h := newIDHasher("orbis/ring")
 	h.writeStringSlice(sorted)
 	h.writeUint32(threshold)
 	h.writeOptionalUint64(pssInterval)
 	h.writeString(policyID)
 	h.writeOptionalString(nonce)
+	h.writeUint64(currentVersion)
 	return h.sum()
+}
+
+func (h *idHasher) writeUint64(value uint64) {
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], value)
+	h.bytes = append(h.bytes, buf[:]...)
 }
 
 // GenerateDocumentID returns the stable ID for an encrypted document.

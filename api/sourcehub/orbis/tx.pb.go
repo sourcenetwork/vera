@@ -124,9 +124,10 @@ type MsgCreateRing struct {
 	PssInterval *uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
 	PolicyId    string  `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	// Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
-	Nonce         *string `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Nonce          *string `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
+	CurrentVersion uint64  `protobuf:"varint,7,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *MsgCreateRing) Reset() {
@@ -199,6 +200,13 @@ func (x *MsgCreateRing) GetNonce() string {
 		return *x.Nonce
 	}
 	return ""
+}
+
+func (x *MsgCreateRing) GetCurrentVersion() uint64 {
+	if x != nil {
+		return x.CurrentVersion
+	}
+	return 0
 }
 
 type MsgCreateRingResponse struct {
@@ -349,7 +357,12 @@ type MsgUpdateRingByAcp struct {
 	// Absent means no pending threshold update.
 	NewThreshold *uint32 `protobuf:"varint,4,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Absent means no PSS refresh interval update.
-	PssInterval   *uint64 `protobuf:"varint,5,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	PssInterval *uint64 `protobuf:"varint,5,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	// next_version and activation_height must be supplied together.
+	NextVersion      *uint64 `protobuf:"varint,6,opt,name=next_version,json=nextVersion,proto3,oneof" json:"next_version,omitempty"`
+	ActivationHeight *int64  `protobuf:"varint,7,opt,name=activation_height,json=activationHeight,proto3,oneof" json:"activation_height,omitempty"`
+	// Clears a pending upgrade before activation. Mutually exclusive with a new schedule.
+	ClearUpgrade  bool `protobuf:"varint,8,opt,name=clear_upgrade,json=clearUpgrade,proto3" json:"clear_upgrade,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -417,6 +430,27 @@ func (x *MsgUpdateRingByAcp) GetPssInterval() uint64 {
 		return *x.PssInterval
 	}
 	return 0
+}
+
+func (x *MsgUpdateRingByAcp) GetNextVersion() uint64 {
+	if x != nil && x.NextVersion != nil {
+		return *x.NextVersion
+	}
+	return 0
+}
+
+func (x *MsgUpdateRingByAcp) GetActivationHeight() int64 {
+	if x != nil && x.ActivationHeight != nil {
+		return *x.ActivationHeight
+	}
+	return 0
+}
+
+func (x *MsgUpdateRingByAcp) GetClearUpgrade() bool {
+	if x != nil {
+		return x.ClearUpgrade
+	}
+	return false
 }
 
 type MsgUpdateRingByAcpResponse struct {
@@ -1285,14 +1319,15 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x12:\n" +
 	"\x06params\x18\x02 \x01(\v2\x17.sourcehub.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:4\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*!sourcehub/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xf6\x01\n" +
+	"\x17MsgUpdateParamsResponse\"\x9f\x02\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
 	"\tthreshold\x18\x03 \x01(\rR\tthreshold\x12&\n" +
 	"\fpss_interval\x18\x04 \x01(\x04H\x00R\vpssInterval\x88\x01\x01\x12\x1b\n" +
 	"\tpolicy_id\x18\x05 \x01(\tR\bpolicyId\x12\x19\n" +
-	"\x05nonce\x18\x06 \x01(\tH\x01R\x05nonce\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
+	"\x05nonce\x18\x06 \x01(\tH\x01R\x05nonce\x88\x01\x01\x12'\n" +
+	"\x0fcurrent_version\x18\a \x01(\x04R\x0ecurrentVersion:\f\x82\xe7\xb0*\acreatorB\x0f\n" +
 	"\r_pss_intervalB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
@@ -1301,15 +1336,20 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x17\n" +
 	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"\x19\n" +
-	"\x17MsgFinalizeRingResponse\"\xf7\x01\n" +
+	"\x17MsgFinalizeRingResponse\"\x9d\x03\n" +
 	"\x12MsgUpdateRingByAcp\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12+\n" +
 	"\x12new_peer_node_keys\x18\x03 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
 	"\rnew_threshold\x18\x04 \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
-	"\fpss_interval\x18\x05 \x01(\x04H\x01R\vpssInterval\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x10\n" +
+	"\fpss_interval\x18\x05 \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12&\n" +
+	"\fnext_version\x18\x06 \x01(\x04H\x02R\vnextVersion\x88\x01\x01\x120\n" +
+	"\x11activation_height\x18\a \x01(\x03H\x03R\x10activationHeight\x88\x01\x01\x12#\n" +
+	"\rclear_upgrade\x18\b \x01(\bR\fclearUpgrade:\f\x82\xe7\xb0*\acreatorB\x10\n" +
 	"\x0e_new_thresholdB\x0f\n" +
-	"\r_pss_interval\"\x1c\n" +
+	"\r_pss_intervalB\x0f\n" +
+	"\r_next_versionB\x14\n" +
+	"\x12_activation_height\"\x1c\n" +
 	"\x1aMsgUpdateRingByAcpResponse\"\xb6\x01\n" +
 	"*MsgFinalizeRingReshareByThresholdSignature\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +

@@ -38,6 +38,20 @@ func optionalUpdateRingPSSInterval(msg *types.MsgUpdateRingByAcp) immutable.Opti
 	return immutable.Some(value)
 }
 
+func optionalUpdateRingNextVersion(msg *types.MsgUpdateRingByAcp) immutable.Option[uint64] {
+	if msg.XNextVersion == nil {
+		return immutable.None[uint64]()
+	}
+	return immutable.Some(msg.GetNextVersion())
+}
+
+func optionalUpdateRingActivationHeight(msg *types.MsgUpdateRingByAcp) immutable.Option[int64] {
+	if msg.XActivationHeight == nil {
+		return immutable.None[int64]()
+	}
+	return immutable.Some(msg.GetActivationHeight())
+}
+
 func optionalStoreDocumentTier(msg *types.MsgStoreDocument) immutable.Option[string] {
 	if msg.XTier == nil {
 		return immutable.None[string]()

@@ -52,6 +52,7 @@ message MsgCreateRing {
   string policy_id = 5;
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
   optional string nonce = 6;
+  uint64 current_version = 7;
 }
 
 message MsgCreateRingResponse {
@@ -76,6 +77,11 @@ message MsgUpdateRingByAcp {
   optional uint32 new_threshold = 4;
   // Absent means no PSS refresh interval update.
   optional uint64 pss_interval = 5;
+  // next_version and activation_height must be supplied together.
+  optional uint64 next_version = 6;
+  optional int64 activation_height = 7;
+  // Clears a pending upgrade before activation. Mutually exclusive with a new schedule.
+  bool clear_upgrade = 8;
 }
 
 message MsgUpdateRingByAcpResponse {}

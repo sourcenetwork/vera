@@ -1,7 +1,16 @@
 syntax = "proto3";
 package sourcehub.orbis;
 
+import "gogoproto/gogo.proto";
+
 option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// UpgradeInfo stores the active protocol epoch and an optional pending upgrade.
+message UpgradeInfo {
+  uint64 current_version = 1;
+  optional uint64 next_version = 2;
+  optional int64 activation_height = 3;
+}
 
 // Ring stores the active and pending committee metadata for an Orbis ring.
 message Ring {
@@ -18,6 +27,7 @@ message Ring {
   uint64 block_number_nonce = 9;
   string policy_id = 10;
   repeated RingConfirmation confirmations = 11;
+  UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key.

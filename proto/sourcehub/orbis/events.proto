@@ -45,3 +45,22 @@ message EventRingDeleted {
   string ring_id = 1;
   string reason = 2;
 }
+
+message EventRingUpgradeScheduled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+  uint64 next_version = 3;
+  int64 activation_height = 4;
+}
+
+message EventRingUpgradeCancelled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+}
+
+message EventRingUpgradeNormalized {
+  string ring_id = 1;
+  uint64 previous_version = 2;
+  uint64 current_version = 3;
+  int64 activation_height = 4;
+}

@@ -240,7 +240,7 @@ func TestMsgServer_CreateRing_PeerKeyOrderDoesNotAffectRingID(t *testing.T) {
 	require.NoError(t, err)
 
 	// GenerateRingID with keys in the opposite order must produce the same ID
-	require.Equal(t, types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]()), resp.RingId)
+	require.Equal(t, types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0), resp.RingId)
 }
 
 func TestMsgServer_CreateRingRequiresPolicyID(t *testing.T) {
@@ -266,7 +266,7 @@ func TestMsgServer_CreateRingRequiresExistingRingPolicy(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), "missing-policy", immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), "missing-policy", immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -285,7 +285,7 @@ func TestMsgServer_CreateRingRequiresRegisteredRingPolicyControlObject(t *testin
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testOrbisRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -304,7 +304,7 @@ func TestMsgServer_CreateRingRequiresPolicyWithRingResource(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testNonRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -325,7 +325,7 @@ func TestMsgServer_CreateRingRejectsActorWithoutCreatePermission(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, policyOwnerCtx, "12D3KooWPeer1")
 	policyID := createOrbisRingPolicy(t, k, policyOwnerCtx, policyOwnerAddr)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -577,7 +577,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]()),
+		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0),
 		createRingResp.RingId,
 	)
 
@@ -626,7 +626,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.Some(pssInterval), policyID, immutable.None[string]()),
+		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.Some(pssInterval), policyID, immutable.None[string](), 0),
 		createRingResp.RingId,
 	)
 

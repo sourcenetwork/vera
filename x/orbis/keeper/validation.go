@@ -10,6 +10,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
+const MinRingUpgradeLeadBlocks int64 = 100
+
 func requireRingFinalized(ring *types.Ring) error {
 	if ring.RingPk == "" {
 		return types.ErrRingNotFinalized
@@ -27,6 +29,9 @@ func validateRing(ring *types.Ring) error {
 		return errorsmod.Wrapf(types.ErrInvalidRing, "threshold %d is invalid for committee size %d", ring.Threshold, len(ring.PeerNodeKeys))
 	case ring.PolicyId == "":
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing policy_id")
+	}
+	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
+		return err
 	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
@@ -57,7 +62,15 @@ func validateRing(ring *types.Ring) error {
 	return nil
 }
 
-func validateRingUpdate(newPeerNodeKeys []string, newThreshold immutable.Option[uint32], existing *types.Ring) error {
+func validateRingUpdate(
+	newPeerNodeKeys []string,
+	newThreshold immutable.Option[uint32],
+	nextVersion immutable.Option[uint64],
+	activationHeight immutable.Option[int64],
+	clearUpgrade bool,
+	currentHeight int64,
+	existing *types.Ring,
+) error {
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
 	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold.HasValue()
 	if reshareInProgress && touchingReshareFields {
@@ -89,8 +102,72 @@ func validateRingUpdate(newPeerNodeKeys []string, newThreshold immutable.Option[
 			return err
 		}
 	}
+	if nextVersion.HasValue() != activationHeight.HasValue() {
+		return errorsmod.Wrap(types.ErrInvalidRing, "next_version and activation_height must be supplied together")
+	}
+	if clearUpgrade && nextVersion.HasValue() {
+		return errorsmod.Wrap(types.ErrInvalidRing, "clear_upgrade cannot be combined with a new upgrade schedule")
+	}
+	if nextVersion.HasValue() {
+		if nextVersion.Value() <= existing.UpgradeInfo.CurrentVersion {
+			return errorsmod.Wrapf(
+				types.ErrInvalidRing,
+				"next_version (%d) must be greater than current_version (%d)",
+				nextVersion.Value(),
+				existing.UpgradeInfo.CurrentVersion,
+			)
+		}
+		minimumActivationHeight := currentHeight + MinRingUpgradeLeadBlocks
+		if activationHeight.Value() < minimumActivationHeight {
+			return errorsmod.Wrapf(
+				types.ErrInvalidRing,
+				"activation_height (%d) must be at least %d",
+				activationHeight.Value(),
+				minimumActivationHeight,
+			)
+		}
+	}
 
 	return nil
+}
+
+func validateUpgradeInfo(info *types.UpgradeInfo) error {
+	if (info.XNextVersion == nil) != (info.XActivationHeight == nil) {
+		return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version and activation_height must both be set or both be absent")
+	}
+	if info.XNextVersion != nil {
+		if info.GetNextVersion() <= info.CurrentVersion {
+			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version must be greater than current_version")
+		}
+		if info.GetActivationHeight() <= 0 {
+			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade activation_height must be positive")
+		}
+	}
+	return nil
+}
+
+func normalizeRingUpgrade(ring *types.Ring, currentHeight int64) (bool, uint64, int64) {
+	if ring.UpgradeInfo.XNextVersion == nil || ring.UpgradeInfo.XActivationHeight == nil {
+		return false, 0, 0
+	}
+	activationHeight := ring.UpgradeInfo.GetActivationHeight()
+	if currentHeight < activationHeight {
+		return false, 0, 0
+	}
+	previousVersion := ring.UpgradeInfo.CurrentVersion
+	ring.UpgradeInfo.CurrentVersion = ring.UpgradeInfo.GetNextVersion()
+	clearRingUpgrade(ring)
+	return true, previousVersion, activationHeight
+}
+
+func clearRingUpgrade(ring *types.Ring) {
+	ring.UpgradeInfo.XNextVersion = nil
+	ring.UpgradeInfo.XActivationHeight = nil
+}
+
+func setRingUpgrade(ring *types.Ring, nextVersion uint64, activationHeight int64) {
+	ring.UpgradeInfo.XNextVersion = &types.UpgradeInfo_NextVersion{NextVersion: nextVersion}
+	ring.UpgradeInfo.XActivationHeight = &types.UpgradeInfo_ActivationHeight{ActivationHeight: activationHeight}
 }
 
 func validateEffectiveReshareThreshold(threshold uint32, committeeSize int) error {

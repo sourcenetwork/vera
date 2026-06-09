@@ -7,6 +7,7 @@
 package orbis
 
 import (
+	_ "github.com/cosmos/gogoproto/gogoproto"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -20,6 +21,67 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+// UpgradeInfo stores the active protocol epoch and an optional pending upgrade.
+type UpgradeInfo struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	CurrentVersion   uint64                 `protobuf:"varint,1,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	NextVersion      *uint64                `protobuf:"varint,2,opt,name=next_version,json=nextVersion,proto3,oneof" json:"next_version,omitempty"`
+	ActivationHeight *int64                 `protobuf:"varint,3,opt,name=activation_height,json=activationHeight,proto3,oneof" json:"activation_height,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *UpgradeInfo) Reset() {
+	*x = UpgradeInfo{}
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpgradeInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpgradeInfo) ProtoMessage() {}
+
+func (x *UpgradeInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpgradeInfo.ProtoReflect.Descriptor instead.
+func (*UpgradeInfo) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *UpgradeInfo) GetCurrentVersion() uint64 {
+	if x != nil {
+		return x.CurrentVersion
+	}
+	return 0
+}
+
+func (x *UpgradeInfo) GetNextVersion() uint64 {
+	if x != nil && x.NextVersion != nil {
+		return *x.NextVersion
+	}
+	return 0
+}
+
+func (x *UpgradeInfo) GetActivationHeight() int64 {
+	if x != nil && x.ActivationHeight != nil {
+		return *x.ActivationHeight
+	}
+	return 0
+}
 
 // Ring stores the active and pending committee metadata for an Orbis ring.
 type Ring struct {
@@ -37,13 +99,14 @@ type Ring struct {
 	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
 	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
+	UpgradeInfo      *UpgradeInfo        `protobuf:"bytes,12,opt,name=upgrade_info,json=upgradeInfo,proto3" json:"upgrade_info,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
 	*x = Ring{}
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[0]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -55,7 +118,7 @@ func (x *Ring) String() string {
 func (*Ring) ProtoMessage() {}
 
 func (x *Ring) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[0]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -68,7 +131,7 @@ func (x *Ring) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ring.ProtoReflect.Descriptor instead.
 func (*Ring) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{0}
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Ring) GetId() string {
@@ -148,6 +211,13 @@ func (x *Ring) GetConfirmations() []*RingConfirmation {
 	return nil
 }
 
+func (x *Ring) GetUpgradeInfo() *UpgradeInfo {
+	if x != nil {
+		return x.UpgradeInfo
+	}
+	return nil
+}
+
 // RingConfirmation records a single peer's agreement on the ring public key.
 type RingConfirmation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -159,7 +229,7 @@ type RingConfirmation struct {
 
 func (x *RingConfirmation) Reset() {
 	*x = RingConfirmation{}
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -171,7 +241,7 @@ func (x *RingConfirmation) String() string {
 func (*RingConfirmation) ProtoMessage() {}
 
 func (x *RingConfirmation) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[1]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,7 +254,7 @@ func (x *RingConfirmation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingConfirmation.ProtoReflect.Descriptor instead.
 func (*RingConfirmation) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{1}
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *RingConfirmation) GetNodeKey() string {
@@ -205,7 +275,13 @@ var File_sourcehub_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\n" +
-	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\"\xca\x03\n" +
+	"\x1asourcehub/orbis/ring.proto\x12\x0fsourcehub.orbis\x1a\x14gogoproto/gogo.proto\"\xb7\x01\n" +
+	"\vUpgradeInfo\x12'\n" +
+	"\x0fcurrent_version\x18\x01 \x01(\x04R\x0ecurrentVersion\x12&\n" +
+	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x120\n" +
+	"\x11activation_height\x18\x03 \x01(\x03H\x01R\x10activationHeight\x88\x01\x01B\x0f\n" +
+	"\r_next_versionB\x14\n" +
+	"\x12_activation_height\"\x91\x04\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -219,7 +295,8 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\x12block_number_nonce\x18\t \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
 	"\tpolicy_id\x18\n" +
 	" \x01(\tR\bpolicyId\x12G\n" +
-	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmationsB\x10\n" +
+	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmations\x12E\n" +
+	"\fupgrade_info\x18\f \x01(\v2\x1c.sourcehub.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfoB\x10\n" +
 	"\x0e_new_thresholdB\x0f\n" +
 	"\r_pss_interval\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +
@@ -239,18 +316,20 @@ func file_sourcehub_orbis_ring_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_ring_proto_rawDescData
 }
 
-var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_sourcehub_orbis_ring_proto_goTypes = []any{
-	(*Ring)(nil),             // 0: sourcehub.orbis.Ring
-	(*RingConfirmation)(nil), // 1: sourcehub.orbis.RingConfirmation
+	(*UpgradeInfo)(nil),      // 0: sourcehub.orbis.UpgradeInfo
+	(*Ring)(nil),             // 1: sourcehub.orbis.Ring
+	(*RingConfirmation)(nil), // 2: sourcehub.orbis.RingConfirmation
 }
 var file_sourcehub_orbis_ring_proto_depIdxs = []int32{
-	1, // 0: sourcehub.orbis.Ring.confirmations:type_name -> sourcehub.orbis.RingConfirmation
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 0: sourcehub.orbis.Ring.confirmations:type_name -> sourcehub.orbis.RingConfirmation
+	0, // 1: sourcehub.orbis.Ring.upgrade_info:type_name -> sourcehub.orbis.UpgradeInfo
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_orbis_ring_proto_init() }
@@ -259,13 +338,14 @@ func file_sourcehub_orbis_ring_proto_init() {
 		return
 	}
 	file_sourcehub_orbis_ring_proto_msgTypes[0].OneofWrappers = []any{}
+	file_sourcehub_orbis_ring_proto_msgTypes[1].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_ring_proto_rawDesc), len(file_sourcehub_orbis_ring_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

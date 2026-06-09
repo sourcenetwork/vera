@@ -43,7 +43,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce)
+	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -55,6 +55,9 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		Threshold:        msg.Threshold,
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
+		UpgradeInfo: types.UpgradeInfo{
+			CurrentVersion: msg.CurrentVersion,
+		},
 	}
 	setRingPSSInterval(&ring, pssInterval)
 	if err := validateRing(&ring); err != nil {
@@ -180,7 +183,19 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	}
 
 	newThreshold := optionalUpdateRingNewThreshold(msg)
-	if err := validateRingUpdate(msg.NewPeerNodeKeys, newThreshold, ring); err != nil {
+	nextVersion := optionalUpdateRingNextVersion(msg)
+	activationHeight := optionalUpdateRingActivationHeight(msg)
+	normalized, previousVersion, normalizedActivationHeight := normalizeRingUpgrade(ring, ctx.BlockHeight())
+	hadPendingUpgrade := ring.UpgradeInfo.XNextVersion != nil
+	if err := validateRingUpdate(
+		msg.NewPeerNodeKeys,
+		newThreshold,
+		nextVersion,
+		activationHeight,
+		msg.ClearUpgrade,
+		ctx.BlockHeight(),
+		ring,
+	); err != nil {
 		return nil, err
 	}
 	for _, nodeKey := range msg.NewPeerNodeKeys {
@@ -208,6 +223,12 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	if msg.XPssInterval != nil {
 		setRingPSSInterval(ring, optionalUpdateRingPSSInterval(msg))
 	}
+	if msg.ClearUpgrade {
+		clearRingUpgrade(ring)
+	}
+	if nextVersion.HasValue() {
+		setRingUpgrade(ring, nextVersion.Value(), activationHeight.Value())
+	}
 	if err := validateRing(ring); err != nil {
 		return nil, err
 	}
@@ -219,6 +240,33 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		UpdaterDid: updaterDID,
 	}); err != nil {
 		return nil, err
+	}
+	if normalized {
+		if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeNormalized{
+			RingId:           ring.Id,
+			PreviousVersion:  previousVersion,
+			CurrentVersion:   ring.UpgradeInfo.CurrentVersion,
+			ActivationHeight: normalizedActivationHeight,
+		}); err != nil {
+			return nil, err
+		}
+	}
+	if nextVersion.HasValue() {
+		if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeScheduled{
+			RingId:           ring.Id,
+			CurrentVersion:   ring.UpgradeInfo.CurrentVersion,
+			NextVersion:      nextVersion.Value(),
+			ActivationHeight: activationHeight.Value(),
+		}); err != nil {
+			return nil, err
+		}
+	} else if msg.ClearUpgrade && hadPendingUpgrade && !normalized {
+		if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeCancelled{
+			RingId:         ring.Id,
+			CurrentVersion: ring.UpgradeInfo.CurrentVersion,
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	return &types.MsgUpdateRingByAcpResponse{}, nil
