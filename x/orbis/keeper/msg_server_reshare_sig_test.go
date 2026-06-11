@@ -5,11 +5,12 @@ import (
 	"encoding/hex"
 	"math/big"
 	"testing"
+	"time"
 
 	decaf377 "github.com/mizufinance/decaf377-go"
 	"github.com/mizufinance/decaf377-go/orbisfrost"
-	blst "github.com/supranational/blst/bindings/go"
 	"github.com/stretchr/testify/require"
+	blst "github.com/supranational/blst/bindings/go"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
@@ -17,7 +18,9 @@ import (
 
 func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
-	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+	ctx = ctx.
+		WithValue(appparams.ExtractedDIDContextKey, testDID).
+		WithBlockTime(time.Unix(int64(ringUpgradeBaseTime), 0))
 
 	// BLS key pair — G1 public key, G2 signature scheme.
 	ikm := make([]byte, 32)
@@ -59,7 +62,22 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	})
 	require.NoError(t, err)
 
+	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+		Creator: creatorAddr,
+		RingId:  ringID,
+		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
+			NextVersion: 1,
+		},
+		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+			ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
+		},
+	})
+	require.NoError(t, err)
+
 	ring := k.GetRing(ctx, ringID)
+	require.Equal(t, uint64(0), ring.UpgradeInfo.CurrentVersion)
+	require.Equal(t, uint64(1), ring.UpgradeInfo.GetNextVersion())
+	require.Equal(t, ringUpgradeBaseTime+MinRingUpgradeLeadSeconds, ring.UpgradeInfo.GetActivationTime())
 	finalizedRing, err := ringForReshareFinalization(ring)
 	require.NoError(t, err)
 	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), ring, finalizedRing)
@@ -83,6 +101,9 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	require.Empty(t, updated.NewPeerNodeKeys)
 	require.Nil(t, updated.XNewThreshold)
 	require.Equal(t, uint64(ctx.BlockHeight()), updated.BlockNumberNonce)
+	require.Equal(t, uint64(0), updated.UpgradeInfo.CurrentVersion)
+	require.Equal(t, uint64(1), updated.UpgradeInfo.GetNextVersion())
+	require.Equal(t, ringUpgradeBaseTime+MinRingUpgradeLeadSeconds, updated.UpgradeInfo.GetActivationTime())
 }
 
 func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *testing.T) {

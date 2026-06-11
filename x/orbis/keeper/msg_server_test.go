@@ -992,9 +992,30 @@ func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 
+	_, err = k.UpdateRingByAcp(outsiderCtx, &types.MsgUpdateRingByAcp{
+		Creator: outsiderAddr,
+		RingId:  createRingResp.RingId,
+		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
+			NextVersion: 1,
+		},
+		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
+			ActivationTime: MinRingUpgradeLeadSeconds,
+		},
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
+	_, err = k.UpdateRingByAcp(outsiderCtx, &types.MsgUpdateRingByAcp{
+		Creator:      outsiderAddr,
+		RingId:       createRingResp.RingId,
+		ClearUpgrade: true,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
 	ring := k.GetRing(creatorCtx, createRingResp.RingId)
 	require.NotNil(t, ring)
 	require.Nil(t, ring.XPssInterval)
+	require.Nil(t, ring.UpgradeInfo.XNextVersion)
+	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 }
 
 func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
