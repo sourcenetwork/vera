@@ -31,19 +31,26 @@ func setupFinalizedRingUpgradeFixture(t *testing.T, currentVersion uint64) ringU
 		WithBlockTime(time.Unix(int64(ringUpgradeBaseTime), 0))
 
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
-	peerAddr, peerKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWUpgradeFixturePeer")
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWUpgradeFixturePeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWUpgradeFixturePeer2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	createResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:        creatorAddr,
-		PeerNodeKeys:   []string{peerKey},
+		PeerNodeKeys:   []string{peer1Key, peer2Key},
 		Threshold:      1,
 		PolicyId:       policyID,
 		CurrentVersion: currentVersion,
 	})
 	require.NoError(t, err)
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
-		Creator: peerAddr,
+		Creator: peer1Addr,
+		RingId:  createResp.RingId,
+		RingPk:  "ring-pk",
+	})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer2Addr,
 		RingId:  createResp.RingId,
 		RingPk:  "ring-pk",
 	})
@@ -69,15 +76,11 @@ func scheduleRingUpgrade(
 	updateCtx := fixture.ctx.
 		WithBlockTime(time.Unix(int64(currentTime), 0)).
 		WithEventManager(sdk.NewEventManager())
-	_, err := fixture.k.UpdateRingByAcp(updateCtx, &types.MsgUpdateRingByAcp{
-		Creator: fixture.creatorAddr,
-		RingId:  fixture.ringID,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: nextVersion,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: activationTime,
-		},
+	_, err := fixture.k.ScheduleRingUpgradeByAcp(updateCtx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		NextVersion:    nextVersion,
+		ActivationTime: activationTime,
 	})
 	require.NoError(t, err)
 	return updateCtx
@@ -135,64 +138,30 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, uint64(0), k.GetRing(ctx, createVersionZero.RingId).UpgradeInfo.CurrentVersion)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator: creatorAddr,
-		RingId:  createVersionZero.RingId,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 1,
-		},
-	})
-	require.ErrorContains(t, err, "must be supplied together")
-
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator: creatorAddr,
-		RingId:  createVersionZero.RingId,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 1,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: baseTime + 599,
-		},
+	_, err = k.ScheduleRingUpgradeByAcp(ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        creatorAddr,
+		RingId:         createVersionZero.RingId,
+		NextVersion:    1,
+		ActivationTime: baseTime + 599,
 	})
 	require.ErrorContains(t, err, "must be at least 1800000600")
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator: creatorAddr,
-		RingId:  createVersionZero.RingId,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 0,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: baseTime + 600,
-		},
+	_, err = k.ScheduleRingUpgradeByAcp(ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        creatorAddr,
+		RingId:         createVersionZero.RingId,
+		NextVersion:    0,
+		ActivationTime: baseTime + 600,
 	})
 	require.ErrorContains(t, err, "must be greater than current_version")
-
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator:      creatorAddr,
-		RingId:       createVersionZero.RingId,
-		ClearUpgrade: true,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 1,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: baseTime + 600,
-		},
-	})
-	require.ErrorContains(t, err, "cannot be combined")
 
 	schedule := func(atTime uint64, nextVersion uint64, activationTime uint64) {
 		t.Helper()
 		updateCtx := ctx.WithBlockTime(time.Unix(int64(atTime), 0))
-		_, updateErr := k.UpdateRingByAcp(updateCtx, &types.MsgUpdateRingByAcp{
-			Creator: creatorAddr,
-			RingId:  createVersionZero.RingId,
-			XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-				NextVersion: nextVersion,
-			},
-			XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-				ActivationTime: activationTime,
-			},
+		_, updateErr := k.ScheduleRingUpgradeByAcp(updateCtx, &types.MsgScheduleRingUpgradeByAcp{
+			Creator:        creatorAddr,
+			RingId:         createVersionZero.RingId,
+			NextVersion:    nextVersion,
+			ActivationTime: activationTime,
 		})
 		require.NoError(t, updateErr)
 	}
@@ -208,10 +177,9 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.Equal(t, uint64(2), ring.UpgradeInfo.GetNextVersion())
 	require.Equal(t, baseTime+601, ring.UpgradeInfo.GetActivationTime())
 
-	_, err = k.UpdateRingByAcp(ctx.WithBlockTime(time.Unix(int64(baseTime+2), 0)), &types.MsgUpdateRingByAcp{
-		Creator:      creatorAddr,
-		RingId:       createVersionZero.RingId,
-		ClearUpgrade: true,
+	_, err = k.CancelRingUpgradeByAcp(ctx.WithBlockTime(time.Unix(int64(baseTime+2), 0)), &types.MsgCancelRingUpgradeByAcp{
+		Creator: creatorAddr,
+		RingId:  createVersionZero.RingId,
 	})
 	require.NoError(t, err)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
@@ -219,10 +187,16 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 
 	schedule(baseTime+2, 1, baseTime+602)
-	_, err = k.UpdateRingByAcp(ctx.WithBlockTime(time.Unix(int64(baseTime+602), 0)), &types.MsgUpdateRingByAcp{
-		Creator:      creatorAddr,
-		RingId:       createVersionZero.RingId,
-		ClearUpgrade: true,
+	activationCtx := ctx.WithBlockTime(time.Unix(int64(baseTime+602), 0))
+	_, err = k.CancelRingUpgradeByAcp(activationCtx, &types.MsgCancelRingUpgradeByAcp{
+		Creator: creatorAddr,
+		RingId:  createVersionZero.RingId,
+	})
+	require.ErrorIs(t, err, types.ErrRingUpgradeAlreadyActive)
+	_, err = k.SetRingPssIntervalByAcp(activationCtx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     creatorAddr,
+		RingId:      createVersionZero.RingId,
+		PssInterval: 900,
 	})
 	require.NoError(t, err)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
@@ -265,20 +239,22 @@ func TestRingUpgradeRemainsPendingUntilAnUpdateNormalizesIt(t *testing.T) {
 	require.Empty(t, queryCtx.EventManager().Events())
 }
 
-func TestRingUpgradeActivationTimeRequiresNextVersion(t *testing.T) {
+func TestRingUpgradeScheduleValidateBasicRejectsZeroFields(t *testing.T) {
 	fixture := setupFinalizedRingUpgradeFixture(t, 0)
-	before := fixture.k.GetRing(fixture.ctx, fixture.ringID)
 
-	_, err := fixture.k.UpdateRingByAcp(fixture.ctx, &types.MsgUpdateRingByAcp{
-		Creator: fixture.creatorAddr,
-		RingId:  fixture.ringID,
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
-		},
-	})
-	require.ErrorContains(t, err, "must be supplied together")
-	require.Equal(t, before, fixture.k.GetRing(fixture.ctx, fixture.ringID))
-	require.Empty(t, fixture.ctx.EventManager().Events())
+	err := (&types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
+	}).ValidateBasic()
+	require.ErrorContains(t, err, "next_version must be positive")
+
+	err = (&types.MsgScheduleRingUpgradeByAcp{
+		Creator:     fixture.creatorAddr,
+		RingId:      fixture.ringID,
+		NextVersion: 1,
+	}).ValidateBasic()
+	require.ErrorContains(t, err, "activation_time must be positive")
 }
 
 func TestRingUpgradeFailedUpdateDoesNotPersistNormalization(t *testing.T) {
@@ -290,15 +266,11 @@ func TestRingUpgradeFailedUpdateDoesNotPersistNormalization(t *testing.T) {
 	updateCtx := fixture.ctx.
 		WithBlockTime(time.Unix(int64(activationTime), 0)).
 		WithEventManager(sdk.NewEventManager())
-	_, err := fixture.k.UpdateRingByAcp(updateCtx, &types.MsgUpdateRingByAcp{
-		Creator: fixture.creatorAddr,
-		RingId:  fixture.ringID,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 1,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: activationTime + MinRingUpgradeLeadSeconds,
-		},
+	_, err := fixture.k.ScheduleRingUpgradeByAcp(updateCtx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		NextVersion:    1,
+		ActivationTime: activationTime + MinRingUpgradeLeadSeconds,
 	})
 	require.ErrorContains(t, err, "must be greater than current_version")
 	require.Equal(t, before, fixture.k.GetRing(updateCtx, fixture.ringID))
@@ -339,6 +311,73 @@ func TestRingUpgradeNormalizesAndReschedulesWithExactEvents(t *testing.T) {
 	}, events)
 }
 
+func TestRingUpgradeNormalizesWhenStartingReshare(t *testing.T) {
+	fixture := setupFinalizedRingUpgradeFixture(t, 0)
+	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
+	scheduleRingUpgrade(t, fixture, ringUpgradeBaseTime, 1, activationTime)
+
+	updateCtx := fixture.ctx.
+		WithBlockTime(time.Unix(int64(activationTime), 0)).
+		WithEventManager(sdk.NewEventManager())
+	_, err := fixture.k.StartRingReshareByAcp(updateCtx, &types.MsgStartRingReshareByAcp{
+		Creator: fixture.creatorAddr,
+		RingId:  fixture.ringID,
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
+			NewThreshold: 2,
+		},
+	})
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(updateCtx, fixture.ringID)
+	require.Equal(t, uint64(1), ring.UpgradeInfo.CurrentVersion)
+	require.Nil(t, ring.UpgradeInfo.XNextVersion)
+	require.Equal(t, uint32(2), ring.GetNewThreshold())
+	require.IsType(t, &types.EventRingUpgradeNormalized{}, parseTypedEvents(t, updateCtx)[1])
+}
+
+func TestRingUpgradeNormalizesWhenDisablingPss(t *testing.T) {
+	fixture := setupFinalizedRingUpgradeFixture(t, 0)
+	_, err := fixture.k.SetRingPssIntervalByAcp(fixture.ctx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     fixture.creatorAddr,
+		RingId:      fixture.ringID,
+		PssInterval: 300,
+	})
+	require.NoError(t, err)
+	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
+	scheduleRingUpgrade(t, fixture, ringUpgradeBaseTime, 1, activationTime)
+
+	updateCtx := fixture.ctx.
+		WithBlockTime(time.Unix(int64(activationTime), 0)).
+		WithEventManager(sdk.NewEventManager())
+	_, err = fixture.k.DisableRingPssByAcp(updateCtx, &types.MsgDisableRingPssByAcp{
+		Creator: fixture.creatorAddr,
+		RingId:  fixture.ringID,
+	})
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(updateCtx, fixture.ringID)
+	require.Equal(t, uint64(1), ring.UpgradeInfo.CurrentVersion)
+	require.Nil(t, ring.UpgradeInfo.XNextVersion)
+	require.Nil(t, ring.XPssInterval)
+	require.IsType(t, &types.EventRingUpgradeNormalized{}, parseTypedEvents(t, updateCtx)[1])
+}
+
+func TestRingUpgradeRejectsUnchangedSchedule(t *testing.T) {
+	fixture := setupFinalizedRingUpgradeFixture(t, 0)
+	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
+	scheduleRingUpgrade(t, fixture, ringUpgradeBaseTime, 1, activationTime)
+	before := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+
+	_, err := fixture.k.ScheduleRingUpgradeByAcp(fixture.ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		NextVersion:    1,
+		ActivationTime: activationTime,
+	})
+	require.ErrorIs(t, err, types.ErrRingUpgradeUnchanged)
+	require.Equal(t, before, fixture.k.GetRing(fixture.ctx, fixture.ringID))
+}
+
 func TestRingUpgradeCancellationEmitsExactEvent(t *testing.T) {
 	fixture := setupFinalizedRingUpgradeFixture(t, 3)
 	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
@@ -347,10 +386,9 @@ func TestRingUpgradeCancellationEmitsExactEvent(t *testing.T) {
 	updateCtx := fixture.ctx.
 		WithBlockTime(time.Unix(int64(ringUpgradeBaseTime+1), 0)).
 		WithEventManager(sdk.NewEventManager())
-	_, err := fixture.k.UpdateRingByAcp(updateCtx, &types.MsgUpdateRingByAcp{
-		Creator:      fixture.creatorAddr,
-		RingId:       fixture.ringID,
-		ClearUpgrade: true,
+	_, err := fixture.k.CancelRingUpgradeByAcp(updateCtx, &types.MsgCancelRingUpgradeByAcp{
+		Creator: fixture.creatorAddr,
+		RingId:  fixture.ringID,
 	})
 	require.NoError(t, err)
 
@@ -367,24 +405,18 @@ func TestRingUpgradeCancellationEmitsExactEvent(t *testing.T) {
 	}, events)
 }
 
-func TestRingUpgradeClearWithoutPendingUpgradeOnlyEmitsRingUpdated(t *testing.T) {
+func TestRingUpgradeCancelWithoutPendingUpgradeFails(t *testing.T) {
 	fixture := setupFinalizedRingUpgradeFixture(t, 3)
 
-	_, err := fixture.k.UpdateRingByAcp(fixture.ctx, &types.MsgUpdateRingByAcp{
-		Creator:      fixture.creatorAddr,
-		RingId:       fixture.ringID,
-		ClearUpgrade: true,
+	_, err := fixture.k.CancelRingUpgradeByAcp(fixture.ctx, &types.MsgCancelRingUpgradeByAcp{
+		Creator: fixture.creatorAddr,
+		RingId:  fixture.ringID,
 	})
-	require.NoError(t, err)
+	require.ErrorIs(t, err, types.ErrRingUpgradeNotScheduled)
 
 	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
 	require.Equal(t, uint64(3), ring.UpgradeInfo.CurrentVersion)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
 	require.Nil(t, ring.UpgradeInfo.XActivationTime)
-	require.Equal(t, []proto.Message{
-		&types.EventRingUpdated{
-			RingId:     fixture.ringID,
-			UpdaterDid: testDID,
-		},
-	}, parseTypedEvents(t, fixture.ctx))
+	require.Empty(t, parseTypedEvents(t, fixture.ctx))
 }

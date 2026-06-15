@@ -6,14 +6,14 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgUpdateNodeInfo{}
+var _ sdk.Msg = &MsgDisableRingPssByAcp{}
 
-func (msg *MsgUpdateNodeInfo) ValidateBasic() error {
+func (msg *MsgDisableRingPssByAcp) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
-	if msg.NodeKey == "" {
-		return errorsmod.Wrap(ErrInvalidNodeInfo, "missing node_key")
+	if msg.RingId == "" {
+		return ErrInvalidRingId
 	}
 	return nil
 }

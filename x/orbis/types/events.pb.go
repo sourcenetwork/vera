@@ -393,6 +393,7 @@ func (m *EventRingDeleted) GetReason() string {
 	return ""
 }
 
+// EventRingUpgradeScheduled is emitted when a future ring upgrade is scheduled.
 type EventRingUpgradeScheduled struct {
 	RingId         string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
 	CurrentVersion uint64 `protobuf:"varint,2,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
@@ -461,6 +462,7 @@ func (m *EventRingUpgradeScheduled) GetActivationTime() uint64 {
 	return 0
 }
 
+// EventRingUpgradeCancelled is emitted when a pending ring upgrade is cancelled.
 type EventRingUpgradeCancelled struct {
 	RingId         string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
 	CurrentVersion uint64 `protobuf:"varint,2,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
@@ -513,6 +515,7 @@ func (m *EventRingUpgradeCancelled) GetCurrentVersion() uint64 {
 	return 0
 }
 
+// EventRingUpgradeNormalized is emitted when a scheduled upgrade becomes active.
 type EventRingUpgradeNormalized struct {
 	RingId          string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
 	PreviousVersion uint64 `protobuf:"varint,2,opt,name=previous_version,json=previousVersion,proto3" json:"previous_version,omitempty"`

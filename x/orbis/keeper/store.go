@@ -11,6 +11,9 @@ import (
 )
 
 func (k *Keeper) SetRing(ctx context.Context, ring types.Ring) {
+	ring.PeerNodeKeys = canonicalNodeKeys(ring.PeerNodeKeys)
+	ring.NewPeerNodeKeys = canonicalNodeKeys(ring.NewPeerNodeKeys)
+
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.RingKeyPrefix))
 	bz := k.cdc.MustMarshal(&ring)

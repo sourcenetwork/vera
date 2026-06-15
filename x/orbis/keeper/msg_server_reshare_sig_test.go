@@ -52,25 +52,21 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBLSPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          ringID,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
 	require.NoError(t, err)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator: creatorAddr,
-		RingId:  ringID,
-		XNextVersion: &types.MsgUpdateRingByAcp_NextVersion{
-			NextVersion: 1,
-		},
-		XActivationTime: &types.MsgUpdateRingByAcp_ActivationTime{
-			ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
-		},
+	_, err = k.ScheduleRingUpgradeByAcp(ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        creatorAddr,
+		RingId:         ringID,
+		NextVersion:    1,
+		ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
 	})
 	require.NoError(t, err)
 
@@ -141,11 +137,11 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWFROSTPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          ringID,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})

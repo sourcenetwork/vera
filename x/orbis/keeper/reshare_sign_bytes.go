@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"crypto/sha256"
-	"sort"
+	"slices"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -50,9 +50,9 @@ func ringReshareSignStateHash(ring *types.Ring) ([]byte, error) {
 func ringReshareSignState(ring *types.Ring) types.RingReshareSignState {
 	signState := types.RingReshareSignState{
 		RingPk:           ring.RingPk,
-		PeerNodeKeys:     sortedStringCopy(ring.PeerNodeKeys),
+		PeerNodeKeys:     slices.Clone(ring.PeerNodeKeys),
 		Threshold:        ring.Threshold,
-		NewPeerNodeKeys:  sortedStringCopy(ring.NewPeerNodeKeys),
+		NewPeerNodeKeys:  slices.Clone(ring.NewPeerNodeKeys),
 		BlockNumberNonce: ring.BlockNumberNonce,
 		PolicyId:         ring.PolicyId,
 	}
@@ -63,10 +63,4 @@ func ringReshareSignState(ring *types.Ring) types.RingReshareSignState {
 	}
 
 	return signState
-}
-
-func sortedStringCopy(values []string) []string {
-	copied := append([]string(nil), values...)
-	sort.Strings(copied)
-	return copied
 }

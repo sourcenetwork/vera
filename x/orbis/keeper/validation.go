@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/hex"
+	"slices"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
@@ -9,8 +10,6 @@ import (
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
-
-const MinRingUpgradeLeadSeconds uint64 = 600
 
 func requireRingFinalized(ring *types.Ring) error {
 	if ring.RingPk == "" {
@@ -62,19 +61,24 @@ func validateRing(ring *types.Ring) error {
 	return nil
 }
 
-func validateRingUpdate(
+func validateStartRingReshare(
 	newPeerNodeKeys []string,
 	newThreshold immutable.Option[uint32],
-	nextVersion immutable.Option[uint64],
-	activationTime immutable.Option[uint64],
-	clearUpgrade bool,
-	currentTime uint64,
 	existing *types.Ring,
 ) error {
+	if len(newPeerNodeKeys) == 0 && !newThreshold.HasValue() {
+		return errorsmod.Wrap(types.ErrInvalidRing, "reshare must change the committee or threshold")
+	}
+
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
-	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold.HasValue()
-	if reshareInProgress && touchingReshareFields {
+	if reshareInProgress {
 		return types.ErrReshareInProgress
+	}
+
+	committeeChanged := len(newPeerNodeKeys) > 0 && !slices.Equal(newPeerNodeKeys, existing.PeerNodeKeys)
+	thresholdChanged := newThreshold.HasValue() && newThreshold.Value() != existing.Threshold
+	if !committeeChanged && !thresholdChanged {
+		return errorsmod.Wrap(types.ErrInvalidRing, "reshare must change the committee or threshold")
 	}
 
 	if len(newPeerNodeKeys) > 0 {
@@ -102,75 +106,7 @@ func validateRingUpdate(
 			return err
 		}
 	}
-	if nextVersion.HasValue() != activationTime.HasValue() {
-		return errorsmod.Wrap(types.ErrInvalidRing, "next_version and activation_time must be supplied together")
-	}
-	if clearUpgrade && nextVersion.HasValue() {
-		return errorsmod.Wrap(types.ErrInvalidRing, "clear_upgrade cannot be combined with a new upgrade schedule")
-	}
-	if nextVersion.HasValue() {
-		if nextVersion.Value() <= existing.UpgradeInfo.CurrentVersion {
-			return errorsmod.Wrapf(
-				types.ErrInvalidRing,
-				"next_version (%d) must be greater than current_version (%d)",
-				nextVersion.Value(),
-				existing.UpgradeInfo.CurrentVersion,
-			)
-		}
-		if currentTime > ^uint64(0)-MinRingUpgradeLeadSeconds {
-			return errorsmod.Wrap(types.ErrInvalidRing, "current block time is too large to schedule an upgrade")
-		}
-		minimumActivationTime := currentTime + MinRingUpgradeLeadSeconds
-		if activationTime.Value() < minimumActivationTime {
-			return errorsmod.Wrapf(
-				types.ErrInvalidRing,
-				"activation_time (%d) must be at least %d",
-				activationTime.Value(),
-				minimumActivationTime,
-			)
-		}
-	}
-
 	return nil
-}
-
-func validateUpgradeInfo(info *types.UpgradeInfo) error {
-	if (info.XNextVersion == nil) != (info.XActivationTime == nil) {
-		return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version and activation_time must both be set or both be absent")
-	}
-	if info.XNextVersion != nil {
-		if info.GetNextVersion() <= info.CurrentVersion {
-			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade next_version must be greater than current_version")
-		}
-		if info.GetActivationTime() == 0 {
-			return errorsmod.Wrap(types.ErrInvalidRing, "upgrade activation_time must be positive")
-		}
-	}
-	return nil
-}
-
-func normalizeRingUpgrade(ring *types.Ring, currentTime uint64) (bool, uint64, uint64) {
-	if ring.UpgradeInfo.XNextVersion == nil || ring.UpgradeInfo.XActivationTime == nil {
-		return false, 0, 0
-	}
-	activationTime := ring.UpgradeInfo.GetActivationTime()
-	if currentTime < activationTime {
-		return false, 0, 0
-	}
-	previousVersion := ring.UpgradeInfo.CurrentVersion
-	ring.UpgradeInfo.CurrentVersion = ring.UpgradeInfo.GetNextVersion()
-	clearRingUpgrade(ring)
-	return true, previousVersion, activationTime
-}
-
-func clearRingUpgrade(ring *types.Ring) {
-	ring.UpgradeInfo.XNextVersion = nil
-	ring.UpgradeInfo.XActivationTime = nil
-}
-
-func setRingUpgrade(ring *types.Ring, nextVersion uint64, activationTime uint64) {
-	ring.UpgradeInfo.XNextVersion = &types.UpgradeInfo_NextVersion{NextVersion: nextVersion}
-	ring.UpgradeInfo.XActivationTime = &types.UpgradeInfo_ActivationTime{ActivationTime: activationTime}
 }
 
 func validateEffectiveReshareThreshold(threshold uint32, committeeSize int) error {
@@ -220,7 +156,7 @@ func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	}
 
 	if len(finalized.NewPeerNodeKeys) > 0 {
-		finalized.PeerNodeKeys = append([]string(nil), finalized.NewPeerNodeKeys...)
+		finalized.PeerNodeKeys = slices.Clone(finalized.NewPeerNodeKeys)
 	}
 	if finalized.XNewThreshold != nil {
 		finalized.Threshold = finalized.GetNewThreshold()
@@ -262,24 +198,5 @@ func validateKeyDerivation(keyDerivation *types.KeyDerivation) error {
 	case keyDerivation.PolicyId == "" || keyDerivation.Resource == "" || keyDerivation.Permission == "":
 		return errorsmod.Wrap(types.ErrInvalidKeyDerivation, "missing policy binding")
 	}
-	return nil
-}
-
-// secp256k1 compressed public key length in bytes
-const compressedPubKeyLen = 33
-
-func validateNodeInfo(nodeInfo *types.NodeInfo) error {
-	switch {
-	case nodeInfo.PeerId == "":
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
-	case nodeInfo.ControllerKey == "":
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
-	}
-	keyHex := strings.ToLower(strings.TrimPrefix(nodeInfo.ControllerKey, "0x"))
-	decoded, err := hex.DecodeString(keyHex)
-	if err != nil || len(decoded) != compressedPubKeyLen {
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "invalid controller_key encoding")
-	}
-	nodeInfo.ControllerKey = keyHex
 	return nil
 }

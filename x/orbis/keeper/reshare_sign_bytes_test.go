@@ -19,9 +19,9 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Id:              "ring-id",
 		CreatorDid:      "did:example:one",
 		RingPk:          "ring-pk",
-		PeerNodeKeys:    []string{nodeB, nodeA},
+		PeerNodeKeys:    []string{nodeA, nodeB},
 		Threshold:       2,
-		NewPeerNodeKeys: []string{nodeD, nodeC},
+		NewPeerNodeKeys: []string{nodeC, nodeD},
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
@@ -46,6 +46,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 	finalized, err := ringForReshareFinalization(current)
 	require.NoError(t, err)
 	require.Equal(t, current.UpgradeInfo, finalized.UpgradeInfo)
+	require.Equal(t, []string{nodeC, nodeD}, finalized.PeerNodeKeys)
 
 	signBytes, err := ringReshareFinalizeSignBytes("sourcehub-test", current, finalized)
 	require.NoError(t, err)

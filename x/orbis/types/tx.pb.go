@@ -399,42 +399,28 @@ func (m *MsgFinalizeRingResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgFinalizeRingResponse proto.InternalMessageInfo
 
-type MsgUpdateRingByAcp struct {
+type MsgStartRingReshareByAcp struct {
 	Creator         string   `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	RingId          string   `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
 	NewPeerNodeKeys []string `protobuf:"bytes,3,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Types that are valid to be assigned to XNewThreshold:
 	//
-	//	*MsgUpdateRingByAcp_NewThreshold
-	XNewThreshold isMsgUpdateRingByAcp_XNewThreshold `protobuf_oneof:"_new_threshold"`
-	// Types that are valid to be assigned to XPssInterval:
-	//
-	//	*MsgUpdateRingByAcp_PssInterval
-	XPssInterval isMsgUpdateRingByAcp_XPssInterval `protobuf_oneof:"_pss_interval"`
-	// Types that are valid to be assigned to XNextVersion:
-	//
-	//	*MsgUpdateRingByAcp_NextVersion
-	XNextVersion isMsgUpdateRingByAcp_XNextVersion `protobuf_oneof:"_next_version"`
-	// Types that are valid to be assigned to XActivationTime:
-	//
-	//	*MsgUpdateRingByAcp_ActivationTime
-	XActivationTime isMsgUpdateRingByAcp_XActivationTime `protobuf_oneof:"_activation_time"`
-	// Clears a pending upgrade before activation. Mutually exclusive with a new schedule.
-	ClearUpgrade bool `protobuf:"varint,8,opt,name=clear_upgrade,json=clearUpgrade,proto3" json:"clear_upgrade,omitempty"`
+	//	*MsgStartRingReshareByAcp_NewThreshold
+	XNewThreshold isMsgStartRingReshareByAcp_XNewThreshold `protobuf_oneof:"_new_threshold"`
 }
 
-func (m *MsgUpdateRingByAcp) Reset()         { *m = MsgUpdateRingByAcp{} }
-func (m *MsgUpdateRingByAcp) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateRingByAcp) ProtoMessage()    {}
-func (*MsgUpdateRingByAcp) Descriptor() ([]byte, []int) {
+func (m *MsgStartRingReshareByAcp) Reset()         { *m = MsgStartRingReshareByAcp{} }
+func (m *MsgStartRingReshareByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgStartRingReshareByAcp) ProtoMessage()    {}
+func (*MsgStartRingReshareByAcp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7711ae63507074e0, []int{6}
 }
-func (m *MsgUpdateRingByAcp) XXX_Unmarshal(b []byte) error {
+func (m *MsgStartRingReshareByAcp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateRingByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgStartRingReshareByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateRingByAcp.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgStartRingReshareByAcp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -444,163 +430,87 @@ func (m *MsgUpdateRingByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateRingByAcp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateRingByAcp.Merge(m, src)
+func (m *MsgStartRingReshareByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgStartRingReshareByAcp.Merge(m, src)
 }
-func (m *MsgUpdateRingByAcp) XXX_Size() int {
+func (m *MsgStartRingReshareByAcp) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateRingByAcp) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateRingByAcp.DiscardUnknown(m)
+func (m *MsgStartRingReshareByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgStartRingReshareByAcp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateRingByAcp proto.InternalMessageInfo
+var xxx_messageInfo_MsgStartRingReshareByAcp proto.InternalMessageInfo
 
-type isMsgUpdateRingByAcp_XNewThreshold interface {
-	isMsgUpdateRingByAcp_XNewThreshold()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-type isMsgUpdateRingByAcp_XPssInterval interface {
-	isMsgUpdateRingByAcp_XPssInterval()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-type isMsgUpdateRingByAcp_XNextVersion interface {
-	isMsgUpdateRingByAcp_XNextVersion()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-type isMsgUpdateRingByAcp_XActivationTime interface {
-	isMsgUpdateRingByAcp_XActivationTime()
+type isMsgStartRingReshareByAcp_XNewThreshold interface {
+	isMsgStartRingReshareByAcp_XNewThreshold()
 	MarshalTo([]byte) (int, error)
 	Size() int
 }
 
-type MsgUpdateRingByAcp_NewThreshold struct {
+type MsgStartRingReshareByAcp_NewThreshold struct {
 	NewThreshold uint32 `protobuf:"varint,4,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 }
-type MsgUpdateRingByAcp_PssInterval struct {
-	PssInterval uint64 `protobuf:"varint,5,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
-}
-type MsgUpdateRingByAcp_NextVersion struct {
-	NextVersion uint64 `protobuf:"varint,6,opt,name=next_version,json=nextVersion,proto3,oneof" json:"next_version,omitempty"`
-}
-type MsgUpdateRingByAcp_ActivationTime struct {
-	ActivationTime uint64 `protobuf:"varint,7,opt,name=activation_time,json=activationTime,proto3,oneof" json:"activation_time,omitempty"`
-}
 
-func (*MsgUpdateRingByAcp_NewThreshold) isMsgUpdateRingByAcp_XNewThreshold()     {}
-func (*MsgUpdateRingByAcp_PssInterval) isMsgUpdateRingByAcp_XPssInterval()       {}
-func (*MsgUpdateRingByAcp_NextVersion) isMsgUpdateRingByAcp_XNextVersion()       {}
-func (*MsgUpdateRingByAcp_ActivationTime) isMsgUpdateRingByAcp_XActivationTime() {}
+func (*MsgStartRingReshareByAcp_NewThreshold) isMsgStartRingReshareByAcp_XNewThreshold() {}
 
-func (m *MsgUpdateRingByAcp) GetXNewThreshold() isMsgUpdateRingByAcp_XNewThreshold {
+func (m *MsgStartRingReshareByAcp) GetXNewThreshold() isMsgStartRingReshareByAcp_XNewThreshold {
 	if m != nil {
 		return m.XNewThreshold
 	}
 	return nil
 }
-func (m *MsgUpdateRingByAcp) GetXPssInterval() isMsgUpdateRingByAcp_XPssInterval {
-	if m != nil {
-		return m.XPssInterval
-	}
-	return nil
-}
-func (m *MsgUpdateRingByAcp) GetXNextVersion() isMsgUpdateRingByAcp_XNextVersion {
-	if m != nil {
-		return m.XNextVersion
-	}
-	return nil
-}
-func (m *MsgUpdateRingByAcp) GetXActivationTime() isMsgUpdateRingByAcp_XActivationTime {
-	if m != nil {
-		return m.XActivationTime
-	}
-	return nil
-}
 
-func (m *MsgUpdateRingByAcp) GetCreator() string {
+func (m *MsgStartRingReshareByAcp) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdateRingByAcp) GetRingId() string {
+func (m *MsgStartRingReshareByAcp) GetRingId() string {
 	if m != nil {
 		return m.RingId
 	}
 	return ""
 }
 
-func (m *MsgUpdateRingByAcp) GetNewPeerNodeKeys() []string {
+func (m *MsgStartRingReshareByAcp) GetNewPeerNodeKeys() []string {
 	if m != nil {
 		return m.NewPeerNodeKeys
 	}
 	return nil
 }
 
-func (m *MsgUpdateRingByAcp) GetNewThreshold() uint32 {
-	if x, ok := m.GetXNewThreshold().(*MsgUpdateRingByAcp_NewThreshold); ok {
+func (m *MsgStartRingReshareByAcp) GetNewThreshold() uint32 {
+	if x, ok := m.GetXNewThreshold().(*MsgStartRingReshareByAcp_NewThreshold); ok {
 		return x.NewThreshold
 	}
 	return 0
 }
 
-func (m *MsgUpdateRingByAcp) GetPssInterval() uint64 {
-	if x, ok := m.GetXPssInterval().(*MsgUpdateRingByAcp_PssInterval); ok {
-		return x.PssInterval
-	}
-	return 0
-}
-
-func (m *MsgUpdateRingByAcp) GetNextVersion() uint64 {
-	if x, ok := m.GetXNextVersion().(*MsgUpdateRingByAcp_NextVersion); ok {
-		return x.NextVersion
-	}
-	return 0
-}
-
-func (m *MsgUpdateRingByAcp) GetActivationTime() uint64 {
-	if x, ok := m.GetXActivationTime().(*MsgUpdateRingByAcp_ActivationTime); ok {
-		return x.ActivationTime
-	}
-	return 0
-}
-
-func (m *MsgUpdateRingByAcp) GetClearUpgrade() bool {
-	if m != nil {
-		return m.ClearUpgrade
-	}
-	return false
-}
-
 // XXX_OneofWrappers is for the internal use of the proto package.
-func (*MsgUpdateRingByAcp) XXX_OneofWrappers() []interface{} {
+func (*MsgStartRingReshareByAcp) XXX_OneofWrappers() []interface{} {
 	return []interface{}{
-		(*MsgUpdateRingByAcp_NewThreshold)(nil),
-		(*MsgUpdateRingByAcp_PssInterval)(nil),
-		(*MsgUpdateRingByAcp_NextVersion)(nil),
-		(*MsgUpdateRingByAcp_ActivationTime)(nil),
+		(*MsgStartRingReshareByAcp_NewThreshold)(nil),
 	}
 }
 
-type MsgUpdateRingByAcpResponse struct {
+type MsgStartRingReshareByAcpResponse struct {
 }
 
-func (m *MsgUpdateRingByAcpResponse) Reset()         { *m = MsgUpdateRingByAcpResponse{} }
-func (m *MsgUpdateRingByAcpResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateRingByAcpResponse) ProtoMessage()    {}
-func (*MsgUpdateRingByAcpResponse) Descriptor() ([]byte, []int) {
+func (m *MsgStartRingReshareByAcpResponse) Reset()         { *m = MsgStartRingReshareByAcpResponse{} }
+func (m *MsgStartRingReshareByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgStartRingReshareByAcpResponse) ProtoMessage()    {}
+func (*MsgStartRingReshareByAcpResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_7711ae63507074e0, []int{7}
 }
-func (m *MsgUpdateRingByAcpResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgStartRingReshareByAcpResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateRingByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgStartRingReshareByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateRingByAcpResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgStartRingReshareByAcpResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -610,17 +520,394 @@ func (m *MsgUpdateRingByAcpResponse) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateRingByAcpResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateRingByAcpResponse.Merge(m, src)
+func (m *MsgStartRingReshareByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgStartRingReshareByAcpResponse.Merge(m, src)
 }
-func (m *MsgUpdateRingByAcpResponse) XXX_Size() int {
+func (m *MsgStartRingReshareByAcpResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateRingByAcpResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateRingByAcpResponse.DiscardUnknown(m)
+func (m *MsgStartRingReshareByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgStartRingReshareByAcpResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateRingByAcpResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgStartRingReshareByAcpResponse proto.InternalMessageInfo
+
+type MsgSetRingPssIntervalByAcp struct {
+	Creator     string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId      string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	PssInterval uint64 `protobuf:"varint,3,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
+}
+
+func (m *MsgSetRingPssIntervalByAcp) Reset()         { *m = MsgSetRingPssIntervalByAcp{} }
+func (m *MsgSetRingPssIntervalByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgSetRingPssIntervalByAcp) ProtoMessage()    {}
+func (*MsgSetRingPssIntervalByAcp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{8}
+}
+func (m *MsgSetRingPssIntervalByAcp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetRingPssIntervalByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetRingPssIntervalByAcp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetRingPssIntervalByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetRingPssIntervalByAcp.Merge(m, src)
+}
+func (m *MsgSetRingPssIntervalByAcp) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetRingPssIntervalByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetRingPssIntervalByAcp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetRingPssIntervalByAcp proto.InternalMessageInfo
+
+func (m *MsgSetRingPssIntervalByAcp) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgSetRingPssIntervalByAcp) GetRingId() string {
+	if m != nil {
+		return m.RingId
+	}
+	return ""
+}
+
+func (m *MsgSetRingPssIntervalByAcp) GetPssInterval() uint64 {
+	if m != nil {
+		return m.PssInterval
+	}
+	return 0
+}
+
+type MsgSetRingPssIntervalByAcpResponse struct {
+}
+
+func (m *MsgSetRingPssIntervalByAcpResponse) Reset()         { *m = MsgSetRingPssIntervalByAcpResponse{} }
+func (m *MsgSetRingPssIntervalByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgSetRingPssIntervalByAcpResponse) ProtoMessage()    {}
+func (*MsgSetRingPssIntervalByAcpResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{9}
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgSetRingPssIntervalByAcpResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgSetRingPssIntervalByAcpResponse.Merge(m, src)
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgSetRingPssIntervalByAcpResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgSetRingPssIntervalByAcpResponse proto.InternalMessageInfo
+
+type MsgDisableRingPssByAcp struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId  string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+}
+
+func (m *MsgDisableRingPssByAcp) Reset()         { *m = MsgDisableRingPssByAcp{} }
+func (m *MsgDisableRingPssByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgDisableRingPssByAcp) ProtoMessage()    {}
+func (*MsgDisableRingPssByAcp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{10}
+}
+func (m *MsgDisableRingPssByAcp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDisableRingPssByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDisableRingPssByAcp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDisableRingPssByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDisableRingPssByAcp.Merge(m, src)
+}
+func (m *MsgDisableRingPssByAcp) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDisableRingPssByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDisableRingPssByAcp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDisableRingPssByAcp proto.InternalMessageInfo
+
+func (m *MsgDisableRingPssByAcp) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgDisableRingPssByAcp) GetRingId() string {
+	if m != nil {
+		return m.RingId
+	}
+	return ""
+}
+
+type MsgDisableRingPssByAcpResponse struct {
+}
+
+func (m *MsgDisableRingPssByAcpResponse) Reset()         { *m = MsgDisableRingPssByAcpResponse{} }
+func (m *MsgDisableRingPssByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDisableRingPssByAcpResponse) ProtoMessage()    {}
+func (*MsgDisableRingPssByAcpResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{11}
+}
+func (m *MsgDisableRingPssByAcpResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDisableRingPssByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDisableRingPssByAcpResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDisableRingPssByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDisableRingPssByAcpResponse.Merge(m, src)
+}
+func (m *MsgDisableRingPssByAcpResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDisableRingPssByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDisableRingPssByAcpResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDisableRingPssByAcpResponse proto.InternalMessageInfo
+
+type MsgScheduleRingUpgradeByAcp struct {
+	Creator     string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId      string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	NextVersion uint64 `protobuf:"varint,3,opt,name=next_version,json=nextVersion,proto3" json:"next_version,omitempty"`
+	// Unix timestamp in seconds. Must be at least 10 minutes in the future.
+	ActivationTime uint64 `protobuf:"varint,4,opt,name=activation_time,json=activationTime,proto3" json:"activation_time,omitempty"`
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) Reset()         { *m = MsgScheduleRingUpgradeByAcp{} }
+func (m *MsgScheduleRingUpgradeByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgScheduleRingUpgradeByAcp) ProtoMessage()    {}
+func (*MsgScheduleRingUpgradeByAcp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{12}
+}
+func (m *MsgScheduleRingUpgradeByAcp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgScheduleRingUpgradeByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgScheduleRingUpgradeByAcp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgScheduleRingUpgradeByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgScheduleRingUpgradeByAcp.Merge(m, src)
+}
+func (m *MsgScheduleRingUpgradeByAcp) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgScheduleRingUpgradeByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgScheduleRingUpgradeByAcp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgScheduleRingUpgradeByAcp proto.InternalMessageInfo
+
+func (m *MsgScheduleRingUpgradeByAcp) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) GetRingId() string {
+	if m != nil {
+		return m.RingId
+	}
+	return ""
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) GetNextVersion() uint64 {
+	if m != nil {
+		return m.NextVersion
+	}
+	return 0
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) GetActivationTime() uint64 {
+	if m != nil {
+		return m.ActivationTime
+	}
+	return 0
+}
+
+type MsgScheduleRingUpgradeByAcpResponse struct {
+}
+
+func (m *MsgScheduleRingUpgradeByAcpResponse) Reset()         { *m = MsgScheduleRingUpgradeByAcpResponse{} }
+func (m *MsgScheduleRingUpgradeByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgScheduleRingUpgradeByAcpResponse) ProtoMessage()    {}
+func (*MsgScheduleRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{13}
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgScheduleRingUpgradeByAcpResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgScheduleRingUpgradeByAcpResponse.Merge(m, src)
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgScheduleRingUpgradeByAcpResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgScheduleRingUpgradeByAcpResponse proto.InternalMessageInfo
+
+type MsgCancelRingUpgradeByAcp struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId  string `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+}
+
+func (m *MsgCancelRingUpgradeByAcp) Reset()         { *m = MsgCancelRingUpgradeByAcp{} }
+func (m *MsgCancelRingUpgradeByAcp) String() string { return proto.CompactTextString(m) }
+func (*MsgCancelRingUpgradeByAcp) ProtoMessage()    {}
+func (*MsgCancelRingUpgradeByAcp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{14}
+}
+func (m *MsgCancelRingUpgradeByAcp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCancelRingUpgradeByAcp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCancelRingUpgradeByAcp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCancelRingUpgradeByAcp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCancelRingUpgradeByAcp.Merge(m, src)
+}
+func (m *MsgCancelRingUpgradeByAcp) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCancelRingUpgradeByAcp) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCancelRingUpgradeByAcp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCancelRingUpgradeByAcp proto.InternalMessageInfo
+
+func (m *MsgCancelRingUpgradeByAcp) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgCancelRingUpgradeByAcp) GetRingId() string {
+	if m != nil {
+		return m.RingId
+	}
+	return ""
+}
+
+type MsgCancelRingUpgradeByAcpResponse struct {
+}
+
+func (m *MsgCancelRingUpgradeByAcpResponse) Reset()         { *m = MsgCancelRingUpgradeByAcpResponse{} }
+func (m *MsgCancelRingUpgradeByAcpResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCancelRingUpgradeByAcpResponse) ProtoMessage()    {}
+func (*MsgCancelRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{15}
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCancelRingUpgradeByAcpResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCancelRingUpgradeByAcpResponse.Merge(m, src)
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCancelRingUpgradeByAcpResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCancelRingUpgradeByAcpResponse proto.InternalMessageInfo
 
 type MsgFinalizeRingReshareByThresholdSignature struct {
 	Creator         string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -637,7 +924,7 @@ func (m *MsgFinalizeRingReshareByThresholdSignature) String() string {
 }
 func (*MsgFinalizeRingReshareByThresholdSignature) ProtoMessage() {}
 func (*MsgFinalizeRingReshareByThresholdSignature) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{8}
+	return fileDescriptor_7711ae63507074e0, []int{16}
 }
 func (m *MsgFinalizeRingReshareByThresholdSignature) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -705,7 +992,7 @@ func (m *MsgFinalizeRingReshareByThresholdSignatureResponse) String() string {
 }
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoMessage() {}
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{9}
+	return fileDescriptor_7711ae63507074e0, []int{17}
 }
 func (m *MsgFinalizeRingReshareByThresholdSignatureResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -748,7 +1035,7 @@ func (m *RingReshareFinalizeSignDoc) Reset()         { *m = RingReshareFinalizeS
 func (m *RingReshareFinalizeSignDoc) String() string { return proto.CompactTextString(m) }
 func (*RingReshareFinalizeSignDoc) ProtoMessage()    {}
 func (*RingReshareFinalizeSignDoc) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{10}
+	return fileDescriptor_7711ae63507074e0, []int{18}
 }
 func (m *RingReshareFinalizeSignDoc) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -847,7 +1134,7 @@ func (m *RingReshareSignState) Reset()         { *m = RingReshareSignState{} }
 func (m *RingReshareSignState) String() string { return proto.CompactTextString(m) }
 func (*RingReshareSignState) ProtoMessage()    {}
 func (*RingReshareSignState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{11}
+	return fileDescriptor_7711ae63507074e0, []int{19}
 }
 func (m *RingReshareSignState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -996,7 +1283,7 @@ func (m *MsgStoreDocument) Reset()         { *m = MsgStoreDocument{} }
 func (m *MsgStoreDocument) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreDocument) ProtoMessage()    {}
 func (*MsgStoreDocument) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{12}
+	return fileDescriptor_7711ae63507074e0, []int{20}
 }
 func (m *MsgStoreDocument) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1138,7 +1425,7 @@ func (m *MsgStoreDocumentResponse) Reset()         { *m = MsgStoreDocumentRespon
 func (m *MsgStoreDocumentResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreDocumentResponse) ProtoMessage()    {}
 func (*MsgStoreDocumentResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{13}
+	return fileDescriptor_7711ae63507074e0, []int{21}
 }
 func (m *MsgStoreDocumentResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1187,7 +1474,7 @@ func (m *MsgStoreKeyDerivation) Reset()         { *m = MsgStoreKeyDerivation{} }
 func (m *MsgStoreKeyDerivation) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreKeyDerivation) ProtoMessage()    {}
 func (*MsgStoreKeyDerivation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{14}
+	return fileDescriptor_7711ae63507074e0, []int{22}
 }
 func (m *MsgStoreKeyDerivation) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1266,7 +1553,7 @@ func (m *MsgStoreKeyDerivationResponse) Reset()         { *m = MsgStoreKeyDeriva
 func (m *MsgStoreKeyDerivationResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgStoreKeyDerivationResponse) ProtoMessage()    {}
 func (*MsgStoreKeyDerivationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{15}
+	return fileDescriptor_7711ae63507074e0, []int{23}
 }
 func (m *MsgStoreKeyDerivationResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1314,7 +1601,7 @@ func (m *MsgCreateNodeInfo) Reset()         { *m = MsgCreateNodeInfo{} }
 func (m *MsgCreateNodeInfo) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateNodeInfo) ProtoMessage()    {}
 func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{16}
+	return fileDescriptor_7711ae63507074e0, []int{24}
 }
 func (m *MsgCreateNodeInfo) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1385,7 +1672,7 @@ func (m *MsgCreateNodeInfoResponse) Reset()         { *m = MsgCreateNodeInfoResp
 func (m *MsgCreateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
 func (*MsgCreateNodeInfoResponse) ProtoMessage()    {}
 func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{17}
+	return fileDescriptor_7711ae63507074e0, []int{25}
 }
 func (m *MsgCreateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1414,43 +1701,24 @@ func (m *MsgCreateNodeInfoResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreateNodeInfoResponse proto.InternalMessageInfo
 
-// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
-// The signer must be the current controller_key holder.
-//
-// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
-// full, not merged. To add a single entry you must re-send the complete desired
-// list. Sending an empty repeated field clears the whitelist entirely.
-type MsgUpdateNodeInfo struct {
+type MsgUpdateNodePeerId struct {
 	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
 	NodeKey string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
-	// Types that are valid to be assigned to XPeerId:
-	//
-	//	*MsgUpdateNodeInfo_PeerId
-	XPeerId isMsgUpdateNodeInfo_XPeerId `protobuf_oneof:"_peer_id"`
-	// Replaces the full policy whitelist. Send the complete desired list on every
-	// update; an empty field clears all whitelisted policies.
-	WhitelistedPolicyIds []string `protobuf:"bytes,4,rep,name=whitelisted_policy_ids,json=whitelistedPolicyIds,proto3" json:"whitelisted_policy_ids,omitempty"`
-	// Replaces the full ring whitelist. Send the complete desired list on every
-	// update; an empty field clears all whitelisted rings.
-	WhitelistedRingIds []string `protobuf:"bytes,5,rep,name=whitelisted_ring_ids,json=whitelistedRingIds,proto3" json:"whitelisted_ring_ids,omitempty"`
-	// Types that are valid to be assigned to XControllerKey:
-	//
-	//	*MsgUpdateNodeInfo_ControllerKey
-	XControllerKey isMsgUpdateNodeInfo_XControllerKey `protobuf_oneof:"_controller_key"`
+	PeerId  string `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3" json:"peer_id,omitempty"`
 }
 
-func (m *MsgUpdateNodeInfo) Reset()         { *m = MsgUpdateNodeInfo{} }
-func (m *MsgUpdateNodeInfo) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateNodeInfo) ProtoMessage()    {}
-func (*MsgUpdateNodeInfo) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{18}
+func (m *MsgUpdateNodePeerId) Reset()         { *m = MsgUpdateNodePeerId{} }
+func (m *MsgUpdateNodePeerId) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateNodePeerId) ProtoMessage()    {}
+func (*MsgUpdateNodePeerId) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{26}
 }
-func (m *MsgUpdateNodeInfo) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateNodePeerId) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateNodeInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateNodePeerId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateNodeInfo.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateNodePeerId.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1460,117 +1728,54 @@ func (m *MsgUpdateNodeInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, e
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateNodeInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateNodeInfo.Merge(m, src)
+func (m *MsgUpdateNodePeerId) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateNodePeerId.Merge(m, src)
 }
-func (m *MsgUpdateNodeInfo) XXX_Size() int {
+func (m *MsgUpdateNodePeerId) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateNodeInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateNodeInfo.DiscardUnknown(m)
+func (m *MsgUpdateNodePeerId) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateNodePeerId.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateNodeInfo proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateNodePeerId proto.InternalMessageInfo
 
-type isMsgUpdateNodeInfo_XPeerId interface {
-	isMsgUpdateNodeInfo_XPeerId()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-type isMsgUpdateNodeInfo_XControllerKey interface {
-	isMsgUpdateNodeInfo_XControllerKey()
-	MarshalTo([]byte) (int, error)
-	Size() int
-}
-
-type MsgUpdateNodeInfo_PeerId struct {
-	PeerId string `protobuf:"bytes,3,opt,name=peer_id,json=peerId,proto3,oneof" json:"peer_id,omitempty"`
-}
-type MsgUpdateNodeInfo_ControllerKey struct {
-	ControllerKey string `protobuf:"bytes,6,opt,name=controller_key,json=controllerKey,proto3,oneof" json:"controller_key,omitempty"`
-}
-
-func (*MsgUpdateNodeInfo_PeerId) isMsgUpdateNodeInfo_XPeerId()               {}
-func (*MsgUpdateNodeInfo_ControllerKey) isMsgUpdateNodeInfo_XControllerKey() {}
-
-func (m *MsgUpdateNodeInfo) GetXPeerId() isMsgUpdateNodeInfo_XPeerId {
-	if m != nil {
-		return m.XPeerId
-	}
-	return nil
-}
-func (m *MsgUpdateNodeInfo) GetXControllerKey() isMsgUpdateNodeInfo_XControllerKey {
-	if m != nil {
-		return m.XControllerKey
-	}
-	return nil
-}
-
-func (m *MsgUpdateNodeInfo) GetCreator() string {
+func (m *MsgUpdateNodePeerId) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgUpdateNodeInfo) GetNodeKey() string {
+func (m *MsgUpdateNodePeerId) GetNodeKey() string {
 	if m != nil {
 		return m.NodeKey
 	}
 	return ""
 }
 
-func (m *MsgUpdateNodeInfo) GetPeerId() string {
-	if x, ok := m.GetXPeerId().(*MsgUpdateNodeInfo_PeerId); ok {
-		return x.PeerId
+func (m *MsgUpdateNodePeerId) GetPeerId() string {
+	if m != nil {
+		return m.PeerId
 	}
 	return ""
 }
 
-func (m *MsgUpdateNodeInfo) GetWhitelistedPolicyIds() []string {
-	if m != nil {
-		return m.WhitelistedPolicyIds
-	}
-	return nil
+type MsgUpdateNodePeerIdResponse struct {
 }
 
-func (m *MsgUpdateNodeInfo) GetWhitelistedRingIds() []string {
-	if m != nil {
-		return m.WhitelistedRingIds
-	}
-	return nil
+func (m *MsgUpdateNodePeerIdResponse) Reset()         { *m = MsgUpdateNodePeerIdResponse{} }
+func (m *MsgUpdateNodePeerIdResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateNodePeerIdResponse) ProtoMessage()    {}
+func (*MsgUpdateNodePeerIdResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{27}
 }
-
-func (m *MsgUpdateNodeInfo) GetControllerKey() string {
-	if x, ok := m.GetXControllerKey().(*MsgUpdateNodeInfo_ControllerKey); ok {
-		return x.ControllerKey
-	}
-	return ""
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*MsgUpdateNodeInfo) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*MsgUpdateNodeInfo_PeerId)(nil),
-		(*MsgUpdateNodeInfo_ControllerKey)(nil),
-	}
-}
-
-type MsgUpdateNodeInfoResponse struct {
-}
-
-func (m *MsgUpdateNodeInfoResponse) Reset()         { *m = MsgUpdateNodeInfoResponse{} }
-func (m *MsgUpdateNodeInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgUpdateNodeInfoResponse) ProtoMessage()    {}
-func (*MsgUpdateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_7711ae63507074e0, []int{19}
-}
-func (m *MsgUpdateNodeInfoResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgUpdateNodePeerIdResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgUpdateNodeInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgUpdateNodePeerIdResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgUpdateNodeInfoResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgUpdateNodePeerIdResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -1580,17 +1785,389 @@ func (m *MsgUpdateNodeInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([
 		return b[:n], nil
 	}
 }
-func (m *MsgUpdateNodeInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgUpdateNodeInfoResponse.Merge(m, src)
+func (m *MsgUpdateNodePeerIdResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateNodePeerIdResponse.Merge(m, src)
 }
-func (m *MsgUpdateNodeInfoResponse) XXX_Size() int {
+func (m *MsgUpdateNodePeerIdResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgUpdateNodeInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgUpdateNodeInfoResponse.DiscardUnknown(m)
+func (m *MsgUpdateNodePeerIdResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateNodePeerIdResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgUpdateNodeInfoResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgUpdateNodePeerIdResponse proto.InternalMessageInfo
+
+type MsgTransferNodeController struct {
+	Creator       string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	NodeKey       string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	ControllerKey string `protobuf:"bytes,3,opt,name=controller_key,json=controllerKey,proto3" json:"controller_key,omitempty"`
+}
+
+func (m *MsgTransferNodeController) Reset()         { *m = MsgTransferNodeController{} }
+func (m *MsgTransferNodeController) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferNodeController) ProtoMessage()    {}
+func (*MsgTransferNodeController) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{28}
+}
+func (m *MsgTransferNodeController) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferNodeController) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferNodeController.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferNodeController) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferNodeController.Merge(m, src)
+}
+func (m *MsgTransferNodeController) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferNodeController) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferNodeController.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferNodeController proto.InternalMessageInfo
+
+func (m *MsgTransferNodeController) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgTransferNodeController) GetNodeKey() string {
+	if m != nil {
+		return m.NodeKey
+	}
+	return ""
+}
+
+func (m *MsgTransferNodeController) GetControllerKey() string {
+	if m != nil {
+		return m.ControllerKey
+	}
+	return ""
+}
+
+type MsgTransferNodeControllerResponse struct {
+}
+
+func (m *MsgTransferNodeControllerResponse) Reset()         { *m = MsgTransferNodeControllerResponse{} }
+func (m *MsgTransferNodeControllerResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgTransferNodeControllerResponse) ProtoMessage()    {}
+func (*MsgTransferNodeControllerResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{29}
+}
+func (m *MsgTransferNodeControllerResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgTransferNodeControllerResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgTransferNodeControllerResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgTransferNodeControllerResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgTransferNodeControllerResponse.Merge(m, src)
+}
+func (m *MsgTransferNodeControllerResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgTransferNodeControllerResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgTransferNodeControllerResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgTransferNodeControllerResponse proto.InternalMessageInfo
+
+type MsgAddNodeToWhitelist struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	NodeKey string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	// Types that are valid to be assigned to Target:
+	//
+	//	*MsgAddNodeToWhitelist_PolicyId
+	//	*MsgAddNodeToWhitelist_RingId
+	Target isMsgAddNodeToWhitelist_Target `protobuf_oneof:"target"`
+}
+
+func (m *MsgAddNodeToWhitelist) Reset()         { *m = MsgAddNodeToWhitelist{} }
+func (m *MsgAddNodeToWhitelist) String() string { return proto.CompactTextString(m) }
+func (*MsgAddNodeToWhitelist) ProtoMessage()    {}
+func (*MsgAddNodeToWhitelist) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{30}
+}
+func (m *MsgAddNodeToWhitelist) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddNodeToWhitelist) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddNodeToWhitelist.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddNodeToWhitelist) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddNodeToWhitelist.Merge(m, src)
+}
+func (m *MsgAddNodeToWhitelist) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddNodeToWhitelist) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddNodeToWhitelist.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddNodeToWhitelist proto.InternalMessageInfo
+
+type isMsgAddNodeToWhitelist_Target interface {
+	isMsgAddNodeToWhitelist_Target()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type MsgAddNodeToWhitelist_PolicyId struct {
+	PolicyId string `protobuf:"bytes,3,opt,name=policy_id,json=policyId,proto3,oneof" json:"policy_id,omitempty"`
+}
+type MsgAddNodeToWhitelist_RingId struct {
+	RingId string `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3,oneof" json:"ring_id,omitempty"`
+}
+
+func (*MsgAddNodeToWhitelist_PolicyId) isMsgAddNodeToWhitelist_Target() {}
+func (*MsgAddNodeToWhitelist_RingId) isMsgAddNodeToWhitelist_Target()   {}
+
+func (m *MsgAddNodeToWhitelist) GetTarget() isMsgAddNodeToWhitelist_Target {
+	if m != nil {
+		return m.Target
+	}
+	return nil
+}
+
+func (m *MsgAddNodeToWhitelist) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgAddNodeToWhitelist) GetNodeKey() string {
+	if m != nil {
+		return m.NodeKey
+	}
+	return ""
+}
+
+func (m *MsgAddNodeToWhitelist) GetPolicyId() string {
+	if x, ok := m.GetTarget().(*MsgAddNodeToWhitelist_PolicyId); ok {
+		return x.PolicyId
+	}
+	return ""
+}
+
+func (m *MsgAddNodeToWhitelist) GetRingId() string {
+	if x, ok := m.GetTarget().(*MsgAddNodeToWhitelist_RingId); ok {
+		return x.RingId
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*MsgAddNodeToWhitelist) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*MsgAddNodeToWhitelist_PolicyId)(nil),
+		(*MsgAddNodeToWhitelist_RingId)(nil),
+	}
+}
+
+type MsgAddNodeToWhitelistResponse struct {
+}
+
+func (m *MsgAddNodeToWhitelistResponse) Reset()         { *m = MsgAddNodeToWhitelistResponse{} }
+func (m *MsgAddNodeToWhitelistResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgAddNodeToWhitelistResponse) ProtoMessage()    {}
+func (*MsgAddNodeToWhitelistResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{31}
+}
+func (m *MsgAddNodeToWhitelistResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgAddNodeToWhitelistResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgAddNodeToWhitelistResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgAddNodeToWhitelistResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgAddNodeToWhitelistResponse.Merge(m, src)
+}
+func (m *MsgAddNodeToWhitelistResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgAddNodeToWhitelistResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgAddNodeToWhitelistResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgAddNodeToWhitelistResponse proto.InternalMessageInfo
+
+type MsgRemoveNodeFromWhitelist struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	NodeKey string `protobuf:"bytes,2,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	// Types that are valid to be assigned to Target:
+	//
+	//	*MsgRemoveNodeFromWhitelist_PolicyId
+	//	*MsgRemoveNodeFromWhitelist_RingId
+	Target isMsgRemoveNodeFromWhitelist_Target `protobuf_oneof:"target"`
+}
+
+func (m *MsgRemoveNodeFromWhitelist) Reset()         { *m = MsgRemoveNodeFromWhitelist{} }
+func (m *MsgRemoveNodeFromWhitelist) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveNodeFromWhitelist) ProtoMessage()    {}
+func (*MsgRemoveNodeFromWhitelist) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{32}
+}
+func (m *MsgRemoveNodeFromWhitelist) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveNodeFromWhitelist) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveNodeFromWhitelist.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveNodeFromWhitelist) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveNodeFromWhitelist.Merge(m, src)
+}
+func (m *MsgRemoveNodeFromWhitelist) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveNodeFromWhitelist) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveNodeFromWhitelist.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveNodeFromWhitelist proto.InternalMessageInfo
+
+type isMsgRemoveNodeFromWhitelist_Target interface {
+	isMsgRemoveNodeFromWhitelist_Target()
+	MarshalTo([]byte) (int, error)
+	Size() int
+}
+
+type MsgRemoveNodeFromWhitelist_PolicyId struct {
+	PolicyId string `protobuf:"bytes,3,opt,name=policy_id,json=policyId,proto3,oneof" json:"policy_id,omitempty"`
+}
+type MsgRemoveNodeFromWhitelist_RingId struct {
+	RingId string `protobuf:"bytes,4,opt,name=ring_id,json=ringId,proto3,oneof" json:"ring_id,omitempty"`
+}
+
+func (*MsgRemoveNodeFromWhitelist_PolicyId) isMsgRemoveNodeFromWhitelist_Target() {}
+func (*MsgRemoveNodeFromWhitelist_RingId) isMsgRemoveNodeFromWhitelist_Target()   {}
+
+func (m *MsgRemoveNodeFromWhitelist) GetTarget() isMsgRemoveNodeFromWhitelist_Target {
+	if m != nil {
+		return m.Target
+	}
+	return nil
+}
+
+func (m *MsgRemoveNodeFromWhitelist) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgRemoveNodeFromWhitelist) GetNodeKey() string {
+	if m != nil {
+		return m.NodeKey
+	}
+	return ""
+}
+
+func (m *MsgRemoveNodeFromWhitelist) GetPolicyId() string {
+	if x, ok := m.GetTarget().(*MsgRemoveNodeFromWhitelist_PolicyId); ok {
+		return x.PolicyId
+	}
+	return ""
+}
+
+func (m *MsgRemoveNodeFromWhitelist) GetRingId() string {
+	if x, ok := m.GetTarget().(*MsgRemoveNodeFromWhitelist_RingId); ok {
+		return x.RingId
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*MsgRemoveNodeFromWhitelist) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*MsgRemoveNodeFromWhitelist_PolicyId)(nil),
+		(*MsgRemoveNodeFromWhitelist_RingId)(nil),
+	}
+}
+
+type MsgRemoveNodeFromWhitelistResponse struct {
+}
+
+func (m *MsgRemoveNodeFromWhitelistResponse) Reset()         { *m = MsgRemoveNodeFromWhitelistResponse{} }
+func (m *MsgRemoveNodeFromWhitelistResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgRemoveNodeFromWhitelistResponse) ProtoMessage()    {}
+func (*MsgRemoveNodeFromWhitelistResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_7711ae63507074e0, []int{33}
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgRemoveNodeFromWhitelistResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgRemoveNodeFromWhitelistResponse.Merge(m, src)
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgRemoveNodeFromWhitelistResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgRemoveNodeFromWhitelistResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "sourcehub.orbis.MsgUpdateParams")
@@ -1599,8 +2176,16 @@ func init() {
 	proto.RegisterType((*MsgCreateRingResponse)(nil), "sourcehub.orbis.MsgCreateRingResponse")
 	proto.RegisterType((*MsgFinalizeRing)(nil), "sourcehub.orbis.MsgFinalizeRing")
 	proto.RegisterType((*MsgFinalizeRingResponse)(nil), "sourcehub.orbis.MsgFinalizeRingResponse")
-	proto.RegisterType((*MsgUpdateRingByAcp)(nil), "sourcehub.orbis.MsgUpdateRingByAcp")
-	proto.RegisterType((*MsgUpdateRingByAcpResponse)(nil), "sourcehub.orbis.MsgUpdateRingByAcpResponse")
+	proto.RegisterType((*MsgStartRingReshareByAcp)(nil), "sourcehub.orbis.MsgStartRingReshareByAcp")
+	proto.RegisterType((*MsgStartRingReshareByAcpResponse)(nil), "sourcehub.orbis.MsgStartRingReshareByAcpResponse")
+	proto.RegisterType((*MsgSetRingPssIntervalByAcp)(nil), "sourcehub.orbis.MsgSetRingPssIntervalByAcp")
+	proto.RegisterType((*MsgSetRingPssIntervalByAcpResponse)(nil), "sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse")
+	proto.RegisterType((*MsgDisableRingPssByAcp)(nil), "sourcehub.orbis.MsgDisableRingPssByAcp")
+	proto.RegisterType((*MsgDisableRingPssByAcpResponse)(nil), "sourcehub.orbis.MsgDisableRingPssByAcpResponse")
+	proto.RegisterType((*MsgScheduleRingUpgradeByAcp)(nil), "sourcehub.orbis.MsgScheduleRingUpgradeByAcp")
+	proto.RegisterType((*MsgScheduleRingUpgradeByAcpResponse)(nil), "sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse")
+	proto.RegisterType((*MsgCancelRingUpgradeByAcp)(nil), "sourcehub.orbis.MsgCancelRingUpgradeByAcp")
+	proto.RegisterType((*MsgCancelRingUpgradeByAcpResponse)(nil), "sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse")
 	proto.RegisterType((*MsgFinalizeRingReshareByThresholdSignature)(nil), "sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature")
 	proto.RegisterType((*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), "sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse")
 	proto.RegisterType((*RingReshareFinalizeSignDoc)(nil), "sourcehub.orbis.RingReshareFinalizeSignDoc")
@@ -1611,106 +2196,129 @@ func init() {
 	proto.RegisterType((*MsgStoreKeyDerivationResponse)(nil), "sourcehub.orbis.MsgStoreKeyDerivationResponse")
 	proto.RegisterType((*MsgCreateNodeInfo)(nil), "sourcehub.orbis.MsgCreateNodeInfo")
 	proto.RegisterType((*MsgCreateNodeInfoResponse)(nil), "sourcehub.orbis.MsgCreateNodeInfoResponse")
-	proto.RegisterType((*MsgUpdateNodeInfo)(nil), "sourcehub.orbis.MsgUpdateNodeInfo")
-	proto.RegisterType((*MsgUpdateNodeInfoResponse)(nil), "sourcehub.orbis.MsgUpdateNodeInfoResponse")
+	proto.RegisterType((*MsgUpdateNodePeerId)(nil), "sourcehub.orbis.MsgUpdateNodePeerId")
+	proto.RegisterType((*MsgUpdateNodePeerIdResponse)(nil), "sourcehub.orbis.MsgUpdateNodePeerIdResponse")
+	proto.RegisterType((*MsgTransferNodeController)(nil), "sourcehub.orbis.MsgTransferNodeController")
+	proto.RegisterType((*MsgTransferNodeControllerResponse)(nil), "sourcehub.orbis.MsgTransferNodeControllerResponse")
+	proto.RegisterType((*MsgAddNodeToWhitelist)(nil), "sourcehub.orbis.MsgAddNodeToWhitelist")
+	proto.RegisterType((*MsgAddNodeToWhitelistResponse)(nil), "sourcehub.orbis.MsgAddNodeToWhitelistResponse")
+	proto.RegisterType((*MsgRemoveNodeFromWhitelist)(nil), "sourcehub.orbis.MsgRemoveNodeFromWhitelist")
+	proto.RegisterType((*MsgRemoveNodeFromWhitelistResponse)(nil), "sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse")
 }
 
 func init() { proto.RegisterFile("sourcehub/orbis/tx.proto", fileDescriptor_7711ae63507074e0) }
 
 var fileDescriptor_7711ae63507074e0 = []byte{
-	// 1462 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcf, 0x6f, 0x1b, 0xc5,
-	0x17, 0xcf, 0x3a, 0xb1, 0x63, 0xbf, 0xd8, 0x71, 0x32, 0x4d, 0x1b, 0x67, 0x9b, 0xaf, 0x9b, 0xba,
-	0x5f, 0x52, 0x37, 0x2d, 0x71, 0x09, 0xa5, 0x87, 0xf6, 0x54, 0xb7, 0x42, 0x09, 0x51, 0xaa, 0x68,
-	0xd3, 0x72, 0xa8, 0x84, 0x96, 0xcd, 0xee, 0xd4, 0x5e, 0xd9, 0xde, 0x59, 0xcd, 0xac, 0x93, 0x9a,
-	0x13, 0xe2, 0x54, 0x71, 0x42, 0xe2, 0xc0, 0x91, 0x23, 0x48, 0x5c, 0x8a, 0x84, 0xb8, 0x20, 0x71,
-	0xee, 0xb1, 0x70, 0xe2, 0x84, 0xaa, 0xe6, 0xd0, 0x7f, 0x03, 0xcd, 0xec, 0xec, 0x4f, 0x3b, 0x89,
-	0x09, 0x88, 0x4b, 0x9b, 0x79, 0xbf, 0xe6, 0xbd, 0xcf, 0xfb, 0x35, 0x6b, 0xa8, 0x30, 0xd2, 0xa7,
-	0x26, 0x6e, 0xf7, 0xf7, 0x1b, 0x84, 0xee, 0xdb, 0xac, 0xe1, 0x3d, 0x5b, 0x77, 0x29, 0xf1, 0x08,
-	0x2a, 0x87, 0x9c, 0x75, 0xc1, 0x51, 0xe7, 0x8d, 0x9e, 0xed, 0x90, 0x86, 0xf8, 0xd7, 0x97, 0x51,
-	0x17, 0x4d, 0xc2, 0x7a, 0x84, 0x35, 0x7a, 0xac, 0xd5, 0x38, 0x78, 0x8f, 0xff, 0x27, 0x19, 0x4b,
-	0x3e, 0x43, 0x17, 0xa7, 0x86, 0x7f, 0x90, 0xac, 0x85, 0x16, 0x69, 0x11, 0x9f, 0xce, 0xff, 0x92,
-	0xd4, 0xe5, 0xb4, 0x1f, 0xae, 0x41, 0x8d, 0x9e, 0xd4, 0xa9, 0xfd, 0xa2, 0x40, 0x79, 0x87, 0xb5,
-	0x1e, 0xbb, 0x96, 0xe1, 0xe1, 0x5d, 0xc1, 0x41, 0xb7, 0xa1, 0x60, 0xf4, 0xbd, 0x36, 0xa1, 0xb6,
-	0x37, 0xa8, 0x28, 0x2b, 0x4a, 0xbd, 0xd0, 0xac, 0xfc, 0xfe, 0xd3, 0xbb, 0x0b, 0xf2, 0xb2, 0x7b,
-	0x96, 0x45, 0x31, 0x63, 0x7b, 0x1e, 0xb5, 0x9d, 0x96, 0x16, 0x89, 0xa2, 0x3b, 0x90, 0xf3, 0x6d,
-	0x57, 0x32, 0x2b, 0x4a, 0x7d, 0x66, 0x63, 0x71, 0x3d, 0x15, 0xe8, 0xba, 0x7f, 0x41, 0xb3, 0xf0,
-	0xf2, 0xcf, 0x4b, 0x13, 0xdf, 0xbf, 0x7d, 0xb1, 0xa6, 0x68, 0x52, 0xe3, 0xce, 0xad, 0x2f, 0xde,
-	0xbe, 0x58, 0x8b, 0x6c, 0x7d, 0xf9, 0xf6, 0xc5, 0xda, 0xe5, 0xc8, 0xf1, 0x67, 0xd2, 0xf5, 0x94,
-	0xa7, 0xb5, 0x25, 0x58, 0x4c, 0x91, 0x34, 0xcc, 0x5c, 0xe2, 0x30, 0x5c, 0xfb, 0x36, 0x03, 0xa5,
-	0x1d, 0xd6, 0xba, 0x4f, 0xb1, 0xe1, 0x61, 0xcd, 0x76, 0x5a, 0xa8, 0x02, 0xd3, 0x26, 0x3f, 0x11,
-	0xea, 0x07, 0xa5, 0x05, 0x47, 0xf4, 0x7f, 0x98, 0x75, 0x31, 0xa6, 0xba, 0x43, 0x2c, 0xac, 0x77,
-	0xf0, 0x80, 0x07, 0x30, 0x59, 0x2f, 0x68, 0x45, 0x4e, 0x7d, 0x48, 0x2c, 0xbc, 0x8d, 0x07, 0x0c,
-	0x2d, 0x43, 0xc1, 0x6b, 0x53, 0xcc, 0xda, 0xa4, 0x6b, 0x55, 0x26, 0x57, 0x94, 0x7a, 0x49, 0x8b,
-	0x08, 0x68, 0x15, 0x8a, 0x2e, 0x63, 0xba, 0xed, 0x78, 0x98, 0x1e, 0x18, 0xdd, 0xca, 0xd4, 0x8a,
-	0x52, 0x9f, 0xda, 0x9c, 0xd0, 0x66, 0x5c, 0xc6, 0xb6, 0x24, 0xf1, 0xb9, 0xa2, 0xa0, 0x8b, 0x50,
-	0x70, 0x49, 0xd7, 0x36, 0x07, 0xba, 0x6d, 0x55, 0xb2, 0xc2, 0x8f, 0xbc, 0x4f, 0xd8, 0xb2, 0xd0,
-	0x12, 0x64, 0x1d, 0xe2, 0x98, 0xb8, 0x92, 0xe3, 0x8c, 0x4d, 0x45, 0xf3, 0x8f, 0x5c, 0xef, 0x2a,
-	0x94, 0xcd, 0x3e, 0xa5, 0xd8, 0xf1, 0xf4, 0x03, 0x4c, 0x99, 0x4d, 0x9c, 0xca, 0x34, 0xbf, 0x42,
-	0x9b, 0x95, 0xe4, 0x8f, 0x7d, 0xea, 0x9d, 0x22, 0x47, 0x32, 0x08, 0xad, 0x59, 0x86, 0x92, 0x1e,
-	0xf7, 0xab, 0x99, 0x87, 0x9c, 0x2e, 0x8c, 0xd6, 0x6e, 0xc2, 0xf9, 0x04, 0x40, 0x01, 0x74, 0x68,
-	0x11, 0xa6, 0x79, 0x6a, 0xb9, 0x83, 0x3e, 0x50, 0x39, 0x7e, 0xdc, 0xb2, 0x6a, 0x1d, 0x51, 0x2b,
-	0x1f, 0xda, 0x8e, 0xd1, 0xb5, 0x3f, 0x3b, 0x0d, 0xd4, 0x98, 0x95, 0x4c, 0xdc, 0x4a, 0xc8, 0x70,
-	0x3b, 0x02, 0x45, 0xc9, 0xd8, 0xed, 0x24, 0x3d, 0x97, 0xb9, 0x8d, 0x5f, 0x16, 0xe6, 0xf6, 0x9b,
-	0x49, 0x40, 0x61, 0xde, 0x39, 0xa7, 0x39, 0xb8, 0x67, 0xba, 0x67, 0xf1, 0xe5, 0x3a, 0x20, 0x07,
-	0x1f, 0xea, 0xa9, 0xec, 0x4f, 0x8a, 0xec, 0x97, 0x1d, 0x7c, 0xb8, 0x1b, 0x2f, 0x80, 0x3a, 0x94,
-	0xb8, 0x70, 0x54, 0x04, 0x3c, 0xc7, 0xa5, 0xcd, 0x09, 0xad, 0xe8, 0xe0, 0xc3, 0x47, 0x01, 0x95,
-	0x27, 0x2b, 0x5d, 0x0c, 0x59, 0x51, 0x0c, 0xca, 0x50, 0x31, 0xac, 0x42, 0xd1, 0xc1, 0xcf, 0xa2,
-	0x8c, 0xe6, 0x84, 0x5c, 0x46, 0x9b, 0xe1, 0x54, 0x99, 0x50, 0x2e, 0x77, 0x03, 0xca, 0x86, 0xe9,
-	0xd9, 0x07, 0x86, 0x67, 0x13, 0x47, 0xf7, 0xec, 0x1e, 0xf6, 0x93, 0xbf, 0x39, 0xa9, 0xcd, 0x46,
-	0x8c, 0x47, 0x76, 0x4f, 0x94, 0xca, 0x15, 0x28, 0x99, 0x5d, 0x6c, 0x50, 0xbd, 0xef, 0xb6, 0xa8,
-	0x61, 0xe1, 0x4a, 0x7e, 0x45, 0xa9, 0xe7, 0xb5, 0xa2, 0x20, 0x3e, 0xf6, 0x69, 0xa9, 0x32, 0x99,
-	0x83, 0x59, 0x3d, 0x11, 0xdb, 0x70, 0xe1, 0x70, 0x42, 0xdc, 0xd9, 0x26, 0x82, 0x39, 0x3d, 0xe5,
-	0x55, 0x6d, 0x19, 0xd4, 0xe1, 0xc4, 0x84, 0x79, 0xfb, 0x59, 0x81, 0xb5, 0xe1, 0x9c, 0xb6, 0x0d,
-	0x8a, 0x9b, 0x83, 0x10, 0xbf, 0x3d, 0xbb, 0xe5, 0x18, 0x5e, 0x9f, 0xe2, 0xb3, 0xe4, 0xf3, 0x1a,
-	0xcc, 0xb1, 0x40, 0x5f, 0x67, 0x66, 0x1b, 0xf7, 0xb0, 0x2c, 0xb2, 0x72, 0x48, 0xdf, 0x13, 0x64,
-	0xde, 0xce, 0x21, 0x49, 0x64, 0xb2, 0xa8, 0x45, 0x84, 0x54, 0x2d, 0xde, 0x82, 0x8d, 0xf1, 0xfd,
-	0x0e, 0xc3, 0xfd, 0x3a, 0x03, 0x6a, 0x4c, 0x36, 0x50, 0xe7, 0x82, 0x0f, 0x88, 0x89, 0x2e, 0x40,
-	0xce, 0x22, 0x3d, 0xc3, 0x76, 0x82, 0x2e, 0xf3, 0x4f, 0x68, 0x09, 0xf2, 0x66, 0xdb, 0xb0, 0x9d,
-	0x28, 0xba, 0x69, 0x71, 0x8e, 0xb5, 0x8e, 0x6d, 0xc5, 0x5b, 0x27, 0xd9, 0x53, 0x53, 0xf1, 0x9e,
-	0x42, 0xeb, 0x70, 0x2e, 0x18, 0x1b, 0x42, 0x80, 0xb5, 0x8d, 0x8d, 0x0f, 0x6e, 0x8b, 0x82, 0x2c,
-	0x6a, 0xf3, 0x92, 0xc5, 0x9d, 0xdc, 0x13, 0x0c, 0xb4, 0x01, 0xe7, 0x9f, 0x4a, 0x3f, 0xad, 0x84,
-	0x46, 0x4e, 0x68, 0x9c, 0x0b, 0x99, 0x31, 0x9d, 0x1b, 0x80, 0xf6, 0xbb, 0xc4, 0xec, 0xe8, 0x4e,
-	0xbf, 0xb7, 0x2f, 0x1a, 0x89, 0x8f, 0x30, 0x7f, 0x3a, 0xcd, 0x09, 0xce, 0x43, 0xc1, 0x78, 0x28,
-	0xc6, 0xce, 0xeb, 0x0c, 0x2c, 0xc4, 0x50, 0xe1, 0x68, 0xec, 0x79, 0x86, 0x87, 0xe3, 0x31, 0x28,
-	0x89, 0x18, 0xfe, 0x8d, 0xf1, 0x3c, 0xba, 0xd1, 0xa7, 0xc6, 0x6c, 0xf4, 0xec, 0xb8, 0x8d, 0x9e,
-	0x3b, 0xa6, 0xd1, 0xff, 0x16, 0x44, 0xc9, 0x1d, 0x91, 0x4f, 0xee, 0x88, 0x31, 0x5a, 0xb5, 0xf6,
-	0x63, 0x06, 0xe6, 0x76, 0x58, 0x6b, 0xcf, 0x23, 0x14, 0x3f, 0x20, 0x66, 0xbf, 0x87, 0x1d, 0xef,
-	0x2c, 0xdd, 0xa4, 0x42, 0xde, 0x92, 0xea, 0xb2, 0xde, 0xc2, 0x33, 0x5a, 0x80, 0xac, 0x4b, 0x09,
-	0x79, 0x2a, 0xeb, 0xcd, 0x3f, 0x9c, 0xbc, 0xdd, 0x54, 0xc8, 0x53, 0xec, 0x2f, 0x75, 0x7f, 0xc1,
-	0x69, 0xe1, 0x19, 0x55, 0x01, 0x5c, 0x4c, 0x7b, 0x36, 0x0b, 0x37, 0x5b, 0x41, 0x8b, 0x51, 0xd0,
-	0x22, 0x4c, 0x79, 0x36, 0xa6, 0x3e, 0x1a, 0x9b, 0x13, 0x9a, 0x38, 0x71, 0x64, 0x2f, 0x43, 0x81,
-	0x4f, 0x1e, 0xe6, 0x19, 0x3d, 0xb7, 0x52, 0x90, 0xf0, 0x47, 0xa4, 0xe7, 0x8a, 0x92, 0x1a, 0x75,
-	0xd3, 0x90, 0xd5, 0xb9, 0x72, 0xb3, 0x08, 0xa0, 0x87, 0x72, 0xb5, 0xbb, 0x50, 0x49, 0x43, 0x16,
-	0x2e, 0xc4, 0x4b, 0x30, 0x13, 0xc4, 0x1d, 0x2d, 0x45, 0x08, 0x48, 0x5b, 0x56, 0xed, 0x37, 0x45,
-	0xec, 0x52, 0xa1, 0xbd, 0x8d, 0x07, 0x0f, 0x30, 0x95, 0x53, 0xf1, 0x2c, 0xa8, 0x57, 0x01, 0xac,
-	0xd0, 0x80, 0xc4, 0x3d, 0x46, 0x49, 0x62, 0x3c, 0x75, 0x02, 0xc6, 0xd9, 0x13, 0x31, 0xce, 0xa5,
-	0x31, 0x4e, 0xcd, 0xbc, 0x6d, 0xf8, 0xdf, 0xc8, 0x90, 0x42, 0x54, 0xd6, 0x60, 0xbe, 0x83, 0x07,
-	0x7a, 0xe4, 0x59, 0x84, 0x4d, 0xb9, 0x13, 0xd7, 0xd8, 0xb2, 0x6a, 0x47, 0x0a, 0xcc, 0x87, 0x8f,
-	0x0d, 0xde, 0x67, 0x5b, 0xce, 0x53, 0x72, 0x32, 0x38, 0xa2, 0x55, 0x23, 0x70, 0xf8, 0x71, 0xcb,
-	0x42, 0xef, 0xc0, 0xac, 0x49, 0x1c, 0x8f, 0x92, 0x6e, 0x17, 0x53, 0xde, 0xc4, 0x12, 0xa0, 0x52,
-	0x44, 0xdd, 0xc6, 0x03, 0x74, 0x0b, 0x2e, 0x1c, 0xb6, 0x6d, 0x0f, 0x77, 0x6d, 0xe6, 0x61, 0x4b,
-	0x0f, 0xf1, 0x0a, 0x5a, 0x7e, 0x21, 0xc6, 0xdd, 0x95, 0xd8, 0x31, 0x74, 0x13, 0xe2, 0x74, 0x5d,
-	0xa6, 0x87, 0x55, 0xb2, 0x42, 0x07, 0xc5, 0x78, 0x9a, 0x48, 0x15, 0x4b, 0x41, 0x76, 0x11, 0x96,
-	0x86, 0x82, 0x0c, 0xb7, 0xc1, 0x77, 0x19, 0x01, 0x81, 0xbf, 0x1b, 0xc7, 0x80, 0x60, 0x09, 0xf2,
-	0xc1, 0xa0, 0x0a, 0xd6, 0x80, 0xe3, 0x0f, 0x28, 0xb4, 0x1c, 0xa1, 0x33, 0x29, 0xfb, 0x41, 0xe2,
-	0xc3, 0x3b, 0xe2, 0x3f, 0x8a, 0x1d, 0xad, 0x0d, 0xa5, 0x22, 0x78, 0xb5, 0x26, 0x93, 0x31, 0xdc,
-	0x82, 0x00, 0x79, 0x5d, 0x06, 0xd0, 0x9c, 0x87, 0xb2, 0x9e, 0x34, 0x23, 0x61, 0x4c, 0x02, 0x15,
-	0xc0, 0xb8, 0xf1, 0xeb, 0x34, 0x4c, 0xee, 0xb0, 0x16, 0x7a, 0x02, 0xc5, 0xc4, 0x47, 0xcb, 0xca,
-	0xd0, 0xc7, 0x46, 0xea, 0xcb, 0x40, 0xad, 0x9f, 0x26, 0x11, 0x56, 0xf6, 0x23, 0x80, 0xd8, 0x77,
-	0x43, 0x75, 0x94, 0x5e, 0xc4, 0x57, 0x57, 0x4f, 0xe6, 0x87, 0x56, 0x9f, 0x40, 0x31, 0xf1, 0x74,
-	0x1e, 0xe9, 0x71, 0x5c, 0x62, 0xb4, 0xc7, 0xa3, 0x5e, 0xc4, 0xc8, 0x84, 0x72, 0xfa, 0x35, 0x7c,
-	0xe5, 0xf8, 0x70, 0x43, 0x21, 0xf5, 0xfa, 0x18, 0x42, 0xe1, 0x25, 0x3f, 0x28, 0x70, 0x75, 0xdc,
-	0xb7, 0xdb, 0xdd, 0x31, 0x5c, 0x3f, 0x4e, 0x59, 0xbd, 0xff, 0x0f, 0x94, 0x43, 0x6f, 0x3f, 0x81,
-	0x52, 0x72, 0x01, 0x5e, 0x1e, 0x65, 0x35, 0x21, 0xa2, 0x5e, 0x3b, 0x55, 0x24, 0x34, 0xdf, 0x05,
-	0x34, 0x62, 0xdc, 0xaf, 0x1e, 0x6b, 0x20, 0x21, 0xa7, 0xae, 0x8f, 0x27, 0x17, 0xde, 0xf6, 0x29,
-	0xcc, 0xa6, 0x66, 0x67, 0xed, 0xf8, 0xaa, 0x0b, 0x64, 0xd4, 0xb5, 0xd3, 0x65, 0xe2, 0x37, 0xa4,
-	0x46, 0x53, 0xed, 0xf8, 0xda, 0x38, 0xf9, 0x86, 0xd1, 0x9d, 0xab, 0x66, 0x3f, 0xe7, 0x5f, 0xfc,
-	0xcd, 0x8f, 0x5e, 0xbe, 0xa9, 0x2a, 0xaf, 0xde, 0x54, 0x95, 0xd7, 0x6f, 0xaa, 0xca, 0x57, 0x47,
-	0xd5, 0x89, 0x57, 0x47, 0xd5, 0x89, 0x3f, 0x8e, 0xaa, 0x13, 0x4f, 0x6e, 0xb6, 0x6c, 0x8f, 0x1b,
-	0x32, 0x49, 0xaf, 0xe1, 0x9b, 0x75, 0xb0, 0x77, 0x48, 0x68, 0xa7, 0x31, 0xfc, 0x4b, 0x80, 0x37,
-	0x70, 0x31, 0xdb, 0xcf, 0x89, 0x1f, 0x31, 0xde, 0xff, 0x2b, 0x00, 0x00, 0xff, 0xff, 0x90, 0xce,
-	0xf4, 0xc4, 0x6c, 0x11, 0x00, 0x00,
+	// 1729 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x58, 0xcd, 0x6f, 0xdb, 0x46,
+	0x16, 0x37, 0x6d, 0x4b, 0xb6, 0x5e, 0xe4, 0x2f, 0xda, 0xb1, 0x65, 0x26, 0x51, 0x6c, 0xe5, 0xcb,
+	0x51, 0xb2, 0x56, 0xe2, 0x78, 0x73, 0x48, 0x4e, 0x71, 0x8c, 0xc0, 0x5e, 0xc3, 0x81, 0x41, 0x3b,
+	0xbb, 0xd8, 0x60, 0x17, 0x5c, 0x9a, 0x1c, 0x4b, 0x84, 0x24, 0x8e, 0x96, 0x43, 0xd9, 0xd6, 0x2e,
+	0x50, 0x04, 0x05, 0x0a, 0x04, 0x3d, 0x15, 0xe8, 0xbd, 0x3d, 0xe4, 0x52, 0xb4, 0x17, 0x17, 0x28,
+	0x7a, 0xe9, 0xb5, 0x87, 0x1c, 0xd3, 0x9e, 0x7a, 0x2a, 0x82, 0xf8, 0xe0, 0x7f, 0xa3, 0x98, 0x21,
+	0x39, 0xa4, 0xa8, 0xa1, 0xad, 0x28, 0x39, 0xf4, 0x62, 0x6b, 0xde, 0xfb, 0xcd, 0xcc, 0x7b, 0xbf,
+	0x79, 0xf3, 0xde, 0x1b, 0x42, 0x8e, 0xe0, 0xa6, 0x63, 0xa0, 0x4a, 0x73, 0xb7, 0x84, 0x9d, 0x5d,
+	0x8b, 0x94, 0xdc, 0xc3, 0xc5, 0x86, 0x83, 0x5d, 0x2c, 0x8f, 0x71, 0xcd, 0x22, 0xd3, 0x28, 0x13,
+	0x7a, 0xdd, 0xb2, 0x71, 0x89, 0xfd, 0xf5, 0x30, 0xca, 0x8c, 0x81, 0x49, 0x1d, 0x93, 0x52, 0x9d,
+	0x94, 0x4b, 0xfb, 0x77, 0xe9, 0x3f, 0x5f, 0x31, 0xeb, 0x29, 0x34, 0x36, 0x2a, 0x79, 0x03, 0x5f,
+	0x35, 0x55, 0xc6, 0x65, 0xec, 0xc9, 0xe9, 0x2f, 0x5f, 0x7a, 0x31, 0x6e, 0x47, 0x43, 0x77, 0xf4,
+	0xba, 0x3f, 0xa7, 0xf0, 0x93, 0x04, 0x63, 0x9b, 0xa4, 0xfc, 0xac, 0x61, 0xea, 0x2e, 0xda, 0x62,
+	0x1a, 0xf9, 0x3e, 0x64, 0xf4, 0xa6, 0x5b, 0xc1, 0x8e, 0xe5, 0xb6, 0x72, 0xd2, 0x9c, 0xb4, 0x90,
+	0x59, 0xc9, 0xfd, 0xfa, 0xc3, 0x5f, 0xa6, 0xfc, 0xcd, 0x1e, 0x99, 0xa6, 0x83, 0x08, 0xd9, 0x76,
+	0x1d, 0xcb, 0x2e, 0xab, 0x21, 0x54, 0x7e, 0x00, 0x69, 0x6f, 0xed, 0x5c, 0xff, 0x9c, 0xb4, 0x70,
+	0x6e, 0x69, 0x66, 0x31, 0xe6, 0xe8, 0xa2, 0xb7, 0xc1, 0x4a, 0xe6, 0xf5, 0xef, 0x97, 0xfb, 0xbe,
+	0x39, 0x39, 0x2a, 0x4a, 0xaa, 0x3f, 0xe3, 0xc1, 0xf2, 0xa7, 0x27, 0x47, 0xc5, 0x70, 0xad, 0xcf,
+	0x4f, 0x8e, 0x8a, 0xf3, 0xa1, 0xe1, 0x87, 0xbe, 0xe9, 0x31, 0x4b, 0x0b, 0xb3, 0x30, 0x13, 0x13,
+	0xa9, 0x88, 0x34, 0xb0, 0x4d, 0x50, 0xe1, 0xeb, 0x7e, 0x18, 0xd9, 0x24, 0xe5, 0xc7, 0x0e, 0xd2,
+	0x5d, 0xa4, 0x5a, 0x76, 0x59, 0xce, 0xc1, 0x90, 0x41, 0x47, 0xd8, 0xf1, 0x9c, 0x52, 0x83, 0xa1,
+	0x7c, 0x15, 0x46, 0x1b, 0x08, 0x39, 0x9a, 0x8d, 0x4d, 0xa4, 0x55, 0x51, 0x8b, 0x3a, 0x30, 0xb0,
+	0x90, 0x51, 0xb3, 0x54, 0xfa, 0x14, 0x9b, 0x68, 0x03, 0xb5, 0x88, 0x7c, 0x11, 0x32, 0x6e, 0xc5,
+	0x41, 0xa4, 0x82, 0x6b, 0x66, 0x6e, 0x60, 0x4e, 0x5a, 0x18, 0x51, 0x43, 0x81, 0x7c, 0x1d, 0xb2,
+	0x0d, 0x42, 0x34, 0xcb, 0x76, 0x91, 0xb3, 0xaf, 0xd7, 0x72, 0x83, 0x73, 0xd2, 0xc2, 0xe0, 0x5a,
+	0x9f, 0x7a, 0xae, 0x41, 0xc8, 0xba, 0x2f, 0x7c, 0x29, 0x49, 0xf2, 0x05, 0xc8, 0x34, 0x70, 0xcd,
+	0x32, 0x5a, 0x9a, 0x65, 0xe6, 0x52, 0xcc, 0x8e, 0x61, 0x4f, 0xb0, 0x6e, 0xca, 0xb3, 0x90, 0xb2,
+	0xb1, 0x6d, 0xa0, 0x5c, 0x9a, 0x2a, 0xd6, 0x24, 0xd5, 0x1b, 0xd2, 0x79, 0x37, 0x60, 0xcc, 0x68,
+	0x3a, 0x0e, 0xb2, 0x5d, 0x6d, 0x1f, 0x39, 0xc4, 0xc2, 0x76, 0x6e, 0x88, 0x6e, 0xa1, 0x8e, 0xfa,
+	0xe2, 0xbf, 0x7b, 0xd2, 0x07, 0x59, 0xca, 0x64, 0xe0, 0xda, 0xca, 0x18, 0x8c, 0x68, 0x51, 0xbb,
+	0x56, 0x86, 0x21, 0xad, 0xb1, 0x45, 0x0b, 0x77, 0xe0, 0x7c, 0x1b, 0x41, 0x01, 0x75, 0xf2, 0x0c,
+	0x0c, 0xd1, 0xa3, 0xa5, 0x06, 0x7a, 0x44, 0xa5, 0xe9, 0x70, 0xdd, 0x2c, 0x54, 0x59, 0xac, 0x3c,
+	0xb1, 0x6c, 0xbd, 0x66, 0xfd, 0xef, 0x2c, 0x52, 0x23, 0xab, 0xf4, 0x47, 0x57, 0xe1, 0x8a, 0x46,
+	0x95, 0xb1, 0xe8, 0x2b, 0xb6, 0xaa, 0xed, 0x96, 0xfb, 0x67, 0x1b, 0xdd, 0x8c, 0x9f, 0xed, 0xcf,
+	0x12, 0xe4, 0x36, 0x49, 0x79, 0xdb, 0xd5, 0x1d, 0xd7, 0x57, 0x54, 0x74, 0x07, 0xad, 0xb4, 0x1e,
+	0x19, 0x8d, 0x5e, 0x2c, 0xba, 0x05, 0xb2, 0x8d, 0x0e, 0xb4, 0x58, 0x0c, 0x0c, 0xb0, 0x18, 0x18,
+	0xb3, 0xd1, 0xc1, 0x56, 0x34, 0x0c, 0x16, 0x60, 0x84, 0x82, 0xc3, 0x50, 0xa0, 0x27, 0x3d, 0xb2,
+	0xd6, 0xa7, 0x66, 0x6d, 0x74, 0xb0, 0x13, 0x48, 0x5f, 0x4a, 0x52, 0xec, 0x24, 0xc6, 0x61, 0x54,
+	0x6b, 0x9b, 0x58, 0x28, 0xc0, 0x5c, 0x92, 0x17, 0xdc, 0xd5, 0x17, 0x12, 0x28, 0x14, 0x84, 0x18,
+	0x64, 0x2b, 0x8c, 0xa5, 0x9e, 0x9d, 0x9d, 0x8f, 0x05, 0xea, 0x00, 0x8b, 0xa2, 0x68, 0x98, 0xc6,
+	0x0e, 0xe2, 0x2a, 0x14, 0x92, 0x2d, 0xe0, 0x86, 0xfe, 0x13, 0xa6, 0x37, 0x49, 0x79, 0xd5, 0x22,
+	0xfa, 0x6e, 0x0d, 0xf9, 0xc8, 0x5e, 0x6d, 0x8c, 0x19, 0x30, 0x07, 0x79, 0xf1, 0xd2, 0x7c, 0xf3,
+	0x6f, 0x25, 0xb8, 0x40, 0x6d, 0x34, 0x2a, 0xc8, 0x6c, 0x7a, 0x98, 0x67, 0x8d, 0xb2, 0xa3, 0x9b,
+	0xe8, 0x43, 0x68, 0xb2, 0xd1, 0x61, 0x78, 0xd9, 0x7c, 0x9a, 0xa8, 0xcc, 0xbf, 0x69, 0xf4, 0x4a,
+	0xea, 0x86, 0x6b, 0xed, 0xeb, 0xae, 0x85, 0x6d, 0xcd, 0xb5, 0xea, 0xc8, 0xbb, 0xf5, 0xea, 0x68,
+	0x28, 0xde, 0xb1, 0xea, 0x28, 0xe6, 0xce, 0x35, 0xb8, 0x72, 0x8a, 0xad, 0xdc, 0xa7, 0x7f, 0xc1,
+	0x2c, 0xbd, 0x9e, 0xba, 0x6d, 0xa0, 0xda, 0x47, 0x70, 0x28, 0x66, 0xc4, 0x15, 0x98, 0x4f, 0x5c,
+	0x9d, 0x9b, 0xf0, 0xa3, 0x04, 0xc5, 0xce, 0x3b, 0xe8, 0x05, 0x29, 0x8f, 0xf4, 0x6d, 0xab, 0x6c,
+	0xeb, 0x6e, 0xd3, 0x41, 0xbd, 0xb0, 0x7c, 0x13, 0xc6, 0x49, 0x30, 0x5f, 0x23, 0x46, 0x05, 0xd5,
+	0x91, 0x9f, 0x14, 0xc6, 0xb8, 0x7c, 0x9b, 0x89, 0x69, 0xfa, 0xe5, 0x22, 0xc6, 0x73, 0x56, 0x0d,
+	0x05, 0x31, 0xef, 0x96, 0x61, 0xa9, 0x7b, 0xbb, 0xb9, 0xbb, 0x5f, 0xf6, 0x83, 0x12, 0xc1, 0x06,
+	0xd3, 0x29, 0x70, 0x15, 0x1b, 0xf2, 0x34, 0xa4, 0x4d, 0x5c, 0xd7, 0x2d, 0x3b, 0xc8, 0x8a, 0xde,
+	0x48, 0x9e, 0x85, 0x61, 0xa3, 0xa2, 0x5b, 0x76, 0xe8, 0xdd, 0x10, 0x1b, 0x47, 0x52, 0x9d, 0x65,
+	0x46, 0x53, 0x5d, 0x7b, 0x0e, 0x1c, 0x8c, 0xe6, 0x40, 0x79, 0x11, 0x26, 0x83, 0x34, 0xcf, 0x00,
+	0xa4, 0xa2, 0x2f, 0xfd, 0xf5, 0x3e, 0x2b, 0x14, 0x59, 0x75, 0xc2, 0x57, 0x51, 0x23, 0xb7, 0x99,
+	0x42, 0x5e, 0x82, 0xf3, 0x7b, 0xbe, 0x9d, 0x66, 0xdb, 0x8c, 0x34, 0x9b, 0x31, 0xc9, 0x95, 0x91,
+	0x39, 0xb7, 0x41, 0xde, 0xad, 0x61, 0xa3, 0xaa, 0xd9, 0xcd, 0xfa, 0x2e, 0x4b, 0x79, 0xb4, 0xe4,
+	0x78, 0xd5, 0x64, 0x9c, 0x69, 0x9e, 0x32, 0xc5, 0x53, 0x56, 0x26, 0xde, 0xf6, 0xc3, 0x54, 0x84,
+	0x15, 0xca, 0xc6, 0xb6, 0xab, 0xbb, 0x28, 0xea, 0x83, 0xd4, 0xe6, 0xc3, 0xc7, 0x28, 0xa7, 0xe2,
+	0x94, 0x3c, 0xd8, 0x65, 0x4a, 0x4e, 0x25, 0xa4, 0xe4, 0x8e, 0x2a, 0x9d, 0x66, 0x55, 0x5a, 0xea,
+	0xa8, 0xd2, 0xef, 0x45, 0x51, 0x7b, 0x4d, 0x1f, 0x6e, 0xaf, 0xe9, 0x9d, 0x79, 0xbf, 0xa3, 0x26,
+	0x17, 0xbe, 0xef, 0x87, 0x71, 0x56, 0x09, 0xb0, 0x83, 0x56, 0xb1, 0xd1, 0xac, 0x23, 0xdb, 0xed,
+	0xe5, 0x36, 0x29, 0x30, 0x6c, 0xfa, 0xd3, 0xfd, 0x78, 0xe3, 0x63, 0x79, 0x0a, 0x52, 0x0d, 0x07,
+	0xe3, 0x3d, 0x3f, 0xde, 0xbc, 0xc1, 0xe9, 0xdd, 0x88, 0x02, 0xc3, 0x0e, 0xf2, 0x9a, 0x30, 0xaf,
+	0x21, 0x51, 0xf9, 0x58, 0xce, 0x03, 0x34, 0x90, 0x53, 0xb7, 0x08, 0xef, 0x44, 0x32, 0x6a, 0x44,
+	0x22, 0xcf, 0xc0, 0xa0, 0x6b, 0x21, 0xc7, 0x63, 0x63, 0xad, 0x4f, 0x65, 0x23, 0xca, 0xec, 0x3c,
+	0x64, 0x68, 0xa6, 0x24, 0xae, 0x5e, 0x6f, 0xe4, 0x32, 0x3e, 0xfd, 0xa1, 0xa8, 0xb3, 0x6e, 0x0e,
+	0x41, 0x4a, 0xa3, 0x93, 0x57, 0xb2, 0x00, 0x1a, 0xc7, 0x15, 0x1e, 0xfa, 0x2d, 0x40, 0x84, 0x32,
+	0xde, 0xc0, 0x5c, 0x86, 0x73, 0x81, 0xdf, 0x61, 0x13, 0x03, 0x81, 0x68, 0xdd, 0x2c, 0xfc, 0x22,
+	0xb1, 0xde, 0x87, 0xcd, 0xde, 0x40, 0xad, 0x55, 0xe4, 0xf8, 0xe9, 0xba, 0x17, 0xd6, 0xf3, 0x00,
+	0x26, 0x5f, 0xc0, 0xe7, 0x3d, 0x22, 0x69, 0xe7, 0x78, 0xf0, 0x14, 0x8e, 0x53, 0xa7, 0x72, 0x9c,
+	0x8e, 0x73, 0x1c, 0xcb, 0x79, 0x1b, 0x70, 0x49, 0xe8, 0x12, 0x67, 0xa5, 0x08, 0x13, 0x55, 0xd4,
+	0xd2, 0x42, 0xcb, 0x42, 0x6e, 0xc6, 0xaa, 0xd1, 0x19, 0xeb, 0x66, 0xe1, 0x58, 0x82, 0x09, 0xde,
+	0x1c, 0xd2, 0x7b, 0xb6, 0x6e, 0xef, 0xe1, 0xd3, 0xc9, 0x61, 0x57, 0x35, 0x24, 0x87, 0x0e, 0xd7,
+	0x4d, 0xf9, 0x1a, 0x8c, 0x1a, 0xd8, 0x76, 0x1d, 0x5c, 0xab, 0x21, 0x87, 0x5e, 0x62, 0x9f, 0xa0,
+	0x91, 0x50, 0xba, 0x81, 0x5a, 0xf2, 0x32, 0x4c, 0x1f, 0x54, 0x2c, 0x17, 0xd5, 0x2c, 0xe2, 0x22,
+	0x53, 0xe3, 0x7c, 0x05, 0x57, 0x7e, 0x2a, 0xa2, 0xdd, 0xf2, 0xb9, 0x23, 0xf2, 0x1d, 0x88, 0xca,
+	0x35, 0xff, 0x78, 0x48, 0x2e, 0xc5, 0xe6, 0xc8, 0x11, 0x9d, 0xca, 0x8e, 0x8a, 0xc4, 0x28, 0xbb,
+	0xe0, 0x95, 0xd8, 0x36, 0x27, 0x79, 0x35, 0xf8, 0x2f, 0x4c, 0xf2, 0xb7, 0x05, 0x55, 0x6e, 0x79,
+	0x0e, 0x25, 0x73, 0x30, 0x0b, 0xc3, 0x41, 0xa6, 0x0a, 0xea, 0x80, 0xed, 0x65, 0xa8, 0x28, 0x3d,
+	0x03, 0x51, 0x7a, 0x62, 0xf6, 0x5c, 0x62, 0x5d, 0x4c, 0x7c, 0x4b, 0x6e, 0xd1, 0x67, 0x12, 0xb3,
+	0x77, 0xc7, 0xd1, 0x6d, 0xb2, 0xe7, 0xa5, 0xbf, 0xc7, 0x9c, 0xc5, 0xde, 0x0c, 0xeb, 0xee, 0x78,
+	0x84, 0xbd, 0x83, 0xd8, 0x0c, 0x6e, 0xec, 0x57, 0xde, 0x15, 0x7b, 0x64, 0x9a, 0x14, 0xb0, 0x83,
+	0xff, 0x11, 0x1c, 0x46, 0x6f, 0x86, 0x5e, 0x8a, 0x5e, 0xa2, 0x01, 0x3f, 0xa9, 0x44, 0x1f, 0x4e,
+	0xfc, 0x72, 0x0e, 0xfa, 0x4a, 0x61, 0xdf, 0x43, 0x9f, 0x3f, 0xae, 0xee, 0x94, 0x91, 0x5b, 0xb8,
+	0xcc, 0xee, 0x4b, 0xa7, 0x7d, 0xdc, 0x83, 0x57, 0x5e, 0xeb, 0xad, 0xa2, 0x3a, 0xde, 0x67, 0xc7,
+	0xf1, 0xc4, 0xc1, 0xf5, 0x3f, 0x9d, 0x1b, 0x5e, 0x77, 0x9e, 0x60, 0x64, 0xe0, 0xcb, 0xd2, 0xab,
+	0x51, 0x18, 0xd8, 0x24, 0x65, 0xf9, 0x39, 0x64, 0xdb, 0x9e, 0xfa, 0x73, 0x1d, 0x4f, 0xf4, 0xd8,
+	0x7b, 0x5a, 0x59, 0x38, 0x0b, 0xc1, 0xf3, 0xcb, 0x0e, 0x40, 0xe4, 0xb5, 0x9d, 0x17, 0xcd, 0x0b,
+	0xf5, 0xca, 0xf5, 0xd3, 0xf5, 0x7c, 0xd5, 0xe7, 0x90, 0x6d, 0x7b, 0x70, 0x0a, 0x2d, 0x8e, 0x22,
+	0xc4, 0x16, 0x8b, 0xde, 0x91, 0x72, 0x13, 0xce, 0x8b, 0xdf, 0x90, 0x37, 0x45, 0x4b, 0x08, 0xa1,
+	0xca, 0xdd, 0xae, 0xa1, 0x7c, 0xdb, 0xff, 0xc3, 0x4c, 0xd2, 0x7b, 0xee, 0x96, 0x70, 0x35, 0x31,
+	0x58, 0xb9, 0xf7, 0x1e, 0x60, 0xbe, 0x39, 0x86, 0x49, 0xd1, 0x23, 0xed, 0x86, 0x68, 0x2d, 0x01,
+	0x50, 0x29, 0x75, 0x09, 0xe4, 0x1b, 0x7e, 0x02, 0xb9, 0xc4, 0x77, 0xd9, 0x6d, 0xa1, 0x07, 0x09,
+	0x68, 0x65, 0xf9, 0x7d, 0xd0, 0x7c, 0xff, 0x43, 0x98, 0x4e, 0x78, 0x44, 0x15, 0x85, 0x21, 0x28,
+	0xc4, 0x2a, 0x4b, 0xdd, 0x63, 0xf9, 0xce, 0xdf, 0x49, 0x70, 0xa3, 0xdb, 0xb7, 0xd3, 0xc3, 0x2e,
+	0x82, 0x36, 0x69, 0xb2, 0xf2, 0xf8, 0x03, 0x26, 0x73, 0x6b, 0xff, 0x0d, 0x23, 0xed, 0x0d, 0xe8,
+	0xbc, 0x38, 0xb2, 0x23, 0x10, 0xe5, 0xe6, 0x99, 0x10, 0xbe, 0x7c, 0x0d, 0x64, 0x41, 0xbb, 0x75,
+	0x3d, 0x71, 0x81, 0x36, 0x9c, 0xb2, 0xd8, 0x1d, 0x8e, 0xef, 0xf6, 0x1f, 0x18, 0x8d, 0xf5, 0x2e,
+	0x85, 0xe4, 0x7c, 0x13, 0x60, 0x94, 0xe2, 0xd9, 0x18, 0xbe, 0xc3, 0x1e, 0x8c, 0x77, 0xf4, 0x06,
+	0x57, 0x93, 0x73, 0x65, 0x88, 0x52, 0x6e, 0x77, 0x83, 0x8a, 0x86, 0x6f, 0x42, 0xc1, 0x17, 0x5a,
+	0x2b, 0xc6, 0x8a, 0xc3, 0xf7, 0xf4, 0x0a, 0x4e, 0x4f, 0x4c, 0x50, 0xbd, 0x85, 0x27, 0xd6, 0x89,
+	0x13, 0x9f, 0x58, 0x72, 0xb5, 0xa5, 0x49, 0x31, 0xa9, 0xd2, 0x0a, 0x93, 0x62, 0x02, 0x58, 0x9c,
+	0x14, 0xcf, 0x28, 0x8f, 0x4a, 0xea, 0xc5, 0xc9, 0x51, 0x51, 0x5a, 0xf9, 0xdb, 0xeb, 0x77, 0x79,
+	0xe9, 0xcd, 0xbb, 0xbc, 0xf4, 0xf6, 0x5d, 0x5e, 0xfa, 0xe2, 0x38, 0xdf, 0xf7, 0xe6, 0x38, 0xdf,
+	0xf7, 0xdb, 0x71, 0xbe, 0xef, 0xf9, 0x9d, 0xb2, 0xe5, 0xd2, 0x15, 0x0d, 0x5c, 0x2f, 0x79, 0xeb,
+	0xdb, 0xc8, 0x3d, 0xc0, 0x4e, 0xb5, 0xd4, 0xf9, 0x91, 0xda, 0x6d, 0x35, 0x10, 0xd9, 0x4d, 0xb3,
+	0xef, 0xeb, 0xf7, 0xfe, 0x08, 0x00, 0x00, 0xff, 0xff, 0x19, 0x20, 0x63, 0x04, 0x07, 0x18, 0x00,
+	0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1729,12 +2337,19 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreateRing(ctx context.Context, in *MsgCreateRing, opts ...grpc.CallOption) (*MsgCreateRingResponse, error)
 	FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error)
-	UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error)
+	StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error)
+	SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error)
+	DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error)
+	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
+	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDerivation, opts ...grpc.CallOption) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error)
-	UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error)
+	UpdateNodePeerId(ctx context.Context, in *MsgUpdateNodePeerId, opts ...grpc.CallOption) (*MsgUpdateNodePeerIdResponse, error)
+	TransferNodeController(ctx context.Context, in *MsgTransferNodeController, opts ...grpc.CallOption) (*MsgTransferNodeControllerResponse, error)
+	AddNodeToWhitelist(ctx context.Context, in *MsgAddNodeToWhitelist, opts ...grpc.CallOption) (*MsgAddNodeToWhitelistResponse, error)
+	RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNodeFromWhitelist, opts ...grpc.CallOption) (*MsgRemoveNodeFromWhitelistResponse, error)
 }
 
 type msgClient struct {
@@ -1772,9 +2387,45 @@ func (c *msgClient) FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts 
 	return out, nil
 }
 
-func (c *msgClient) UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error) {
-	out := new(MsgUpdateRingByAcpResponse)
-	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/UpdateRingByAcp", in, out, opts...)
+func (c *msgClient) StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error) {
+	out := new(MsgStartRingReshareByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/StartRingReshareByAcp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error) {
+	out := new(MsgSetRingPssIntervalByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/SetRingPssIntervalByAcp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error) {
+	out := new(MsgDisableRingPssByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/DisableRingPssByAcp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error) {
+	out := new(MsgScheduleRingUpgradeByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error) {
+	out := new(MsgCancelRingUpgradeByAcpResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1817,9 +2468,36 @@ func (c *msgClient) CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, o
 	return out, nil
 }
 
-func (c *msgClient) UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error) {
-	out := new(MsgUpdateNodeInfoResponse)
-	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/UpdateNodeInfo", in, out, opts...)
+func (c *msgClient) UpdateNodePeerId(ctx context.Context, in *MsgUpdateNodePeerId, opts ...grpc.CallOption) (*MsgUpdateNodePeerIdResponse, error) {
+	out := new(MsgUpdateNodePeerIdResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/UpdateNodePeerId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) TransferNodeController(ctx context.Context, in *MsgTransferNodeController, opts ...grpc.CallOption) (*MsgTransferNodeControllerResponse, error) {
+	out := new(MsgTransferNodeControllerResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/TransferNodeController", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddNodeToWhitelist(ctx context.Context, in *MsgAddNodeToWhitelist, opts ...grpc.CallOption) (*MsgAddNodeToWhitelistResponse, error) {
+	out := new(MsgAddNodeToWhitelistResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/AddNodeToWhitelist", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNodeFromWhitelist, opts ...grpc.CallOption) (*MsgRemoveNodeFromWhitelistResponse, error) {
+	out := new(MsgRemoveNodeFromWhitelistResponse)
+	err := c.cc.Invoke(ctx, "/sourcehub.orbis.Msg/RemoveNodeFromWhitelist", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -1832,12 +2510,19 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreateRing(context.Context, *MsgCreateRing) (*MsgCreateRingResponse, error)
 	FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error)
-	UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error)
+	StartRingReshareByAcp(context.Context, *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error)
+	SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error)
+	DisableRingPssByAcp(context.Context, *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error)
+	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
+	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error)
-	UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error)
+	UpdateNodePeerId(context.Context, *MsgUpdateNodePeerId) (*MsgUpdateNodePeerIdResponse, error)
+	TransferNodeController(context.Context, *MsgTransferNodeController) (*MsgTransferNodeControllerResponse, error)
+	AddNodeToWhitelist(context.Context, *MsgAddNodeToWhitelist) (*MsgAddNodeToWhitelistResponse, error)
+	RemoveNodeFromWhitelist(context.Context, *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1853,8 +2538,20 @@ func (*UnimplementedMsgServer) CreateRing(ctx context.Context, req *MsgCreateRin
 func (*UnimplementedMsgServer) FinalizeRing(ctx context.Context, req *MsgFinalizeRing) (*MsgFinalizeRingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRing not implemented")
 }
-func (*UnimplementedMsgServer) UpdateRingByAcp(ctx context.Context, req *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingByAcp not implemented")
+func (*UnimplementedMsgServer) StartRingReshareByAcp(ctx context.Context, req *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartRingReshareByAcp not implemented")
+}
+func (*UnimplementedMsgServer) SetRingPssIntervalByAcp(ctx context.Context, req *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetRingPssIntervalByAcp not implemented")
+}
+func (*UnimplementedMsgServer) DisableRingPssByAcp(ctx context.Context, req *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableRingPssByAcp not implemented")
+}
+func (*UnimplementedMsgServer) ScheduleRingUpgradeByAcp(ctx context.Context, req *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScheduleRingUpgradeByAcp not implemented")
+}
+func (*UnimplementedMsgServer) CancelRingUpgradeByAcp(ctx context.Context, req *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelRingUpgradeByAcp not implemented")
 }
 func (*UnimplementedMsgServer) FinalizeRingReshareByThresholdSignature(ctx context.Context, req *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRingReshareByThresholdSignature not implemented")
@@ -1868,8 +2565,17 @@ func (*UnimplementedMsgServer) StoreKeyDerivation(ctx context.Context, req *MsgS
 func (*UnimplementedMsgServer) CreateNodeInfo(ctx context.Context, req *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNodeInfo not implemented")
 }
-func (*UnimplementedMsgServer) UpdateNodeInfo(ctx context.Context, req *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeInfo not implemented")
+func (*UnimplementedMsgServer) UpdateNodePeerId(ctx context.Context, req *MsgUpdateNodePeerId) (*MsgUpdateNodePeerIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodePeerId not implemented")
+}
+func (*UnimplementedMsgServer) TransferNodeController(ctx context.Context, req *MsgTransferNodeController) (*MsgTransferNodeControllerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferNodeController not implemented")
+}
+func (*UnimplementedMsgServer) AddNodeToWhitelist(ctx context.Context, req *MsgAddNodeToWhitelist) (*MsgAddNodeToWhitelistResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddNodeToWhitelist not implemented")
+}
+func (*UnimplementedMsgServer) RemoveNodeFromWhitelist(ctx context.Context, req *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveNodeFromWhitelist not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1930,20 +2636,92 @@ func _Msg_FinalizeRing_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateRingByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateRingByAcp)
+func _Msg_StartRingReshareByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgStartRingReshareByAcp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateRingByAcp(ctx, in)
+		return srv.(MsgServer).StartRingReshareByAcp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sourcehub.orbis.Msg/UpdateRingByAcp",
+		FullMethod: "/sourcehub.orbis.Msg/StartRingReshareByAcp",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateRingByAcp(ctx, req.(*MsgUpdateRingByAcp))
+		return srv.(MsgServer).StartRingReshareByAcp(ctx, req.(*MsgStartRingReshareByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetRingPssIntervalByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetRingPssIntervalByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/SetRingPssIntervalByAcp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, req.(*MsgSetRingPssIntervalByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DisableRingPssByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDisableRingPssByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DisableRingPssByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/DisableRingPssByAcp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DisableRingPssByAcp(ctx, req.(*MsgDisableRingPssByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_ScheduleRingUpgradeByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgScheduleRingUpgradeByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ScheduleRingUpgradeByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ScheduleRingUpgradeByAcp(ctx, req.(*MsgScheduleRingUpgradeByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_CancelRingUpgradeByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCancelRingUpgradeByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CancelRingUpgradeByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CancelRingUpgradeByAcp(ctx, req.(*MsgCancelRingUpgradeByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2020,20 +2798,74 @@ func _Msg_CreateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateNodeInfo)
+func _Msg_UpdateNodePeerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateNodePeerId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateNodeInfo(ctx, in)
+		return srv.(MsgServer).UpdateNodePeerId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sourcehub.orbis.Msg/UpdateNodeInfo",
+		FullMethod: "/sourcehub.orbis.Msg/UpdateNodePeerId",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateNodeInfo(ctx, req.(*MsgUpdateNodeInfo))
+		return srv.(MsgServer).UpdateNodePeerId(ctx, req.(*MsgUpdateNodePeerId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_TransferNodeController_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferNodeController)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).TransferNodeController(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/TransferNodeController",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).TransferNodeController(ctx, req.(*MsgTransferNodeController))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddNodeToWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddNodeToWhitelist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddNodeToWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/AddNodeToWhitelist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddNodeToWhitelist(ctx, req.(*MsgAddNodeToWhitelist))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveNodeFromWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveNodeFromWhitelist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveNodeFromWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sourcehub.orbis.Msg/RemoveNodeFromWhitelist",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveNodeFromWhitelist(ctx, req.(*MsgRemoveNodeFromWhitelist))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2056,8 +2888,24 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_FinalizeRing_Handler,
 		},
 		{
-			MethodName: "UpdateRingByAcp",
-			Handler:    _Msg_UpdateRingByAcp_Handler,
+			MethodName: "StartRingReshareByAcp",
+			Handler:    _Msg_StartRingReshareByAcp_Handler,
+		},
+		{
+			MethodName: "SetRingPssIntervalByAcp",
+			Handler:    _Msg_SetRingPssIntervalByAcp_Handler,
+		},
+		{
+			MethodName: "DisableRingPssByAcp",
+			Handler:    _Msg_DisableRingPssByAcp_Handler,
+		},
+		{
+			MethodName: "ScheduleRingUpgradeByAcp",
+			Handler:    _Msg_ScheduleRingUpgradeByAcp_Handler,
+		},
+		{
+			MethodName: "CancelRingUpgradeByAcp",
+			Handler:    _Msg_CancelRingUpgradeByAcp_Handler,
 		},
 		{
 			MethodName: "FinalizeRingReshareByThresholdSignature",
@@ -2076,8 +2924,20 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateNodeInfo_Handler,
 		},
 		{
-			MethodName: "UpdateNodeInfo",
-			Handler:    _Msg_UpdateNodeInfo_Handler,
+			MethodName: "UpdateNodePeerId",
+			Handler:    _Msg_UpdateNodePeerId_Handler,
+		},
+		{
+			MethodName: "TransferNodeController",
+			Handler:    _Msg_TransferNodeController_Handler,
+		},
+		{
+			MethodName: "AddNodeToWhitelist",
+			Handler:    _Msg_AddNodeToWhitelist_Handler,
+		},
+		{
+			MethodName: "RemoveNodeFromWhitelist",
+			Handler:    _Msg_RemoveNodeFromWhitelist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -2344,7 +3204,7 @@ func (m *MsgFinalizeRingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateRingByAcp) Marshal() (dAtA []byte, err error) {
+func (m *MsgStartRingReshareByAcp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2354,53 +3214,16 @@ func (m *MsgUpdateRingByAcp) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateRingByAcp) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcp) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateRingByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.ClearUpgrade {
-		i--
-		if m.ClearUpgrade {
-			dAtA[i] = 1
-		} else {
-			dAtA[i] = 0
-		}
-		i--
-		dAtA[i] = 0x40
-	}
-	if m.XActivationTime != nil {
-		{
-			size := m.XActivationTime.Size()
-			i -= size
-			if _, err := m.XActivationTime.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if m.XNextVersion != nil {
-		{
-			size := m.XNextVersion.Size()
-			i -= size
-			if _, err := m.XNextVersion.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if m.XPssInterval != nil {
-		{
-			size := m.XPssInterval.Size()
-			i -= size
-			if _, err := m.XPssInterval.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
 	if m.XNewThreshold != nil {
 		{
 			size := m.XNewThreshold.Size()
@@ -2436,55 +3259,19 @@ func (m *MsgUpdateRingByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateRingByAcp_NewThreshold) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcp_NewThreshold) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateRingByAcp_NewThreshold) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcp_NewThreshold) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	i = encodeVarintTx(dAtA, i, uint64(m.NewThreshold))
 	i--
 	dAtA[i] = 0x20
 	return len(dAtA) - i, nil
 }
-func (m *MsgUpdateRingByAcp_PssInterval) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgUpdateRingByAcp_PssInterval) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i = encodeVarintTx(dAtA, i, uint64(m.PssInterval))
-	i--
-	dAtA[i] = 0x28
-	return len(dAtA) - i, nil
-}
-func (m *MsgUpdateRingByAcp_NextVersion) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgUpdateRingByAcp_NextVersion) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i = encodeVarintTx(dAtA, i, uint64(m.NextVersion))
-	i--
-	dAtA[i] = 0x30
-	return len(dAtA) - i, nil
-}
-func (m *MsgUpdateRingByAcp_ActivationTime) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgUpdateRingByAcp_ActivationTime) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	i = encodeVarintTx(dAtA, i, uint64(m.ActivationTime))
-	i--
-	dAtA[i] = 0x38
-	return len(dAtA) - i, nil
-}
-func (m *MsgUpdateRingByAcpResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgStartRingReshareByAcpResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2494,12 +3281,267 @@ func (m *MsgUpdateRingByAcpResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateRingByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateRingByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgStartRingReshareByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetRingPssIntervalByAcp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetRingPssIntervalByAcp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetRingPssIntervalByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.PssInterval != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.PssInterval))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.RingId) > 0 {
+		i -= len(m.RingId)
+		copy(dAtA[i:], m.RingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgSetRingPssIntervalByAcpResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgSetRingPssIntervalByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgSetRingPssIntervalByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDisableRingPssByAcp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDisableRingPssByAcp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDisableRingPssByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RingId) > 0 {
+		i -= len(m.RingId)
+		copy(dAtA[i:], m.RingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDisableRingPssByAcpResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDisableRingPssByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDisableRingPssByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ActivationTime != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.ActivationTime))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.NextVersion != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.NextVersion))
+		i--
+		dAtA[i] = 0x18
+	}
+	if len(m.RingId) > 0 {
+		i -= len(m.RingId)
+		copy(dAtA[i:], m.RingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgScheduleRingUpgradeByAcpResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgScheduleRingUpgradeByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgScheduleRingUpgradeByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCancelRingUpgradeByAcp) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCancelRingUpgradeByAcp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCancelRingUpgradeByAcp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.RingId) > 0 {
+		i -= len(m.RingId)
+		copy(dAtA[i:], m.RingId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCancelRingUpgradeByAcpResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCancelRingUpgradeByAcpResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCancelRingUpgradeByAcpResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3084,7 +4126,7 @@ func (m *MsgCreateNodeInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, erro
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateNodeInfo) Marshal() (dAtA []byte, err error) {
+func (m *MsgUpdateNodePeerId) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3094,48 +4136,155 @@ func (m *MsgUpdateNodeInfo) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateNodeInfo) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgUpdateNodePeerId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgUpdateNodePeerId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if m.XControllerKey != nil {
+	if len(m.PeerId) > 0 {
+		i -= len(m.PeerId)
+		copy(dAtA[i:], m.PeerId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.PeerId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NodeKey) > 0 {
+		i -= len(m.NodeKey)
+		copy(dAtA[i:], m.NodeKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodeKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateNodePeerIdResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateNodePeerIdResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateNodePeerIdResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTransferNodeController) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferNodeController) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferNodeController) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.ControllerKey) > 0 {
+		i -= len(m.ControllerKey)
+		copy(dAtA[i:], m.ControllerKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerKey)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.NodeKey) > 0 {
+		i -= len(m.NodeKey)
+		copy(dAtA[i:], m.NodeKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodeKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgTransferNodeControllerResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgTransferNodeControllerResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgTransferNodeControllerResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgAddNodeToWhitelist) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgAddNodeToWhitelist) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgAddNodeToWhitelist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Target != nil {
 		{
-			size := m.XControllerKey.Size()
+			size := m.Target.Size()
 			i -= size
-			if _, err := m.XControllerKey.MarshalTo(dAtA[i:]); err != nil {
-				return 0, err
-			}
-		}
-	}
-	if len(m.WhitelistedRingIds) > 0 {
-		for iNdEx := len(m.WhitelistedRingIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.WhitelistedRingIds[iNdEx])
-			copy(dAtA[i:], m.WhitelistedRingIds[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedRingIds[iNdEx])))
-			i--
-			dAtA[i] = 0x2a
-		}
-	}
-	if len(m.WhitelistedPolicyIds) > 0 {
-		for iNdEx := len(m.WhitelistedPolicyIds) - 1; iNdEx >= 0; iNdEx-- {
-			i -= len(m.WhitelistedPolicyIds[iNdEx])
-			copy(dAtA[i:], m.WhitelistedPolicyIds[iNdEx])
-			i = encodeVarintTx(dAtA, i, uint64(len(m.WhitelistedPolicyIds[iNdEx])))
-			i--
-			dAtA[i] = 0x22
-		}
-	}
-	if m.XPeerId != nil {
-		{
-			size := m.XPeerId.Size()
-			i -= size
-			if _, err := m.XPeerId.MarshalTo(dAtA[i:]); err != nil {
+			if _, err := m.Target.MarshalTo(dAtA[i:]); err != nil {
 				return 0, err
 			}
 		}
@@ -3157,35 +4306,35 @@ func (m *MsgUpdateNodeInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgUpdateNodeInfo_PeerId) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelist_PolicyId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateNodeInfo_PeerId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelist_PolicyId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	i -= len(m.PeerId)
-	copy(dAtA[i:], m.PeerId)
-	i = encodeVarintTx(dAtA, i, uint64(len(m.PeerId)))
+	i -= len(m.PolicyId)
+	copy(dAtA[i:], m.PolicyId)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
 	i--
 	dAtA[i] = 0x1a
 	return len(dAtA) - i, nil
 }
-func (m *MsgUpdateNodeInfo_ControllerKey) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelist_RingId) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateNodeInfo_ControllerKey) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelist_RingId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
-	i -= len(m.ControllerKey)
-	copy(dAtA[i:], m.ControllerKey)
-	i = encodeVarintTx(dAtA, i, uint64(len(m.ControllerKey)))
+	i -= len(m.RingId)
+	copy(dAtA[i:], m.RingId)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
 	i--
-	dAtA[i] = 0x32
+	dAtA[i] = 0x22
 	return len(dAtA) - i, nil
 }
-func (m *MsgUpdateNodeInfoResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgAddNodeToWhitelistResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -3195,12 +4344,109 @@ func (m *MsgUpdateNodeInfoResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgUpdateNodeInfoResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelistResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgUpdateNodeInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgAddNodeToWhitelistResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveNodeFromWhitelist) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveNodeFromWhitelist) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveNodeFromWhitelist) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Target != nil {
+		{
+			size := m.Target.Size()
+			i -= size
+			if _, err := m.Target.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+		}
+	}
+	if len(m.NodeKey) > 0 {
+		i -= len(m.NodeKey)
+		copy(dAtA[i:], m.NodeKey)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.NodeKey)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgRemoveNodeFromWhitelist_PolicyId) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveNodeFromWhitelist_PolicyId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.PolicyId)
+	copy(dAtA[i:], m.PolicyId)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.PolicyId)))
+	i--
+	dAtA[i] = 0x1a
+	return len(dAtA) - i, nil
+}
+func (m *MsgRemoveNodeFromWhitelist_RingId) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveNodeFromWhitelist_RingId) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	i -= len(m.RingId)
+	copy(dAtA[i:], m.RingId)
+	i = encodeVarintTx(dAtA, i, uint64(len(m.RingId)))
+	i--
+	dAtA[i] = 0x22
+	return len(dAtA) - i, nil
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgRemoveNodeFromWhitelistResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgRemoveNodeFromWhitelistResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3340,7 +4586,7 @@ func (m *MsgFinalizeRingResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateRingByAcp) Size() (n int) {
+func (m *MsgStartRingReshareByAcp) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3363,22 +4609,10 @@ func (m *MsgUpdateRingByAcp) Size() (n int) {
 	if m.XNewThreshold != nil {
 		n += m.XNewThreshold.Size()
 	}
-	if m.XPssInterval != nil {
-		n += m.XPssInterval.Size()
-	}
-	if m.XNextVersion != nil {
-		n += m.XNextVersion.Size()
-	}
-	if m.XActivationTime != nil {
-		n += m.XActivationTime.Size()
-	}
-	if m.ClearUpgrade {
-		n += 2
-	}
 	return n
 }
 
-func (m *MsgUpdateRingByAcp_NewThreshold) Size() (n int) {
+func (m *MsgStartRingReshareByAcp_NewThreshold) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3387,34 +4621,120 @@ func (m *MsgUpdateRingByAcp_NewThreshold) Size() (n int) {
 	n += 1 + sovTx(uint64(m.NewThreshold))
 	return n
 }
-func (m *MsgUpdateRingByAcp_PssInterval) Size() (n int) {
+func (m *MsgStartRingReshareByAcpResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	n += 1 + sovTx(uint64(m.PssInterval))
 	return n
 }
-func (m *MsgUpdateRingByAcp_NextVersion) Size() (n int) {
+
+func (m *MsgSetRingPssIntervalByAcp) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	n += 1 + sovTx(uint64(m.NextVersion))
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.PssInterval != 0 {
+		n += 1 + sovTx(uint64(m.PssInterval))
+	}
 	return n
 }
-func (m *MsgUpdateRingByAcp_ActivationTime) Size() (n int) {
+
+func (m *MsgSetRingPssIntervalByAcpResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	n += 1 + sovTx(uint64(m.ActivationTime))
 	return n
 }
-func (m *MsgUpdateRingByAcpResponse) Size() (n int) {
+
+func (m *MsgDisableRingPssByAcp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDisableRingPssByAcpResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgScheduleRingUpgradeByAcp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.NextVersion != 0 {
+		n += 1 + sovTx(uint64(m.NextVersion))
+	}
+	if m.ActivationTime != 0 {
+		n += 1 + sovTx(uint64(m.ActivationTime))
+	}
+	return n
+}
+
+func (m *MsgScheduleRingUpgradeByAcpResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCancelRingUpgradeByAcp) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.RingId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgCancelRingUpgradeByAcpResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3715,7 +5035,7 @@ func (m *MsgCreateNodeInfoResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgUpdateNodeInfo) Size() (n int) {
+func (m *MsgUpdateNodePeerId) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3729,48 +5049,142 @@ func (m *MsgUpdateNodeInfo) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.XPeerId != nil {
-		n += m.XPeerId.Size()
-	}
-	if len(m.WhitelistedPolicyIds) > 0 {
-		for _, s := range m.WhitelistedPolicyIds {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if len(m.WhitelistedRingIds) > 0 {
-		for _, s := range m.WhitelistedRingIds {
-			l = len(s)
-			n += 1 + l + sovTx(uint64(l))
-		}
-	}
-	if m.XControllerKey != nil {
-		n += m.XControllerKey.Size()
+	l = len(m.PeerId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
 	}
 	return n
 }
 
-func (m *MsgUpdateNodeInfo_PeerId) Size() (n int) {
+func (m *MsgUpdateNodePeerIdResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = len(m.PeerId)
-	n += 1 + l + sovTx(uint64(l))
 	return n
 }
-func (m *MsgUpdateNodeInfo_ControllerKey) Size() (n int) {
+
+func (m *MsgTransferNodeController) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodeKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
 	l = len(m.ControllerKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgTransferNodeControllerResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgAddNodeToWhitelist) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodeKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Target != nil {
+		n += m.Target.Size()
+	}
+	return n
+}
+
+func (m *MsgAddNodeToWhitelist_PolicyId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PolicyId)
 	n += 1 + l + sovTx(uint64(l))
 	return n
 }
-func (m *MsgUpdateNodeInfoResponse) Size() (n int) {
+func (m *MsgAddNodeToWhitelist_RingId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RingId)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+func (m *MsgAddNodeToWhitelistResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgRemoveNodeFromWhitelist) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.NodeKey)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Target != nil {
+		n += m.Target.Size()
+	}
+	return n
+}
+
+func (m *MsgRemoveNodeFromWhitelist_PolicyId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PolicyId)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+func (m *MsgRemoveNodeFromWhitelist_RingId) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.RingId)
+	n += 1 + l + sovTx(uint64(l))
+	return n
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -4464,7 +5878,7 @@ func (m *MsgFinalizeRingResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
+func (m *MsgStartRingReshareByAcp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4487,10 +5901,10 @@ func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateRingByAcp: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgStartRingReshareByAcp: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateRingByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgStartRingReshareByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -4608,87 +6022,7 @@ func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-			m.XNewThreshold = &MsgUpdateRingByAcp_NewThreshold{v}
-		case 5:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
-			}
-			var v uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.XPssInterval = &MsgUpdateRingByAcp_PssInterval{v}
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextVersion", wireType)
-			}
-			var v uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.XNextVersion = &MsgUpdateRingByAcp_NextVersion{v}
-		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ActivationTime", wireType)
-			}
-			var v uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.XActivationTime = &MsgUpdateRingByAcp_ActivationTime{v}
-		case 8:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ClearUpgrade", wireType)
-			}
-			var v int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				v |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			m.ClearUpgrade = bool(v != 0)
+			m.XNewThreshold = &MsgStartRingReshareByAcp_NewThreshold{v}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -4710,7 +6044,7 @@ func (m *MsgUpdateRingByAcp) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateRingByAcpResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgStartRingReshareByAcpResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -4733,10 +6067,723 @@ func (m *MsgUpdateRingByAcpResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateRingByAcpResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgStartRingReshareByAcpResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateRingByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgStartRingReshareByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetRingPssIntervalByAcp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetRingPssIntervalByAcp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetRingPssIntervalByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PssInterval", wireType)
+			}
+			m.PssInterval = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.PssInterval |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgSetRingPssIntervalByAcpResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgSetRingPssIntervalByAcpResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgSetRingPssIntervalByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDisableRingPssByAcp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDisableRingPssByAcp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDisableRingPssByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDisableRingPssByAcpResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDisableRingPssByAcpResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDisableRingPssByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgScheduleRingUpgradeByAcp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgScheduleRingUpgradeByAcp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgScheduleRingUpgradeByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NextVersion", wireType)
+			}
+			m.NextVersion = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.NextVersion |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ActivationTime", wireType)
+			}
+			m.ActivationTime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ActivationTime |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgScheduleRingUpgradeByAcpResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgScheduleRingUpgradeByAcpResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgScheduleRingUpgradeByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCancelRingUpgradeByAcp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCancelRingUpgradeByAcp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCancelRingUpgradeByAcp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.RingId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCancelRingUpgradeByAcpResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCancelRingUpgradeByAcpResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCancelRingUpgradeByAcpResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
@@ -6503,7 +8550,7 @@ func (m *MsgCreateNodeInfoResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
+func (m *MsgUpdateNodePeerId) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6526,10 +8573,10 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateNodeInfo: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgUpdateNodePeerId: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateNodeInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgUpdateNodePeerId: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -6626,11 +8673,111 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XPeerId = &MsgUpdateNodeInfo_PeerId{string(dAtA[iNdEx:postIndex])}
+			m.PeerId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 4:
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateNodePeerIdResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateNodePeerIdResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateNodePeerIdResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgTransferNodeController) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgTransferNodeController: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgTransferNodeController: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedPolicyIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6658,11 +8805,11 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WhitelistedPolicyIds = append(m.WhitelistedPolicyIds, string(dAtA[iNdEx:postIndex]))
+			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 5:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedRingIds", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeKey", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -6690,9 +8837,9 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WhitelistedRingIds = append(m.WhitelistedRingIds, string(dAtA[iNdEx:postIndex]))
+			m.NodeKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 6:
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ControllerKey", wireType)
 			}
@@ -6722,7 +8869,7 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.XControllerKey = &MsgUpdateNodeInfo_ControllerKey{string(dAtA[iNdEx:postIndex])}
+			m.ControllerKey = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -6745,7 +8892,7 @@ func (m *MsgUpdateNodeInfo) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgUpdateNodeInfoResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgTransferNodeControllerResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -6768,10 +8915,466 @@ func (m *MsgUpdateNodeInfoResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgUpdateNodeInfoResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgTransferNodeControllerResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgUpdateNodeInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgTransferNodeControllerResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddNodeToWhitelist) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddNodeToWhitelist: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddNodeToWhitelist: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Target = &MsgAddNodeToWhitelist_PolicyId{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Target = &MsgAddNodeToWhitelist_RingId{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgAddNodeToWhitelistResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgAddNodeToWhitelistResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgAddNodeToWhitelistResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveNodeFromWhitelist) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveNodeFromWhitelist: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveNodeFromWhitelist: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field NodeKey", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.NodeKey = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PolicyId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Target = &MsgRemoveNodeFromWhitelist_PolicyId{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Target = &MsgRemoveNodeFromWhitelist_RingId{string(dAtA[iNdEx:postIndex])}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgRemoveNodeFromWhitelistResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgRemoveNodeFromWhitelistResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgRemoveNodeFromWhitelistResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

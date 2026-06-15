@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
-	"sort"
+	"slices"
 
 	"github.com/sourcenetwork/immutable"
 )
@@ -33,9 +33,10 @@ func KeyPrefix(p string) []byte {
 // GenerateRingID returns the stable ID for a ring's creation parameters.
 // peerNodeKeys are sorted before hashing so the ID is order-independent.
 func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutable.Option[uint64], policyID string, nonce immutable.Option[string], currentVersion uint64) string {
-	sorted := make([]string, len(peerNodeKeys))
-	copy(sorted, peerNodeKeys)
-	sort.Strings(sorted)
+	sorted := slices.Clone(peerNodeKeys)
+	if !slices.IsSorted(sorted) {
+		slices.Sort(sorted)
+	}
 
 	h := newIDHasher("orbis/ring")
 	h.writeStringSlice(sorted)

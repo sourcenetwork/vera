@@ -22,12 +22,19 @@ const (
 	Msg_UpdateParams_FullMethodName                            = "/sourcehub.orbis.Msg/UpdateParams"
 	Msg_CreateRing_FullMethodName                              = "/sourcehub.orbis.Msg/CreateRing"
 	Msg_FinalizeRing_FullMethodName                            = "/sourcehub.orbis.Msg/FinalizeRing"
-	Msg_UpdateRingByAcp_FullMethodName                         = "/sourcehub.orbis.Msg/UpdateRingByAcp"
+	Msg_StartRingReshareByAcp_FullMethodName                   = "/sourcehub.orbis.Msg/StartRingReshareByAcp"
+	Msg_SetRingPssIntervalByAcp_FullMethodName                 = "/sourcehub.orbis.Msg/SetRingPssIntervalByAcp"
+	Msg_DisableRingPssByAcp_FullMethodName                     = "/sourcehub.orbis.Msg/DisableRingPssByAcp"
+	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp"
+	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp"
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
 	Msg_StoreDocument_FullMethodName                           = "/sourcehub.orbis.Msg/StoreDocument"
 	Msg_StoreKeyDerivation_FullMethodName                      = "/sourcehub.orbis.Msg/StoreKeyDerivation"
 	Msg_CreateNodeInfo_FullMethodName                          = "/sourcehub.orbis.Msg/CreateNodeInfo"
-	Msg_UpdateNodeInfo_FullMethodName                          = "/sourcehub.orbis.Msg/UpdateNodeInfo"
+	Msg_UpdateNodePeerId_FullMethodName                        = "/sourcehub.orbis.Msg/UpdateNodePeerId"
+	Msg_TransferNodeController_FullMethodName                  = "/sourcehub.orbis.Msg/TransferNodeController"
+	Msg_AddNodeToWhitelist_FullMethodName                      = "/sourcehub.orbis.Msg/AddNodeToWhitelist"
+	Msg_RemoveNodeFromWhitelist_FullMethodName                 = "/sourcehub.orbis.Msg/RemoveNodeFromWhitelist"
 )
 
 // MsgClient is the client API for Msg service.
@@ -40,12 +47,19 @@ type MsgClient interface {
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
 	CreateRing(ctx context.Context, in *MsgCreateRing, opts ...grpc.CallOption) (*MsgCreateRingResponse, error)
 	FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error)
-	UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error)
+	StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error)
+	SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error)
+	DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error)
+	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
+	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDerivation, opts ...grpc.CallOption) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error)
-	UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error)
+	UpdateNodePeerId(ctx context.Context, in *MsgUpdateNodePeerId, opts ...grpc.CallOption) (*MsgUpdateNodePeerIdResponse, error)
+	TransferNodeController(ctx context.Context, in *MsgTransferNodeController, opts ...grpc.CallOption) (*MsgTransferNodeControllerResponse, error)
+	AddNodeToWhitelist(ctx context.Context, in *MsgAddNodeToWhitelist, opts ...grpc.CallOption) (*MsgAddNodeToWhitelistResponse, error)
+	RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNodeFromWhitelist, opts ...grpc.CallOption) (*MsgRemoveNodeFromWhitelistResponse, error)
 }
 
 type msgClient struct {
@@ -86,10 +100,50 @@ func (c *msgClient) FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts 
 	return out, nil
 }
 
-func (c *msgClient) UpdateRingByAcp(ctx context.Context, in *MsgUpdateRingByAcp, opts ...grpc.CallOption) (*MsgUpdateRingByAcpResponse, error) {
+func (c *msgClient) StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MsgUpdateRingByAcpResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdateRingByAcp_FullMethodName, in, out, cOpts...)
+	out := new(MsgStartRingReshareByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_StartRingReshareByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgSetRingPssIntervalByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_SetRingPssIntervalByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgDisableRingPssByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_DisableRingPssByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgScheduleRingUpgradeByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_ScheduleRingUpgradeByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgCancelRingUpgradeByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_CancelRingUpgradeByAcp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -136,10 +190,40 @@ func (c *msgClient) CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, o
 	return out, nil
 }
 
-func (c *msgClient) UpdateNodeInfo(ctx context.Context, in *MsgUpdateNodeInfo, opts ...grpc.CallOption) (*MsgUpdateNodeInfoResponse, error) {
+func (c *msgClient) UpdateNodePeerId(ctx context.Context, in *MsgUpdateNodePeerId, opts ...grpc.CallOption) (*MsgUpdateNodePeerIdResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MsgUpdateNodeInfoResponse)
-	err := c.cc.Invoke(ctx, Msg_UpdateNodeInfo_FullMethodName, in, out, cOpts...)
+	out := new(MsgUpdateNodePeerIdResponse)
+	err := c.cc.Invoke(ctx, Msg_UpdateNodePeerId_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) TransferNodeController(ctx context.Context, in *MsgTransferNodeController, opts ...grpc.CallOption) (*MsgTransferNodeControllerResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgTransferNodeControllerResponse)
+	err := c.cc.Invoke(ctx, Msg_TransferNodeController_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddNodeToWhitelist(ctx context.Context, in *MsgAddNodeToWhitelist, opts ...grpc.CallOption) (*MsgAddNodeToWhitelistResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgAddNodeToWhitelistResponse)
+	err := c.cc.Invoke(ctx, Msg_AddNodeToWhitelist_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNodeFromWhitelist, opts ...grpc.CallOption) (*MsgRemoveNodeFromWhitelistResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRemoveNodeFromWhitelistResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveNodeFromWhitelist_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -156,12 +240,19 @@ type MsgServer interface {
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
 	CreateRing(context.Context, *MsgCreateRing) (*MsgCreateRingResponse, error)
 	FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error)
-	UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error)
+	StartRingReshareByAcp(context.Context, *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error)
+	SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error)
+	DisableRingPssByAcp(context.Context, *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error)
+	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
+	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error)
-	UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error)
+	UpdateNodePeerId(context.Context, *MsgUpdateNodePeerId) (*MsgUpdateNodePeerIdResponse, error)
+	TransferNodeController(context.Context, *MsgTransferNodeController) (*MsgTransferNodeControllerResponse, error)
+	AddNodeToWhitelist(context.Context, *MsgAddNodeToWhitelist) (*MsgAddNodeToWhitelistResponse, error)
+	RemoveNodeFromWhitelist(context.Context, *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -181,8 +272,20 @@ func (UnimplementedMsgServer) CreateRing(context.Context, *MsgCreateRing) (*MsgC
 func (UnimplementedMsgServer) FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRing not implemented")
 }
-func (UnimplementedMsgServer) UpdateRingByAcp(context.Context, *MsgUpdateRingByAcp) (*MsgUpdateRingByAcpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateRingByAcp not implemented")
+func (UnimplementedMsgServer) StartRingReshareByAcp(context.Context, *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method StartRingReshareByAcp not implemented")
+}
+func (UnimplementedMsgServer) SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetRingPssIntervalByAcp not implemented")
+}
+func (UnimplementedMsgServer) DisableRingPssByAcp(context.Context, *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DisableRingPssByAcp not implemented")
+}
+func (UnimplementedMsgServer) ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ScheduleRingUpgradeByAcp not implemented")
+}
+func (UnimplementedMsgServer) CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelRingUpgradeByAcp not implemented")
 }
 func (UnimplementedMsgServer) FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRingReshareByThresholdSignature not implemented")
@@ -196,8 +299,17 @@ func (UnimplementedMsgServer) StoreKeyDerivation(context.Context, *MsgStoreKeyDe
 func (UnimplementedMsgServer) CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateNodeInfo not implemented")
 }
-func (UnimplementedMsgServer) UpdateNodeInfo(context.Context, *MsgUpdateNodeInfo) (*MsgUpdateNodeInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeInfo not implemented")
+func (UnimplementedMsgServer) UpdateNodePeerId(context.Context, *MsgUpdateNodePeerId) (*MsgUpdateNodePeerIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodePeerId not implemented")
+}
+func (UnimplementedMsgServer) TransferNodeController(context.Context, *MsgTransferNodeController) (*MsgTransferNodeControllerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TransferNodeController not implemented")
+}
+func (UnimplementedMsgServer) AddNodeToWhitelist(context.Context, *MsgAddNodeToWhitelist) (*MsgAddNodeToWhitelistResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddNodeToWhitelist not implemented")
+}
+func (UnimplementedMsgServer) RemoveNodeFromWhitelist(context.Context, *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveNodeFromWhitelist not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -274,20 +386,92 @@ func _Msg_FinalizeRing_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateRingByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateRingByAcp)
+func _Msg_StartRingReshareByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgStartRingReshareByAcp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateRingByAcp(ctx, in)
+		return srv.(MsgServer).StartRingReshareByAcp(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_UpdateRingByAcp_FullMethodName,
+		FullMethod: Msg_StartRingReshareByAcp_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateRingByAcp(ctx, req.(*MsgUpdateRingByAcp))
+		return srv.(MsgServer).StartRingReshareByAcp(ctx, req.(*MsgStartRingReshareByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetRingPssIntervalByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetRingPssIntervalByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_SetRingPssIntervalByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, req.(*MsgSetRingPssIntervalByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DisableRingPssByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDisableRingPssByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DisableRingPssByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_DisableRingPssByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DisableRingPssByAcp(ctx, req.(*MsgDisableRingPssByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_ScheduleRingUpgradeByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgScheduleRingUpgradeByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ScheduleRingUpgradeByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_ScheduleRingUpgradeByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ScheduleRingUpgradeByAcp(ctx, req.(*MsgScheduleRingUpgradeByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_CancelRingUpgradeByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCancelRingUpgradeByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CancelRingUpgradeByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CancelRingUpgradeByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CancelRingUpgradeByAcp(ctx, req.(*MsgCancelRingUpgradeByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -364,20 +548,74 @@ func _Msg_CreateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_UpdateNodeInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgUpdateNodeInfo)
+func _Msg_UpdateNodePeerId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateNodePeerId)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).UpdateNodeInfo(ctx, in)
+		return srv.(MsgServer).UpdateNodePeerId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Msg_UpdateNodeInfo_FullMethodName,
+		FullMethod: Msg_UpdateNodePeerId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).UpdateNodeInfo(ctx, req.(*MsgUpdateNodeInfo))
+		return srv.(MsgServer).UpdateNodePeerId(ctx, req.(*MsgUpdateNodePeerId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_TransferNodeController_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgTransferNodeController)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).TransferNodeController(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_TransferNodeController_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).TransferNodeController(ctx, req.(*MsgTransferNodeController))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddNodeToWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddNodeToWhitelist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddNodeToWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_AddNodeToWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddNodeToWhitelist(ctx, req.(*MsgAddNodeToWhitelist))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveNodeFromWhitelist_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveNodeFromWhitelist)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveNodeFromWhitelist(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemoveNodeFromWhitelist_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveNodeFromWhitelist(ctx, req.(*MsgRemoveNodeFromWhitelist))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -402,8 +640,24 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_FinalizeRing_Handler,
 		},
 		{
-			MethodName: "UpdateRingByAcp",
-			Handler:    _Msg_UpdateRingByAcp_Handler,
+			MethodName: "StartRingReshareByAcp",
+			Handler:    _Msg_StartRingReshareByAcp_Handler,
+		},
+		{
+			MethodName: "SetRingPssIntervalByAcp",
+			Handler:    _Msg_SetRingPssIntervalByAcp_Handler,
+		},
+		{
+			MethodName: "DisableRingPssByAcp",
+			Handler:    _Msg_DisableRingPssByAcp_Handler,
+		},
+		{
+			MethodName: "ScheduleRingUpgradeByAcp",
+			Handler:    _Msg_ScheduleRingUpgradeByAcp_Handler,
+		},
+		{
+			MethodName: "CancelRingUpgradeByAcp",
+			Handler:    _Msg_CancelRingUpgradeByAcp_Handler,
 		},
 		{
 			MethodName: "FinalizeRingReshareByThresholdSignature",
@@ -422,8 +676,20 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_CreateNodeInfo_Handler,
 		},
 		{
-			MethodName: "UpdateNodeInfo",
-			Handler:    _Msg_UpdateNodeInfo_Handler,
+			MethodName: "UpdateNodePeerId",
+			Handler:    _Msg_UpdateNodePeerId_Handler,
+		},
+		{
+			MethodName: "TransferNodeController",
+			Handler:    _Msg_TransferNodeController_Handler,
+		},
+		{
+			MethodName: "AddNodeToWhitelist",
+			Handler:    _Msg_AddNodeToWhitelist_Handler,
+		},
+		{
+			MethodName: "RemoveNodeFromWhitelist",
+			Handler:    _Msg_RemoveNodeFromWhitelist_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
