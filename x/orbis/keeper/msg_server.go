@@ -360,6 +360,8 @@ func (k *Keeper) ScheduleRingUpgradeByAcp(goCtx context.Context, msg *types.MsgS
 		return nil, err
 	}
 
+	// currentTime is needed for validateRingUpgradeSchedule below, so we call
+	// normalizeMaturedRingUpgrade directly instead of maybeNormalizeMaturedRingUpgrade.
 	currentTime, err := currentBlockUnixTime(ctx)
 	if err != nil {
 		return nil, err
@@ -569,7 +571,7 @@ func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeI
 		WhitelistedPolicyIds: append([]string(nil), msg.WhitelistedPolicyIds...),
 		WhitelistedRingIds:   append([]string(nil), msg.WhitelistedRingIds...),
 	}
-	if err := validateNodeInfo(&nodeInfo); err != nil {
+	if err := normalizeAndValidateNodeInfo(&nodeInfo); err != nil {
 		return nil, err
 	}
 
@@ -601,7 +603,7 @@ func (k *Keeper) UpdateNodePeerId(goCtx context.Context, msg *types.MsgUpdateNod
 	}
 
 	nodeInfo.PeerId = msg.PeerId
-	if err := validateNodeInfo(nodeInfo); err != nil {
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
 		return nil, err
 	}
 	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
@@ -625,7 +627,10 @@ func (k *Keeper) TransferNodeController(goCtx context.Context, msg *types.MsgTra
 
 	previousControllerKey := nodeInfo.ControllerKey
 	nodeInfo.ControllerKey = msg.ControllerKey
-	if err := validateNodeInfo(nodeInfo); err != nil {
+	// normalizeAndValidateNodeInfo normalizes ControllerKey (strips 0x, lowercases),
+	// so the equality check below correctly identifies e.g. "0xABCD" as unchanged
+	// against the stored "abcd". Validation must run before the comparison.
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
 		return nil, err
 	}
 	if nodeInfo.ControllerKey == previousControllerKey {
@@ -672,7 +677,7 @@ func (k *Keeper) AddNodeToWhitelist(goCtx context.Context, msg *types.MsgAddNode
 		return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing whitelist target")
 	}
 
-	if err := validateNodeInfo(nodeInfo); err != nil {
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
 		return nil, err
 	}
 	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
@@ -717,7 +722,7 @@ func (k *Keeper) RemoveNodeFromWhitelist(goCtx context.Context, msg *types.MsgRe
 		return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing whitelist target")
 	}
 
-	if err := validateNodeInfo(nodeInfo); err != nil {
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
 		return nil, err
 	}
 	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)

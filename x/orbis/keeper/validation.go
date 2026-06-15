@@ -66,10 +66,6 @@ func validateStartRingReshare(
 	newThreshold immutable.Option[uint32],
 	existing *types.Ring,
 ) error {
-	if len(newPeerNodeKeys) == 0 && !newThreshold.HasValue() {
-		return errorsmod.Wrap(types.ErrInvalidRing, "reshare must change the committee or threshold")
-	}
-
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
 	if reshareInProgress {
 		return types.ErrReshareInProgress

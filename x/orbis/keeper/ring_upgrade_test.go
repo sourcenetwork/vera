@@ -1,10 +1,10 @@
 package keeper
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
-	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
@@ -145,7 +145,7 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		NextVersion:    1,
 		ActivationTime: baseTime + 599,
 	})
-		require.ErrorContains(
+	require.ErrorContains(
 		t,
 		err,
 		fmt.Sprintf("must be at least %d", baseTime+MinRingUpgradeLeadSeconds),

@@ -19,12 +19,23 @@ func nodeInfoAllowsRing(nodeInfo *types.NodeInfo, ring *types.Ring) bool {
 		slices.Contains(nodeInfo.WhitelistedRingIds, ring.Id)
 }
 
-func validateNodeInfo(nodeInfo *types.NodeInfo) error {
+const maxNodeWhitelistLen = 256
+
+// normalizeAndValidateNodeInfo validates nodeInfo and normalizes nodeInfo.ControllerKey
+// to lowercase hex without a 0x prefix. Callers must use nodeInfo after this call for
+// any storage or comparison, since the key value may change.
+func normalizeAndValidateNodeInfo(nodeInfo *types.NodeInfo) error {
 	switch {
 	case nodeInfo.PeerId == "":
 		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
 	case nodeInfo.ControllerKey == "":
 		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
+	}
+	if len(nodeInfo.WhitelistedPolicyIds) > maxNodeWhitelistLen {
+		return errorsmod.Wrapf(types.ErrInvalidNodeInfo, "whitelisted_policy_ids exceeds maximum length %d", maxNodeWhitelistLen)
+	}
+	if len(nodeInfo.WhitelistedRingIds) > maxNodeWhitelistLen {
+		return errorsmod.Wrapf(types.ErrInvalidNodeInfo, "whitelisted_ring_ids exceeds maximum length %d", maxNodeWhitelistLen)
 	}
 	if err := validateUniqueNonEmptyStrings("whitelisted_policy_ids", nodeInfo.WhitelistedPolicyIds); err != nil {
 		return err
