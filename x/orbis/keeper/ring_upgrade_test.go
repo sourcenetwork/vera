@@ -4,6 +4,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
@@ -144,7 +145,11 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		NextVersion:    1,
 		ActivationTime: baseTime + 599,
 	})
-	require.ErrorContains(t, err, "must be at least 1800000600")
+		require.ErrorContains(
+		t,
+		err,
+		fmt.Sprintf("must be at least %d", baseTime+MinRingUpgradeLeadSeconds),
+	)
 
 	_, err = k.ScheduleRingUpgradeByAcp(ctx, &types.MsgScheduleRingUpgradeByAcp{
 		Creator:        creatorAddr,

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"context"
 	"encoding/hex"
 	"slices"
 	"strings"
@@ -52,6 +53,21 @@ func validateUniqueNonEmptyStrings(field string, values []string) error {
 		seen[value] = struct{}{}
 	}
 	return nil
+}
+
+func (k *Keeper) authorizeNodeInfoUpdate(goCtx context.Context, ctx sdk.Context, nodeKey, creator string) (*types.NodeInfo, error) {
+	nodeInfo := k.GetNodeInfo(goCtx, nodeKey)
+	if nodeInfo == nil {
+		return nil, types.ErrNodeInfoNotFound
+	}
+	signerKey, err := signerPublicKeyHex(ctx, k, creator)
+	if err != nil {
+		return nil, err
+	}
+	if signerKey != nodeInfo.ControllerKey {
+		return nil, types.ErrUnauthorizedNodeInfoUpdate
+	}
+	return nodeInfo, nil
 }
 
 // signerPublicKeyHex returns the hex-encoded compressed public key for a bech32 address.

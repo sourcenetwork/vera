@@ -77,6 +77,17 @@ func validateUpgradeInfo(info *types.UpgradeInfo) error {
 	return nil
 }
 
+func maybeNormalizeMaturedRingUpgrade(ring *types.Ring, ctx sdk.Context) (*types.EventRingUpgradeNormalized, error) {
+	if ring.UpgradeInfo.XNextVersion == nil {
+		return nil, nil
+	}
+	currentTime, err := currentBlockUnixTime(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return normalizeMaturedRingUpgrade(ring, currentTime), nil
+}
+
 func clearRingUpgrade(ring *types.Ring) {
 	ring.UpgradeInfo.XNextVersion = nil
 	ring.UpgradeInfo.XActivationTime = nil

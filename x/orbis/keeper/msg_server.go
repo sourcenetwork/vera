@@ -183,13 +183,9 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 		return nil, err
 	}
 
-	var upgradeNormalizedEvent *types.EventRingUpgradeNormalized
-	if ring.UpgradeInfo.XNextVersion != nil {
-		currentTime, err := currentBlockUnixTime(ctx)
-		if err != nil {
-			return nil, err
-		}
-		upgradeNormalizedEvent = normalizeMaturedRingUpgrade(ring, currentTime)
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	newPeerNodeKeys := canonicalNodeKeys(msg.NewPeerNodeKeys)
@@ -263,13 +259,9 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 		return nil, err
 	}
 
-	var upgradeNormalizedEvent *types.EventRingUpgradeNormalized
-	if ring.UpgradeInfo.XNextVersion != nil {
-		currentTime, err := currentBlockUnixTime(ctx)
-		if err != nil {
-			return nil, err
-		}
-		upgradeNormalizedEvent = normalizeMaturedRingUpgrade(ring, currentTime)
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if msg.PssInterval == 0 {
@@ -319,13 +311,9 @@ func (k *Keeper) DisableRingPssByAcp(goCtx context.Context, msg *types.MsgDisabl
 		return nil, err
 	}
 
-	var upgradeNormalizedEvent *types.EventRingUpgradeNormalized
-	if ring.UpgradeInfo.XNextVersion != nil {
-		currentTime, err := currentBlockUnixTime(ctx)
-		if err != nil {
-			return nil, err
-		}
-		upgradeNormalizedEvent = normalizeMaturedRingUpgrade(ring, currentTime)
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	if ring.XPssInterval == nil {
@@ -600,17 +588,9 @@ func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeI
 func (k *Keeper) UpdateNodePeerId(goCtx context.Context, msg *types.MsgUpdateNodePeerId) (*types.MsgUpdateNodePeerIdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
-	if nodeInfo == nil {
-		return nil, types.ErrNodeInfoNotFound
-	}
-
-	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-	if signerKey != nodeInfo.ControllerKey {
-		return nil, types.ErrUnauthorizedNodeInfoUpdate
 	}
 
 	if msg.PeerId == "" {
@@ -638,17 +618,9 @@ func (k *Keeper) UpdateNodePeerId(goCtx context.Context, msg *types.MsgUpdateNod
 func (k *Keeper) TransferNodeController(goCtx context.Context, msg *types.MsgTransferNodeController) (*types.MsgTransferNodeControllerResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
-	if nodeInfo == nil {
-		return nil, types.ErrNodeInfoNotFound
-	}
-
-	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-	if signerKey != nodeInfo.ControllerKey {
-		return nil, types.ErrUnauthorizedNodeInfoUpdate
 	}
 
 	previousControllerKey := nodeInfo.ControllerKey
@@ -674,17 +646,9 @@ func (k *Keeper) TransferNodeController(goCtx context.Context, msg *types.MsgTra
 func (k *Keeper) AddNodeToWhitelist(goCtx context.Context, msg *types.MsgAddNodeToWhitelist) (*types.MsgAddNodeToWhitelistResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
-	if nodeInfo == nil {
-		return nil, types.ErrNodeInfoNotFound
-	}
-
-	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-	if signerKey != nodeInfo.ControllerKey {
-		return nil, types.ErrUnauthorizedNodeInfoUpdate
 	}
 
 	switch target := msg.Target.(type) {
@@ -725,17 +689,9 @@ func (k *Keeper) AddNodeToWhitelist(goCtx context.Context, msg *types.MsgAddNode
 func (k *Keeper) RemoveNodeFromWhitelist(goCtx context.Context, msg *types.MsgRemoveNodeFromWhitelist) (*types.MsgRemoveNodeFromWhitelistResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
-	if nodeInfo == nil {
-		return nil, types.ErrNodeInfoNotFound
-	}
-
-	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
 		return nil, err
-	}
-	if signerKey != nodeInfo.ControllerKey {
-		return nil, types.ErrUnauthorizedNodeInfoUpdate
 	}
 
 	switch target := msg.Target.(type) {
