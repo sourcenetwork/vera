@@ -10,6 +10,7 @@ import (
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateRing{},
+		&MsgFinalizeRing{},
 		&MsgStartRingReshareByAcp{},
 		&MsgSetRingPssIntervalByAcp{},
 		&MsgDisableRingPssByAcp{},
