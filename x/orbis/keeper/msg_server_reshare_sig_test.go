@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"math/big"
 	"testing"
@@ -200,7 +200,7 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 
 	// Deterministic nonce: k = H(x || msg) mod order
 	nonceInput := append(scalarToLittleEndian32(x), msg...)
-	nonceHash := sha256.Sum256(nonceInput)
+	nonceHash := sha512.Sum512(nonceInput)
 	k := decaf377.ScalarFromUniformBytes(nonceHash[:])
 
 	// R = k·G
@@ -214,7 +214,7 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 	}
 
 	// c = H(domain || R || pubKey || msg)
-	h := sha256.New()
+	h := sha512.New()
 	h.Write([]byte(orbisfrost.ChallengeDomain))
 	h.Write(rBytes)
 	h.Write(pubKeyBytes)

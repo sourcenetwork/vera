@@ -47,7 +47,7 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
-	github.com/mizufinance/decaf377-go v0.1.0
+	github.com/mizufinance/decaf377-go v0.2.0
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.1
 	github.com/sourcenetwork/immutable v0.3.0
@@ -162,7 +162,7 @@ require (
 	github.com/cockroachdb/redact v1.1.6 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
-	github.com/consensys/gnark-crypto v0.19.0 // indirect
+	github.com/consensys/gnark-crypto v0.19.2 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
