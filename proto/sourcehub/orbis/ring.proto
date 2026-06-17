@@ -23,8 +23,8 @@ message Ring {
   repeated string new_peer_node_keys = 6;
   // Absent means no pending threshold update.
   optional uint32 new_threshold = 7;
-  // Absent means automatic PSS refresh is disabled.
-  optional uint64 pss_interval = 8;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 8;
   uint64 block_number_nonce = 9;
   string policy_id = 10;
   repeated RingConfirmation confirmations = 11;

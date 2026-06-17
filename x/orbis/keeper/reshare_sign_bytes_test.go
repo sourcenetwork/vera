@@ -25,9 +25,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
-		XPssInterval: &types.Ring_PssInterval{
-			PssInterval: 30,
-		},
+		PssInterval:      types.MinPSSIntervalSeconds,
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
 		UpgradeInfo: types.UpgradeInfo{
@@ -61,9 +59,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
-		XPssInterval: &types.Ring_PssInterval{
-			PssInterval: 60,
-		},
+		PssInterval:      types.MinPSSIntervalSeconds + 1,
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
 		UpgradeInfo: types.UpgradeInfo{

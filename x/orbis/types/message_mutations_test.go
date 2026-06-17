@@ -9,6 +9,23 @@ import (
 
 var validMutationCreator = sdk.AccAddress(make([]byte, 20)).String()
 
+func TestMsgCreateRingValidateBasicPSSInterval(t *testing.T) {
+	base := MsgCreateRing{
+		Creator:      validMutationCreator,
+		PeerNodeKeys: []string{"node-1"},
+		Threshold:    1,
+		PssInterval:  MinPSSIntervalSeconds,
+		PolicyId:     "policy-1",
+	}
+	require.NoError(t, base.ValidateBasic())
+
+	for _, pssInterval := range []uint64{0, MinPSSIntervalSeconds - 1} {
+		msg := base
+		msg.PssInterval = pssInterval
+		require.ErrorContains(t, msg.ValidateBasic(), "pss_interval must be at least 86400 seconds")
+	}
+}
+
 func TestRingMutationMessagesValidateBasic(t *testing.T) {
 	validMessages := []interface{ ValidateBasic() error }{
 		&MsgStartRingReshareByAcp{
@@ -19,11 +36,7 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 		&MsgSetRingPssIntervalByAcp{
 			Creator:     validMutationCreator,
 			RingId:      "ring-1",
-			PssInterval: 60,
-		},
-		&MsgDisableRingPssByAcp{
-			Creator: validMutationCreator,
-			RingId:  "ring-1",
+			PssInterval: MinPSSIntervalSeconds,
 		},
 		&MsgScheduleRingUpgradeByAcp{
 			Creator:        validMutationCreator,
@@ -47,6 +60,11 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 	require.Error(t, (&MsgSetRingPssIntervalByAcp{
 		Creator: validMutationCreator,
 		RingId:  "ring-1",
+	}).ValidateBasic())
+	require.Error(t, (&MsgSetRingPssIntervalByAcp{
+		Creator:     validMutationCreator,
+		RingId:      "ring-1",
+		PssInterval: MinPSSIntervalSeconds - 1,
 	}).ValidateBasic())
 	require.Error(t, (&MsgScheduleRingUpgradeByAcp{
 		Creator:        validMutationCreator,

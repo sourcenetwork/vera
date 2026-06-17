@@ -24,7 +24,6 @@ const (
 	Msg_FinalizeRing_FullMethodName                            = "/sourcehub.orbis.Msg/FinalizeRing"
 	Msg_StartRingReshareByAcp_FullMethodName                   = "/sourcehub.orbis.Msg/StartRingReshareByAcp"
 	Msg_SetRingPssIntervalByAcp_FullMethodName                 = "/sourcehub.orbis.Msg/SetRingPssIntervalByAcp"
-	Msg_DisableRingPssByAcp_FullMethodName                     = "/sourcehub.orbis.Msg/DisableRingPssByAcp"
 	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp"
 	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp"
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
@@ -49,7 +48,6 @@ type MsgClient interface {
 	FinalizeRing(ctx context.Context, in *MsgFinalizeRing, opts ...grpc.CallOption) (*MsgFinalizeRingResponse, error)
 	StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error)
 	SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error)
-	DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
@@ -114,16 +112,6 @@ func (c *msgClient) SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingP
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgSetRingPssIntervalByAcpResponse)
 	err := c.cc.Invoke(ctx, Msg_SetRingPssIntervalByAcp_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) DisableRingPssByAcp(ctx context.Context, in *MsgDisableRingPssByAcp, opts ...grpc.CallOption) (*MsgDisableRingPssByAcpResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MsgDisableRingPssByAcpResponse)
-	err := c.cc.Invoke(ctx, Msg_DisableRingPssByAcp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -242,7 +230,6 @@ type MsgServer interface {
 	FinalizeRing(context.Context, *MsgFinalizeRing) (*MsgFinalizeRingResponse, error)
 	StartRingReshareByAcp(context.Context, *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error)
 	SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error)
-	DisableRingPssByAcp(context.Context, *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
@@ -277,9 +264,6 @@ func (UnimplementedMsgServer) StartRingReshareByAcp(context.Context, *MsgStartRi
 }
 func (UnimplementedMsgServer) SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetRingPssIntervalByAcp not implemented")
-}
-func (UnimplementedMsgServer) DisableRingPssByAcp(context.Context, *MsgDisableRingPssByAcp) (*MsgDisableRingPssByAcpResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DisableRingPssByAcp not implemented")
 }
 func (UnimplementedMsgServer) ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ScheduleRingUpgradeByAcp not implemented")
@@ -418,24 +402,6 @@ func _Msg_SetRingPssIntervalByAcp_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, req.(*MsgSetRingPssIntervalByAcp))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_DisableRingPssByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgDisableRingPssByAcp)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).DisableRingPssByAcp(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Msg_DisableRingPssByAcp_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).DisableRingPssByAcp(ctx, req.(*MsgDisableRingPssByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -646,10 +612,6 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetRingPssIntervalByAcp",
 			Handler:    _Msg_SetRingPssIntervalByAcp_Handler,
-		},
-		{
-			MethodName: "DisableRingPssByAcp",
-			Handler:    _Msg_DisableRingPssByAcp_Handler,
 		},
 		{
 			MethodName: "ScheduleRingUpgradeByAcp",

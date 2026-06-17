@@ -6,7 +6,6 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/immutable"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -34,9 +33,11 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
-	pssInterval := optionalCreateRingPSSInterval(msg)
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalNodeKeys(msg.PeerNodeKeys)
+	if err := types.ValidatePSSInterval(msg.PssInterval); err != nil {
+		return nil, err
+	}
 
 	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -44,7 +45,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
+	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, msg.PssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -54,13 +55,13 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		CreatorDid:       creatorDID,
 		PeerNodeKeys:     peerNodeKeys,
 		Threshold:        msg.Threshold,
+		PssInterval:      msg.PssInterval,
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
 	}
-	setRingPSSInterval(&ring, pssInterval)
 	if err := validateRing(&ring); err != nil {
 		return nil, err
 	}
@@ -264,14 +265,14 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 		return nil, err
 	}
 
-	if msg.PssInterval == 0 {
-		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pss_interval must be positive")
+	if err := types.ValidatePSSInterval(msg.PssInterval); err != nil {
+		return nil, err
 	}
-	if ring.XPssInterval != nil && ring.GetPssInterval() == msg.PssInterval {
+	if ring.GetPssInterval() == msg.PssInterval {
 		return nil, types.ErrRingPssIntervalUnchanged
 	}
 
-	setRingPSSInterval(ring, immutable.Some(msg.PssInterval))
+	ring.PssInterval = msg.PssInterval
 	if err := validateRing(ring); err != nil {
 		return nil, err
 	}
@@ -290,55 +291,6 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 	}
 
 	return &types.MsgSetRingPssIntervalByAcpResponse{}, nil
-}
-
-func (k *Keeper) DisableRingPssByAcp(goCtx context.Context, msg *types.MsgDisableRingPssByAcp) (*types.MsgDisableRingPssByAcpResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	ring := k.GetRing(goCtx, msg.RingId)
-	if ring == nil {
-		return nil, types.ErrRingNotFound
-	}
-	if err := requireRingFinalized(ring); err != nil {
-		return nil, err
-	}
-
-	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
-		return nil, err
-	}
-
-	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if ring.XPssInterval == nil {
-		return nil, types.ErrRingPssAlreadyDisabled
-	}
-
-	setRingPSSInterval(ring, immutable.None[uint64]())
-	if err := validateRing(ring); err != nil {
-		return nil, err
-	}
-	k.SetRing(goCtx, *ring)
-
-	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
-		RingId:     ring.Id,
-		UpdaterDid: updaterDID,
-	}); err != nil {
-		return nil, err
-	}
-	if upgradeNormalizedEvent != nil {
-		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
-			return nil, err
-		}
-	}
-
-	return &types.MsgDisableRingPssByAcpResponse{}, nil
 }
 
 func (k *Keeper) ScheduleRingUpgradeByAcp(goCtx context.Context, msg *types.MsgScheduleRingUpgradeByAcp) (*types.MsgScheduleRingUpgradeByAcpResponse, error) {

@@ -34,7 +34,6 @@ var (
 	ErrUnauthorizedRingCreate     = sdkerrors.Register(ModuleName, 1231, "actor is not authorized to create ring")
 	ErrNodeWhitelistEntryExists   = sdkerrors.Register(ModuleName, 1232, "node whitelist entry already exists")
 	ErrNodeWhitelistEntryNotFound = sdkerrors.Register(ModuleName, 1233, "node whitelist entry not found")
-	ErrRingPssAlreadyDisabled     = sdkerrors.Register(ModuleName, 1234, "ring PSS is already disabled")
 	ErrRingPssIntervalUnchanged   = sdkerrors.Register(ModuleName, 1235, "ring PSS interval is unchanged")
 	ErrRingUpgradeNotScheduled    = sdkerrors.Register(ModuleName, 1236, "ring upgrade is not scheduled")
 	ErrRingUpgradeAlreadyActive   = sdkerrors.Register(ModuleName, 1237, "ring upgrade activation time has passed")

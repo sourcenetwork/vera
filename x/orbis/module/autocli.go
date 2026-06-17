@@ -57,9 +57,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{RpcMethod: "UpdateParams", Skip: true},
 				{
 					RpcMethod:      "CreateRing",
-					Use:            "create-ring [threshold] [policy_id] [current_version]",
+					Use:            "create-ring [threshold] [pss_interval] [policy_id] [current_version]",
 					Short:          "Create an Orbis ring",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "policy_id"}, {ProtoField: "current_version"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "pss_interval"}, {ProtoField: "policy_id"}, {ProtoField: "current_version"}},
 				},
 				{
 					RpcMethod:      "StartRingReshareByAcp",
@@ -72,12 +72,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:            "set-ring-pss-interval-by-acp [ring_id] [pss_interval]",
 					Short:          "Set a ring PSS interval via external ACP policy",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "pss_interval"}},
-				},
-				{
-					RpcMethod:      "DisableRingPssByAcp",
-					Use:            "disable-ring-pss-by-acp [ring_id]",
-					Short:          "Disable ring PSS via external ACP policy",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
 					RpcMethod:      "ScheduleRingUpgradeByAcp",

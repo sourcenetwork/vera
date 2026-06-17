@@ -32,7 +32,7 @@ func KeyPrefix(p string) []byte {
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
 // peerNodeKeys are sorted before hashing so the ID is order-independent.
-func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutable.Option[uint64], policyID string, nonce immutable.Option[string], currentVersion uint64) string {
+func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval uint64, policyID string, nonce immutable.Option[string], currentVersion uint64) string {
 	sorted := slices.Clone(peerNodeKeys)
 	if !slices.IsSorted(sorted) {
 		slices.Sort(sorted)
@@ -41,7 +41,7 @@ func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval immutab
 	h := newIDHasher("orbis/ring")
 	h.writeStringSlice(sorted)
 	h.writeUint32(threshold)
-	h.writeOptionalUint64(pssInterval)
+	h.writeUint64(pssInterval)
 	h.writeString(policyID)
 	h.writeOptionalString(nonce)
 	h.writeUint64(currentVersion)

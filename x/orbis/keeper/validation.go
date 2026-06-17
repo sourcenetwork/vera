@@ -29,6 +29,9 @@ func validateRing(ring *types.Ring) error {
 	case ring.PolicyId == "":
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing policy_id")
 	}
+	if err := types.ValidatePSSInterval(ring.GetPssInterval()); err != nil {
+		return err
+	}
 	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
 		return err
 	}

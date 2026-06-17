@@ -13,7 +13,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgFinalizeRing{},
 		&MsgStartRingReshareByAcp{},
 		&MsgSetRingPssIntervalByAcp{},
-		&MsgDisableRingPssByAcp{},
 		&MsgScheduleRingUpgradeByAcp{},
 		&MsgCancelRingUpgradeByAcp{},
 		&MsgFinalizeRingReshareByThresholdSignature{},

@@ -95,8 +95,8 @@ type Ring struct {
 	NewPeerNodeKeys []string               `protobuf:"bytes,6,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Absent means no pending threshold update.
 	NewThreshold *uint32 `protobuf:"varint,7,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
-	// Absent means automatic PSS refresh is disabled.
-	PssInterval      *uint64             `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3,oneof" json:"pss_interval,omitempty"`
+	// Interval in seconds. Must be at least 86400.
+	PssInterval      uint64              `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
 	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
 	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
@@ -185,8 +185,8 @@ func (x *Ring) GetNewThreshold() uint32 {
 }
 
 func (x *Ring) GetPssInterval() uint64 {
-	if x != nil && x.PssInterval != nil {
-		return *x.PssInterval
+	if x != nil {
+		return x.PssInterval
 	}
 	return 0
 }
@@ -282,7 +282,7 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x12,\n" +
 	"\x0factivation_time\x18\x03 \x01(\x04H\x01R\x0eactivationTime\x88\x01\x01B\x0f\n" +
 	"\r_next_versionB\x12\n" +
-	"\x10_activation_time\"\x91\x04\n" +
+	"\x10_activation_time\"\xfb\x03\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -291,15 +291,14 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\x0epeer_node_keys\x18\x04 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
 	"\tthreshold\x18\x05 \x01(\rR\tthreshold\x12+\n" +
 	"\x12new_peer_node_keys\x18\x06 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
-	"\rnew_threshold\x18\a \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12&\n" +
-	"\fpss_interval\x18\b \x01(\x04H\x01R\vpssInterval\x88\x01\x01\x12,\n" +
+	"\rnew_threshold\x18\a \x01(\rH\x00R\fnewThreshold\x88\x01\x01\x12!\n" +
+	"\fpss_interval\x18\b \x01(\x04R\vpssInterval\x12,\n" +
 	"\x12block_number_nonce\x18\t \x01(\x04R\x10blockNumberNonce\x12\x1b\n" +
 	"\tpolicy_id\x18\n" +
 	" \x01(\tR\bpolicyId\x12G\n" +
 	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmations\x12E\n" +
 	"\fupgrade_info\x18\f \x01(\v2\x1c.sourcehub.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfoB\x10\n" +
-	"\x0e_new_thresholdB\x0f\n" +
-	"\r_pss_interval\"F\n" +
+	"\x0e_new_threshold\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +
 	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +
 	"\aring_pk\x18\x02 \x01(\tR\x06ringPkB\x9f\x01\n" +

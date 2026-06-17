@@ -20,7 +20,6 @@ service Msg {
   rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
   rpc StartRingReshareByAcp(MsgStartRingReshareByAcp) returns (MsgStartRingReshareByAcpResponse);
   rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
-  rpc DisableRingPssByAcp(MsgDisableRingPssByAcp) returns (MsgDisableRingPssByAcpResponse);
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
@@ -54,8 +53,8 @@ message MsgCreateRing {
   string creator = 1;
   repeated string peer_node_keys = 2;
   uint32 threshold = 3;
-  // Absent means automatic PSS refresh is disabled.
-  optional uint64 pss_interval = 4;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 4;
   string policy_id = 5;
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
   optional string nonce = 6;
@@ -90,18 +89,11 @@ message MsgSetRingPssIntervalByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
+  // Interval in seconds. Must be at least 86400.
   uint64 pss_interval = 3;
 }
 
 message MsgSetRingPssIntervalByAcpResponse {}
-
-message MsgDisableRingPssByAcp {
-  option (cosmos.msg.v1.signer) = "creator";
-  string creator = 1;
-  string ring_id = 2;
-}
-
-message MsgDisableRingPssByAcpResponse {}
 
 message MsgScheduleRingUpgradeByAcp {
   option (cosmos.msg.v1.signer) = "creator";
@@ -148,7 +140,7 @@ message RingReshareSignState {
   uint32 threshold = 3;
   repeated string new_peer_node_keys = 4;
   optional uint32 new_threshold = 5;
-  optional uint64 pss_interval = 6;
+  reserved 6;
   uint64 block_number_nonce = 7;
   string policy_id = 8;
 }
