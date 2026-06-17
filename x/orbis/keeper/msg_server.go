@@ -217,9 +217,6 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 	if newThreshold.HasValue() {
 		setRingNewThreshold(ring, newThreshold)
 	}
-	if err := validateRing(ring); err != nil {
-		return nil, err
-	}
 
 	k.SetRing(goCtx, *ring)
 
