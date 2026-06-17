@@ -149,9 +149,6 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 
 	ring.RingPk = msg.RingPk
 	ring.Confirmations = nil
-	if err := validateRing(ring); err != nil {
-		return nil, err
-	}
 
 	k.SetRing(goCtx, *ring)
 
