@@ -163,10 +163,6 @@ func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	finalized.NewPeerNodeKeys = nil
 	finalized.XNewThreshold = nil
 
-	if err := validateRing(&finalized); err != nil {
-		return nil, err
-	}
-
 	return &finalized, nil
 }
 
