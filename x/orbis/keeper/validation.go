@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"encoding/hex"
+	"slices"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
@@ -27,6 +28,9 @@ func validateRing(ring *types.Ring) error {
 		return errorsmod.Wrapf(types.ErrInvalidRing, "threshold %d is invalid for committee size %d", ring.Threshold, len(ring.PeerNodeKeys))
 	case ring.PolicyId == "":
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing policy_id")
+	}
+	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
+		return err
 	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
@@ -57,11 +61,20 @@ func validateRing(ring *types.Ring) error {
 	return nil
 }
 
-func validateRingUpdate(newPeerNodeKeys []string, newThreshold immutable.Option[uint32], existing *types.Ring) error {
+func validateStartRingReshare(
+	newPeerNodeKeys []string,
+	newThreshold immutable.Option[uint32],
+	existing *types.Ring,
+) error {
 	reshareInProgress := len(existing.NewPeerNodeKeys) > 0 || existing.XNewThreshold != nil
-	touchingReshareFields := len(newPeerNodeKeys) > 0 || newThreshold.HasValue()
-	if reshareInProgress && touchingReshareFields {
+	if reshareInProgress {
 		return types.ErrReshareInProgress
+	}
+
+	committeeChanged := len(newPeerNodeKeys) > 0 && !slices.Equal(newPeerNodeKeys, existing.PeerNodeKeys)
+	thresholdChanged := newThreshold.HasValue() && newThreshold.Value() != existing.Threshold
+	if !committeeChanged && !thresholdChanged {
+		return errorsmod.Wrap(types.ErrInvalidRing, "reshare must change the committee or threshold")
 	}
 
 	if len(newPeerNodeKeys) > 0 {
@@ -89,7 +102,6 @@ func validateRingUpdate(newPeerNodeKeys []string, newThreshold immutable.Option[
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -140,7 +152,7 @@ func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	}
 
 	if len(finalized.NewPeerNodeKeys) > 0 {
-		finalized.PeerNodeKeys = append([]string(nil), finalized.NewPeerNodeKeys...)
+		finalized.PeerNodeKeys = slices.Clone(finalized.NewPeerNodeKeys)
 	}
 	if finalized.XNewThreshold != nil {
 		finalized.Threshold = finalized.GetNewThreshold()
@@ -182,24 +194,5 @@ func validateKeyDerivation(keyDerivation *types.KeyDerivation) error {
 	case keyDerivation.PolicyId == "" || keyDerivation.Resource == "" || keyDerivation.Permission == "":
 		return errorsmod.Wrap(types.ErrInvalidKeyDerivation, "missing policy binding")
 	}
-	return nil
-}
-
-// secp256k1 compressed public key length in bytes
-const compressedPubKeyLen = 33
-
-func validateNodeInfo(nodeInfo *types.NodeInfo) error {
-	switch {
-	case nodeInfo.PeerId == "":
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
-	case nodeInfo.ControllerKey == "":
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing controller_key")
-	}
-	keyHex := strings.ToLower(strings.TrimPrefix(nodeInfo.ControllerKey, "0x"))
-	decoded, err := hex.DecodeString(keyHex)
-	if err != nil || len(decoded) != compressedPubKeyLen {
-		return errorsmod.Wrap(types.ErrInvalidNodeInfo, "invalid controller_key encoding")
-	}
-	nodeInfo.ControllerKey = keyHex
 	return nil
 }

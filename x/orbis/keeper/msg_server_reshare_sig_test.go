@@ -1,15 +1,16 @@
 package keeper
 
 import (
-	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"math/big"
 	"testing"
+	"time"
 
 	decaf377 "github.com/mizufinance/decaf377-go"
 	"github.com/mizufinance/decaf377-go/orbisfrost"
-	blst "github.com/supranational/blst/bindings/go"
 	"github.com/stretchr/testify/require"
+	blst "github.com/supranational/blst/bindings/go"
 
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
@@ -17,7 +18,9 @@ import (
 
 func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
-	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+	ctx = ctx.
+		WithValue(appparams.ExtractedDIDContextKey, testDID).
+		WithBlockTime(time.Unix(int64(ringUpgradeBaseTime), 0))
 
 	// BLS key pair — G1 public key, G2 signature scheme.
 	ikm := make([]byte, 32)
@@ -49,17 +52,28 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBLSPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          ringID,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
 	require.NoError(t, err)
 
+	_, err = k.ScheduleRingUpgradeByAcp(ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        creatorAddr,
+		RingId:         ringID,
+		NextVersion:    1,
+		ActivationTime: ringUpgradeBaseTime + MinRingUpgradeLeadSeconds,
+	})
+	require.NoError(t, err)
+
 	ring := k.GetRing(ctx, ringID)
+	require.Equal(t, uint64(0), ring.UpgradeInfo.CurrentVersion)
+	require.Equal(t, uint64(1), ring.UpgradeInfo.GetNextVersion())
+	require.Equal(t, ringUpgradeBaseTime+MinRingUpgradeLeadSeconds, ring.UpgradeInfo.GetActivationTime())
 	finalizedRing, err := ringForReshareFinalization(ring)
 	require.NoError(t, err)
 	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), ring, finalizedRing)
@@ -83,6 +97,9 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	require.Empty(t, updated.NewPeerNodeKeys)
 	require.Nil(t, updated.XNewThreshold)
 	require.Equal(t, uint64(ctx.BlockHeight()), updated.BlockNumberNonce)
+	require.Equal(t, uint64(0), updated.UpgradeInfo.CurrentVersion)
+	require.Equal(t, uint64(1), updated.UpgradeInfo.GetNextVersion())
+	require.Equal(t, ringUpgradeBaseTime+MinRingUpgradeLeadSeconds, updated.UpgradeInfo.GetActivationTime())
 }
 
 func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *testing.T) {
@@ -120,11 +137,11 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWFROSTPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          ringID,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
@@ -183,7 +200,7 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 
 	// Deterministic nonce: k = H(x || msg) mod order
 	nonceInput := append(scalarToLittleEndian32(x), msg...)
-	nonceHash := sha256.Sum256(nonceInput)
+	nonceHash := sha512.Sum512(nonceInput)
 	k := decaf377.ScalarFromUniformBytes(nonceHash[:])
 
 	// R = k·G
@@ -197,7 +214,7 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 	}
 
 	// c = H(domain || R || pubKey || msg)
-	h := sha256.New()
+	h := sha512.New()
 	h.Write([]byte(orbisfrost.ChallengeDomain))
 	h.Write(rBytes)
 	h.Write(pubKeyBytes)

@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	"github.com/cosmos/gogoproto/proto"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/sourcenetwork/immutable"
 	"github.com/stretchr/testify/require"
@@ -78,7 +79,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.NotNil(t, ring)
 	require.Equal(t, testDID, ring.CreatorDid)
 	require.Empty(t, ring.RingPk)
-	require.Equal(t, []string{peer1Key, peer2Key, peer3Key}, ring.PeerNodeKeys)
+	require.Equal(t, canonicalNodeKeys([]string{peer1Key, peer2Key, peer3Key}), ring.PeerNodeKeys)
 	require.Equal(t, uint32(2), ring.Threshold)
 	require.Equal(t, policyID, ring.PolicyId)
 	require.NotNil(t, ring.XPssInterval)
@@ -231,16 +232,20 @@ func TestMsgServer_CreateRing_PeerKeyOrderDoesNotAffectRingID(t *testing.T) {
 	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
+	canonicalCommittee := canonicalNodeKeys([]string{peer1Key, peer2Key})
+	submittedCommittee := []string{canonicalCommittee[1], canonicalCommittee[0]}
 	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
-		PeerNodeKeys: []string{peer2Key, peer1Key},
+		PeerNodeKeys: submittedCommittee,
 		Threshold:    1,
 		PolicyId:     policyID,
 	})
 	require.NoError(t, err)
 
 	// GenerateRingID with keys in the opposite order must produce the same ID
-	require.Equal(t, types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]()), resp.RingId)
+	require.Equal(t, types.GenerateRingID(canonicalCommittee, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0), resp.RingId)
+	require.Equal(t, []string{canonicalCommittee[1], canonicalCommittee[0]}, submittedCommittee)
+	require.Equal(t, canonicalCommittee, k.GetRing(ctx, resp.RingId).PeerNodeKeys)
 }
 
 func TestMsgServer_CreateRingRequiresPolicyID(t *testing.T) {
@@ -266,7 +271,7 @@ func TestMsgServer_CreateRingRequiresExistingRingPolicy(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), "missing-policy", immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), "missing-policy", immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -285,7 +290,7 @@ func TestMsgServer_CreateRingRequiresRegisteredRingPolicyControlObject(t *testin
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testOrbisRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -304,7 +309,7 @@ func TestMsgServer_CreateRingRequiresPolicyWithRingResource(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testNonRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -325,7 +330,7 @@ func TestMsgServer_CreateRingRejectsActorWithoutCreatePermission(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, policyOwnerCtx, "12D3KooWPeer1")
 	policyID := createOrbisRingPolicy(t, k, policyOwnerCtx, policyOwnerAddr)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]())
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0)
 	_, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -577,7 +582,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string]()),
+		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.None[uint64](), policyID, immutable.None[string](), 0),
 		createRingResp.RingId,
 	)
 
@@ -626,7 +631,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.Some(pssInterval), policyID, immutable.None[string]()),
+		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, immutable.Some(pssInterval), policyID, immutable.None[string](), 0),
 		createRingResp.RingId,
 	)
 
@@ -636,7 +641,7 @@ func TestMsgServer_ZeroPSSIntervalIsPreservedWhenPresent(t *testing.T) {
 	require.Equal(t, pssInterval, ring.GetPssInterval())
 }
 
-func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
+func TestMsgServer_SetRingPssIntervalByAcpAllowsRingOwner(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -660,12 +665,10 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 	require.NoError(t, err)
 
 	pssInterval := uint64(900)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
-		Creator: creatorAddr,
-		RingId:  createRingResp.RingId,
-		XPssInterval: &types.MsgUpdateRingByAcp_PssInterval{
-			PssInterval: pssInterval,
-		},
+	_, err = k.SetRingPssIntervalByAcp(ctx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     creatorAddr,
+		RingId:      createRingResp.RingId,
+		PssInterval: pssInterval,
 	})
 	require.NoError(t, err)
 
@@ -673,9 +676,43 @@ func TestMsgServer_UpdateRingByAcpAllowsRingOwner(t *testing.T) {
 	require.NotNil(t, ring)
 	require.Equal(t, policyID, ring.PolicyId)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
+
+	_, err = k.SetRingPssIntervalByAcp(ctx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     creatorAddr,
+		RingId:      createRingResp.RingId,
+		PssInterval: pssInterval,
+	})
+	require.ErrorIs(t, err, types.ErrRingPssIntervalUnchanged)
+
+	_, err = k.SetRingPssIntervalByAcp(ctx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     creatorAddr,
+		RingId:      createRingResp.RingId,
+		PssInterval: 1200,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(1200), k.GetRing(ctx, createRingResp.RingId).GetPssInterval())
+
+	_, err = k.DisableRingPssByAcp(ctx, &types.MsgDisableRingPssByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.NoError(t, err)
+	require.Nil(t, k.GetRing(ctx, createRingResp.RingId).XPssInterval)
+
+	_, err = k.DisableRingPssByAcp(ctx, &types.MsgDisableRingPssByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.ErrorIs(t, err, types.ErrRingPssAlreadyDisabled)
+
+	_, err = k.SetRingPssIntervalByAcp(ctx, &types.MsgSetRingPssIntervalByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.ErrorContains(t, err, "pss_interval must be positive")
 }
 
-func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -698,10 +735,25 @@ func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
 
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator: creatorAddr,
 		RingId:  createRingResp.RingId,
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+	})
+	require.ErrorContains(t, err, "reshare must change the committee or threshold")
+
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
+			NewThreshold: 1,
+		},
+	})
+	require.ErrorContains(t, err, "reshare must change the committee or threshold")
+
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 3,
 		},
 	})
@@ -713,7 +765,7 @@ func TestMsgServer_UpdateRingByAcpRejectsThresholdOnlyAboveExistingCommitteeSize
 	require.Nil(t, ring.XNewThreshold)
 }
 
-func TestMsgServer_UpdateRingByAcpRejectsCommitteeOnlyReshareWhenExistingThresholdExceedsTargetCommitteeSize(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpRejectsCommitteeOnlyWhenThresholdExceedsTargetSize(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -738,7 +790,7 @@ func TestMsgServer_UpdateRingByAcpRejectsCommitteeOnlyReshareWhenExistingThresho
 
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key},
@@ -752,7 +804,44 @@ func TestMsgServer_UpdateRingByAcpRejectsCommitteeOnlyReshareWhenExistingThresho
 	require.Nil(t, ring.XNewThreshold)
 }
 
-func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThresholdFitsSingleNodeTarget(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpRejectsReorderedExistingCommittee(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	storedCommittee := k.GetRing(ctx, createRingResp.RingId).PeerNodeKeys
+	reorderedCommittee := []string{storedCommittee[1], storedCommittee[0]}
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
+		Creator:         creatorAddr,
+		RingId:          createRingResp.RingId,
+		NewPeerNodeKeys: reorderedCommittee,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "reshare must change the committee or threshold")
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.Empty(t, ring.NewPeerNodeKeys)
+	require.Equal(t, []string{storedCommittee[1], storedCommittee[0]}, reorderedCommittee)
+}
+
+func TestMsgServer_StartRingReshareByAcpAllowsCommitteeOnlyForSingleNodeTarget(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -777,7 +866,7 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThreshol
 
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key},
@@ -788,9 +877,18 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThreshol
 	require.NotNil(t, ring)
 	require.Equal(t, []string{peer3Key}, ring.NewPeerNodeKeys)
 	require.Nil(t, ring.XNewThreshold)
+
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
+			NewThreshold: 1,
+		},
+	})
+	require.ErrorIs(t, err, types.ErrReshareInProgress)
 }
 
-func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThresholdFitsSameSizeTarget(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpAllowsCommitteeOnlyForSameSizeTarget(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -817,20 +915,23 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeOnlyReshareWhenExistingThreshol
 	peer4Addr, peer4Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer4")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
 	updatePeerNodeWhitelists(t, k, ctx, peer4Addr, peer4Key, []string{policyID}, nil)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	canonicalCommittee := canonicalNodeKeys([]string{peer3Key, peer4Key})
+	submittedCommittee := []string{canonicalCommittee[1], canonicalCommittee[0]}
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
-		NewPeerNodeKeys: []string{peer3Key, peer4Key},
+		NewPeerNodeKeys: submittedCommittee,
 	})
 	require.NoError(t, err)
 
 	ring := k.GetRing(ctx, createRingResp.RingId)
 	require.NotNil(t, ring)
-	require.Equal(t, []string{peer3Key, peer4Key}, ring.NewPeerNodeKeys)
+	require.Equal(t, canonicalCommittee, ring.NewPeerNodeKeys)
+	require.Equal(t, []string{canonicalCommittee[1], canonicalCommittee[0]}, submittedCommittee)
 	require.Nil(t, ring.XNewThreshold)
 }
 
-func TestMsgServer_UpdateRingByAcpAllowsCommitteeReshareWithLowerExplicitThreshold(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpAllowsCommitteeWithLowerThreshold(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -855,11 +956,11 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeReshareWithLowerExplicitThresho
 
 	peer3Addr, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
 	updatePeerNodeWhitelists(t, k, ctx, peer3Addr, peer3Key, []string{policyID}, nil)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
@@ -871,7 +972,7 @@ func TestMsgServer_UpdateRingByAcpAllowsCommitteeReshareWithLowerExplicitThresho
 	require.Equal(t, uint32(1), ring.GetNewThreshold())
 }
 
-func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -895,11 +996,11 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
 	require.NoError(t, err)
 
 	_, missingNodeInfoKey := testAccountWithPubKey(t, ctx, authKeeper)
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{missingNodeInfoKey},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
@@ -912,7 +1013,7 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutNodeInfo(t *testing.T) {
 	require.Nil(t, ring.XNewThreshold)
 }
 
-func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutRingWhitelist(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpRejectsNewPeerWithoutWhitelist(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
 
@@ -936,11 +1037,11 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutRingWhitelist(t *testing.
 	require.NoError(t, err)
 
 	_, peer3Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer3")
-	_, err = k.UpdateRingByAcp(ctx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(ctx, &types.MsgStartRingReshareByAcp{
 		Creator:         creatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
@@ -957,7 +1058,7 @@ func TestMsgServer_UpdateRingByAcpRejectsNewPeerWithoutRingWhitelist(t *testing.
 	require.Nil(t, ring.XNewThreshold)
 }
 
-func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
+func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
@@ -983,21 +1084,35 @@ func TestMsgServer_UpdateRingByAcpRejectsUnauthorizedActor(t *testing.T) {
 	require.NoError(t, err)
 
 	outsiderAddr, _ := testAccountWithPubKey(t, outsiderCtx, authKeeper)
-	_, err = k.UpdateRingByAcp(outsiderCtx, &types.MsgUpdateRingByAcp{
+	_, err = k.SetRingPssIntervalByAcp(outsiderCtx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     outsiderAddr,
+		RingId:      createRingResp.RingId,
+		PssInterval: 900,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
+	_, err = k.ScheduleRingUpgradeByAcp(outsiderCtx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        outsiderAddr,
+		RingId:         createRingResp.RingId,
+		NextVersion:    1,
+		ActivationTime: MinRingUpgradeLeadSeconds,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
+	_, err = k.CancelRingUpgradeByAcp(outsiderCtx, &types.MsgCancelRingUpgradeByAcp{
 		Creator: outsiderAddr,
 		RingId:  createRingResp.RingId,
-		XPssInterval: &types.MsgUpdateRingByAcp_PssInterval{
-			PssInterval: 900,
-		},
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 
 	ring := k.GetRing(creatorCtx, createRingResp.RingId)
 	require.NotNil(t, ring)
 	require.Nil(t, ring.XPssInterval)
+	require.Nil(t, ring.UpgradeInfo.XNextVersion)
+	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 }
 
-func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
+func TestMsgServer_RingMutationUsesRingPolicy(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
@@ -1042,18 +1157,16 @@ func TestMsgServer_UpdateRingByAcpUsesRingPolicy(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	_, err = k.UpdateRingByAcp(operatorCtx, &types.MsgUpdateRingByAcp{
-		Creator: operatorAddr,
-		RingId:  createRingResp.RingId,
-		XPssInterval: &types.MsgUpdateRingByAcp_PssInterval{
-			PssInterval: 900,
-		},
+	_, err = k.SetRingPssIntervalByAcp(operatorCtx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     operatorAddr,
+		RingId:      createRingResp.RingId,
+		PssInterval: 900,
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 	require.Equal(t, policyID, k.GetRing(creatorCtx, createRingResp.RingId).PolicyId)
 }
 
-func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
+func TestMsgServer_StartRingReshareByAcpAllowsOperatorRelation(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	creatorCtx := ctxWithDID(ctx, testDID)
 	peerCtx := ctxWithDID(ctx, testPeerDID)
@@ -1095,11 +1208,11 @@ func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
 	peer4Addr, peer4Key := setupPeerWithNodeInfo(t, k, authKeeper, creatorCtx, "12D3KooWPeer4")
 	updatePeerNodeWhitelists(t, k, creatorCtx, peer3Addr, peer3Key, []string{policyID}, nil)
 	updatePeerNodeWhitelists(t, k, creatorCtx, peer4Addr, peer4Key, nil, []string{createRingResp.RingId})
-	_, err = k.UpdateRingByAcp(operatorCtx, &types.MsgUpdateRingByAcp{
+	_, err = k.StartRingReshareByAcp(operatorCtx, &types.MsgStartRingReshareByAcp{
 		Creator:         operatorAddr,
 		RingId:          createRingResp.RingId,
 		NewPeerNodeKeys: []string{peer3Key, peer4Key},
-		XNewThreshold: &types.MsgUpdateRingByAcp_NewThreshold{
+		XNewThreshold: &types.MsgStartRingReshareByAcp_NewThreshold{
 			NewThreshold: 1,
 		},
 	})
@@ -1108,7 +1221,7 @@ func TestMsgServer_UpdateRingByAcpAllowsOperatorRelation(t *testing.T) {
 	ring := k.GetRing(creatorCtx, createRingResp.RingId)
 	require.NotNil(t, ring)
 	require.Equal(t, policyID, ring.PolicyId)
-	require.Equal(t, []string{peer3Key, peer4Key}, ring.NewPeerNodeKeys)
+	require.Equal(t, canonicalNodeKeys([]string{peer3Key, peer4Key}), ring.NewPeerNodeKeys)
 	require.Equal(t, uint32(1), ring.GetNewThreshold())
 }
 
@@ -1203,10 +1316,10 @@ func TestMsgServer_CreateNodeInfo_CanonicalizesControllerKey(t *testing.T) {
 	require.NotNil(t, nodeInfo)
 	require.Equal(t, controllerPubKeyHex, nodeInfo.ControllerKey)
 
-	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
-		Creator:            controllerAddr,
-		NodeKey:            nodePubKeyHex,
-		WhitelistedRingIds: []string{"ring-1"},
+	_, err = k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgAddNodeToWhitelist_RingId{RingId: "ring-1"},
 	})
 	require.NoError(t, err)
 }
@@ -1231,120 +1344,201 @@ func TestMsgServer_CreateNodeInfo_AlreadyExists(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrNodeInfoAlreadyExists)
 }
 
-func TestMsgServer_UpdateNodeInfo(t *testing.T) {
+func TestMsgServer_CreateNodeInfoRejectsInvalidWhitelistSets(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-
-	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
-		Creator:              nodeAddr,
-		PeerId:               "peer-original",
-		ControllerKey:        controllerPubKeyHex,
-		WhitelistedPolicyIds: []string{"policy-a"},
-	})
-	require.NoError(t, err)
-
-	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
-		Creator:              controllerAddr,
-		NodeKey:              nodePubKeyHex,
-		WhitelistedPolicyIds: []string{"policy-b", "policy-c"},
-		WhitelistedRingIds:   []string{"ring-1", "ring-2"},
-	})
-	require.NoError(t, err)
-
-	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
-	require.NotNil(t, nodeInfo)
-	require.Equal(t, "peer-original", nodeInfo.PeerId)
-	require.Equal(t, []string{"policy-b", "policy-c"}, nodeInfo.WhitelistedPolicyIds)
-	require.Equal(t, []string{"ring-1", "ring-2"}, nodeInfo.WhitelistedRingIds)
+	for _, testCase := range []struct {
+		name      string
+		policyIDs []string
+		ringIDs   []string
+		errorText string
+	}{
+		{name: "empty policy", policyIDs: []string{""}, errorText: "contains an empty value"},
+		{name: "duplicate policy", policyIDs: []string{"policy-a", "policy-a"}, errorText: "contains duplicate value"},
+		{name: "empty ring", ringIDs: []string{""}, errorText: "contains an empty value"},
+		{name: "duplicate ring", ringIDs: []string{"ring-a", "ring-a"}, errorText: "contains duplicate value"},
+	} {
+		t.Run(testCase.name, func(t *testing.T) {
+			nodeAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+			_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+			_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+				Creator:              nodeAddr,
+				PeerId:               "peer-1",
+				ControllerKey:        controllerPubKeyHex,
+				WhitelistedPolicyIds: testCase.policyIDs,
+				WhitelistedRingIds:   testCase.ringIDs,
+			})
+			require.ErrorContains(t, err, testCase.errorText)
+		})
+	}
 }
 
-func TestMsgServer_UpdateNodeInfo_UpdatePeerId(t *testing.T) {
+func TestMsgServer_UpdateNodePeerId(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
 	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-
+	wrongAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
 		Creator:       nodeAddr,
 		PeerId:        "peer-original",
 		ControllerKey: controllerPubKeyHex,
 	})
 	require.NoError(t, err)
+	ctx = ctx.WithEventManager(sdk.NewEventManager())
 
-	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
 		Creator: controllerAddr,
 		NodeKey: nodePubKeyHex,
-		XPeerId: &types.MsgUpdateNodeInfo_PeerId{PeerId: "peer-updated"},
+		PeerId:  "peer-updated",
 	})
 	require.NoError(t, err)
+	require.Equal(t, "peer-updated", k.GetNodeInfo(ctx, nodePubKeyHex).PeerId)
+	require.Equal(t, []proto.Message{
+		&types.EventNodeInfoUpdated{
+			PeerId:        "peer-updated",
+			ControllerKey: controllerPubKeyHex,
+		},
+	}, parseTypedEvents(t, ctx))
 
-	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
-	require.NotNil(t, nodeInfo)
-	require.Equal(t, "peer-updated", nodeInfo.PeerId)
-}
-
-func TestMsgServer_UpdateNodeInfo_AbsentPeerIdIsNotCleared(t *testing.T) {
-	k, authKeeper, ctx := setupOrbisKeeper(t)
-	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
-
-	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-
-	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
-		Creator:       nodeAddr,
-		PeerId:        "peer-original",
-		ControllerKey: controllerPubKeyHex,
-	})
-	require.NoError(t, err)
-
-	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
-		Creator:            controllerAddr,
-		NodeKey:            nodePubKeyHex,
-		WhitelistedRingIds: []string{"ring-1"},
-	})
-	require.NoError(t, err)
-
-	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
-	require.Equal(t, "peer-original", nodeInfo.PeerId)
-}
-
-func TestMsgServer_UpdateNodeInfo_NotFound(t *testing.T) {
-	k, authKeeper, ctx := setupOrbisKeeper(t)
-	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
-
-	controllerAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
-
-	_, err := k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
 		Creator: controllerAddr,
-		NodeKey: "nonexistent-key",
+		NodeKey: nodePubKeyHex,
+		PeerId:  "peer-updated",
+	})
+	require.ErrorIs(t, err, types.ErrNodeInfoUnchanged)
+
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
+		Creator: wrongAddr,
+		NodeKey: nodePubKeyHex,
+		PeerId:  "peer-wrong",
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedNodeInfoUpdate)
+
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
+		Creator: controllerAddr,
+		NodeKey: "missing",
+		PeerId:  "peer-missing",
 	})
 	require.ErrorIs(t, err, types.ErrNodeInfoNotFound)
 }
 
-func TestMsgServer_UpdateNodeInfo_Unauthorized(t *testing.T) {
+func TestMsgServer_TransferNodeController(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
 	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	_, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
-	wrongAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
-
+	oldControllerAddr, oldControllerKey := testAccountWithPubKey(t, ctx, authKeeper)
+	newControllerAddr, newControllerKey := testAccountWithPubKey(t, ctx, authKeeper)
 	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
 		Creator:       nodeAddr,
 		PeerId:        "peer-1",
-		ControllerKey: controllerPubKeyHex,
+		ControllerKey: oldControllerKey,
 	})
 	require.NoError(t, err)
 
-	_, err = k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
-		Creator: wrongAddr,
+	_, err = k.TransferNodeController(ctx, &types.MsgTransferNodeController{
+		Creator:       oldControllerAddr,
+		NodeKey:       nodePubKeyHex,
+		ControllerKey: "0x" + strings.ToUpper(newControllerKey),
+	})
+	require.NoError(t, err)
+	require.Equal(t, newControllerKey, k.GetNodeInfo(ctx, nodePubKeyHex).ControllerKey)
+
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
+		Creator: oldControllerAddr,
 		NodeKey: nodePubKeyHex,
+		PeerId:  "old-controller",
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedNodeInfoUpdate)
+
+	_, err = k.UpdateNodePeerId(ctx, &types.MsgUpdateNodePeerId{
+		Creator: newControllerAddr,
+		NodeKey: nodePubKeyHex,
+		PeerId:  "new-controller",
+	})
+	require.NoError(t, err)
+
+	_, err = k.TransferNodeController(ctx, &types.MsgTransferNodeController{
+		Creator:       newControllerAddr,
+		NodeKey:       nodePubKeyHex,
+		ControllerKey: newControllerKey,
+	})
+	require.ErrorIs(t, err, types.ErrNodeInfoUnchanged)
+
+	_, err = k.TransferNodeController(ctx, &types.MsgTransferNodeController{
+		Creator:       newControllerAddr,
+		NodeKey:       nodePubKeyHex,
+		ControllerKey: "not-a-key",
+	})
+	require.ErrorIs(t, err, types.ErrInvalidNodeInfo)
+	require.Equal(t, newControllerKey, k.GetNodeInfo(ctx, nodePubKeyHex).ControllerKey)
+}
+
+func TestMsgServer_AddAndRemoveNodeWhitelistEntries(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:              nodeAddr,
+		PeerId:               "peer-1",
+		ControllerKey:        controllerPubKeyHex,
+		WhitelistedPolicyIds: []string{"policy-a"},
+		WhitelistedRingIds:   []string{"ring-a"},
+	})
+	require.NoError(t, err)
+
+	_, err = k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgAddNodeToWhitelist_PolicyId{PolicyId: "policy-b"},
+	})
+	require.NoError(t, err)
+	_, err = k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgAddNodeToWhitelist_RingId{RingId: "ring-b"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo := k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.Equal(t, []string{"policy-a", "policy-b"}, nodeInfo.WhitelistedPolicyIds)
+	require.Equal(t, []string{"ring-a", "ring-b"}, nodeInfo.WhitelistedRingIds)
+
+	_, err = k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgAddNodeToWhitelist_PolicyId{PolicyId: "policy-b"},
+	})
+	require.ErrorIs(t, err, types.ErrNodeWhitelistEntryExists)
+
+	_, err = k.RemoveNodeFromWhitelist(ctx, &types.MsgRemoveNodeFromWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgRemoveNodeFromWhitelist_PolicyId{PolicyId: "policy-a"},
+	})
+	require.NoError(t, err)
+	_, err = k.RemoveNodeFromWhitelist(ctx, &types.MsgRemoveNodeFromWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgRemoveNodeFromWhitelist_RingId{RingId: "ring-a"},
+	})
+	require.NoError(t, err)
+
+	nodeInfo = k.GetNodeInfo(ctx, nodePubKeyHex)
+	require.Equal(t, []string{"policy-b"}, nodeInfo.WhitelistedPolicyIds)
+	require.Equal(t, []string{"ring-b"}, nodeInfo.WhitelistedRingIds)
+
+	_, err = k.RemoveNodeFromWhitelist(ctx, &types.MsgRemoveNodeFromWhitelist{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+		Target:  &types.MsgRemoveNodeFromWhitelist_RingId{RingId: "ring-missing"},
+	})
+	require.ErrorIs(t, err, types.ErrNodeWhitelistEntryNotFound)
 }
 
 // setupPeerWithNodeInfo registers an account and creates a NodeInfo entry for it.
@@ -1371,13 +1565,22 @@ func updatePeerNodeWhitelists(
 	ringIDs []string,
 ) {
 	t.Helper()
-	_, err := k.UpdateNodeInfo(ctx, &types.MsgUpdateNodeInfo{
-		Creator:              creator,
-		NodeKey:              nodeKey,
-		WhitelistedPolicyIds: policyIDs,
-		WhitelistedRingIds:   ringIDs,
-	})
-	require.NoError(t, err)
+	for _, policyID := range policyIDs {
+		_, err := k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+			Creator: creator,
+			NodeKey: nodeKey,
+			Target:  &types.MsgAddNodeToWhitelist_PolicyId{PolicyId: policyID},
+		})
+		require.NoError(t, err)
+	}
+	for _, ringID := range ringIDs {
+		_, err := k.AddNodeToWhitelist(ctx, &types.MsgAddNodeToWhitelist{
+			Creator: creator,
+			NodeKey: nodeKey,
+			Target:  &types.MsgAddNodeToWhitelist_RingId{RingId: ringID},
+		})
+		require.NoError(t, err)
+	}
 }
 
 func createOrbisRingPolicy(t *testing.T, k Keeper, ctx sdk.Context, creator string) string {

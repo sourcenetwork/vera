@@ -19,9 +19,9 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Id:              "ring-id",
 		CreatorDid:      "did:example:one",
 		RingPk:          "ring-pk",
-		PeerNodeKeys:    []string{nodeB, nodeA},
+		PeerNodeKeys:    []string{nodeA, nodeB},
 		Threshold:       2,
-		NewPeerNodeKeys: []string{nodeD, nodeC},
+		NewPeerNodeKeys: []string{nodeC, nodeD},
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
@@ -30,12 +30,23 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		},
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
+		UpgradeInfo: types.UpgradeInfo{
+			CurrentVersion: 1,
+			XNextVersion: &types.UpgradeInfo_NextVersion{
+				NextVersion: 2,
+			},
+			XActivationTime: &types.UpgradeInfo_ActivationTime{
+				ActivationTime: 100,
+			},
+		},
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeA, RingPk: "ring-pk"},
 		},
 	}
 	finalized, err := ringForReshareFinalization(current)
 	require.NoError(t, err)
+	require.Equal(t, current.UpgradeInfo, finalized.UpgradeInfo)
+	require.Equal(t, []string{nodeC, nodeD}, finalized.PeerNodeKeys)
 
 	signBytes, err := ringReshareFinalizeSignBytes("sourcehub-test", current, finalized)
 	require.NoError(t, err)
@@ -55,6 +66,15 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		},
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
+		UpgradeInfo: types.UpgradeInfo{
+			CurrentVersion: 7,
+			XNextVersion: &types.UpgradeInfo_NextVersion{
+				NextVersion: 8,
+			},
+			XActivationTime: &types.UpgradeInfo_ActivationTime{
+				ActivationTime: 900,
+			},
+		},
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeB, RingPk: "different-storage-only-value"},
 		},

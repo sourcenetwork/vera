@@ -8,12 +8,13 @@ import (
 
 var _ sdk.Msg = &MsgCreateRing{}
 
-func NewMsgCreateRing(creator string, peerNodeKeys []string, threshold uint32, policyID string) *MsgCreateRing {
+func NewMsgCreateRing(creator string, peerNodeKeys []string, threshold uint32, policyID string, currentVersion uint64) *MsgCreateRing {
 	return &MsgCreateRing{
-		Creator:      creator,
-		PeerNodeKeys: peerNodeKeys,
-		Threshold:    threshold,
-		PolicyId:     policyID,
+		Creator:        creator,
+		PeerNodeKeys:   peerNodeKeys,
+		Threshold:      threshold,
+		PolicyId:       policyID,
+		CurrentVersion: currentVersion,
 	}
 }
 

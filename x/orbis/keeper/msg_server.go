@@ -2,11 +2,11 @@ package keeper
 
 import (
 	"context"
-	"encoding/hex"
 	"slices"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/sourcenetwork/immutable"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -36,14 +36,15 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 
 	pssInterval := optionalCreateRingPSSInterval(msg)
 	nonce := optionalCreateRingNonce(msg)
+	peerNodeKeys := canonicalNodeKeys(msg.PeerNodeKeys)
 
-	for _, nodeKey := range msg.PeerNodeKeys {
+	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
 			return nil, errorsmod.Wrapf(types.ErrInvalidRing, "peer_node_key %q has no registered node info", nodeKey)
 		}
 	}
 
-	ringID := types.GenerateRingID(msg.PeerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce)
+	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -51,10 +52,13 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	ring := types.Ring{
 		Id:               ringID,
 		CreatorDid:       creatorDID,
-		PeerNodeKeys:     append([]string(nil), msg.PeerNodeKeys...),
+		PeerNodeKeys:     peerNodeKeys,
 		Threshold:        msg.Threshold,
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
+		UpgradeInfo: types.UpgradeInfo{
+			CurrentVersion: msg.CurrentVersion,
+		},
 	}
 	setRingPSSInterval(&ring, pssInterval)
 	if err := validateRing(&ring); err != nil {
@@ -160,7 +164,7 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	return &types.MsgFinalizeRingResponse{}, nil
 }
 
-func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRingByAcp) (*types.MsgUpdateRingByAcpResponse, error) {
+func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStartRingReshareByAcp) (*types.MsgStartRingReshareByAcpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ring := k.GetRing(goCtx, msg.RingId)
@@ -179,11 +183,21 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		return nil, err
 	}
 
-	newThreshold := optionalUpdateRingNewThreshold(msg)
-	if err := validateRingUpdate(msg.NewPeerNodeKeys, newThreshold, ring); err != nil {
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
 		return nil, err
 	}
-	for _, nodeKey := range msg.NewPeerNodeKeys {
+
+	newPeerNodeKeys := canonicalNodeKeys(msg.NewPeerNodeKeys)
+	newThreshold := optionalStartRingReshareNewThreshold(msg)
+	if err := validateStartRingReshare(
+		newPeerNodeKeys,
+		newThreshold,
+		ring,
+	); err != nil {
+		return nil, err
+	}
+	for _, nodeKey := range newPeerNodeKeys {
 		nodeInfo := k.GetNodeInfo(goCtx, nodeKey)
 		if nodeInfo == nil {
 			return nil, errorsmod.Wrapf(types.ErrInvalidRing, "peer_node_key %q has no registered node info", nodeKey)
@@ -199,14 +213,11 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 		}
 	}
 
-	if len(msg.NewPeerNodeKeys) > 0 {
-		ring.NewPeerNodeKeys = append([]string(nil), msg.NewPeerNodeKeys...)
+	if len(newPeerNodeKeys) > 0 {
+		ring.NewPeerNodeKeys = newPeerNodeKeys
 	}
 	if newThreshold.HasValue() {
 		setRingNewThreshold(ring, newThreshold)
-	}
-	if msg.XPssInterval != nil {
-		setRingPSSInterval(ring, optionalUpdateRingPSSInterval(msg))
 	}
 	if err := validateRing(ring); err != nil {
 		return nil, err
@@ -220,13 +231,231 @@ func (k *Keeper) UpdateRingByAcp(goCtx context.Context, msg *types.MsgUpdateRing
 	}); err != nil {
 		return nil, err
 	}
+	if upgradeNormalizedEvent != nil {
+		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
+			return nil, err
+		}
+	}
 
-	return &types.MsgUpdateRingByAcpResponse{}, nil
+	return &types.MsgStartRingReshareByAcpResponse{}, nil
 }
 
-func nodeInfoAllowsRing(nodeInfo *types.NodeInfo, ring *types.Ring) bool {
-	return slices.Contains(nodeInfo.WhitelistedPolicyIds, ring.PolicyId) ||
-		slices.Contains(nodeInfo.WhitelistedRingIds, ring.Id)
+func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSetRingPssIntervalByAcp) (*types.MsgSetRingPssIntervalByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if msg.PssInterval == 0 {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pss_interval must be positive")
+	}
+	if ring.XPssInterval != nil && ring.GetPssInterval() == msg.PssInterval {
+		return nil, types.ErrRingPssIntervalUnchanged
+	}
+
+	setRingPSSInterval(ring, immutable.Some(msg.PssInterval))
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if upgradeNormalizedEvent != nil {
+		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
+			return nil, err
+		}
+	}
+
+	return &types.MsgSetRingPssIntervalByAcpResponse{}, nil
+}
+
+func (k *Keeper) DisableRingPssByAcp(goCtx context.Context, msg *types.MsgDisableRingPssByAcp) (*types.MsgDisableRingPssByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if ring.XPssInterval == nil {
+		return nil, types.ErrRingPssAlreadyDisabled
+	}
+
+	setRingPSSInterval(ring, immutable.None[uint64]())
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if upgradeNormalizedEvent != nil {
+		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
+			return nil, err
+		}
+	}
+
+	return &types.MsgDisableRingPssByAcpResponse{}, nil
+}
+
+func (k *Keeper) ScheduleRingUpgradeByAcp(goCtx context.Context, msg *types.MsgScheduleRingUpgradeByAcp) (*types.MsgScheduleRingUpgradeByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	// currentTime is needed for validateRingUpgradeSchedule below, so we call
+	// normalizeMaturedRingUpgrade directly instead of maybeNormalizeMaturedRingUpgrade.
+	currentTime, err := currentBlockUnixTime(ctx)
+	if err != nil {
+		return nil, err
+	}
+	upgradeNormalizedEvent := normalizeMaturedRingUpgrade(ring, currentTime)
+
+	if ring.UpgradeInfo.XNextVersion != nil &&
+		ring.UpgradeInfo.GetNextVersion() == msg.NextVersion &&
+		ring.UpgradeInfo.GetActivationTime() == msg.ActivationTime {
+		return nil, types.ErrRingUpgradeUnchanged
+	}
+	if err := validateRingUpgradeSchedule(msg.NextVersion, msg.ActivationTime, currentTime, ring); err != nil {
+		return nil, err
+	}
+
+	setRingUpgrade(ring, msg.NextVersion, msg.ActivationTime)
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if upgradeNormalizedEvent != nil {
+		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
+			return nil, err
+		}
+	}
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeScheduled{
+		RingId:         ring.Id,
+		CurrentVersion: ring.UpgradeInfo.CurrentVersion,
+		NextVersion:    msg.NextVersion,
+		ActivationTime: msg.ActivationTime,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgScheduleRingUpgradeByAcpResponse{}, nil
+}
+
+func (k *Keeper) CancelRingUpgradeByAcp(goCtx context.Context, msg *types.MsgCancelRingUpgradeByAcp) (*types.MsgCancelRingUpgradeByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	if ring.UpgradeInfo.XNextVersion == nil || ring.UpgradeInfo.XActivationTime == nil {
+		return nil, types.ErrRingUpgradeNotScheduled
+	}
+	currentTime, err := currentBlockUnixTime(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if currentTime >= ring.UpgradeInfo.GetActivationTime() {
+		return nil, types.ErrRingUpgradeAlreadyActive
+	}
+
+	clearRingUpgrade(ring)
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpgradeCancelled{
+		RingId:         ring.Id,
+		CurrentVersion: ring.UpgradeInfo.CurrentVersion,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCancelRingUpgradeByAcpResponse{}, nil
 }
 
 func (k *Keeper) FinalizeRingReshareByThresholdSignature(
@@ -342,7 +571,7 @@ func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeI
 		WhitelistedPolicyIds: append([]string(nil), msg.WhitelistedPolicyIds...),
 		WhitelistedRingIds:   append([]string(nil), msg.WhitelistedRingIds...),
 	}
-	if err := validateNodeInfo(&nodeInfo); err != nil {
+	if err := normalizeAndValidateNodeInfo(&nodeInfo); err != nil {
 		return nil, err
 	}
 
@@ -358,36 +587,26 @@ func (k *Keeper) CreateNodeInfo(goCtx context.Context, msg *types.MsgCreateNodeI
 	return &types.MsgCreateNodeInfoResponse{}, nil
 }
 
-func (k *Keeper) UpdateNodeInfo(goCtx context.Context, msg *types.MsgUpdateNodeInfo) (*types.MsgUpdateNodeInfoResponse, error) {
+func (k *Keeper) UpdateNodePeerId(goCtx context.Context, msg *types.MsgUpdateNodePeerId) (*types.MsgUpdateNodePeerIdResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	nodeInfo := k.GetNodeInfo(goCtx, msg.NodeKey)
-	if nodeInfo == nil {
-		return nil, types.ErrNodeInfoNotFound
-	}
-
-	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
 		return nil, err
 	}
-	if signerKey != nodeInfo.ControllerKey {
-		return nil, types.ErrUnauthorizedNodeInfoUpdate
+
+	if msg.PeerId == "" {
+		return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing peer_id")
+	}
+	if nodeInfo.PeerId == msg.PeerId {
+		return nil, types.ErrNodeInfoUnchanged
 	}
 
-	if msg.XPeerId != nil {
-		nodeInfo.PeerId = msg.GetPeerId()
-	}
-	if msg.XControllerKey != nil {
-		nodeInfo.ControllerKey = msg.GetControllerKey()
-	}
-	nodeInfo.WhitelistedPolicyIds = append([]string(nil), msg.WhitelistedPolicyIds...)
-	nodeInfo.WhitelistedRingIds = append([]string(nil), msg.WhitelistedRingIds...)
-	if err := validateNodeInfo(nodeInfo); err != nil {
+	nodeInfo.PeerId = msg.PeerId
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
 		return nil, err
 	}
-
 	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
-
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoUpdated{
 		PeerId:        nodeInfo.PeerId,
 		ControllerKey: nodeInfo.ControllerKey,
@@ -395,29 +614,126 @@ func (k *Keeper) UpdateNodeInfo(goCtx context.Context, msg *types.MsgUpdateNodeI
 		return nil, err
 	}
 
-	return &types.MsgUpdateNodeInfoResponse{}, nil
+	return &types.MsgUpdateNodePeerIdResponse{}, nil
 }
 
-// signerPublicKeyHex returns the hex-encoded compressed public key for a bech32 address.
-// The ante handler populates the account's public key before message handlers run,
-// so it is guaranteed non-nil for the transaction signer.
-func signerPublicKeyHex(ctx sdk.Context, k *Keeper, address string) (string, error) {
-	addr, err := sdk.AccAddressFromBech32(address)
+func (k *Keeper) TransferNodeController(goCtx context.Context, msg *types.MsgTransferNodeController) (*types.MsgTransferNodeControllerResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
 	if err != nil {
-		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "invalid signer address: %s", err)
+		return nil, err
 	}
 
-	account := k.accountKeeper.GetAccount(ctx, addr)
-	if account == nil {
-		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "account not found for address %s", address)
+	previousControllerKey := nodeInfo.ControllerKey
+	nodeInfo.ControllerKey = msg.ControllerKey
+	// normalizeAndValidateNodeInfo normalizes ControllerKey (strips 0x, lowercases),
+	// so the equality check below correctly identifies e.g. "0xABCD" as unchanged
+	// against the stored "abcd". Validation must run before the comparison.
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
+		return nil, err
+	}
+	if nodeInfo.ControllerKey == previousControllerKey {
+		return nil, types.ErrNodeInfoUnchanged
 	}
 
-	pubKey := account.GetPubKey()
-	if pubKey == nil {
-		return "", errorsmod.Wrapf(types.ErrInvalidNodeInfo, "public key not set for account %s", address)
+	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoUpdated{
+		PeerId:        nodeInfo.PeerId,
+		ControllerKey: nodeInfo.ControllerKey,
+	}); err != nil {
+		return nil, err
 	}
 
-	return hex.EncodeToString(pubKey.Bytes()), nil
+	return &types.MsgTransferNodeControllerResponse{}, nil
+}
+
+func (k *Keeper) AddNodeToWhitelist(goCtx context.Context, msg *types.MsgAddNodeToWhitelist) (*types.MsgAddNodeToWhitelistResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	switch target := msg.Target.(type) {
+	case *types.MsgAddNodeToWhitelist_PolicyId:
+		if target.PolicyId == "" {
+			return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing policy_id")
+		}
+		if slices.Contains(nodeInfo.WhitelistedPolicyIds, target.PolicyId) {
+			return nil, types.ErrNodeWhitelistEntryExists
+		}
+		nodeInfo.WhitelistedPolicyIds = append(nodeInfo.WhitelistedPolicyIds, target.PolicyId)
+	case *types.MsgAddNodeToWhitelist_RingId:
+		if target.RingId == "" {
+			return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing ring_id")
+		}
+		if slices.Contains(nodeInfo.WhitelistedRingIds, target.RingId) {
+			return nil, types.ErrNodeWhitelistEntryExists
+		}
+		nodeInfo.WhitelistedRingIds = append(nodeInfo.WhitelistedRingIds, target.RingId)
+	default:
+		return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing whitelist target")
+	}
+
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
+		return nil, err
+	}
+	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoUpdated{
+		PeerId:        nodeInfo.PeerId,
+		ControllerKey: nodeInfo.ControllerKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddNodeToWhitelistResponse{}, nil
+}
+
+func (k *Keeper) RemoveNodeFromWhitelist(goCtx context.Context, msg *types.MsgRemoveNodeFromWhitelist) (*types.MsgRemoveNodeFromWhitelistResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	nodeInfo, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	switch target := msg.Target.(type) {
+	case *types.MsgRemoveNodeFromWhitelist_PolicyId:
+		if target.PolicyId == "" {
+			return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing policy_id")
+		}
+		index := slices.Index(nodeInfo.WhitelistedPolicyIds, target.PolicyId)
+		if index < 0 {
+			return nil, types.ErrNodeWhitelistEntryNotFound
+		}
+		nodeInfo.WhitelistedPolicyIds = slices.Delete(nodeInfo.WhitelistedPolicyIds, index, index+1)
+	case *types.MsgRemoveNodeFromWhitelist_RingId:
+		if target.RingId == "" {
+			return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing ring_id")
+		}
+		index := slices.Index(nodeInfo.WhitelistedRingIds, target.RingId)
+		if index < 0 {
+			return nil, types.ErrNodeWhitelistEntryNotFound
+		}
+		nodeInfo.WhitelistedRingIds = slices.Delete(nodeInfo.WhitelistedRingIds, index, index+1)
+	default:
+		return nil, errorsmod.Wrap(types.ErrInvalidNodeInfo, "missing whitelist target")
+	}
+
+	if err := normalizeAndValidateNodeInfo(nodeInfo); err != nil {
+		return nil, err
+	}
+	k.SetNodeInfo(goCtx, msg.NodeKey, *nodeInfo)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeInfoUpdated{
+		PeerId:        nodeInfo.PeerId,
+		ControllerKey: nodeInfo.ControllerKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRemoveNodeFromWhitelistResponse{}, nil
 }
 
 func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKeyDerivation) (*types.MsgStoreKeyDerivationResponse, error) {

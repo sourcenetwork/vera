@@ -45,3 +45,25 @@ message EventRingDeleted {
   string ring_id = 1;
   string reason = 2;
 }
+
+// EventRingUpgradeScheduled is emitted when a future ring upgrade is scheduled.
+message EventRingUpgradeScheduled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+  uint64 next_version = 3;
+  uint64 activation_time = 4;
+}
+
+// EventRingUpgradeCancelled is emitted when a pending ring upgrade is cancelled.
+message EventRingUpgradeCancelled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+}
+
+// EventRingUpgradeNormalized is emitted when a scheduled upgrade becomes active.
+message EventRingUpgradeNormalized {
+  string ring_id = 1;
+  uint64 previous_version = 2;
+  uint64 current_version = 3;
+  uint64 activation_time = 4;
+}

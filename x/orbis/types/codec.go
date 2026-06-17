@@ -10,12 +10,20 @@ import (
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateRing{},
-		&MsgUpdateRingByAcp{},
+		&MsgFinalizeRing{},
+		&MsgStartRingReshareByAcp{},
+		&MsgSetRingPssIntervalByAcp{},
+		&MsgDisableRingPssByAcp{},
+		&MsgScheduleRingUpgradeByAcp{},
+		&MsgCancelRingUpgradeByAcp{},
 		&MsgFinalizeRingReshareByThresholdSignature{},
 		&MsgStoreDocument{},
 		&MsgStoreKeyDerivation{},
 		&MsgCreateNodeInfo{},
-		&MsgUpdateNodeInfo{},
+		&MsgUpdateNodePeerId{},
+		&MsgTransferNodeController{},
+		&MsgAddNodeToWhitelist{},
+		&MsgRemoveNodeFromWhitelist{},
 		&MsgUpdateParams{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

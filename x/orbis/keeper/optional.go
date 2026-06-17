@@ -22,19 +22,11 @@ func optionalCreateRingNonce(msg *types.MsgCreateRing) immutable.Option[string] 
 	return immutable.Some(value)
 }
 
-func optionalUpdateRingNewThreshold(msg *types.MsgUpdateRingByAcp) immutable.Option[uint32] {
+func optionalStartRingReshareNewThreshold(msg *types.MsgStartRingReshareByAcp) immutable.Option[uint32] {
 	if msg.XNewThreshold == nil {
 		return immutable.None[uint32]()
 	}
 	value := msg.GetNewThreshold()
-	return immutable.Some(value)
-}
-
-func optionalUpdateRingPSSInterval(msg *types.MsgUpdateRingByAcp) immutable.Option[uint64] {
-	if msg.XPssInterval == nil {
-		return immutable.None[uint64]()
-	}
-	value := msg.GetPssInterval()
 	return immutable.Some(value)
 }
 

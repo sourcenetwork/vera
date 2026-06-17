@@ -18,12 +18,19 @@ service Msg {
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
   rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
-  rpc UpdateRingByAcp(MsgUpdateRingByAcp) returns (MsgUpdateRingByAcpResponse);
+  rpc StartRingReshareByAcp(MsgStartRingReshareByAcp) returns (MsgStartRingReshareByAcpResponse);
+  rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
+  rpc DisableRingPssByAcp(MsgDisableRingPssByAcp) returns (MsgDisableRingPssByAcpResponse);
+  rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
+  rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
   rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
   rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
-  rpc UpdateNodeInfo(MsgUpdateNodeInfo) returns (MsgUpdateNodeInfoResponse);
+  rpc UpdateNodePeerId(MsgUpdateNodePeerId) returns (MsgUpdateNodePeerIdResponse);
+  rpc TransferNodeController(MsgTransferNodeController) returns (MsgTransferNodeControllerResponse);
+  rpc AddNodeToWhitelist(MsgAddNodeToWhitelist) returns (MsgAddNodeToWhitelistResponse);
+  rpc RemoveNodeFromWhitelist(MsgRemoveNodeFromWhitelist) returns (MsgRemoveNodeFromWhitelistResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -52,6 +59,7 @@ message MsgCreateRing {
   string policy_id = 5;
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
   optional string nonce = 6;
+  uint64 current_version = 7;
 }
 
 message MsgCreateRingResponse {
@@ -67,18 +75,52 @@ message MsgFinalizeRing {
 
 message MsgFinalizeRingResponse {}
 
-message MsgUpdateRingByAcp {
+message MsgStartRingReshareByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
   repeated string new_peer_node_keys = 3;
   // Absent means no pending threshold update.
   optional uint32 new_threshold = 4;
-  // Absent means no PSS refresh interval update.
-  optional uint64 pss_interval = 5;
 }
 
-message MsgUpdateRingByAcpResponse {}
+message MsgStartRingReshareByAcpResponse {}
+
+message MsgSetRingPssIntervalByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  uint64 pss_interval = 3;
+}
+
+message MsgSetRingPssIntervalByAcpResponse {}
+
+message MsgDisableRingPssByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgDisableRingPssByAcpResponse {}
+
+message MsgScheduleRingUpgradeByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  uint64 next_version = 3;
+  // Unix timestamp in seconds. Must be at least 10 minutes in the future.
+  uint64 activation_time = 4;
+}
+
+message MsgScheduleRingUpgradeByAcpResponse {}
+
+message MsgCancelRingUpgradeByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgCancelRingUpgradeByAcpResponse {}
 
 message MsgFinalizeRingReshareByThresholdSignature {
   option (cosmos.msg.v1.signer) = "creator";
@@ -155,26 +197,44 @@ message MsgCreateNodeInfo {
 
 message MsgCreateNodeInfoResponse {}
 
-// MsgUpdateNodeInfo replaces mutable fields on an existing NodeInfo record.
-// The signer must be the current controller_key holder.
-//
-// IMPORTANT: whitelisted_policy_ids and whitelisted_ring_ids are REPLACED in
-// full, not merged. To add a single entry you must re-send the complete desired
-// list. Sending an empty repeated field clears the whitelist entirely.
-message MsgUpdateNodeInfo {
+message MsgUpdateNodePeerId {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string node_key = 2;
-  // Absent means no peer_id update.
-  optional string peer_id = 3;
-  // Replaces the full policy whitelist. Send the complete desired list on every
-  // update; an empty field clears all whitelisted policies.
-  repeated string whitelisted_policy_ids = 4;
-  // Replaces the full ring whitelist. Send the complete desired list on every
-  // update; an empty field clears all whitelisted rings.
-  repeated string whitelisted_ring_ids = 5;
-  // Absent means no controller_key update.
-  optional string controller_key = 6;
+  string peer_id = 3;
 }
 
-message MsgUpdateNodeInfoResponse {}
+message MsgUpdateNodePeerIdResponse {}
+
+message MsgTransferNodeController {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  string controller_key = 3;
+}
+
+message MsgTransferNodeControllerResponse {}
+
+message MsgAddNodeToWhitelist {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  oneof target {
+    string policy_id = 3;
+    string ring_id = 4;
+  }
+}
+
+message MsgAddNodeToWhitelistResponse {}
+
+message MsgRemoveNodeFromWhitelist {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  oneof target {
+    string policy_id = 3;
+    string ring_id = 4;
+  }
+}
+
+message MsgRemoveNodeFromWhitelistResponse {}
