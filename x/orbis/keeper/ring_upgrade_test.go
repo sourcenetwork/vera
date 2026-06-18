@@ -231,6 +231,28 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.True(t, seenEvent("EventRingUpgradeNormalized"))
 }
 
+func TestScheduleRingUpgradeAllowsStoredPSSIntervalBelowMinimum(t *testing.T) {
+	fixture := setupFinalizedRingUpgradeFixture(t, 0)
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.NotNil(t, ring)
+	ring.PssInterval = types.MinPSSIntervalSeconds - 1
+	fixture.k.SetRing(fixture.ctx, *ring)
+
+	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
+	_, err := fixture.k.ScheduleRingUpgradeByAcp(fixture.ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		NextVersion:    1,
+		ActivationTime: activationTime,
+	})
+	require.NoError(t, err)
+
+	stored := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.Equal(t, types.MinPSSIntervalSeconds-1, stored.GetPssInterval())
+	require.Equal(t, uint64(1), stored.UpgradeInfo.GetNextVersion())
+	require.Equal(t, activationTime, stored.UpgradeInfo.GetActivationTime())
+}
+
 func TestRingUpgradeRemainsPendingUntilAnUpdateNormalizesIt(t *testing.T) {
 	fixture := setupFinalizedRingUpgradeFixture(t, 0)
 	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds

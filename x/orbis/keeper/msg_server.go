@@ -35,9 +35,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalNodeKeys(msg.PeerNodeKeys)
-	if err := types.ValidatePSSInterval(msg.PssInterval); err != nil {
-		return nil, err
-	}
 
 	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -61,6 +58,9 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
+	}
+	if err := validateRingPSSInterval(&ring); err != nil {
+		return nil, err
 	}
 	if err := validateRing(&ring); err != nil {
 		return nil, err
@@ -149,6 +149,9 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 
 	ring.RingPk = msg.RingPk
 	ring.Confirmations = nil
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
 
 	k.SetRing(goCtx, *ring)
 
@@ -217,6 +220,9 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 	if newThreshold.HasValue() {
 		setRingNewThreshold(ring, newThreshold)
 	}
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
 
 	k.SetRing(goCtx, *ring)
 
@@ -259,7 +265,9 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 		return nil, err
 	}
 
-	if err := types.ValidatePSSInterval(msg.PssInterval); err != nil {
+	nextRing := *ring
+	nextRing.PssInterval = msg.PssInterval
+	if err := validateRingPSSInterval(&nextRing); err != nil {
 		return nil, err
 	}
 	if ring.GetPssInterval() == msg.PssInterval {

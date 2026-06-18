@@ -29,9 +29,6 @@ func validateRing(ring *types.Ring) error {
 	case ring.PolicyId == "":
 		return errorsmod.Wrap(types.ErrInvalidRing, "missing policy_id")
 	}
-	if err := types.ValidatePSSInterval(ring.GetPssInterval()); err != nil {
-		return err
-	}
 	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
 		return err
 	}
@@ -62,6 +59,10 @@ func validateRing(ring *types.Ring) error {
 	}
 
 	return nil
+}
+
+func validateRingPSSInterval(ring *types.Ring) error {
+	return types.ValidatePSSInterval(ring.GetPssInterval())
 }
 
 func validateStartRingReshare(
@@ -162,6 +163,10 @@ func ringForReshareFinalization(currentRing *types.Ring) (*types.Ring, error) {
 	}
 	finalized.NewPeerNodeKeys = nil
 	finalized.XNewThreshold = nil
+
+	if err := validateRing(&finalized); err != nil {
+		return nil, err
+	}
 
 	return &finalized, nil
 }
