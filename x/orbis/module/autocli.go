@@ -62,6 +62,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "pss_interval"}, {ProtoField: "policy_id"}, {ProtoField: "current_version"}},
 				},
 				{
+					RpcMethod:      "CancelPendingRing",
+					Use:            "cancel-pending-ring [ring_id]",
+					Short:          "Cancel an unfinished Orbis DKG",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
+				},
+				{
 					RpcMethod:      "StartRingReshareByAcp",
 					Use:            "start-ring-reshare-by-acp [ring_id]",
 					Short:          "Start a ring reshare via external ACP policy",

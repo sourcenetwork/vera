@@ -140,3 +140,106 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T
 		Reason: "ring_pk_conflict",
 	}, ringDeletedEvent)
 }
+
+func TestMsgServer_CancelPendingRing_DeletesRingThroughBaseApp(t *testing.T) {
+	registry, err := codectypes.NewInterfaceRegistryWithOptions(codectypes.InterfaceRegistryOptions{
+		ProtoFiles: proto.HybridResolver,
+		SigningOptions: txsigning.Options{
+			AddressCodec:          addresscodec.NewBech32Codec("cosmos"),
+			ValidatorAddressCodec: addresscodec.NewBech32Codec("cosmosvaloper"),
+		},
+	})
+	require.NoError(t, err)
+	authtypes.RegisterInterfaces(registry)
+	cryptocodec.RegisterInterfaces(registry)
+	orbistypes.RegisterInterfaces(registry)
+
+	cdc := codec.NewProtoCodec(registry)
+	txConfig := authtx.NewTxConfig(cdc, authtx.DefaultSignModes)
+
+	orbisStoreKey := storetypes.NewKVStoreKey(orbistypes.StoreKey)
+	authStoreKey := storetypes.NewKVStoreKey(authtypes.StoreKey)
+	bApp := baseapp.NewBaseApp(
+		t.Name(),
+		log.NewNopLogger(),
+		dbm.NewMemDB(),
+		txConfig.TxDecoder(),
+	)
+	bApp.SetInterfaceRegistry(registry)
+	bApp.MsgServiceRouter().SetInterfaceRegistry(registry)
+	bApp.MountStores(orbisStoreKey, authStoreKey)
+	bApp.SetAnteHandler(func(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
+		return ctx, nil
+	})
+	require.NoError(t, bApp.LoadLatestVersion())
+
+	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
+	accountKeeper := authkeeper.NewAccountKeeper(
+		cdc,
+		runtime.NewKVStoreService(authStoreKey),
+		authtypes.ProtoBaseAccount,
+		map[string][]string{authtypes.FeeCollectorName: nil},
+		authcodec.NewBech32Codec("cosmos"),
+		"cosmos",
+		authority.String(),
+	)
+	orbisKeeper := NewKeeper(
+		cdc,
+		runtime.NewKVStoreService(orbisStoreKey),
+		log.NewNopLogger(),
+		authority.String(),
+		accountKeeper,
+		nil,
+	)
+	orbistypes.RegisterMsgServer(bApp.MsgServiceRouter(), &orbisKeeper)
+
+	_, err = bApp.FinalizeBlock(&abci.RequestFinalizeBlock{Height: 1})
+	require.NoError(t, err)
+
+	ctx := bApp.NewContextLegacy(false, cmtproto.Header{Height: 1})
+	peerPrivKey := secp256k1.GenPrivKeyFromSecret([]byte("cancelling-peer"))
+	peerNodeKey := hex.EncodeToString(peerPrivKey.PubKey().Bytes())
+	peerAddress := sdk.AccAddress(peerPrivKey.PubKey().Address())
+
+	peerAccount := accountKeeper.NewAccountWithAddress(ctx, peerAddress)
+	require.NoError(t, peerAccount.SetPubKey(peerPrivKey.PubKey()))
+	accountKeeper.SetAccount(ctx, peerAccount)
+
+	const ringID = "unfinished-ring-to-cancel"
+	orbisKeeper.SetRing(ctx, orbistypes.Ring{
+		Id:           ringID,
+		CreatorDid:   "did:example:ring-creator",
+		PeerNodeKeys: []string{peerNodeKey},
+		Threshold:    1,
+		PolicyId:     "policy",
+	})
+	require.NotNil(t, orbisKeeper.GetRing(ctx, ringID))
+
+	txBuilder := txConfig.NewTxBuilder()
+	require.NoError(t, txBuilder.SetMsgs(&orbistypes.MsgCancelPendingRing{
+		Creator: peerAddress.String(),
+		RingId:  ringID,
+	}))
+
+	_, result, err := bApp.SimDeliver(txConfig.TxEncoder(), txBuilder.GetTx())
+	require.NoError(t, err)
+	require.Len(t, result.MsgResponses, 1)
+	var cancelResp orbistypes.MsgCancelPendingRingResponse
+	require.NoError(t, cdc.Unmarshal(result.MsgResponses[0].Value, &cancelResp))
+	require.Nil(t, orbisKeeper.GetRing(ctx, ringID))
+
+	var ringDeletedEvent *orbistypes.EventRingDeleted
+	for _, event := range result.Events {
+		if event.Type != "sourcehub.orbis.EventRingDeleted" {
+			continue
+		}
+		typedEvent, err := sdk.ParseTypedEvent(event)
+		require.NoError(t, err)
+		ringDeletedEvent = typedEvent.(*orbistypes.EventRingDeleted)
+		break
+	}
+	require.Equal(t, &orbistypes.EventRingDeleted{
+		RingId: ringID,
+		Reason: "dkg_cancelled",
+	}, ringDeletedEvent)
+}

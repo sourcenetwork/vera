@@ -48,6 +48,10 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 			Creator: validMutationCreator,
 			RingId:  "ring-1",
 		},
+		&MsgCancelPendingRing{
+			Creator: validMutationCreator,
+			RingId:  "ring-1",
+		},
 	}
 	for _, msg := range validMessages {
 		require.NoError(t, msg.ValidateBasic())
@@ -70,6 +74,9 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 		Creator:        validMutationCreator,
 		RingId:         "ring-1",
 		ActivationTime: 100,
+	}).ValidateBasic())
+	require.Error(t, (&MsgCancelPendingRing{
+		Creator: validMutationCreator,
 	}).ValidateBasic())
 }
 

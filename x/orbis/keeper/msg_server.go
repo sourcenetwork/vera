@@ -177,6 +177,45 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	}, nil
 }
 
+func (k *Keeper) CancelPendingRing(goCtx context.Context, msg *types.MsgCancelPendingRing) (*types.MsgCancelPendingRingResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if ring.RingPk != "" {
+		return nil, types.ErrRingAlreadyFinalized
+	}
+
+	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	authorized := slices.Contains(ring.PeerNodeKeys, signerKey)
+	if !authorized {
+		cancellerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+		if err != nil {
+			return nil, err
+		}
+		authorized = cancellerDID == ring.CreatorDid
+	}
+	if !authorized {
+		return nil, types.ErrInvalidRingCanceller
+	}
+
+	k.DeleteRing(goCtx, ring.Id)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
+		RingId: ring.Id,
+		Reason: "dkg_cancelled",
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCancelPendingRingResponse{}, nil
+}
+
 func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStartRingReshareByAcp) (*types.MsgStartRingReshareByAcpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

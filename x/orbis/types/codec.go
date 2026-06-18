@@ -11,6 +11,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateRing{},
 		&MsgFinalizeRing{},
+		&MsgCancelPendingRing{},
 		&MsgStartRingReshareByAcp{},
 		&MsgSetRingPssIntervalByAcp{},
 		&MsgScheduleRingUpgradeByAcp{},
