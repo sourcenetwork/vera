@@ -454,20 +454,23 @@ func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
 	ringID := createRingResp.RingId
 
 	// first confirmation — not finalized
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "agreed-pk"})
+	finalizeResp, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
 	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
 	require.Len(t, k.GetRing(ctx, ringID).Confirmations, 1)
 
 	// second confirmation — threshold=2 is met but not all nodes, so still not finalized
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "agreed-pk"})
+	finalizeResp, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
 	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
 	require.Len(t, k.GetRing(ctx, ringID).Confirmations, 2)
 
 	// third confirmation — all nodes confirmed → finalized, confirmations cleared
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: ringID, RingPk: "agreed-pk"})
+	finalizeResp, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer3Addr, RingId: ringID, RingPk: "agreed-pk"})
 	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_RING_FINALIZED, finalizeResp.Outcome)
 	ring := k.GetRing(ctx, ringID)
 	require.Equal(t, "agreed-pk", ring.RingPk)
 	require.Empty(t, ring.Confirmations)
@@ -477,7 +480,7 @@ func TestMsgServer_FinalizeRing_RequiresAllNodes(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrRingAlreadyFinalized)
 }
 
-func TestMsgServer_FinalizeRing_PkConflictRejected(t *testing.T) {
+func TestMsgServer_FinalizeRing_PkConflictDeletesRing(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
@@ -497,13 +500,22 @@ func TestMsgServer_FinalizeRing_PkConflictRejected(t *testing.T) {
 	require.NoError(t, err)
 	ringID := createRingResp.RingId
 
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "pk-version-A"})
+	finalizeResp, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "pk-version-A"})
 	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
 
 	// peer2 disagrees on the ring_pk -> BFT violation, ring is deleted
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "pk-version-B"})
-	require.ErrorIs(t, err, types.ErrRingPkConflict)
+	conflictCtx := ctx.WithEventManager(sdk.NewEventManager())
+	finalizeResp, err = k.FinalizeRing(conflictCtx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: ringID, RingPk: "pk-version-B"})
+	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFLICT_DELETED, finalizeResp.Outcome)
 	require.Nil(t, k.GetRing(ctx, ringID))
+	require.Equal(t, []proto.Message{
+		&types.EventRingDeleted{
+			RingId: ringID,
+			Reason: "ring_pk_conflict",
+		},
+	}, parseTypedEvents(t, conflictCtx))
 }
 
 func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
@@ -526,11 +538,16 @@ func TestMsgServer_FinalizeRing_DuplicateConfirmationRejected(t *testing.T) {
 	require.NoError(t, err)
 	ringID := createRingResp.RingId
 
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "ring-pk"})
+	finalizeResp, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "ring-pk"})
 	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
 
-	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "ring-pk"})
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: ringID, RingPk: "different-ring-pk"})
 	require.ErrorIs(t, err, types.ErrDuplicateConfirmation)
+	ring := k.GetRing(ctx, ringID)
+	require.NotNil(t, ring)
+	require.Len(t, ring.Confirmations, 1)
+	require.Equal(t, "ring-pk", ring.Confirmations[0].RingPk)
 }
 
 func TestMsgServer_RingNotFinalizedGuard(t *testing.T) {

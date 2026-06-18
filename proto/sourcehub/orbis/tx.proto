@@ -72,7 +72,16 @@ message MsgFinalizeRing {
   string ring_pk = 3;
 }
 
-message MsgFinalizeRingResponse {}
+enum FinalizeRingOutcome {
+  UNSPECIFIED = 0;
+  CONFIRMATION_RECORDED = 1;
+  RING_FINALIZED = 2;
+  CONFLICT_DELETED = 3;
+}
+
+message MsgFinalizeRingResponse {
+  FinalizeRingOutcome outcome = 1;
+}
 
 message MsgStartRingReshareByAcp {
   option (cosmos.msg.v1.signer) = "creator";

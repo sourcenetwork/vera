@@ -25,6 +25,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type FinalizeRingOutcome int32
+
+const (
+	FinalizeRingOutcome_UNSPECIFIED           FinalizeRingOutcome = 0
+	FinalizeRingOutcome_CONFIRMATION_RECORDED FinalizeRingOutcome = 1
+	FinalizeRingOutcome_RING_FINALIZED        FinalizeRingOutcome = 2
+	FinalizeRingOutcome_CONFLICT_DELETED      FinalizeRingOutcome = 3
+)
+
+// Enum value maps for FinalizeRingOutcome.
+var (
+	FinalizeRingOutcome_name = map[int32]string{
+		0: "UNSPECIFIED",
+		1: "CONFIRMATION_RECORDED",
+		2: "RING_FINALIZED",
+		3: "CONFLICT_DELETED",
+	}
+	FinalizeRingOutcome_value = map[string]int32{
+		"UNSPECIFIED":           0,
+		"CONFIRMATION_RECORDED": 1,
+		"RING_FINALIZED":        2,
+		"CONFLICT_DELETED":      3,
+	}
+)
+
+func (x FinalizeRingOutcome) Enum() *FinalizeRingOutcome {
+	p := new(FinalizeRingOutcome)
+	*p = x
+	return p
+}
+
+func (x FinalizeRingOutcome) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (FinalizeRingOutcome) Descriptor() protoreflect.EnumDescriptor {
+	return file_sourcehub_orbis_tx_proto_enumTypes[0].Descriptor()
+}
+
+func (FinalizeRingOutcome) Type() protoreflect.EnumType {
+	return &file_sourcehub_orbis_tx_proto_enumTypes[0]
+}
+
+func (x FinalizeRingOutcome) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use FinalizeRingOutcome.Descriptor instead.
+func (FinalizeRingOutcome) EnumDescriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{0}
+}
+
 // MsgUpdateParams is the Msg/UpdateParams request type.
 type MsgUpdateParams struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -315,6 +367,7 @@ func (x *MsgFinalizeRing) GetRingPk() string {
 
 type MsgFinalizeRingResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
+	Outcome       FinalizeRingOutcome    `protobuf:"varint,1,opt,name=outcome,proto3,enum=sourcehub.orbis.FinalizeRingOutcome" json:"outcome,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -347,6 +400,13 @@ func (x *MsgFinalizeRingResponse) ProtoReflect() protoreflect.Message {
 // Deprecated: Use MsgFinalizeRingResponse.ProtoReflect.Descriptor instead.
 func (*MsgFinalizeRingResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MsgFinalizeRingResponse) GetOutcome() FinalizeRingOutcome {
+	if x != nil {
+		return x.Outcome
+	}
+	return FinalizeRingOutcome_UNSPECIFIED
 }
 
 type MsgStartRingReshareByAcp struct {
@@ -1909,8 +1969,9 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgFinalizeRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x17\n" +
-	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"\x19\n" +
-	"\x17MsgFinalizeRingResponse\"\xc4\x01\n" +
+	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"Y\n" +
+	"\x17MsgFinalizeRingResponse\x12>\n" +
+	"\aoutcome\x18\x01 \x01(\x0e2$.sourcehub.orbis.FinalizeRingOutcomeR\aoutcome\"\xc4\x01\n" +
 	"\x18MsgStartRingReshareByAcp\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12+\n" +
@@ -2017,7 +2078,12 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\tpolicy_id\x18\x03 \x01(\tH\x00R\bpolicyId\x12\x19\n" +
 	"\aring_id\x18\x04 \x01(\tH\x00R\x06ringId:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06target\"$\n" +
-	"\"MsgRemoveNodeFromWhitelistResponse2\xb2\r\n" +
+	"\"MsgRemoveNodeFromWhitelistResponse*k\n" +
+	"\x13FinalizeRingOutcome\x12\x0f\n" +
+	"\vUNSPECIFIED\x10\x00\x12\x19\n" +
+	"\x15CONFIRMATION_RECORDED\x10\x01\x12\x12\n" +
+	"\x0eRING_FINALIZED\x10\x02\x12\x14\n" +
+	"\x10CONFLICT_DELETED\x10\x032\xb2\r\n" +
 	"\x03Msg\x12Z\n" +
 	"\fUpdateParams\x12 .sourcehub.orbis.MsgUpdateParams\x1a(.sourcehub.orbis.MsgUpdateParamsResponse\x12T\n" +
 	"\n" +
@@ -2049,79 +2115,82 @@ func file_sourcehub_orbis_tx_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_tx_proto_rawDescData
 }
 
+var file_sourcehub_orbis_tx_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_sourcehub_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_sourcehub_orbis_tx_proto_goTypes = []any{
-	(*MsgUpdateParams)(nil),                                    // 0: sourcehub.orbis.MsgUpdateParams
-	(*MsgUpdateParamsResponse)(nil),                            // 1: sourcehub.orbis.MsgUpdateParamsResponse
-	(*MsgCreateRing)(nil),                                      // 2: sourcehub.orbis.MsgCreateRing
-	(*MsgCreateRingResponse)(nil),                              // 3: sourcehub.orbis.MsgCreateRingResponse
-	(*MsgFinalizeRing)(nil),                                    // 4: sourcehub.orbis.MsgFinalizeRing
-	(*MsgFinalizeRingResponse)(nil),                            // 5: sourcehub.orbis.MsgFinalizeRingResponse
-	(*MsgStartRingReshareByAcp)(nil),                           // 6: sourcehub.orbis.MsgStartRingReshareByAcp
-	(*MsgStartRingReshareByAcpResponse)(nil),                   // 7: sourcehub.orbis.MsgStartRingReshareByAcpResponse
-	(*MsgSetRingPssIntervalByAcp)(nil),                         // 8: sourcehub.orbis.MsgSetRingPssIntervalByAcp
-	(*MsgSetRingPssIntervalByAcpResponse)(nil),                 // 9: sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
-	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 10: sourcehub.orbis.MsgScheduleRingUpgradeByAcp
-	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 11: sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
-	(*MsgCancelRingUpgradeByAcp)(nil),                          // 12: sourcehub.orbis.MsgCancelRingUpgradeByAcp
-	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 13: sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
-	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 14: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
-	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 15: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	(*RingReshareFinalizeSignDoc)(nil),                         // 16: sourcehub.orbis.RingReshareFinalizeSignDoc
-	(*RingReshareSignState)(nil),                               // 17: sourcehub.orbis.RingReshareSignState
-	(*MsgStoreDocument)(nil),                                   // 18: sourcehub.orbis.MsgStoreDocument
-	(*MsgStoreDocumentResponse)(nil),                           // 19: sourcehub.orbis.MsgStoreDocumentResponse
-	(*MsgStoreKeyDerivation)(nil),                              // 20: sourcehub.orbis.MsgStoreKeyDerivation
-	(*MsgStoreKeyDerivationResponse)(nil),                      // 21: sourcehub.orbis.MsgStoreKeyDerivationResponse
-	(*MsgCreateNodeInfo)(nil),                                  // 22: sourcehub.orbis.MsgCreateNodeInfo
-	(*MsgCreateNodeInfoResponse)(nil),                          // 23: sourcehub.orbis.MsgCreateNodeInfoResponse
-	(*MsgUpdateNodePeerId)(nil),                                // 24: sourcehub.orbis.MsgUpdateNodePeerId
-	(*MsgUpdateNodePeerIdResponse)(nil),                        // 25: sourcehub.orbis.MsgUpdateNodePeerIdResponse
-	(*MsgTransferNodeController)(nil),                          // 26: sourcehub.orbis.MsgTransferNodeController
-	(*MsgTransferNodeControllerResponse)(nil),                  // 27: sourcehub.orbis.MsgTransferNodeControllerResponse
-	(*MsgAddNodeToWhitelist)(nil),                              // 28: sourcehub.orbis.MsgAddNodeToWhitelist
-	(*MsgAddNodeToWhitelistResponse)(nil),                      // 29: sourcehub.orbis.MsgAddNodeToWhitelistResponse
-	(*MsgRemoveNodeFromWhitelist)(nil),                         // 30: sourcehub.orbis.MsgRemoveNodeFromWhitelist
-	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 31: sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
-	(*Params)(nil),                                             // 32: sourcehub.orbis.Params
+	(FinalizeRingOutcome)(0),                                   // 0: sourcehub.orbis.FinalizeRingOutcome
+	(*MsgUpdateParams)(nil),                                    // 1: sourcehub.orbis.MsgUpdateParams
+	(*MsgUpdateParamsResponse)(nil),                            // 2: sourcehub.orbis.MsgUpdateParamsResponse
+	(*MsgCreateRing)(nil),                                      // 3: sourcehub.orbis.MsgCreateRing
+	(*MsgCreateRingResponse)(nil),                              // 4: sourcehub.orbis.MsgCreateRingResponse
+	(*MsgFinalizeRing)(nil),                                    // 5: sourcehub.orbis.MsgFinalizeRing
+	(*MsgFinalizeRingResponse)(nil),                            // 6: sourcehub.orbis.MsgFinalizeRingResponse
+	(*MsgStartRingReshareByAcp)(nil),                           // 7: sourcehub.orbis.MsgStartRingReshareByAcp
+	(*MsgStartRingReshareByAcpResponse)(nil),                   // 8: sourcehub.orbis.MsgStartRingReshareByAcpResponse
+	(*MsgSetRingPssIntervalByAcp)(nil),                         // 9: sourcehub.orbis.MsgSetRingPssIntervalByAcp
+	(*MsgSetRingPssIntervalByAcpResponse)(nil),                 // 10: sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
+	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 11: sourcehub.orbis.MsgScheduleRingUpgradeByAcp
+	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 12: sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
+	(*MsgCancelRingUpgradeByAcp)(nil),                          // 13: sourcehub.orbis.MsgCancelRingUpgradeByAcp
+	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 14: sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
+	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 15: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
+	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 16: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	(*RingReshareFinalizeSignDoc)(nil),                         // 17: sourcehub.orbis.RingReshareFinalizeSignDoc
+	(*RingReshareSignState)(nil),                               // 18: sourcehub.orbis.RingReshareSignState
+	(*MsgStoreDocument)(nil),                                   // 19: sourcehub.orbis.MsgStoreDocument
+	(*MsgStoreDocumentResponse)(nil),                           // 20: sourcehub.orbis.MsgStoreDocumentResponse
+	(*MsgStoreKeyDerivation)(nil),                              // 21: sourcehub.orbis.MsgStoreKeyDerivation
+	(*MsgStoreKeyDerivationResponse)(nil),                      // 22: sourcehub.orbis.MsgStoreKeyDerivationResponse
+	(*MsgCreateNodeInfo)(nil),                                  // 23: sourcehub.orbis.MsgCreateNodeInfo
+	(*MsgCreateNodeInfoResponse)(nil),                          // 24: sourcehub.orbis.MsgCreateNodeInfoResponse
+	(*MsgUpdateNodePeerId)(nil),                                // 25: sourcehub.orbis.MsgUpdateNodePeerId
+	(*MsgUpdateNodePeerIdResponse)(nil),                        // 26: sourcehub.orbis.MsgUpdateNodePeerIdResponse
+	(*MsgTransferNodeController)(nil),                          // 27: sourcehub.orbis.MsgTransferNodeController
+	(*MsgTransferNodeControllerResponse)(nil),                  // 28: sourcehub.orbis.MsgTransferNodeControllerResponse
+	(*MsgAddNodeToWhitelist)(nil),                              // 29: sourcehub.orbis.MsgAddNodeToWhitelist
+	(*MsgAddNodeToWhitelistResponse)(nil),                      // 30: sourcehub.orbis.MsgAddNodeToWhitelistResponse
+	(*MsgRemoveNodeFromWhitelist)(nil),                         // 31: sourcehub.orbis.MsgRemoveNodeFromWhitelist
+	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 32: sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
+	(*Params)(nil),                                             // 33: sourcehub.orbis.Params
 }
 var file_sourcehub_orbis_tx_proto_depIdxs = []int32{
-	32, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
-	0,  // 1: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
-	2,  // 2: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
-	4,  // 3: sourcehub.orbis.Msg.FinalizeRing:input_type -> sourcehub.orbis.MsgFinalizeRing
-	6,  // 4: sourcehub.orbis.Msg.StartRingReshareByAcp:input_type -> sourcehub.orbis.MsgStartRingReshareByAcp
-	8,  // 5: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
-	10, // 6: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
-	12, // 7: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
-	14, // 8: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
-	18, // 9: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
-	20, // 10: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
-	22, // 11: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
-	24, // 12: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
-	26, // 13: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
-	28, // 14: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
-	30, // 15: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
-	1,  // 16: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
-	3,  // 17: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
-	5,  // 18: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
-	7,  // 19: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
-	9,  // 20: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
-	11, // 21: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
-	13, // 22: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
-	15, // 23: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	19, // 24: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
-	21, // 25: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
-	23, // 26: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
-	25, // 27: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
-	27, // 28: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
-	29, // 29: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
-	31, // 30: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
-	16, // [16:31] is the sub-list for method output_type
-	1,  // [1:16] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	33, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
+	0,  // 1: sourcehub.orbis.MsgFinalizeRingResponse.outcome:type_name -> sourcehub.orbis.FinalizeRingOutcome
+	1,  // 2: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
+	3,  // 3: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
+	5,  // 4: sourcehub.orbis.Msg.FinalizeRing:input_type -> sourcehub.orbis.MsgFinalizeRing
+	7,  // 5: sourcehub.orbis.Msg.StartRingReshareByAcp:input_type -> sourcehub.orbis.MsgStartRingReshareByAcp
+	9,  // 6: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
+	11, // 7: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
+	13, // 8: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
+	15, // 9: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
+	19, // 10: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
+	21, // 11: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
+	23, // 12: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
+	25, // 13: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
+	27, // 14: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
+	29, // 15: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
+	31, // 16: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
+	2,  // 17: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
+	4,  // 18: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
+	6,  // 19: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
+	8,  // 20: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
+	10, // 21: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
+	12, // 22: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
+	14, // 23: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
+	16, // 24: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	20, // 25: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
+	22, // 26: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
+	24, // 27: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
+	26, // 28: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
+	28, // 29: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
+	30, // 30: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
+	32, // 31: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
+	17, // [17:32] is the sub-list for method output_type
+	2,  // [2:17] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_orbis_tx_proto_init() }
@@ -2147,13 +2216,14 @@ func file_sourcehub_orbis_tx_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_tx_proto_rawDesc), len(file_sourcehub_orbis_tx_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_sourcehub_orbis_tx_proto_goTypes,
 		DependencyIndexes: file_sourcehub_orbis_tx_proto_depIdxs,
+		EnumInfos:         file_sourcehub_orbis_tx_proto_enumTypes,
 		MessageInfos:      file_sourcehub_orbis_tx_proto_msgTypes,
 	}.Build()
 	File_sourcehub_orbis_tx_proto = out.File

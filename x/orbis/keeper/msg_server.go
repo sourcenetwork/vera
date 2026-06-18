@@ -127,7 +127,15 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	for _, c := range ring.Confirmations {
 		if c.RingPk != msg.RingPk {
 			k.DeleteRing(goCtx, ring.Id)
-			return nil, types.ErrRingPkConflict
+			if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
+				RingId: ring.Id,
+				Reason: "ring_pk_conflict",
+			}); err != nil {
+				return nil, err
+			}
+			return &types.MsgFinalizeRingResponse{
+				Outcome: types.FinalizeRingOutcome_CONFLICT_DELETED,
+			}, nil
 		}
 	}
 
@@ -138,7 +146,9 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 
 	if len(ring.Confirmations) < len(ring.PeerNodeKeys) {
 		k.SetRing(goCtx, *ring)
-		return &types.MsgFinalizeRingResponse{}, nil
+		return &types.MsgFinalizeRingResponse{
+			Outcome: types.FinalizeRingOutcome_CONFIRMATION_RECORDED,
+		}, nil
 	}
 
 	// All nodes confirmed — finalize.
@@ -162,7 +172,9 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, err
 	}
 
-	return &types.MsgFinalizeRingResponse{}, nil
+	return &types.MsgFinalizeRingResponse{
+		Outcome: types.FinalizeRingOutcome_RING_FINALIZED,
+	}, nil
 }
 
 func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStartRingReshareByAcp) (*types.MsgStartRingReshareByAcpResponse, error) {
