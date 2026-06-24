@@ -26,12 +26,6 @@ const (
 	offlineOriginProtocolPSSRefresh = "pss_refresh"
 	offlineOriginProtocolPSSReshare = "pss_reshare"
 
-	offlineFailureStageConnect         = byte(1)
-	offlineFailureStageOpenStream      = byte(2)
-	offlineFailureStageSend            = byte(3)
-	offlineFailureStageReceive         = byte(4)
-	offlineFailureStageResponseTimeout = byte(5)
-
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
 )
@@ -39,7 +33,6 @@ const (
 type nodeOfflineReportPayload struct {
 	originProtocol        string
 	originProtocolVersion uint64
-	failureStage          byte
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
 }
@@ -215,19 +208,6 @@ func decodeNodeOfflinePayload(payload []byte) (nodeOfflineReportPayload, error) 
 	if err != nil {
 		return nodeOfflineReportPayload{}, err
 	}
-	failureStage, err := decoder.readByte("failure_stage")
-	if err != nil {
-		return nodeOfflineReportPayload{}, err
-	}
-	switch failureStage {
-	case offlineFailureStageConnect,
-		offlineFailureStageOpenStream,
-		offlineFailureStageSend,
-		offlineFailureStageReceive,
-		offlineFailureStageResponseTimeout:
-	default:
-		return nodeOfflineReportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown offline failure stage %d", failureStage)
-	}
 
 	accusedScope, err := decoder.readByte("accused_committee_scope")
 	if err != nil {
@@ -250,7 +230,6 @@ func decodeNodeOfflinePayload(payload []byte) (nodeOfflineReportPayload, error) 
 	return nodeOfflineReportPayload{
 		originProtocol:        originProtocol,
 		originProtocolVersion: originProtocolVersion,
-		failureStage:          failureStage,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 	}, nil

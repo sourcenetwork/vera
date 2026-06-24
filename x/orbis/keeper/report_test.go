@@ -23,7 +23,7 @@ const reportTestChainID = "sourcehub-test"
 const reportTestObservedAt = uint64(1_700_000_000)
 
 func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
-	payload := nodeOfflinePayloadForTest("pre", 0, offlineFailureStageResponseTimeout, committeeScopeCurrent, committeeScopeCurrent)
+	payload := nodeOfflinePayloadForTest("pre", 0, committeeScopeCurrent, committeeScopeCurrent)
 	report := types.ReportEnvelope{
 		Domain:          ReportDomain,
 		ReportType:      NodeOfflineReportType,
@@ -41,7 +41,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 
 	_, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
-	require.Equal(t, "55ea1e152ea0b5a0a50b7db6e42b8753b110240851585927da894e3d4ee753bb", reportID)
+	require.Equal(t, "dfb170015fd469566dadfedadf6ff110f840e6a1e53b35a2850581bcf74da797", reportID)
 
 	ring := &types.Ring{
 		RingPk:       "pk",
@@ -58,18 +58,22 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
-	valid := nodeOfflinePayloadForTest("pre", 0, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopePendingNew)
+	valid := nodeOfflinePayloadForTest("pre", 0, committeeScopeCurrent, committeeScopePendingNew)
 	decoded, err := decodeNodeOfflinePayload(valid)
 	require.NoError(t, err)
 	require.Equal(t, "pre", decoded.originProtocol)
 	require.Equal(t, uint64(0), decoded.originProtocolVersion)
-	require.Equal(t, offlineFailureStageOpenStream, decoded.failureStage)
 	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
 	require.Equal(t, committeeScopePendingNew, decoded.signingCommitteeScope)
 
-	unknownStage := append([]byte{}, valid...)
-	unknownStage[len(unknownStage)-3] = 99
-	_, err = decodeNodeOfflinePayload(unknownStage)
+	unknownAccusedScope := append([]byte{}, valid...)
+	unknownAccusedScope[len(unknownAccusedScope)-2] = 99
+	_, err = decodeNodeOfflinePayload(unknownAccusedScope)
+	require.ErrorIs(t, err, types.ErrInvalidReport)
+
+	unknownSigningScope := append([]byte{}, valid...)
+	unknownSigningScope[len(unknownSigningScope)-1] = 99
+	_, err = decodeNodeOfflinePayload(unknownSigningScope)
 	require.ErrorIs(t, err, types.ErrInvalidReport)
 
 	trailing := append(append([]byte{}, valid...), 0)
@@ -88,7 +92,7 @@ func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 	ringPk := hex.EncodeToString(new(blst.P1Affine).From(sk).Compress())
 	fixture.setRing(t, ringPk, 2)
 
-	report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 	msg := fixture.signBLSReport(t, sk, report)
 
 	resp, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -119,7 +123,7 @@ func TestMsgServer_SubmitReport_Decaf377FROSTAccepts(t *testing.T) {
 	require.NoError(t, err)
 	fixture.setRing(t, hex.EncodeToString(ringPkBytes), 2)
 
-	report := fixture.validReport(t, offlineFailureStageSend, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 	message, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
 	signature, err := decaf377SchnorrSign(secretScalar, ringPkBytes, message)
@@ -155,7 +159,7 @@ func TestMsgServer_SubmitReportAllowsPendingReshareScopes(t *testing.T) {
 	fixture.originalRing = fixture.k.GetRing(fixture.ctx, fixture.ringID)
 
 	t.Run("pending-new accused can be reported by current signing committee", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopePendingNew, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopePendingNew, committeeScopeCurrent, 0)
 		report.AccusedNodeKey = pendingKey
 		report.AccusedPeerId = pendingPeerID
 		msg := fixture.signBLSReport(t, sk, report)
@@ -166,7 +170,7 @@ func TestMsgServer_SubmitReportAllowsPendingReshareScopes(t *testing.T) {
 	})
 
 	t.Run("pending-new signing committee can authorize current accused report", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageSend, committeeScopeCurrent, committeeScopePendingNew, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopePendingNew, 0)
 		msg := fixture.signBLSReport(t, sk, report)
 
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -183,7 +187,7 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 	fixture.setRing(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2)
 
 	t.Run("wrong fixed identity", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		report.Domain = "wrong"
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -191,14 +195,14 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 	})
 
 	t.Run("report ID mismatch", func(t *testing.T) {
-		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0))
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
 		msg.ReportId = "00" + msg.ReportId[2:]
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
 		require.ErrorIs(t, err, types.ErrInvalidReport)
 	})
 
 	t.Run("unknown report type is rejected by dispatch", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		report.ReportType = "future_fault"
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -207,13 +211,13 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 
 	t.Run("expired", func(t *testing.T) {
 		ctx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+ReportTTLSeconds+1), 0))
-		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0))
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
 		_, err := fixture.k.SubmitReport(ctx, msg)
 		require.ErrorIs(t, err, types.ErrInvalidReport)
 	})
 
 	t.Run("stale ring digest from block nonce change", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
 		ring.BlockNumberNonce++
 		fixture.k.SetRing(fixture.ctx, *ring)
@@ -225,7 +229,7 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 	})
 
 	t.Run("signature over report ID instead of canonical envelope", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		_, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 		require.NoError(t, err)
 		sig := new(blst.P2Affine).Sign(sk, []byte(reportID), []byte(bls12381G2SignatureDST))
@@ -242,7 +246,7 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 
 	t.Run("reporter outside signing committee", func(t *testing.T) {
 		_, outsiderKey := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWReportOutsider")
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		report.ReporterNodeKey = outsiderKey
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -250,7 +254,7 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 	})
 
 	t.Run("accused peer mismatch", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		report.AccusedPeerId = "wrong-peer"
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
@@ -268,22 +272,22 @@ func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 			fixture.k.SetRing(fixture.ctx, *originalRing)
 		}()
 
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
 		require.ErrorIs(t, err, types.ErrInvalidReport)
 	})
 
 	t.Run("origin protocol version mismatch", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 99)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 99)
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
 		require.ErrorIs(t, err, types.ErrInvalidReport)
 	})
 
 	t.Run("unknown origin protocol", func(t *testing.T) {
-		report := fixture.validReport(t, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent, 0)
-		report.Payload = nodeOfflinePayloadForTest("unknown", 0, offlineFailureStageOpenStream, committeeScopeCurrent, committeeScopeCurrent)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+		report.Payload = nodeOfflinePayloadForTest("unknown", 0, committeeScopeCurrent, committeeScopeCurrent)
 		msg := fixture.signBLSReport(t, sk, report)
 		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
 		require.ErrorIs(t, err, types.ErrInvalidReport)
@@ -351,7 +355,6 @@ func (f *reportTestFixture) setRing(t *testing.T, ringPk string, threshold uint3
 
 func (f reportTestFixture) validReport(
 	t *testing.T,
-	stage byte,
 	accusedScope byte,
 	signingScope byte,
 	originProtocolVersion uint64,
@@ -376,7 +379,6 @@ func (f reportTestFixture) validReport(
 		Payload: nodeOfflinePayloadForTest(
 			"pre",
 			originProtocolVersion,
-			stage,
 			accusedScope,
 			signingScope,
 		),
@@ -401,14 +403,13 @@ func (f reportTestFixture) signBLSReport(t *testing.T, sk *blst.SecretKey, repor
 func nodeOfflinePayloadForTest(
 	originProtocol string,
 	originProtocolVersion uint64,
-	stage byte,
 	accusedScope byte,
 	signingScope byte,
 ) []byte {
 	w := newReportCanonicalWriter()
 	w.writeString(originProtocol)
 	w.writeU64(originProtocolVersion)
-	w.bytes = append(w.bytes, stage, accusedScope, signingScope)
+	w.bytes = append(w.bytes, accusedScope, signingScope)
 	payload, err := w.finish()
 	if err != nil {
 		panic(err)
