@@ -16,10 +16,11 @@ const (
 	// StoreKey defines the primary module store key.
 	StoreKey = ModuleName
 
-	RingKeyPrefix          = "ring/"
-	DocumentKeyPrefix      = "document/"
-	KeyDerivationKeyPrefix = "key_derivation/"
-	NodeInfoKeyPrefix      = "node_info/"
+	RingKeyPrefix           = "ring/"
+	DocumentKeyPrefix       = "document/"
+	KeyDerivationKeyPrefix  = "key_derivation/"
+	NodeInfoKeyPrefix       = "node_info/"
+	AcceptedReportKeyPrefix = "accepted_report/"
 )
 
 var (

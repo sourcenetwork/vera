@@ -99,6 +99,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "signature_scheme"}, {ProtoField: "signature"}},
 				},
 				{
+					RpcMethod: "SubmitReport",
+					Use:       "submit-report",
+					Short:     "Submit an MPC fault report",
+					Long:      "Submit an MPC fault report. The report field is a message value and the signature field must be base64-encoded.",
+				},
+				{
 					RpcMethod:      "StoreDocument",
 					Use:            "store-document [ring_id] [document] [proof] [policy_id] [resource] [permission]",
 					Short:          "Store an encrypted Orbis document",

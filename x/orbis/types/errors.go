@@ -39,4 +39,6 @@ var (
 	ErrNodeInfoUnchanged          = sdkerrors.Register(ModuleName, 1236, "node info value is unchanged")
 	ErrRingUpgradeUnchanged       = sdkerrors.Register(ModuleName, 1237, "ring upgrade schedule is unchanged")
 	ErrInvalidRingCanceller       = sdkerrors.Register(ModuleName, 1238, "tx signer is neither the ring creator nor a member of the ring's peer set")
+	ErrInvalidReport              = sdkerrors.Register(ModuleName, 1239, "invalid report")
+	ErrReportAlreadyAccepted      = sdkerrors.Register(ModuleName, 1240, "report already accepted")
 )

@@ -39,6 +39,18 @@ func (k *Keeper) DeleteRing(ctx context.Context, ringID string) {
 	store.Delete([]byte(ringID))
 }
 
+func (k *Keeper) SetAcceptedReport(ctx context.Context, reportID string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
+	store.Set([]byte(reportID), []byte{1})
+}
+
+func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
+	return store.Has([]byte(reportID))
+}
+
 func (k *Keeper) GetAllRings(ctx context.Context) []types.Ring {
 	var rings []types.Ring
 	k.mustIterateRings(ctx, func(ring types.Ring) {

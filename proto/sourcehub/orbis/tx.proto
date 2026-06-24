@@ -24,6 +24,7 @@ service Msg {
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
+  rpc SubmitReport(MsgSubmitReport) returns (MsgSubmitReportResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
   rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
   rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
@@ -141,6 +142,34 @@ message MsgFinalizeRingReshareByThresholdSignature {
 }
 
 message MsgFinalizeRingReshareByThresholdSignatureResponse {}
+
+message MsgSubmitReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  ReportEnvelope report = 2 [(gogoproto.nullable) = false];
+  string report_id = 3;
+  string signature_scheme = 4;
+  bytes signature = 5;
+}
+
+message MsgSubmitReportResponse {
+  string report_id = 1;
+}
+
+message ReportEnvelope {
+  string domain = 1;
+  string report_type = 2;
+  string chain_id = 3;
+  string ring_id = 4;
+  string ring_pk = 5;
+  string ring_state_sha256 = 6;
+  string reporter_node_key = 7;
+  string accused_node_key = 8;
+  string accused_peer_id = 9;
+  uint64 observed_at = 10;
+  uint64 expires_at = 11;
+  bytes payload = 12;
+}
 
 message RingReshareFinalizeSignDoc {
   string domain = 1;
