@@ -17,6 +17,8 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const reportTestChainID = "sourcehub-test"
@@ -85,6 +87,22 @@ func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidReport)
 }
 
+func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
+	_, err := DemeritAmountForReportType(nil, NodeOfflineReportType)
+	require.ErrorIs(t, err, types.ErrRingNotFound)
+
+	_, err = DemeritAmountForReportType(&types.Ring{
+		DemeritConfig: types.DefaultDemeritConfig(),
+	}, "unknown")
+	require.ErrorIs(t, err, types.ErrInvalidReport)
+
+	amount, err := DemeritAmountForReportType(&types.Ring{
+		DemeritConfig: types.DemeritConfig{NodeOfflineDemerits: 5},
+	}, NodeOfflineReportType)
+	require.NoError(t, err)
+	require.Equal(t, uint64(5), amount)
+}
+
 func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 	fixture := setupReportTestFixture(t)
 	ikm := make([]byte, 32)
@@ -101,6 +119,12 @@ func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 	require.Equal(t, msg.ReportId, resp.ReportId)
 	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
 	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+	queryResp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: fixture.accusedKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), queryResp.Points)
 	require.Equal(t, *fixture.originalRing, *fixture.k.GetRing(fixture.ctx, fixture.ringID))
 
 	events := parseTypedEvents(t, fixture.ctx)
@@ -170,6 +194,58 @@ func TestMsgServer_SubmitReportDemeritsAreIsolatedByNodeAndRing(t *testing.T) {
 	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.validatorKey))
 	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, secondRingID, fixture.accusedKey))
 	require.Equal(t, uint64(0), fixture.k.GetNodeDemerits(fixture.ctx, secondRingID, fixture.validatorKey))
+
+	accusedResp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: fixture.accusedKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), accusedResp.Points)
+
+	validatorResp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: fixture.validatorKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), validatorResp.Points)
+
+	secondRingValidatorResp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  secondRingID,
+		NodeKey: fixture.validatorKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), secondRingValidatorResp.Points)
+}
+
+func TestQueryServer_NodeDemeritsValidationAndEmptyScore(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	fixture.setRing(t, "query-ring-pk", 2)
+
+	resp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: "unknown-node",
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), resp.Points)
+
+	_, err = fixture.k.NodeDemerits(fixture.ctx, nil)
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		NodeKey: fixture.accusedKey,
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId: fixture.ringID,
+	})
+	require.Equal(t, codes.InvalidArgument, status.Code(err))
+
+	_, err = fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
+		RingId:  "missing-ring",
+		NodeKey: fixture.accusedKey,
+	})
+	require.Equal(t, codes.NotFound, status.Code(err))
 }
 
 func TestMsgServer_SubmitReportRejectedReportDoesNotIncrementDemerits(t *testing.T) {

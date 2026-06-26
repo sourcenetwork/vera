@@ -55,6 +55,11 @@ service Query {
   rpc NodeInfo(QueryNodeInfoRequest) returns (QueryNodeInfoResponse) {
     option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/node_info/{node_key}";
   }
+
+  // NodeDemerits queries a node's demerit score in a ring.
+  rpc NodeDemerits(QueryNodeDemeritsRequest) returns (QueryNodeDemeritsResponse) {
+    option (google.api.http).get = "/sourcenetwork/sourcehub/orbis/node_demerits/{ring_id}/{node_key}";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -134,4 +139,13 @@ message QueryNodeInfoRequest {
 
 message QueryNodeInfoResponse {
   NodeInfo node_info = 1;
+}
+
+message QueryNodeDemeritsRequest {
+  string ring_id = 1;
+  string node_key = 2;
+}
+
+message QueryNodeDemeritsResponse {
+  uint64 points = 1;
 }

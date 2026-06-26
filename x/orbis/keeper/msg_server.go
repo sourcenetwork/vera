@@ -532,8 +532,12 @@ func (k *Keeper) SubmitReport(
 		return nil, err
 	}
 
+	demeritAmount, err := DemeritAmountForReportType(validatedReport.ring, report.ReportType)
+	if err != nil {
+		return nil, err
+	}
+
 	k.SetAcceptedReport(goCtx, validatedReport.reportID)
-	demeritAmount := DemeritAmountForReportType(validatedReport.ring, report.ReportType)
 	k.IncrementNodeDemerits(goCtx, report.RingId, report.AccusedNodeKey, demeritAmount)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventReportAccepted{

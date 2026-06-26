@@ -127,6 +127,25 @@ func (k *Keeper) NodeInfo(ctx context.Context, req *types.QueryNodeInfoRequest) 
 	return &types.QueryNodeInfoResponse{NodeInfo: nodeInfo}, nil
 }
 
+func (k *Keeper) NodeDemerits(ctx context.Context, req *types.QueryNodeDemeritsRequest) (*types.QueryNodeDemeritsResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	if req.RingId == "" {
+		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidRingId.Error())
+	}
+	if req.NodeKey == "" {
+		return nil, status.Error(codes.InvalidArgument, "node_key is required")
+	}
+	if k.GetRing(ctx, req.RingId) == nil {
+		return nil, status.Error(codes.NotFound, types.ErrRingNotFound.Error())
+	}
+
+	return &types.QueryNodeDemeritsResponse{
+		Points: k.GetNodeDemerits(ctx, req.RingId, req.NodeKey),
+	}, nil
+}
+
 func (k *Keeper) KeyDerivations(ctx context.Context, req *types.QueryKeyDerivationsRequest) (*types.QueryKeyDerivationsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

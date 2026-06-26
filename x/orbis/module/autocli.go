@@ -48,6 +48,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query node info by node key",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
 				},
+				{
+					RpcMethod:      "NodeDemerits",
+					Use:            "node-demerits [ring_id] [node_key]",
+					Short:          "Query a node's demerit score in a ring",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "node_key"}},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
