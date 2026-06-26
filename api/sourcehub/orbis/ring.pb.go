@@ -86,10 +86,11 @@ func (x *UpgradeInfo) GetActivationTime() uint64 {
 
 // DemeritConfig stores the number of demerit points assigned per report type.
 type DemeritConfig struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	NodeOfflineDemerits uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	NodeOfflineDemerits  uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
+	ResetIntervalSeconds uint64                 `protobuf:"varint,2,opt,name=reset_interval_seconds,json=resetIntervalSeconds,proto3" json:"reset_interval_seconds,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *DemeritConfig) Reset() {
@@ -125,6 +126,13 @@ func (*DemeritConfig) Descriptor() ([]byte, []int) {
 func (x *DemeritConfig) GetNodeOfflineDemerits() uint64 {
 	if x != nil {
 		return x.NodeOfflineDemerits
+	}
+	return 0
+}
+
+func (x *DemeritConfig) GetResetIntervalSeconds() uint64 {
+	if x != nil {
+		return x.ResetIntervalSeconds
 	}
 	return 0
 }
@@ -335,9 +343,10 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x12,\n" +
 	"\x0factivation_time\x18\x03 \x01(\x04H\x01R\x0eactivationTime\x88\x01\x01B\x0f\n" +
 	"\r_next_versionB\x12\n" +
-	"\x10_activation_time\"I\n" +
+	"\x10_activation_time\"\x7f\n" +
 	"\rDemeritConfig\x122\n" +
-	"\x15node_offline_demerits\x18\x01 \x01(\x04R\x13nodeOfflineDemerits:\x04\xe8\xa0\x1f\x01\"\xc8\x04\n" +
+	"\x15node_offline_demerits\x18\x01 \x01(\x04R\x13nodeOfflineDemerits\x124\n" +
+	"\x16reset_interval_seconds\x18\x02 \x01(\x04R\x14resetIntervalSeconds:\x04\xe8\xa0\x1f\x01\"\xc8\x04\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
