@@ -10,11 +10,12 @@ import (
 
 func TestValidateRingDoesNotValidatePSSInterval(t *testing.T) {
 	base := types.Ring{
-		Id:           "ring-1",
-		PeerNodeKeys: []string{"020000000000000000000000000000000000000000000000000000000000000000"},
-		Threshold:    1,
-		PssInterval:  types.MinPSSIntervalSeconds,
-		PolicyId:     "policy-1",
+		Id:            "ring-1",
+		PeerNodeKeys:  []string{"020000000000000000000000000000000000000000000000000000000000000000"},
+		Threshold:     1,
+		PssInterval:   types.MinPSSIntervalSeconds,
+		PolicyId:      "policy-1",
+		DemeritConfig: types.DefaultDemeritConfig(),
 	}
 	require.NoError(t, validateRing(&base))
 
@@ -28,11 +29,12 @@ func TestValidateRingDoesNotValidatePSSInterval(t *testing.T) {
 
 func TestValidateRingPSSIntervalRejectsBelowMinimum(t *testing.T) {
 	base := types.Ring{
-		Id:           "ring-1",
-		PeerNodeKeys: []string{"020000000000000000000000000000000000000000000000000000000000000000"},
-		Threshold:    1,
-		PssInterval:  types.MinPSSIntervalSeconds,
-		PolicyId:     "policy-1",
+		Id:            "ring-1",
+		PeerNodeKeys:  []string{"020000000000000000000000000000000000000000000000000000000000000000"},
+		Threshold:     1,
+		PssInterval:   types.MinPSSIntervalSeconds,
+		PolicyId:      "policy-1",
+		DemeritConfig: types.DefaultDemeritConfig(),
 	}
 	require.NoError(t, validateRingPSSInterval(&base))
 

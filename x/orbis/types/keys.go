@@ -21,6 +21,7 @@ const (
 	KeyDerivationKeyPrefix  = "key_derivation/"
 	NodeInfoKeyPrefix       = "node_info/"
 	AcceptedReportKeyPrefix = "accepted_report/"
+	NodeDemeritKeyPrefix    = "node_demerit/"
 )
 
 var (

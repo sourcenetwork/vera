@@ -51,6 +51,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: 0,
 		},
+		DemeritConfig: types.DefaultDemeritConfig(),
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
@@ -99,6 +100,7 @@ func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, msg.ReportId, resp.ReportId)
 	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 	require.Equal(t, *fixture.originalRing, *fixture.k.GetRing(fixture.ctx, fixture.ringID))
 
 	events := parseTypedEvents(t, fixture.ctx)
@@ -112,6 +114,76 @@ func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 
 	_, err = fixture.k.SubmitReport(fixture.ctx, msg)
 	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-demerit-ikm-0000")
+	sk := blst.KeyGen(ikm)
+	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
+		NodeOfflineDemerits: 3,
+	})
+
+	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, first)
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondReport.ObservedAt++
+	secondReport.ExpiresAt++
+	second := fixture.signBLSReport(t, sk, secondReport)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.NoError(t, err)
+	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestMsgServer_SubmitReportDemeritsAreIsolatedByNodeAndRing(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-isolate-ikm-000")
+	sk := blst.KeyGen(ikm)
+	fixture.setRing(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2)
+
+	accusedReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	_, err := fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, accusedReport))
+	require.NoError(t, err)
+
+	validatorReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	validatorReport.AccusedNodeKey = fixture.validatorKey
+	validatorReport.AccusedPeerId = "12D3KooWReportValidator"
+	_, err = fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, validatorReport))
+	require.NoError(t, err)
+
+	secondRingID := "report-ring-2"
+	secondRing := *fixture.originalRing
+	secondRing.Id = secondRingID
+	fixture.k.SetRing(fixture.ctx, secondRing)
+	secondRingReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondRingReport.RingId = secondRingID
+	_, err = fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, secondRingReport))
+	require.NoError(t, err)
+
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.validatorKey))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, secondRingID, fixture.accusedKey))
+	require.Equal(t, uint64(0), fixture.k.GetNodeDemerits(fixture.ctx, secondRingID, fixture.validatorKey))
+}
+
+func TestMsgServer_SubmitReportRejectedReportDoesNotIncrementDemerits(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-no-demerit-0000")
+	sk := blst.KeyGen(ikm)
+	fixture.setRing(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2)
+
+	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.Domain = "wrong"
+	_, err := fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, report))
+	require.ErrorIs(t, err, types.ErrInvalidReport)
+	require.Equal(t, uint64(0), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
 func TestMsgServer_SubmitReport_Decaf377FROSTAccepts(t *testing.T) {
@@ -334,6 +406,10 @@ func setupReportTestFixture(t *testing.T) reportTestFixture {
 }
 
 func (f *reportTestFixture) setRing(t *testing.T, ringPk string, threshold uint32) {
+	f.setRingWithDemeritConfig(t, ringPk, threshold, types.DefaultDemeritConfig())
+}
+
+func (f *reportTestFixture) setRingWithDemeritConfig(t *testing.T, ringPk string, threshold uint32, demeritConfig types.DemeritConfig) {
 	t.Helper()
 	ring := types.Ring{
 		Id:           f.ringID,
@@ -346,6 +422,7 @@ func (f *reportTestFixture) setRing(t *testing.T, ringPk string, threshold uint3
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: 0,
 		},
+		DemeritConfig: demeritConfig,
 	}
 	f.k.SetRing(f.ctx, ring)
 	stored := f.k.GetRing(f.ctx, f.ringID)

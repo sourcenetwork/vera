@@ -47,6 +47,12 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, types.ErrRingAlreadyExists
 	}
 
+	demeritConfig := msg.DemeritConfig
+	if demeritConfig == nil {
+		params := k.GetParams(goCtx)
+		demeritConfig = &params.DefaultDemeritConfig
+	}
+
 	ring := types.Ring{
 		Id:               ringID,
 		CreatorDid:       creatorDID,
@@ -58,6 +64,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
+		DemeritConfig: *demeritConfig,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
@@ -526,6 +533,8 @@ func (k *Keeper) SubmitReport(
 	}
 
 	k.SetAcceptedReport(goCtx, validatedReport.reportID)
+	demeritAmount := DemeritAmountForReportType(validatedReport.ring, report.ReportType)
+	k.IncrementNodeDemerits(goCtx, report.RingId, report.AccusedNodeKey, demeritAmount)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventReportAccepted{
 		ReportId:        validatedReport.reportID,

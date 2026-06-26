@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/binary"
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
@@ -49,6 +50,35 @@ func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
 	return store.Has([]byte(reportID))
+}
+
+func (k *Keeper) GetNodeDemerits(ctx context.Context, ringID, nodeKey string) uint64 {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeDemeritKeyPrefix))
+	bz := store.Get(nodeDemeritStoreKey(ringID, nodeKey))
+	if bz == nil {
+		return 0
+	}
+	return binary.BigEndian.Uint64(bz)
+}
+
+func (k *Keeper) IncrementNodeDemerits(ctx context.Context, ringID, nodeKey string, amount uint64) uint64 {
+	next := k.GetNodeDemerits(ctx, ringID, nodeKey) + amount
+	var buf [8]byte
+	binary.BigEndian.PutUint64(buf[:], next)
+
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeDemeritKeyPrefix))
+	store.Set(nodeDemeritStoreKey(ringID, nodeKey), buf[:])
+	return next
+}
+
+func nodeDemeritStoreKey(ringID, nodeKey string) []byte {
+	key := make([]byte, 4+len(ringID)+len(nodeKey))
+	binary.BigEndian.PutUint32(key[:4], uint32(len(ringID)))
+	copy(key[4:], ringID)
+	copy(key[4+len(ringID):], nodeKey)
+	return key
 }
 
 func (k *Keeper) GetAllRings(ctx context.Context) []types.Ring {

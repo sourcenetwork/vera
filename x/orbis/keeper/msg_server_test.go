@@ -81,6 +81,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.Equal(t, uint32(2), ring.Threshold)
 	require.Equal(t, policyID, ring.PolicyId)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
+	require.Equal(t, types.DefaultDemeritConfig(), ring.DemeritConfig)
 
 	// all three nodes must confirm; ring not finalized until the last one
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
@@ -170,6 +171,44 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 
 	_, err = k.StoreKeyDerivation(ctx, storeKeyDerivationMsg)
 	require.ErrorIs(t, err, types.ErrKeyDerivationAlreadyExists)
+}
+
+func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	defaultConfig := types.DemeritConfig{NodeOfflineDemerits: 4}
+	require.NoError(t, k.SetParams(ctx, types.NewParams(defaultConfig)))
+
+	defaultResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
+
+	require.NoError(t, k.SetParams(ctx, types.NewParams(types.DemeritConfig{NodeOfflineDemerits: 8})))
+	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
+
+	explicitConfig := types.DemeritConfig{NodeOfflineDemerits: 7}
+	explicitResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:       creatorAddr,
+		PeerNodeKeys:  []string{peer1Key},
+		Threshold:     1,
+		PssInterval:   types.MinPSSIntervalSeconds,
+		PolicyId:      policyID,
+		XNonce:        &types.MsgCreateRing_Nonce{Nonce: "explicit-demerit-config"},
+		DemeritConfig: &explicitConfig,
+	})
+	require.NoError(t, err)
+	require.Equal(t, explicitConfig, k.GetRing(ctx, explicitResp.RingId).DemeritConfig)
 }
 
 func TestMsgServer_CreateRing_NonceDisambiguatesIdenticalSettings(t *testing.T) {

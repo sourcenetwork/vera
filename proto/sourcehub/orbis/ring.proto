@@ -13,6 +13,13 @@ message UpgradeInfo {
   optional uint64 activation_time = 3;
 }
 
+// DemeritConfig stores the number of demerit points assigned per report type.
+message DemeritConfig {
+  option (gogoproto.equal) = true;
+
+  uint64 node_offline_demerits = 1;
+}
+
 // Ring stores the active and pending committee metadata for an Orbis ring.
 message Ring {
   string id = 1;
@@ -29,6 +36,7 @@ message Ring {
   string policy_id = 10;
   repeated RingConfirmation confirmations = 11;
   UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
+  DemeritConfig demerit_config = 13 [(gogoproto.nullable) = false];
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key.

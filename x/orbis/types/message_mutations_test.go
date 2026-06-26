@@ -26,6 +26,20 @@ func TestMsgCreateRingValidateBasicPSSInterval(t *testing.T) {
 	}
 }
 
+func TestMsgCreateRingValidateBasicDemeritConfig(t *testing.T) {
+	msg := MsgCreateRing{
+		Creator:      validMutationCreator,
+		PeerNodeKeys: []string{"node-1"},
+		Threshold:    1,
+		PssInterval:  MinPSSIntervalSeconds,
+		PolicyId:     "policy-1",
+		DemeritConfig: &DemeritConfig{
+			NodeOfflineDemerits: 0,
+		},
+	}
+	require.ErrorContains(t, msg.ValidateBasic(), "node_offline_demerits must be at least 1")
+}
+
 func TestMsgSubmitReportValidateBasic(t *testing.T) {
 	base := MsgSubmitReport{
 		Creator: validMutationCreator,

@@ -176,8 +176,9 @@ type MsgCreateRing struct {
 	PssInterval uint64 `protobuf:"varint,4,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
 	PolicyId    string `protobuf:"bytes,5,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	// Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
-	Nonce          *string `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
-	CurrentVersion uint64  `protobuf:"varint,7,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	Nonce          *string        `protobuf:"bytes,6,opt,name=nonce,proto3,oneof" json:"nonce,omitempty"`
+	CurrentVersion uint64         `protobuf:"varint,7,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
+	DemeritConfig  *DemeritConfig `protobuf:"bytes,8,opt,name=demerit_config,json=demeritConfig,proto3" json:"demerit_config,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -259,6 +260,13 @@ func (x *MsgCreateRing) GetCurrentVersion() uint64 {
 		return x.CurrentVersion
 	}
 	return 0
+}
+
+func (x *MsgCreateRing) GetDemeritConfig() *DemeritConfig {
+	if x != nil {
+		return x.DemeritConfig
+	}
+	return nil
 }
 
 type MsgCreateRingResponse struct {
@@ -2290,11 +2298,11 @@ var File_sourcehub_orbis_tx_proto protoreflect.FileDescriptor
 
 const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\n" +
-	"\x18sourcehub/orbis/tx.proto\x12\x0fsourcehub.orbis\x1a\x11amino/amino.proto\x1a\x17cosmos/msg/v1/msg.proto\x1a\x19cosmos_proto/cosmos.proto\x1a\x14gogoproto/gogo.proto\x1a\x1csourcehub/orbis/params.proto\"\xbb\x01\n" +
+	"\x18sourcehub/orbis/tx.proto\x12\x0fsourcehub.orbis\x1a\x11amino/amino.proto\x1a\x17cosmos/msg/v1/msg.proto\x1a\x19cosmos_proto/cosmos.proto\x1a\x14gogoproto/gogo.proto\x1a\x1csourcehub/orbis/params.proto\x1a\x1asourcehub/orbis/ring.proto\"\xbb\x01\n" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x12:\n" +
 	"\x06params\x18\x02 \x01(\v2\x17.sourcehub.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:4\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*!sourcehub/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\x89\x02\n" +
+	"\x17MsgUpdateParamsResponse\"\xd0\x02\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
@@ -2302,7 +2310,8 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\fpss_interval\x18\x04 \x01(\x04R\vpssInterval\x12\x1b\n" +
 	"\tpolicy_id\x18\x05 \x01(\tR\bpolicyId\x12\x19\n" +
 	"\x05nonce\x18\x06 \x01(\tH\x00R\x05nonce\x88\x01\x01\x12'\n" +
-	"\x0fcurrent_version\x18\a \x01(\x04R\x0ecurrentVersion:\f\x82\xe7\xb0*\acreatorB\b\n" +
+	"\x0fcurrent_version\x18\a \x01(\x04R\x0ecurrentVersion\x12E\n" +
+	"\x0edemerit_config\x18\b \x01(\v2\x1e.sourcehub.orbis.DemeritConfigR\rdemeritConfig:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
 	"\aring_id\x18\x01 \x01(\tR\x06ringId\"k\n" +
@@ -2528,50 +2537,52 @@ var file_sourcehub_orbis_tx_proto_goTypes = []any{
 	(*MsgRemoveNodeFromWhitelist)(nil),                         // 36: sourcehub.orbis.MsgRemoveNodeFromWhitelist
 	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 37: sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
 	(*Params)(nil),                                             // 38: sourcehub.orbis.Params
+	(*DemeritConfig)(nil),                                      // 39: sourcehub.orbis.DemeritConfig
 }
 var file_sourcehub_orbis_tx_proto_depIdxs = []int32{
 	38, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
-	0,  // 1: sourcehub.orbis.MsgFinalizeRingResponse.outcome:type_name -> sourcehub.orbis.FinalizeRingOutcome
-	21, // 2: sourcehub.orbis.MsgSubmitReport.report:type_name -> sourcehub.orbis.ReportEnvelope
-	1,  // 3: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
-	3,  // 4: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
-	5,  // 5: sourcehub.orbis.Msg.FinalizeRing:input_type -> sourcehub.orbis.MsgFinalizeRing
-	7,  // 6: sourcehub.orbis.Msg.CancelPendingRing:input_type -> sourcehub.orbis.MsgCancelPendingRing
-	9,  // 7: sourcehub.orbis.Msg.StartRingReshareByAcp:input_type -> sourcehub.orbis.MsgStartRingReshareByAcp
-	11, // 8: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
-	13, // 9: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
-	15, // 10: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
-	17, // 11: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
-	19, // 12: sourcehub.orbis.Msg.SubmitReport:input_type -> sourcehub.orbis.MsgSubmitReport
-	24, // 13: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
-	26, // 14: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
-	28, // 15: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
-	30, // 16: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
-	32, // 17: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
-	34, // 18: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
-	36, // 19: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
-	2,  // 20: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
-	4,  // 21: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
-	6,  // 22: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
-	8,  // 23: sourcehub.orbis.Msg.CancelPendingRing:output_type -> sourcehub.orbis.MsgCancelPendingRingResponse
-	10, // 24: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
-	12, // 25: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
-	14, // 26: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
-	16, // 27: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
-	18, // 28: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	20, // 29: sourcehub.orbis.Msg.SubmitReport:output_type -> sourcehub.orbis.MsgSubmitReportResponse
-	25, // 30: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
-	27, // 31: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
-	29, // 32: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
-	31, // 33: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
-	33, // 34: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
-	35, // 35: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
-	37, // 36: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
-	20, // [20:37] is the sub-list for method output_type
-	3,  // [3:20] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	39, // 1: sourcehub.orbis.MsgCreateRing.demerit_config:type_name -> sourcehub.orbis.DemeritConfig
+	0,  // 2: sourcehub.orbis.MsgFinalizeRingResponse.outcome:type_name -> sourcehub.orbis.FinalizeRingOutcome
+	21, // 3: sourcehub.orbis.MsgSubmitReport.report:type_name -> sourcehub.orbis.ReportEnvelope
+	1,  // 4: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
+	3,  // 5: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
+	5,  // 6: sourcehub.orbis.Msg.FinalizeRing:input_type -> sourcehub.orbis.MsgFinalizeRing
+	7,  // 7: sourcehub.orbis.Msg.CancelPendingRing:input_type -> sourcehub.orbis.MsgCancelPendingRing
+	9,  // 8: sourcehub.orbis.Msg.StartRingReshareByAcp:input_type -> sourcehub.orbis.MsgStartRingReshareByAcp
+	11, // 9: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
+	13, // 10: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
+	15, // 11: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
+	17, // 12: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
+	19, // 13: sourcehub.orbis.Msg.SubmitReport:input_type -> sourcehub.orbis.MsgSubmitReport
+	24, // 14: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
+	26, // 15: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
+	28, // 16: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
+	30, // 17: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
+	32, // 18: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
+	34, // 19: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
+	36, // 20: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
+	2,  // 21: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
+	4,  // 22: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
+	6,  // 23: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
+	8,  // 24: sourcehub.orbis.Msg.CancelPendingRing:output_type -> sourcehub.orbis.MsgCancelPendingRingResponse
+	10, // 25: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
+	12, // 26: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
+	14, // 27: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
+	16, // 28: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
+	18, // 29: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	20, // 30: sourcehub.orbis.Msg.SubmitReport:output_type -> sourcehub.orbis.MsgSubmitReportResponse
+	25, // 31: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
+	27, // 32: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
+	29, // 33: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
+	31, // 34: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
+	33, // 35: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
+	35, // 36: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
+	37, // 37: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
+	21, // [21:38] is the sub-list for method output_type
+	4,  // [4:21] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_orbis_tx_proto_init() }
@@ -2580,6 +2591,7 @@ func file_sourcehub_orbis_tx_proto_init() {
 		return
 	}
 	file_sourcehub_orbis_params_proto_init()
+	file_sourcehub_orbis_ring_proto_init()
 	file_sourcehub_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
 	file_sourcehub_orbis_tx_proto_msgTypes[8].OneofWrappers = []any{}
 	file_sourcehub_orbis_tx_proto_msgTypes[22].OneofWrappers = []any{}
