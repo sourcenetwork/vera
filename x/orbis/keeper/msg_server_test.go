@@ -181,7 +181,10 @@ func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
-	defaultConfig := types.DemeritConfig{NodeOfflineDemerits: 4}
+	defaultConfig := types.DemeritConfig{
+		NodeOfflineDemerits:   4,
+		ResetIntervalSeconds: 12,
+	}
 	require.NoError(t, k.SetParams(ctx, types.NewParams(defaultConfig)))
 
 	defaultResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -194,10 +197,16 @@ func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
 
-	require.NoError(t, k.SetParams(ctx, types.NewParams(types.DemeritConfig{NodeOfflineDemerits: 8})))
+	require.NoError(t, k.SetParams(ctx, types.NewParams(types.DemeritConfig{
+		NodeOfflineDemerits:   8,
+		ResetIntervalSeconds: 24,
+	})))
 	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
 
-	explicitConfig := types.DemeritConfig{NodeOfflineDemerits: 7}
+	explicitConfig := types.DemeritConfig{
+		NodeOfflineDemerits:   7,
+		ResetIntervalSeconds: 60,
+	}
 	explicitResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:       creatorAddr,
 		PeerNodeKeys:  []string{peer1Key},

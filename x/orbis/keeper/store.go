@@ -53,24 +53,54 @@ func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
 }
 
 func (k *Keeper) GetNodeDemerits(ctx context.Context, ringID, nodeKey string) uint64 {
+	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
+	if !found {
+		return 0
+	}
+	return state.points
+}
+
+func (k *Keeper) IncrementNodeDemerits(ctx context.Context, ringID, nodeKey string, amount, now, resetIntervalSeconds uint64) uint64 {
+	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
+	if !found || nodeDemeritWindowExpired(state.windowStartedAt, now, resetIntervalSeconds) {
+		state = nodeDemeritState{windowStartedAt: now}
+	}
+	state.points += amount
+	k.setNodeDemeritState(ctx, ringID, nodeKey, state)
+	return state.points
+}
+
+type nodeDemeritState struct {
+	points          uint64
+	windowStartedAt uint64
+}
+
+const nodeDemeritStateSize = 16
+
+func (k *Keeper) getNodeDemeritState(ctx context.Context, ringID, nodeKey string) (nodeDemeritState, bool) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeDemeritKeyPrefix))
 	bz := store.Get(nodeDemeritStoreKey(ringID, nodeKey))
-	if bz == nil {
-		return 0
+	if len(bz) != nodeDemeritStateSize {
+		return nodeDemeritState{}, false
 	}
-	return binary.BigEndian.Uint64(bz)
+	return nodeDemeritState{
+		points:          binary.BigEndian.Uint64(bz[:8]),
+		windowStartedAt: binary.BigEndian.Uint64(bz[8:]),
+	}, true
 }
 
-func (k *Keeper) IncrementNodeDemerits(ctx context.Context, ringID, nodeKey string, amount uint64) uint64 {
-	next := k.GetNodeDemerits(ctx, ringID, nodeKey) + amount
-	var buf [8]byte
-	binary.BigEndian.PutUint64(buf[:], next)
-
+func (k *Keeper) setNodeDemeritState(ctx context.Context, ringID, nodeKey string, state nodeDemeritState) {
+	var buf [nodeDemeritStateSize]byte
+	binary.BigEndian.PutUint64(buf[:8], state.points)
+	binary.BigEndian.PutUint64(buf[8:], state.windowStartedAt)
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeDemeritKeyPrefix))
 	store.Set(nodeDemeritStoreKey(ringID, nodeKey), buf[:])
-	return next
+}
+
+func nodeDemeritWindowExpired(windowStartedAt, now, resetIntervalSeconds uint64) bool {
+	return now >= windowStartedAt && now-windowStartedAt >= resetIntervalSeconds
 }
 
 func nodeDemeritStoreKey(ringID, nodeKey string) []byte {

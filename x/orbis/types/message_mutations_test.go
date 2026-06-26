@@ -34,10 +34,17 @@ func TestMsgCreateRingValidateBasicDemeritConfig(t *testing.T) {
 		PssInterval:  MinPSSIntervalSeconds,
 		PolicyId:     "policy-1",
 		DemeritConfig: &DemeritConfig{
-			NodeOfflineDemerits: 0,
+			NodeOfflineDemerits:   0,
+			ResetIntervalSeconds: DefaultDemeritResetIntervalSecs,
 		},
 	}
 	require.ErrorContains(t, msg.ValidateBasic(), "node_offline_demerits must be at least 1")
+
+	msg.DemeritConfig = &DemeritConfig{
+		NodeOfflineDemerits:   DefaultNodeOfflineDemerits,
+		ResetIntervalSeconds: 0,
+	}
+	require.ErrorContains(t, msg.ValidateBasic(), "reset_interval_seconds must be at least 1")
 }
 
 func TestMsgSubmitReportValidateBasic(t *testing.T) {

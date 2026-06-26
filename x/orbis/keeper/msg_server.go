@@ -538,7 +538,14 @@ func (k *Keeper) SubmitReport(
 	}
 
 	k.SetAcceptedReport(goCtx, validatedReport.reportID)
-	k.IncrementNodeDemerits(goCtx, report.RingId, report.AccusedNodeKey, demeritAmount)
+	k.IncrementNodeDemerits(
+		goCtx,
+		report.RingId,
+		report.AccusedNodeKey,
+		demeritAmount,
+		validatedReport.blockUnixTime,
+		validatedReport.ring.DemeritConfig.ResetIntervalSeconds,
+	)
 
 	if err := ctx.EventManager().EmitTypedEvent(&types.EventReportAccepted{
 		ReportId:        validatedReport.reportID,

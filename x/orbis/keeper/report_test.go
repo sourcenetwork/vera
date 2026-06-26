@@ -97,7 +97,10 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidReport)
 
 	amount, err := DemeritAmountForReportType(&types.Ring{
-		DemeritConfig: types.DemeritConfig{NodeOfflineDemerits: 5},
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:   5,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		},
 	}, NodeOfflineReportType)
 	require.NoError(t, err)
 	require.Equal(t, uint64(5), amount)
@@ -147,7 +150,8 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	copy(ikm, "orbis-report-demerit-ikm-0000")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits: 3,
+		NodeOfflineDemerits:   3,
+		ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
 	})
 
 	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))

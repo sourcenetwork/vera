@@ -43,8 +43,9 @@ type reportCommitteeView struct {
 }
 
 type validatedSubmittedReport struct {
-	reportID string
-	ring     *types.Ring
+	reportID      string
+	ring          *types.Ring
+	blockUnixTime uint64
 }
 
 func (k *Keeper) validateSubmittedReport(
@@ -132,8 +133,9 @@ func (k *Keeper) validateSubmittedReport(
 	}
 
 	return &validatedSubmittedReport{
-		reportID: reportID,
-		ring:     ring,
+		reportID:      reportID,
+		ring:          ring,
+		blockUnixTime: now,
 	}, nil
 }
 

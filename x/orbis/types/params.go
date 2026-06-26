@@ -5,7 +5,10 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-const DefaultNodeOfflineDemerits = uint64(1)
+const (
+	DefaultNodeOfflineDemerits       = uint64(1)
+	DefaultDemeritResetIntervalSecs = uint64(86400)
+)
 
 var _ paramtypes.ParamSet = (*Params)(nil)
 
@@ -29,7 +32,8 @@ func DefaultParams() Params {
 // DefaultDemeritConfig returns the module's default report demerit policy.
 func DefaultDemeritConfig() DemeritConfig {
 	return DemeritConfig{
-		NodeOfflineDemerits: DefaultNodeOfflineDemerits,
+		NodeOfflineDemerits:   DefaultNodeOfflineDemerits,
+		ResetIntervalSeconds: DefaultDemeritResetIntervalSecs,
 	}
 }
 
@@ -47,6 +51,9 @@ func (p Params) Validate() error {
 func ValidateDemeritConfig(config DemeritConfig) error {
 	if config.NodeOfflineDemerits == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "node_offline_demerits must be at least 1")
+	}
+	if config.ResetIntervalSeconds == 0 {
+		return errorsmod.Wrap(ErrInvalidRing, "reset_interval_seconds must be at least 1")
 	}
 	return nil
 }
