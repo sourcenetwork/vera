@@ -98,7 +98,7 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 
 	amount, err := DemeritAmountForReportType(&types.Ring{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:   5,
+			NodeOfflineDemerits:  5,
 			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
 		},
 	}, NodeOfflineReportType)
@@ -150,7 +150,7 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	copy(ikm, "orbis-report-demerit-ikm-0000")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits:   3,
+		NodeOfflineDemerits:  3,
 		ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
 	})
 
@@ -166,6 +166,97 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	_, err = fixture.k.SubmitReport(fixture.ctx, second)
 	require.NoError(t, err)
 	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-reset-ikm-00000")
+	sk := blst.KeyGen(ikm)
+	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
+		NodeOfflineDemerits:  3,
+		ResetIntervalSeconds: 10,
+	})
+
+	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, first)
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondReport.ObservedAt++
+	secondReport.ExpiresAt++
+	second := fixture.signBLSReport(t, sk, secondReport)
+	withinWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+9), 0))
+	_, err = fixture.k.SubmitReport(withinWindowCtx, second)
+	require.NoError(t, err)
+	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	thirdReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	thirdReport.ObservedAt += 2
+	thirdReport.ExpiresAt += 2
+	third := fixture.signBLSReport(t, sk, thirdReport)
+	resetBoundaryCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
+	_, err = fixture.k.SubmitReport(resetBoundaryCtx, third)
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestMsgServer_SubmitReportDoesNotResetDemeritsOnReplayOrRejectedReport(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-no-reset-ikm-00")
+	sk := blst.KeyGen(ikm)
+	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
+		NodeOfflineDemerits:  3,
+		ResetIntervalSeconds: 10,
+	})
+
+	accepted := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, accepted)
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	expiredWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
+	_, err = fixture.k.SubmitReport(expiredWindowCtx, accepted)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	rejectedReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	rejectedReport.ObservedAt++
+	rejectedReport.ExpiresAt++
+	rejectedReport.Domain = "wrong"
+	_, err = fixture.k.SubmitReport(expiredWindowCtx, fixture.signBLSReport(t, sk, rejectedReport))
+	require.ErrorIs(t, err, types.ErrInvalidReport)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestQueryServer_NodeDemeritsDoesNotResetExpiredWindow(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-query-reset-ikm")
+	sk := blst.KeyGen(ikm)
+	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
+		NodeOfflineDemerits:  3,
+		ResetIntervalSeconds: 10,
+	})
+
+	accepted := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, accepted)
+	require.NoError(t, err)
+
+	expiredWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
+	resp, err := fixture.k.NodeDemerits(expiredWindowCtx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: fixture.accusedKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), resp.Points)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	state, found := fixture.k.getNodeDemeritState(fixture.ctx, fixture.ringID, fixture.accusedKey)
+	require.True(t, found)
+	require.Equal(t, reportTestObservedAt, state.windowStartedAt)
 }
 
 func TestMsgServer_SubmitReportDemeritsAreIsolatedByNodeAndRing(t *testing.T) {

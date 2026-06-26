@@ -38,3 +38,54 @@ func TestSetRingCanonicalizesCommitteesWithoutMutatingInput(t *testing.T) {
 	require.Equal(t, []string{"node-a", "node-b", "node-c"}, stored.PeerNodeKeys)
 	require.Equal(t, []string{"node-d", "node-e", "node-f"}, stored.NewPeerNodeKeys)
 }
+
+func TestIncrementNodeDemeritsAppliesLazyResetWindow(t *testing.T) {
+	k, _, ctx := setupOrbisKeeper(t)
+
+	const (
+		ringID        = "ring-id"
+		otherRingID   = "other-ring-id"
+		nodeKey       = "node-key"
+		otherNodeKey  = "other-node-key"
+		resetInterval = uint64(10)
+	)
+
+	require.Equal(t, uint64(2), k.IncrementNodeDemerits(ctx, ringID, nodeKey, 2, 100, resetInterval))
+	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
+	require.True(t, found)
+	require.Equal(t, nodeDemeritState{
+		points:          2,
+		windowStartedAt: 100,
+	}, state)
+
+	require.Equal(t, uint64(5), k.IncrementNodeDemerits(ctx, ringID, nodeKey, 3, 109, resetInterval))
+	state, found = k.getNodeDemeritState(ctx, ringID, nodeKey)
+	require.True(t, found)
+	require.Equal(t, nodeDemeritState{
+		points:          5,
+		windowStartedAt: 100,
+	}, state)
+
+	require.Equal(t, uint64(4), k.IncrementNodeDemerits(ctx, ringID, nodeKey, 4, 110, resetInterval))
+	state, found = k.getNodeDemeritState(ctx, ringID, nodeKey)
+	require.True(t, found)
+	require.Equal(t, nodeDemeritState{
+		points:          4,
+		windowStartedAt: 110,
+	}, state)
+
+	require.Equal(t, uint64(7), k.IncrementNodeDemerits(ctx, ringID, otherNodeKey, 7, 105, resetInterval))
+	require.Equal(t, uint64(8), k.IncrementNodeDemerits(ctx, otherRingID, nodeKey, 8, 105, resetInterval))
+
+	require.Equal(t, uint64(4), k.GetNodeDemerits(ctx, ringID, nodeKey))
+	require.Equal(t, uint64(7), k.GetNodeDemerits(ctx, ringID, otherNodeKey))
+	require.Equal(t, uint64(8), k.GetNodeDemerits(ctx, otherRingID, nodeKey))
+
+	otherNodeState, found := k.getNodeDemeritState(ctx, ringID, otherNodeKey)
+	require.True(t, found)
+	require.Equal(t, uint64(105), otherNodeState.windowStartedAt)
+
+	otherRingState, found := k.getNodeDemeritState(ctx, otherRingID, nodeKey)
+	require.True(t, found)
+	require.Equal(t, uint64(105), otherRingState.windowStartedAt)
+}
