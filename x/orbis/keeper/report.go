@@ -114,7 +114,7 @@ func (k *Keeper) validateSubmittedReport(
 		return nil, errorsmod.Wrap(types.ErrInvalidReport, "report ring-state digest is stale")
 	}
 
-	effectiveVersion := effectiveReportProtocolVersion(ring, now)
+	effectiveVersion := effectiveReportProtocolVersion(ring, report.ObservedAt)
 	if payload.originProtocolVersion != effectiveVersion {
 		return nil, errorsmod.Wrapf(
 			types.ErrInvalidReport,
