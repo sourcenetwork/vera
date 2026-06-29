@@ -163,9 +163,10 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	secondReport.ObservedAt++
 	secondReport.ExpiresAt++
 	second := fixture.signBLSReport(t, sk, secondReport)
-	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	secondCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+1), 0))
+	_, err = fixture.k.SubmitReport(secondCtx, second)
 	require.NoError(t, err)
-	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(secondCtx, fixture.ringID, fixture.accusedKey))
 }
 
 func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {

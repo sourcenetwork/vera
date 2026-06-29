@@ -220,6 +220,62 @@ func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
 	require.Equal(t, explicitConfig, k.GetRing(ctx, explicitResp.RingId).DemeritConfig)
 }
 
+// TestMsgServer_CreateRingParamsValidation exercises the params validation/defaulting
+// paths in params.go that TestMsgServer_CreateRingSnapshotsDemeritConfig does not reach:
+// (1) ring with no DemeritConfig inherits the module-default DemeritConfig via GetParams,
+// (2) SetParams rejects zero-value fields and leaves existing params intact.
+func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	// setupOrbisKeeper seeds the store with DefaultParams; a ring with no explicit
+	// DemeritConfig must inherit exactly DefaultDemeritConfig via GetParams (params.go:12-21).
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.DefaultDemeritConfig(), k.GetRing(ctx, resp.RingId).DemeritConfig)
+
+	// params.go SetParams runs Validate(); zero NodeOfflineDemerits must be rejected.
+	require.ErrorContains(t,
+		k.SetParams(ctx, types.NewParams(types.DemeritConfig{
+			NodeOfflineDemerits:  0,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		})),
+		"node_offline_demerits must be at least 1",
+	)
+
+	// params.go SetParams runs Validate(); zero ResetIntervalSeconds must be rejected.
+	require.ErrorContains(t,
+		k.SetParams(ctx, types.NewParams(types.DemeritConfig{
+			NodeOfflineDemerits:  types.DefaultNodeOfflineDemerits,
+			ResetIntervalSeconds: 0,
+		})),
+		"reset_interval_seconds must be at least 1",
+	)
+
+	// After both failed SetParams calls params remain DefaultParams; a second ring
+	// (disambiguated by nonce) must still inherit DefaultDemeritConfig.
+	resp2, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		XNonce:       &types.MsgCreateRing_Nonce{Nonce: "after-invalid-params"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.DefaultDemeritConfig(), k.GetRing(ctx, resp2.RingId).DemeritConfig)
+}
+
 func TestMsgServer_CreateRing_NonceDisambiguatesIdenticalSettings(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)

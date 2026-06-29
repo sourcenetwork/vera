@@ -145,6 +145,8 @@ func validateReportEnvelopeShape(report *types.ReportEnvelope, now uint64) error
 		return errorsmod.Wrapf(types.ErrInvalidReport, "unexpected report domain %q", report.Domain)
 	case report.ObservedAt > report.ExpiresAt:
 		return errorsmod.Wrap(types.ErrInvalidReport, "report observed_at is after expires_at")
+	case report.ObservedAt > now:
+		return errorsmod.Wrap(types.ErrInvalidReport, "report observed_at is in the future")
 	case report.ExpiresAt-report.ObservedAt != ReportTTLSeconds:
 		return errorsmod.Wrap(types.ErrInvalidReport, "invalid report validity window")
 	case now > report.ExpiresAt:
