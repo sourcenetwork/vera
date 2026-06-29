@@ -60,6 +60,14 @@ func (k *Keeper) GetNodeDemerits(ctx context.Context, ringID, nodeKey string) ui
 	return state.points
 }
 
+func (k *Keeper) GetEffectiveNodeDemerits(ctx context.Context, ringID, nodeKey string, now, resetIntervalSeconds uint64) uint64 {
+	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
+	if !found || nodeDemeritWindowExpired(state.windowStartedAt, now, resetIntervalSeconds) {
+		return 0
+	}
+	return state.points
+}
+
 func (k *Keeper) IncrementNodeDemerits(ctx context.Context, ringID, nodeKey string, amount, now, resetIntervalSeconds uint64) uint64 {
 	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
 	if !found || nodeDemeritWindowExpired(state.windowStartedAt, now, resetIntervalSeconds) {

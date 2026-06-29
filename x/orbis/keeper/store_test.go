@@ -50,6 +50,8 @@ func TestIncrementNodeDemeritsAppliesLazyResetWindow(t *testing.T) {
 		resetInterval = uint64(10)
 	)
 
+	require.Equal(t, uint64(0), k.GetEffectiveNodeDemerits(ctx, ringID, nodeKey, 100, resetInterval))
+
 	require.Equal(t, uint64(2), k.IncrementNodeDemerits(ctx, ringID, nodeKey, 2, 100, resetInterval))
 	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
 	require.True(t, found)
@@ -59,6 +61,14 @@ func TestIncrementNodeDemeritsAppliesLazyResetWindow(t *testing.T) {
 	}, state)
 
 	require.Equal(t, uint64(5), k.IncrementNodeDemerits(ctx, ringID, nodeKey, 3, 109, resetInterval))
+	state, found = k.getNodeDemeritState(ctx, ringID, nodeKey)
+	require.True(t, found)
+	require.Equal(t, nodeDemeritState{
+		points:          5,
+		windowStartedAt: 100,
+	}, state)
+	require.Equal(t, uint64(5), k.GetEffectiveNodeDemerits(ctx, ringID, nodeKey, 109, resetInterval))
+	require.Equal(t, uint64(0), k.GetEffectiveNodeDemerits(ctx, ringID, nodeKey, 110, resetInterval))
 	state, found = k.getNodeDemeritState(ctx, ringID, nodeKey)
 	require.True(t, found)
 	require.Equal(t, nodeDemeritState{

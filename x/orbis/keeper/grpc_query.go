@@ -5,6 +5,7 @@ import (
 
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 	"google.golang.org/grpc/codes"
@@ -137,12 +138,17 @@ func (k *Keeper) NodeDemerits(ctx context.Context, req *types.QueryNodeDemeritsR
 	if req.NodeKey == "" {
 		return nil, status.Error(codes.InvalidArgument, "node_key is required")
 	}
-	if k.GetRing(ctx, req.RingId) == nil {
+	ring := k.GetRing(ctx, req.RingId)
+	if ring == nil {
 		return nil, status.Error(codes.NotFound, types.ErrRingNotFound.Error())
+	}
+	now, err := reportBlockUnixTime(sdk.UnwrapSDKContext(ctx))
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &types.QueryNodeDemeritsResponse{
-		Points: k.GetNodeDemerits(ctx, req.RingId, req.NodeKey),
+		Points: k.GetEffectiveNodeDemerits(ctx, req.RingId, req.NodeKey, now, ring.DemeritConfig.ResetIntervalSeconds),
 	}, nil
 }
 

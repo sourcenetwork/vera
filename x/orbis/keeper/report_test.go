@@ -231,7 +231,7 @@ func TestMsgServer_SubmitReportDoesNotResetDemeritsOnReplayOrRejectedReport(t *t
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
-func TestQueryServer_NodeDemeritsDoesNotResetExpiredWindow(t *testing.T) {
+func TestQueryServer_NodeDemeritsReturnsEffectiveScoreWithoutResettingExpiredWindow(t *testing.T) {
 	fixture := setupReportTestFixture(t)
 	ikm := make([]byte, 32)
 	copy(ikm, "orbis-report-query-reset-ikm")
@@ -245,18 +245,36 @@ func TestQueryServer_NodeDemeritsDoesNotResetExpiredWindow(t *testing.T) {
 	_, err := fixture.k.SubmitReport(fixture.ctx, accepted)
 	require.NoError(t, err)
 
-	expiredWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
-	resp, err := fixture.k.NodeDemerits(expiredWindowCtx, &types.QueryNodeDemeritsRequest{
+	resp, err := fixture.k.NodeDemerits(fixture.ctx, &types.QueryNodeDemeritsRequest{
 		RingId:  fixture.ringID,
 		NodeKey: fixture.accusedKey,
 	})
 	require.NoError(t, err)
 	require.Equal(t, uint64(3), resp.Points)
+
+	expiredWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
+	resp, err = fixture.k.NodeDemerits(expiredWindowCtx, &types.QueryNodeDemeritsRequest{
+		RingId:  fixture.ringID,
+		NodeKey: fixture.accusedKey,
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), resp.Points)
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 
 	state, found := fixture.k.getNodeDemeritState(fixture.ctx, fixture.ringID, fixture.accusedKey)
 	require.True(t, found)
 	require.Equal(t, reportTestObservedAt, state.windowStartedAt)
+
+	nextReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	nextReport.ObservedAt++
+	nextReport.ExpiresAt++
+	_, err = fixture.k.SubmitReport(expiredWindowCtx, fixture.signBLSReport(t, sk, nextReport))
+	require.NoError(t, err)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	state, found = fixture.k.getNodeDemeritState(fixture.ctx, fixture.ringID, fixture.accusedKey)
+	require.True(t, found)
+	require.Equal(t, reportTestObservedAt+10, state.windowStartedAt)
 }
 
 func TestMsgServer_SubmitReportDemeritsAreIsolatedByNodeAndRing(t *testing.T) {
