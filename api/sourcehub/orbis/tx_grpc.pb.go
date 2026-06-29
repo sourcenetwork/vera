@@ -28,6 +28,7 @@ const (
 	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp"
 	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp"
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
+	Msg_SubmitReport_FullMethodName                            = "/sourcehub.orbis.Msg/SubmitReport"
 	Msg_StoreDocument_FullMethodName                           = "/sourcehub.orbis.Msg/StoreDocument"
 	Msg_StoreKeyDerivation_FullMethodName                      = "/sourcehub.orbis.Msg/StoreKeyDerivation"
 	Msg_CreateNodeInfo_FullMethodName                          = "/sourcehub.orbis.Msg/CreateNodeInfo"
@@ -53,6 +54,7 @@ type MsgClient interface {
 	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
+	SubmitReport(ctx context.Context, in *MsgSubmitReport, opts ...grpc.CallOption) (*MsgSubmitReportResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(ctx context.Context, in *MsgStoreKeyDerivation, opts ...grpc.CallOption) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(ctx context.Context, in *MsgCreateNodeInfo, opts ...grpc.CallOption) (*MsgCreateNodeInfoResponse, error)
@@ -160,6 +162,16 @@ func (c *msgClient) FinalizeRingReshareByThresholdSignature(ctx context.Context,
 	return out, nil
 }
 
+func (c *msgClient) SubmitReport(ctx context.Context, in *MsgSubmitReport, opts ...grpc.CallOption) (*MsgSubmitReportResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgSubmitReportResponse)
+	err := c.cc.Invoke(ctx, Msg_SubmitReport_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *msgClient) StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgStoreDocumentResponse)
@@ -246,6 +258,7 @@ type MsgServer interface {
 	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
+	SubmitReport(context.Context, *MsgSubmitReport) (*MsgSubmitReportResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
 	StoreKeyDerivation(context.Context, *MsgStoreKeyDerivation) (*MsgStoreKeyDerivationResponse, error)
 	CreateNodeInfo(context.Context, *MsgCreateNodeInfo) (*MsgCreateNodeInfoResponse, error)
@@ -289,6 +302,9 @@ func (UnimplementedMsgServer) CancelRingUpgradeByAcp(context.Context, *MsgCancel
 }
 func (UnimplementedMsgServer) FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRingReshareByThresholdSignature not implemented")
+}
+func (UnimplementedMsgServer) SubmitReport(context.Context, *MsgSubmitReport) (*MsgSubmitReportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitReport not implemented")
 }
 func (UnimplementedMsgServer) StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreDocument not implemented")
@@ -494,6 +510,24 @@ func _Msg_FinalizeRingReshareByThresholdSignature_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_SubmitReport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSubmitReport)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SubmitReport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_SubmitReport_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SubmitReport(ctx, req.(*MsgSubmitReport))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Msg_StoreDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MsgStoreDocument)
 	if err := dec(in); err != nil {
@@ -662,6 +696,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FinalizeRingReshareByThresholdSignature",
 			Handler:    _Msg_FinalizeRingReshareByThresholdSignature_Handler,
+		},
+		{
+			MethodName: "SubmitReport",
+			Handler:    _Msg_SubmitReport_Handler,
 		},
 		{
 			MethodName: "StoreDocument",

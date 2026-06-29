@@ -47,6 +47,12 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, types.ErrRingAlreadyExists
 	}
 
+	demeritConfig := msg.DemeritConfig
+	if demeritConfig == nil {
+		params := k.GetParams(goCtx)
+		demeritConfig = &params.DefaultDemeritConfig
+	}
+
 	ring := types.Ring{
 		Id:               ringID,
 		CreatorDid:       creatorDID,
@@ -58,6 +64,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
+		DemeritConfig: *demeritConfig,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
@@ -504,6 +511,53 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 	}
 
 	return &types.MsgFinalizeRingReshareByThresholdSignatureResponse{}, nil
+}
+
+func (k *Keeper) SubmitReport(
+	goCtx context.Context,
+	msg *types.MsgSubmitReport,
+) (*types.MsgSubmitReportResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	report := msg.GetReport()
+	validatedReport, err := k.validateSubmittedReport(
+		goCtx,
+		ctx,
+		&report,
+		msg.ReportId,
+		msg.SignatureScheme,
+		msg.Signature,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	demeritAmount, err := DemeritAmountForReportType(validatedReport.ring, report.ReportType)
+	if err != nil {
+		return nil, err
+	}
+
+	k.SetAcceptedReport(goCtx, validatedReport.reportID)
+	k.IncrementNodeDemerits(
+		goCtx,
+		report.RingId,
+		report.AccusedNodeKey,
+		demeritAmount,
+		validatedReport.blockUnixTime,
+		validatedReport.ring.DemeritConfig.ResetIntervalSeconds,
+	)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventReportAccepted{
+		ReportId:        validatedReport.reportID,
+		RingId:          report.RingId,
+		ReportType:      report.ReportType,
+		ReporterNodeKey: report.ReporterNodeKey,
+		AccusedNodeKey:  report.AccusedNodeKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgSubmitReportResponse{ReportId: validatedReport.reportID}, nil
 }
 
 func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocument) (*types.MsgStoreDocumentResponse, error) {
