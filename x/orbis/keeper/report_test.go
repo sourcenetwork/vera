@@ -477,6 +477,80 @@ func TestMsgServer_SubmitReportAllowsPendingReshareScopes(t *testing.T) {
 	})
 }
 
+func TestMsgServer_SubmitReportValidatesSigningCommitteeCapacity(t *testing.T) {
+	t.Run("current signing threshold must be at least two", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-low", 1)
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+		require.ErrorContains(t, err, "threshold >= 2")
+	})
+
+	t.Run("current signing threshold cannot exceed committee size", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-big", 4)
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+		require.ErrorContains(t, err, "threshold exceeds signing committee size")
+	})
+
+	t.Run("current signing threshold must be reachable without accused", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-exc", 3)
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+		require.ErrorContains(t, err, "cannot be met while excluding the accused")
+	})
+
+	t.Run("pending-new signing threshold cannot exceed pending committee size", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-pbig", 2)
+		ring := *fixture.originalRing
+		ring.NewPeerNodeKeys = []string{fixture.reporterKey, fixture.validatorKey}
+		ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: 3}
+		fixture.replaceRing(t, ring)
+		msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopePendingNew, 0))
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+		require.ErrorContains(t, err, "threshold exceeds signing committee size")
+	})
+
+	t.Run("pending-new signing threshold must be reachable without pending accused", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-pexc", 2)
+		pendingPeerID := "12D3KooWReportPendingCapacity"
+		_, pendingKey := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, pendingPeerID)
+		ring := *fixture.originalRing
+		ring.NewPeerNodeKeys = []string{fixture.reporterKey, pendingKey}
+		ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: 2}
+		fixture.replaceRing(t, ring)
+		report := fixture.validReport(t, committeeScopePendingNew, committeeScopePendingNew, 0)
+		report.AccusedNodeKey = pendingKey
+		report.AccusedPeerId = pendingPeerID
+		msg := fixture.signBLSReport(t, sk, report)
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+		require.ErrorContains(t, err, "cannot be met while excluding the accused")
+	})
+
+	t.Run("full pending-new threshold is allowed when accused is outside signing committee", func(t *testing.T) {
+		fixture, sk := setupBLSReportFixture(t, "orbis-report-capacity-ok", 2)
+		ring := *fixture.originalRing
+		ring.NewPeerNodeKeys = []string{fixture.reporterKey, fixture.validatorKey}
+		ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: 2}
+		fixture.replaceRing(t, ring)
+		report := fixture.validReport(t, committeeScopeCurrent, committeeScopePendingNew, 0)
+		msg := fixture.signBLSReport(t, sk, report)
+
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.NoError(t, err)
+		require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	})
+}
+
 func TestMsgServer_SubmitReportRejectsSecurityFailures(t *testing.T) {
 	fixture := setupReportTestFixture(t)
 	ikm := make([]byte, 32)
@@ -631,6 +705,16 @@ func setupReportTestFixture(t *testing.T) reportTestFixture {
 	}
 }
 
+func setupBLSReportFixture(t *testing.T, ikmLabel string, threshold uint32) (reportTestFixture, *blst.SecretKey) {
+	t.Helper()
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, ikmLabel)
+	sk := blst.KeyGen(ikm)
+	fixture.setRing(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), threshold)
+	return fixture, sk
+}
+
 func (f *reportTestFixture) setRing(t *testing.T, ringPk string, threshold uint32) {
 	f.setRingWithDemeritConfig(t, ringPk, threshold, types.DefaultDemeritConfig())
 }
@@ -652,6 +736,14 @@ func (f *reportTestFixture) setRingWithDemeritConfig(t *testing.T, ringPk string
 	}
 	f.k.SetRing(f.ctx, ring)
 	stored := f.k.GetRing(f.ctx, f.ringID)
+	require.NotNil(t, stored)
+	f.originalRing = stored
+}
+
+func (f *reportTestFixture) replaceRing(t *testing.T, ring types.Ring) {
+	t.Helper()
+	f.k.SetRing(f.ctx, ring)
+	stored := f.k.GetRing(f.ctx, ring.Id)
 	require.NotNil(t, stored)
 	f.originalRing = stored
 }
