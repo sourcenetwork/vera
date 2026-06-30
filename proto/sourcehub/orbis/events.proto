@@ -67,3 +67,12 @@ message EventRingUpgradeNormalized {
   uint64 current_version = 3;
   uint64 activation_time = 4;
 }
+
+// EventReportAccepted is emitted after an MPC fault report passes security validation.
+message EventReportAccepted {
+  string report_id = 1;
+  string ring_id = 2;
+  string report_type = 3;
+  string reporter_node_key = 4;
+  string accused_node_key = 5;
+}

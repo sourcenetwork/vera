@@ -25,9 +25,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
-		XPssInterval: &types.Ring_PssInterval{
-			PssInterval: 30,
-		},
+		PssInterval:      types.MinPSSIntervalSeconds,
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
 		UpgradeInfo: types.UpgradeInfo{
@@ -42,6 +40,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeA, RingPk: "ring-pk"},
 		},
+		DemeritConfig: types.DefaultDemeritConfig(),
 	}
 	finalized, err := ringForReshareFinalization(current)
 	require.NoError(t, err)
@@ -61,9 +60,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		XNewThreshold: &types.Ring_NewThreshold{
 			NewThreshold: 1,
 		},
-		XPssInterval: &types.Ring_PssInterval{
-			PssInterval: 60,
-		},
+		PssInterval:      types.MinPSSIntervalSeconds + 1,
 		BlockNumberNonce: 9,
 		PolicyId:         "policy-id",
 		UpgradeInfo: types.UpgradeInfo{
@@ -78,6 +75,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeB, RingPk: "different-storage-only-value"},
 		},
+		DemeritConfig: types.DefaultDemeritConfig(),
 	}
 	sameSignStateFinalized, err := ringForReshareFinalization(sameSignState)
 	require.NoError(t, err)

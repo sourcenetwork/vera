@@ -6,7 +6,6 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/immutable"
 
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
@@ -34,7 +33,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
-	pssInterval := optionalCreateRingPSSInterval(msg)
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalNodeKeys(msg.PeerNodeKeys)
 
@@ -44,9 +42,15 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, pssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
+	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, msg.PssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
+	}
+
+	demeritConfig := msg.DemeritConfig
+	if demeritConfig == nil {
+		params := k.GetParams(goCtx)
+		demeritConfig = &params.DefaultDemeritConfig
 	}
 
 	ring := types.Ring{
@@ -54,13 +58,17 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		CreatorDid:       creatorDID,
 		PeerNodeKeys:     peerNodeKeys,
 		Threshold:        msg.Threshold,
+		PssInterval:      msg.PssInterval,
 		PolicyId:         msg.PolicyId,
 		BlockNumberNonce: 0,
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
+		DemeritConfig: *demeritConfig,
 	}
-	setRingPSSInterval(&ring, pssInterval)
+	if err := validateRingPSSInterval(&ring); err != nil {
+		return nil, err
+	}
 	if err := validateRing(&ring); err != nil {
 		return nil, err
 	}
@@ -126,7 +134,15 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	for _, c := range ring.Confirmations {
 		if c.RingPk != msg.RingPk {
 			k.DeleteRing(goCtx, ring.Id)
-			return nil, types.ErrRingPkConflict
+			if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
+				RingId: ring.Id,
+				Reason: "ring_pk_conflict",
+			}); err != nil {
+				return nil, err
+			}
+			return &types.MsgFinalizeRingResponse{
+				Outcome: types.FinalizeRingOutcome_CONFLICT_DELETED,
+			}, nil
 		}
 	}
 
@@ -137,7 +153,9 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 
 	if len(ring.Confirmations) < len(ring.PeerNodeKeys) {
 		k.SetRing(goCtx, *ring)
-		return &types.MsgFinalizeRingResponse{}, nil
+		return &types.MsgFinalizeRingResponse{
+			Outcome: types.FinalizeRingOutcome_CONFIRMATION_RECORDED,
+		}, nil
 	}
 
 	// All nodes confirmed — finalize.
@@ -161,7 +179,48 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, err
 	}
 
-	return &types.MsgFinalizeRingResponse{}, nil
+	return &types.MsgFinalizeRingResponse{
+		Outcome: types.FinalizeRingOutcome_RING_FINALIZED,
+	}, nil
+}
+
+func (k *Keeper) CancelPendingRing(goCtx context.Context, msg *types.MsgCancelPendingRing) (*types.MsgCancelPendingRingResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if ring.RingPk != "" {
+		return nil, types.ErrRingAlreadyFinalized
+	}
+
+	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+
+	authorized := slices.Contains(ring.PeerNodeKeys, signerKey)
+	if !authorized {
+		cancellerDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+		if err != nil {
+			return nil, err
+		}
+		authorized = cancellerDID == ring.CreatorDid
+	}
+	if !authorized {
+		return nil, types.ErrInvalidRingCanceller
+	}
+
+	k.DeleteRing(goCtx, ring.Id)
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
+		RingId: ring.Id,
+		Reason: "dkg_cancelled",
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCancelPendingRingResponse{}, nil
 }
 
 func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStartRingReshareByAcp) (*types.MsgStartRingReshareByAcpResponse, error) {
@@ -264,14 +323,16 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 		return nil, err
 	}
 
-	if msg.PssInterval == 0 {
-		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pss_interval must be positive")
+	nextRing := *ring
+	nextRing.PssInterval = msg.PssInterval
+	if err := validateRingPSSInterval(&nextRing); err != nil {
+		return nil, err
 	}
-	if ring.XPssInterval != nil && ring.GetPssInterval() == msg.PssInterval {
+	if ring.GetPssInterval() == msg.PssInterval {
 		return nil, types.ErrRingPssIntervalUnchanged
 	}
 
-	setRingPSSInterval(ring, immutable.Some(msg.PssInterval))
+	ring.PssInterval = msg.PssInterval
 	if err := validateRing(ring); err != nil {
 		return nil, err
 	}
@@ -290,55 +351,6 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 	}
 
 	return &types.MsgSetRingPssIntervalByAcpResponse{}, nil
-}
-
-func (k *Keeper) DisableRingPssByAcp(goCtx context.Context, msg *types.MsgDisableRingPssByAcp) (*types.MsgDisableRingPssByAcpResponse, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
-	ring := k.GetRing(goCtx, msg.RingId)
-	if ring == nil {
-		return nil, types.ErrRingNotFound
-	}
-	if err := requireRingFinalized(ring); err != nil {
-		return nil, err
-	}
-
-	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
-	if err != nil {
-		return nil, err
-	}
-	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
-		return nil, err
-	}
-
-	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if ring.XPssInterval == nil {
-		return nil, types.ErrRingPssAlreadyDisabled
-	}
-
-	setRingPSSInterval(ring, immutable.None[uint64]())
-	if err := validateRing(ring); err != nil {
-		return nil, err
-	}
-	k.SetRing(goCtx, *ring)
-
-	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
-		RingId:     ring.Id,
-		UpdaterDid: updaterDID,
-	}); err != nil {
-		return nil, err
-	}
-	if upgradeNormalizedEvent != nil {
-		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
-			return nil, err
-		}
-	}
-
-	return &types.MsgDisableRingPssByAcpResponse{}, nil
 }
 
 func (k *Keeper) ScheduleRingUpgradeByAcp(goCtx context.Context, msg *types.MsgScheduleRingUpgradeByAcp) (*types.MsgScheduleRingUpgradeByAcpResponse, error) {
@@ -499,6 +511,53 @@ func (k *Keeper) FinalizeRingReshareByThresholdSignature(
 	}
 
 	return &types.MsgFinalizeRingReshareByThresholdSignatureResponse{}, nil
+}
+
+func (k *Keeper) SubmitReport(
+	goCtx context.Context,
+	msg *types.MsgSubmitReport,
+) (*types.MsgSubmitReportResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	report := msg.GetReport()
+	validatedReport, err := k.validateSubmittedReport(
+		goCtx,
+		ctx,
+		&report,
+		msg.ReportId,
+		msg.SignatureScheme,
+		msg.Signature,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	demeritAmount, err := DemeritAmountForReportType(validatedReport.ring, report.ReportType)
+	if err != nil {
+		return nil, err
+	}
+
+	k.SetAcceptedReportPair(goCtx, validatedReport.reportID, validatedReport.sessionDedupeID, validatedReport.blockUnixTime+ReportTTLSeconds)
+	k.IncrementNodeDemerits(
+		goCtx,
+		report.RingId,
+		report.AccusedNodeKey,
+		demeritAmount,
+		validatedReport.blockUnixTime,
+		validatedReport.ring.DemeritConfig.ResetIntervalSeconds,
+	)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventReportAccepted{
+		ReportId:        validatedReport.reportID,
+		RingId:          report.RingId,
+		ReportType:      report.ReportType,
+		ReporterNodeKey: report.ReporterNodeKey,
+		AccusedNodeKey:  report.AccusedNodeKey,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgSubmitReportResponse{ReportId: validatedReport.reportID}, nil
 }
 
 func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocument) (*types.MsgStoreDocumentResponse, error) {

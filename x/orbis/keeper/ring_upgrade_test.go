@@ -40,6 +40,7 @@ func setupFinalizedRingUpgradeFixture(t *testing.T, currentVersion uint64) ringU
 		Creator:        creatorAddr,
 		PeerNodeKeys:   []string{peer1Key, peer2Key},
 		Threshold:      1,
+		PssInterval:    types.MinPSSIntervalSeconds,
 		PolicyId:       policyID,
 		CurrentVersion: currentVersion,
 	})
@@ -115,6 +116,7 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		Creator:        creatorAddr,
 		PeerNodeKeys:   []string{peerKey},
 		Threshold:      1,
+		PssInterval:    types.MinPSSIntervalSeconds,
 		PolicyId:       policyID,
 		CurrentVersion: 0,
 	})
@@ -124,6 +126,7 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 		Creator:        creatorAddr,
 		PeerNodeKeys:   []string{peerKey},
 		Threshold:      1,
+		PssInterval:    types.MinPSSIntervalSeconds,
 		PolicyId:       policyID,
 		CurrentVersion: 1,
 	})
@@ -201,7 +204,7 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	_, err = k.SetRingPssIntervalByAcp(activationCtx, &types.MsgSetRingPssIntervalByAcp{
 		Creator:     creatorAddr,
 		RingId:      createVersionZero.RingId,
-		PssInterval: 900,
+		PssInterval: types.MinPSSIntervalSeconds + 1,
 	})
 	require.NoError(t, err)
 	ring = k.GetRing(ctx, createVersionZero.RingId)
@@ -226,6 +229,28 @@ func TestRingUpgradeLifecycle(t *testing.T) {
 	require.True(t, seenEvent("EventRingUpgradeScheduled"))
 	require.True(t, seenEvent("EventRingUpgradeCancelled"))
 	require.True(t, seenEvent("EventRingUpgradeNormalized"))
+}
+
+func TestScheduleRingUpgradeAllowsStoredPSSIntervalBelowMinimum(t *testing.T) {
+	fixture := setupFinalizedRingUpgradeFixture(t, 0)
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.NotNil(t, ring)
+	ring.PssInterval = types.MinPSSIntervalSeconds - 1
+	fixture.k.SetRing(fixture.ctx, *ring)
+
+	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
+	_, err := fixture.k.ScheduleRingUpgradeByAcp(fixture.ctx, &types.MsgScheduleRingUpgradeByAcp{
+		Creator:        fixture.creatorAddr,
+		RingId:         fixture.ringID,
+		NextVersion:    1,
+		ActivationTime: activationTime,
+	})
+	require.NoError(t, err)
+
+	stored := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.Equal(t, types.MinPSSIntervalSeconds-1, stored.GetPssInterval())
+	require.Equal(t, uint64(1), stored.UpgradeInfo.GetNextVersion())
+	require.Equal(t, activationTime, stored.UpgradeInfo.GetActivationTime())
 }
 
 func TestRingUpgradeRemainsPendingUntilAnUpdateNormalizesIt(t *testing.T) {
@@ -340,30 +365,25 @@ func TestRingUpgradeNormalizesWhenStartingReshare(t *testing.T) {
 	require.IsType(t, &types.EventRingUpgradeNormalized{}, parseTypedEvents(t, updateCtx)[1])
 }
 
-func TestRingUpgradeNormalizesWhenDisablingPss(t *testing.T) {
+func TestRingUpgradeNormalizesWhenSettingPssInterval(t *testing.T) {
 	fixture := setupFinalizedRingUpgradeFixture(t, 0)
-	_, err := fixture.k.SetRingPssIntervalByAcp(fixture.ctx, &types.MsgSetRingPssIntervalByAcp{
-		Creator:     fixture.creatorAddr,
-		RingId:      fixture.ringID,
-		PssInterval: 300,
-	})
-	require.NoError(t, err)
 	activationTime := ringUpgradeBaseTime + MinRingUpgradeLeadSeconds
 	scheduleRingUpgrade(t, fixture, ringUpgradeBaseTime, 1, activationTime)
 
 	updateCtx := fixture.ctx.
 		WithBlockTime(time.Unix(int64(activationTime), 0)).
 		WithEventManager(sdk.NewEventManager())
-	_, err = fixture.k.DisableRingPssByAcp(updateCtx, &types.MsgDisableRingPssByAcp{
-		Creator: fixture.creatorAddr,
-		RingId:  fixture.ringID,
+	_, err := fixture.k.SetRingPssIntervalByAcp(updateCtx, &types.MsgSetRingPssIntervalByAcp{
+		Creator:     fixture.creatorAddr,
+		RingId:      fixture.ringID,
+		PssInterval: types.MinPSSIntervalSeconds + 1,
 	})
 	require.NoError(t, err)
 
 	ring := fixture.k.GetRing(updateCtx, fixture.ringID)
 	require.Equal(t, uint64(1), ring.UpgradeInfo.CurrentVersion)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
-	require.Nil(t, ring.XPssInterval)
+	require.Equal(t, types.MinPSSIntervalSeconds+1, ring.GetPssInterval())
 	require.IsType(t, &types.EventRingUpgradeNormalized{}, parseTypedEvents(t, updateCtx)[1])
 }
 

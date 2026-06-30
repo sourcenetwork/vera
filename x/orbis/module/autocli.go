@@ -48,6 +48,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query node info by node key",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
 				},
+				{
+					RpcMethod:      "NodeDemerits",
+					Use:            "node-demerits [ring_id] [node_key]",
+					Short:          "Query a node's demerit score in a ring",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "node_key"}},
+				},
 			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
@@ -57,9 +63,15 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				{RpcMethod: "UpdateParams", Skip: true},
 				{
 					RpcMethod:      "CreateRing",
-					Use:            "create-ring [threshold] [policy_id] [current_version]",
+					Use:            "create-ring [threshold] [pss_interval] [policy_id] [current_version]",
 					Short:          "Create an Orbis ring",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "policy_id"}, {ProtoField: "current_version"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "threshold"}, {ProtoField: "pss_interval"}, {ProtoField: "policy_id"}, {ProtoField: "current_version"}},
+				},
+				{
+					RpcMethod:      "CancelPendingRing",
+					Use:            "cancel-pending-ring [ring_id]",
+					Short:          "Cancel an unfinished Orbis DKG",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
 					RpcMethod:      "StartRingReshareByAcp",
@@ -72,12 +84,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:            "set-ring-pss-interval-by-acp [ring_id] [pss_interval]",
 					Short:          "Set a ring PSS interval via external ACP policy",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "pss_interval"}},
-				},
-				{
-					RpcMethod:      "DisableRingPssByAcp",
-					Use:            "disable-ring-pss-by-acp [ring_id]",
-					Short:          "Disable ring PSS via external ACP policy",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
 					RpcMethod:      "ScheduleRingUpgradeByAcp",
@@ -97,6 +103,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Finalize a ring reshare using a threshold signature",
 					Long:           "Finalize a ring reshare using a threshold signature. The signature argument is a bytes field and must be base64-encoded.",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "signature_scheme"}, {ProtoField: "signature"}},
+				},
+				{
+					RpcMethod: "SubmitReport",
+					Use:       "submit-report",
+					Short:     "Submit an MPC fault report",
+					Long:      "Submit an MPC fault report. The report field is a message value and the signature field must be base64-encoded.",
 				},
 				{
 					RpcMethod:      "StoreDocument",

@@ -15,8 +15,8 @@ func (msg *MsgSetRingPssIntervalByAcp) ValidateBasic() error {
 	if msg.RingId == "" {
 		return ErrInvalidRingId
 	}
-	if msg.PssInterval == 0 {
-		return errorsmod.Wrap(ErrInvalidRing, "pss_interval must be positive")
+	if err := ValidatePSSInterval(msg.PssInterval); err != nil {
+		return err
 	}
 	return nil
 }

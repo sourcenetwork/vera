@@ -6,14 +6,6 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
-func optionalCreateRingPSSInterval(msg *types.MsgCreateRing) immutable.Option[uint64] {
-	if msg.XPssInterval == nil {
-		return immutable.None[uint64]()
-	}
-	value := msg.GetPssInterval()
-	return immutable.Some(value)
-}
-
 func optionalCreateRingNonce(msg *types.MsgCreateRing) immutable.Option[string] {
 	if msg.XNonce == nil {
 		return immutable.None[string]()
@@ -52,14 +44,6 @@ func setRingNewThreshold(ring *types.Ring, value immutable.Option[uint32]) {
 		return
 	}
 	ring.XNewThreshold = &types.Ring_NewThreshold{NewThreshold: value.Value()}
-}
-
-func setRingPSSInterval(ring *types.Ring, value immutable.Option[uint64]) {
-	if !value.HasValue() {
-		ring.XPssInterval = nil
-		return
-	}
-	ring.XPssInterval = &types.Ring_PssInterval{PssInterval: value.Value()}
 }
 
 func setDocumentTier(document *types.Document, value immutable.Option[string]) {

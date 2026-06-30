@@ -3,6 +3,7 @@ package sourcehub.orbis;
 
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
+import "sourcehub/orbis/ring.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 
@@ -10,4 +11,6 @@ option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 message Params {
   option (amino.name) = "sourcehub/x/orbis/Params";
   option (gogoproto.equal) = true;
+
+  DemeritConfig default_demerit_config = 1 [(gogoproto.nullable) = false];
 }

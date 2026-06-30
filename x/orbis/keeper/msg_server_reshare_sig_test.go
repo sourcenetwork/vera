@@ -38,6 +38,7 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key, peer2Key},
 		Threshold:    2,
+		PssInterval:  types.MinPSSIntervalSeconds,
 		PolicyId:     policyID,
 	})
 	require.NoError(t, err)
@@ -123,6 +124,7 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key, peer2Key},
 		Threshold:    2,
+		PssInterval:  types.MinPSSIntervalSeconds,
 		PolicyId:     policyID,
 	})
 	require.NoError(t, err)

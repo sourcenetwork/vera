@@ -32,6 +32,9 @@ func validateRing(ring *types.Ring) error {
 	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
 		return err
 	}
+	if err := types.ValidateDemeritConfig(ring.DemeritConfig); err != nil {
+		return err
+	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
 		return err
@@ -59,6 +62,10 @@ func validateRing(ring *types.Ring) error {
 	}
 
 	return nil
+}
+
+func validateRingPSSInterval(ring *types.Ring) error {
+	return types.ValidatePSSInterval(ring.GetPssInterval())
 }
 
 func validateStartRingReshare(

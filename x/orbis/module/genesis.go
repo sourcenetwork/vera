@@ -27,6 +27,12 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 			k.SetNodeInfo(ctx, entry.NodeKey, *entry.NodeInfo)
 		}
 	}
+	for _, entry := range genState.NodeDemerits {
+		k.SetNodeDemerits(ctx, entry.RingId, entry.NodeKey, entry.Points, entry.WindowStartedAt)
+	}
+	for _, entry := range genState.AcceptedReportPairs {
+		k.SetAcceptedReportPair(ctx, entry.ReportId, entry.SessionId, entry.ExpiresAt)
+	}
 }
 
 // ExportGenesis returns the module's exported genesis.
@@ -37,5 +43,7 @@ func ExportGenesis(ctx sdk.Context, k *keeper.Keeper) *types.GenesisState {
 	genesis.Documents = k.GetAllDocuments(ctx)
 	genesis.KeyDerivations = k.GetAllKeyDerivations(ctx)
 	genesis.NodeInfos = k.GetAllNodeInfos(ctx)
+	genesis.NodeDemerits = k.GetAllNodeDemerits(ctx)
+	genesis.AcceptedReportPairs = k.GetAllAcceptedReportPairs(ctx)
 	return genesis
 }

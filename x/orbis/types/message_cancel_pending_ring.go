@@ -6,9 +6,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-var _ sdk.Msg = &MsgDisableRingPssByAcp{}
+var _ sdk.Msg = &MsgCancelPendingRing{}
 
-func (msg *MsgDisableRingPssByAcp) ValidateBasic() error {
+func (msg *MsgCancelPendingRing) ValidateBasic() error {
 	if _, err := sdk.AccAddressFromBech32(msg.Creator); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}

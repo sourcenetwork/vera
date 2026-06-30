@@ -99,6 +99,10 @@ func DefaultConfigWithOptions(options NetworkOptions) network.Config {
 	if err != nil {
 		panic(err)
 	}
+	// These integration tests only use validator 0. Keeping the default network
+	// single-validator also avoids a CometBFT v0.38.21 shutdown race where a
+	// peer-reactor goroutine can access the block store after it has been closed.
+	cfg.NumValidators = 1
 	ports, err := freePorts(3)
 	if err != nil {
 		panic(err)

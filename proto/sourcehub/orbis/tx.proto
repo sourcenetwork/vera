@@ -7,6 +7,7 @@ import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "sourcehub/orbis/params.proto";
+import "sourcehub/orbis/ring.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
 
@@ -18,12 +19,13 @@ service Msg {
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
   rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
+  rpc CancelPendingRing(MsgCancelPendingRing) returns (MsgCancelPendingRingResponse);
   rpc StartRingReshareByAcp(MsgStartRingReshareByAcp) returns (MsgStartRingReshareByAcpResponse);
   rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
-  rpc DisableRingPssByAcp(MsgDisableRingPssByAcp) returns (MsgDisableRingPssByAcpResponse);
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
+  rpc SubmitReport(MsgSubmitReport) returns (MsgSubmitReportResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
   rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
   rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
@@ -54,12 +56,13 @@ message MsgCreateRing {
   string creator = 1;
   repeated string peer_node_keys = 2;
   uint32 threshold = 3;
-  // Absent means automatic PSS refresh is disabled.
-  optional uint64 pss_interval = 4;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 4;
   string policy_id = 5;
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
   optional string nonce = 6;
   uint64 current_version = 7;
+  DemeritConfig demerit_config = 8;
 }
 
 message MsgCreateRingResponse {
@@ -73,7 +76,24 @@ message MsgFinalizeRing {
   string ring_pk = 3;
 }
 
-message MsgFinalizeRingResponse {}
+enum FinalizeRingOutcome {
+  UNSPECIFIED = 0;
+  CONFIRMATION_RECORDED = 1;
+  RING_FINALIZED = 2;
+  CONFLICT_DELETED = 3;
+}
+
+message MsgFinalizeRingResponse {
+  FinalizeRingOutcome outcome = 1;
+}
+
+message MsgCancelPendingRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgCancelPendingRingResponse {}
 
 message MsgStartRingReshareByAcp {
   option (cosmos.msg.v1.signer) = "creator";
@@ -90,18 +110,11 @@ message MsgSetRingPssIntervalByAcp {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string ring_id = 2;
+  // Interval in seconds. Must be at least 86400.
   uint64 pss_interval = 3;
 }
 
 message MsgSetRingPssIntervalByAcpResponse {}
-
-message MsgDisableRingPssByAcp {
-  option (cosmos.msg.v1.signer) = "creator";
-  string creator = 1;
-  string ring_id = 2;
-}
-
-message MsgDisableRingPssByAcpResponse {}
 
 message MsgScheduleRingUpgradeByAcp {
   option (cosmos.msg.v1.signer) = "creator";
@@ -132,6 +145,35 @@ message MsgFinalizeRingReshareByThresholdSignature {
 
 message MsgFinalizeRingReshareByThresholdSignatureResponse {}
 
+message MsgSubmitReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  ReportEnvelope report = 2 [(gogoproto.nullable) = false];
+  string report_id = 3;
+  string signature_scheme = 4;
+  bytes signature = 5;
+}
+
+message MsgSubmitReportResponse {
+  string report_id = 1;
+}
+
+message ReportEnvelope {
+  string domain = 1;
+  string report_type = 2;
+  string chain_id = 3;
+  string ring_id = 4;
+  string ring_pk = 5;
+  string ring_state_sha256 = 6;
+  string reporter_node_key = 7;
+  string accused_node_key = 8;
+  string accused_peer_id = 9;
+  uint64 observed_at = 10;
+  uint64 expires_at = 11;
+  bytes payload = 12;
+  string session_id = 13;
+}
+
 message RingReshareFinalizeSignDoc {
   string domain = 1;
   string chain_id = 2;
@@ -148,7 +190,7 @@ message RingReshareSignState {
   uint32 threshold = 3;
   repeated string new_peer_node_keys = 4;
   optional uint32 new_threshold = 5;
-  optional uint64 pss_interval = 6;
+  reserved 6;
   uint64 block_number_nonce = 7;
   string policy_id = 8;
 }
