@@ -41,10 +41,14 @@ func (k *Keeper) DeleteRing(ctx context.Context, ringID string) {
 	store.Delete([]byte(ringID))
 }
 
-func (k *Keeper) SetAcceptedReport(ctx context.Context, reportID string) {
+func (k *Keeper) SetAcceptedReportPair(ctx context.Context, reportID, sessionID string, expiresAt uint64) {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
-	store.Set([]byte(reportID), []byte{1})
+	reportStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
+	reportStore.Set([]byte(reportID), []byte{1})
+	sessionStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
+	sessionStore.Set([]byte(sessionID), []byte{1})
+	expiryStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportExpiryKeyPrefix))
+	expiryStore.Set(acceptedExpiryKey(expiresAt, reportID), []byte(sessionID))
 }
 
 func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
@@ -53,16 +57,75 @@ func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
 	return store.Has([]byte(reportID))
 }
 
-func (k *Keeper) SetAcceptedReportSession(ctx context.Context, sessionID string) {
-	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
-	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
-	store.Set([]byte(sessionID), []byte{1})
-}
-
 func (k *Keeper) HasAcceptedReportSession(ctx context.Context, sessionID string) bool {
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
 	return store.Has([]byte(sessionID))
+}
+
+func (k *Keeper) DeleteExpiredAcceptedReportPairs(ctx context.Context, now uint64) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	reportStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportKeyPrefix))
+	sessionStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
+	expiryStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportExpiryKeyPrefix))
+
+	type expiredPair struct {
+		expiryKey []byte
+		reportID  string
+		sessionID string
+	}
+	var expired []expiredPair
+
+	iterator := storetypes.KVStorePrefixIterator(expiryStore, []byte{})
+	for ; iterator.Valid(); iterator.Next() {
+		key := iterator.Key()
+		if len(key) < 8 {
+			continue
+		}
+		if binary.BigEndian.Uint64(key[:8]) > now {
+			break
+		}
+		expired = append(expired, expiredPair{
+			expiryKey: append([]byte{}, key...),
+			reportID:  string(key[8:]),
+			sessionID: string(iterator.Value()),
+		})
+	}
+	iterator.Close()
+
+	for _, p := range expired {
+		expiryStore.Delete(p.expiryKey)
+		reportStore.Delete([]byte(p.reportID))
+		sessionStore.Delete([]byte(p.sessionID))
+	}
+}
+
+func (k *Keeper) GetAllAcceptedReportPairs(ctx context.Context) []types.AcceptedReportPairEntry {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	expiryStore := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportExpiryKeyPrefix))
+
+	var pairs []types.AcceptedReportPairEntry
+	iterator := storetypes.KVStorePrefixIterator(expiryStore, []byte{})
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		key := iterator.Key()
+		if len(key) < 8 {
+			continue
+		}
+		pairs = append(pairs, types.AcceptedReportPairEntry{
+			ReportId:  string(key[8:]),
+			SessionId: string(iterator.Value()),
+			ExpiresAt: binary.BigEndian.Uint64(key[:8]),
+		})
+	}
+	return pairs
+}
+
+func acceptedExpiryKey(expiresAt uint64, id string) []byte {
+	key := make([]byte, 8+len(id))
+	binary.BigEndian.PutUint64(key[:8], expiresAt)
+	copy(key[8:], id)
+	return key
 }
 
 func (k *Keeper) GetNodeDemerits(ctx context.Context, ringID, nodeKey string) uint64 {

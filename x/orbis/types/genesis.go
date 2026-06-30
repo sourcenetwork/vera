@@ -5,11 +5,12 @@ import "fmt"
 // DefaultGenesis returns the default genesis state.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
-		Params:         DefaultParams(),
-		Rings:          []Ring{},
-		Documents:      []Document{},
-		KeyDerivations: []KeyDerivation{},
-		NodeDemerits:   []NodeDemeritEntry{},
+		Params:              DefaultParams(),
+		Rings:               []Ring{},
+		Documents:           []Document{},
+		KeyDerivations:      []KeyDerivation{},
+		NodeDemerits:        []NodeDemeritEntry{},
+		AcceptedReportPairs: []AcceptedReportPairEntry{},
 	}
 }
 
@@ -41,6 +42,27 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicate node_demerits entry for ring %q node %q", entry.RingId, entry.NodeKey)
 		}
 		seenDemerits[key] = struct{}{}
+	}
+
+	seenReportPairs := map[string]struct{}{}
+	seenSessionPairs := map[string]struct{}{}
+	for _, entry := range gs.AcceptedReportPairs {
+		switch {
+		case entry.ReportId == "":
+			return fmt.Errorf("accepted_report_pairs report_id cannot be empty")
+		case entry.SessionId == "":
+			return fmt.Errorf("accepted_report_pairs session_id cannot be empty")
+		case entry.ExpiresAt == 0:
+			return fmt.Errorf("accepted_report_pairs expires_at cannot be zero")
+		}
+		if _, found := seenReportPairs[entry.ReportId]; found {
+			return fmt.Errorf("duplicate accepted_report_pairs entry for report_id %q", entry.ReportId)
+		}
+		seenReportPairs[entry.ReportId] = struct{}{}
+		if _, found := seenSessionPairs[entry.SessionId]; found {
+			return fmt.Errorf("duplicate accepted_report_pairs entry for session_id %q", entry.SessionId)
+		}
+		seenSessionPairs[entry.SessionId] = struct{}{}
 	}
 
 	return nil

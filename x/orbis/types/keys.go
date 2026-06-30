@@ -22,6 +22,7 @@ const (
 	NodeInfoKeyPrefix              = "node_info/"
 	AcceptedReportKeyPrefix        = "accepted_report/"
 	AcceptedReportSessionKeyPrefix = "accepted_report_session/"
+	AcceptedReportExpiryKeyPrefix  = "accepted_report_expiry/"
 	NodeDemeritKeyPrefix           = "node_demerit/"
 )
 

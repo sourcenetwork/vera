@@ -39,6 +39,39 @@ func TestSetRingCanonicalizesCommitteesWithoutMutatingInput(t *testing.T) {
 	require.Equal(t, []string{"node-d", "node-e", "node-f"}, stored.NewPeerNodeKeys)
 }
 
+func TestDeleteExpiredAcceptedReportPairs(t *testing.T) {
+	k, _, ctx := setupOrbisKeeper(t)
+
+	const (
+		reportA  = "report-a"
+		reportB  = "report-b"
+		sessionA = "session-a"
+		sessionB = "session-b"
+	)
+
+	k.SetAcceptedReportPair(ctx, reportA, sessionA, 100)
+	k.SetAcceptedReportPair(ctx, reportB, sessionB, 200)
+
+	require.True(t, k.HasAcceptedReport(ctx, reportA))
+	require.True(t, k.HasAcceptedReport(ctx, reportB))
+	require.True(t, k.HasAcceptedReportSession(ctx, sessionA))
+	require.True(t, k.HasAcceptedReportSession(ctx, sessionB))
+
+	// at t=100 only entries with expiresAt <= 100 are deleted
+	k.DeleteExpiredAcceptedReportPairs(ctx, 100)
+
+	require.False(t, k.HasAcceptedReport(ctx, reportA))
+	require.True(t, k.HasAcceptedReport(ctx, reportB))
+	require.False(t, k.HasAcceptedReportSession(ctx, sessionA))
+	require.True(t, k.HasAcceptedReportSession(ctx, sessionB))
+
+	// at t=200 the remaining pair is also deleted
+	k.DeleteExpiredAcceptedReportPairs(ctx, 200)
+
+	require.False(t, k.HasAcceptedReport(ctx, reportB))
+	require.False(t, k.HasAcceptedReportSession(ctx, sessionB))
+}
+
 func TestIncrementNodeDemeritsAppliesLazyResetWindow(t *testing.T) {
 	k, _, ctx := setupOrbisKeeper(t)
 

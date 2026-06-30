@@ -78,12 +78,20 @@ func TestGenesisRoundTrip(t *testing.T) {
 		},
 	}
 
+	expectedReportPairs := []types.AcceptedReportPairEntry{
+		{ReportId: "report-1", SessionId: "session-1", ExpiresAt: 1000},
+		{ReportId: "report-2", SessionId: "session-2", ExpiresAt: 2000},
+	}
+
 	k.SetRing(ctx, expectedRing)
 	k.SetDocument(ctx, expectedDocument)
 	k.SetKeyDerivation(ctx, expectedKeyDerivation)
 	k.SetNodeInfo(ctx, expectedNodeInfo.NodeKey, *expectedNodeInfo.NodeInfo)
 	for _, entry := range expectedNodeDemerits {
 		k.SetNodeDemerits(ctx, entry.RingId, entry.NodeKey, entry.Points, entry.WindowStartedAt)
+	}
+	for _, entry := range expectedReportPairs {
+		k.SetAcceptedReportPair(ctx, entry.ReportId, entry.SessionId, entry.ExpiresAt)
 	}
 
 	exported := ExportGenesis(ctx, &k)
@@ -93,6 +101,7 @@ func TestGenesisRoundTrip(t *testing.T) {
 	require.ElementsMatch(t, []types.KeyDerivation{expectedKeyDerivation}, exported.KeyDerivations)
 	require.ElementsMatch(t, []types.NodeInfoEntry{expectedNodeInfo}, exported.NodeInfos)
 	require.ElementsMatch(t, expectedNodeDemerits, exported.NodeDemerits)
+	require.ElementsMatch(t, expectedReportPairs, exported.AcceptedReportPairs)
 
 	importedKeeper, importedCtx := keepertestutil.OrbisKeeper(t)
 	InitGenesis(importedCtx, &importedKeeper, *exported)
@@ -106,6 +115,10 @@ func TestGenesisRoundTrip(t *testing.T) {
 	}
 	require.Equal(t, uint64(3), importedKeeper.GetEffectiveNodeDemerits(importedCtx, expectedRing.Id, "node-1", 109, 10))
 	require.Equal(t, uint64(0), importedKeeper.GetEffectiveNodeDemerits(importedCtx, expectedRing.Id, "node-1", 110, 10))
+	for _, entry := range expectedReportPairs {
+		require.True(t, importedKeeper.HasAcceptedReport(importedCtx, entry.ReportId))
+		require.True(t, importedKeeper.HasAcceptedReportSession(importedCtx, entry.SessionId))
+	}
 
 	reexported := ExportGenesis(importedCtx, &importedKeeper)
 	require.Equal(t, exported, reexported)

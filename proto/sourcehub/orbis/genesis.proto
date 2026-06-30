@@ -37,6 +37,10 @@ message GenesisState {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+  repeated AcceptedReportPairEntry accepted_report_pairs = 7 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
 }
 
 // NodeDemeritEntry pairs a ring/node demerit score with its reset window.
@@ -45,4 +49,11 @@ message NodeDemeritEntry {
   string node_key = 2;
   uint64 points = 3;
   uint64 window_started_at = 4;
+}
+
+// AcceptedReportPairEntry records a replay-protection pair that must always be stored together.
+message AcceptedReportPairEntry {
+  string report_id = 1;
+  string session_id = 2;
+  uint64 expires_at = 3;
 }
