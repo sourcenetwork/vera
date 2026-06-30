@@ -538,6 +538,7 @@ func (k *Keeper) SubmitReport(
 	}
 
 	k.SetAcceptedReport(goCtx, validatedReport.reportID)
+	k.SetAcceptedReportSession(goCtx, validatedReport.sessionDedupeID)
 	k.IncrementNodeDemerits(
 		goCtx,
 		report.RingId,

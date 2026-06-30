@@ -53,6 +53,18 @@ func (k *Keeper) HasAcceptedReport(ctx context.Context, reportID string) bool {
 	return store.Has([]byte(reportID))
 }
 
+func (k *Keeper) SetAcceptedReportSession(ctx context.Context, sessionID string) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
+	store.Set([]byte(sessionID), []byte{1})
+}
+
+func (k *Keeper) HasAcceptedReportSession(ctx context.Context, sessionID string) bool {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.AcceptedReportSessionKeyPrefix))
+	return store.Has([]byte(sessionID))
+}
+
 func (k *Keeper) GetNodeDemerits(ctx context.Context, ringID, nodeKey string) uint64 {
 	state, found := k.getNodeDemeritState(ctx, ringID, nodeKey)
 	if !found {

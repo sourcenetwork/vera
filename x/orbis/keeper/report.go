@@ -18,6 +18,7 @@ import (
 
 const (
 	ReportDomain          = "orbis-mpc-fault-report"
+	ReportSessionDomain   = "orbis-mpc-fault-report-session"
 	NodeOfflineReportType = "node_offline"
 	ReportTTLSeconds      = uint64(120)
 
@@ -43,9 +44,10 @@ type reportCommitteeView struct {
 }
 
 type validatedSubmittedReport struct {
-	reportID      string
-	ring          *types.Ring
-	blockUnixTime uint64
+	reportID        string
+	sessionDedupeID string
+	ring            *types.Ring
+	blockUnixTime   uint64
 }
 
 func (k *Keeper) validateSubmittedReport(
@@ -128,14 +130,23 @@ func (k *Keeper) validateSubmittedReport(
 		return nil, err
 	}
 
+	sessionDedupeID, err := reportSessionDedupeID(report, payload)
+	if err != nil {
+		return nil, err
+	}
+	if k.HasAcceptedReportSession(goCtx, sessionDedupeID) {
+		return nil, types.ErrReportAlreadyAccepted
+	}
+
 	if err := verifyThresholdSignature(signatureScheme, ring.RingPk, message, signature); err != nil {
 		return nil, err
 	}
 
 	return &validatedSubmittedReport{
-		reportID:      reportID,
-		ring:          ring,
-		blockUnixTime: now,
+		reportID:        reportID,
+		sessionDedupeID: sessionDedupeID,
+		ring:            ring,
+		blockUnixTime:   now,
 	}, nil
 }
 
@@ -155,6 +166,8 @@ func validateReportEnvelopeShape(report *types.ReportEnvelope, now uint64) error
 		return errorsmod.Wrap(types.ErrInvalidReport, "reporter and accused node must differ")
 	case len(report.Payload) == 0:
 		return errorsmod.Wrap(types.ErrInvalidReport, "missing report payload")
+	case report.SessionId == "":
+		return errorsmod.Wrap(types.ErrInvalidReport, "session_id cannot be empty")
 	}
 
 	for label, value := range map[string]string{
@@ -187,6 +200,23 @@ func reportEnvelopeCanonicalMessageAndID(report *types.ReportEnvelope) ([]byte, 
 	return message, hex.EncodeToString(hash[:]), nil
 }
 
+func reportSessionDedupeID(report *types.ReportEnvelope, payload nodeOfflineReportPayload) (string, error) {
+	w := newReportCanonicalWriter()
+	w.writeString(ReportSessionDomain)
+	w.writeString(report.ChainId)
+	w.writeString(report.RingId)
+	w.writeString(report.ReportType)
+	w.writeString(payload.originProtocol)
+	w.writeString(report.AccusedNodeKey)
+	w.writeString(report.SessionId)
+	message, err := w.finish()
+	if err != nil {
+		return "", err
+	}
+	hash := sha256.Sum256(message)
+	return hex.EncodeToString(hash[:]), nil
+}
+
 func reportEnvelopeCanonicalBytes(report *types.ReportEnvelope) ([]byte, error) {
 	w := newReportCanonicalWriter()
 	w.writeString(report.Domain)
@@ -201,6 +231,7 @@ func reportEnvelopeCanonicalBytes(report *types.ReportEnvelope) ([]byte, error) 
 	w.writeU64(report.ObservedAt)
 	w.writeU64(report.ExpiresAt)
 	w.writeBytes(report.Payload)
+	w.writeString(report.SessionId)
 	return w.finish()
 }
 

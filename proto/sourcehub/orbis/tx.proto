@@ -171,6 +171,7 @@ message ReportEnvelope {
   uint64 observed_at = 10;
   uint64 expires_at = 11;
   bytes payload = 12;
+  string session_id = 13;
 }
 
 message RingReshareFinalizeSignDoc {

@@ -1138,6 +1138,7 @@ type ReportEnvelope struct {
 	ObservedAt      uint64                 `protobuf:"varint,10,opt,name=observed_at,json=observedAt,proto3" json:"observed_at,omitempty"`
 	ExpiresAt       uint64                 `protobuf:"varint,11,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
 	Payload         []byte                 `protobuf:"bytes,12,opt,name=payload,proto3" json:"payload,omitempty"`
+	SessionId       string                 `protobuf:"bytes,13,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1254,6 +1255,13 @@ func (x *ReportEnvelope) GetPayload() []byte {
 		return x.Payload
 	}
 	return nil
+}
+
+func (x *ReportEnvelope) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
 }
 
 type RingReshareFinalizeSignDoc struct {
@@ -2360,7 +2368,7 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x10signature_scheme\x18\x04 \x01(\tR\x0fsignatureScheme\x12\x1c\n" +
 	"\tsignature\x18\x05 \x01(\fR\tsignature:\f\x82\xe7\xb0*\acreator\"6\n" +
 	"\x17MsgSubmitReportResponse\x12\x1b\n" +
-	"\treport_id\x18\x01 \x01(\tR\breportId\"\x9a\x03\n" +
+	"\treport_id\x18\x01 \x01(\tR\breportId\"\xb9\x03\n" +
 	"\x0eReportEnvelope\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x1f\n" +
 	"\vreport_type\x18\x02 \x01(\tR\n" +
@@ -2377,7 +2385,9 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"observedAt\x12\x1d\n" +
 	"\n" +
 	"expires_at\x18\v \x01(\x04R\texpiresAt\x12\x18\n" +
-	"\apayload\x18\f \x01(\fR\apayload\"\x93\x02\n" +
+	"\apayload\x18\f \x01(\fR\apayload\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\r \x01(\tR\tsessionId\"\x93\x02\n" +
 	"\x1aRingReshareFinalizeSignDoc\x12\x16\n" +
 	"\x06domain\x18\x01 \x01(\tR\x06domain\x12\x19\n" +
 	"\bchain_id\x18\x02 \x01(\tR\achainId\x12\x17\n" +

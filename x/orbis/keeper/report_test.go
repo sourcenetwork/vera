@@ -39,11 +39,12 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 		ObservedAt:      reportTestObservedAt,
 		ExpiresAt:       reportTestObservedAt + ReportTTLSeconds,
 		Payload:         payload,
+		SessionId:       "pre-request-1",
 	}
 
 	_, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
-	require.Equal(t, "dfb170015fd469566dadfedadf6ff110f840e6a1e53b35a2850581bcf74da797", reportID)
+	require.Equal(t, "80b0f43ae215dd88a6e635de00207cd549c2492bb2086b22ceceda73a4de65f3", reportID)
 
 	ring := &types.Ring{
 		RingPk:       "pk",
@@ -144,6 +145,39 @@ func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
 	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
+func TestMsgServer_SubmitReportRejectsDuplicateSession(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-session-ikm-0000")
+	sk := blst.KeyGen(ikm)
+	fixture.setRing(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2)
+
+	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	firstPayload, err := decodeNodeOfflinePayload(first.Report.Payload)
+	require.NoError(t, err)
+	firstSessionID, err := reportSessionDedupeID(&first.Report, firstPayload)
+	require.NoError(t, err)
+	_, err = fixture.k.SubmitReport(fixture.ctx, first)
+	require.NoError(t, err)
+
+	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondReport.ReporterNodeKey = fixture.validatorKey
+	second := fixture.signBLSReport(t, sk, secondReport)
+	secondPayload, err := decodeNodeOfflinePayload(second.Report.Payload)
+	require.NoError(t, err)
+	secondSessionID, err := reportSessionDedupeID(&second.Report, secondPayload)
+	require.NoError(t, err)
+	require.NotEqual(t, first.ReportId, second.ReportId)
+	require.Equal(t, firstSessionID, secondSessionID)
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, first.ReportId))
+	require.False(t, fixture.k.HasAcceptedReport(fixture.ctx, second.ReportId))
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, firstSessionID))
+}
+
 func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T) {
 	fixture := setupReportTestFixture(t)
 	ikm := make([]byte, 32)
@@ -160,13 +194,11 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 
 	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
-	secondReport.ObservedAt++
-	secondReport.ExpiresAt++
+	secondReport.SessionId = "pre-request-2"
 	second := fixture.signBLSReport(t, sk, secondReport)
-	secondCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+1), 0))
-	_, err = fixture.k.SubmitReport(secondCtx, second)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
 	require.NoError(t, err)
-	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(secondCtx, fixture.ringID, fixture.accusedKey))
+	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
 func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
@@ -176,7 +208,7 @@ func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
 		NodeOfflineDemerits:  3,
-		ResetIntervalSeconds: 10,
+		ResetIntervalSeconds: ReportTTLSeconds * 2,
 	})
 
 	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -185,19 +217,21 @@ func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 
 	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
-	secondReport.ObservedAt++
-	secondReport.ExpiresAt++
+	secondReport.ObservedAt += ReportTTLSeconds
+	secondReport.ExpiresAt += ReportTTLSeconds
+	secondReport.SessionId = "pre-request-2"
 	second := fixture.signBLSReport(t, sk, secondReport)
-	withinWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+9), 0))
+	withinWindowCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+ReportTTLSeconds), 0))
 	_, err = fixture.k.SubmitReport(withinWindowCtx, second)
 	require.NoError(t, err)
 	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 
 	thirdReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
-	thirdReport.ObservedAt += 2
-	thirdReport.ExpiresAt += 2
+	thirdReport.ObservedAt += ReportTTLSeconds * 2
+	thirdReport.ExpiresAt += ReportTTLSeconds * 2
+	thirdReport.SessionId = "pre-request-3"
 	third := fixture.signBLSReport(t, sk, thirdReport)
-	resetBoundaryCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+10), 0))
+	resetBoundaryCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+ReportTTLSeconds*2), 0))
 	_, err = fixture.k.SubmitReport(resetBoundaryCtx, third)
 	require.NoError(t, err)
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
@@ -267,15 +301,17 @@ func TestQueryServer_NodeDemeritsReturnsEffectiveScoreWithoutResettingExpiredWin
 	require.Equal(t, reportTestObservedAt, state.windowStartedAt)
 
 	nextReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
-	nextReport.ObservedAt++
-	nextReport.ExpiresAt++
-	_, err = fixture.k.SubmitReport(expiredWindowCtx, fixture.signBLSReport(t, sk, nextReport))
+	nextReport.ObservedAt += ReportTTLSeconds
+	nextReport.ExpiresAt += ReportTTLSeconds
+	nextReport.SessionId = "pre-request-2"
+	nextReportCtx := fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+ReportTTLSeconds), 0))
+	_, err = fixture.k.SubmitReport(nextReportCtx, fixture.signBLSReport(t, sk, nextReport))
 	require.NoError(t, err)
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 
 	state, found = fixture.k.getNodeDemeritState(fixture.ctx, fixture.ringID, fixture.accusedKey)
 	require.True(t, found)
-	require.Equal(t, reportTestObservedAt+10, state.windowStartedAt)
+	require.Equal(t, reportTestObservedAt+ReportTTLSeconds, state.windowStartedAt)
 }
 
 func TestMsgServer_SubmitReportDemeritsAreIsolatedByNodeAndRing(t *testing.T) {
@@ -643,6 +679,7 @@ func (f reportTestFixture) validReport(
 		AccusedPeerId:   f.accusedPeer,
 		ObservedAt:      reportTestObservedAt,
 		ExpiresAt:       reportTestObservedAt + ReportTTLSeconds,
+		SessionId:       "pre-request-1",
 		Payload: nodeOfflinePayloadForTest(
 			"pre",
 			originProtocolVersion,
