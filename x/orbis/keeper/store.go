@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"encoding/binary"
+	"fmt"
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"
@@ -78,6 +79,13 @@ func (k *Keeper) IncrementNodeDemerits(ctx context.Context, ringID, nodeKey stri
 	return state.points
 }
 
+func (k *Keeper) SetNodeDemerits(ctx context.Context, ringID, nodeKey string, points, windowStartedAt uint64) {
+	k.setNodeDemeritState(ctx, ringID, nodeKey, nodeDemeritState{
+		points:          points,
+		windowStartedAt: windowStartedAt,
+	})
+}
+
 type nodeDemeritState struct {
 	points          uint64
 	windowStartedAt uint64
@@ -117,6 +125,25 @@ func nodeDemeritStoreKey(ringID, nodeKey string) []byte {
 	copy(key[4:], ringID)
 	copy(key[4+len(ringID):], nodeKey)
 	return key
+}
+
+func decodeNodeDemeritStoreKey(key []byte) (ringID, nodeKey string, ok bool) {
+	if len(key) < 4 {
+		return "", "", false
+	}
+	ringIDLength := int(binary.BigEndian.Uint32(key[:4]))
+	if len(key) < 4+ringIDLength {
+		return "", "", false
+	}
+	return string(key[4 : 4+ringIDLength]), string(key[4+ringIDLength:]), true
+}
+
+func (k *Keeper) GetAllNodeDemerits(ctx context.Context) []types.NodeDemeritEntry {
+	var entries []types.NodeDemeritEntry
+	k.mustIterateNodeDemerits(ctx, func(entry types.NodeDemeritEntry) {
+		entries = append(entries, entry)
+	})
+	return entries
 }
 
 func (k *Keeper) GetAllRings(ctx context.Context) []types.Ring {
@@ -219,6 +246,30 @@ func (k *Keeper) mustIterateKeyDerivations(ctx context.Context, cb func(keyDeriv
 		var keyDerivation types.KeyDerivation
 		k.cdc.MustUnmarshal(iterator.Value(), &keyDerivation)
 		cb(keyDerivation)
+	}
+}
+
+func (k *Keeper) mustIterateNodeDemerits(ctx context.Context, cb func(entry types.NodeDemeritEntry)) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.NodeDemeritKeyPrefix))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		ringID, nodeKey, ok := decodeNodeDemeritStoreKey(iterator.Key())
+		if !ok {
+			panic(fmt.Sprintf("invalid node demerit key %x", iterator.Key()))
+		}
+		bz := iterator.Value()
+		if len(bz) != nodeDemeritStateSize {
+			panic(fmt.Sprintf("invalid node demerit state size for ring %q node %q", ringID, nodeKey))
+		}
+		cb(types.NodeDemeritEntry{
+			RingId:          ringID,
+			NodeKey:         nodeKey,
+			Points:          binary.BigEndian.Uint64(bz[:8]),
+			WindowStartedAt: binary.BigEndian.Uint64(bz[8:]),
+		})
 	}
 }
 

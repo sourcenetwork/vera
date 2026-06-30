@@ -35,3 +35,53 @@ func TestGenesisRingUpgradeInfoRoundTrips(t *testing.T) {
 	require.Equal(t, uint64(2), decoded.Rings[0].UpgradeInfo.GetNextVersion())
 	require.Equal(t, uint64(500), decoded.Rings[0].UpgradeInfo.GetActivationTime())
 }
+
+func TestGenesisValidateNodeDemerits(t *testing.T) {
+	valid := DefaultGenesis()
+	valid.NodeDemerits = []NodeDemeritEntry{
+		{
+			RingId:          "ring-1",
+			NodeKey:         "node-1",
+			Points:          3,
+			WindowStartedAt: 100,
+		},
+	}
+	require.NoError(t, valid.Validate())
+
+	testCases := []struct {
+		name     string
+		entry    NodeDemeritEntry
+		errMatch string
+	}{
+		{
+			name:     "missing ring id",
+			entry:    NodeDemeritEntry{NodeKey: "node-1", Points: 1},
+			errMatch: "ring_id cannot be empty",
+		},
+		{
+			name:     "missing node key",
+			entry:    NodeDemeritEntry{RingId: "ring-1", Points: 1},
+			errMatch: "node_key cannot be empty",
+		},
+		{
+			name:     "zero points",
+			entry:    NodeDemeritEntry{RingId: "ring-1", NodeKey: "node-1"},
+			errMatch: "points must be at least 1",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			genesis := DefaultGenesis()
+			genesis.NodeDemerits = []NodeDemeritEntry{tc.entry}
+			require.ErrorContains(t, genesis.Validate(), tc.errMatch)
+		})
+	}
+
+	duplicate := DefaultGenesis()
+	duplicate.NodeDemerits = []NodeDemeritEntry{
+		{RingId: "ring-1", NodeKey: "node-1", Points: 1},
+		{RingId: "ring-1", NodeKey: "node-1", Points: 2},
+	}
+	require.ErrorContains(t, duplicate.Validate(), "duplicate node_demerits entry")
+}

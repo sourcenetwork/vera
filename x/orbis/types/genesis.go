@@ -1,5 +1,7 @@
 package types
 
+import "fmt"
+
 // DefaultGenesis returns the default genesis state.
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
@@ -7,10 +9,39 @@ func DefaultGenesis() *GenesisState {
 		Rings:          []Ring{},
 		Documents:      []Document{},
 		KeyDerivations: []KeyDerivation{},
+		NodeDemerits:   []NodeDemeritEntry{},
 	}
 }
 
 // Validate performs basic genesis state validation.
 func (gs GenesisState) Validate() error {
-	return gs.Params.Validate()
+	if err := gs.Params.Validate(); err != nil {
+		return err
+	}
+
+	seenDemerits := map[struct {
+		ringID  string
+		nodeKey string
+	}]struct{}{}
+	for _, entry := range gs.NodeDemerits {
+		switch {
+		case entry.RingId == "":
+			return fmt.Errorf("node_demerits ring_id cannot be empty")
+		case entry.NodeKey == "":
+			return fmt.Errorf("node_demerits node_key cannot be empty")
+		case entry.Points == 0:
+			return fmt.Errorf("node_demerits points must be at least 1")
+		}
+
+		key := struct {
+			ringID  string
+			nodeKey string
+		}{ringID: entry.RingId, nodeKey: entry.NodeKey}
+		if _, found := seenDemerits[key]; found {
+			return fmt.Errorf("duplicate node_demerits entry for ring %q node %q", entry.RingId, entry.NodeKey)
+		}
+		seenDemerits[key] = struct{}{}
+	}
+
+	return nil
 }

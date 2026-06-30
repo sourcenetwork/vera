@@ -33,4 +33,16 @@ message GenesisState {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+  repeated NodeDemeritEntry node_demerits = 6 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// NodeDemeritEntry pairs a ring/node demerit score with its reset window.
+message NodeDemeritEntry {
+  string ring_id = 1;
+  string node_key = 2;
+  uint64 points = 3;
+  uint64 window_started_at = 4;
 }
