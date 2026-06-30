@@ -173,6 +173,7 @@ var (
 		acptypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
+		orbistypes.ModuleName,
 	}
 
 	preBlockers = []string{
