@@ -20,6 +20,11 @@ func (gs GenesisState) Validate() error {
 		return err
 	}
 
+	knownRings := make(map[string]struct{}, len(gs.Rings))
+	for _, r := range gs.Rings {
+		knownRings[r.Id] = struct{}{}
+	}
+
 	seenDemerits := map[struct {
 		ringID  string
 		nodeKey string
@@ -32,6 +37,9 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("node_demerits node_key cannot be empty")
 		case entry.Points == 0:
 			return fmt.Errorf("node_demerits points must be at least 1")
+		}
+		if _, ok := knownRings[entry.RingId]; !ok {
+			return fmt.Errorf("node_demerits references unknown ring %q", entry.RingId)
 		}
 
 		key := struct {

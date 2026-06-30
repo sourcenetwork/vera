@@ -37,7 +37,10 @@ func TestGenesisRingUpgradeInfoRoundTrips(t *testing.T) {
 }
 
 func TestGenesisValidateNodeDemerits(t *testing.T) {
+	knownRing := Ring{Id: "ring-1"}
+
 	valid := DefaultGenesis()
+	valid.Rings = []Ring{knownRing}
 	valid.NodeDemerits = []NodeDemeritEntry{
 		{
 			RingId:          "ring-1",
@@ -68,17 +71,24 @@ func TestGenesisValidateNodeDemerits(t *testing.T) {
 			entry:    NodeDemeritEntry{RingId: "ring-1", NodeKey: "node-1"},
 			errMatch: "points must be at least 1",
 		},
+		{
+			name:     "unknown ring",
+			entry:    NodeDemeritEntry{RingId: "ring-999", NodeKey: "node-1", Points: 1},
+			errMatch: "unknown ring",
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			genesis := DefaultGenesis()
+			genesis.Rings = []Ring{knownRing}
 			genesis.NodeDemerits = []NodeDemeritEntry{tc.entry}
 			require.ErrorContains(t, genesis.Validate(), tc.errMatch)
 		})
 	}
 
 	duplicate := DefaultGenesis()
+	duplicate.Rings = []Ring{knownRing}
 	duplicate.NodeDemerits = []NodeDemeritEntry{
 		{RingId: "ring-1", NodeKey: "node-1", Points: 1},
 		{RingId: "ring-1", NodeKey: "node-1", Points: 2},
