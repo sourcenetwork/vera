@@ -14,6 +14,9 @@ func InitGenesis(ctx sdk.Context, k *keeper.Keeper, genState types.GenesisState)
 	}
 
 	for _, ring := range genState.Rings {
+		if ring.Reporting.Equal(types.ReportingConfig{}) {
+			ring.Reporting = types.ReportingConfigFromDefaults(genState.Params.DefaultReporting)
+		}
 		k.SetRing(ctx, ring)
 	}
 	for _, document := range genState.Documents {

@@ -377,6 +377,84 @@ func reportBlockUnixTime(ctx sdk.Context) (uint64, error) {
 	return uint64(unixTime), nil
 }
 
+func (k *Keeper) maybeScheduleAutoReshareForReport(
+	goCtx context.Context,
+	ctx sdk.Context,
+	ring *types.Ring,
+	accusedNodeKey string,
+	effectiveDemerits uint64,
+) error {
+	if effectiveDemerits < ring.Reporting.KickThreshold {
+		return nil
+	}
+	if len(ring.NewPeerNodeKeys) > 0 || ring.XNewThreshold != nil {
+		return nil
+	}
+	if !slices.Contains(ring.PeerNodeKeys, accusedNodeKey) {
+		return nil
+	}
+
+	replacementNodeKey, remainingBackups, found := k.selectAutoReshareReplacement(goCtx, ring, accusedNodeKey)
+	if !found {
+		return nil
+	}
+
+	nextPeerNodeKeys := make([]string, 0, len(ring.PeerNodeKeys))
+	for _, nodeKey := range ring.PeerNodeKeys {
+		if nodeKey != accusedNodeKey {
+			nextPeerNodeKeys = append(nextPeerNodeKeys, nodeKey)
+		}
+	}
+	nextPeerNodeKeys = append(nextPeerNodeKeys, replacementNodeKey)
+
+	nextRing := *ring
+	nextRing.NewPeerNodeKeys = canonicalNodeKeys(nextPeerNodeKeys)
+	nextRing.XNewThreshold = nil
+	nextRing.Reporting.BackupNodeKeys = remainingBackups
+	if err := validateRing(&nextRing); err != nil {
+		return err
+	}
+	k.SetRing(goCtx, nextRing)
+
+	return ctx.EventManager().EmitTypedEvent(&types.EventRingAutoReshareScheduled{
+		RingId:             ring.Id,
+		AccusedNodeKey:     accusedNodeKey,
+		ReplacementNodeKey: replacementNodeKey,
+		KickThreshold:      ring.Reporting.KickThreshold,
+		Demerits:           effectiveDemerits,
+	})
+}
+
+func (k *Keeper) selectAutoReshareReplacement(
+	goCtx context.Context,
+	ring *types.Ring,
+	accusedNodeKey string,
+) (string, []string, bool) {
+	active := make(map[string]struct{}, len(ring.PeerNodeKeys))
+	for _, nodeKey := range ring.PeerNodeKeys {
+		active[nodeKey] = struct{}{}
+	}
+
+	for i, backupNodeKey := range ring.Reporting.BackupNodeKeys {
+		if backupNodeKey == accusedNodeKey {
+			continue
+		}
+		if _, alreadyActive := active[backupNodeKey]; alreadyActive {
+			continue
+		}
+		nodeInfo := k.GetNodeInfo(goCtx, backupNodeKey)
+		if nodeInfo == nil || !nodeInfoAllowsRing(nodeInfo, ring) {
+			continue
+		}
+
+		remainingBackups := slices.Clone(ring.Reporting.BackupNodeKeys[:i])
+		remainingBackups = append(remainingBackups, ring.Reporting.BackupNodeKeys[i+1:]...)
+		return backupNodeKey, remainingBackups, true
+	}
+
+	return "", slices.Clone(ring.Reporting.BackupNodeKeys), false
+}
+
 func reportRingStateSHA256(ring *types.Ring) (string, error) {
 	canonical, err := reportRingStateCanonicalBytes(ring)
 	if err != nil {
@@ -423,6 +501,7 @@ func reportRingStateCanonicalBytes(ring *types.Ring) ([]byte, error) {
 		activationTime := ring.UpgradeInfo.GetActivationTime()
 		w.writeOptionalU64(&activationTime)
 	}
+	w.writeReportingConfig(ring.Reporting)
 	return w.finish()
 }
 
@@ -505,6 +584,17 @@ func (w *reportCanonicalWriter) writeOptionalU64(value *uint64) {
 	}
 	w.bytes = append(w.bytes, 1)
 	w.writeU64(*value)
+}
+
+func (w *reportCanonicalWriter) writeDemeritConfig(value types.DemeritConfig) {
+	w.writeU64(value.NodeOfflineDemerits)
+	w.writeU64(value.ResetIntervalSeconds)
+}
+
+func (w *reportCanonicalWriter) writeReportingConfig(value types.ReportingConfig) {
+	w.writeDemeritConfig(value.DemeritConfig)
+	w.writeStringSlice(value.BackupNodeKeys)
+	w.writeU64(value.KickThreshold)
 }
 
 func (w *reportCanonicalWriter) finish() ([]byte, error) {

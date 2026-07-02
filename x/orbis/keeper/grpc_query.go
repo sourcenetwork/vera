@@ -148,7 +148,7 @@ func (k *Keeper) NodeDemerits(ctx context.Context, req *types.QueryNodeDemeritsR
 	}
 
 	return &types.QueryNodeDemeritsResponse{
-		Points: k.GetEffectiveNodeDemerits(ctx, req.RingId, req.NodeKey, now, ring.DemeritConfig.ResetIntervalSeconds),
+		Points: k.GetEffectiveNodeDemerits(ctx, req.RingId, req.NodeKey, now, ring.Reporting.DemeritConfig.ResetIntervalSeconds),
 	}, nil
 }
 

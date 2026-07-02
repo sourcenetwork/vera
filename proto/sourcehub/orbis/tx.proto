@@ -24,6 +24,7 @@ service Msg {
   rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
+  rpc SetRingReportingByAcp(MsgSetRingReportingByAcp) returns (MsgSetRingReportingByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
   rpc SubmitReport(MsgSubmitReport) returns (MsgSubmitReportResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
@@ -62,7 +63,7 @@ message MsgCreateRing {
   // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
   optional string nonce = 6;
   uint64 current_version = 7;
-  DemeritConfig demerit_config = 8;
+  ReportingConfig reporting = 8;
 }
 
 message MsgCreateRingResponse {
@@ -134,6 +135,15 @@ message MsgCancelRingUpgradeByAcp {
 }
 
 message MsgCancelRingUpgradeByAcpResponse {}
+
+message MsgSetRingReportingByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  ReportingConfig reporting = 3 [(gogoproto.nullable) = false];
+}
+
+message MsgSetRingReportingByAcpResponse {}
 
 message MsgFinalizeRingReshareByThresholdSignature {
   option (cosmos.msg.v1.signer) = "creator";

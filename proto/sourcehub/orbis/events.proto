@@ -76,3 +76,12 @@ message EventReportAccepted {
   string reporter_node_key = 4;
   string accused_node_key = 5;
 }
+
+// EventRingAutoReshareScheduled is emitted when accepted reports trigger a replacement reshare.
+message EventRingAutoReshareScheduled {
+  string ring_id = 1;
+  string accused_node_key = 2;
+  string replacement_node_key = 3;
+  uint64 kick_threshold = 4;
+  uint64 demerits = 5;
+}

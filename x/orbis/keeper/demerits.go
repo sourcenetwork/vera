@@ -14,7 +14,7 @@ func DemeritAmountForReportType(ring *types.Ring, reportType string) (uint64, er
 
 	switch reportType {
 	case NodeOfflineReportType:
-		return ring.DemeritConfig.NodeOfflineDemerits, nil
+		return ring.Reporting.DemeritConfig.NodeOfflineDemerits, nil
 	default:
 		return 0, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported report type %q", reportType)
 	}

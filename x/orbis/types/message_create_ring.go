@@ -35,8 +35,8 @@ func (msg *MsgCreateRing) ValidateBasic() error {
 	if err := ValidatePSSInterval(msg.PssInterval); err != nil {
 		return err
 	}
-	if msg.DemeritConfig != nil {
-		if err := ValidateDemeritConfig(*msg.DemeritConfig); err != nil {
+	if msg.Reporting != nil {
+		if err := ValidateReportingConfig(*msg.Reporting); err != nil {
 			return err
 		}
 	}

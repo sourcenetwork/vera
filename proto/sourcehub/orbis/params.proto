@@ -12,5 +12,13 @@ message Params {
   option (amino.name) = "sourcehub/x/orbis/Params";
   option (gogoproto.equal) = true;
 
-  DemeritConfig default_demerit_config = 1 [(gogoproto.nullable) = false];
+  ReportingDefaults default_reporting = 1 [(gogoproto.nullable) = false];
+}
+
+// ReportingDefaults stores module defaults copied into rings at creation time.
+message ReportingDefaults {
+  option (gogoproto.equal) = true;
+
+  DemeritConfig demerit_config = 1 [(gogoproto.nullable) = false];
+  uint64 kick_threshold = 2;
 }

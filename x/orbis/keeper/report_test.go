@@ -54,11 +54,11 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: 0,
 		},
-		DemeritConfig: types.DefaultDemeritConfig(),
+		Reporting: types.DefaultReportingConfig(),
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "a597b5c00a60c75728b40780bf26efe66150560ca3f511264e7f804e3bd2c870", ringHash)
+	require.Equal(t, "7da44e690e8cb8c223ee4ce80d35b12c7f41e92bbac5a114f89c26657b4148db", ringHash)
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
@@ -93,14 +93,17 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrRingNotFound)
 
 	_, err = DemeritAmountForReportType(&types.Ring{
-		DemeritConfig: types.DefaultDemeritConfig(),
+		Reporting: types.DefaultReportingConfig(),
 	}, "unknown")
 	require.ErrorIs(t, err, types.ErrInvalidReport)
 
 	amount, err := DemeritAmountForReportType(&types.Ring{
-		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  5,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		Reporting: types.ReportingConfig{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:  5,
+				ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+			},
+			KickThreshold: types.DefaultReportingKickThreshold,
 		},
 	}, NodeOfflineReportType)
 	require.NoError(t, err)
@@ -199,6 +202,130 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	_, err = fixture.k.SubmitReport(fixture.ctx, second)
 	require.NoError(t, err)
 	require.Equal(t, uint64(6), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+}
+
+func TestMsgServer_SubmitReportSchedulesAutoReshareAtKickThreshold(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-auto-kick-ikm")
+	sk := blst.KeyGen(ikm)
+
+	backup1Addr, backup1Key := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWBackup1")
+	backup2Addr, backup2Key := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWBackup2")
+	updatePeerNodeWhitelists(t, fixture.k, fixture.ctx, backup1Addr, backup1Key, []string{"report-policy"}, nil)
+	updatePeerNodeWhitelists(t, fixture.k, fixture.ctx, backup2Addr, backup2Key, []string{"report-policy"}, nil)
+
+	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:  3,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		},
+		BackupNodeKeys: []string{backup1Key, backup2Key},
+		KickThreshold:  3,
+	})
+
+	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.NotNil(t, ring)
+	require.Equal(t, canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey, backup1Key}), ring.NewPeerNodeKeys)
+	require.Nil(t, ring.XNewThreshold)
+	require.Equal(t, []string{backup2Key}, ring.Reporting.BackupNodeKeys)
+	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	events := parseTypedEvents(t, fixture.ctx)
+	require.Contains(t, events, &types.EventRingAutoReshareScheduled{
+		RingId:             fixture.ringID,
+		AccusedNodeKey:     fixture.accusedKey,
+		ReplacementNodeKey: backup1Key,
+		KickThreshold:      3,
+		Demerits:           3,
+	})
+}
+
+func TestMsgServer_SubmitReportDoesNotScheduleAutoReshareBelowThreshold(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-below-kick")
+	sk := blst.KeyGen(ikm)
+
+	backupAddr, backupKey := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWBackupBelow")
+	updatePeerNodeWhitelists(t, fixture.k, fixture.ctx, backupAddr, backupKey, []string{"report-policy"}, nil)
+
+	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:  1,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		},
+		BackupNodeKeys: []string{backupKey},
+		KickThreshold:  2,
+	})
+
+	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.Empty(t, ring.NewPeerNodeKeys)
+	require.Equal(t, []string{backupKey}, ring.Reporting.BackupNodeKeys)
+}
+
+func TestMsgServer_SubmitReportSuppressesAutoReshareWhenAlreadyPending(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-pending-kick")
+	sk := blst.KeyGen(ikm)
+
+	backupAddr, backupKey := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWBackupPending")
+	updatePeerNodeWhitelists(t, fixture.k, fixture.ctx, backupAddr, backupKey, []string{"report-policy"}, nil)
+
+	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:  3,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		},
+		BackupNodeKeys: []string{backupKey},
+		KickThreshold:  3,
+	})
+	pendingRing := *fixture.originalRing
+	pendingRing.NewPeerNodeKeys = canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey})
+	fixture.replaceRing(t, pendingRing)
+
+	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.Equal(t, pendingRing.NewPeerNodeKeys, ring.NewPeerNodeKeys)
+	require.Equal(t, []string{backupKey}, ring.Reporting.BackupNodeKeys)
+}
+
+func TestMsgServer_SubmitReportSuppressesAutoReshareWithoutEligibleBackup(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	ikm := make([]byte, 32)
+	copy(ikm, "orbis-report-no-backup")
+	sk := blst.KeyGen(ikm)
+
+	_, ineligibleBackupKey := setupPeerWithNodeInfo(t, fixture.k, fixture.authKeeper, fixture.ctx, "12D3KooWBackupNoWhitelist")
+
+	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:  3,
+			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		},
+		BackupNodeKeys: []string{fixture.reporterKey, ineligibleBackupKey},
+		KickThreshold:  3,
+	})
+
+	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
+	_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+
+	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
+	require.Empty(t, ring.NewPeerNodeKeys)
+	require.Equal(t, []string{fixture.reporterKey, ineligibleBackupKey}, ring.Reporting.BackupNodeKeys)
 }
 
 func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
@@ -720,6 +847,13 @@ func (f *reportTestFixture) setRing(t *testing.T, ringPk string, threshold uint3
 }
 
 func (f *reportTestFixture) setRingWithDemeritConfig(t *testing.T, ringPk string, threshold uint32, demeritConfig types.DemeritConfig) {
+	f.setRingWithReportingConfig(t, ringPk, threshold, types.ReportingConfig{
+		DemeritConfig: demeritConfig,
+		KickThreshold: types.DefaultReportingKickThreshold,
+	})
+}
+
+func (f *reportTestFixture) setRingWithReportingConfig(t *testing.T, ringPk string, threshold uint32, reporting types.ReportingConfig) {
 	t.Helper()
 	ring := types.Ring{
 		Id:           f.ringID,
@@ -732,7 +866,7 @@ func (f *reportTestFixture) setRingWithDemeritConfig(t *testing.T, ringPk string
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: 0,
 		},
-		DemeritConfig: demeritConfig,
+		Reporting: reporting,
 	}
 	f.k.SetRing(f.ctx, ring)
 	stored := f.k.GetRing(f.ctx, f.ringID)

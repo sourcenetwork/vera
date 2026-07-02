@@ -21,6 +21,15 @@ message DemeritConfig {
   uint64 reset_interval_seconds = 2;
 }
 
+// ReportingConfig stores fault-report policy and automatic replacement settings for a ring.
+message ReportingConfig {
+  option (gogoproto.equal) = true;
+
+  DemeritConfig demerit_config = 1 [(gogoproto.nullable) = false];
+  repeated string backup_node_keys = 2;
+  uint64 kick_threshold = 3;
+}
+
 // Ring stores the active and pending committee metadata for an Orbis ring.
 message Ring {
   string id = 1;
@@ -37,7 +46,7 @@ message Ring {
   string policy_id = 10;
   repeated RingConfirmation confirmations = 11;
   UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
-  DemeritConfig demerit_config = 13 [(gogoproto.nullable) = false];
+  ReportingConfig reporting = 13 [(gogoproto.nullable) = false];
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key.

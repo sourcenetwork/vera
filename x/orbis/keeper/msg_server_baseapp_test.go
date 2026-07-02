@@ -97,11 +97,11 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T
 
 	const ringID = "ring-with-conflicting-finalizations"
 	orbisKeeper.SetRing(ctx, orbistypes.Ring{
-		Id:            ringID,
-		PeerNodeKeys:  []string{peer1NodeKey, peer2NodeKey},
-		Threshold:     2,
-		PolicyId:      "policy",
-		DemeritConfig: orbistypes.DefaultDemeritConfig(),
+		Id:           ringID,
+		PeerNodeKeys: []string{peer1NodeKey, peer2NodeKey},
+		Threshold:    2,
+		PolicyId:     "policy",
+		Reporting:    orbistypes.DefaultReportingConfig(),
 		Confirmations: []*orbistypes.RingConfirmation{
 			{
 				NodeKey: peer1NodeKey,
@@ -208,12 +208,12 @@ func TestMsgServer_CancelPendingRing_DeletesRingThroughBaseApp(t *testing.T) {
 
 	const ringID = "unfinished-ring-to-cancel"
 	orbisKeeper.SetRing(ctx, orbistypes.Ring{
-		Id:            ringID,
-		CreatorDid:    "did:example:ring-creator",
-		PeerNodeKeys:  []string{peerNodeKey},
-		Threshold:     1,
-		PolicyId:      "policy",
-		DemeritConfig: orbistypes.DefaultDemeritConfig(),
+		Id:           ringID,
+		CreatorDid:   "did:example:ring-creator",
+		PeerNodeKeys: []string{peerNodeKey},
+		Threshold:    1,
+		PolicyId:     "policy",
+		Reporting:    orbistypes.DefaultReportingConfig(),
 	})
 	require.NotNil(t, orbisKeeper.GetRing(ctx, ringID))
 

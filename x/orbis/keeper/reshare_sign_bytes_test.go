@@ -40,7 +40,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeA, RingPk: "ring-pk"},
 		},
-		DemeritConfig: types.DefaultDemeritConfig(),
+		Reporting: types.DefaultReportingConfig(),
 	}
 	finalized, err := ringForReshareFinalization(current)
 	require.NoError(t, err)
@@ -75,7 +75,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 		Confirmations: []*types.RingConfirmation{
 			{NodeKey: nodeB, RingPk: "different-storage-only-value"},
 		},
-		DemeritConfig: types.DefaultDemeritConfig(),
+		Reporting: types.DefaultReportingConfig(),
 	}
 	sameSignStateFinalized, err := ringForReshareFinalization(sameSignState)
 	require.NoError(t, err)
