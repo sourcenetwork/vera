@@ -856,8 +856,8 @@ func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 
 	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
-	_, backup1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup1")
-	_, backup2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup2")
+	backup1Addr, backup1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup1")
+	backup2Addr, backup2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
@@ -873,6 +873,9 @@ func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 	require.NoError(t, err)
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
 	require.NoError(t, err)
+
+	updatePeerNodeWhitelists(t, k, ctx, backup1Addr, backup1Key, []string{policyID}, nil)
+	updatePeerNodeWhitelists(t, k, ctx, backup2Addr, backup2Key, []string{policyID}, nil)
 
 	reporting := types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
@@ -909,6 +912,117 @@ func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 	})
 	require.ErrorContains(t, err, "kick_threshold must be at least 1")
 	require.Equal(t, reporting, k.GetRing(ctx, createRingResp.RingId).Reporting)
+}
+
+func TestMsgServer_CreateRingValidatesReportingBackupNodeInfo(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, backupKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup")
+	_, missingBackupKey := testAccountWithPubKey(t, ctx, authKeeper)
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	missingNodeInfoReporting := types.DefaultReportingConfig()
+	missingNodeInfoReporting.BackupNodeKeys = []string{missingBackupKey}
+	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		Reporting:    &missingNodeInfoReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "has no registered node info")
+
+	reporting := types.DefaultReportingConfig()
+	reporting.BackupNodeKeys = []string{backupKey}
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		Reporting:    &reporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, reporting, k.GetRing(ctx, resp.RingId).Reporting)
+}
+
+func TestMsgServer_SetRingReportingByAcpValidatesBackupNodeInfoAndWhitelist(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	_, backupNoWhitelistKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupNoWhitelist")
+	backupPolicyAddr, backupPolicyKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupPolicy")
+	backupRingAddr, backupRingKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupRing")
+	_, missingBackupKey := testAccountWithPubKey(t, ctx, authKeeper)
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	missingNodeInfoReporting := types.DefaultReportingConfig()
+	missingNodeInfoReporting.BackupNodeKeys = []string{missingBackupKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: missingNodeInfoReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "has no registered node info")
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	notWhitelistedReporting := types.DefaultReportingConfig()
+	notWhitelistedReporting.BackupNodeKeys = []string{backupNoWhitelistKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: notWhitelistedReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "is not whitelisted")
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	updatePeerNodeWhitelists(t, k, ctx, backupPolicyAddr, backupPolicyKey, []string{policyID}, nil)
+	policyWhitelistedReporting := types.DefaultReportingConfig()
+	policyWhitelistedReporting.BackupNodeKeys = []string{backupPolicyKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: policyWhitelistedReporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, policyWhitelistedReporting, k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	updatePeerNodeWhitelists(t, k, ctx, backupRingAddr, backupRingKey, nil, []string{createRingResp.RingId})
+	ringWhitelistedReporting := types.DefaultReportingConfig()
+	ringWhitelistedReporting.BackupNodeKeys = []string{backupRingKey, backupPolicyKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: ringWhitelistedReporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{backupRingKey, backupPolicyKey}, k.GetRing(ctx, createRingResp.RingId).Reporting.BackupNodeKeys)
 }
 
 func TestMsgServer_StartRingReshareByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {

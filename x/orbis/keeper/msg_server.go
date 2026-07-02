@@ -73,6 +73,9 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	if err := validateRing(&ring); err != nil {
 		return nil, err
 	}
+	if err := k.requireReportingBackupNodeInfos(goCtx, ring.Reporting.BackupNodeKeys); err != nil {
+		return nil, err
+	}
 
 	if err := k.ensureRingCreatePermission(goCtx, msg.PolicyId, creatorDID); err != nil {
 		return nil, err
@@ -497,6 +500,9 @@ func (k *Keeper) SetRingReportingByAcp(goCtx context.Context, msg *types.MsgSetR
 
 	ring.Reporting = msg.Reporting
 	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	if err := k.requireReportingBackupNodeWhitelist(goCtx, ring, ring.Reporting.BackupNodeKeys); err != nil {
 		return nil, err
 	}
 	k.SetRing(goCtx, *ring)

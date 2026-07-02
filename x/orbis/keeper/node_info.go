@@ -19,6 +19,34 @@ func nodeInfoAllowsRing(nodeInfo *types.NodeInfo, ring *types.Ring) bool {
 		slices.Contains(nodeInfo.WhitelistedRingIds, ring.Id)
 }
 
+func (k *Keeper) requireReportingBackupNodeInfos(goCtx context.Context, backupNodeKeys []string) error {
+	for _, nodeKey := range backupNodeKeys {
+		if k.GetNodeInfo(goCtx, nodeKey) == nil {
+			return errorsmod.Wrapf(types.ErrInvalidRing, "backup_node_key %q has no registered node info", nodeKey)
+		}
+	}
+	return nil
+}
+
+func (k *Keeper) requireReportingBackupNodeWhitelist(goCtx context.Context, ring *types.Ring, backupNodeKeys []string) error {
+	for _, nodeKey := range backupNodeKeys {
+		nodeInfo := k.GetNodeInfo(goCtx, nodeKey)
+		if nodeInfo == nil {
+			return errorsmod.Wrapf(types.ErrInvalidRing, "backup_node_key %q has no registered node info", nodeKey)
+		}
+		if !nodeInfoAllowsRing(nodeInfo, ring) {
+			return errorsmod.Wrapf(
+				types.ErrInvalidRing,
+				"backup_node_key %q is not whitelisted for policy_id %q or ring_id %q",
+				nodeKey,
+				ring.PolicyId,
+				ring.Id,
+			)
+		}
+	}
+	return nil
+}
+
 const maxNodeWhitelistLen = 256
 
 // normalizeAndValidateNodeInfo validates nodeInfo and normalizes nodeInfo.ControllerKey
