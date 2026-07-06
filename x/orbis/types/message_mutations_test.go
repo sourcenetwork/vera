@@ -3,6 +3,7 @@ package types
 import (
 	"testing"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
@@ -159,6 +160,23 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 			DemeritConfig: DefaultDemeritConfig(),
 		},
 	}).ValidateBasic())
+}
+
+func TestMsgSetRingReportingByAcpRegisteredForAnyUnpacking(t *testing.T) {
+	registry := codectypes.NewInterfaceRegistry()
+	RegisterInterfaces(registry)
+
+	msg := &MsgSetRingReportingByAcp{
+		Creator:   validMutationCreator,
+		RingId:    "ring-1",
+		Reporting: DefaultReportingConfig(),
+	}
+	any, err := codectypes.NewAnyWithValue(msg)
+	require.NoError(t, err)
+
+	var unpacked sdk.Msg
+	require.NoError(t, registry.UnpackAny(any, &unpacked))
+	require.Equal(t, msg, unpacked)
 }
 
 func TestNodeMutationMessagesValidateBasic(t *testing.T) {
