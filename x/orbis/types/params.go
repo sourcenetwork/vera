@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	DefaultNodeOfflineDemerits      = uint64(1)
-	DefaultPreInvalidProofDemerits  = uint64(1)
-	DefaultDemeritResetIntervalSecs = uint64(86400)
-	DefaultReportingKickThreshold   = uint64(3)
+	DefaultNodeOfflineDemerits           = uint64(1)
+	DefaultInvalidCryptoResponseDemerits = uint64(1)
+	DefaultDemeritResetIntervalSecs      = uint64(86400)
+	DefaultReportingKickThreshold        = uint64(3)
 )
 
 var _ paramtypes.ParamSet = (*Params)(nil)
@@ -34,9 +34,9 @@ func DefaultParams() Params {
 // DefaultDemeritConfig returns the module's default report demerit policy.
 func DefaultDemeritConfig() DemeritConfig {
 	return DemeritConfig{
-		NodeOfflineDemerits:     DefaultNodeOfflineDemerits,
-		PreInvalidProofDemerits: DefaultPreInvalidProofDemerits,
-		ResetIntervalSeconds:    DefaultDemeritResetIntervalSecs,
+		NodeOfflineDemerits:           DefaultNodeOfflineDemerits,
+		InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+		ResetIntervalSeconds:          DefaultDemeritResetIntervalSecs,
 	}
 }
 
@@ -76,8 +76,8 @@ func ValidateDemeritConfig(config DemeritConfig) error {
 	if config.NodeOfflineDemerits == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "node_offline_demerits must be at least 1")
 	}
-	if config.PreInvalidProofDemerits == 0 {
-		return errorsmod.Wrap(ErrInvalidRing, "pre_invalid_proof_demerits must be at least 1")
+	if config.InvalidCryptoResponseDemerits == 0 {
+		return errorsmod.Wrap(ErrInvalidRing, "invalid_crypto_response_demerits must be at least 1")
 	}
 	if config.ResetIntervalSeconds == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "reset_interval_seconds must be at least 1")

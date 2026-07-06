@@ -14,17 +14,17 @@ func TestInitGenesisAppliesDefaultReportingToRings(t *testing.T) {
 
 	params := types.NewParams(types.ReportingDefaults{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:     7,
-			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
-			ResetIntervalSeconds:    120,
+			NodeOfflineDemerits:           7,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			ResetIntervalSeconds:          120,
 		},
 		KickThreshold: 5,
 	})
 	explicitReporting := types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:     2,
-			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
-			ResetIntervalSeconds:    60,
+			NodeOfflineDemerits:           2,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			ResetIntervalSeconds:          60,
 		},
 		BackupNodeKeys: []string{"node-9"},
 		KickThreshold:  4,
@@ -69,9 +69,9 @@ func TestGenesisRoundTrip(t *testing.T) {
 		},
 		Reporting: types.ReportingConfig{
 			DemeritConfig: types.DemeritConfig{
-				NodeOfflineDemerits:     4,
-				PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
-				ResetIntervalSeconds:    30,
+				NodeOfflineDemerits:           4,
+				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				ResetIntervalSeconds:          30,
 			},
 			BackupNodeKeys: []string{"node-4", "node-3"},
 			KickThreshold:  2,
