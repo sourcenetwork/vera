@@ -19,6 +19,7 @@ message DemeritConfig {
 
   uint64 node_offline_demerits = 1;
   uint64 reset_interval_seconds = 2;
+  uint64 pre_invalid_proof_demerits = 3;
 }
 
 // ReportingConfig stores fault-report policy and automatic replacement settings for a ring.

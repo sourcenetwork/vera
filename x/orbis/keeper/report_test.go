@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"math/big"
@@ -46,6 +47,25 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "80b0f43ae215dd88a6e635de00207cd549c2492bb2086b22ceceda73a4de65f3", reportID)
 
+	// pre_invalid_reencryption_proof payload + report_id goldens: the same
+	// values are asserted by pre_invalid_proof_payload_matches_golden_vector
+	// in orbis-rs reporting/v0/types.rs — regenerate both sides together.
+	preInvalidPayload := preInvalidProofPayloadForTest(
+		rustGoldenPreInvalidStatement().encode(),
+		bytes.Repeat([]byte{42}, 64),
+	)
+	require.Equal(
+		t,
+		"000000f80000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a0000000761636375736564000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
+		hex.EncodeToString(preInvalidPayload),
+	)
+	preInvalidReport := report
+	preInvalidReport.ReportType = PreInvalidReencryptionProofReportType
+	preInvalidReport.Payload = preInvalidPayload
+	_, preInvalidReportID, err := reportEnvelopeCanonicalMessageAndID(&preInvalidReport)
+	require.NoError(t, err)
+	require.Equal(t, "29c88e561ffad3d440c862a0ee7b9092ade3f13469721677042504c6390541d9", preInvalidReportID)
+
 	ring := &types.Ring{
 		RingPk:       "pk",
 		PeerNodeKeys: []string{"b", "a"},
@@ -58,7 +78,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "7da44e690e8cb8c223ee4ce80d35b12c7f41e92bbac5a114f89c26657b4148db", ringHash)
+	require.Equal(t, "f6561137d2827315c438a8e0608cdf86748e7e7d0aa4b741dedc065f536c7861", ringHash)
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
@@ -88,6 +108,94 @@ func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidReport)
 }
 
+func TestPreInvalidProofPayloadDecodeRejectsMalformedPayloads(t *testing.T) {
+	signature := bytes.Repeat([]byte{42}, 64)
+	validStatement := rustGoldenPreInvalidStatement()
+	valid := preInvalidProofPayloadForTest(validStatement.encode(), signature)
+
+	decoded, err := decodePreInvalidReencryptionProofPayload(valid)
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "aabb", decoded.ringPk)
+	require.Equal(t, strings.Repeat("11", 32), decoded.ringStateSha256)
+	require.Equal(t, uint64(7), decoded.protocolVersion)
+	require.Equal(t, "pre-request-1", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, "accused", decoded.responderNodeKey)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"truncated outer", valid[:10]},
+		{"trailing outer bytes", append(append([]byte{}, valid...), 0)},
+		{"trailing inner bytes", preInvalidProofPayloadForTest(append(validStatement.encode(), 0), signature)},
+		{"short signature", preInvalidProofPayloadForTest(validStatement.encode(), bytes.Repeat([]byte{42}, 63))},
+		{"wrong domain", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.domain = "other" }).encode(), signature)},
+		{"empty request_id", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.requestID = "" }).encode(), signature)},
+		{"empty responder", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.responderKey = "" }).encode(), signature)},
+		{"empty object_id", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.objectID = "" }).encode(), signature)},
+		{"empty crypto backend", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.cryptoBackend = "" }).encode(), signature)},
+		{"empty proof", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.proof = nil }).encode(), signature)},
+		{"oversize share", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.share = make([]byte, preResponseMaxElementLen+1) }).encode(), signature)},
+		{"oversize derivation", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.derivation = make([]byte, preResponseMaxDerivationLen+1) }).encode(), signature)},
+		{"invalid derivation tag", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { tag := byte(2); s.derivationTagOverride = &tag }).encode(), signature)},
+		{"non-utf8 string field", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.chainID = string([]byte{0xff, 0xfe}) }).encode(), signature)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodePreInvalidReencryptionProofPayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
+func TestValidatePreInvalidProofStatementBindingAndAnchor(t *testing.T) {
+	report := &types.ReportEnvelope{
+		ChainId:         "chain",
+		RingId:          "ring",
+		RingPk:          "pk",
+		RingStateSha256: "digest",
+		SessionId:       "req",
+		AccusedNodeKey:  "accused",
+		ObservedAt:      reportTestObservedAt,
+	}
+	base := preInvalidProofStatement{
+		chainID:          "chain",
+		ringID:           "ring",
+		ringPk:           "pk",
+		ringStateSha256:  "digest",
+		requestID:        "req",
+		signedAt:         reportTestObservedAt + reportObservedAtGraceSecs,
+		responderNodeKey: "accused",
+	}
+	require.NoError(t, validatePreInvalidProofStatement(report, base))
+
+	rejected := []struct {
+		name   string
+		mutate func(*preInvalidProofStatement)
+	}{
+		{"chain mismatch", func(s *preInvalidProofStatement) { s.chainID = "other" }},
+		{"ring id mismatch", func(s *preInvalidProofStatement) { s.ringID = "other" }},
+		{"ring pk mismatch", func(s *preInvalidProofStatement) { s.ringPk = "other" }},
+		{"ring state mismatch", func(s *preInvalidProofStatement) { s.ringStateSha256 = "other" }},
+		{"session mismatch", func(s *preInvalidProofStatement) { s.requestID = "other" }},
+		{"responder mismatch", func(s *preInvalidProofStatement) { s.responderNodeKey = "other" }},
+		{"anchor off by one late", func(s *preInvalidProofStatement) { s.signedAt++ }},
+		{"anchor off by one early", func(s *preInvalidProofStatement) { s.signedAt-- }},
+		{"signed_at below grace", func(s *preInvalidProofStatement) { s.signedAt = reportObservedAtGraceSecs - 1 }},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			statement := base
+			tc.mutate(&statement)
+			err := validatePreInvalidProofStatement(report, statement)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 	_, err := DemeritAmountForReportType(nil, NodeOfflineReportType)
 	require.ErrorIs(t, err, types.ErrRingNotFound)
@@ -100,14 +208,146 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 	amount, err := DemeritAmountForReportType(&types.Ring{
 		Reporting: types.ReportingConfig{
 			DemeritConfig: types.DemeritConfig{
-				NodeOfflineDemerits:  5,
-				ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+				NodeOfflineDemerits:     5,
+				PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+				ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
 		},
 	}, NodeOfflineReportType)
 	require.NoError(t, err)
 	require.Equal(t, uint64(5), amount)
+
+	amount, err = DemeritAmountForReportType(&types.Ring{
+		Reporting: types.ReportingConfig{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:     5,
+				PreInvalidProofDemerits: 7,
+				ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
+			},
+			KickThreshold: types.DefaultReportingKickThreshold,
+		},
+	}, PreInvalidReencryptionProofReportType)
+	require.NoError(t, err)
+	require.Equal(t, uint64(7), amount)
+}
+
+func TestMsgServer_SubmitReport_PreInvalidProofAcceptsRetainsAndDedupes(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-preproof-ikm-000", 2)
+
+	report := fixture.validPreInvalidProofReport(t)
+	msg := fixture.signBLSReport(t, sk, report)
+
+	resp, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+	require.Equal(t, msg.ReportId, resp.ReportId)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	events := parseTypedEvents(t, fixture.ctx)
+	require.Contains(t, events, &types.EventReportAccepted{
+		ReportId:        msg.ReportId,
+		RingId:          fixture.ringID,
+		ReportType:      PreInvalidReencryptionProofReportType,
+		ReporterNodeKey: fixture.reporterKey,
+		AccusedNodeKey:  fixture.accusedKey,
+	})
+
+	// Same report replayed: rejected by report-ID dedupe.
+	_, err = fixture.k.SubmitReport(fixture.ctx, msg)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+
+	// Same evidence re-wrapped by a different reporter: rejected by session dedupe.
+	secondReport := fixture.validPreInvalidProofReport(t)
+	secondReport.ReporterNodeKey = fixture.validatorKey
+	second := fixture.signBLSReport(t, sk, secondReport)
+	require.NotEqual(t, msg.ReportId, second.ReportId)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	// Dedupe records live for the plain report TTL — the anchored envelope
+	// (observed_at == signed_at - grace) guarantees no envelope over the same
+	// evidence can still be valid once the record prunes.
+	sessionID, err := reportSessionDedupeID(&msg.Report, reportPayload{
+		originProtocol:        offlineOriginProtocolPRE,
+		originProtocolVersion: 0,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	})
+	require.NoError(t, err)
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+
+	fixture.k.DeleteExpiredAcceptedReportPairs(fixture.ctx, reportTestObservedAt+ReportTTLSeconds-1)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+
+	fixture.k.DeleteExpiredAcceptedReportPairs(fixture.ctx, reportTestObservedAt+ReportTTLSeconds)
+	require.False(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.False(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+func TestMsgServer_SubmitReport_PreInvalidProofRejectsTamperedStatements(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-preproof-bad-000", 2)
+
+	t.Run("session_id not matching statement request_id", func(t *testing.T) {
+		report := fixture.validPreInvalidProofReport(t)
+		report.SessionId = "different-request"
+		msg := fixture.signBLSReport(t, sk, report)
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+	})
+
+	t.Run("accused not matching statement responder", func(t *testing.T) {
+		report := fixture.validPreInvalidProofReport(t)
+		report.AccusedNodeKey = fixture.validatorKey
+		report.AccusedPeerId = "12D3KooWReportValidator"
+		msg := fixture.signBLSReport(t, sk, report)
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+	})
+
+	t.Run("envelope not anchored to evidence timestamp", func(t *testing.T) {
+		report := fixture.validPreInvalidProofReport(t)
+		report.Payload = preInvalidProofPayloadForTest(
+			fixture.preInvalidProofStatementFields(t).with(func(s *preInvalidProofStatementFields) {
+				s.signedAt++
+			}).encode(),
+			bytes.Repeat([]byte{42}, 64),
+		)
+		msg := fixture.signBLSReport(t, sk, report)
+		_, err := fixture.k.SubmitReport(fixture.ctx, msg)
+		require.ErrorIs(t, err, types.ErrInvalidReport)
+	})
+}
+
+func TestMsgServer_SubmitReport_PreInvalidProofDecaf377FROSTAccepts(t *testing.T) {
+	fixture := setupReportTestFixture(t)
+	secretScalar := new(big.Int).SetBytes([]byte("orbis-preproof-decaf377-secret-k"))
+	secretScalar.Mod(secretScalar, decaf377.ScalarOrder())
+
+	ringPkBytes, err := decaf377PublicKeyBytes(secretScalar)
+	require.NoError(t, err)
+	fixture.setRing(t, hex.EncodeToString(ringPkBytes), 2)
+
+	report := fixture.validPreInvalidProofReport(t)
+	message, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
+	require.NoError(t, err)
+	signature, err := decaf377SchnorrSign(secretScalar, ringPkBytes, message)
+	require.NoError(t, err)
+	ok, err := orbisfrost.Verify(ringPkBytes, message, signature)
+	require.NoError(t, err)
+	require.True(t, ok)
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, &types.MsgSubmitReport{
+		Creator:         fixture.creator,
+		Report:          report,
+		ReportId:        reportID,
+		SignatureScheme: ThresholdSignatureSchemeDecaf377FROST,
+		Signature:       signature,
+	})
+	require.NoError(t, err)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, reportID))
 }
 
 func TestMsgServer_SubmitReport_BLS12381AcceptsAndRejectsReplay(t *testing.T) {
@@ -187,8 +427,9 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	copy(ikm, "orbis-report-demerit-ikm-0000")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits:  3,
-		ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		NodeOfflineDemerits:     3,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 	})
 
 	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -217,8 +458,9 @@ func TestMsgServer_SubmitReportSchedulesAutoReshareAtKickThreshold(t *testing.T)
 
 	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  3,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+			NodeOfflineDemerits:     3,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backup1Key, backup2Key},
 		KickThreshold:  3,
@@ -256,8 +498,9 @@ func TestMsgServer_SubmitReportDoesNotScheduleAutoReshareBelowThreshold(t *testi
 
 	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  1,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+			NodeOfflineDemerits:     1,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backupKey},
 		KickThreshold:  2,
@@ -283,8 +526,9 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWhenAlreadyPending(t *testin
 
 	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  3,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+			NodeOfflineDemerits:     3,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backupKey},
 		KickThreshold:  3,
@@ -312,8 +556,9 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWithoutEligibleBackup(t *tes
 
 	fixture.setRingWithReportingConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  3,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+			NodeOfflineDemerits:     3,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{fixture.reporterKey, ineligibleBackupKey},
 		KickThreshold:  3,
@@ -334,8 +579,9 @@ func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
 	copy(ikm, "orbis-report-reset-ikm-00000")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits:  3,
-		ResetIntervalSeconds: ReportTTLSeconds * 2,
+		NodeOfflineDemerits:     3,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    ReportTTLSeconds * 2,
 	})
 
 	first := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -370,8 +616,9 @@ func TestMsgServer_SubmitReportDoesNotResetDemeritsOnReplayOrRejectedReport(t *t
 	copy(ikm, "orbis-report-no-reset-ikm-00")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits:  3,
-		ResetIntervalSeconds: 10,
+		NodeOfflineDemerits:     3,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    10,
 	})
 
 	accepted := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -399,8 +646,9 @@ func TestQueryServer_NodeDemeritsReturnsEffectiveScoreWithoutResettingExpiredWin
 	copy(ikm, "orbis-report-query-reset-ikm")
 	sk := blst.KeyGen(ikm)
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
-		NodeOfflineDemerits:  3,
-		ResetIntervalSeconds: 10,
+		NodeOfflineDemerits:     3,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    10,
 	})
 
 	accepted := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -945,6 +1193,143 @@ func nodeOfflinePayloadForTest(
 		panic(err)
 	}
 	return payload
+}
+
+// preInvalidProofStatementFields mirrors the orbis-rs PreReencryptResponseStatement
+// canonical encoding for tests. derivationTagOverride forces an invalid optional
+// tag byte for decoder rejection cases.
+type preInvalidProofStatementFields struct {
+	domain                string
+	chainID               string
+	ringID                string
+	ringPk                string
+	ringStateSha256       string
+	protocolVersion       uint64
+	requestID             string
+	signedAt              uint64
+	responderKey          string
+	objectID              string
+	rdrPk                 []byte
+	derivation            []byte
+	derivationTagOverride *byte
+	fromNodeID            uint32
+	share                 []byte
+	challenge             []byte
+	proof                 []byte
+	cryptoBackend         string
+}
+
+func (s preInvalidProofStatementFields) with(mutate func(*preInvalidProofStatementFields)) preInvalidProofStatementFields {
+	mutate(&s)
+	return s
+}
+
+func (s preInvalidProofStatementFields) encode() []byte {
+	w := newReportCanonicalWriter()
+	w.writeString(s.domain)
+	w.writeString(s.chainID)
+	w.writeString(s.ringID)
+	w.writeString(s.ringPk)
+	w.writeString(s.ringStateSha256)
+	w.writeU64(s.protocolVersion)
+	w.writeString(s.requestID)
+	w.writeU64(s.signedAt)
+	w.writeString(s.responderKey)
+	w.writeString(s.objectID)
+	w.writeBytes(s.rdrPk)
+	switch {
+	case s.derivationTagOverride != nil:
+		w.bytes = append(w.bytes, *s.derivationTagOverride)
+	case s.derivation == nil:
+		w.bytes = append(w.bytes, 0)
+	default:
+		w.bytes = append(w.bytes, 1)
+		w.writeBytes(s.derivation)
+	}
+	w.writeU32(s.fromNodeID)
+	w.writeBytes(s.share)
+	w.writeBytes(s.challenge)
+	w.writeBytes(s.proof)
+	w.writeString(s.cryptoBackend)
+	statement, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return statement
+}
+
+func preInvalidProofPayloadForTest(statement []byte, signature []byte) []byte {
+	w := newReportCanonicalWriter()
+	w.writeBytes(statement)
+	w.writeBytes(signature)
+	payload, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+// rustGoldenPreInvalidStatement matches the pre_statement() fixture in
+// orbis-rs reporting/v0/types.rs so the golden vectors line up byte-for-byte.
+func rustGoldenPreInvalidStatement() preInvalidProofStatementFields {
+	return preInvalidProofStatementFields{
+		domain:          PreReencryptResponseDomain,
+		chainID:         reportTestChainID,
+		ringID:          "ring-1",
+		ringPk:          "aabb",
+		ringStateSha256: strings.Repeat("11", 32),
+		protocolVersion: 7,
+		requestID:       "pre-request-1",
+		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
+		responderKey:    "accused",
+		objectID:        "object-1",
+		rdrPk:           []byte{1, 2, 3},
+		derivation:      []byte{4, 5, 6},
+		fromNodeID:      2,
+		share:           []byte{7, 8},
+		challenge:       []byte{9, 10},
+		proof:           []byte{11, 12},
+		cryptoBackend:   "elgamal/test",
+	}
+}
+
+// preInvalidProofStatementFields builds a statement consistent with the
+// fixture's ring and a validPreInvalidProofReport envelope.
+func (f reportTestFixture) preInvalidProofStatementFields(t *testing.T) preInvalidProofStatementFields {
+	t.Helper()
+	require.NotNil(t, f.originalRing)
+	ringDigest, err := reportRingStateSHA256(f.originalRing)
+	require.NoError(t, err)
+	return preInvalidProofStatementFields{
+		domain:          PreReencryptResponseDomain,
+		chainID:         f.ctx.ChainID(),
+		ringID:          f.ringID,
+		ringPk:          f.originalRing.RingPk,
+		ringStateSha256: ringDigest,
+		protocolVersion: 0,
+		requestID:       "pre-request-1",
+		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
+		responderKey:    f.accusedKey,
+		objectID:        "object-1",
+		rdrPk:           []byte{1, 2, 3},
+		derivation:      nil,
+		fromNodeID:      2,
+		share:           []byte{7, 8},
+		challenge:       []byte{9, 10},
+		proof:           []byte{11, 12},
+		cryptoBackend:   "elgamal/test",
+	}
+}
+
+func (f reportTestFixture) validPreInvalidProofReport(t *testing.T) types.ReportEnvelope {
+	t.Helper()
+	report := f.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.ReportType = PreInvalidReencryptionProofReportType
+	report.Payload = preInvalidProofPayloadForTest(
+		f.preInvalidProofStatementFields(t).encode(),
+		bytes.Repeat([]byte{42}, 64),
+	)
+	return report
 }
 
 func reportIDForTest(t *testing.T, report *types.ReportEnvelope) string {

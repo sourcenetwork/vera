@@ -35,8 +35,9 @@ func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 		PolicyId:     "policy-1",
 		Reporting: &ReportingConfig{
 			DemeritConfig: DemeritConfig{
-				NodeOfflineDemerits:  0,
-				ResetIntervalSeconds: DefaultDemeritResetIntervalSecs,
+				NodeOfflineDemerits:     0,
+				PreInvalidProofDemerits: DefaultPreInvalidProofDemerits,
+				ResetIntervalSeconds:    DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: DefaultReportingKickThreshold,
 		},
@@ -45,8 +46,9 @@ func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 
 	msg.Reporting = &ReportingConfig{
 		DemeritConfig: DemeritConfig{
-			NodeOfflineDemerits:  DefaultNodeOfflineDemerits,
-			ResetIntervalSeconds: 0,
+			NodeOfflineDemerits:     DefaultNodeOfflineDemerits,
+			PreInvalidProofDemerits: DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    0,
 		},
 		KickThreshold: DefaultReportingKickThreshold,
 	}

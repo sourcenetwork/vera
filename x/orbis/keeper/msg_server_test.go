@@ -182,8 +182,9 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	defaultConfig := types.DemeritConfig{
-		NodeOfflineDemerits:  4,
-		ResetIntervalSeconds: 12,
+		NodeOfflineDemerits:     4,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    12,
 	}
 	defaultReporting := types.ReportingDefaults{
 		DemeritConfig: defaultConfig,
@@ -203,8 +204,9 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 
 	updatedReporting := types.ReportingDefaults{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  8,
-			ResetIntervalSeconds: 24,
+			NodeOfflineDemerits:     8,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    24,
 		},
 		KickThreshold: 6,
 	}
@@ -212,8 +214,9 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 	require.Equal(t, types.ReportingConfigFromDefaults(defaultReporting), k.GetRing(ctx, defaultResp.RingId).Reporting)
 
 	explicitConfig := types.DemeritConfig{
-		NodeOfflineDemerits:  7,
-		ResetIntervalSeconds: 60,
+		NodeOfflineDemerits:     7,
+		PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    60,
 	}
 	explicitReporting := types.ReportingConfig{
 		DemeritConfig: explicitConfig,
@@ -260,8 +263,9 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 	require.ErrorContains(t,
 		k.SetParams(ctx, types.NewParams(types.ReportingDefaults{
 			DemeritConfig: types.DemeritConfig{
-				NodeOfflineDemerits:  0,
-				ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+				NodeOfflineDemerits:     0,
+				PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+				ResetIntervalSeconds:    types.DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
 		})),
@@ -272,8 +276,9 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 	require.ErrorContains(t,
 		k.SetParams(ctx, types.NewParams(types.ReportingDefaults{
 			DemeritConfig: types.DemeritConfig{
-				NodeOfflineDemerits:  types.DefaultNodeOfflineDemerits,
-				ResetIntervalSeconds: 0,
+				NodeOfflineDemerits:     types.DefaultNodeOfflineDemerits,
+				PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+				ResetIntervalSeconds:    0,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
 		})),
@@ -879,8 +884,9 @@ func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 
 	reporting := types.ReportingConfig{
 		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  2,
-			ResetIntervalSeconds: 42,
+			NodeOfflineDemerits:     2,
+			PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits,
+			ResetIntervalSeconds:    42,
 		},
 		BackupNodeKeys: []string{backup2Key, backup1Key},
 		KickThreshold:  4,

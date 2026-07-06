@@ -17,10 +17,29 @@ import (
 )
 
 const (
-	ReportDomain          = "orbis-mpc-fault-report"
-	ReportSessionDomain   = "orbis-mpc-fault-report-session"
-	NodeOfflineReportType = "node_offline"
-	ReportTTLSeconds      = uint64(120)
+	ReportDomain                          = "orbis-mpc-fault-report"
+	ReportSessionDomain                   = "orbis-mpc-fault-report-session"
+	NodeOfflineReportType                 = "node_offline"
+	PreInvalidReencryptionProofReportType = "pre_invalid_reencryption_proof"
+	ReportTTLSeconds                      = uint64(120)
+
+	// PreReencryptResponseDomain is the domain tag of the responder-signed PRE
+	// response statement carried as pre_invalid_reencryption_proof evidence.
+	PreReencryptResponseDomain = "orbis-pre-reencrypt-response-v1"
+	// reportObservedAtGraceSecs mirrors orbis-rs CHAIN_BLOCK_GRACE_SECS:
+	// reporters backdate observed_at by this so the observed_at <= block_time
+	// check passes gas simulation. pre_invalid_reencryption_proof envelopes are
+	// pinned to their evidence via observed_at == signed_at - grace, which makes
+	// the envelope's fixed observed_at + ReportTTLSeconds expiry double as the
+	// evidence expiry: acceptance can only happen in
+	// [signed_at - grace, signed_at - grace + TTL], so a plain TTL dedupe
+	// record always outlives any resubmission of the same evidence.
+	reportObservedAtGraceSecs = uint64(10)
+
+	// Size bounds for evidence blobs (group elements are 32-112 bytes across
+	// crypto backends; derivation is capability bytes).
+	preResponseMaxElementLen    = 512
+	preResponseMaxDerivationLen = 4096
 
 	offlineOriginProtocolPRE        = "pre"
 	offlineOriginProtocolSign       = "sign"
@@ -31,11 +50,31 @@ const (
 	committeeScopePendingNew = byte(2)
 )
 
-type nodeOfflineReportPayload struct {
+// reportPayload is normalized per-report metadata consumed by the version
+// check, committee authorization, and session-dedupe ID. node_offline decodes
+// it directly from its payload; other report types synthesize it from their own
+// payloads.
+type reportPayload struct {
 	originProtocol        string
 	originProtocolVersion uint64
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
+}
+
+// preInvalidProofStatement holds the fields of the responder-signed PRE
+// response statement that the chain validates. The cryptographic blobs
+// (rdr_pk, share, challenge, proof, signature) are bounds-checked during
+// decoding and then dropped — the chain never re-verifies the NIZK or the
+// responder signature; its only crypto gate is the ring threshold signature.
+type preInvalidProofStatement struct {
+	chainID          string
+	ringID           string
+	ringPk           string
+	ringStateSha256  string
+	protocolVersion  uint64
+	requestID        string
+	signedAt         uint64
+	responderNodeKey string
 }
 
 type reportCommitteeView struct {
@@ -84,7 +123,7 @@ func (k *Keeper) validateSubmittedReport(
 		return nil, types.ErrReportAlreadyAccepted
 	}
 
-	var payload nodeOfflineReportPayload
+	var payload reportPayload
 	switch report.ReportType {
 	case NodeOfflineReportType:
 		payload, err = decodeNodeOfflinePayload(report.Payload)
@@ -93,6 +132,20 @@ func (k *Keeper) validateSubmittedReport(
 		}
 		if !isValidOfflineOriginProtocol(payload.originProtocol) {
 			return nil, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported offline report origin protocol %q", payload.originProtocol)
+		}
+	case PreInvalidReencryptionProofReportType:
+		statement, err := decodePreInvalidReencryptionProofPayload(report.Payload)
+		if err != nil {
+			return nil, err
+		}
+		if err := validatePreInvalidProofStatement(report, statement); err != nil {
+			return nil, err
+		}
+		payload = reportPayload{
+			originProtocol:        offlineOriginProtocolPRE,
+			originProtocolVersion: statement.protocolVersion,
+			accusedCommitteeScope: committeeScopeCurrent,
+			signingCommitteeScope: committeeScopeCurrent,
 		}
 	default:
 		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported report type %q", report.ReportType)
@@ -200,7 +253,7 @@ func reportEnvelopeCanonicalMessageAndID(report *types.ReportEnvelope) ([]byte, 
 	return message, hex.EncodeToString(hash[:]), nil
 }
 
-func reportSessionDedupeID(report *types.ReportEnvelope, payload nodeOfflineReportPayload) (string, error) {
+func reportSessionDedupeID(report *types.ReportEnvelope, payload reportPayload) (string, error) {
 	w := newReportCanonicalWriter()
 	w.writeString(ReportSessionDomain)
 	w.writeString(report.ChainId)
@@ -235,41 +288,196 @@ func reportEnvelopeCanonicalBytes(report *types.ReportEnvelope) ([]byte, error) 
 	return w.finish()
 }
 
-func decodeNodeOfflinePayload(payload []byte) (nodeOfflineReportPayload, error) {
+func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 	decoder := newReportCanonicalDecoder(payload)
 	originProtocol, err := decoder.readString("origin_protocol")
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 	originProtocolVersion, err := decoder.readU64("origin_protocol_version")
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 
 	accusedScope, err := decoder.readByte("accused_committee_scope")
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
-		return nodeOfflineReportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+		return reportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
 	signingScope, err := decoder.readByte("signing_committee_scope")
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
-		return nodeOfflineReportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+		return reportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
 	if err := decoder.finish(); err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 
-	return nodeOfflineReportPayload{
+	return reportPayload{
 		originProtocol:        originProtocol,
 		originProtocolVersion: originProtocolVersion,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 	}, nil
+}
+
+// decodePreInvalidReencryptionProofPayload decodes and shape-validates a
+// pre_invalid_reencryption_proof payload: a responder-signed PRE response
+// statement plus a 64-byte secp256k1 signature. The field order matches the
+// orbis-rs canonical encoding (PreInvalidReencryptionProof /
+// PreReencryptResponseStatement in reporting/v0/types.rs) exactly.
+func decodePreInvalidReencryptionProofPayload(payload []byte) (preInvalidProofStatement, error) {
+	outer := newReportCanonicalDecoder(payload)
+	statementBytes, err := outer.readBytes("statement")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	responseSignature, err := outer.readBytes("response_signature")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if err := outer.finish(); err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if len(responseSignature) != 64 {
+		return preInvalidProofStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response signature must be 64 bytes")
+	}
+
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString("domain")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if domain != PreReencryptResponseDomain {
+		return preInvalidProofStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected PRE response domain %q", domain)
+	}
+	chainID, err := decoder.readString("chain_id")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	ringID, err := decoder.readString("ring_id")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	ringPk, err := decoder.readString("ring_pk")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64("protocol_version")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	requestID, err := decoder.readString("request_id")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	signedAt, err := decoder.readU64("signed_at")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString("responder_node_key")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	objectID, err := decoder.readString("object_id")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if requestID == "" || responderNodeKey == "" || objectID == "" {
+		return preInvalidProofStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response statement has empty identity fields")
+	}
+	rdrPk, err := decoder.readBytes("rdr_pk")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	derivation, err := decoder.readOptionalBytes("derivation")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if len(derivation) > preResponseMaxDerivationLen {
+		return preInvalidProofStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response derivation exceeds size bound")
+	}
+	if _, err := decoder.readU32("from_node_id"); err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	share, err := decoder.readBytes("share")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	challenge, err := decoder.readBytes("challenge")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	proof, err := decoder.readBytes("proof")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	cryptoBackend, err := decoder.readString("crypto_backend")
+	if err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	if cryptoBackend == "" {
+		return preInvalidProofStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response crypto backend cannot be empty")
+	}
+	if err := decoder.finish(); err != nil {
+		return preInvalidProofStatement{}, err
+	}
+	for label, blob := range map[string][]byte{
+		"rdr_pk":    rdrPk,
+		"share":     share,
+		"challenge": challenge,
+		"proof":     proof,
+	} {
+		if len(blob) == 0 {
+			return preInvalidProofStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PRE response %s cannot be empty", label)
+		}
+		if len(blob) > preResponseMaxElementLen {
+			return preInvalidProofStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PRE response %s exceeds size bound", label)
+		}
+	}
+
+	return preInvalidProofStatement{
+		chainID:          chainID,
+		ringID:           ringID,
+		ringPk:           ringPk,
+		ringStateSha256:  ringStateSha256,
+		protocolVersion:  protocolVersion,
+		requestID:        requestID,
+		signedAt:         signedAt,
+		responderNodeKey: responderNodeKey,
+	}, nil
+}
+
+// validatePreInvalidProofStatement binds the signed statement to the report
+// envelope. Pinning observed_at to signed_at - grace makes the envelope's
+// fixed observed_at+TTL expiry double as the evidence expiry, so the shared
+// envelope shape checks (observed_at <= now, now <= expires_at) already bound
+// how long this evidence stays reportable — no separate timing rules needed.
+func validatePreInvalidProofStatement(report *types.ReportEnvelope, statement preInvalidProofStatement) error {
+	switch {
+	case statement.chainID != report.ChainId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "PRE response chain ID does not match report envelope")
+	case statement.ringID != report.RingId,
+		statement.ringPk != report.RingPk,
+		statement.ringStateSha256 != report.RingStateSha256:
+		return errorsmod.Wrap(types.ErrInvalidReport, "PRE response ring binding does not match report envelope")
+	case statement.requestID != report.SessionId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "PRE response request_id does not match report session_id")
+	case statement.responderNodeKey != report.AccusedNodeKey:
+		return errorsmod.Wrap(types.ErrInvalidReport, "PRE response responder does not match accused node")
+	case statement.signedAt < reportObservedAtGraceSecs,
+		report.ObservedAt != statement.signedAt-reportObservedAtGraceSecs:
+		return errorsmod.Wrap(types.ErrInvalidReport, "report envelope is not anchored to the evidence timestamp")
+	}
+	return nil
 }
 
 func isValidReportCommitteeScope(scope byte) bool {
@@ -292,7 +500,7 @@ func validateReportCommitteeAuthorization(
 	goCtx context.Context,
 	k *Keeper,
 	report *types.ReportEnvelope,
-	payload nodeOfflineReportPayload,
+	payload reportPayload,
 	ring *types.Ring,
 ) error {
 	accusedCommittee, err := reportCommitteeForScope(ring, payload.accusedCommitteeScope)
@@ -588,6 +796,7 @@ func (w *reportCanonicalWriter) writeOptionalU64(value *uint64) {
 
 func (w *reportCanonicalWriter) writeDemeritConfig(value types.DemeritConfig) {
 	w.writeU64(value.NodeOfflineDemerits)
+	w.writeU64(value.PreInvalidProofDemerits)
 	w.writeU64(value.ResetIntervalSeconds)
 }
 
@@ -660,6 +869,34 @@ func (d *reportCanonicalDecoder) readString(label string) (string, error) {
 		return "", errorsmod.Wrapf(types.ErrInvalidReport, "%s is not utf-8", label)
 	}
 	return string(valueBytes), nil
+}
+
+func (d *reportCanonicalDecoder) readBytes(label string) ([]byte, error) {
+	length, err := d.readU32(label + "_length")
+	if err != nil {
+		return nil, err
+	}
+	if uint64(len(d.bytes)-d.cursor) < uint64(length) {
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "truncated %s", label)
+	}
+	value := d.bytes[d.cursor : d.cursor+int(length)]
+	d.cursor += int(length)
+	return value, nil
+}
+
+func (d *reportCanonicalDecoder) readOptionalBytes(label string) ([]byte, error) {
+	tag, err := d.readByte(label + "_present")
+	if err != nil {
+		return nil, err
+	}
+	switch tag {
+	case 0:
+		return nil, nil
+	case 1:
+		return d.readBytes(label)
+	default:
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
+	}
 }
 
 func (d *reportCanonicalDecoder) finish() error {

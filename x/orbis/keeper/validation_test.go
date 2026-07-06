@@ -45,12 +45,12 @@ func TestValidateRingDemeritConfig(t *testing.T) {
 	}{
 		{
 			name:        "zero NodeOfflineDemerits",
-			config:      types.DemeritConfig{NodeOfflineDemerits: 0, ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs},
+			config:      types.DemeritConfig{NodeOfflineDemerits: 0, PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits, ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs},
 			errContains: "node_offline_demerits must be at least 1",
 		},
 		{
 			name:        "zero ResetIntervalSeconds",
-			config:      types.DemeritConfig{NodeOfflineDemerits: types.DefaultNodeOfflineDemerits, ResetIntervalSeconds: 0},
+			config:      types.DemeritConfig{NodeOfflineDemerits: types.DefaultNodeOfflineDemerits, PreInvalidProofDemerits: types.DefaultPreInvalidProofDemerits, ResetIntervalSeconds: 0},
 			errContains: "reset_interval_seconds must be at least 1",
 		},
 	}

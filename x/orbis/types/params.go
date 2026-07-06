@@ -7,6 +7,7 @@ import (
 
 const (
 	DefaultNodeOfflineDemerits      = uint64(1)
+	DefaultPreInvalidProofDemerits  = uint64(1)
 	DefaultDemeritResetIntervalSecs = uint64(86400)
 	DefaultReportingKickThreshold   = uint64(3)
 )
@@ -33,8 +34,9 @@ func DefaultParams() Params {
 // DefaultDemeritConfig returns the module's default report demerit policy.
 func DefaultDemeritConfig() DemeritConfig {
 	return DemeritConfig{
-		NodeOfflineDemerits:  DefaultNodeOfflineDemerits,
-		ResetIntervalSeconds: DefaultDemeritResetIntervalSecs,
+		NodeOfflineDemerits:     DefaultNodeOfflineDemerits,
+		PreInvalidProofDemerits: DefaultPreInvalidProofDemerits,
+		ResetIntervalSeconds:    DefaultDemeritResetIntervalSecs,
 	}
 }
 
@@ -73,6 +75,9 @@ func (p Params) Validate() error {
 func ValidateDemeritConfig(config DemeritConfig) error {
 	if config.NodeOfflineDemerits == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "node_offline_demerits must be at least 1")
+	}
+	if config.PreInvalidProofDemerits == 0 {
+		return errorsmod.Wrap(ErrInvalidRing, "pre_invalid_proof_demerits must be at least 1")
 	}
 	if config.ResetIntervalSeconds == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "reset_interval_seconds must be at least 1")

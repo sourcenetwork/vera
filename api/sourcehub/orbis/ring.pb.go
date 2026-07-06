@@ -86,11 +86,12 @@ func (x *UpgradeInfo) GetActivationTime() uint64 {
 
 // DemeritConfig stores the number of demerit points assigned per report type.
 type DemeritConfig struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	NodeOfflineDemerits  uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
-	ResetIntervalSeconds uint64                 `protobuf:"varint,2,opt,name=reset_interval_seconds,json=resetIntervalSeconds,proto3" json:"reset_interval_seconds,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"open.v1"`
+	NodeOfflineDemerits     uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
+	ResetIntervalSeconds    uint64                 `protobuf:"varint,2,opt,name=reset_interval_seconds,json=resetIntervalSeconds,proto3" json:"reset_interval_seconds,omitempty"`
+	PreInvalidProofDemerits uint64                 `protobuf:"varint,3,opt,name=pre_invalid_proof_demerits,json=preInvalidProofDemerits,proto3" json:"pre_invalid_proof_demerits,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *DemeritConfig) Reset() {
@@ -133,6 +134,13 @@ func (x *DemeritConfig) GetNodeOfflineDemerits() uint64 {
 func (x *DemeritConfig) GetResetIntervalSeconds() uint64 {
 	if x != nil {
 		return x.ResetIntervalSeconds
+	}
+	return 0
+}
+
+func (x *DemeritConfig) GetPreInvalidProofDemerits() uint64 {
+	if x != nil {
+		return x.PreInvalidProofDemerits
 	}
 	return 0
 }
@@ -404,10 +412,11 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x12,\n" +
 	"\x0factivation_time\x18\x03 \x01(\x04H\x01R\x0eactivationTime\x88\x01\x01B\x0f\n" +
 	"\r_next_versionB\x12\n" +
-	"\x10_activation_time\"\x7f\n" +
+	"\x10_activation_time\"\xbc\x01\n" +
 	"\rDemeritConfig\x122\n" +
 	"\x15node_offline_demerits\x18\x01 \x01(\x04R\x13nodeOfflineDemerits\x124\n" +
-	"\x16reset_interval_seconds\x18\x02 \x01(\x04R\x14resetIntervalSeconds:\x04\xe8\xa0\x1f\x01\"\xb5\x01\n" +
+	"\x16reset_interval_seconds\x18\x02 \x01(\x04R\x14resetIntervalSeconds\x12;\n" +
+	"\x1apre_invalid_proof_demerits\x18\x03 \x01(\x04R\x17preInvalidProofDemerits:\x04\xe8\xa0\x1f\x01\"\xb5\x01\n" +
 	"\x0fReportingConfig\x12K\n" +
 	"\x0edemerit_config\x18\x01 \x01(\v2\x1e.sourcehub.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
 	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
