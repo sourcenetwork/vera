@@ -56,7 +56,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	)
 	require.Equal(
 		t,
-		"00000003707265000000f80000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a0000000761636375736564000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
+		"00000003707265000000ff0000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a000000076163637573656400000003707265000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
 		hex.EncodeToString(preInvalidPayload),
 	)
 	preInvalidReport := report
@@ -64,7 +64,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	preInvalidReport.Payload = preInvalidPayload
 	_, preInvalidReportID, err := reportEnvelopeCanonicalMessageAndID(&preInvalidReport)
 	require.NoError(t, err)
-	require.Equal(t, "b35280e108d54f6e3597c6e0d4632b87147980075cd069fbe302acfd64702c0e", preInvalidReportID)
+	require.Equal(t, "65450d9adeeb115d5985655b0d850af988af3cf7dd5e60d0c9d55df091a983e2", preInvalidReportID)
 
 	ring := &types.Ring{
 		RingPk:       "pk",
@@ -137,6 +137,7 @@ func TestInvalidCryptoResponsePayloadDecodeRejectsMalformedPayloads(t *testing.T
 		{"trailing inner bytes", preInvalidProofPayloadForTest(append(validStatement.encode(), 0), signature)},
 		{"short signature", preInvalidProofPayloadForTest(validStatement.encode(), bytes.Repeat([]byte{42}, 63))},
 		{"wrong domain", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.domain = "other" }).encode(), signature)},
+		{"wrong origin protocol", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.originProtocol = offlineOriginProtocolSign }).encode(), signature)},
 		{"empty request_id", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.requestID = "" }).encode(), signature)},
 		{"empty responder", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.responderKey = "" }).encode(), signature)},
 		{"empty object_id", preInvalidProofPayloadForTest(validStatement.with(func(s *preInvalidProofStatementFields) { s.objectID = "" }).encode(), signature)},
@@ -201,6 +202,9 @@ func TestInvalidCryptoResponseSignPayloadDecodeNormalizesMetadata(t *testing.T) 
 		{"empty request_id", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.requestID = "" }).encode(), signature)},
 		{"empty responder", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.responderKey = "" }).encode(), signature)},
 		{"unknown origin protocol", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.originProtocol = "policy" }).encode(), signature)},
+		// "pre" is only valid for the dedicated PRE evidence kind, never as a Sign
+		// statement origin — matching the node-side sign-origin allowlist.
+		{"pre origin rejected for sign", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.originProtocol = offlineOriginProtocolPRE }).encode(), signature)},
 		{"unknown accused scope", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.accusedCommitteeScope = 99 }).encode(), signature)},
 		{"unknown signing scope", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.signingCommitteeScope = 99 }).encode(), signature)},
 		{"empty message", signResponsePayloadForTest(validStatement.with(func(s *signResponseStatementFields) { s.message = nil }).encode(), signature)},
@@ -1403,6 +1407,7 @@ type preInvalidProofStatementFields struct {
 	requestID             string
 	signedAt              uint64
 	responderKey          string
+	originProtocol        string
 	objectID              string
 	rdrPk                 []byte
 	derivation            []byte
@@ -1430,6 +1435,7 @@ func (s preInvalidProofStatementFields) encode() []byte {
 	w.writeString(s.requestID)
 	w.writeU64(s.signedAt)
 	w.writeString(s.responderKey)
+	w.writeString(s.originProtocol)
 	w.writeString(s.objectID)
 	w.writeBytes(s.rdrPk)
 	switch {
@@ -1693,6 +1699,7 @@ func rustGoldenPreInvalidStatement() preInvalidProofStatementFields {
 		requestID:       "pre-request-1",
 		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
 		responderKey:    "accused",
+		originProtocol:  offlineOriginProtocolPRE,
 		objectID:        "object-1",
 		rdrPk:           []byte{1, 2, 3},
 		derivation:      []byte{4, 5, 6},
@@ -1721,6 +1728,7 @@ func (f reportTestFixture) preInvalidProofStatementFields(t *testing.T) preInval
 		requestID:       "pre-request-1",
 		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
 		responderKey:    f.accusedKey,
+		originProtocol:  offlineOriginProtocolPRE,
 		objectID:        "object-1",
 		rdrPk:           []byte{1, 2, 3},
 		derivation:      nil,

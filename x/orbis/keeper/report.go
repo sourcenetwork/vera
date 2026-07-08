@@ -445,6 +445,13 @@ func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoRe
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
+	originProtocol, err := decoder.readString("origin_protocol")
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindPRE, originProtocol) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported PRE response origin protocol %q", originProtocol)
+	}
 	objectID, err := decoder.readString("object_id")
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
@@ -511,7 +518,7 @@ func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoRe
 		requestID:             requestID,
 		signedAt:              signedAt,
 		responderNodeKey:      responderNodeKey,
-		originProtocol:        offlineOriginProtocolPRE,
+		originProtocol:        originProtocol,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
 	}, nil
@@ -562,7 +569,7 @@ func decodeSignResponseStatement(statementBytes []byte) (invalidCryptoResponseSt
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	if !isValidInvalidCryptoOriginProtocol(originProtocol) {
+	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindSign, originProtocol) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported Sign response origin protocol %q", originProtocol)
 	}
 	accusedScope, err := decoder.readByte("accused_committee_scope")
@@ -960,14 +967,18 @@ func isValidOfflineOriginProtocol(originProtocol string) bool {
 	}
 }
 
-func isValidInvalidCryptoOriginProtocol(originProtocol string) bool {
+// isValidInvalidCryptoOriginProtocol lists the origins each non-DKG invalid
+// crypto evidence kind may carry. "pre" is intentionally excluded from Sign:
+// a PRE re-encryption response is reported as the dedicated "pre" evidence kind.
+func isValidInvalidCryptoOriginProtocol(evidenceKind string, originProtocol string) bool {
 	switch originProtocol {
-	case offlineOriginProtocolPRE,
-		offlineOriginProtocolSign,
+	case offlineOriginProtocolPRE:
+		return evidenceKind == invalidCryptoEvidenceKindPRE
+	case offlineOriginProtocolSign,
 		offlineOriginProtocolPSSRefresh,
 		offlineOriginProtocolPSSReshare,
 		originProtocolReport:
-		return true
+		return evidenceKind == invalidCryptoEvidenceKindSign
 	default:
 		return false
 	}
