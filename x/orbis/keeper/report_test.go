@@ -304,6 +304,81 @@ func TestInvalidCryptoResponseDkgSharePayloadDecodeBindsNestedCommitment(t *test
 	}
 }
 
+func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *testing.T) {
+	signatureA := bytes.Repeat([]byte{42}, 64)
+	signatureB := bytes.Repeat([]byte{43}, 64)
+	commitmentA, commitmentB := dkgEquivocationCommitmentsForTest()
+
+	decoded, err := decodeInvalidCryptoResponsePayload(dkgEquivocationPayloadForTest(
+		commitmentA.encode(),
+		signatureA,
+		commitmentB.encode(),
+		signatureB,
+	))
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "aabb", decoded.ringPk)
+	require.Equal(t, strings.Repeat("11", 32), decoded.ringStateSha256)
+	require.Equal(t, uint64(7), decoded.protocolVersion)
+	require.Equal(t, "dkg-session-1", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, "accused", decoded.responderNodeKey)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
+	require.Equal(t, committeeScopeCurrent, decoded.signingCommitteeScope)
+
+	reshareA := commitmentA.with(func(s *dkgCommitmentStatementFields) {
+		s.originProtocol = offlineOriginProtocolPSSReshare
+	})
+	reshareB := commitmentB.with(func(s *dkgCommitmentStatementFields) {
+		s.originProtocol = offlineOriginProtocolPSSReshare
+	})
+	decoded, err = decodeInvalidCryptoResponsePayload(dkgEquivocationPayloadForTest(
+		reshareA.encode(),
+		signatureA,
+		reshareB.encode(),
+		signatureB,
+	))
+	require.NoError(t, err)
+	require.Equal(t, offlineOriginProtocolPSSReshare, decoded.originProtocol)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"short commitment_a signature", dkgEquivocationPayloadForTest(commitmentA.encode(), bytes.Repeat([]byte{1}, 63), commitmentB.encode(), signatureB)},
+		{"short commitment_b signature", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.encode(), bytes.Repeat([]byte{1}, 63))},
+		{"wrong domain", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.domain = "other" }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"empty request_id", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.requestID = "" }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"empty responder", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.responderKey = "" }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"unsupported origin", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolSign }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"unknown accused scope", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.accusedCommitteeScope = 99 }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"pending accused scope", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.accusedCommitteeScope = committeeScopePendingNew }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"from node zero", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.fromNodeID = 0 }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"empty commitment", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.commitment = nil }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"oversize commitment", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.commitment = make([]byte, dkgCommitmentMaxLen+1) }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"bad session nonce length", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.sessionNonce = bytes.Repeat([]byte{12}, dkgNonceLen-1) }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"empty crypto backend", dkgEquivocationPayloadForTest(commitmentA.with(func(s *dkgCommitmentStatementFields) { s.cryptoBackend = "" }).encode(), signatureA, commitmentB.encode(), signatureB)},
+		{"ring mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.ringID = "other" }).encode(), signatureB)},
+		{"session mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.requestID = "other" }).encode(), signatureB)},
+		{"responder mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.responderKey = "other" }).encode(), signatureB)},
+		{"origin mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolPSSReshare }).encode(), signatureB)},
+		{"from node mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.fromNodeID = 3 }).encode(), signatureB)},
+		{"crypto backend mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.cryptoBackend = "dkg/other" }).encode(), signatureB)},
+		{"different session nonce", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.sessionNonce = bytes.Repeat([]byte{13}, dkgNonceLen) }).encode(), signatureB)},
+		{"identical commitments", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.commitment = commitmentA.commitment }).encode(), signatureB)},
+		{"trailing outer bytes", append(dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.encode(), signatureB), 0)},
+		{"trailing commitment_a bytes", dkgEquivocationPayloadForTest(append(commitmentA.encode(), 0), signatureA, commitmentB.encode(), signatureB)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestValidateInvalidCryptoResponseStatementBindingAndAnchor(t *testing.T) {
 	report := &types.ReportEnvelope{
 		ChainId:         "chain",
@@ -465,6 +540,48 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGShareAcceptsAndDedupes(t *testin
 	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
 
 	secondReport := fixture.validDkgInvalidShareReport(t)
+	secondReport.ReporterNodeKey = fixture.validatorKey
+	second := fixture.signBLSReport(t, sk, secondReport)
+	require.NotEqual(t, msg.ReportId, second.ReportId)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	sessionID, err := reportSessionDedupeID(&msg.Report, reportPayload{
+		originProtocol:        offlineOriginProtocolPSSRefresh,
+		originProtocolVersion: 0,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	})
+	require.NoError(t, err)
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgequiv-ikm0", 2)
+
+	report := fixture.validDkgEquivocationReport(t)
+	msg := fixture.signBLSReport(t, sk, report)
+
+	resp, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+	require.Equal(t, msg.ReportId, resp.ReportId)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	events := parseTypedEvents(t, fixture.ctx)
+	require.Contains(t, events, &types.EventReportAccepted{
+		ReportId:        msg.ReportId,
+		RingId:          fixture.ringID,
+		ReportType:      InvalidCryptoResponseReportType,
+		ReporterNodeKey: fixture.reporterKey,
+		AccusedNodeKey:  fixture.accusedKey,
+	})
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, msg)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+
+	secondReport := fixture.validDkgEquivocationReport(t)
 	secondReport.ReporterNodeKey = fixture.validatorKey
 	second := fixture.signBLSReport(t, sk, secondReport)
 	require.NotEqual(t, msg.ReportId, second.ReportId)
@@ -1546,7 +1663,13 @@ type dkgCommitmentStatementFields struct {
 	signingCommitteeScope byte
 	fromNodeID            uint32
 	commitment            []byte
+	sessionNonce          []byte
 	cryptoBackend         string
+}
+
+func (s dkgCommitmentStatementFields) with(mutate func(*dkgCommitmentStatementFields)) dkgCommitmentStatementFields {
+	mutate(&s)
+	return s
 }
 
 func (s dkgCommitmentStatementFields) encode() []byte {
@@ -1564,6 +1687,7 @@ func (s dkgCommitmentStatementFields) encode() []byte {
 	w.bytes = append(w.bytes, s.accusedCommitteeScope, s.signingCommitteeScope)
 	w.writeU32(s.fromNodeID)
 	w.writeBytes(s.commitment)
+	w.writeBytes(s.sessionNonce)
 	w.writeString(s.cryptoBackend)
 	statement, err := w.finish()
 	if err != nil {
@@ -1644,6 +1768,7 @@ func dkgShareStatementForTest() dkgShareStatementFields {
 		signingCommitteeScope: committeeScopeCurrent,
 		fromNodeID:            2,
 		commitment:            []byte{1, 2, 3, 4},
+		sessionNonce:          bytes.Repeat([]byte{12}, dkgNonceLen),
 		cryptoBackend:         "dkg/test",
 	}
 	return dkgShareStatementFields{
@@ -1672,6 +1797,34 @@ func dkgShareStatementForTest() dkgShareStatementFields {
 
 func dkgSharePayloadForTest(statement []byte, signature []byte) []byte {
 	return invalidCryptoResponsePayloadForTest(invalidCryptoEvidenceKindDkgShare, statement, signature)
+}
+
+func dkgEquivocationCommitmentsForTest() (dkgCommitmentStatementFields, dkgCommitmentStatementFields) {
+	commitmentA := dkgShareStatementForTest().commitmentStatement
+	commitmentA.signedAt = reportTestObservedAt + reportObservedAtGraceSecs
+	commitmentB := commitmentA
+	commitmentB.signedAt = commitmentA.signedAt + 5
+	commitmentB.commitment = []byte{4, 3, 2, 1}
+	return commitmentA, commitmentB
+}
+
+func dkgEquivocationPayloadForTest(
+	commitmentAStatement []byte,
+	commitmentASignature []byte,
+	commitmentBStatement []byte,
+	commitmentBSignature []byte,
+) []byte {
+	w := newReportCanonicalWriter()
+	w.writeString(invalidCryptoEvidenceKindDkgEquivocation)
+	w.writeBytes(commitmentAStatement)
+	w.writeBytes(commitmentASignature)
+	w.writeBytes(commitmentBStatement)
+	w.writeBytes(commitmentBSignature)
+	payload, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
 }
 
 func invalidCryptoResponsePayloadForTest(evidenceKind string, statement []byte, signature []byte) []byte {
@@ -1779,6 +1932,23 @@ func (f reportTestFixture) dkgShareStatementFields(t *testing.T) dkgShareStateme
 	return statement
 }
 
+func (f reportTestFixture) dkgEquivocationCommitments(t *testing.T) (dkgCommitmentStatementFields, dkgCommitmentStatementFields) {
+	t.Helper()
+	require.NotNil(t, f.originalRing)
+	ringDigest, err := reportRingStateSHA256(f.originalRing)
+	require.NoError(t, err)
+	commitmentA, commitmentB := dkgEquivocationCommitmentsForTest()
+	for _, commitment := range []*dkgCommitmentStatementFields{&commitmentA, &commitmentB} {
+		commitment.chainID = f.ctx.ChainID()
+		commitment.ringID = f.ringID
+		commitment.ringPk = f.originalRing.RingPk
+		commitment.ringStateSha256 = ringDigest
+		commitment.protocolVersion = 0
+		commitment.responderKey = f.accusedKey
+	}
+	return commitmentA, commitmentB
+}
+
 func (f reportTestFixture) validDkgInvalidShareReport(t *testing.T) types.ReportEnvelope {
 	t.Helper()
 	statement := f.dkgShareStatementFields(t)
@@ -1788,6 +1958,21 @@ func (f reportTestFixture) validDkgInvalidShareReport(t *testing.T) types.Report
 	report.Payload = dkgSharePayloadForTest(
 		statement.encode(),
 		bytes.Repeat([]byte{42}, 64),
+	)
+	return report
+}
+
+func (f reportTestFixture) validDkgEquivocationReport(t *testing.T) types.ReportEnvelope {
+	t.Helper()
+	commitmentA, commitmentB := f.dkgEquivocationCommitments(t)
+	report := f.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.ReportType = InvalidCryptoResponseReportType
+	report.SessionId = commitmentA.requestID
+	report.Payload = dkgEquivocationPayloadForTest(
+		commitmentA.encode(),
+		bytes.Repeat([]byte{42}, 64),
+		commitmentB.encode(),
+		bytes.Repeat([]byte{43}, 64),
 	)
 	return report
 }

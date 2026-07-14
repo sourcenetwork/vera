@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
@@ -30,7 +31,7 @@ const (
 	// statement carried as invalid_crypto_response/sign evidence.
 	SignResponseDomain = "orbis-sign-response-v1"
 	// DkgCommitmentDomain is the domain tag of the responder-signed raw DKG
-	// commitment statement nested inside invalid_crypto_response/dkg_share evidence.
+	// commitment statement nested inside invalid_crypto_response DKG evidence.
 	DkgCommitmentDomain = "orbis-dkg-commitment-v1"
 	// DkgShareDomain is the domain tag of the responder-signed raw DKG share
 	// statement carried as invalid_crypto_response/dkg_share evidence.
@@ -63,9 +64,10 @@ const (
 	offlineOriginProtocolPSSReshare = "pss_reshare"
 	originProtocolReport            = "report"
 
-	invalidCryptoEvidenceKindPRE      = "pre"
-	invalidCryptoEvidenceKindSign     = "sign"
-	invalidCryptoEvidenceKindDkgShare = "dkg_share"
+	invalidCryptoEvidenceKindPRE             = "pre"
+	invalidCryptoEvidenceKindSign            = "sign"
+	invalidCryptoEvidenceKindDkgShare        = "dkg_share"
+	invalidCryptoEvidenceKindDkgEquivocation = "dkg_equivocation"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -116,6 +118,7 @@ type dkgCommitmentStatement struct {
 	signingCommitteeScope byte
 	fromNodeID            uint32
 	commitment            []byte
+	sessionNonce          []byte
 	cryptoBackend         string
 }
 
@@ -368,40 +371,89 @@ func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 }
 
 // decodeInvalidCryptoResponsePayload decodes and shape-validates an
-// invalid_crypto_response payload: a tagged responder-signed PRE, Sign, or DKG
-// share response statement plus a 64-byte secp256k1 signature. The field order
-// matches the orbis-rs canonical encoding in reporting/v0/types.rs exactly.
+// invalid_crypto_response payload. PRE, Sign, and DKG-share evidence use a
+// tagged statement plus a 64-byte secp256k1 signature; DKG equivocation carries
+// two signed commitment statements. The field order matches the orbis-rs
+// canonical encoding in reporting/v0/types.rs exactly.
 func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseStatement, error) {
 	outer := newReportCanonicalDecoder(payload)
 	evidenceKind, err := outer.readString("evidence_kind")
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	statementBytes, err := outer.readBytes("statement")
-	if err != nil {
-		return invalidCryptoResponseStatement{}, err
-	}
-	responseSignature, err := outer.readBytes("response_signature")
-	if err != nil {
-		return invalidCryptoResponseStatement{}, err
-	}
-	if err := outer.finish(); err != nil {
-		return invalidCryptoResponseStatement{}, err
-	}
-	if len(responseSignature) != 64 {
-		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
-	}
 
 	switch evidenceKind {
 	case invalidCryptoEvidenceKindPRE:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
 		return decodePreReencryptResponseStatement(statementBytes)
 	case invalidCryptoEvidenceKindSign:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
 		return decodeSignResponseStatement(statementBytes)
 	case invalidCryptoEvidenceKindDkgShare:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
 		return decodeDkgShareStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgEquivocation:
+		commitmentAStatementBytes, err := outer.readBytes("commitment_a_statement")
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentASignature, err := outer.readBytes("commitment_a_signature")
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentBStatementBytes, err := outer.readBytes("commitment_b_statement")
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentBSignature, err := outer.readBytes("commitment_b_signature")
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if err := outer.finish(); err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		return decodeDkgEquivocationStatements(
+			commitmentAStatementBytes,
+			commitmentASignature,
+			commitmentBStatementBytes,
+			commitmentBSignature,
+		)
 	default:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported invalid crypto evidence kind %q", evidenceKind)
 	}
+}
+
+func decodeSingleStatementInvalidCryptoPayloadTail(decoder *reportCanonicalDecoder) ([]byte, []byte, error) {
+	statementBytes, err := decoder.readBytes("statement")
+	if err != nil {
+		return nil, nil, err
+	}
+	responseSignature, err := decoder.readBytes("response_signature")
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := decoder.finish(); err != nil {
+		return nil, nil, err
+	}
+	return statementBytes, responseSignature, nil
 }
 
 func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
@@ -886,6 +938,10 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
+	sessionNonce, err := decoder.readBytes("session_nonce")
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
 	cryptoBackend, err := decoder.readString("crypto_backend")
 	if err != nil {
 		return dkgCommitmentStatement{}, err
@@ -905,6 +961,8 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment cannot be empty")
 	case len(commitment) > dkgCommitmentMaxLen:
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment exceeds size bound")
+	case len(sessionNonce) != dkgNonceLen:
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "DKG commitment session nonce must be %d bytes", dkgNonceLen)
 	case cryptoBackend == "":
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment crypto backend cannot be empty")
 	}
@@ -923,7 +981,66 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		signingCommitteeScope: signingScope,
 		fromNodeID:            fromNodeID,
 		commitment:            commitment,
+		sessionNonce:          sessionNonce,
 		cryptoBackend:         cryptoBackend,
+	}, nil
+}
+
+func decodeDkgEquivocationStatements(
+	commitmentAStatementBytes []byte,
+	commitmentASignature []byte,
+	commitmentBStatementBytes []byte,
+	commitmentBSignature []byte,
+) (invalidCryptoResponseStatement, error) {
+	if len(commitmentASignature) != 64 {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment_a signature must be 64 bytes")
+	}
+	if len(commitmentBSignature) != 64 {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment_b signature must be 64 bytes")
+	}
+
+	commitmentA, err := decodeDkgCommitmentStatement(commitmentAStatementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	commitmentB, err := decodeDkgCommitmentStatement(commitmentBStatementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	if commitmentA.chainID != commitmentB.chainID ||
+		commitmentA.ringID != commitmentB.ringID ||
+		commitmentA.ringPk != commitmentB.ringPk ||
+		commitmentA.ringStateSha256 != commitmentB.ringStateSha256 ||
+		commitmentA.protocolVersion != commitmentB.protocolVersion ||
+		commitmentA.requestID != commitmentB.requestID ||
+		commitmentA.responderNodeKey != commitmentB.responderNodeKey ||
+		commitmentA.originProtocol != commitmentB.originProtocol ||
+		commitmentA.accusedCommitteeScope != commitmentB.accusedCommitteeScope ||
+		commitmentA.signingCommitteeScope != commitmentB.signingCommitteeScope ||
+		commitmentA.fromNodeID != commitmentB.fromNodeID ||
+		commitmentA.cryptoBackend != commitmentB.cryptoBackend {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment bindings do not match")
+	}
+	if !bytes.Equal(commitmentA.sessionNonce, commitmentB.sessionNonce) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitments must share a session nonce")
+	}
+	if bytes.Equal(commitmentA.commitment, commitmentB.commitment) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitments must differ")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               commitmentA.chainID,
+		ringID:                commitmentA.ringID,
+		ringPk:                commitmentA.ringPk,
+		ringStateSha256:       commitmentA.ringStateSha256,
+		protocolVersion:       commitmentA.protocolVersion,
+		requestID:             commitmentA.requestID,
+		signedAt:              commitmentA.signedAt,
+		responderNodeKey:      commitmentA.responderNodeKey,
+		originProtocol:        commitmentA.originProtocol,
+		accusedCommitteeScope: commitmentA.accusedCommitteeScope,
+		signingCommitteeScope: commitmentA.signingCommitteeScope,
 	}, nil
 }
 
