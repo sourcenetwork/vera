@@ -304,6 +304,54 @@ func TestInvalidCryptoResponseDkgSharePayloadDecodeBindsNestedCommitment(t *test
 	}
 }
 
+func TestInvalidCryptoResponseDkgInvalidRefreshCommitmentPayloadDecodeBindsCommitment(t *testing.T) {
+	signature := bytes.Repeat([]byte{42}, 64)
+	validStatement, _ := dkgEquivocationCommitmentsForTest()
+
+	decoded, err := decodeInvalidCryptoResponsePayload(dkgInvalidRefreshCommitmentPayloadForTest(validStatement.encode(), signature))
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "aabb", decoded.ringPk)
+	require.Equal(t, strings.Repeat("11", 32), decoded.ringStateSha256)
+	require.Equal(t, uint64(7), decoded.protocolVersion)
+	require.Equal(t, "dkg-session-1", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, "accused", decoded.responderNodeKey)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
+	require.Equal(t, committeeScopeCurrent, decoded.signingCommitteeScope)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"short signature", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.encode(), bytes.Repeat([]byte{42}, 63))},
+		{"wrong domain", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.domain = "other" }).encode(), signature)},
+		{"empty request_id", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.requestID = "" }).encode(), signature)},
+		{"empty responder", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.responderKey = "" }).encode(), signature)},
+		{"unsupported origin", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolSign }).encode(), signature)},
+		{"reshare origin", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolPSSReshare }).encode(), signature)},
+		{"unknown accused scope", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.accusedCommitteeScope = 99 }).encode(), signature)},
+		{"pending accused scope", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.accusedCommitteeScope = committeeScopePendingNew }).encode(), signature)},
+		{"unknown signing scope", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.signingCommitteeScope = 99 }).encode(), signature)},
+		{"pending signing scope", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.signingCommitteeScope = committeeScopePendingNew }).encode(), signature)},
+		{"from node zero", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.fromNodeID = 0 }).encode(), signature)},
+		{"empty commitment", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.commitment = nil }).encode(), signature)},
+		{"oversize commitment", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.commitment = make([]byte, dkgCommitmentMaxLen+1) }).encode(), signature)},
+		{"bad session nonce length", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.sessionNonce = bytes.Repeat([]byte{12}, dkgNonceLen-1) }).encode(), signature)},
+		{"empty crypto backend", dkgInvalidRefreshCommitmentPayloadForTest(validStatement.with(func(s *dkgCommitmentStatementFields) { s.cryptoBackend = "" }).encode(), signature)},
+		{"trailing inner bytes", dkgInvalidRefreshCommitmentPayloadForTest(append(validStatement.encode(), 0), signature)},
+		{"trailing outer bytes", append(dkgInvalidRefreshCommitmentPayloadForTest(validStatement.encode(), signature), 0)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *testing.T) {
 	signatureA := bytes.Repeat([]byte{42}, 64)
 	signatureB := bytes.Repeat([]byte{43}, 64)
@@ -540,6 +588,48 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGShareAcceptsAndDedupes(t *testin
 	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
 
 	secondReport := fixture.validDkgInvalidShareReport(t)
+	secondReport.ReporterNodeKey = fixture.validatorKey
+	second := fixture.signBLSReport(t, sk, secondReport)
+	require.NotEqual(t, msg.ReportId, second.ReportId)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	sessionID, err := reportSessionDedupeID(&msg.Report, reportPayload{
+		originProtocol:        offlineOriginProtocolPSSRefresh,
+		originProtocolVersion: 0,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	})
+	require.NoError(t, err)
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsAndDedupes(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgcommit-ikm", 2)
+
+	report := fixture.validDkgInvalidRefreshCommitmentReport(t)
+	msg := fixture.signBLSReport(t, sk, report)
+
+	resp, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+	require.Equal(t, msg.ReportId, resp.ReportId)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	events := parseTypedEvents(t, fixture.ctx)
+	require.Contains(t, events, &types.EventReportAccepted{
+		ReportId:        msg.ReportId,
+		RingId:          fixture.ringID,
+		ReportType:      InvalidCryptoResponseReportType,
+		ReporterNodeKey: fixture.reporterKey,
+		AccusedNodeKey:  fixture.accusedKey,
+	})
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, msg)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+
+	secondReport := fixture.validDkgInvalidRefreshCommitmentReport(t)
 	secondReport.ReporterNodeKey = fixture.validatorKey
 	second := fixture.signBLSReport(t, sk, secondReport)
 	require.NotEqual(t, msg.ReportId, second.ReportId)
@@ -1799,6 +1889,10 @@ func dkgSharePayloadForTest(statement []byte, signature []byte) []byte {
 	return invalidCryptoResponsePayloadForTest(invalidCryptoEvidenceKindDkgShare, statement, signature)
 }
 
+func dkgInvalidRefreshCommitmentPayloadForTest(statement []byte, signature []byte) []byte {
+	return invalidCryptoResponsePayloadForTest(invalidCryptoEvidenceKindDkgInvalidRefreshCommitment, statement, signature)
+}
+
 func dkgEquivocationCommitmentsForTest() (dkgCommitmentStatementFields, dkgCommitmentStatementFields) {
 	commitmentA := dkgShareStatementForTest().commitmentStatement
 	commitmentA.signedAt = reportTestObservedAt + reportObservedAtGraceSecs
@@ -1932,6 +2026,12 @@ func (f reportTestFixture) dkgShareStatementFields(t *testing.T) dkgShareStateme
 	return statement
 }
 
+func (f reportTestFixture) dkgInvalidRefreshCommitmentStatementFields(t *testing.T) dkgCommitmentStatementFields {
+	t.Helper()
+	commitment, _ := f.dkgEquivocationCommitments(t)
+	return commitment
+}
+
 func (f reportTestFixture) dkgEquivocationCommitments(t *testing.T) (dkgCommitmentStatementFields, dkgCommitmentStatementFields) {
 	t.Helper()
 	require.NotNil(t, f.originalRing)
@@ -1956,6 +2056,19 @@ func (f reportTestFixture) validDkgInvalidShareReport(t *testing.T) types.Report
 	report.ReportType = InvalidCryptoResponseReportType
 	report.SessionId = statement.requestID
 	report.Payload = dkgSharePayloadForTest(
+		statement.encode(),
+		bytes.Repeat([]byte{42}, 64),
+	)
+	return report
+}
+
+func (f reportTestFixture) validDkgInvalidRefreshCommitmentReport(t *testing.T) types.ReportEnvelope {
+	t.Helper()
+	statement := f.dkgInvalidRefreshCommitmentStatementFields(t)
+	report := f.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.ReportType = InvalidCryptoResponseReportType
+	report.SessionId = statement.requestID
+	report.Payload = dkgInvalidRefreshCommitmentPayloadForTest(
 		statement.encode(),
 		bytes.Repeat([]byte{42}, 64),
 	)

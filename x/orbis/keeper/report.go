@@ -64,10 +64,11 @@ const (
 	offlineOriginProtocolPSSReshare = "pss_reshare"
 	originProtocolReport            = "report"
 
-	invalidCryptoEvidenceKindPRE             = "pre"
-	invalidCryptoEvidenceKindSign            = "sign"
-	invalidCryptoEvidenceKindDkgShare        = "dkg_share"
-	invalidCryptoEvidenceKindDkgEquivocation = "dkg_equivocation"
+	invalidCryptoEvidenceKindPRE                         = "pre"
+	invalidCryptoEvidenceKindSign                        = "sign"
+	invalidCryptoEvidenceKindDkgShare                    = "dkg_share"
+	invalidCryptoEvidenceKindDkgInvalidRefreshCommitment = "dkg_invalid_refresh_commitment"
+	invalidCryptoEvidenceKindDkgEquivocation             = "dkg_equivocation"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -371,10 +372,11 @@ func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 }
 
 // decodeInvalidCryptoResponsePayload decodes and shape-validates an
-// invalid_crypto_response payload. PRE, Sign, and DKG-share evidence use a
-// tagged statement plus a 64-byte secp256k1 signature; DKG equivocation carries
-// two signed commitment statements. The field order matches the orbis-rs
-// canonical encoding in reporting/v0/types.rs exactly.
+// invalid_crypto_response payload. PRE, Sign, DKG-share, and invalid refresh
+// commitment evidence use a tagged statement plus a 64-byte secp256k1
+// signature; DKG equivocation carries two signed commitment statements. The
+// field order matches the orbis-rs canonical encoding in reporting/v0/types.rs
+// exactly.
 func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseStatement, error) {
 	outer := newReportCanonicalDecoder(payload)
 	evidenceKind, err := outer.readString("evidence_kind")
@@ -410,6 +412,15 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
 		}
 		return decodeDkgShareStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgInvalidRefreshCommitment:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodeDkgInvalidRefreshCommitmentStatement(statementBytes)
 	case invalidCryptoEvidenceKindDkgEquivocation:
 		commitmentAStatementBytes, err := outer.readBytes("commitment_a_statement")
 		if err != nil {
@@ -983,6 +994,34 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		commitment:            commitment,
 		sessionNonce:          sessionNonce,
 		cryptoBackend:         cryptoBackend,
+	}, nil
+}
+
+func decodeDkgInvalidRefreshCommitmentStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	commitment, err := decodeDkgCommitmentStatement(statementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if commitment.originProtocol != offlineOriginProtocolPSSRefresh {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(
+			types.ErrInvalidReport,
+			"DKG invalid-refresh-commitment report requires pss_refresh origin, got %s",
+			commitment.originProtocol,
+		)
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               commitment.chainID,
+		ringID:                commitment.ringID,
+		ringPk:                commitment.ringPk,
+		ringStateSha256:       commitment.ringStateSha256,
+		protocolVersion:       commitment.protocolVersion,
+		requestID:             commitment.requestID,
+		signedAt:              commitment.signedAt,
+		responderNodeKey:      commitment.responderNodeKey,
+		originProtocol:        commitment.originProtocol,
+		accusedCommitteeScope: commitment.accusedCommitteeScope,
+		signingCommitteeScope: commitment.signingCommitteeScope,
 	}, nil
 }
 
