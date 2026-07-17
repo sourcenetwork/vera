@@ -472,6 +472,93 @@ func TestValidateInvalidCryptoResponseStatementBindingAndAnchor(t *testing.T) {
 	}
 }
 
+func TestUnauthorizedRequestPayloadDecodeAcceptsAndRejectsMalformed(t *testing.T) {
+	validSig := make([]byte, 64)
+	valid := validRelayRequestStatementFields()
+
+	statement, err := decodeUnauthorizedRequestPayload(
+		unauthorizedRequestPayloadForTest(valid.encode(), validSig, "42"),
+	)
+	require.NoError(t, err)
+	require.Equal(t, offlineOriginProtocolPRE, statement.originProtocol)
+	require.Equal(t, "accused", statement.relayerNodeKey)
+	require.Equal(t, uint64(0), statement.protocolVersion)
+
+	// The sign origin is equally valid.
+	_, err = decodeUnauthorizedRequestPayload(unauthorizedRequestPayloadForTest(
+		valid.with(func(s *relayRequestStatementFields) { s.originProtocol = offlineOriginProtocolSign }).encode(),
+		validSig, "42",
+	))
+	require.NoError(t, err)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"short signature", unauthorizedRequestPayloadForTest(valid.encode(), make([]byte, 63), "42")},
+		{"empty anchor", unauthorizedRequestPayloadForTest(valid.encode(), validSig, "")},
+		{"wrong domain", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.domain = "other" }).encode(), validSig, "42")},
+		{"bad origin", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.originProtocol = "dkg" }).encode(), validSig, "42")},
+		{"non-current accused scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.accusedScope = committeeScopePendingNew }).encode(), validSig, "42")},
+		{"non-current signing scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.signingScope = committeeScopePendingNew }).encode(), validSig, "42")},
+		{"zero from_node_id", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.fromNodeID = 0 }).encode(), validSig, "42")},
+		{"empty actor", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.actorID = "" }).encode(), validSig, "42")},
+		{"empty object", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.objectID = "" }).encode(), validSig, "42")},
+		{"half-set window", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { v := uint64(1); s.validWindowStart = &v }).encode(), validSig, "42")},
+		{"drift exceeds max", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.userSignedAt = s.signedAt - relayCheckMaxDriftSecs - 1 }).encode(), validSig, "42")},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeUnauthorizedRequestPayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
+func TestValidateRelayRequestStatementBindingAndAnchor(t *testing.T) {
+	report := &types.ReportEnvelope{
+		ChainId:         "chain",
+		RingId:          "ring",
+		RingPk:          "pk",
+		RingStateSha256: "digest",
+		SessionId:       "req",
+		AccusedNodeKey:  "accused",
+		ObservedAt:      reportTestObservedAt,
+	}
+	base := relayRequestStatement{
+		chainID:         "chain",
+		ringID:          "ring",
+		ringPk:          "pk",
+		ringStateSha256: "digest",
+		requestID:       "req",
+		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
+		relayerNodeKey:  "accused",
+	}
+	require.NoError(t, validateRelayRequestStatement(report, base))
+
+	rejected := []struct {
+		name   string
+		mutate func(*relayRequestStatement)
+	}{
+		{"chain mismatch", func(s *relayRequestStatement) { s.chainID = "other" }},
+		{"ring id mismatch", func(s *relayRequestStatement) { s.ringID = "other" }},
+		{"ring pk mismatch", func(s *relayRequestStatement) { s.ringPk = "other" }},
+		{"ring state mismatch", func(s *relayRequestStatement) { s.ringStateSha256 = "other" }},
+		{"session mismatch", func(s *relayRequestStatement) { s.requestID = "other" }},
+		{"relayer mismatch", func(s *relayRequestStatement) { s.relayerNodeKey = "other" }},
+		{"anchor off by one late", func(s *relayRequestStatement) { s.signedAt++ }},
+		{"anchor off by one early", func(s *relayRequestStatement) { s.signedAt-- }},
+		{"signed_at below grace", func(s *relayRequestStatement) { s.signedAt = reportObservedAtGraceSecs - 1 }},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			statement := base
+			tc.mutate(&statement)
+			require.ErrorIs(t, validateRelayRequestStatement(report, statement), types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 	_, err := DemeritAmountForReportType(nil, NodeOfflineReportType)
 	require.ErrorIs(t, err, types.ErrRingNotFound)
@@ -486,6 +573,7 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 			DemeritConfig: types.DemeritConfig{
 				NodeOfflineDemerits:           5,
 				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
@@ -499,6 +587,7 @@ func TestDemeritAmountForReportTypeRejectsInvalidInputs(t *testing.T) {
 			DemeritConfig: types.DemeritConfig{
 				NodeOfflineDemerits:           5,
 				InvalidCryptoResponseDemerits: 7,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
@@ -831,6 +920,7 @@ func TestMsgServer_SubmitReportIncrementsDemeritsForDistinctReports(t *testing.T
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
 		NodeOfflineDemerits:           3,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 	})
 
@@ -862,6 +952,7 @@ func TestMsgServer_SubmitReportSchedulesAutoReshareAtKickThreshold(t *testing.T)
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           3,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backup1Key, backup2Key},
@@ -902,6 +993,7 @@ func TestMsgServer_SubmitReportDoesNotScheduleAutoReshareBelowThreshold(t *testi
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           1,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backupKey},
@@ -930,6 +1022,7 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWhenAlreadyPending(t *testin
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           3,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{backupKey},
@@ -960,6 +1053,7 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWithoutEligibleBackup(t *tes
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           3,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 		},
 		BackupNodeKeys: []string{fixture.reporterKey, ineligibleBackupKey},
@@ -983,6 +1077,7 @@ func TestMsgServer_SubmitReportAppliesLazyDemeritReset(t *testing.T) {
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
 		NodeOfflineDemerits:           3,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          ReportTTLSeconds * 2,
 	})
 
@@ -1020,6 +1115,7 @@ func TestMsgServer_SubmitReportDoesNotResetDemeritsOnReplayOrRejectedReport(t *t
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
 		NodeOfflineDemerits:           3,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          10,
 	})
 
@@ -1050,6 +1146,7 @@ func TestQueryServer_NodeDemeritsReturnsEffectiveScoreWithoutResettingExpiredWin
 	fixture.setRingWithDemeritConfig(t, hex.EncodeToString(new(blst.P1Affine).From(sk).Compress()), 2, types.DemeritConfig{
 		NodeOfflineDemerits:           3,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          10,
 	})
 
@@ -1926,6 +2023,95 @@ func invalidCryptoResponsePayloadForTest(evidenceKind string, statement []byte, 
 	w.writeString(evidenceKind)
 	w.writeBytes(statement)
 	w.writeBytes(signature)
+	payload, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+// relayRequestStatementFields mirrors the orbis-rs RelayRequestStatement canonical
+// encoding for tests.
+type relayRequestStatementFields struct {
+	domain           string
+	chainID          string
+	ringID           string
+	ringPk           string
+	ringStateSha256  string
+	protocolVersion  uint64
+	requestID        string
+	signedAt         uint64
+	userSignedAt     uint64
+	relayerNodeKey   string
+	originProtocol   string
+	accusedScope     byte
+	signingScope     byte
+	fromNodeID       uint32
+	actorID          string
+	objectID         string
+	validWindowStart *uint64
+	validWindowEnd   *uint64
+	timestamp        *uint64
+}
+
+func validRelayRequestStatementFields() relayRequestStatementFields {
+	return relayRequestStatementFields{
+		domain:          RelayRequestDomain,
+		chainID:         reportTestChainID,
+		ringID:          "ring",
+		ringPk:          "pk",
+		ringStateSha256: "digest",
+		protocolVersion: 0,
+		requestID:       "relay-req",
+		signedAt:        reportTestObservedAt + reportObservedAtGraceSecs,
+		userSignedAt:    reportTestObservedAt + reportObservedAtGraceSecs,
+		relayerNodeKey:  "accused",
+		originProtocol:  offlineOriginProtocolPRE,
+		accusedScope:    committeeScopeCurrent,
+		signingScope:    committeeScopeCurrent,
+		fromNodeID:      2,
+		actorID:         "did:key:actor",
+		objectID:        "object",
+	}
+}
+
+func (s relayRequestStatementFields) with(mutate func(*relayRequestStatementFields)) relayRequestStatementFields {
+	mutate(&s)
+	return s
+}
+
+func (s relayRequestStatementFields) encode() []byte {
+	w := newReportCanonicalWriter()
+	w.writeString(s.domain)
+	w.writeString(s.chainID)
+	w.writeString(s.ringID)
+	w.writeString(s.ringPk)
+	w.writeString(s.ringStateSha256)
+	w.writeU64(s.protocolVersion)
+	w.writeString(s.requestID)
+	w.writeU64(s.signedAt)
+	w.writeU64(s.userSignedAt)
+	w.writeString(s.relayerNodeKey)
+	w.writeString(s.originProtocol)
+	w.bytes = append(w.bytes, s.accusedScope, s.signingScope)
+	w.writeU32(s.fromNodeID)
+	w.writeString(s.actorID)
+	w.writeString(s.objectID)
+	w.writeOptionalU64(s.validWindowStart)
+	w.writeOptionalU64(s.validWindowEnd)
+	w.writeOptionalU64(s.timestamp)
+	statement, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return statement
+}
+
+func unauthorizedRequestPayloadForTest(statement []byte, signature []byte, anchor string) []byte {
+	w := newReportCanonicalWriter()
+	w.writeBytes(statement)
+	w.writeBytes(signature)
+	w.writeString(anchor)
 	payload, err := w.finish()
 	if err != nil {
 		panic(err)

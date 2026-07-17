@@ -38,6 +38,7 @@ func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 			DemeritConfig: DemeritConfig{
 				NodeOfflineDemerits:           0,
 				InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: DefaultReportingKickThreshold,
@@ -49,6 +50,7 @@ func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 		DemeritConfig: DemeritConfig{
 			NodeOfflineDemerits:           DefaultNodeOfflineDemerits,
 			InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          0,
 		},
 		KickThreshold: DefaultReportingKickThreshold,

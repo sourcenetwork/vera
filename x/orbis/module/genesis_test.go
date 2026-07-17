@@ -16,6 +16,7 @@ func TestInitGenesisAppliesDefaultReportingToRings(t *testing.T) {
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           7,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          120,
 		},
 		KickThreshold: 5,
@@ -24,6 +25,7 @@ func TestInitGenesisAppliesDefaultReportingToRings(t *testing.T) {
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           2,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          60,
 		},
 		BackupNodeKeys: []string{"node-9"},
@@ -71,6 +73,7 @@ func TestGenesisRoundTrip(t *testing.T) {
 			DemeritConfig: types.DemeritConfig{
 				NodeOfflineDemerits:           4,
 				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          30,
 			},
 			BackupNodeKeys: []string{"node-4", "node-3"},

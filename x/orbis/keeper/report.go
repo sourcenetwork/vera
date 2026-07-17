@@ -22,6 +22,7 @@ const (
 	ReportSessionDomain             = "orbis-mpc-fault-report-session"
 	NodeOfflineReportType           = "node_offline"
 	InvalidCryptoResponseReportType = "invalid_crypto_response"
+	UnauthorizedRequestReportType   = "unauthorized_request"
 	ReportTTLSeconds                = uint64(120)
 
 	// PreReencryptResponseDomain is the domain tag of the responder-signed PRE
@@ -36,6 +37,13 @@ const (
 	// DkgShareDomain is the domain tag of the responder-signed raw DKG share
 	// statement carried as invalid_crypto_response/dkg_share evidence.
 	DkgShareDomain = "orbis-dkg-share-v1"
+	// RelayRequestDomain is the domain tag of the relayer-signed statement carried
+	// as the unauthorized_request report payload.
+	RelayRequestDomain = "orbis-relay-request-v1"
+	// relayCheckMaxDriftSecs mirrors orbis-rs RELAY_CHECK_MAX_DRIFT_SECS: the
+	// relayer must have forwarded within this many seconds of the caller signing
+	// the request (|signed_at - user_signed_at| <= relayCheckMaxDriftSecs).
+	relayCheckMaxDriftSecs = uint64(30)
 	// reportObservedAtGraceSecs mirrors orbis-rs CHAIN_BLOCK_GRACE_SECS:
 	// reporters backdate observed_at by this so the observed_at <= block_time
 	// check passes gas simulation. invalid_crypto_response envelopes are pinned
@@ -123,6 +131,24 @@ type dkgCommitmentStatement struct {
 	cryptoBackend         string
 }
 
+// relayRequestStatement is the relayer-signed record of a Sign/PRE request it
+// forwarded after its own ACP check passed. The relayer is the accused. Field
+// order matches the orbis-rs canonical encoding in reporting/v0/types.rs
+// RelayRequestStatement exactly.
+type relayRequestStatement struct {
+	chainID               string
+	ringID                string
+	ringPk                string
+	ringStateSha256       string
+	protocolVersion       uint64
+	requestID             string
+	signedAt              uint64
+	relayerNodeKey        string
+	originProtocol        string
+	accusedCommitteeScope byte
+	signingCommitteeScope byte
+}
+
 type reportCommitteeView struct {
 	peerNodeKeys []string
 	threshold    uint32
@@ -185,6 +211,20 @@ func (k *Keeper) validateSubmittedReport(
 			return nil, err
 		}
 		if err := validateInvalidCryptoResponseStatement(report, statement); err != nil {
+			return nil, err
+		}
+		payload = reportPayload{
+			originProtocol:        statement.originProtocol,
+			originProtocolVersion: statement.protocolVersion,
+			accusedCommitteeScope: statement.accusedCommitteeScope,
+			signingCommitteeScope: statement.signingCommitteeScope,
+		}
+	case UnauthorizedRequestReportType:
+		statement, err := decodeUnauthorizedRequestPayload(report.Payload)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateRelayRequestStatement(report, statement); err != nil {
 			return nil, err
 		}
 		payload = reportPayload{
@@ -1107,6 +1147,192 @@ func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statem
 	return nil
 }
 
+// decodeUnauthorizedRequestPayload decodes the unauthorized_request payload: the
+// relayer-signed statement, its 64-byte secp256k1 signature, and the acceptor's
+// opaque ACP anchor. The chain does not re-run the ACP check or verify the relay
+// signature — that anti-framing refutation runs off-chain in the orbis co-signer
+// set; the chain's crypto gate remains the ring threshold signature on the
+// report envelope. The field order matches orbis-rs UnauthorizedRequestPayload.
+func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, error) {
+	outer := newReportCanonicalDecoder(payload)
+	statementBytes, err := outer.readBytes("statement")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	relaySignature, err := outer.readBytes("relay_signature")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	checkedAtAnchor, err := outer.readString("checked_at_anchor")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if err := outer.finish(); err != nil {
+		return relayRequestStatement{}, err
+	}
+	if len(relaySignature) != 64 {
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay signature must be 64 bytes")
+	}
+	if checkedAtAnchor == "" {
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request checked_at_anchor cannot be empty")
+	}
+	return decodeRelayRequestStatement(statementBytes)
+}
+
+func decodeRelayRequestStatement(statementBytes []byte) (relayRequestStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString("domain")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if domain != RelayRequestDomain {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected relay request domain %q", domain)
+	}
+	chainID, err := decoder.readString("chain_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringID, err := decoder.readString("ring_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringPk, err := decoder.readString("ring_pk")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64("protocol_version")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	requestID, err := decoder.readString("request_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	signedAt, err := decoder.readU64("signed_at")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	userSignedAt, err := decoder.readU64("user_signed_at")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	relayerNodeKey, err := decoder.readString("relayer_node_key")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	originProtocol, err := decoder.readString("origin_protocol")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	accusedScope, err := decoder.readByte("accused_committee_scope")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte("signing_committee_scope")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	fromNodeID, err := decoder.readU32("from_node_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	actorID, err := decoder.readString("actor_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	objectID, err := decoder.readString("object_id")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	validWindowStart, err := decoder.readOptionalU64("valid_window_start")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	validWindowEnd, err := decoder.readOptionalU64("valid_window_end")
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	// timestamp is the relayer's ACP-check time; only the off-chain refutation
+	// re-runs the ACP check, so the chain decodes it for framing but ignores it.
+	if _, err := decoder.readOptionalU64("timestamp"); err != nil {
+		return relayRequestStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return relayRequestStatement{}, err
+	}
+
+	switch {
+	case originProtocol != offlineOriginProtocolPRE && originProtocol != offlineOriginProtocolSign:
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported relay request origin protocol %q", originProtocol)
+	case accusedScope != committeeScopeCurrent || signingScope != committeeScopeCurrent:
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request reports must use current accused and signing scopes")
+	case fromNodeID == 0:
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request from_node_id must be non-zero")
+	case requestID == "" || relayerNodeKey == "" || actorID == "" || objectID == "":
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request statement has empty identity fields")
+	case (validWindowStart != nil) != (validWindowEnd != nil):
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request valid_window bounds must both be present or both absent")
+	case absDiffUint64(signedAt, userSignedAt) > relayCheckMaxDriftSecs:
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "relay request signed_at %d drifts from caller signed_at %d by more than %ds", signedAt, userSignedAt, relayCheckMaxDriftSecs)
+	}
+
+	return relayRequestStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		relayerNodeKey:        relayerNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+	}, nil
+}
+
+// validateRelayRequestStatement binds the relayer-signed statement to the report
+// envelope. As with invalid_crypto_response, pinning observed_at to
+// signed_at - grace makes the envelope's fixed observed_at+TTL window double as
+// the evidence expiry, so the shared envelope timing checks already bound how
+// long this evidence stays reportable.
+func validateRelayRequestStatement(report *types.ReportEnvelope, statement relayRequestStatement) error {
+	switch {
+	case statement.chainID != report.ChainId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request chain ID does not match report envelope")
+	case statement.ringID != report.RingId,
+		statement.ringPk != report.RingPk,
+		statement.ringStateSha256 != report.RingStateSha256:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request ring binding does not match report envelope")
+	case statement.requestID != report.SessionId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request request_id does not match report session_id")
+	case statement.relayerNodeKey != report.AccusedNodeKey:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request relayer does not match accused node")
+	case statement.signedAt < reportObservedAtGraceSecs,
+		report.ObservedAt != statement.signedAt-reportObservedAtGraceSecs:
+		return errorsmod.Wrap(types.ErrInvalidReport, "report envelope is not anchored to the evidence timestamp")
+	}
+	return nil
+}
+
+// absDiffUint64 returns |a - b| without casting through float64.
+func absDiffUint64(a, b uint64) uint64 {
+	if a > b {
+		return a - b
+	}
+	return b - a
+}
+
 func isValidReportCommitteeScope(scope byte) bool {
 	return scope == committeeScopeCurrent || scope == committeeScopePendingNew
 }
@@ -1548,6 +1774,25 @@ func (d *reportCanonicalDecoder) readOptionalBytes(label string) ([]byte, error)
 		return nil, nil
 	case 1:
 		return d.readBytes(label)
+	default:
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
+	}
+}
+
+func (d *reportCanonicalDecoder) readOptionalU64(label string) (*uint64, error) {
+	tag, err := d.readByte(label + "_present")
+	if err != nil {
+		return nil, err
+	}
+	switch tag {
+	case 0:
+		return nil, nil
+	case 1:
+		value, err := d.readU64(label)
+		if err != nil {
+			return nil, err
+		}
+		return &value, nil
 	default:
 		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
 	}

@@ -8,6 +8,7 @@ import (
 const (
 	DefaultNodeOfflineDemerits           = uint64(1)
 	DefaultInvalidCryptoResponseDemerits = uint64(1)
+	DefaultUnauthorizedRequestDemerits   = uint64(1)
 	DefaultDemeritResetIntervalSecs      = uint64(86400)
 	DefaultReportingKickThreshold        = uint64(3)
 )
@@ -36,6 +37,7 @@ func DefaultDemeritConfig() DemeritConfig {
 	return DemeritConfig{
 		NodeOfflineDemerits:           DefaultNodeOfflineDemerits,
 		InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          DefaultDemeritResetIntervalSecs,
 	}
 }
@@ -78,6 +80,9 @@ func ValidateDemeritConfig(config DemeritConfig) error {
 	}
 	if config.InvalidCryptoResponseDemerits == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "invalid_crypto_response_demerits must be at least 1")
+	}
+	if config.UnauthorizedRequestDemerits == 0 {
+		return errorsmod.Wrap(ErrInvalidRing, "unauthorized_request_demerits must be at least 1")
 	}
 	if config.ResetIntervalSeconds == 0 {
 		return errorsmod.Wrap(ErrInvalidRing, "reset_interval_seconds must be at least 1")

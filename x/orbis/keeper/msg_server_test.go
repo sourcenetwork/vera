@@ -184,6 +184,7 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 	defaultConfig := types.DemeritConfig{
 		NodeOfflineDemerits:           4,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          12,
 	}
 	defaultReporting := types.ReportingDefaults{
@@ -206,6 +207,7 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           8,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          24,
 		},
 		KickThreshold: 6,
@@ -216,6 +218,7 @@ func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 	explicitConfig := types.DemeritConfig{
 		NodeOfflineDemerits:           7,
 		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 		ResetIntervalSeconds:          60,
 	}
 	explicitReporting := types.ReportingConfig{
@@ -265,6 +268,7 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 			DemeritConfig: types.DemeritConfig{
 				NodeOfflineDemerits:           0,
 				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
@@ -278,6 +282,7 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 			DemeritConfig: types.DemeritConfig{
 				NodeOfflineDemerits:           types.DefaultNodeOfflineDemerits,
 				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 				ResetIntervalSeconds:          0,
 			},
 			KickThreshold: types.DefaultReportingKickThreshold,
@@ -886,6 +891,7 @@ func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 		DemeritConfig: types.DemeritConfig{
 			NodeOfflineDemerits:           2,
 			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
 			ResetIntervalSeconds:          42,
 		},
 		BackupNodeKeys: []string{backup2Key, backup1Key},
