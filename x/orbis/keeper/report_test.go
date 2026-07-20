@@ -78,7 +78,30 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "f6561137d2827315c438a8e0608cdf86748e7e7d0aa4b741dedc065f536c7861", ringHash)
+	require.Equal(t, "ad10dfb463d1d3aeca03644e200aa192c49d6689300e90fe243d710e645aba18", ringHash)
+}
+
+func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) {
+	baseRing := func(unauthorizedRequestDemerits uint64) *types.Ring {
+		reporting := types.DefaultReportingConfig()
+		reporting.DemeritConfig.UnauthorizedRequestDemerits = unauthorizedRequestDemerits
+		return &types.Ring{
+			RingPk:       "pk",
+			PeerNodeKeys: []string{"b", "a"},
+			Threshold:    2,
+			PssInterval:  types.MinPSSIntervalSeconds,
+			UpgradeInfo: types.UpgradeInfo{
+				CurrentVersion: 0,
+			},
+			Reporting: reporting,
+		}
+	}
+
+	hashA, err := reportRingStateSHA256(baseRing(1))
+	require.NoError(t, err)
+	hashB, err := reportRingStateSHA256(baseRing(2))
+	require.NoError(t, err)
+	require.NotEqual(t, hashA, hashB)
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
