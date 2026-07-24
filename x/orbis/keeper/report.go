@@ -1673,8 +1673,8 @@ func (w *reportCanonicalWriter) writeOptionalU64(value *uint64) {
 
 func (w *reportCanonicalWriter) writeDemeritConfig(value types.DemeritConfig) {
 	w.writeU64(value.NodeOfflineDemerits)
-	w.writeU64(value.InvalidCryptoResponseDemerits)
 	w.writeU64(value.ResetIntervalSeconds)
+	w.writeU64(value.InvalidCryptoResponseDemerits)
 	w.writeU64(value.UnauthorizedRequestDemerits)
 }
 

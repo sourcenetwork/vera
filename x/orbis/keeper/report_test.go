@@ -78,7 +78,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "ad10dfb463d1d3aeca03644e200aa192c49d6689300e90fe243d710e645aba18", ringHash)
+	require.Equal(t, "d33ea6fdeda388fa0e31f128a5e649714887308e75220414d7a2df96222f5cb7", ringHash)
 }
 
 func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) {
@@ -793,6 +793,48 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t 
 
 	sessionID, err := reportSessionDedupeID(&msg.Report, reportPayload{
 		originProtocol:        offlineOriginProtocolPSSRefresh,
+		originProtocolVersion: 0,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	})
+	require.NoError(t, err)
+	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+func TestMsgServer_SubmitReport_UnauthorizedRequestAcceptsAndDedupes(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-unauthorized-ikm0", 2)
+
+	report := fixture.validUnauthorizedRequestReport(t)
+	msg := fixture.signBLSReport(t, sk, report)
+
+	resp, err := fixture.k.SubmitReport(fixture.ctx, msg)
+	require.NoError(t, err)
+	require.Equal(t, msg.ReportId, resp.ReportId)
+	require.True(t, fixture.k.HasAcceptedReport(fixture.ctx, msg.ReportId))
+	require.Equal(t, types.DefaultUnauthorizedRequestDemerits, fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	events := parseTypedEvents(t, fixture.ctx)
+	require.Contains(t, events, &types.EventReportAccepted{
+		ReportId:        msg.ReportId,
+		RingId:          fixture.ringID,
+		ReportType:      UnauthorizedRequestReportType,
+		ReporterNodeKey: fixture.reporterKey,
+		AccusedNodeKey:  fixture.accusedKey,
+	})
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, msg)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+
+	secondReport := fixture.validUnauthorizedRequestReport(t)
+	secondReport.ReporterNodeKey = fixture.validatorKey
+	second := fixture.signBLSReport(t, sk, secondReport)
+	require.NotEqual(t, msg.ReportId, second.ReportId)
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, types.DefaultUnauthorizedRequestDemerits, fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	sessionID, err := reportSessionDedupeID(&msg.Report, reportPayload{
+		originProtocol:        offlineOriginProtocolPRE,
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
@@ -2203,6 +2245,46 @@ func (f reportTestFixture) validPreInvalidProofReport(t *testing.T) types.Report
 	report.Payload = preInvalidProofPayloadForTest(
 		f.preInvalidProofStatementFields(t).encode(),
 		bytes.Repeat([]byte{42}, 64),
+	)
+	return report
+}
+
+func (f reportTestFixture) relayRequestStatementFields(t *testing.T) relayRequestStatementFields {
+	t.Helper()
+	require.NotNil(t, f.originalRing)
+	ringDigest, err := reportRingStateSHA256(f.originalRing)
+	require.NoError(t, err)
+	signedAt := reportTestObservedAt + reportObservedAtGraceSecs
+	return relayRequestStatementFields{
+		domain:          RelayRequestDomain,
+		chainID:         f.ctx.ChainID(),
+		ringID:          f.ringID,
+		ringPk:          f.originalRing.RingPk,
+		ringStateSha256: ringDigest,
+		protocolVersion: 0,
+		requestID:       "relay-request-1",
+		signedAt:        signedAt,
+		userSignedAt:    signedAt,
+		relayerNodeKey:  f.accusedKey,
+		originProtocol:  offlineOriginProtocolPRE,
+		accusedScope:    committeeScopeCurrent,
+		signingScope:    committeeScopeCurrent,
+		fromNodeID:      2,
+		actorID:         "did:key:actor",
+		objectID:        "object-1",
+	}
+}
+
+func (f reportTestFixture) validUnauthorizedRequestReport(t *testing.T) types.ReportEnvelope {
+	t.Helper()
+	statement := f.relayRequestStatementFields(t)
+	report := f.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.ReportType = UnauthorizedRequestReportType
+	report.SessionId = statement.requestID
+	report.Payload = unauthorizedRequestPayloadForTest(
+		statement.encode(),
+		bytes.Repeat([]byte{42}, 64),
+		"42",
 	)
 	return report
 }
