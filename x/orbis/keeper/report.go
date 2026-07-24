@@ -1524,9 +1524,6 @@ func (k *Keeper) selectAutoReshareReplacement(
 	}
 
 	for i, backupNodeKey := range ring.Reporting.BackupNodeKeys {
-		if backupNodeKey == accusedNodeKey {
-			continue
-		}
 		if _, alreadyActive := active[backupNodeKey]; alreadyActive {
 			continue
 		}
