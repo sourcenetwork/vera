@@ -376,23 +376,23 @@ func reportEnvelopeCanonicalBytes(report *types.ReportEnvelope) ([]byte, error) 
 
 func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 	decoder := newReportCanonicalDecoder(payload)
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return reportPayload{}, err
 	}
-	originProtocolVersion, err := decoder.readU64("origin_protocol_version")
+	originProtocolVersion, err := decoder.readU64(fieldOriginProtocolVersion)
 	if err != nil {
 		return reportPayload{}, err
 	}
 
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
 		return reportPayload{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
 		return reportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
 		return reportPayload{}, err
 	}
@@ -419,7 +419,7 @@ func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 // exactly.
 func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseStatement, error) {
 	outer := newReportCanonicalDecoder(payload)
-	evidenceKind, err := outer.readString("evidence_kind")
+	evidenceKind, err := outer.readString(fieldEvidenceKind)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -462,19 +462,19 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 		}
 		return decodeDkgInvalidRefreshCommitmentStatement(statementBytes)
 	case invalidCryptoEvidenceKindDkgEquivocation:
-		commitmentAStatementBytes, err := outer.readBytes("commitment_a_statement")
+		commitmentAStatementBytes, err := outer.readBytes(fieldCommitmentAStatement)
 		if err != nil {
 			return invalidCryptoResponseStatement{}, err
 		}
-		commitmentASignature, err := outer.readBytes("commitment_a_signature")
+		commitmentASignature, err := outer.readBytes(fieldCommitmentASignature)
 		if err != nil {
 			return invalidCryptoResponseStatement{}, err
 		}
-		commitmentBStatementBytes, err := outer.readBytes("commitment_b_statement")
+		commitmentBStatementBytes, err := outer.readBytes(fieldCommitmentBStatement)
 		if err != nil {
 			return invalidCryptoResponseStatement{}, err
 		}
-		commitmentBSignature, err := outer.readBytes("commitment_b_signature")
+		commitmentBSignature, err := outer.readBytes(fieldCommitmentBSignature)
 		if err != nil {
 			return invalidCryptoResponseStatement{}, err
 		}
@@ -493,11 +493,11 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 }
 
 func decodeSingleStatementInvalidCryptoPayloadTail(decoder *reportCanonicalDecoder) ([]byte, []byte, error) {
-	statementBytes, err := decoder.readBytes("statement")
+	statementBytes, err := decoder.readBytes(fieldStatement)
 	if err != nil {
 		return nil, nil, err
 	}
-	responseSignature, err := decoder.readBytes("response_signature")
+	responseSignature, err := decoder.readBytes(fieldResponseSignature)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -509,86 +509,86 @@ func decodeSingleStatementInvalidCryptoPayloadTail(decoder *reportCanonicalDecod
 
 func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
 	decoder := newReportCanonicalDecoder(statementBytes)
-	domain, err := decoder.readString("domain")
+	domain, err := decoder.readString(fieldDomain)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if domain != PreReencryptResponseDomain {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected PRE response domain %q", domain)
 	}
-	chainID, err := decoder.readString("chain_id")
+	chainID, err := decoder.readString(fieldChainID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringID, err := decoder.readString("ring_id")
+	ringID, err := decoder.readString(fieldRingID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringPk, err := decoder.readString("ring_pk")
+	ringPk, err := decoder.readString(fieldRingPk)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	protocolVersion, err := decoder.readU64("protocol_version")
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	requestID, err := decoder.readString("request_id")
+	requestID, err := decoder.readString(fieldRequestID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	signedAt, err := decoder.readU64("signed_at")
+	signedAt, err := decoder.readU64(fieldSignedAt)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	responderNodeKey, err := decoder.readString("responder_node_key")
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindPRE, originProtocol) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported PRE response origin protocol %q", originProtocol)
 	}
-	objectID, err := decoder.readString("object_id")
+	objectID, err := decoder.readString(fieldObjectID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if requestID == "" || responderNodeKey == "" || objectID == "" {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response statement has empty identity fields")
 	}
-	rdrPk, err := decoder.readBytes("rdr_pk")
+	rdrPk, err := decoder.readBytes(fieldRdrPk)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	derivation, err := decoder.readOptionalBytes("derivation")
+	derivation, err := decoder.readOptionalBytes(fieldDerivation)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if len(derivation) > preResponseMaxDerivationLen {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response derivation exceeds size bound")
 	}
-	if _, err := decoder.readU32("from_node_id"); err != nil {
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	share, err := decoder.readBytes("share")
+	share, err := decoder.readBytes(fieldShare)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	challenge, err := decoder.readBytes("challenge")
+	challenge, err := decoder.readBytes(fieldChallenge)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	proof, err := decoder.readBytes("proof")
+	proof, err := decoder.readBytes(fieldProof)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	cryptoBackend, err := decoder.readString("crypto_backend")
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -629,90 +629,90 @@ func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoRe
 
 func decodeSignResponseStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
 	decoder := newReportCanonicalDecoder(statementBytes)
-	domain, err := decoder.readString("domain")
+	domain, err := decoder.readString(fieldDomain)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if domain != SignResponseDomain {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected Sign response domain %q", domain)
 	}
-	chainID, err := decoder.readString("chain_id")
+	chainID, err := decoder.readString(fieldChainID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringID, err := decoder.readString("ring_id")
+	ringID, err := decoder.readString(fieldRingID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringPk, err := decoder.readString("ring_pk")
+	ringPk, err := decoder.readString(fieldRingPk)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	protocolVersion, err := decoder.readU64("protocol_version")
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	requestID, err := decoder.readString("request_id")
+	requestID, err := decoder.readString(fieldRequestID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	signedAt, err := decoder.readU64("signed_at")
+	signedAt, err := decoder.readU64(fieldSignedAt)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	responderNodeKey, err := decoder.readString("responder_node_key")
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindSign, originProtocol) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported Sign response origin protocol %q", originProtocol)
 	}
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
-	if _, err := decoder.readU32("from_node_id"); err != nil {
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	message, err := decoder.readBytes("message")
+	message, err := decoder.readBytes(fieldMessage)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	signingCommitments, err := decoder.readBytes("signing_commitments")
+	signingCommitments, err := decoder.readBytes(fieldSigningCommitments)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	derivation, err := decoder.readOptionalBytes("derivation")
+	derivation, err := decoder.readOptionalBytes(fieldDerivation)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	metadata, err := decoder.readOptionalBytes("metadata")
+	metadata, err := decoder.readOptionalBytes(fieldMetadata)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	sigShare, err := decoder.readBytes("sig_share")
+	sigShare, err := decoder.readBytes(fieldSigShare)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	cryptoBackend, err := decoder.readString("crypto_backend")
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -760,95 +760,95 @@ func decodeDkgShareStatement(statementBytes []byte) (invalidCryptoResponseStatem
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share statement exceeds size bound")
 	}
 	decoder := newReportCanonicalDecoder(statementBytes)
-	domain, err := decoder.readString("domain")
+	domain, err := decoder.readString(fieldDomain)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if domain != DkgShareDomain {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG share domain %q", domain)
 	}
-	chainID, err := decoder.readString("chain_id")
+	chainID, err := decoder.readString(fieldChainID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringID, err := decoder.readString("ring_id")
+	ringID, err := decoder.readString(fieldRingID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringPk, err := decoder.readString("ring_pk")
+	ringPk, err := decoder.readString(fieldRingPk)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	protocolVersion, err := decoder.readU64("protocol_version")
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	requestID, err := decoder.readString("request_id")
+	requestID, err := decoder.readString(fieldRequestID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	signedAt, err := decoder.readU64("signed_at")
+	signedAt, err := decoder.readU64(fieldSignedAt)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	responderNodeKey, err := decoder.readString("responder_node_key")
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	receiverNodeKey, err := decoder.readString("receiver_node_key")
+	receiverNodeKey, err := decoder.readString(fieldReceiverNodeKey)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidInvalidCryptoDkgOriginProtocol(originProtocol) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG share origin protocol %q", originProtocol)
 	}
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
-	fromNodeID, err := decoder.readU32("from_node_id")
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	toNodeID, err := decoder.readU32("to_node_id")
+	toNodeID, err := decoder.readU32(fieldToNodeID)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	commitmentStatementBytes, err := decoder.readBytes("commitment_statement")
+	commitmentStatementBytes, err := decoder.readBytes(fieldCommitmentStatement)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	commitmentSignature, err := decoder.readBytes("commitment_signature")
+	commitmentSignature, err := decoder.readBytes(fieldCommitmentSignature)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	shareValue, err := decoder.readBytes("share_value")
+	shareValue, err := decoder.readBytes(fieldShareValue)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	nonce, err := decoder.readBytes("nonce")
+	nonce, err := decoder.readBytes(fieldNonce)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	cryptoBackend, err := decoder.readString("crypto_backend")
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -921,79 +921,79 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment statement exceeds size bound")
 	}
 	decoder := newReportCanonicalDecoder(statementBytes)
-	domain, err := decoder.readString("domain")
+	domain, err := decoder.readString(fieldDomain)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
 	if domain != DkgCommitmentDomain {
 		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG commitment domain %q", domain)
 	}
-	chainID, err := decoder.readString("chain_id")
+	chainID, err := decoder.readString(fieldChainID)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	ringID, err := decoder.readString("ring_id")
+	ringID, err := decoder.readString(fieldRingID)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	ringPk, err := decoder.readString("ring_pk")
+	ringPk, err := decoder.readString(fieldRingPk)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	protocolVersion, err := decoder.readU64("protocol_version")
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	requestID, err := decoder.readString("request_id")
+	requestID, err := decoder.readString(fieldRequestID)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	signedAt, err := decoder.readU64("signed_at")
+	signedAt, err := decoder.readU64(fieldSignedAt)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	responderNodeKey, err := decoder.readString("responder_node_key")
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
 	if !isValidInvalidCryptoDkgOriginProtocol(originProtocol) {
 		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG commitment origin protocol %q", originProtocol)
 	}
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
 		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
 		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
-	fromNodeID, err := decoder.readU32("from_node_id")
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	commitment, err := decoder.readBytes("commitment")
+	commitment, err := decoder.readBytes(fieldCommitment)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	sessionNonce, err := decoder.readBytes("session_nonce")
+	sessionNonce, err := decoder.readBytes(fieldSessionNonce)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
-	cryptoBackend, err := decoder.readString("crypto_backend")
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
@@ -1155,15 +1155,15 @@ func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statem
 // report envelope. The field order matches orbis-rs UnauthorizedRequestPayload.
 func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, error) {
 	outer := newReportCanonicalDecoder(payload)
-	statementBytes, err := outer.readBytes("statement")
+	statementBytes, err := outer.readBytes(fieldStatement)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	relaySignature, err := outer.readBytes("relay_signature")
+	relaySignature, err := outer.readBytes(fieldRelaySignature)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	checkedAtAnchor, err := outer.readString("checked_at_anchor")
+	checkedAtAnchor, err := outer.readString(fieldCheckedAtAnchor)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
@@ -1181,90 +1181,90 @@ func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, er
 
 func decodeRelayRequestStatement(statementBytes []byte) (relayRequestStatement, error) {
 	decoder := newReportCanonicalDecoder(statementBytes)
-	domain, err := decoder.readString("domain")
+	domain, err := decoder.readString(fieldDomain)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
 	if domain != RelayRequestDomain {
 		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected relay request domain %q", domain)
 	}
-	chainID, err := decoder.readString("chain_id")
+	chainID, err := decoder.readString(fieldChainID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	ringID, err := decoder.readString("ring_id")
+	ringID, err := decoder.readString(fieldRingID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	ringPk, err := decoder.readString("ring_pk")
+	ringPk, err := decoder.readString(fieldRingPk)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	ringStateSha256, err := decoder.readString("ring_state_sha256")
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	protocolVersion, err := decoder.readU64("protocol_version")
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	requestID, err := decoder.readString("request_id")
+	requestID, err := decoder.readString(fieldRequestID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	signedAt, err := decoder.readU64("signed_at")
+	signedAt, err := decoder.readU64(fieldSignedAt)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	userSignedAt, err := decoder.readU64("user_signed_at")
+	userSignedAt, err := decoder.readU64(fieldUserSignedAt)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	relayerNodeKey, err := decoder.readString("relayer_node_key")
+	relayerNodeKey, err := decoder.readString(fieldRelayerNodeKey)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
 		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
 		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
-	fromNodeID, err := decoder.readU32("from_node_id")
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	actorID, err := decoder.readString("actor_id")
+	actorID, err := decoder.readString(fieldActorID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	objectID, err := decoder.readString("object_id")
+	objectID, err := decoder.readString(fieldObjectID)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	validWindowStart, err := decoder.readOptionalU64("valid_window_start")
+	validWindowStart, err := decoder.readOptionalU64(fieldValidWindowStart)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	validWindowEnd, err := decoder.readOptionalU64("valid_window_end")
+	validWindowEnd, err := decoder.readOptionalU64(fieldValidWindowEnd)
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
 	// timestamp is the relayer's ACP-check time; only the off-chain refutation
 	// re-runs the ACP check, so the chain decodes it for framing but ignores it.
-	if _, err := decoder.readOptionalU64("timestamp"); err != nil {
+	if _, err := decoder.readOptionalU64(fieldTimestamp); err != nil {
 		return relayRequestStatement{}, err
 	}
 	if err := decoder.finish(); err != nil {
@@ -1699,6 +1699,59 @@ func (w *reportCanonicalWriter) setErr(err error) {
 		w.err = err
 	}
 }
+
+// Field-name labels passed to reportCanonicalDecoder read calls, used to
+// identify the field in decode error messages.
+const (
+	fieldAccusedCommitteeScope = "accused_committee_scope"
+	fieldActorID               = "actor_id"
+	fieldChainID               = "chain_id"
+	fieldChallenge             = "challenge"
+	fieldCheckedAtAnchor       = "checked_at_anchor"
+	fieldCommitment            = "commitment"
+	fieldCommitmentASignature  = "commitment_a_signature"
+	fieldCommitmentAStatement  = "commitment_a_statement"
+	fieldCommitmentBSignature  = "commitment_b_signature"
+	fieldCommitmentBStatement  = "commitment_b_statement"
+	fieldCommitmentSignature   = "commitment_signature"
+	fieldCommitmentStatement   = "commitment_statement"
+	fieldCryptoBackend         = "crypto_backend"
+	fieldDerivation            = "derivation"
+	fieldDomain                = "domain"
+	fieldEvidenceKind          = "evidence_kind"
+	fieldFromNodeID            = "from_node_id"
+	fieldMessage               = "message"
+	fieldMetadata              = "metadata"
+	fieldNonce                 = "nonce"
+	fieldObjectID              = "object_id"
+	fieldOriginProtocol        = "origin_protocol"
+	fieldOriginProtocolVersion = "origin_protocol_version"
+	fieldProof                 = "proof"
+	fieldProtocolVersion       = "protocol_version"
+	fieldRdrPk                 = "rdr_pk"
+	fieldReceiverNodeKey       = "receiver_node_key"
+	fieldRelaySignature        = "relay_signature"
+	fieldRelayerNodeKey        = "relayer_node_key"
+	fieldRequestID             = "request_id"
+	fieldResponderNodeKey      = "responder_node_key"
+	fieldResponseSignature     = "response_signature"
+	fieldRingID                = "ring_id"
+	fieldRingPk                = "ring_pk"
+	fieldRingStateSha256       = "ring_state_sha256"
+	fieldSessionNonce          = "session_nonce"
+	fieldShare                 = "share"
+	fieldShareValue            = "share_value"
+	fieldSigShare              = "sig_share"
+	fieldSignedAt              = "signed_at"
+	fieldSigningCommitments    = "signing_commitments"
+	fieldSigningCommitteeScope = "signing_committee_scope"
+	fieldStatement             = "statement"
+	fieldTimestamp             = "timestamp"
+	fieldToNodeID              = "to_node_id"
+	fieldUserSignedAt          = "user_signed_at"
+	fieldValidWindowEnd        = "valid_window_end"
+	fieldValidWindowStart      = "valid_window_start"
+)
 
 type reportCanonicalDecoder struct {
 	bytes  []byte
