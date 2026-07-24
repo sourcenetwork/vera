@@ -9,6 +9,51 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
+func TestInitGenesisAppliesDefaultReportingToRings(t *testing.T) {
+	k, ctx := keepertestutil.OrbisKeeper(t)
+
+	params := types.NewParams(types.ReportingDefaults{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:           7,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+			ResetIntervalSeconds:          120,
+		},
+		KickThreshold: 5,
+	})
+	explicitReporting := types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:           2,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+			ResetIntervalSeconds:          60,
+		},
+		BackupNodeKeys: []string{"node-9"},
+		KickThreshold:  4,
+	}
+	genesis := types.GenesisState{
+		Params: params,
+		Rings: []types.Ring{
+			{Id: "ring-default"},
+			{Id: "ring-explicit", Reporting: explicitReporting},
+		},
+	}
+	require.NoError(t, genesis.Validate())
+
+	InitGenesis(ctx, &k, genesis)
+
+	defaultRing := k.GetRing(ctx, "ring-default")
+	require.NotNil(t, defaultRing)
+	require.Equal(t, types.ReportingConfigFromDefaults(params.DefaultReporting), defaultRing.Reporting)
+
+	explicitRing := k.GetRing(ctx, "ring-explicit")
+	require.NotNil(t, explicitRing)
+	require.Equal(t, explicitReporting, explicitRing.Reporting)
+
+	exported := ExportGenesis(ctx, &k)
+	require.ElementsMatch(t, []types.Ring{*defaultRing, *explicitRing}, exported.Rings)
+}
+
 func TestGenesisRoundTrip(t *testing.T) {
 	k, ctx := keepertestutil.OrbisKeeper(t)
 
@@ -24,9 +69,15 @@ func TestGenesisRoundTrip(t *testing.T) {
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: 3,
 		},
-		DemeritConfig: types.DemeritConfig{
-			NodeOfflineDemerits:  4,
-			ResetIntervalSeconds: 30,
+		Reporting: types.ReportingConfig{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:           4,
+				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+				ResetIntervalSeconds:          30,
+			},
+			BackupNodeKeys: []string{"node-4", "node-3"},
+			KickThreshold:  2,
 		},
 	}
 	expectedDocument := types.Document{

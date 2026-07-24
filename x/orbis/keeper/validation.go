@@ -32,7 +32,7 @@ func validateRing(ring *types.Ring) error {
 	if err := validateUpgradeInfo(&ring.UpgradeInfo); err != nil {
 		return err
 	}
-	if err := types.ValidateDemeritConfig(ring.DemeritConfig); err != nil {
+	if err := validateReportingConfig(ring.Reporting); err != nil {
 		return err
 	}
 
@@ -61,6 +61,18 @@ func validateRing(ring *types.Ring) error {
 		}
 	}
 
+	return nil
+}
+
+func validateReportingConfig(config types.ReportingConfig) error {
+	if err := types.ValidateReportingConfig(config); err != nil {
+		return err
+	}
+	if len(config.BackupNodeKeys) > 0 {
+		if err := validateUniquePeerNodeKeys(config.BackupNodeKeys); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

@@ -3,6 +3,7 @@ package types
 import (
 	"testing"
 
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 )
@@ -26,25 +27,41 @@ func TestMsgCreateRingValidateBasicPSSInterval(t *testing.T) {
 	}
 }
 
-func TestMsgCreateRingValidateBasicDemeritConfig(t *testing.T) {
+func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 	msg := MsgCreateRing{
 		Creator:      validMutationCreator,
 		PeerNodeKeys: []string{"node-1"},
 		Threshold:    1,
 		PssInterval:  MinPSSIntervalSeconds,
 		PolicyId:     "policy-1",
-		DemeritConfig: &DemeritConfig{
-			NodeOfflineDemerits:   0,
-			ResetIntervalSeconds: DefaultDemeritResetIntervalSecs,
+		Reporting: &ReportingConfig{
+			DemeritConfig: DemeritConfig{
+				NodeOfflineDemerits:           0,
+				InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   DefaultUnauthorizedRequestDemerits,
+				ResetIntervalSeconds:          DefaultDemeritResetIntervalSecs,
+			},
+			KickThreshold: DefaultReportingKickThreshold,
 		},
 	}
 	require.ErrorContains(t, msg.ValidateBasic(), "node_offline_demerits must be at least 1")
 
-	msg.DemeritConfig = &DemeritConfig{
-		NodeOfflineDemerits:   DefaultNodeOfflineDemerits,
-		ResetIntervalSeconds: 0,
+	msg.Reporting = &ReportingConfig{
+		DemeritConfig: DemeritConfig{
+			NodeOfflineDemerits:           DefaultNodeOfflineDemerits,
+			InvalidCryptoResponseDemerits: DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   DefaultUnauthorizedRequestDemerits,
+			ResetIntervalSeconds:          0,
+		},
+		KickThreshold: DefaultReportingKickThreshold,
 	}
 	require.ErrorContains(t, msg.ValidateBasic(), "reset_interval_seconds must be at least 1")
+
+	msg.Reporting = &ReportingConfig{
+		DemeritConfig: DefaultDemeritConfig(),
+		KickThreshold: 0,
+	}
+	require.ErrorContains(t, msg.ValidateBasic(), "kick_threshold must be at least 1")
 }
 
 func TestMsgSubmitReportValidateBasic(t *testing.T) {
@@ -104,6 +121,11 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 			Creator: validMutationCreator,
 			RingId:  "ring-1",
 		},
+		&MsgSetRingReportingByAcp{
+			Creator:   validMutationCreator,
+			RingId:    "ring-1",
+			Reporting: DefaultReportingConfig(),
+		},
 	}
 	for _, msg := range validMessages {
 		require.NoError(t, msg.ValidateBasic())
@@ -130,6 +152,33 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 	require.Error(t, (&MsgCancelPendingRing{
 		Creator: validMutationCreator,
 	}).ValidateBasic())
+	require.Error(t, (&MsgSetRingReportingByAcp{
+		Creator: validMutationCreator,
+	}).ValidateBasic())
+	require.Error(t, (&MsgSetRingReportingByAcp{
+		Creator: validMutationCreator,
+		RingId:  "ring-1",
+		Reporting: ReportingConfig{
+			DemeritConfig: DefaultDemeritConfig(),
+		},
+	}).ValidateBasic())
+}
+
+func TestMsgSetRingReportingByAcpRegisteredForAnyUnpacking(t *testing.T) {
+	registry := codectypes.NewInterfaceRegistry()
+	RegisterInterfaces(registry)
+
+	msg := &MsgSetRingReportingByAcp{
+		Creator:   validMutationCreator,
+		RingId:    "ring-1",
+		Reporting: DefaultReportingConfig(),
+	}
+	any, err := codectypes.NewAnyWithValue(msg)
+	require.NoError(t, err)
+
+	var unpacked sdk.Msg
+	require.NoError(t, registry.UnpackAny(any, &unpacked))
+	require.Equal(t, msg, unpacked)
 }
 
 func TestNodeMutationMessagesValidateBasic(t *testing.T) {

@@ -98,6 +98,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
+					RpcMethod:      "SetRingReportingByAcp",
+					Use:            "set-ring-reporting-by-acp [ring_id]",
+					Short:          "Set ring reporting policy via external ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
+				},
+				{
 					RpcMethod:      "FinalizeRingReshareByThresholdSignature",
 					Use:            "finalize-ring-reshare [ring_id] [signature_scheme] [signature]",
 					Short:          "Finalize a ring reshare using a threshold signature",

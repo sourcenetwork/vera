@@ -86,11 +86,13 @@ func (x *UpgradeInfo) GetActivationTime() uint64 {
 
 // DemeritConfig stores the number of demerit points assigned per report type.
 type DemeritConfig struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	NodeOfflineDemerits  uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
-	ResetIntervalSeconds uint64                 `protobuf:"varint,2,opt,name=reset_interval_seconds,json=resetIntervalSeconds,proto3" json:"reset_interval_seconds,omitempty"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state                         protoimpl.MessageState `protogen:"open.v1"`
+	NodeOfflineDemerits           uint64                 `protobuf:"varint,1,opt,name=node_offline_demerits,json=nodeOfflineDemerits,proto3" json:"node_offline_demerits,omitempty"`
+	ResetIntervalSeconds          uint64                 `protobuf:"varint,2,opt,name=reset_interval_seconds,json=resetIntervalSeconds,proto3" json:"reset_interval_seconds,omitempty"`
+	InvalidCryptoResponseDemerits uint64                 `protobuf:"varint,3,opt,name=invalid_crypto_response_demerits,json=invalidCryptoResponseDemerits,proto3" json:"invalid_crypto_response_demerits,omitempty"`
+	UnauthorizedRequestDemerits   uint64                 `protobuf:"varint,4,opt,name=unauthorized_request_demerits,json=unauthorizedRequestDemerits,proto3" json:"unauthorized_request_demerits,omitempty"`
+	unknownFields                 protoimpl.UnknownFields
+	sizeCache                     protoimpl.SizeCache
 }
 
 func (x *DemeritConfig) Reset() {
@@ -137,6 +139,81 @@ func (x *DemeritConfig) GetResetIntervalSeconds() uint64 {
 	return 0
 }
 
+func (x *DemeritConfig) GetInvalidCryptoResponseDemerits() uint64 {
+	if x != nil {
+		return x.InvalidCryptoResponseDemerits
+	}
+	return 0
+}
+
+func (x *DemeritConfig) GetUnauthorizedRequestDemerits() uint64 {
+	if x != nil {
+		return x.UnauthorizedRequestDemerits
+	}
+	return 0
+}
+
+// ReportingConfig stores fault-report policy and automatic replacement settings for a ring.
+type ReportingConfig struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	DemeritConfig  *DemeritConfig         `protobuf:"bytes,1,opt,name=demerit_config,json=demeritConfig,proto3" json:"demerit_config,omitempty"`
+	BackupNodeKeys []string               `protobuf:"bytes,2,rep,name=backup_node_keys,json=backupNodeKeys,proto3" json:"backup_node_keys,omitempty"`
+	KickThreshold  uint64                 `protobuf:"varint,3,opt,name=kick_threshold,json=kickThreshold,proto3" json:"kick_threshold,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ReportingConfig) Reset() {
+	*x = ReportingConfig{}
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportingConfig) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportingConfig) ProtoMessage() {}
+
+func (x *ReportingConfig) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportingConfig.ProtoReflect.Descriptor instead.
+func (*ReportingConfig) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ReportingConfig) GetDemeritConfig() *DemeritConfig {
+	if x != nil {
+		return x.DemeritConfig
+	}
+	return nil
+}
+
+func (x *ReportingConfig) GetBackupNodeKeys() []string {
+	if x != nil {
+		return x.BackupNodeKeys
+	}
+	return nil
+}
+
+func (x *ReportingConfig) GetKickThreshold() uint64 {
+	if x != nil {
+		return x.KickThreshold
+	}
+	return 0
+}
+
 // Ring stores the active and pending committee metadata for an Orbis ring.
 type Ring struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
@@ -154,14 +231,14 @@ type Ring struct {
 	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
 	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
 	UpgradeInfo      *UpgradeInfo        `protobuf:"bytes,12,opt,name=upgrade_info,json=upgradeInfo,proto3" json:"upgrade_info,omitempty"`
-	DemeritConfig    *DemeritConfig      `protobuf:"bytes,13,opt,name=demerit_config,json=demeritConfig,proto3" json:"demerit_config,omitempty"`
+	Reporting        *ReportingConfig    `protobuf:"bytes,13,opt,name=reporting,proto3" json:"reporting,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
 	*x = Ring{}
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -173,7 +250,7 @@ func (x *Ring) String() string {
 func (*Ring) ProtoMessage() {}
 
 func (x *Ring) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[2]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -186,7 +263,7 @@ func (x *Ring) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ring.ProtoReflect.Descriptor instead.
 func (*Ring) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{2}
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Ring) GetId() string {
@@ -273,9 +350,9 @@ func (x *Ring) GetUpgradeInfo() *UpgradeInfo {
 	return nil
 }
 
-func (x *Ring) GetDemeritConfig() *DemeritConfig {
+func (x *Ring) GetReporting() *ReportingConfig {
 	if x != nil {
-		return x.DemeritConfig
+		return x.Reporting
 	}
 	return nil
 }
@@ -291,7 +368,7 @@ type RingConfirmation struct {
 
 func (x *RingConfirmation) Reset() {
 	*x = RingConfirmation{}
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[3]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -303,7 +380,7 @@ func (x *RingConfirmation) String() string {
 func (*RingConfirmation) ProtoMessage() {}
 
 func (x *RingConfirmation) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_ring_proto_msgTypes[3]
+	mi := &file_sourcehub_orbis_ring_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -316,7 +393,7 @@ func (x *RingConfirmation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingConfirmation.ProtoReflect.Descriptor instead.
 func (*RingConfirmation) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{3}
+	return file_sourcehub_orbis_ring_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RingConfirmation) GetNodeKey() string {
@@ -343,10 +420,16 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\fnext_version\x18\x02 \x01(\x04H\x00R\vnextVersion\x88\x01\x01\x12,\n" +
 	"\x0factivation_time\x18\x03 \x01(\x04H\x01R\x0eactivationTime\x88\x01\x01B\x0f\n" +
 	"\r_next_versionB\x12\n" +
-	"\x10_activation_time\"\x7f\n" +
+	"\x10_activation_time\"\x8c\x02\n" +
 	"\rDemeritConfig\x122\n" +
 	"\x15node_offline_demerits\x18\x01 \x01(\x04R\x13nodeOfflineDemerits\x124\n" +
-	"\x16reset_interval_seconds\x18\x02 \x01(\x04R\x14resetIntervalSeconds:\x04\xe8\xa0\x1f\x01\"\xc8\x04\n" +
+	"\x16reset_interval_seconds\x18\x02 \x01(\x04R\x14resetIntervalSeconds\x12G\n" +
+	" invalid_crypto_response_demerits\x18\x03 \x01(\x04R\x1dinvalidCryptoResponseDemerits\x12B\n" +
+	"\x1dunauthorized_request_demerits\x18\x04 \x01(\x04R\x1bunauthorizedRequestDemerits:\x04\xe8\xa0\x1f\x01\"\xb5\x01\n" +
+	"\x0fReportingConfig\x12K\n" +
+	"\x0edemerit_config\x18\x01 \x01(\v2\x1e.sourcehub.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
+	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
+	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xc1\x04\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -361,8 +444,8 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\tpolicy_id\x18\n" +
 	" \x01(\tR\bpolicyId\x12G\n" +
 	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmations\x12E\n" +
-	"\fupgrade_info\x18\f \x01(\v2\x1c.sourcehub.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfo\x12K\n" +
-	"\x0edemerit_config\x18\r \x01(\v2\x1e.sourcehub.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfigB\x10\n" +
+	"\fupgrade_info\x18\f \x01(\v2\x1c.sourcehub.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfo\x12D\n" +
+	"\treporting\x18\r \x01(\v2 .sourcehub.orbis.ReportingConfigB\x04\xc8\xde\x1f\x00R\treportingB\x10\n" +
 	"\x0e_new_threshold\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +
 	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +
@@ -381,22 +464,24 @@ func file_sourcehub_orbis_ring_proto_rawDescGZIP() []byte {
 	return file_sourcehub_orbis_ring_proto_rawDescData
 }
 
-var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_sourcehub_orbis_ring_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_sourcehub_orbis_ring_proto_goTypes = []any{
 	(*UpgradeInfo)(nil),      // 0: sourcehub.orbis.UpgradeInfo
 	(*DemeritConfig)(nil),    // 1: sourcehub.orbis.DemeritConfig
-	(*Ring)(nil),             // 2: sourcehub.orbis.Ring
-	(*RingConfirmation)(nil), // 3: sourcehub.orbis.RingConfirmation
+	(*ReportingConfig)(nil),  // 2: sourcehub.orbis.ReportingConfig
+	(*Ring)(nil),             // 3: sourcehub.orbis.Ring
+	(*RingConfirmation)(nil), // 4: sourcehub.orbis.RingConfirmation
 }
 var file_sourcehub_orbis_ring_proto_depIdxs = []int32{
-	3, // 0: sourcehub.orbis.Ring.confirmations:type_name -> sourcehub.orbis.RingConfirmation
-	0, // 1: sourcehub.orbis.Ring.upgrade_info:type_name -> sourcehub.orbis.UpgradeInfo
-	1, // 2: sourcehub.orbis.Ring.demerit_config:type_name -> sourcehub.orbis.DemeritConfig
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 0: sourcehub.orbis.ReportingConfig.demerit_config:type_name -> sourcehub.orbis.DemeritConfig
+	4, // 1: sourcehub.orbis.Ring.confirmations:type_name -> sourcehub.orbis.RingConfirmation
+	0, // 2: sourcehub.orbis.Ring.upgrade_info:type_name -> sourcehub.orbis.UpgradeInfo
+	2, // 3: sourcehub.orbis.Ring.reporting:type_name -> sourcehub.orbis.ReportingConfig
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_sourcehub_orbis_ring_proto_init() }
@@ -405,14 +490,14 @@ func file_sourcehub_orbis_ring_proto_init() {
 		return
 	}
 	file_sourcehub_orbis_ring_proto_msgTypes[0].OneofWrappers = []any{}
-	file_sourcehub_orbis_ring_proto_msgTypes[2].OneofWrappers = []any{}
+	file_sourcehub_orbis_ring_proto_msgTypes[3].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_ring_proto_rawDesc), len(file_sourcehub_orbis_ring_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

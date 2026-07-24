@@ -81,7 +81,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.Equal(t, uint32(2), ring.Threshold)
 	require.Equal(t, policyID, ring.PolicyId)
 	require.Equal(t, pssInterval, ring.GetPssInterval())
-	require.Equal(t, types.DefaultDemeritConfig(), ring.DemeritConfig)
+	require.Equal(t, types.DefaultReportingConfig(), ring.Reporting)
 
 	// all three nodes must confirm; ring not finalized until the last one
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
@@ -173,7 +173,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrKeyDerivationAlreadyExists)
 }
 
-func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
+func TestMsgServer_CreateRingSnapshotsReportingConfig(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
@@ -182,10 +182,16 @@ func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	defaultConfig := types.DemeritConfig{
-		NodeOfflineDemerits:   4,
-		ResetIntervalSeconds: 12,
+		NodeOfflineDemerits:           4,
+		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+		ResetIntervalSeconds:          12,
 	}
-	require.NoError(t, k.SetParams(ctx, types.NewParams(defaultConfig)))
+	defaultReporting := types.ReportingDefaults{
+		DemeritConfig: defaultConfig,
+		KickThreshold: 5,
+	}
+	require.NoError(t, k.SetParams(ctx, types.NewParams(defaultReporting)))
 
 	defaultResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
@@ -195,34 +201,46 @@ func TestMsgServer_CreateRingSnapshotsDemeritConfig(t *testing.T) {
 		PolicyId:     policyID,
 	})
 	require.NoError(t, err)
-	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
+	require.Equal(t, types.ReportingConfigFromDefaults(defaultReporting), k.GetRing(ctx, defaultResp.RingId).Reporting)
 
-	require.NoError(t, k.SetParams(ctx, types.NewParams(types.DemeritConfig{
-		NodeOfflineDemerits:   8,
-		ResetIntervalSeconds: 24,
-	})))
-	require.Equal(t, defaultConfig, k.GetRing(ctx, defaultResp.RingId).DemeritConfig)
+	updatedReporting := types.ReportingDefaults{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:           8,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+			ResetIntervalSeconds:          24,
+		},
+		KickThreshold: 6,
+	}
+	require.NoError(t, k.SetParams(ctx, types.NewParams(updatedReporting)))
+	require.Equal(t, types.ReportingConfigFromDefaults(defaultReporting), k.GetRing(ctx, defaultResp.RingId).Reporting)
 
 	explicitConfig := types.DemeritConfig{
-		NodeOfflineDemerits:   7,
-		ResetIntervalSeconds: 60,
+		NodeOfflineDemerits:           7,
+		InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+		UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+		ResetIntervalSeconds:          60,
+	}
+	explicitReporting := types.ReportingConfig{
+		DemeritConfig: explicitConfig,
+		KickThreshold: 2,
 	}
 	explicitResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
-		Creator:       creatorAddr,
-		PeerNodeKeys:  []string{peer1Key},
-		Threshold:     1,
-		PssInterval:   types.MinPSSIntervalSeconds,
-		PolicyId:      policyID,
-		XNonce:        &types.MsgCreateRing_Nonce{Nonce: "explicit-demerit-config"},
-		DemeritConfig: &explicitConfig,
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		XNonce:       &types.MsgCreateRing_Nonce{Nonce: "explicit-reporting-config"},
+		Reporting:    &explicitReporting,
 	})
 	require.NoError(t, err)
-	require.Equal(t, explicitConfig, k.GetRing(ctx, explicitResp.RingId).DemeritConfig)
+	require.Equal(t, explicitReporting, k.GetRing(ctx, explicitResp.RingId).Reporting)
 }
 
 // TestMsgServer_CreateRingParamsValidation exercises the params validation/defaulting
-// paths in params.go that TestMsgServer_CreateRingSnapshotsDemeritConfig does not reach:
-// (1) ring with no DemeritConfig inherits the module-default DemeritConfig via GetParams,
+// paths in params.go that TestMsgServer_CreateRingSnapshotsReportingConfig does not reach:
+// (1) ring with no Reporting inherits the module-default Reporting via GetParams,
 // (2) SetParams rejects zero-value fields and leaves existing params intact.
 func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
@@ -233,7 +251,7 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
 	// setupOrbisKeeper seeds the store with DefaultParams; a ring with no explicit
-	// DemeritConfig must inherit exactly DefaultDemeritConfig via GetParams (params.go:12-21).
+	// Reporting must inherit exactly DefaultReportingConfig via GetParams.
 	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -242,28 +260,46 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 		PolicyId:     policyID,
 	})
 	require.NoError(t, err)
-	require.Equal(t, types.DefaultDemeritConfig(), k.GetRing(ctx, resp.RingId).DemeritConfig)
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, resp.RingId).Reporting)
 
 	// params.go SetParams runs Validate(); zero NodeOfflineDemerits must be rejected.
 	require.ErrorContains(t,
-		k.SetParams(ctx, types.NewParams(types.DemeritConfig{
-			NodeOfflineDemerits:  0,
-			ResetIntervalSeconds: types.DefaultDemeritResetIntervalSecs,
+		k.SetParams(ctx, types.NewParams(types.ReportingDefaults{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:           0,
+				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+				ResetIntervalSeconds:          types.DefaultDemeritResetIntervalSecs,
+			},
+			KickThreshold: types.DefaultReportingKickThreshold,
 		})),
 		"node_offline_demerits must be at least 1",
 	)
 
 	// params.go SetParams runs Validate(); zero ResetIntervalSeconds must be rejected.
 	require.ErrorContains(t,
-		k.SetParams(ctx, types.NewParams(types.DemeritConfig{
-			NodeOfflineDemerits:  types.DefaultNodeOfflineDemerits,
-			ResetIntervalSeconds: 0,
+		k.SetParams(ctx, types.NewParams(types.ReportingDefaults{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:           types.DefaultNodeOfflineDemerits,
+				InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+				UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+				ResetIntervalSeconds:          0,
+			},
+			KickThreshold: types.DefaultReportingKickThreshold,
 		})),
 		"reset_interval_seconds must be at least 1",
 	)
 
+	// params.go SetParams runs Validate(); zero KickThreshold must be rejected.
+	require.ErrorContains(t,
+		k.SetParams(ctx, types.NewParams(types.ReportingDefaults{
+			DemeritConfig: types.DefaultDemeritConfig(),
+		})),
+		"kick_threshold must be at least 1",
+	)
+
 	// After both failed SetParams calls params remain DefaultParams; a second ring
-	// (disambiguated by nonce) must still inherit DefaultDemeritConfig.
+	// (disambiguated by nonce) must still inherit DefaultReportingConfig.
 	resp2, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -273,7 +309,7 @@ func TestMsgServer_CreateRingParamsValidation(t *testing.T) {
 		XNonce:       &types.MsgCreateRing_Nonce{Nonce: "after-invalid-params"},
 	})
 	require.NoError(t, err)
-	require.Equal(t, types.DefaultDemeritConfig(), k.GetRing(ctx, resp2.RingId).DemeritConfig)
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, resp2.RingId).Reporting)
 }
 
 func TestMsgServer_CreateRing_NonceDisambiguatesIdenticalSettings(t *testing.T) {
@@ -822,6 +858,185 @@ func TestMsgServer_SetRingPssIntervalByAcpAllowsRingOwner(t *testing.T) {
 	require.ErrorContains(t, err, "pss_interval must be at least 86400 seconds")
 }
 
+func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	backup1Addr, backup1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup1")
+	backup2Addr, backup2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	updatePeerNodeWhitelists(t, k, ctx, backup1Addr, backup1Key, []string{policyID}, nil)
+	updatePeerNodeWhitelists(t, k, ctx, backup2Addr, backup2Key, []string{policyID}, nil)
+
+	reporting := types.ReportingConfig{
+		DemeritConfig: types.DemeritConfig{
+			NodeOfflineDemerits:           2,
+			InvalidCryptoResponseDemerits: types.DefaultInvalidCryptoResponseDemerits,
+			UnauthorizedRequestDemerits:   types.DefaultUnauthorizedRequestDemerits,
+			ResetIntervalSeconds:          42,
+		},
+		BackupNodeKeys: []string{backup2Key, backup1Key},
+		KickThreshold:  4,
+	}
+	updateCtx := ctx.WithEventManager(sdk.NewEventManager())
+	_, err = k.SetRingReportingByAcp(updateCtx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: reporting,
+	})
+	require.NoError(t, err)
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.NotNil(t, ring)
+	require.Equal(t, reporting, ring.Reporting)
+	require.Equal(t, []proto.Message{
+		&types.EventRingUpdated{
+			RingId:     createRingResp.RingId,
+			UpdaterDid: testDID,
+		},
+	}, parseTypedEvents(t, updateCtx))
+
+	invalidReporting := reporting
+	invalidReporting.KickThreshold = 0
+	_, err = k.SetRingReportingByAcp(updateCtx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: invalidReporting,
+	})
+	require.ErrorContains(t, err, "kick_threshold must be at least 1")
+	require.Equal(t, reporting, k.GetRing(ctx, createRingResp.RingId).Reporting)
+}
+
+func TestMsgServer_CreateRingValidatesReportingBackupNodeInfo(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, backupKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup")
+	_, missingBackupKey := testAccountWithPubKey(t, ctx, authKeeper)
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	missingNodeInfoReporting := types.DefaultReportingConfig()
+	missingNodeInfoReporting.BackupNodeKeys = []string{missingBackupKey}
+	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		Reporting:    &missingNodeInfoReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "has no registered node info")
+
+	reporting := types.DefaultReportingConfig()
+	reporting.BackupNodeKeys = []string{backupKey}
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+		Reporting:    &reporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, reporting, k.GetRing(ctx, resp.RingId).Reporting)
+}
+
+func TestMsgServer_SetRingReportingByAcpValidatesBackupNodeInfoAndWhitelist(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	_, backupNoWhitelistKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupNoWhitelist")
+	backupPolicyAddr, backupPolicyKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupPolicy")
+	backupRingAddr, backupRingKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackupRing")
+	_, missingBackupKey := testAccountWithPubKey(t, ctx, authKeeper)
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	missingNodeInfoReporting := types.DefaultReportingConfig()
+	missingNodeInfoReporting.BackupNodeKeys = []string{missingBackupKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: missingNodeInfoReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "has no registered node info")
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	notWhitelistedReporting := types.DefaultReportingConfig()
+	notWhitelistedReporting.BackupNodeKeys = []string{backupNoWhitelistKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: notWhitelistedReporting,
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.ErrorContains(t, err, "backup_node_key")
+	require.ErrorContains(t, err, "is not whitelisted")
+	require.Equal(t, types.DefaultReportingConfig(), k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	updatePeerNodeWhitelists(t, k, ctx, backupPolicyAddr, backupPolicyKey, []string{policyID}, nil)
+	policyWhitelistedReporting := types.DefaultReportingConfig()
+	policyWhitelistedReporting.BackupNodeKeys = []string{backupPolicyKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: policyWhitelistedReporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, policyWhitelistedReporting, k.GetRing(ctx, createRingResp.RingId).Reporting)
+
+	updatePeerNodeWhitelists(t, k, ctx, backupRingAddr, backupRingKey, nil, []string{createRingResp.RingId})
+	ringWhitelistedReporting := types.DefaultReportingConfig()
+	ringWhitelistedReporting.BackupNodeKeys = []string{backupRingKey, backupPolicyKey}
+	_, err = k.SetRingReportingByAcp(ctx, &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: ringWhitelistedReporting,
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{backupRingKey, backupPolicyKey}, k.GetRing(ctx, createRingResp.RingId).Reporting.BackupNodeKeys)
+}
+
 func TestMsgServer_StartRingReshareByAcpRejectsThresholdOnlyAboveExistingCommitteeSize(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
@@ -1224,9 +1439,17 @@ func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 
+	_, err = k.SetRingReportingByAcp(outsiderCtx, &types.MsgSetRingReportingByAcp{
+		Creator:   outsiderAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: types.DefaultReportingConfig(),
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
 	ring := k.GetRing(creatorCtx, createRingResp.RingId)
 	require.NotNil(t, ring)
 	require.Equal(t, types.MinPSSIntervalSeconds, ring.GetPssInterval())
+	require.Equal(t, types.DefaultReportingConfig(), ring.Reporting)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
 	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 }

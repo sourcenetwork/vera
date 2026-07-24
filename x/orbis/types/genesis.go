@@ -23,6 +23,22 @@ func (gs GenesisState) Validate() error {
 	knownRings := make(map[string]struct{}, len(gs.Rings))
 	for _, r := range gs.Rings {
 		knownRings[r.Id] = struct{}{}
+
+		// A zero-value reporting config means "use module defaults" and is
+		// backfilled from params during InitGenesis.
+		if r.Reporting.Equal(ReportingConfig{}) {
+			continue
+		}
+		if err := ValidateReportingConfig(r.Reporting); err != nil {
+			return fmt.Errorf("ring %q reporting config: %w", r.Id, err)
+		}
+		seenBackups := make(map[string]struct{}, len(r.Reporting.BackupNodeKeys))
+		for _, nodeKey := range r.Reporting.BackupNodeKeys {
+			if _, found := seenBackups[nodeKey]; found {
+				return fmt.Errorf("ring %q reporting config: duplicate backup node key %q", r.Id, nodeKey)
+			}
+			seenBackups[nodeKey] = struct{}{}
+		}
 	}
 
 	seenDemerits := map[struct {

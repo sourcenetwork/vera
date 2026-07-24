@@ -36,6 +36,61 @@ func TestGenesisRingUpgradeInfoRoundTrips(t *testing.T) {
 	require.Equal(t, uint64(500), decoded.Rings[0].UpgradeInfo.GetActivationTime())
 }
 
+func TestGenesisValidateRingReportingConfig(t *testing.T) {
+	testCases := []struct {
+		name      string
+		reporting ReportingConfig
+		errMatch  string
+	}{
+		{
+			name:      "zero config accepted as use-defaults",
+			reporting: ReportingConfig{},
+		},
+		{
+			name:      "valid explicit config accepted",
+			reporting: DefaultReportingConfig(),
+		},
+		{
+			name: "invalid demerit config rejected",
+			reporting: ReportingConfig{
+				BackupNodeKeys: []string{"node-2"},
+				KickThreshold:  1,
+			},
+			errMatch: "node_offline_demerits must be at least 1",
+		},
+		{
+			name: "zero kick threshold rejected",
+			reporting: ReportingConfig{
+				DemeritConfig:  DefaultDemeritConfig(),
+				BackupNodeKeys: []string{"node-2"},
+			},
+			errMatch: "kick_threshold must be at least 1",
+		},
+		{
+			name: "duplicate backup node keys rejected",
+			reporting: ReportingConfig{
+				DemeritConfig:  DefaultDemeritConfig(),
+				BackupNodeKeys: []string{"node-2", "node-2"},
+				KickThreshold:  1,
+			},
+			errMatch: "duplicate backup node key",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			genesis := DefaultGenesis()
+			genesis.Rings = []Ring{{Id: "ring-1", Reporting: tc.reporting}}
+			err := genesis.Validate()
+			if tc.errMatch == "" {
+				require.NoError(t, err)
+			} else {
+				require.ErrorContains(t, err, tc.errMatch)
+			}
+		})
+	}
+}
+
 func TestGenesisValidateNodeDemerits(t *testing.T) {
 	knownRing := Ring{Id: "ring-1"}
 

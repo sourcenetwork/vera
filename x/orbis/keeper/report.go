@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
@@ -17,23 +18,133 @@ import (
 )
 
 const (
-	ReportDomain          = "orbis-mpc-fault-report"
-	ReportSessionDomain   = "orbis-mpc-fault-report-session"
-	NodeOfflineReportType = "node_offline"
-	ReportTTLSeconds      = uint64(120)
+	ReportDomain                    = "orbis-mpc-fault-report"
+	ReportSessionDomain             = "orbis-mpc-fault-report-session"
+	NodeOfflineReportType           = "node_offline"
+	InvalidCryptoResponseReportType = "invalid_crypto_response"
+	UnauthorizedRequestReportType   = "unauthorized_request"
+	ReportTTLSeconds                = uint64(120)
+
+	// PreReencryptResponseDomain is the domain tag of the responder-signed PRE
+	// response statement carried as invalid_crypto_response/pre evidence.
+	PreReencryptResponseDomain = "orbis-pre-reencrypt-response-v1"
+	// SignResponseDomain is the domain tag of the responder-signed Sign response
+	// statement carried as invalid_crypto_response/sign evidence.
+	SignResponseDomain = "orbis-sign-response-v1"
+	// DkgCommitmentDomain is the domain tag of the responder-signed raw DKG
+	// commitment statement nested inside invalid_crypto_response DKG evidence.
+	DkgCommitmentDomain = "orbis-dkg-commitment-v1"
+	// DkgShareDomain is the domain tag of the responder-signed raw DKG share
+	// statement carried as invalid_crypto_response/dkg_share evidence.
+	DkgShareDomain = "orbis-dkg-share-v1"
+	// RelayRequestDomain is the domain tag of the relayer-signed statement carried
+	// as the unauthorized_request report payload.
+	RelayRequestDomain = "orbis-relay-request-v1"
+	// relayCheckMaxDriftSecs mirrors orbis-rs RELAY_CHECK_MAX_DRIFT_SECS: the
+	// relayer must have forwarded within this many seconds of the caller signing
+	// the request (|signed_at - user_signed_at| <= relayCheckMaxDriftSecs).
+	relayCheckMaxDriftSecs = uint64(30)
+	// reportObservedAtGraceSecs mirrors orbis-rs CHAIN_BLOCK_GRACE_SECS:
+	// reporters backdate observed_at by this so the observed_at <= block_time
+	// check passes gas simulation. invalid_crypto_response envelopes are pinned
+	// to their evidence via observed_at == signed_at - grace, which makes
+	// the envelope's fixed observed_at + ReportTTLSeconds expiry double as the
+	// evidence expiry: acceptance can only happen in
+	// [signed_at - grace, signed_at - grace + TTL], so a plain TTL dedupe
+	// record always outlives any resubmission of the same evidence.
+	reportObservedAtGraceSecs = uint64(10)
+
+	// Size bounds for evidence blobs (group elements are 32-112 bytes across
+	// crypto backends; derivation is capability bytes).
+	preResponseMaxElementLen      = 512
+	preResponseMaxDerivationLen   = 4096
+	signResponseMaxElementLen     = 4096
+	signResponseMaxMessageLen     = 1024 * 1024
+	signResponseMaxCommitmentsLen = 1024 * 1024
+	dkgStatementMaxLen            = 1024 * 1024
+	dkgCommitmentMaxLen           = 1024 * 1024
+	dkgShareMaxElementLen         = 4096
+	dkgNonceLen                   = 16
 
 	offlineOriginProtocolPRE        = "pre"
 	offlineOriginProtocolSign       = "sign"
 	offlineOriginProtocolPSSRefresh = "pss_refresh"
 	offlineOriginProtocolPSSReshare = "pss_reshare"
+	originProtocolReport            = "report"
+
+	invalidCryptoEvidenceKindPRE                         = "pre"
+	invalidCryptoEvidenceKindSign                        = "sign"
+	invalidCryptoEvidenceKindDkgShare                    = "dkg_share"
+	invalidCryptoEvidenceKindDkgInvalidRefreshCommitment = "dkg_invalid_refresh_commitment"
+	invalidCryptoEvidenceKindDkgEquivocation             = "dkg_equivocation"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
 )
 
-type nodeOfflineReportPayload struct {
+// reportPayload is normalized per-report metadata consumed by the version
+// check, committee authorization, and session-dedupe ID. node_offline decodes
+// it directly from its payload; other report types synthesize it from their own
+// payloads.
+type reportPayload struct {
 	originProtocol        string
 	originProtocolVersion uint64
+	accusedCommitteeScope byte
+	signingCommitteeScope byte
+}
+
+// invalidCryptoResponseStatement holds the common fields of responder-signed
+// PRE, Sign, and raw DKG share response statements that the chain validates.
+// Protocol-specific cryptographic blobs are bounds-checked during decoding and
+// then dropped: the chain does not re-verify the PRE proof, Sign share, DKG
+// share, or responder signature; its crypto gate remains the ring threshold
+// signature on the report envelope.
+type invalidCryptoResponseStatement struct {
+	chainID               string
+	ringID                string
+	ringPk                string
+	ringStateSha256       string
+	protocolVersion       uint64
+	requestID             string
+	signedAt              uint64
+	responderNodeKey      string
+	originProtocol        string
+	accusedCommitteeScope byte
+	signingCommitteeScope byte
+}
+
+type dkgCommitmentStatement struct {
+	chainID               string
+	ringID                string
+	ringPk                string
+	ringStateSha256       string
+	protocolVersion       uint64
+	requestID             string
+	signedAt              uint64
+	responderNodeKey      string
+	originProtocol        string
+	accusedCommitteeScope byte
+	signingCommitteeScope byte
+	fromNodeID            uint32
+	commitment            []byte
+	sessionNonce          []byte
+	cryptoBackend         string
+}
+
+// relayRequestStatement is the relayer-signed record of a Sign/PRE request it
+// forwarded after its own ACP check passed. The relayer is the accused. Field
+// order matches the orbis-rs canonical encoding in reporting/v0/types.rs
+// RelayRequestStatement exactly.
+type relayRequestStatement struct {
+	chainID               string
+	ringID                string
+	ringPk                string
+	ringStateSha256       string
+	protocolVersion       uint64
+	requestID             string
+	signedAt              uint64
+	relayerNodeKey        string
+	originProtocol        string
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
 }
@@ -84,7 +195,7 @@ func (k *Keeper) validateSubmittedReport(
 		return nil, types.ErrReportAlreadyAccepted
 	}
 
-	var payload nodeOfflineReportPayload
+	var payload reportPayload
 	switch report.ReportType {
 	case NodeOfflineReportType:
 		payload, err = decodeNodeOfflinePayload(report.Payload)
@@ -93,6 +204,34 @@ func (k *Keeper) validateSubmittedReport(
 		}
 		if !isValidOfflineOriginProtocol(payload.originProtocol) {
 			return nil, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported offline report origin protocol %q", payload.originProtocol)
+		}
+	case InvalidCryptoResponseReportType:
+		statement, err := decodeInvalidCryptoResponsePayload(report.Payload)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateInvalidCryptoResponseStatement(report, statement); err != nil {
+			return nil, err
+		}
+		payload = reportPayload{
+			originProtocol:        statement.originProtocol,
+			originProtocolVersion: statement.protocolVersion,
+			accusedCommitteeScope: statement.accusedCommitteeScope,
+			signingCommitteeScope: statement.signingCommitteeScope,
+		}
+	case UnauthorizedRequestReportType:
+		statement, err := decodeUnauthorizedRequestPayload(report.Payload)
+		if err != nil {
+			return nil, err
+		}
+		if err := validateRelayRequestStatement(report, statement); err != nil {
+			return nil, err
+		}
+		payload = reportPayload{
+			originProtocol:        statement.originProtocol,
+			originProtocolVersion: statement.protocolVersion,
+			accusedCommitteeScope: statement.accusedCommitteeScope,
+			signingCommitteeScope: statement.signingCommitteeScope,
 		}
 	default:
 		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported report type %q", report.ReportType)
@@ -200,7 +339,7 @@ func reportEnvelopeCanonicalMessageAndID(report *types.ReportEnvelope) ([]byte, 
 	return message, hex.EncodeToString(hash[:]), nil
 }
 
-func reportSessionDedupeID(report *types.ReportEnvelope, payload nodeOfflineReportPayload) (string, error) {
+func reportSessionDedupeID(report *types.ReportEnvelope, payload reportPayload) (string, error) {
 	w := newReportCanonicalWriter()
 	w.writeString(ReportSessionDomain)
 	w.writeString(report.ChainId)
@@ -235,41 +374,963 @@ func reportEnvelopeCanonicalBytes(report *types.ReportEnvelope) ([]byte, error) 
 	return w.finish()
 }
 
-func decodeNodeOfflinePayload(payload []byte) (nodeOfflineReportPayload, error) {
+func decodeNodeOfflinePayload(payload []byte) (reportPayload, error) {
 	decoder := newReportCanonicalDecoder(payload)
-	originProtocol, err := decoder.readString("origin_protocol")
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
-	originProtocolVersion, err := decoder.readU64("origin_protocol_version")
+	originProtocolVersion, err := decoder.readU64(fieldOriginProtocolVersion)
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 
-	accusedScope, err := decoder.readByte("accused_committee_scope")
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 	if !isValidReportCommitteeScope(accusedScope) {
-		return nodeOfflineReportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+		return reportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
 	}
-	signingScope, err := decoder.readByte("signing_committee_scope")
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
 	if err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 	if !isValidReportCommitteeScope(signingScope) {
-		return nodeOfflineReportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+		return reportPayload{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
 	}
 	if err := decoder.finish(); err != nil {
-		return nodeOfflineReportPayload{}, err
+		return reportPayload{}, err
 	}
 
-	return nodeOfflineReportPayload{
+	return reportPayload{
 		originProtocol:        originProtocol,
 		originProtocolVersion: originProtocolVersion,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 	}, nil
+}
+
+// decodeInvalidCryptoResponsePayload decodes and shape-validates an
+// invalid_crypto_response payload. PRE, Sign, DKG-share, and invalid refresh
+// commitment evidence use a tagged statement plus a 64-byte secp256k1
+// signature; DKG equivocation carries two signed commitment statements. The
+// field order matches the orbis-rs canonical encoding in reporting/v0/types.rs
+// exactly.
+func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseStatement, error) {
+	outer := newReportCanonicalDecoder(payload)
+	evidenceKind, err := outer.readString(fieldEvidenceKind)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	switch evidenceKind {
+	case invalidCryptoEvidenceKindPRE:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodePreReencryptResponseStatement(statementBytes)
+	case invalidCryptoEvidenceKindSign:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodeSignResponseStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgShare:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodeDkgShareStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgInvalidRefreshCommitment:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodeDkgInvalidRefreshCommitmentStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgEquivocation:
+		commitmentAStatementBytes, err := outer.readBytes(fieldCommitmentAStatement)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentASignature, err := outer.readBytes(fieldCommitmentASignature)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentBStatementBytes, err := outer.readBytes(fieldCommitmentBStatement)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		commitmentBSignature, err := outer.readBytes(fieldCommitmentBSignature)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if err := outer.finish(); err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		return decodeDkgEquivocationStatements(
+			commitmentAStatementBytes,
+			commitmentASignature,
+			commitmentBStatementBytes,
+			commitmentBSignature,
+		)
+	default:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported invalid crypto evidence kind %q", evidenceKind)
+	}
+}
+
+func decodeSingleStatementInvalidCryptoPayloadTail(decoder *reportCanonicalDecoder) ([]byte, []byte, error) {
+	statementBytes, err := decoder.readBytes(fieldStatement)
+	if err != nil {
+		return nil, nil, err
+	}
+	responseSignature, err := decoder.readBytes(fieldResponseSignature)
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := decoder.finish(); err != nil {
+		return nil, nil, err
+	}
+	return statementBytes, responseSignature, nil
+}
+
+func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != PreReencryptResponseDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected PRE response domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindPRE, originProtocol) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported PRE response origin protocol %q", originProtocol)
+	}
+	objectID, err := decoder.readString(fieldObjectID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if requestID == "" || responderNodeKey == "" || objectID == "" {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response statement has empty identity fields")
+	}
+	rdrPk, err := decoder.readBytes(fieldRdrPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	derivation, err := decoder.readOptionalBytes(fieldDerivation)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if len(derivation) > preResponseMaxDerivationLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response derivation exceeds size bound")
+	}
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	share, err := decoder.readBytes(fieldShare)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	challenge, err := decoder.readBytes(fieldChallenge)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	proof, err := decoder.readBytes(fieldProof)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if cryptoBackend == "" {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response crypto backend cannot be empty")
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	for label, blob := range map[string][]byte{
+		"rdr_pk":    rdrPk,
+		"share":     share,
+		"challenge": challenge,
+		"proof":     proof,
+	} {
+		if len(blob) == 0 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PRE response %s cannot be empty", label)
+		}
+		if len(blob) > preResponseMaxElementLen {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PRE response %s exceeds size bound", label)
+		}
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	}, nil
+}
+
+func decodeSignResponseStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != SignResponseDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected Sign response domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidInvalidCryptoOriginProtocol(invalidCryptoEvidenceKindSign, originProtocol) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported Sign response origin protocol %q", originProtocol)
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	message, err := decoder.readBytes(fieldMessage)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signingCommitments, err := decoder.readBytes(fieldSigningCommitments)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	derivation, err := decoder.readOptionalBytes(fieldDerivation)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	metadata, err := decoder.readOptionalBytes(fieldMetadata)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	sigShare, err := decoder.readBytes(fieldSigShare)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	switch {
+	case requestID == "" || responderNodeKey == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response statement has empty identity fields")
+	case cryptoBackend == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response crypto backend cannot be empty")
+	case len(message) == 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response message cannot be empty")
+	case len(message) > signResponseMaxMessageLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response message exceeds size bound")
+	case len(signingCommitments) > signResponseMaxCommitmentsLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response commitments exceed size bound")
+	case len(derivation) > signResponseMaxElementLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response derivation exceeds size bound")
+	case len(metadata) > signResponseMaxElementLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response metadata exceeds size bound")
+	case len(sigShare) == 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response sig_share cannot be empty")
+	case len(sigShare) > signResponseMaxElementLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Sign response sig_share exceeds size bound")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+	}, nil
+}
+
+func decodeDkgShareStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	if len(statementBytes) > dkgStatementMaxLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share statement exceeds size bound")
+	}
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != DkgShareDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG share domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	receiverNodeKey, err := decoder.readString(fieldReceiverNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidInvalidCryptoDkgOriginProtocol(originProtocol) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG share origin protocol %q", originProtocol)
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	toNodeID, err := decoder.readU32(fieldToNodeID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	commitmentStatementBytes, err := decoder.readBytes(fieldCommitmentStatement)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	commitmentSignature, err := decoder.readBytes(fieldCommitmentSignature)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	shareValue, err := decoder.readBytes(fieldShareValue)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	nonce, err := decoder.readBytes(fieldNonce)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	switch {
+	case requestID == "" || responderNodeKey == "" || receiverNodeKey == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share statement has empty identity fields")
+	case accusedScope != committeeScopeCurrent || signingScope != committeeScopeCurrent:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share reports must use current accused and signing scopes")
+	case fromNodeID == 0 || toNodeID == 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share node IDs must be non-zero")
+	case len(commitmentStatementBytes) == 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment statement cannot be empty")
+	case len(commitmentStatementBytes) > dkgStatementMaxLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment statement exceeds size bound")
+	case len(commitmentSignature) != 64:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment signature must be 64 bytes")
+	case len(shareValue) == 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share value cannot be empty")
+	case len(shareValue) > dkgShareMaxElementLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share value exceeds size bound")
+	case len(nonce) != dkgNonceLen:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "DKG share nonce must be %d bytes", dkgNonceLen)
+	case cryptoBackend == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG share crypto backend cannot be empty")
+	}
+
+	commitment, err := decodeDkgCommitmentStatement(commitmentStatementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if commitment.chainID != chainID ||
+		commitment.ringID != ringID ||
+		commitment.ringPk != ringPk ||
+		commitment.ringStateSha256 != ringStateSha256 ||
+		commitment.protocolVersion != protocolVersion ||
+		commitment.requestID != requestID ||
+		commitment.responderNodeKey != responderNodeKey ||
+		commitment.originProtocol != originProtocol ||
+		commitment.accusedCommitteeScope != accusedScope ||
+		commitment.signingCommitteeScope != signingScope ||
+		commitment.fromNodeID != fromNodeID ||
+		commitment.cryptoBackend != cryptoBackend {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment binding does not match DKG share statement")
+	}
+	if commitment.signedAt > signedAt {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment was signed after the DKG share")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+	}, nil
+}
+
+func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement, error) {
+	if len(statementBytes) > dkgStatementMaxLen {
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment statement exceeds size bound")
+	}
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	if domain != DkgCommitmentDomain {
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG commitment domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	if !isValidInvalidCryptoDkgOriginProtocol(originProtocol) {
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG commitment origin protocol %q", originProtocol)
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	commitment, err := decoder.readBytes(fieldCommitment)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	sessionNonce, err := decoder.readBytes(fieldSessionNonce)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return dkgCommitmentStatement{}, err
+	}
+
+	switch {
+	case requestID == "" || responderNodeKey == "":
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment statement has empty identity fields")
+	case accusedScope != committeeScopeCurrent || signingScope != committeeScopeCurrent:
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment reports must use current accused and signing scopes")
+	case fromNodeID == 0:
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment from_node_id must be non-zero")
+	case len(commitment) == 0:
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment cannot be empty")
+	case len(commitment) > dkgCommitmentMaxLen:
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment exceeds size bound")
+	case len(sessionNonce) != dkgNonceLen:
+		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "DKG commitment session nonce must be %d bytes", dkgNonceLen)
+	case cryptoBackend == "":
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment crypto backend cannot be empty")
+	}
+
+	return dkgCommitmentStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+		fromNodeID:            fromNodeID,
+		commitment:            commitment,
+		sessionNonce:          sessionNonce,
+		cryptoBackend:         cryptoBackend,
+	}, nil
+}
+
+func decodeDkgInvalidRefreshCommitmentStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	commitment, err := decodeDkgCommitmentStatement(statementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if commitment.originProtocol != offlineOriginProtocolPSSRefresh {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(
+			types.ErrInvalidReport,
+			"DKG invalid-refresh-commitment report requires pss_refresh origin, got %s",
+			commitment.originProtocol,
+		)
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               commitment.chainID,
+		ringID:                commitment.ringID,
+		ringPk:                commitment.ringPk,
+		ringStateSha256:       commitment.ringStateSha256,
+		protocolVersion:       commitment.protocolVersion,
+		requestID:             commitment.requestID,
+		signedAt:              commitment.signedAt,
+		responderNodeKey:      commitment.responderNodeKey,
+		originProtocol:        commitment.originProtocol,
+		accusedCommitteeScope: commitment.accusedCommitteeScope,
+		signingCommitteeScope: commitment.signingCommitteeScope,
+	}, nil
+}
+
+func decodeDkgEquivocationStatements(
+	commitmentAStatementBytes []byte,
+	commitmentASignature []byte,
+	commitmentBStatementBytes []byte,
+	commitmentBSignature []byte,
+) (invalidCryptoResponseStatement, error) {
+	if len(commitmentASignature) != 64 {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment_a signature must be 64 bytes")
+	}
+	if len(commitmentBSignature) != 64 {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment_b signature must be 64 bytes")
+	}
+
+	commitmentA, err := decodeDkgCommitmentStatement(commitmentAStatementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	commitmentB, err := decodeDkgCommitmentStatement(commitmentBStatementBytes)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	if commitmentA.chainID != commitmentB.chainID ||
+		commitmentA.ringID != commitmentB.ringID ||
+		commitmentA.ringPk != commitmentB.ringPk ||
+		commitmentA.ringStateSha256 != commitmentB.ringStateSha256 ||
+		commitmentA.protocolVersion != commitmentB.protocolVersion ||
+		commitmentA.requestID != commitmentB.requestID ||
+		commitmentA.responderNodeKey != commitmentB.responderNodeKey ||
+		commitmentA.originProtocol != commitmentB.originProtocol ||
+		commitmentA.accusedCommitteeScope != commitmentB.accusedCommitteeScope ||
+		commitmentA.signingCommitteeScope != commitmentB.signingCommitteeScope ||
+		commitmentA.fromNodeID != commitmentB.fromNodeID ||
+		commitmentA.cryptoBackend != commitmentB.cryptoBackend {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment bindings do not match")
+	}
+	if !bytes.Equal(commitmentA.sessionNonce, commitmentB.sessionNonce) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitments must share a session nonce")
+	}
+	if bytes.Equal(commitmentA.commitment, commitmentB.commitment) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitments must differ")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               commitmentA.chainID,
+		ringID:                commitmentA.ringID,
+		ringPk:                commitmentA.ringPk,
+		ringStateSha256:       commitmentA.ringStateSha256,
+		protocolVersion:       commitmentA.protocolVersion,
+		requestID:             commitmentA.requestID,
+		signedAt:              commitmentA.signedAt,
+		responderNodeKey:      commitmentA.responderNodeKey,
+		originProtocol:        commitmentA.originProtocol,
+		accusedCommitteeScope: commitmentA.accusedCommitteeScope,
+		signingCommitteeScope: commitmentA.signingCommitteeScope,
+	}, nil
+}
+
+// validateInvalidCryptoResponseStatement binds the signed statement to the report
+// envelope. Pinning observed_at to signed_at - grace makes the envelope's
+// fixed observed_at+TTL expiry double as the evidence expiry, so the shared
+// envelope shape checks (observed_at <= now, now <= expires_at) already bound
+// how long this evidence stays reportable — no separate timing rules needed.
+func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statement invalidCryptoResponseStatement) error {
+	switch {
+	case statement.chainID != report.ChainId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "response chain ID does not match report envelope")
+	case statement.ringID != report.RingId,
+		statement.ringPk != report.RingPk,
+		statement.ringStateSha256 != report.RingStateSha256:
+		return errorsmod.Wrap(types.ErrInvalidReport, "response ring binding does not match report envelope")
+	case statement.requestID != report.SessionId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "response request_id does not match report session_id")
+	case statement.responderNodeKey != report.AccusedNodeKey:
+		return errorsmod.Wrap(types.ErrInvalidReport, "response responder does not match accused node")
+	case statement.signedAt < reportObservedAtGraceSecs,
+		report.ObservedAt != statement.signedAt-reportObservedAtGraceSecs:
+		return errorsmod.Wrap(types.ErrInvalidReport, "report envelope is not anchored to the evidence timestamp")
+	}
+	return nil
+}
+
+// decodeUnauthorizedRequestPayload decodes the unauthorized_request payload: the
+// relayer-signed statement, its 64-byte secp256k1 signature, and the acceptor's
+// opaque ACP anchor. The chain does not re-run the ACP check or verify the relay
+// signature — that anti-framing refutation runs off-chain in the orbis co-signer
+// set; the chain's crypto gate remains the ring threshold signature on the
+// report envelope. The field order matches orbis-rs UnauthorizedRequestPayload.
+func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, error) {
+	outer := newReportCanonicalDecoder(payload)
+	statementBytes, err := outer.readBytes(fieldStatement)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	relaySignature, err := outer.readBytes(fieldRelaySignature)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	checkedAtAnchor, err := outer.readString(fieldCheckedAtAnchor)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if err := outer.finish(); err != nil {
+		return relayRequestStatement{}, err
+	}
+	if len(relaySignature) != 64 {
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay signature must be 64 bytes")
+	}
+	if checkedAtAnchor == "" {
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request checked_at_anchor cannot be empty")
+	}
+	return decodeRelayRequestStatement(statementBytes)
+}
+
+func decodeRelayRequestStatement(statementBytes []byte) (relayRequestStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if domain != RelayRequestDomain {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected relay request domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	userSignedAt, err := decoder.readU64(fieldUserSignedAt)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	relayerNodeKey, err := decoder.readString(fieldRelayerNodeKey)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	fromNodeID, err := decoder.readU32(fieldFromNodeID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	actorID, err := decoder.readString(fieldActorID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	objectID, err := decoder.readString(fieldObjectID)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	validWindowStart, err := decoder.readOptionalU64(fieldValidWindowStart)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	validWindowEnd, err := decoder.readOptionalU64(fieldValidWindowEnd)
+	if err != nil {
+		return relayRequestStatement{}, err
+	}
+	// timestamp is the relayer's ACP-check time; only the off-chain refutation
+	// re-runs the ACP check, so the chain decodes it for framing but ignores it.
+	if _, err := decoder.readOptionalU64(fieldTimestamp); err != nil {
+		return relayRequestStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return relayRequestStatement{}, err
+	}
+
+	switch {
+	case originProtocol != offlineOriginProtocolPRE && originProtocol != offlineOriginProtocolSign:
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported relay request origin protocol %q", originProtocol)
+	case accusedScope != committeeScopeCurrent || signingScope != committeeScopeCurrent:
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request reports must use current accused and signing scopes")
+	case fromNodeID == 0:
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request from_node_id must be non-zero")
+	case requestID == "" || relayerNodeKey == "" || actorID == "" || objectID == "":
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request statement has empty identity fields")
+	case (validWindowStart != nil) != (validWindowEnd != nil):
+		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request valid_window bounds must both be present or both absent")
+	case absDiffUint64(signedAt, userSignedAt) > relayCheckMaxDriftSecs:
+		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "relay request signed_at %d drifts from caller signed_at %d by more than %ds", signedAt, userSignedAt, relayCheckMaxDriftSecs)
+	}
+
+	return relayRequestStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		relayerNodeKey:        relayerNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+	}, nil
+}
+
+// validateRelayRequestStatement binds the relayer-signed statement to the report
+// envelope. As with invalid_crypto_response, pinning observed_at to
+// signed_at - grace makes the envelope's fixed observed_at+TTL window double as
+// the evidence expiry, so the shared envelope timing checks already bound how
+// long this evidence stays reportable.
+func validateRelayRequestStatement(report *types.ReportEnvelope, statement relayRequestStatement) error {
+	switch {
+	case statement.chainID != report.ChainId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request chain ID does not match report envelope")
+	case statement.ringID != report.RingId,
+		statement.ringPk != report.RingPk,
+		statement.ringStateSha256 != report.RingStateSha256:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request ring binding does not match report envelope")
+	case statement.requestID != report.SessionId:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request request_id does not match report session_id")
+	case statement.relayerNodeKey != report.AccusedNodeKey:
+		return errorsmod.Wrap(types.ErrInvalidReport, "relay request relayer does not match accused node")
+	case statement.signedAt < reportObservedAtGraceSecs,
+		report.ObservedAt != statement.signedAt-reportObservedAtGraceSecs:
+		return errorsmod.Wrap(types.ErrInvalidReport, "report envelope is not anchored to the evidence timestamp")
+	}
+	return nil
+}
+
+// absDiffUint64 returns |a - b| without casting through float64.
+func absDiffUint64(a, b uint64) uint64 {
+	if a > b {
+		return a - b
+	}
+	return b - a
 }
 
 func isValidReportCommitteeScope(scope byte) bool {
@@ -288,11 +1349,38 @@ func isValidOfflineOriginProtocol(originProtocol string) bool {
 	}
 }
 
+// isValidInvalidCryptoOriginProtocol lists the origins each non-DKG invalid
+// crypto evidence kind may carry. "pre" is intentionally excluded from Sign:
+// a PRE re-encryption response is reported as the dedicated "pre" evidence kind.
+func isValidInvalidCryptoOriginProtocol(evidenceKind string, originProtocol string) bool {
+	switch originProtocol {
+	case offlineOriginProtocolPRE:
+		return evidenceKind == invalidCryptoEvidenceKindPRE
+	case offlineOriginProtocolSign,
+		offlineOriginProtocolPSSRefresh,
+		offlineOriginProtocolPSSReshare,
+		originProtocolReport:
+		return evidenceKind == invalidCryptoEvidenceKindSign
+	default:
+		return false
+	}
+}
+
+func isValidInvalidCryptoDkgOriginProtocol(originProtocol string) bool {
+	switch originProtocol {
+	case offlineOriginProtocolPSSRefresh,
+		offlineOriginProtocolPSSReshare:
+		return true
+	default:
+		return false
+	}
+}
+
 func validateReportCommitteeAuthorization(
 	goCtx context.Context,
 	k *Keeper,
 	report *types.ReportEnvelope,
-	payload nodeOfflineReportPayload,
+	payload reportPayload,
 	ring *types.Ring,
 ) error {
 	accusedCommittee, err := reportCommitteeForScope(ring, payload.accusedCommitteeScope)
@@ -377,6 +1465,81 @@ func reportBlockUnixTime(ctx sdk.Context) (uint64, error) {
 	return uint64(unixTime), nil
 }
 
+func (k *Keeper) maybeScheduleAutoReshareForReport(
+	goCtx context.Context,
+	ctx sdk.Context,
+	ring *types.Ring,
+	accusedNodeKey string,
+	effectiveDemerits uint64,
+) error {
+	if effectiveDemerits < ring.Reporting.KickThreshold {
+		return nil
+	}
+	if len(ring.NewPeerNodeKeys) > 0 || ring.XNewThreshold != nil {
+		return nil
+	}
+	if !slices.Contains(ring.PeerNodeKeys, accusedNodeKey) {
+		return nil
+	}
+
+	replacementNodeKey, remainingBackups, found := k.selectAutoReshareReplacement(goCtx, ring, accusedNodeKey)
+	if !found {
+		return nil
+	}
+
+	nextPeerNodeKeys := make([]string, 0, len(ring.PeerNodeKeys))
+	for _, nodeKey := range ring.PeerNodeKeys {
+		if nodeKey != accusedNodeKey {
+			nextPeerNodeKeys = append(nextPeerNodeKeys, nodeKey)
+		}
+	}
+	nextPeerNodeKeys = append(nextPeerNodeKeys, replacementNodeKey)
+
+	nextRing := *ring
+	nextRing.NewPeerNodeKeys = canonicalNodeKeys(nextPeerNodeKeys)
+	nextRing.XNewThreshold = nil
+	nextRing.Reporting.BackupNodeKeys = remainingBackups
+	if err := validateRing(&nextRing); err != nil {
+		return err
+	}
+	k.SetRing(goCtx, nextRing)
+
+	return ctx.EventManager().EmitTypedEvent(&types.EventRingAutoReshareScheduled{
+		RingId:             ring.Id,
+		AccusedNodeKey:     accusedNodeKey,
+		ReplacementNodeKey: replacementNodeKey,
+		KickThreshold:      ring.Reporting.KickThreshold,
+		Demerits:           effectiveDemerits,
+	})
+}
+
+func (k *Keeper) selectAutoReshareReplacement(
+	goCtx context.Context,
+	ring *types.Ring,
+	accusedNodeKey string,
+) (string, []string, bool) {
+	active := make(map[string]struct{}, len(ring.PeerNodeKeys))
+	for _, nodeKey := range ring.PeerNodeKeys {
+		active[nodeKey] = struct{}{}
+	}
+
+	for i, backupNodeKey := range ring.Reporting.BackupNodeKeys {
+		if _, alreadyActive := active[backupNodeKey]; alreadyActive {
+			continue
+		}
+		nodeInfo := k.GetNodeInfo(goCtx, backupNodeKey)
+		if nodeInfo == nil || !nodeInfoAllowsRing(nodeInfo, ring) {
+			continue
+		}
+
+		remainingBackups := slices.Clone(ring.Reporting.BackupNodeKeys[:i])
+		remainingBackups = append(remainingBackups, ring.Reporting.BackupNodeKeys[i+1:]...)
+		return backupNodeKey, remainingBackups, true
+	}
+
+	return "", slices.Clone(ring.Reporting.BackupNodeKeys), false
+}
+
 func reportRingStateSHA256(ring *types.Ring) (string, error) {
 	canonical, err := reportRingStateCanonicalBytes(ring)
 	if err != nil {
@@ -423,6 +1586,7 @@ func reportRingStateCanonicalBytes(ring *types.Ring) ([]byte, error) {
 		activationTime := ring.UpgradeInfo.GetActivationTime()
 		w.writeOptionalU64(&activationTime)
 	}
+	w.writeReportingConfig(ring.Reporting)
 	return w.finish()
 }
 
@@ -507,6 +1671,19 @@ func (w *reportCanonicalWriter) writeOptionalU64(value *uint64) {
 	w.writeU64(*value)
 }
 
+func (w *reportCanonicalWriter) writeDemeritConfig(value types.DemeritConfig) {
+	w.writeU64(value.NodeOfflineDemerits)
+	w.writeU64(value.ResetIntervalSeconds)
+	w.writeU64(value.InvalidCryptoResponseDemerits)
+	w.writeU64(value.UnauthorizedRequestDemerits)
+}
+
+func (w *reportCanonicalWriter) writeReportingConfig(value types.ReportingConfig) {
+	w.writeDemeritConfig(value.DemeritConfig)
+	w.writeStringSlice(value.BackupNodeKeys)
+	w.writeU64(value.KickThreshold)
+}
+
 func (w *reportCanonicalWriter) finish() ([]byte, error) {
 	if w.err != nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidReport, w.err.Error())
@@ -519,6 +1696,59 @@ func (w *reportCanonicalWriter) setErr(err error) {
 		w.err = err
 	}
 }
+
+// Field-name labels passed to reportCanonicalDecoder read calls, used to
+// identify the field in decode error messages.
+const (
+	fieldAccusedCommitteeScope = "accused_committee_scope"
+	fieldActorID               = "actor_id"
+	fieldChainID               = "chain_id"
+	fieldChallenge             = "challenge"
+	fieldCheckedAtAnchor       = "checked_at_anchor"
+	fieldCommitment            = "commitment"
+	fieldCommitmentASignature  = "commitment_a_signature"
+	fieldCommitmentAStatement  = "commitment_a_statement"
+	fieldCommitmentBSignature  = "commitment_b_signature"
+	fieldCommitmentBStatement  = "commitment_b_statement"
+	fieldCommitmentSignature   = "commitment_signature"
+	fieldCommitmentStatement   = "commitment_statement"
+	fieldCryptoBackend         = "crypto_backend"
+	fieldDerivation            = "derivation"
+	fieldDomain                = "domain"
+	fieldEvidenceKind          = "evidence_kind"
+	fieldFromNodeID            = "from_node_id"
+	fieldMessage               = "message"
+	fieldMetadata              = "metadata"
+	fieldNonce                 = "nonce"
+	fieldObjectID              = "object_id"
+	fieldOriginProtocol        = "origin_protocol"
+	fieldOriginProtocolVersion = "origin_protocol_version"
+	fieldProof                 = "proof"
+	fieldProtocolVersion       = "protocol_version"
+	fieldRdrPk                 = "rdr_pk"
+	fieldReceiverNodeKey       = "receiver_node_key"
+	fieldRelaySignature        = "relay_signature"
+	fieldRelayerNodeKey        = "relayer_node_key"
+	fieldRequestID             = "request_id"
+	fieldResponderNodeKey      = "responder_node_key"
+	fieldResponseSignature     = "response_signature"
+	fieldRingID                = "ring_id"
+	fieldRingPk                = "ring_pk"
+	fieldRingStateSha256       = "ring_state_sha256"
+	fieldSessionNonce          = "session_nonce"
+	fieldShare                 = "share"
+	fieldShareValue            = "share_value"
+	fieldSigShare              = "sig_share"
+	fieldSignedAt              = "signed_at"
+	fieldSigningCommitments    = "signing_commitments"
+	fieldSigningCommitteeScope = "signing_committee_scope"
+	fieldStatement             = "statement"
+	fieldTimestamp             = "timestamp"
+	fieldToNodeID              = "to_node_id"
+	fieldUserSignedAt          = "user_signed_at"
+	fieldValidWindowEnd        = "valid_window_end"
+	fieldValidWindowStart      = "valid_window_start"
+)
 
 type reportCanonicalDecoder struct {
 	bytes  []byte
@@ -570,6 +1800,53 @@ func (d *reportCanonicalDecoder) readString(label string) (string, error) {
 		return "", errorsmod.Wrapf(types.ErrInvalidReport, "%s is not utf-8", label)
 	}
 	return string(valueBytes), nil
+}
+
+func (d *reportCanonicalDecoder) readBytes(label string) ([]byte, error) {
+	length, err := d.readU32(label + "_length")
+	if err != nil {
+		return nil, err
+	}
+	if uint64(len(d.bytes)-d.cursor) < uint64(length) {
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "truncated %s", label)
+	}
+	value := d.bytes[d.cursor : d.cursor+int(length)]
+	d.cursor += int(length)
+	return value, nil
+}
+
+func (d *reportCanonicalDecoder) readOptionalBytes(label string) ([]byte, error) {
+	tag, err := d.readByte(label + "_present")
+	if err != nil {
+		return nil, err
+	}
+	switch tag {
+	case 0:
+		return nil, nil
+	case 1:
+		return d.readBytes(label)
+	default:
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
+	}
+}
+
+func (d *reportCanonicalDecoder) readOptionalU64(label string) (*uint64, error) {
+	tag, err := d.readByte(label + "_present")
+	if err != nil {
+		return nil, err
+	}
+	switch tag {
+	case 0:
+		return nil, nil
+	case 1:
+		value, err := d.readU64(label)
+		if err != nil {
+			return nil, err
+		}
+		return &value, nil
+	default:
+		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
+	}
 }
 
 func (d *reportCanonicalDecoder) finish() error {
