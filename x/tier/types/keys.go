@@ -1,13 +1,15 @@
 package types
 
 import (
-	"bytes"
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
+	addressKeyLength = 20
+	keySeparator     = byte('/')
+
 	// ModuleName defines the module name
 	ModuleName = "tier"
 
@@ -96,31 +98,32 @@ func UnlockingLockupKey(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creation
 
 // LockupKeyToAddresses retrieves delAddr and valAddr from provided Lockup key.
 func LockupKeyToAddresses(key []byte) (sdk.AccAddress, sdk.ValAddress) {
-	// Find the positions of the delimiters
-	parts := bytes.Split(key, []byte{'/'})
-	if len(parts) != 3 {
+	const expectedLength = addressKeyLength*2 + 2
+	if len(key) != expectedLength ||
+		key[addressKeyLength] != keySeparator ||
+		key[expectedLength-1] != keySeparator {
 		panic("invalid key format: expected format delAddr/valAddr/")
 	}
 
-	// Reconstruct the addresses
-	delAddr := sdk.AccAddress(parts[0])
-	valAddr := sdk.ValAddress(parts[1])
+	delAddr := sdk.AccAddress(key[:addressKeyLength])
+	valAddr := sdk.ValAddress(key[addressKeyLength+1 : expectedLength-1])
 
 	return delAddr, valAddr
 }
 
 // UnlockingLockupKeyToAddressesAtHeight retrieves delAddr, valAddr, and creationHeight from provided unlocking Lockup key.
 func UnlockingLockupKeyToAddressesAtHeight(key []byte) (sdk.AccAddress, sdk.ValAddress, int64) {
-	// Find the positions of the delimiters
-	parts := bytes.Split(key, []byte{'/'})
-	if len(parts) != 4 {
+	const heightStart = addressKeyLength*2 + 2
+	if len(key) <= heightStart ||
+		key[addressKeyLength] != keySeparator ||
+		key[heightStart-1] != keySeparator ||
+		key[len(key)-1] != keySeparator {
 		panic("invalid key format: expected format delAddr/valAddr/creationHeight/")
 	}
 
-	// Reconstruct the addresses and creation height
-	delAddr := sdk.AccAddress(parts[0])
-	valAddr := sdk.ValAddress(parts[1])
-	creationHeight, err := strconv.ParseInt(string(parts[2]), 10, 64)
+	delAddr := sdk.AccAddress(key[:addressKeyLength])
+	valAddr := sdk.ValAddress(key[addressKeyLength+1 : heightStart-1])
+	creationHeight, err := strconv.ParseInt(string(key[heightStart:len(key)-1]), 10, 64)
 	if err != nil {
 		panic("unexpected creation height")
 	}
@@ -145,15 +148,15 @@ func UserSubscriptionKey(developerAddr sdk.AccAddress, userDid string) []byte {
 
 // UserSubscriptionKeyToAddresses retrieves developerAddr and userDid from provided UserSubscriptionKey.
 func UserSubscriptionKeyToAddresses(key []byte) (sdk.AccAddress, string) {
-	// Find the positions of the delimiters
-	parts := bytes.Split(key, []byte{'/'})
-	if len(parts) != 3 {
+	const valueStart = addressKeyLength + 1
+	if len(key) <= valueStart ||
+		key[addressKeyLength] != keySeparator ||
+		key[len(key)-1] != keySeparator {
 		panic("invalid key format: expected format developerAddr/userDid/")
 	}
 
-	// Reconstruct the developer address and user DID
-	developerAddr := sdk.AccAddress(parts[0])
-	userDid := string(parts[1])
+	developerAddr := sdk.AccAddress(key[:addressKeyLength])
+	userDid := string(key[valueStart : len(key)-1])
 
 	return developerAddr, userDid
 }
@@ -173,16 +176,12 @@ func DeveloperKey(developerAddr sdk.AccAddress) []byte {
 
 // DeveloperKeyToAddress retrieves developerAddr from provided DeveloperKey.
 func DeveloperKeyToAddress(key []byte) sdk.AccAddress {
-	// Find the positions of the delimiters
-	parts := bytes.Split(key, []byte{'/'})
-	if len(parts) != 2 {
+	const expectedLength = addressKeyLength + 1
+	if len(key) != expectedLength || key[expectedLength-1] != keySeparator {
 		panic("invalid key format: expected format developerAddr/")
 	}
 
-	// Reconstruct the address
-	developerAddr := sdk.AccAddress(parts[0])
-
-	return developerAddr
+	return sdk.AccAddress(key[:addressKeyLength])
 }
 
 // TotalDevGrantedKey builds and returns a key to store developer total granted amount.
