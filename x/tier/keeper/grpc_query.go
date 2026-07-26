@@ -131,6 +131,25 @@ func (k *Keeper) Developers(ctx context.Context, req *types.DevelopersRequest) (
 	}, nil
 }
 
+// Developer query returns a registered developer by address.
+func (k *Keeper) Developer(ctx context.Context, req *types.DeveloperRequest) (*types.DeveloperResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	address, err := sdk.AccAddressFromBech32(req.Address)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid developer address")
+	}
+
+	developer := k.GetDeveloper(ctx, address)
+	if developer == nil {
+		return nil, status.Error(codes.NotFound, "developer does not exist")
+	}
+
+	return &types.DeveloperResponse{Developer: *developer}, nil
+}
+
 // UserSubscriptions query returns all user subscriptions for a specific developer.
 func (k *Keeper) UserSubscriptions(ctx context.Context, req *types.UserSubscriptionsRequest) (*types.UserSubscriptionsResponse, error) {
 	if req == nil {

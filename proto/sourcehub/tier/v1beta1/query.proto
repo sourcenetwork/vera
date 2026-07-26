@@ -43,6 +43,11 @@ service Query {
     option (google.api.http).get = "/sourcehub/tier/v1beta1/developers";
   }
 
+  // Developer queries a registered developer by address.
+  rpc Developer(DeveloperRequest) returns (DeveloperResponse) {
+    option (google.api.http).get = "/sourcehub/tier/v1beta1/developers/{address}";
+  }
+
   // UserSubscriptions queries all user subscriptions for a specific developer.
   rpc UserSubscriptions(UserSubscriptionsRequest) returns (UserSubscriptionsResponse) {
     option (google.api.http).get = "/sourcehub/tier/v1beta1/subscriptions/{developer}";
@@ -117,6 +122,16 @@ message DevelopersRequest {
 message DevelopersResponse {
   repeated Developer developers = 1 [(gogoproto.nullable) = false];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// DeveloperRequest is the request type for the Query/Developer RPC method.
+message DeveloperRequest {
+  string address = 1;
+}
+
+// DeveloperResponse is the response type for the Query/Developer RPC method.
+message DeveloperResponse {
+  Developer developer = 1 [(gogoproto.nullable) = false];
 }
 
 // UserSubscriptionsRequest is the request type for the Query/UserSubscriptions RPC method.
