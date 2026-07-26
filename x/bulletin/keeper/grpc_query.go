@@ -136,39 +136,35 @@ func (k *Keeper) IterateGlob(goCtx context.Context, req *types.QueryIterateGlobR
 		return nil, status.Error(codes.InvalidArgument, "invalid namespace")
 	}
 
-	// Use the sanitized namespace as prefix without trailing slash to match all keys that start with it
 	sanitizedNamespaceId := types.SanitizeKeyPart(getNamespaceId(req.Namespace))
 	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(goCtx))
 	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PostKeyPrefix+sanitizedNamespaceId))
 
 	var posts []*types.Post
 
-	// Use the Paginate function to handle the pagination logic.
-	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
+	pageRes, err := query.FilteredPaginate(store, req.Pagination, func(key, value []byte, accumulate bool) (bool, error) {
 		keyStr := string(key)
-
-		// Strip leading separator:
-		// "|" appears when matching sub-paths within the namespace
-		// "/" appears when matching exactly at namespace boundary with non-empty postId
-		if len(keyStr) > 0 && (keyStr[0] == '|' || keyStr[0] == '/') {
-			keyStr = keyStr[1:]
+		if len(keyStr) == 0 || (keyStr[0] != '|' && keyStr[0] != '/') {
+			return false, nil
 		}
 
-		// Strip trailing "/" before glob matching
+		keyStr = keyStr[1:]
+
 		if len(keyStr) > 0 && keyStr[len(keyStr)-1] == '/' {
 			keyStr = keyStr[:len(keyStr)-1]
 		}
 
-		// Unsanitize the key to restore original "/" characters for glob matching
 		keyStr = types.UnsanitizeKeyPart(keyStr)
-		matched := utils.Glob(req.Glob, keyStr)
-		if matched {
+		if !utils.Glob(req.Glob, keyStr) {
+			return false, nil
+		}
+		if accumulate {
 			var post types.Post
 			k.cdc.MustUnmarshal(value, &post)
 			posts = append(posts, &post)
 		}
 
-		return nil
+		return true, nil
 	})
 	if err != nil {
 		return nil, err
@@ -275,7 +271,6 @@ func (k *Keeper) getAllPostsPaginated(ctx context.Context, pageReq *query.PageRe
 
 	return posts, pageRes, nil
 }
-
 
 // BulletinPolicyId returns the bulletin module policy id.
 func (k *Keeper) BulletinPolicyId(ctx context.Context, req *types.QueryBulletinPolicyIdRequest) (*types.QueryBulletinPolicyIdResponse, error) {
