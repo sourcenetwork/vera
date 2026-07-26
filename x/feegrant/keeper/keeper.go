@@ -646,7 +646,15 @@ func (k Keeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 	store := k.storeService.OpenKVStore(ctx)
 	key := feegrant.FeeAllowanceByDIDKey(granter, granteeDID)
 
-	_, err := k.getDIDGrant(ctx, granter, granteeDID)
+	existingGrant, err := k.getDIDGrant(ctx, granter, granteeDID)
+	if err != nil {
+		return err
+	}
+	existingAllowance, err := existingGrant.GetDIDGrant()
+	if err != nil {
+		return err
+	}
+	existingExpiration, err := existingAllowance.ExpiresAt()
 	if err != nil {
 		return err
 	}
@@ -655,10 +663,25 @@ func (k Keeper) UpdateDIDAllowance(ctx context.Context, granter sdk.AccAddress, 
 	if err != nil {
 		return err
 	}
+	newExpiration, err := feeAllowance.ExpiresAt()
+	if err != nil {
+		return err
+	}
 
 	bz, err := k.cdc.Marshal(&didGrant)
 	if err != nil {
 		return err
+	}
+
+	if existingExpiration != nil && (newExpiration == nil || !existingExpiration.Equal(*newExpiration)) {
+		if err := store.Delete(feegrant.DIDFeeAllowancePrefixQueue(existingExpiration, key[1:])); err != nil {
+			return err
+		}
+	}
+	if newExpiration != nil && (existingExpiration == nil || !newExpiration.Equal(*existingExpiration)) {
+		if err := k.addToDIDFeeAllowanceQueue(ctx, key[1:], newExpiration); err != nil {
+			return err
+		}
 	}
 
 	err = store.Set(key, bz)
