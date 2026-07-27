@@ -244,6 +244,36 @@ func TestDevelopersQuery_InvalidRequest(t *testing.T) {
 	require.Nil(t, resp)
 }
 
+func TestDeveloperQuery(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	address, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	require.NoError(t, err)
+	require.NoError(t, k.CreateDeveloper(ctx, address, true))
+
+	response, err := k.Developer(ctx, &types.DeveloperRequest{Address: address.String()})
+	require.NoError(t, err)
+	require.Equal(t, address.String(), response.Developer.Address)
+	require.True(t, response.Developer.AutoLockEnabled)
+}
+
+func TestDeveloperQueryErrors(t *testing.T) {
+	k, ctx := keepertest.TierKeeper(t)
+
+	response, err := k.Developer(ctx, nil)
+	require.ErrorContains(t, err, "invalid request")
+	require.Nil(t, response)
+
+	response, err = k.Developer(ctx, &types.DeveloperRequest{Address: "invalid"})
+	require.ErrorContains(t, err, "invalid developer address")
+	require.Nil(t, response)
+
+	address := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+	response, err = k.Developer(ctx, &types.DeveloperRequest{Address: address})
+	require.ErrorContains(t, err, "developer does not exist")
+	require.Nil(t, response)
+}
+
 func TestUserSubscriptionsQuery(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 

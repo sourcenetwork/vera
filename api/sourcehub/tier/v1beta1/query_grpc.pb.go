@@ -25,6 +25,7 @@ const (
 	Query_UnlockingLockup_FullMethodName   = "/sourcehub.tier.v1beta1.Query/UnlockingLockup"
 	Query_UnlockingLockups_FullMethodName  = "/sourcehub.tier.v1beta1.Query/UnlockingLockups"
 	Query_Developers_FullMethodName        = "/sourcehub.tier.v1beta1.Query/Developers"
+	Query_Developer_FullMethodName         = "/sourcehub.tier.v1beta1.Query/Developer"
 	Query_UserSubscriptions_FullMethodName = "/sourcehub.tier.v1beta1.Query/UserSubscriptions"
 )
 
@@ -46,6 +47,8 @@ type QueryClient interface {
 	UnlockingLockups(ctx context.Context, in *UnlockingLockupsRequest, opts ...grpc.CallOption) (*UnlockingLockupsResponse, error)
 	// Developers queries all registered developers.
 	Developers(ctx context.Context, in *DevelopersRequest, opts ...grpc.CallOption) (*DevelopersResponse, error)
+	// Developer queries a registered developer by address.
+	Developer(ctx context.Context, in *DeveloperRequest, opts ...grpc.CallOption) (*DeveloperResponse, error)
 	// UserSubscriptions queries all user subscriptions for a specific developer.
 	UserSubscriptions(ctx context.Context, in *UserSubscriptionsRequest, opts ...grpc.CallOption) (*UserSubscriptionsResponse, error)
 }
@@ -118,6 +121,16 @@ func (c *queryClient) Developers(ctx context.Context, in *DevelopersRequest, opt
 	return out, nil
 }
 
+func (c *queryClient) Developer(ctx context.Context, in *DeveloperRequest, opts ...grpc.CallOption) (*DeveloperResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeveloperResponse)
+	err := c.cc.Invoke(ctx, Query_Developer_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *queryClient) UserSubscriptions(ctx context.Context, in *UserSubscriptionsRequest, opts ...grpc.CallOption) (*UserSubscriptionsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(UserSubscriptionsResponse)
@@ -146,6 +159,8 @@ type QueryServer interface {
 	UnlockingLockups(context.Context, *UnlockingLockupsRequest) (*UnlockingLockupsResponse, error)
 	// Developers queries all registered developers.
 	Developers(context.Context, *DevelopersRequest) (*DevelopersResponse, error)
+	// Developer queries a registered developer by address.
+	Developer(context.Context, *DeveloperRequest) (*DeveloperResponse, error)
 	// UserSubscriptions queries all user subscriptions for a specific developer.
 	UserSubscriptions(context.Context, *UserSubscriptionsRequest) (*UserSubscriptionsResponse, error)
 	mustEmbedUnimplementedQueryServer()
@@ -175,6 +190,9 @@ func (UnimplementedQueryServer) UnlockingLockups(context.Context, *UnlockingLock
 }
 func (UnimplementedQueryServer) Developers(context.Context, *DevelopersRequest) (*DevelopersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Developers not implemented")
+}
+func (UnimplementedQueryServer) Developer(context.Context, *DeveloperRequest) (*DeveloperResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Developer not implemented")
 }
 func (UnimplementedQueryServer) UserSubscriptions(context.Context, *UserSubscriptionsRequest) (*UserSubscriptionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UserSubscriptions not implemented")
@@ -308,6 +326,24 @@ func _Query_Developers_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_Developer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeveloperRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).Developer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_Developer_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).Developer(ctx, req.(*DeveloperRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Query_UserSubscriptions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UserSubscriptionsRequest)
 	if err := dec(in); err != nil {
@@ -356,6 +392,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Developers",
 			Handler:    _Query_Developers_Handler,
+		},
+		{
+			MethodName: "Developer",
+			Handler:    _Query_Developer_Handler,
 		},
 		{
 			MethodName: "UserSubscriptions",
