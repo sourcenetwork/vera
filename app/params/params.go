@@ -41,4 +41,6 @@ type contextKey string
 const (
 	// ExtractedDIDContextKey is the key used to store extracted DID in context
 	ExtractedDIDContextKey contextKey = "extracted_did"
+	// TrustedRelayFeeGranterContextKey identifies the fee granter that authorized the relay worker.
+	TrustedRelayFeeGranterContextKey contextKey = "trusted_relay_fee_granter"
 )

@@ -10,6 +10,7 @@ import (
 // HubKeeper is an interface for the x/hub module keeper.
 type HubKeeper interface {
 	GetChainConfig(context.Context) hubtypes.ChainConfig
+	GetParams(context.Context) hubtypes.Params
 
 	// JWS token management
 	StoreOrUpdateJWSToken(

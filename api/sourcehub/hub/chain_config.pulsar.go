@@ -501,8 +501,8 @@ type ChainConfig struct {
 	// allow_zero_fee_txs if true configures the ante handler
 	// to not reject txs with 0 fees
 	AllowZeroFeeTxs bool `protobuf:"varint,1,opt,name=allow_zero_fee_txs,json=allowZeroFeeTxs,proto3" json:"allow_zero_fee_txs,omitempty"`
-	// ignore_bearer_auth if true ignores the `authorized_account`
-	// field in the Bearer JWS from Extension Options
+	// ignore_bearer_auth permits trusted relay workers to replace the
+	// `authorized_account` binding with an on-chain fee grant.
 	IgnoreBearerAuth bool `protobuf:"varint,2,opt,name=ignore_bearer_auth,json=ignoreBearerAuth,proto3" json:"ignore_bearer_auth,omitempty"`
 }
 

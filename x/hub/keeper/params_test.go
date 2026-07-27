@@ -16,3 +16,9 @@ func TestGetParams(t *testing.T) {
 	require.NoError(t, k.SetParams(ctx, params))
 	require.EqualValues(t, params, k.GetParams(ctx))
 }
+
+func TestSetParamsRejectsInvalidTrustedRelay(t *testing.T) {
+	k, ctx := keepertest.HubKeeper(t)
+	err := k.SetParams(ctx, types.Params{TrustedRelayFeeGranters: []string{"invalid"}})
+	require.Error(t, err)
+}

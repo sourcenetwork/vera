@@ -315,11 +315,14 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 	tokenHash := types.HashJWSToken(bearerToken)
 
 	// Check if token already exists
-	_, found, err := k.GetJWSToken(ctx, tokenHash)
+	record, found, err := k.GetJWSToken(ctx, tokenHash)
 	if err != nil {
 		return errorsmod.Wrap(err, "decoding JWS token")
 	}
 	if found {
+		if record.Status != types.JWSTokenStatus_STATUS_VALID {
+			return errorsmod.Wrap(types.ErrJWSTokenInvalid, tokenHash)
+		}
 		// Token exists, update usage timestamp
 		return k.RecordJWSTokenUsage(ctx, tokenHash)
 	}
@@ -331,7 +334,7 @@ func (k *Keeper) StoreOrUpdateJWSToken(
 
 	// Create new token record
 	blockTime := sdk.UnwrapSDKContext(ctx).BlockTime()
-	record := &types.JWSTokenRecord{
+	record = &types.JWSTokenRecord{
 		TokenHash:         tokenHash,
 		BearerToken:       bearerToken,
 		IssuerDid:         issuerDid,
