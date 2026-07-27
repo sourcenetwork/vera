@@ -351,7 +351,7 @@ func TestPostQuery(t *testing.T) {
 		Creator:   baseAcc.Address,
 		Namespace: namespace,
 		Payload:   payload1,
-		Artifact: artifact,
+		Artifact:  artifact,
 	})
 	require.NoError(t, err)
 
@@ -592,6 +592,39 @@ func TestIterateGlobWithPostIds(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, []*types.Post{posts[0]}, resp4.Posts)
+}
+
+func TestIterateGlobNamespaceBoundaryPagination(t *testing.T) {
+	keeper, ctx := setupKeeper(t)
+
+	expected := []*types.Post{
+		{Id: "post1", Namespace: "bulletin/ns1"},
+		{Id: "post2", Namespace: "bulletin/ns1/sub"},
+	}
+	for _, post := range append(expected, &types.Post{Id: "other", Namespace: "bulletin/ns10"}) {
+		keeper.SetPost(ctx, *post)
+	}
+
+	first, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace:  "ns1",
+		Glob:       "*",
+		Pagination: &query.PageRequest{Limit: 1},
+	})
+	require.NoError(t, err)
+	require.Equal(t, expected[:1], first.Posts)
+	require.NotEmpty(t, first.Pagination.NextKey)
+
+	second, err := keeper.IterateGlob(ctx, &types.QueryIterateGlobRequest{
+		Namespace: "ns1",
+		Glob:      "*",
+		Pagination: &query.PageRequest{
+			Key:   first.Pagination.NextKey,
+			Limit: 1,
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, expected[1:], second.Posts)
+	require.Empty(t, second.Pagination.NextKey)
 }
 
 func TestIterateGlobEdgeCases(t *testing.T) {
