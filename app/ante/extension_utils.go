@@ -198,3 +198,10 @@ func getExtractedDIDFromContext(ctx sdk.Context) string {
 	}
 	return ""
 }
+
+func getTrustedRelayFeeGranterFromContext(ctx sdk.Context) string {
+	if address, ok := ctx.Value(appparams.TrustedRelayFeeGranterContextKey).(string); ok {
+		return address
+	}
+	return ""
+}

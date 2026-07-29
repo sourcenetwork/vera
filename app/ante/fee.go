@@ -209,6 +209,31 @@ func (cdfd CustomDeductFeeDecorator) handleFeegrant(
 	fees sdk.Coins,
 	msgs []sdk.Msg,
 ) (sdk.AccAddress, error) {
+	trustedRelayFeeGranter := getTrustedRelayFeeGranterFromContext(ctx)
+	if trustedRelayFeeGranter != "" {
+		if len(feeGranter) == 0 {
+			return nil, sdkerrors.ErrUnauthorized.Wrap("trusted relay fee granter is missing")
+		}
+		feeGranterAddr := sdk.AccAddress(feeGranter)
+		if feeGranterAddr.String() != trustedRelayFeeGranter {
+			return nil, sdkerrors.ErrUnauthorized.Wrapf(
+				"relay fee granter %s does not match trusted account %s",
+				feeGranterAddr,
+				trustedRelayFeeGranter,
+			)
+		}
+		if bytes.Equal(feeGranterAddr, feePayer) {
+			return nil, sdkerrors.ErrUnauthorized.Wrap("relay worker must have a fee grant")
+		}
+		if cdfd.feegrantKeeper == nil {
+			return nil, sdkerrors.ErrInvalidRequest.Wrap("fee grants are not enabled")
+		}
+		if err := cdfd.feegrantKeeper.UseGrantedFees(ctx, feeGranterAddr, feePayer, fees, msgs); err != nil {
+			return nil, errorsmod.Wrapf(err, "%s does not authorize relay worker %s", feeGranterAddr, feePayer)
+		}
+		return feeGranterAddr, nil
+	}
+
 	extractedDID := getExtractedDIDFromContext(ctx)
 
 	// If DID was extracted, try to use the first available grant for that DID
