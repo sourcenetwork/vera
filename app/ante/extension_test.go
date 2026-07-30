@@ -56,6 +56,7 @@ func buildExtensionTestTx(
 	creator string,
 	feeGranter sdk.AccAddress,
 	authorizedAccount string,
+	providerToken *antetypes.ProviderToken,
 ) (sdk.Tx, string) {
 	t.Helper()
 	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
@@ -68,7 +69,7 @@ func buildExtensionTestTx(
 		s.txBuilder.SetFeeGranter(feeGranter)
 	}
 
-	bearerToken, userDID := test.GenerateSignedJWSWithMatchingDID(t, authorizedAccount)
+	bearerToken, userDID := test.GenerateSignedJWSWithProvider(t, authorizedAccount, providerToken)
 	jwsOpt, err := codectypes.NewAnyWithValue(&antetypes.JWSExtensionOption{BearerToken: bearerToken})
 	require.NoError(t, err)
 	extendedBuilder, ok := s.txBuilder.(client.ExtendedTxBuilder)
@@ -926,12 +927,45 @@ func TestExtensionOptionsDecorator_TrustedRelay(t *testing.T) {
 	accs := s.CreateTestAccounts(2)
 	worker := accs[0].acc.GetAddress()
 	feeGranter := accs[1].acc.GetAddress()
-	tx, userDID := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "")
+	tx, userDID := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
 
 	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.NoError(t, err)
 	require.Equal(t, userDID, getExtractedDIDFromContext(newCtx))
+	require.Equal(t, feeGranter.String(), getTrustedRelayFeeGranterFromContext(newCtx))
+}
+
+func TestExtensionOptionsDecorator_RejectsProviderIdentityWithoutTrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	account := s.CreateTestAccounts(1)[0]
+	address := account.acc.GetAddress()
+	tx, _ := buildExtensionTestTx(t, s, account, address.String(), nil, address.String(), &antetypes.ProviderToken{
+		ProviderName: "google",
+		UserID:       "victim@example.com",
+		ActorDID:     "did:opk:victim",
+	})
+
+	_, err := NewExtensionOptionsDecorator(nil).AnteHandle(s.ctx, tx, false, nextAnte)
+	require.ErrorContains(t, err, "provider token requires a trusted relay")
+}
+
+func TestExtensionOptionsDecorator_AcceptsProviderIdentityFromTrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(2)
+	worker := accs[0].acc.GetAddress()
+	feeGranter := accs[1].acc.GetAddress()
+	actorDID := "did:opk:user"
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", &antetypes.ProviderToken{
+		ProviderName: "google",
+		UserID:       "user@example.com",
+		ActorDID:     actorDID,
+	})
+
+	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.NoError(t, err)
+	require.Equal(t, actorDID, getExtractedDIDFromContext(newCtx))
 	require.Equal(t, feeGranter.String(), getTrustedRelayFeeGranterFromContext(newCtx))
 }
 
@@ -941,7 +975,7 @@ func TestExtensionOptionsDecorator_RejectsUntrustedRelay(t *testing.T) {
 	worker := accs[0].acc.GetAddress()
 	feeGranter := accs[1].acc.GetAddress()
 	trusted := accs[2].acc.GetAddress()
-	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "")
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
 
 	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
@@ -953,7 +987,7 @@ func TestExtensionOptionsDecorator_RejectsRelayWithoutFeeGranter(t *testing.T) {
 	accs := s.CreateTestAccounts(2)
 	worker := accs[0].acc.GetAddress()
 	trusted := accs[1].acc.GetAddress()
-	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), nil, "")
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), nil, "", nil)
 
 	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
@@ -988,7 +1022,7 @@ func TestExtensionOptionsDecorator_PropagatesTokenStoreFailure(t *testing.T) {
 	s := SetupTestSuite(t, true)
 	accs := s.CreateTestAccounts(1)
 	creator := accs[0].acc.GetAddress().String()
-	tx, _ := buildExtensionTestTx(t, s, accs[0], creator, nil, creator)
+	tx, _ := buildExtensionTestTx(t, s, accs[0], creator, nil, creator, nil)
 
 	_, err := NewExtensionOptionsDecorator(extensionHubKeeper{storeErr: errors.New("token invalidated")}).
 		AnteHandle(s.ctx, tx, false, nextAnte)

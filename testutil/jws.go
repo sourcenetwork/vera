@@ -39,6 +39,17 @@ func CreateJWSHeader() map[string]any {
 // GenerateSignedJWSWithMatchingDID creates a JWS bearer token with specified authorized account.
 // Returns the JWS string and the DID.
 func GenerateSignedJWSWithMatchingDID(t *testing.T, authorizedAccount string) (string, string) {
+	return GenerateSignedJWSWithProvider(t, authorizedAccount, nil)
+}
+
+// GenerateSignedJWSWithProvider creates a signed bearer token with optional provider identity metadata.
+func GenerateSignedJWSWithProvider(
+	t *testing.T,
+	authorizedAccount string,
+	providerToken *antetypes.ProviderToken,
+) (string, string) {
+	t.Helper()
+
 	// Derive seed from mnemonic
 	mnemonic := "near smoke great nasty alley food crush nurse rubber say danger search employ under gaze today alien eager risk letter drum relief sponsor current"
 	seed, err := hd.Secp256k1.Derive()(mnemonic, "", "m/44'/118'/0'/0/0")
@@ -58,6 +69,11 @@ func GenerateSignedJWSWithMatchingDID(t *testing.T, authorizedAccount string) (s
 
 	// Create bearer token with the matching DID
 	bearerToken := NewBearerTokenNow(userDID, authorizedAccount)
+	if providerToken != nil {
+		providerJSON, err := json.Marshal(providerToken)
+		require.NoError(t, err)
+		bearerToken.ProviderToken = string(providerJSON)
+	}
 	payloadBytes, err := json.Marshal(bearerToken)
 	require.NoError(t, err)
 
