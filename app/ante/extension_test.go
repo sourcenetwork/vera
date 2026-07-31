@@ -1,7 +1,10 @@
 package ante
 
 import (
+	"context"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -18,7 +21,83 @@ import (
 	appparams "github.com/sourcenetwork/sourcehub/app/params"
 	test "github.com/sourcenetwork/sourcehub/testutil"
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
 )
+
+type extensionHubKeeper struct {
+	chainConfig hubtypes.ChainConfig
+	params      hubtypes.Params
+	storeErr    error
+}
+
+func (k extensionHubKeeper) GetChainConfig(context.Context) hubtypes.ChainConfig {
+	return k.chainConfig
+}
+
+func (k extensionHubKeeper) GetParams(context.Context) hubtypes.Params {
+	return k.params
+}
+
+func (k extensionHubKeeper) StoreOrUpdateJWSToken(
+	context.Context,
+	string,
+	string,
+	string,
+	time.Time,
+	time.Time,
+) error {
+	return k.storeErr
+}
+
+func buildExtensionTestTx(
+	t *testing.T,
+	s *AnteTestSuite,
+	signer TestAccount,
+	creator string,
+	feeGranter sdk.AccAddress,
+	authorizedAccount string,
+	providerToken *antetypes.ProviderToken,
+) (sdk.Tx, string) {
+	t.Helper()
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+	require.NoError(t, s.txBuilder.SetMsgs(&acptypes.MsgCreatePolicy{
+		Creator:     creator,
+		Policy:      "name: test policy",
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
+	}))
+	if feeGranter != nil {
+		s.txBuilder.SetFeeGranter(feeGranter)
+	}
+
+	bearerToken, userDID := test.GenerateSignedJWSWithProvider(t, authorizedAccount, providerToken)
+	jwsOpt, err := codectypes.NewAnyWithValue(&antetypes.JWSExtensionOption{BearerToken: bearerToken})
+	require.NoError(t, err)
+	extendedBuilder, ok := s.txBuilder.(client.ExtendedTxBuilder)
+	require.True(t, ok)
+	extendedBuilder.SetExtensionOptions(jwsOpt)
+
+	tx, err := s.CreateTestTx(
+		s.ctx,
+		[]cryptotypes.PrivKey{signer.priv},
+		[]uint64{0},
+		[]uint64{0},
+		s.ctx.ChainID(),
+		signing.SignMode_SIGN_MODE_DIRECT,
+	)
+	require.NoError(t, err)
+	return tx, userDID
+}
+
+func relayHubKeeper(trusted sdk.AccAddress) extensionHubKeeper {
+	return extensionHubKeeper{
+		chainConfig: hubtypes.ChainConfig{IgnoreBearerAuth: true},
+		params:      hubtypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
+	}
+}
+
+func nextAnte(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
+	return ctx, nil
+}
 
 func TestExtensionOptionsDecorator_ValidJWSExtension(t *testing.T) {
 	s := SetupTestSuite(t, true)
@@ -841,4 +920,111 @@ func TestExtensionOptionsDecorator_MultipleMessagesOneUnauthorized(t *testing.T)
 	_, err = antehandler(s.ctx, tx, false)
 	require.Error(t, err, "ExtensionOptionsDecorator should reject transaction with ACP message from unauthorized account")
 	require.Contains(t, err.Error(), "message 1 signer mismatch", "Error should indicate which message failed")
+}
+
+func TestExtensionOptionsDecorator_TrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(2)
+	worker := accs[0].acc.GetAddress()
+	feeGranter := accs[1].acc.GetAddress()
+	tx, userDID := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
+
+	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.NoError(t, err)
+	require.Equal(t, userDID, getExtractedDIDFromContext(newCtx))
+	require.Equal(t, feeGranter.String(), getTrustedRelayFeeGranterFromContext(newCtx))
+}
+
+func TestExtensionOptionsDecorator_RejectsProviderIdentityWithoutTrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	account := s.CreateTestAccounts(1)[0]
+	address := account.acc.GetAddress()
+	tx, _ := buildExtensionTestTx(t, s, account, address.String(), nil, address.String(), &antetypes.ProviderToken{
+		ProviderName: "google",
+		UserID:       "victim@example.com",
+		ActorDID:     "did:opk:victim",
+	})
+
+	_, err := NewExtensionOptionsDecorator(nil).AnteHandle(s.ctx, tx, false, nextAnte)
+	require.ErrorContains(t, err, "provider token requires a trusted relay")
+}
+
+func TestExtensionOptionsDecorator_AcceptsProviderIdentityFromTrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(2)
+	worker := accs[0].acc.GetAddress()
+	feeGranter := accs[1].acc.GetAddress()
+	actorDID := "did:opk:user"
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", &antetypes.ProviderToken{
+		ProviderName: "google",
+		UserID:       "user@example.com",
+		ActorDID:     actorDID,
+	})
+
+	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.NoError(t, err)
+	require.Equal(t, actorDID, getExtractedDIDFromContext(newCtx))
+	require.Equal(t, feeGranter.String(), getTrustedRelayFeeGranterFromContext(newCtx))
+}
+
+func TestExtensionOptionsDecorator_RejectsUntrustedRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(3)
+	worker := accs[0].acc.GetAddress()
+	feeGranter := accs[1].acc.GetAddress()
+	trusted := accs[2].acc.GetAddress()
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
+
+	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.ErrorContains(t, err, "is not a trusted relay")
+}
+
+func TestExtensionOptionsDecorator_RejectsRelayWithoutFeeGranter(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(2)
+	worker := accs[0].acc.GetAddress()
+	trusted := accs[1].acc.GetAddress()
+	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), nil, "", nil)
+
+	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.ErrorContains(t, err, "requires a trusted fee granter")
+}
+
+func TestExtensionOptionsDecorator_RejectsMessageNotSignedByRelayWorker(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	s.txBuilder = s.clientCtx.TxConfig.NewTxBuilder()
+	accs := s.CreateTestAccounts(3)
+	worker := accs[0].acc.GetAddress()
+	creator := accs[1].acc.GetAddress()
+	trusted := accs[2].acc.GetAddress()
+
+	require.NoError(t, s.txBuilder.SetMsgs(&acptypes.MsgCreatePolicy{
+		Creator:     creator.String(),
+		Policy:      "name: test policy",
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
+	}))
+	s.txBuilder.SetFeePayer(worker)
+	s.txBuilder.SetFeeGranter(trusted)
+
+	keeper := extensionHubKeeper{
+		chainConfig: hubtypes.ChainConfig{IgnoreBearerAuth: true},
+		params:      hubtypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
+	}
+	_, err := NewExtensionOptionsDecorator(keeper).validateRelay(s.ctx, s.txBuilder.GetTx())
+	require.ErrorContains(t, err, "does not match relay worker")
+}
+
+func TestExtensionOptionsDecorator_PropagatesTokenStoreFailure(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(1)
+	creator := accs[0].acc.GetAddress().String()
+	tx, _ := buildExtensionTestTx(t, s, accs[0], creator, nil, creator, nil)
+
+	_, err := NewExtensionOptionsDecorator(extensionHubKeeper{storeErr: errors.New("token invalidated")}).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.ErrorContains(t, err, "bearer token is not active")
 }

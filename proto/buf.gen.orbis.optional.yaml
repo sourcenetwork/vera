@@ -1,0 +1,22 @@
+# Generates API Go types for Orbis protos that use proto3 optional scalars.
+# protoc-gen-go-pulsar v1.0.0-beta.5 emits invalid fast-reflection code for
+# these files, so make proto excludes them from Pulsar and runs this template.
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: cosmossdk.io/api
+  disable:
+    - module: buf.build/googleapis/googleapis
+    - module: buf.build/cosmos/gogo-proto
+    - module: buf.build/cosmos/cosmos-proto
+    - module: buf.build/sourcenetwork/acp-core
+plugins:
+  - local: ["go", "run", "google.golang.org/protobuf/cmd/protoc-gen-go"]
+    out: ./api
+    opt: paths=source_relative
+
+  - local: protoc-gen-go-grpc
+    out: ./api
+    opt: paths=source_relative

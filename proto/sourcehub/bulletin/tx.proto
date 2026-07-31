@@ -6,8 +6,8 @@ import "amino/amino.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
-import "sourcehub/bulletin/params.proto";
 import "sourcehub/bulletin/namespace.proto";
+import "sourcehub/bulletin/params.proto";
 
 option go_package = "github.com/sourcenetwork/sourcehub/x/bulletin/types";
 
@@ -19,8 +19,6 @@ service Msg {
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
   rpc CreatePost(MsgCreatePost) returns (MsgCreatePostResponse);
-  rpc UpdateRingPostByAcp(MsgUpdateRingPostByAcp) returns (MsgUpdateRingPostByAcpResponse);
-  rpc UpdateRingPostByThresholdSignature(MsgUpdateRingPostByThresholdSignature) returns (MsgUpdateRingPostByThresholdSignatureResponse);
   rpc RegisterNamespace(MsgRegisterNamespace) returns (MsgRegisterNamespaceResponse);
   rpc AddCollaborator(MsgAddCollaborator) returns (MsgAddCollaboratorResponse);
   rpc RemoveCollaborator(MsgRemoveCollaborator) returns (MsgRemoveCollaboratorResponse);
@@ -56,42 +54,6 @@ message MsgCreatePost {
 }
 
 message MsgCreatePostResponse {}
-
-message MsgUpdateRingPostByAcp {
-  option (cosmos.msg.v1.signer) = "creator";
-  string creator = 1;
-  string namespace = 2;
-  string post_id = 3;
-  string artifact = 4;
-  repeated string new_peer_ids = 5;
-  optional uint32 new_threshold = 6;
-  optional uint64 pss_interval = 7;
-}
-
-message MsgUpdateRingPostByAcpResponse {}
-
-message MsgUpdateRingPostByThresholdSignature {
-  option (cosmos.msg.v1.signer) = "creator";
-  string creator = 1;
-  string namespace = 2;
-  string post_id = 3;
-  string artifact = 4;
-  string signature_scheme = 5;
-  bytes signature = 6;
-}
-
-message MsgUpdateRingPostByThresholdSignatureResponse {}
-
-message RingReshareFinalizeSignDoc {
-  string domain = 1;
-  string chain_id = 2;
-  string namespace = 3;
-  string post_id = 4;
-  string ring_pk = 5;
-  bytes current_payload_sha256 = 6;
-  bytes finalized_payload_sha256 = 7;
-  uint64 block_number_nonce = 8;
-}
 
 message MsgRegisterNamespace {
   option (cosmos.msg.v1.signer) = "creator";

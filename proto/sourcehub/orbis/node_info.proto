@@ -1,0 +1,21 @@
+syntax = "proto3";
+package sourcehub.orbis;
+
+option go_package = "github.com/sourcenetwork/sourcehub/x/orbis/types";
+
+// NodeInfo stores access-control metadata for a node participating in Orbis rings.
+message NodeInfo {
+  // peer_id is the node's p2p network identity key.
+  string peer_id = 1;
+  // controller_key is the node's signing key changing node info. Lives outside the node
+  string controller_key = 2;
+  repeated string whitelisted_policy_ids = 3;
+  repeated string whitelisted_ring_ids = 4;
+}
+
+// NodeInfoEntry pairs a node_key with its NodeInfo for genesis export/import.
+message NodeInfoEntry {
+  // Node key lives inside the node and is for identification of the node
+  string node_key = 1;
+  NodeInfo node_info = 2;
+}

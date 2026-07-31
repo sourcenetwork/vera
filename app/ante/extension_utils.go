@@ -22,7 +22,7 @@ import (
 )
 
 // parseValidateJWS processes a JWS Bearer token by unmarshaling it and verifying its signature.
-func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS string, skipAuthAccountValidation bool) (antetypes.BearerToken, error) {
+func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS string, trustedRelay bool) (antetypes.BearerToken, error) {
 	bearerJWS = strings.TrimLeft(bearerJWS, " \n\t\r")
 	if strings.HasPrefix(bearerJWS, "{") {
 		return antetypes.BearerToken{}, fmt.Errorf("JSON serialization is not supported for security reasons")
@@ -39,7 +39,7 @@ func parseValidateJWS(ctx context.Context, resolver did.Resolver, bearerJWS stri
 		return antetypes.BearerToken{}, err
 	}
 
-	err = validateBearerTokenValues(&bearer, skipAuthAccountValidation)
+	err = validateBearerTokenValues(&bearer, trustedRelay)
 	if err != nil {
 		return antetypes.BearerToken{}, err
 	}
@@ -115,7 +115,7 @@ func validateProviderToken(token *antetypes.ProviderToken) error {
 }
 
 // validateBearerTokenValues validates the bearer token values.
-func validateBearerTokenValues(token *antetypes.BearerToken, skipAuthAccountValidation bool) error {
+func validateBearerTokenValues(token *antetypes.BearerToken, trustedRelay bool) error {
 	if strings.HasPrefix(token.IssuerID, "did:") {
 		if err := did.IsValidDID(token.IssuerID); err != nil {
 			return fmt.Errorf("invalid issuer DID: %v", err)
@@ -127,8 +127,12 @@ func validateBearerTokenValues(token *antetypes.BearerToken, skipAuthAccountVali
 		}
 	}
 
-	// Only validate authorized account if bearer auth is not being ignored
-	if !skipAuthAccountValidation {
+	if token.ProviderToken != "" && !trustedRelay {
+		return fmt.Errorf("provider token requires a trusted relay")
+	}
+
+	// Trusted relays bind the worker account through the transaction fee grant.
+	if !trustedRelay {
 		if err := types.IsValidSourceHubAddr(token.AuthorizedAccount); err != nil {
 			return fmt.Errorf("invalid authorized account: %v", err)
 		}
@@ -142,8 +146,8 @@ func validateBearerTokenValues(token *antetypes.BearerToken, skipAuthAccountVali
 }
 
 // validateBearerToken validates the bearer token including timing
-func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time, skipAuthAccountValidation bool) error {
-	err := validateBearerTokenValues(token, skipAuthAccountValidation)
+func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time, trustedRelay bool) error {
+	err := validateBearerTokenValues(token, trustedRelay)
 	if err != nil {
 		return err
 	}
@@ -159,16 +163,16 @@ func validateBearerToken(token *antetypes.BearerToken, currentTime *time.Time, s
 
 // validateJWSExtension parses and validates JWS extension option bearer token.
 // Returns the actor DID (from provider token if present, otherwise issuer DID) and the authorized account.
-// If skipAuthAccountValidation is true, the authorized account validation is skipped (when ignoreBearerAuth is enabled).
-func validateJWSExtension(ctx context.Context, bearerToken string, currentTime time.Time, skipAuthAccountValidation bool) (string, string, error) {
+// Provider identities are accepted only from a trusted relay.
+func validateJWSExtension(ctx context.Context, bearerToken string, currentTime time.Time, trustedRelay bool) (string, string, error) {
 	resolver := &did.KeyResolver{}
 
-	token, err := parseValidateJWS(ctx, resolver, bearerToken, skipAuthAccountValidation)
+	token, err := parseValidateJWS(ctx, resolver, bearerToken, trustedRelay)
 	if err != nil {
 		return "", "", err
 	}
 
-	err = validateBearerToken(&token, &currentTime, skipAuthAccountValidation)
+	err = validateBearerToken(&token, &currentTime, trustedRelay)
 	if err != nil {
 		return "", "", err
 	}
@@ -195,6 +199,13 @@ func validateJWSExtension(ctx context.Context, bearerToken string, currentTime t
 func getExtractedDIDFromContext(ctx sdk.Context) string {
 	if did, ok := ctx.Value(appparams.ExtractedDIDContextKey).(string); ok {
 		return did
+	}
+	return ""
+}
+
+func getTrustedRelayFeeGranterFromContext(ctx sdk.Context) string {
+	if address, ok := ctx.Value(appparams.TrustedRelayFeeGranterContextKey).(string); ok {
+		return address
 	}
 	return ""
 }

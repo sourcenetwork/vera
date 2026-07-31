@@ -4,6 +4,8 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/feegrant"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -95,6 +97,20 @@ func (suite *KeeperTestSuite) TestFeeAllowance() {
 			}
 		})
 	}
+}
+
+func (suite *KeeperTestSuite) TestMissingAllowancesReturnNotFound() {
+	_, err := suite.feegrantKeeper.Allowance(suite.ctx, &feegrant.QueryAllowanceRequest{
+		Granter: suite.addrs[18].String(),
+		Grantee: suite.addrs[19].String(),
+	})
+	suite.Require().Equal(codes.NotFound, status.Code(err))
+
+	_, err = suite.feegrantKeeper.DIDAllowance(suite.ctx, &feegrant.QueryDIDAllowanceRequest{
+		Granter:    suite.addrs[18].String(),
+		GranteeDid: "did:example:missing",
+	})
+	suite.Require().Equal(codes.NotFound, status.Code(err))
 }
 
 func (suite *KeeperTestSuite) TestFeeAllowances() {

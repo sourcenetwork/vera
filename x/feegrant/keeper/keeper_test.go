@@ -519,6 +519,59 @@ func (suite *KeeperTestSuite) TestDIDAllowanceRevoke() {
 	suite.NotNil(expiredExpiration)
 }
 
+func (suite *KeeperTestSuite) TestDIDAllowanceExpirationQueueUpdates() {
+	now := suite.ctx.BlockTime()
+
+	basicDID := "did:example:basic"
+	basicGranter := suite.addrs[2]
+	originalExpiration := now.Add(24 * time.Hour)
+	err := suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, basicGranter, basicDID, &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &originalExpiration,
+	})
+	suite.Require().NoError(err)
+
+	err = suite.feegrantKeeper.ExpireDIDAllowance(suite.ctx, basicGranter, basicDID)
+	suite.Require().NoError(err)
+	afterImmediateExpiration := suite.ctx.WithBlockTime(now.Add(time.Second))
+	err = suite.feegrantKeeper.RemoveExpiredDIDAllowances(afterImmediateExpiration, 10)
+	suite.Require().NoError(err)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(afterImmediateExpiration, basicGranter, basicDID)
+	suite.Require().ErrorContains(err, "not found")
+
+	newExpiration := now.Add(48 * time.Hour)
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, basicGranter, basicDID, &feegrant.BasicAllowance{
+		SpendLimit: suite.coins,
+		Expiration: &newExpiration,
+	})
+	suite.Require().NoError(err)
+	afterOriginalExpiration := suite.ctx.WithBlockTime(originalExpiration.Add(time.Hour))
+	err = suite.feegrantKeeper.RemoveExpiredDIDAllowances(afterOriginalExpiration, 10)
+	suite.Require().NoError(err)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(afterOriginalExpiration, basicGranter, basicDID)
+	suite.Require().NoError(err)
+
+	periodicDID := "did:example:periodic"
+	periodicGranter := suite.addrs[3]
+	periodReset := now.Add(time.Hour)
+	err = suite.feegrantKeeper.GrantDIDAllowance(suite.ctx, periodicGranter, periodicDID, &feegrant.PeriodicAllowance{
+		Basic:            feegrant.BasicAllowance{SpendLimit: suite.coins},
+		Period:           time.Hour,
+		PeriodReset:      periodReset,
+		PeriodSpendLimit: suite.coins,
+		PeriodCanSpend:   suite.coins,
+	})
+	suite.Require().NoError(err)
+
+	err = suite.feegrantKeeper.ExpireDIDAllowance(suite.ctx, periodicGranter, periodicDID)
+	suite.Require().NoError(err)
+	afterPeriodReset := suite.ctx.WithBlockTime(periodReset.Add(time.Second))
+	err = suite.feegrantKeeper.RemoveExpiredDIDAllowances(afterPeriodReset, 10)
+	suite.Require().NoError(err)
+	_, err = suite.feegrantKeeper.GetDIDAllowance(afterPeriodReset, periodicGranter, periodicDID)
+	suite.Require().ErrorContains(err, "not found")
+}
+
 func (suite *KeeperTestSuite) TestDIDAllowanceUsage() {
 	testDID := "did:example:bob"
 	granter := suite.addrs[3]

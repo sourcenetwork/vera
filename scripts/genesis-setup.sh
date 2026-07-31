@@ -14,10 +14,12 @@ sedi() {
 CHAIN_ID="sourcehub-dev"
 VALIDATOR="validator"
 FAUCET="faucet"
+RELAY="relay"
 NODE_NAME="node"
 BIN="build/sourcehubd"
 GENESIS="$HOME/.sourcehub/config/genesis.json"
 FAUCET_KEY="$HOME/.sourcehub/config/faucet-key.json"
+RELAY_KEY="$HOME/.sourcehub/config/relay-key.json"
 APP_TOML="$HOME/.sourcehub/config/app.toml"
 CONFIG_TOML="$HOME/.sourcehub/config/config.toml"
 
@@ -29,10 +31,17 @@ FAUCET_MNEMONIC=$(jq -r '.mnemonic' "$FAUCET_KEY")
 echo "$FAUCET_MNEMONIC" | $BIN keys add $FAUCET --recover --keyring-backend test
 FAUCET_ADDR=$($BIN keys show $FAUCET -a --keyring-backend test)
 
+# Add the dedicated Trust API relay control account.
+cp scripts/relay-key.json "$RELAY_KEY"
+RELAY_MNEMONIC=$(jq -r '.mnemonic' "$RELAY_KEY")
+echo "$RELAY_MNEMONIC" | $BIN keys add $RELAY --recover --keyring-backend test
+RELAY_ADDR=$($BIN keys show $RELAY -a --keyring-backend test)
+
 $BIN keys add $VALIDATOR --keyring-backend test
 VALIDATOR_ADDR=$($BIN keys show $VALIDATOR -a --keyring-backend test)
 $BIN genesis add-genesis-account $VALIDATOR_ADDR 1000000000000000uopen # 1b open
 $BIN genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen,1000000000000000ucredit # 100m open and 1b ucredit
+$BIN genesis add-genesis-account $RELAY_ADDR 100000000000000uopen,1000000000000000ucredit
 $BIN genesis gentx $VALIDATOR 100000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 100m open
 $BIN genesis collect-gentxs
 
@@ -43,6 +52,7 @@ jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": 
 # Enable/disable zero-fee transactions
 jq '.app_state.hub.chain_config.allow_zero_fee_txs = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 jq '.app_state.hub.chain_config.ignore_bearer_auth = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
+jq --arg relay "$RELAY_ADDR" '.app_state.hub.params.trusted_relay_fee_granters = [$relay]' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' "$APP_TOML"

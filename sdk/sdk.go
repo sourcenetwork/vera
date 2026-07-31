@@ -23,6 +23,7 @@ import (
 
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
 // Opt configures the construction of a Client
@@ -154,6 +155,11 @@ func (c *Client) ACPQueryClient() acptypes.QueryClient {
 // BulletinQueryClient returns a Query Client for the Bulletin module
 func (c *Client) BulletinQueryClient() bulletintypes.QueryClient {
 	return bulletintypes.NewQueryClient(c.conn)
+}
+
+// OrbisQueryClient returns a Query Client for the Orbis module.
+func (c *Client) OrbisQueryClient() orbistypes.QueryClient {
+	return orbistypes.NewQueryClient(c.conn)
 }
 
 // BankQueryClient returns a Query Client for the Bank module

@@ -985,8 +985,8 @@ github.com/cometbft/cometbft v0.38.21 h1:qcIJSH9LiwU5s6ZgKR5eRbsLNucbubfraDs5bzg
 github.com/cometbft/cometbft v0.38.21/go.mod h1:UCu8dlHqvkAsmAFmWDRWNZJPlu6ya2fTWZlDrWsivwo=
 github.com/cometbft/cometbft-db v0.14.1 h1:SxoamPghqICBAIcGpleHbmoPqy+crij/++eZz3DlerQ=
 github.com/cometbft/cometbft-db v0.14.1/go.mod h1:KHP1YghilyGV/xjD5DP3+2hyigWx0WTp9X+0Gnx0RxQ=
-github.com/consensys/gnark-crypto v0.19.0 h1:zXCqeY2txSaMl6G5wFpZzMWJU9HPNh8qxPnYJ1BL9vA=
-github.com/consensys/gnark-crypto v0.19.0/go.mod h1:rT23F0XSZqE0mUA0+pRtnL56IbPxs6gp4CeRsBk4XS0=
+github.com/consensys/gnark-crypto v0.19.2 h1:qrEAIXq3T4egxqiliFFoNrepkIWVEeIYwt3UL0fvS80=
+github.com/consensys/gnark-crypto v0.19.2/go.mod h1:rT23F0XSZqE0mUA0+pRtnL56IbPxs6gp4CeRsBk4XS0=
 github.com/containerd/console v1.0.3/go.mod h1:7LqA/THxQ86k76b8c/EMSiaJ3h1eZkMkXar0TQ1gf3U=
 github.com/containerd/continuity v0.3.0 h1:nisirsYROK15TAMVukJOUyGJjz4BNQJBVsNvAXZJ/eg=
 github.com/containerd/continuity v0.3.0/go.mod h1:wJEAIwKOm/pBZuBd0JmeTvnLquTB1Ag8espWhkykbPM=
@@ -1931,8 +1931,8 @@ github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyua
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/mitchellh/reflectwalk v1.0.1/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
-github.com/mizufinance/decaf377-go v0.1.0 h1:uu3hB1lzmYbcvJJGXQMtAC929TO9R8F759v39MFED7s=
-github.com/mizufinance/decaf377-go v0.1.0/go.mod h1:cgXxxoBtn/DpAnId65Q3G2vbtlPrRi1ZVDqeQvNwq2c=
+github.com/mizufinance/decaf377-go v0.2.0 h1:izT9ymso5nOvn3YtQk4RipU/hQm950d/WfDBZFklm/0=
+github.com/mizufinance/decaf377-go v0.2.0/go.mod h1:tApKZYqMgt6XZW7EWvPolaHxD1Adp4b2Ub1XxZxje9w=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
 github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
 github.com/moby/go-archive v0.2.0 h1:zg5QDUM2mi0JIM9fdQZWC7U8+2ZfixfTYoHL7rWUcP8=
@@ -2324,8 +2324,12 @@ github.com/sourcenetwork/acp_core v0.8.1 h1:xCbFGs9HqQTG/LjfNa7aoD8dc6XhIYLgRdZC
 github.com/sourcenetwork/acp_core v0.8.1/go.mod h1:vmxU/mBphMaU2NjKYEFJLSpk5lbRdWDqgsJZNd+WfZ0=
 github.com/sourcenetwork/acp_core v0.8.2-0.20260515161012-1ff695ed0fa0 h1:x1B/w2qRrM29HxKRPzmkljuBYHvtrZ4T7kKj7WakqqE=
 github.com/sourcenetwork/acp_core v0.8.2-0.20260515161012-1ff695ed0fa0/go.mod h1:ecaSdQoRK433BJexbrr1LzYuG/I/D47tAeXt7C2e0O0=
+github.com/sourcenetwork/acp_core v0.8.2 h1:k33r0c7vJxHRUPc80PmZ9QKOYNwTDUJVegQMIF/O7AM=
+github.com/sourcenetwork/acp_core v0.8.2/go.mod h1:UBjrCrI09Q02Fgy4G2NQzKx+P5RQVlR9Lf16qzuA6JY=
 github.com/sourcenetwork/corekv v0.0.0-20250122161438-c4cec0f30dbe h1:xML1pxD5zf14MAqjCkW584ri6yjp6go+ud83wpMzWtM=
 github.com/sourcenetwork/corekv v0.0.0-20250122161438-c4cec0f30dbe/go.mod h1:hap4+bqs9JcHPcAMALLj2Vu+QDxmHwYBlRyv8mlwsw4=
+github.com/sourcenetwork/immutable v0.3.0 h1:gHPtGvLrTBTK5YpDAhMU+u+S8v1F6iYmc3nbZLryMdc=
+github.com/sourcenetwork/immutable v0.3.0/go.mod h1:GD7ceuh/HD7z6cdIwzKK2ctzgZ1qqYFJpsFp+8qYnbI=
 github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8 h1:d0jNogSYqMt+dC05tnd+x7lmzEcBHpKoIU5woZSSHFM=
 github.com/sourcenetwork/raccoondb v0.2.1-0.20240722161350-d4a78b691ec8/go.mod h1:/WJdZWouiY199DypsN0xaP5PF0zy3rka3FxH5Y8o9Bc=
 github.com/sourcenetwork/raccoondb v0.2.1-0.20260514175348-017fdf639300 h1:Cg44ZTo3jot8806J91dFd0Un6gcYjheUy4sz7XnI7k4=
@@ -2336,6 +2340,8 @@ github.com/sourcenetwork/zanzi v0.3.1-0.20251104182341-4b1bd0f7be5a h1:TlnRmk1v4
 github.com/sourcenetwork/zanzi v0.3.1-0.20251104182341-4b1bd0f7be5a/go.mod h1:j7QmuHK+zfA0JO6FliJzQHijVNSXDuQy8hUzFC5pucA=
 github.com/sourcenetwork/zanzi v0.3.1-0.20260514183406-33141096311f h1:uURLAfIX+KnaQJqNFLy+Sr8MKRcQ2bAmwilHBB4lg7I=
 github.com/sourcenetwork/zanzi v0.3.1-0.20260514183406-33141096311f/go.mod h1:Elj7mNEfkthXGmHOdyfbPMBaJQqKIZlTRmSD0R5FYfs=
+github.com/sourcenetwork/zanzi v0.3.1-0.20260731133738-53cb4f16fe3e h1:Q+qzo49PMTHIrWAAgdkz9PR3R85Gpo7NwAUODHIeigA=
+github.com/sourcenetwork/zanzi v0.3.1-0.20260731133738-53cb4f16fe3e/go.mod h1:Elj7mNEfkthXGmHOdyfbPMBaJQqKIZlTRmSD0R5FYfs=
 github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/spaolacci/murmur3 v1.1.0/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/spf13/afero v1.1.2/go.mod h1:j4pytiNVoe2o6bmDsKpLACNPDBIoEAkihy7loJ1B0CQ=

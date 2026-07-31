@@ -18,8 +18,15 @@ install:
 
 .PHONY: proto
 proto:
-	ignite generate proto-go
-	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.pulsar.yaml
+	ignite generate proto-go --yes
+	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.pulsar.yaml \
+		--exclude-path proto/sourcehub/orbis/document.proto \
+		--exclude-path proto/sourcehub/orbis/ring.proto \
+		--exclude-path proto/sourcehub/orbis/tx.proto
+	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.orbis.optional.yaml \
+		--path proto/sourcehub/orbis/document.proto \
+		--path proto/sourcehub/orbis/ring.proto \
+		--path proto/sourcehub/orbis/tx.proto
 
 .PHONY: test
 test:

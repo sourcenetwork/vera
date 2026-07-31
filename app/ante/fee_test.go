@@ -390,6 +390,43 @@ func TestCustomDeductFeeDecorator_HandleFeegrant_WithoutDID(t *testing.T) {
 	require.Equal(t, granter, deductFrom, "should return the granter address")
 }
 
+func TestCustomDeductFeeDecorator_HandleTrustedRelayFeegrant(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	customDecorator, mockFeegrantKeeper := createCustomDecoratorWithMockDIDKeeper(t, s)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
+	ctx := s.ctx.
+		WithValue(appparams.ExtractedDIDContextKey, "did:example:user").
+		WithValue(appparams.TrustedRelayFeeGranterContextKey, granter.String())
+
+	mockFeegrantKeeper.EXPECT().UseGrantedFees(ctx, granter, feePayer, fees, msgs).Return(nil)
+
+	deductFrom, err := customDecorator.handleFeegrant(ctx, granter.Bytes(), feePayer, fees, msgs)
+	require.NoError(t, err)
+	require.Equal(t, granter, deductFrom)
+}
+
+func TestCustomDeductFeeDecorator_RejectsUnauthorizedRelayWorker(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	customDecorator, mockFeegrantKeeper := createCustomDecoratorWithMockDIDKeeper(t, s)
+
+	accs := s.CreateTestAccounts(2)
+	granter := accs[0].acc.GetAddress()
+	feePayer := accs[1].acc.GetAddress()
+	fees := sdk.NewCoins(sdk.NewInt64Coin(appparams.MicroOpenDenom, 100))
+	msgs := []sdk.Msg{testdata.NewTestMsg(feePayer)}
+	ctx := s.ctx.WithValue(appparams.TrustedRelayFeeGranterContextKey, granter.String())
+	grantErr := sdkerrors.ErrNotFound.Wrap("fee allowance not found")
+	mockFeegrantKeeper.EXPECT().UseGrantedFees(ctx, granter, feePayer, fees, msgs).Return(grantErr)
+
+	_, err := customDecorator.handleFeegrant(ctx, granter.Bytes(), feePayer, fees, msgs)
+	require.ErrorContains(t, err, "does not authorize relay worker")
+}
+
 func TestCustomDeductFeeDecorator_HandleFeegrant_DIDBasedFallback(t *testing.T) {
 	s := SetupTestSuite(t, true)
 

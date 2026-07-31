@@ -66,18 +66,21 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 
 	currentTime := ctx.BlockTime()
 
-	// Check if bearer auth should be ignored for validation
-	skipAuthValidation := eod.hubKeeper != nil && eod.hubKeeper.GetChainConfig(ctx).IgnoreBearerAuth
+	relayFeeGranter, err := eod.validateRelay(ctx, tx)
+	if err != nil {
+		return ctx, err
+	}
+	isRelay := relayFeeGranter != ""
 
 	// Validate JWS format, signature, required claims, and timing
-	did, authorizedAccount, err := validateJWSExtension(ctx, jwsOpt.BearerToken, currentTime, skipAuthValidation)
+	did, authorizedAccount, err := validateJWSExtension(ctx, jwsOpt.BearerToken, currentTime, isRelay)
 	if err != nil {
 		ctx.Logger().Error("Bearer token validation failed", "error", err, "did", did)
 		return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "bearer token validation failed: %v", err)
 	}
 
 	// Parse the bearer token to extract timestamps for storage
-	bearerToken, err := parseValidateJWS(ctx, nil, jwsOpt.BearerToken, skipAuthValidation)
+	bearerToken, err := parseValidateJWS(ctx, nil, jwsOpt.BearerToken, isRelay)
 	if err != nil {
 		return ctx, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "failed to parse bearer token: %v", err)
 	}
@@ -96,8 +99,8 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 			expiresAt,
 		)
 		if err != nil {
-			// Log error but don't fail the transaction
 			ctx.Logger().Error("failed to store JWS token", "error", err)
+			return ctx, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "bearer token is not active")
 		}
 	}
 
@@ -108,7 +111,7 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	}
 
 	// Check that all messages are signed by the same authorized account
-	if !skipAuthValidation {
+	if !isRelay {
 		for i, msg := range msgs {
 			var msgSigner string
 			if msgWithCreator, ok := msg.(interface{ GetCreator() string }); ok {
@@ -131,6 +134,48 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 
 	// Store extracted DID in context
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, did)
+	if isRelay {
+		ctx = ctx.WithValue(appparams.TrustedRelayFeeGranterContextKey, relayFeeGranter)
+	}
 
 	return next(ctx, tx, simulate)
+}
+
+func (eod ExtensionOptionsDecorator) validateRelay(ctx sdk.Context, tx sdk.Tx) (string, error) {
+	if eod.hubKeeper == nil || !eod.hubKeeper.GetChainConfig(ctx).IgnoreBearerAuth {
+		return "", nil
+	}
+
+	feeTx, ok := tx.(sdk.FeeTx)
+	if !ok {
+		return "", errorsmod.Wrap(sdkerrors.ErrTxDecode, "relay transaction must be a FeeTx")
+	}
+	feeGranter := feeTx.FeeGranter()
+	if len(feeGranter) == 0 {
+		return "", errorsmod.Wrap(sdkerrors.ErrUnauthorized, "relay transaction requires a trusted fee granter")
+	}
+
+	feeGranterAddress := sdk.AccAddress(feeGranter).String()
+	if !eod.hubKeeper.GetParams(ctx).IsTrustedRelayFeeGranter(feeGranterAddress) {
+		return "", errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "fee granter %s is not a trusted relay", feeGranterAddress)
+	}
+
+	feePayer := sdk.AccAddress(feeTx.FeePayer()).String()
+	for i, msg := range tx.GetMsgs() {
+		msgWithCreator, ok := msg.(interface{ GetCreator() string })
+		if !ok || msgWithCreator.GetCreator() == "" {
+			return "", errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "cannot determine signer for message %d", i)
+		}
+		if msgWithCreator.GetCreator() != feePayer {
+			return "", errorsmod.Wrapf(
+				sdkerrors.ErrUnauthorized,
+				"message %d signer %s does not match relay worker %s",
+				i,
+				msgWithCreator.GetCreator(),
+				feePayer,
+			)
+		}
+	}
+
+	return feeGranterAddress, nil
 }

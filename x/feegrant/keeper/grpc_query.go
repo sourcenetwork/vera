@@ -3,7 +3,9 @@ package keeper
 import (
 	"bytes"
 	"context"
+	"errors"
 
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/gogoproto/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,7 +41,7 @@ func (q Keeper) Allowance(c context.Context, req *feegrant.QueryAllowanceRequest
 
 	feeAllowance, err := q.GetAllowance(ctx, granterAddr, granteeAddr)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, allowanceQueryError(err)
 	}
 
 	msg, ok := feeAllowance.(proto.Message)
@@ -148,7 +150,7 @@ func (q Keeper) DIDAllowance(c context.Context, req *feegrant.QueryDIDAllowanceR
 
 	feeAllowance, err := q.GetDIDAllowance(ctx, granterAddr, req.GranteeDid)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "failed to get allowance: %v", err)
+		return nil, allowanceQueryError(err)
 	}
 
 	msg, ok := feeAllowance.(proto.Message)
@@ -168,6 +170,13 @@ func (q Keeper) DIDAllowance(c context.Context, req *feegrant.QueryDIDAllowanceR
 			Allowance: feeAllowanceAny,
 		},
 	}, nil
+}
+
+func allowanceQueryError(err error) error {
+	if errors.Is(err, sdkerrors.ErrNotFound) {
+		return status.Error(codes.NotFound, err.Error())
+	}
+	return status.Error(codes.Internal, err.Error())
 }
 
 // DIDAllowances queries all the DID allowances granted to the given DID.

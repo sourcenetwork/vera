@@ -9,8 +9,6 @@ import (
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreatePost{},
-		&MsgUpdateRingPostByAcp{},
-		&MsgUpdateRingPostByThresholdSignature{},
 		&MsgRegisterNamespace{},
 		&MsgAddCollaborator{},
 		&MsgRemoveCollaborator{},

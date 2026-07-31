@@ -76,22 +76,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "payload"}},
 				},
 				{
-					RpcMethod: "UpdateRingPostByAcp",
-					Use:       "update-ring-post-by-acp [namespace] [post_id]",
-					Short:     "Update new_peer_ids, new_threshold, and/or pss_interval of a ring post via ACP policy",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
-						{ProtoField: "namespace"},
-						{ProtoField: "post_id"},
-					},
-				},
-				{
-					RpcMethod:      "UpdateRingPostByThresholdSignature",
-					Use:            "update-post-by-threshold-signature [namespace] [post_id] [signature_scheme] [signature]",
-					Short:          "Finalize a reshare using a threshold signature",
-					Long:           "Finalize a reshare using a threshold signature. The signature argument is a bytes field and must be base64-encoded.",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "namespace"}, {ProtoField: "post_id"}, {ProtoField: "signature_scheme"}, {ProtoField: "signature"}},
-				},
-				{
 					RpcMethod:      "RegisterNamespace",
 					Use:            "register-namespace [namespace]",
 					Short:          "Register a new namespace",

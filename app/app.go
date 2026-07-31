@@ -73,6 +73,7 @@ import (
 	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
 	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
 	hubkeeper "github.com/sourcenetwork/sourcehub/x/hub/keeper"
+	orbiskeeper "github.com/sourcenetwork/sourcehub/x/orbis/keeper"
 	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
 	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
 
@@ -133,6 +134,7 @@ type App struct {
 
 	HubKeeper      *hubkeeper.Keeper
 	AcpKeeper      *acpkeeper.Keeper
+	OrbisKeeper    *orbiskeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
 	EpochsKeeper   *epochskeeper.Keeper
 	TierKeeper     *tierkeeper.Keeper
@@ -262,6 +264,7 @@ func New(
 		&app.CircuitBreakerKeeper,
 		&app.HubKeeper,
 		&app.AcpKeeper,
+		&app.OrbisKeeper,
 		&app.BulletinKeeper,
 		&app.EpochsKeeper,
 		&app.TierKeeper,
