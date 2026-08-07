@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"math"
 	"slices"
+	"strings"
 	"unicode/utf8"
 
 	errorsmod "cosmossdk.io/errors"
@@ -37,6 +38,9 @@ const (
 	// DkgShareDomain is the domain tag of the responder-signed raw DKG share
 	// statement carried as invalid_crypto_response/dkg_share evidence.
 	DkgShareDomain = "orbis-dkg-share-v1"
+	// DkgPublicOriginFaultDomain is the normalized statement carried with an
+	// endpoint-authenticated invalid public DKG contribution.
+	DkgPublicOriginFaultDomain = "orbis-dkg-public-origin-fault-v1"
 	// RelayRequestDomain is the domain tag of the relayer-signed statement carried
 	// as the unauthorized_request report payload.
 	RelayRequestDomain = "orbis-relay-request-v1"
@@ -77,6 +81,7 @@ const (
 	invalidCryptoEvidenceKindDkgShare                    = "dkg_share"
 	invalidCryptoEvidenceKindDkgInvalidRefreshCommitment = "dkg_invalid_refresh_commitment"
 	invalidCryptoEvidenceKindDkgEquivocation             = "dkg_equivocation"
+	invalidCryptoEvidenceKindDkgPublicOriginFault        = "dkg_public_origin_fault"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -93,11 +98,11 @@ type reportPayload struct {
 	signingCommitteeScope byte
 }
 
-// invalidCryptoResponseStatement holds the common fields of responder-signed
-// PRE, Sign, and raw DKG share response statements that the chain validates.
+// invalidCryptoResponseStatement holds the common fields of responder- or
+// endpoint-signed invalid-response statements that the chain validates.
 // Protocol-specific cryptographic blobs are bounds-checked during decoding and
 // then dropped: the chain does not re-verify the PRE proof, Sign share, DKG
-// share, or responder signature; its crypto gate remains the ring threshold
+// share, nested signature, or endpoint signature; its crypto gate remains the ring threshold
 // signature on the report envelope.
 type invalidCryptoResponseStatement struct {
 	chainID               string
@@ -111,6 +116,7 @@ type invalidCryptoResponseStatement struct {
 	originProtocol        string
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
+	endpointOrigin        []byte
 }
 
 type dkgCommitmentStatement struct {
@@ -487,8 +493,181 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 			commitmentBStatementBytes,
 			commitmentBSignature,
 		)
+	case invalidCryptoEvidenceKindDkgPublicOriginFault:
+		statementBytes, err := outer.readBytes(fieldStatement)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if err := outer.finish(); err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		return decodeDkgPublicOriginFaultStatement(statementBytes)
 	default:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported invalid crypto evidence kind %q", evidenceKind)
+	}
+}
+
+func decodeDkgPublicOriginFaultStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != DkgPublicOriginFaultDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG public-origin fault domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	attemptID, err := decoder.readBytes(fieldAttemptID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	phase, err := decoder.readString(fieldPhase)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	faultKind, err := decoder.readString(fieldFaultKind)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	contributionAOrigin, contributionASignature, contributionAData, err := decodeEndpointSignedContribution(decoder, "contribution_a")
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	contributionBPresent, err := decoder.readByte(fieldContributionBPresent)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	var contributionBOrigin []byte
+	switch contributionBPresent {
+	case 0:
+	case 1:
+		contributionBOrigin, _, _, err = decodeEndpointSignedContribution(decoder, "contribution_b")
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+	default:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional contribution_b tag %d", contributionBPresent)
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	switch {
+	case len(attemptID) != 32:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG public-origin attempt_id must be 32 bytes")
+	case requestID == "" || responderNodeKey == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG public-origin statement has empty identity fields")
+	case originProtocol != offlineOriginProtocolPSSRefresh && originProtocol != offlineOriginProtocolPSSReshare:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG public-origin protocol %q", originProtocol)
+	case signingScope != committeeScopeCurrent:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG public-origin reports require current signing scope")
+	case originProtocol == offlineOriginProtocolPSSRefresh && accusedScope != committeeScopeCurrent:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Refresh public-origin reports require current accused scope")
+	case !isDkgPublicOriginPhase(phase):
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG public-origin phase %q", phase)
+	case faultKind == "invalid_payload" && contributionBPresent != 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "invalid-payload evidence must contain one contribution")
+	case faultKind == "origin_equivocation" && contributionBPresent != 1:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "origin-equivocation evidence requires two contributions")
+	case faultKind == "origin_equivocation" && phase == "commitments":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Commitment equivocation requires the dedicated evidence kind")
+	case faultKind != "invalid_payload" && faultKind != "origin_equivocation":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG public-origin fault kind %q", faultKind)
+	case contributionBPresent == 1 && !bytes.Equal(contributionAOrigin, contributionBOrigin):
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "public-origin evidence endpoints differ")
+	}
+	_ = contributionASignature
+	_ = contributionAData
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+		endpointOrigin:        contributionAOrigin,
+	}, nil
+}
+
+func decodeEndpointSignedContribution(decoder *reportCanonicalDecoder, prefix string) ([]byte, []byte, []byte, error) {
+	origin, err := decoder.readBytes(prefix + "_origin")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	signature, err := decoder.readBytes(prefix + "_signature")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	data, err := decoder.readBytes(prefix + "_data")
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	if len(origin) != 32 || len(signature) != 64 || len(data) == 0 || len(data) > dkgStatementMaxLen {
+		return nil, nil, nil, errorsmod.Wrap(types.ErrInvalidReport, "invalid endpoint-signed public contribution field lengths")
+	}
+	return origin, signature, data, nil
+}
+
+func isDkgPublicOriginPhase(phase string) bool {
+	switch phase {
+	case "commitments", "commitment_audit", "refresh_health_check", "reshare_participant_set":
+		return true
+	default:
+		return false
 	}
 }
 
@@ -1129,6 +1308,7 @@ func decodeDkgEquivocationStatements(
 // envelope shape checks (observed_at <= now, now <= expires_at) already bound
 // how long this evidence stays reportable — no separate timing rules needed.
 func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statement invalidCryptoResponseStatement) error {
+	accusedEndpoint := strings.ToLower(strings.SplitN(report.AccusedPeerId, "@", 2)[0])
 	switch {
 	case statement.chainID != report.ChainId:
 		return errorsmod.Wrap(types.ErrInvalidReport, "response chain ID does not match report envelope")
@@ -1143,6 +1323,8 @@ func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statem
 	case statement.signedAt < reportObservedAtGraceSecs,
 		report.ObservedAt != statement.signedAt-reportObservedAtGraceSecs:
 		return errorsmod.Wrap(types.ErrInvalidReport, "report envelope is not anchored to the evidence timestamp")
+	case len(statement.endpointOrigin) > 0 && hex.EncodeToString(statement.endpointOrigin) != accusedEndpoint:
+		return errorsmod.Wrap(types.ErrInvalidReport, "public contribution endpoint does not match accused peer ID")
 	}
 	return nil
 }
@@ -1702,6 +1884,7 @@ func (w *reportCanonicalWriter) setErr(err error) {
 const (
 	fieldAccusedCommitteeScope = "accused_committee_scope"
 	fieldActorID               = "actor_id"
+	fieldAttemptID             = "attempt_id"
 	fieldChainID               = "chain_id"
 	fieldChallenge             = "challenge"
 	fieldCheckedAtAnchor       = "checked_at_anchor"
@@ -1712,11 +1895,13 @@ const (
 	fieldCommitmentBStatement  = "commitment_b_statement"
 	fieldCommitmentSignature   = "commitment_signature"
 	fieldCommitmentStatement   = "commitment_statement"
+	fieldContributionBPresent  = "contribution_b_present"
 	fieldCryptoBackend         = "crypto_backend"
 	fieldDerivation            = "derivation"
 	fieldDomain                = "domain"
 	fieldEvidenceKind          = "evidence_kind"
 	fieldFromNodeID            = "from_node_id"
+	fieldFaultKind             = "fault_kind"
 	fieldMessage               = "message"
 	fieldMetadata              = "metadata"
 	fieldNonce                 = "nonce"
@@ -1724,6 +1909,7 @@ const (
 	fieldOriginProtocol        = "origin_protocol"
 	fieldOriginProtocolVersion = "origin_protocol_version"
 	fieldProof                 = "proof"
+	fieldPhase                 = "phase"
 	fieldProtocolVersion       = "protocol_version"
 	fieldRdrPk                 = "rdr_pk"
 	fieldReceiverNodeKey       = "receiver_node_key"

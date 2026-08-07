@@ -450,6 +450,68 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 	}
 }
 
+func TestInvalidCryptoResponseDkgPublicOriginFaultDecodeAndBinding(t *testing.T) {
+	origin := bytes.Repeat([]byte{0x22}, 32)
+	valid := dkgPublicOriginFaultPayloadForTest(
+		"invalid_payload",
+		"commitments",
+		committeeScopeCurrent,
+		origin,
+		false,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(valid)
+	require.NoError(t, err)
+	goldenHash := sha256.Sum256(valid)
+	require.Equal(t, "2b1a98fd49fa0f9fc0f43ae80108b180eab351d8643654f9b5f22a939552b248", hex.EncodeToString(goldenHash[:]))
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, origin, decoded.endpointOrigin)
+	_, err = decodeInvalidCryptoResponsePayload(dkgPublicOriginFaultPayloadForTest(
+		"origin_equivocation",
+		"commitment_audit",
+		committeeScopeCurrent,
+		origin,
+		true,
+	))
+	require.NoError(t, err, "CommitmentHash origin equivocation is a reportable public-origin fault")
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedPeerId = strings.Repeat("33", 32)
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"invalid payload with second contribution", dkgPublicOriginFaultPayloadForTest("invalid_payload", "commitments", committeeScopeCurrent, origin, true)},
+		{"equivocation without second contribution", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitment_audit", committeeScopeCurrent, origin, false)},
+		{"commitment equivocation", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitments", committeeScopeCurrent, origin, true)},
+		{"refresh pending-new accused", dkgPublicOriginFaultPayloadForTest("invalid_payload", "commitments", committeeScopePendingNew, origin, false)},
+		{"unknown fault", dkgPublicOriginFaultPayloadForTest("unknown", "commitments", committeeScopeCurrent, origin, false)},
+		{"unknown phase", dkgPublicOriginFaultPayloadForTest("invalid_payload", "unknown", committeeScopeCurrent, origin, false)},
+		{"Fresh-only commitment hashes", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitment_hashes", committeeScopeCurrent, origin, true)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestValidateInvalidCryptoResponseStatementBindingAndAnchor(t *testing.T) {
 	report := &types.ReportEnvelope{
 		ChainId:         "chain",
@@ -2081,6 +2143,55 @@ func dkgEquivocationPayloadForTest(
 		panic(err)
 	}
 	return payload
+}
+
+func dkgPublicOriginFaultPayloadForTest(
+	faultKind string,
+	phase string,
+	accusedScope byte,
+	origin []byte,
+	includeSecond bool,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgPublicOriginFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(offlineOriginProtocolPSSRefresh)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(phase)
+	statement.writeString(faultKind)
+	writeEndpointContributionForTest(statement, origin, 1)
+	if includeSecond {
+		statement.bytes = append(statement.bytes, 1)
+		writeEndpointContributionForTest(statement, origin, 2)
+	} else {
+		statement.bytes = append(statement.bytes, 0)
+	}
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgPublicOriginFault)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func writeEndpointContributionForTest(w *reportCanonicalWriter, origin []byte, marker byte) {
+	w.writeBytes(origin)
+	w.writeBytes(bytes.Repeat([]byte{marker}, 64))
+	w.writeBytes([]byte{marker, marker + 1, marker + 2})
 }
 
 func invalidCryptoResponsePayloadForTest(evidenceKind string, statement []byte, signature []byte) []byte {
