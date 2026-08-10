@@ -1639,7 +1639,7 @@ func decodeDkgEquivocationStatements(
 		ringStateSha256:       commitmentA.ringStateSha256,
 		protocolVersion:       commitmentA.protocolVersion,
 		requestID:             commitmentA.requestID,
-		signedAt:              commitmentA.signedAt,
+		signedAt:              max(commitmentA.signedAt, commitmentB.signedAt),
 		responderNodeKey:      commitmentA.responderNodeKey,
 		originProtocol:        commitmentA.originProtocol,
 		accusedCommitteeScope: commitmentA.accusedCommitteeScope,

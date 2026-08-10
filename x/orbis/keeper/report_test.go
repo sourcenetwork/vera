@@ -393,7 +393,11 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 	require.Equal(t, strings.Repeat("11", 32), decoded.ringStateSha256)
 	require.Equal(t, uint64(7), decoded.protocolVersion)
 	require.Equal(t, "dkg-session-1", decoded.requestID)
-	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	// commitmentB.signedAt is the later of the two (see
+	// dkgEquivocationCommitmentsForTest): the decoded anchor must be the
+	// later timestamp, not always commitment_a's, since equivocation is only
+	// provable once the later, conflicting commitment arrives.
+	require.Equal(t, commitmentB.signedAt, decoded.signedAt)
 	require.Equal(t, "accused", decoded.responderNodeKey)
 	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
 	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
@@ -979,6 +983,11 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsA
 
 func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t *testing.T) {
 	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgequiv-ikm0", 2)
+	// validDkgEquivocationReport anchors observed_at to the later of the two
+	// commitments' signed_at (5s after reportTestObservedAt), so block time
+	// must advance to match or the envelope would be rejected as being from
+	// the future.
+	fixture.ctx = fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+5), 0))
 
 	report := fixture.validDkgEquivocationReport(t)
 	msg := fixture.signBLSReport(t, sk, report)
@@ -2734,6 +2743,13 @@ func (f reportTestFixture) validDkgEquivocationReport(t *testing.T) types.Report
 		commitmentB.encode(),
 		bytes.Repeat([]byte{43}, 64),
 	)
+	// commitmentB.signedAt is the later of the two (see
+	// dkgEquivocationCommitmentsForTest), so it — not commitmentA's, which
+	// f.validReport's default ObservedAt is anchored to — is what the
+	// envelope must now be anchored to.
+	anchoredAt := max(commitmentA.signedAt, commitmentB.signedAt)
+	report.ObservedAt = anchoredAt - reportObservedAtGraceSecs
+	report.ExpiresAt = report.ObservedAt + ReportTTLSeconds
 	return report
 }
 
