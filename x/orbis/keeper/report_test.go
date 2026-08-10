@@ -589,6 +589,85 @@ func TestInvalidCryptoResponseDkgLeaderEquivocationDecodeAndBinding(t *testing.T
 	}
 }
 
+func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.T) {
+	leaderPrepareFault := dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault,
+		committeeScopeCurrent, false,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(leaderPrepareFault)
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+
+	// ack_equivocation requires two artifacts and is valid for a Reshare
+	// pending-new accused with any of the three ack message kinds.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation,
+		committeeScopePendingNew, true,
+	))
+	require.NoError(t, err)
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedNodeKey = "other"
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{
+			"leader-prepare-fault with a second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, true),
+		},
+		{
+			"leader-prepare-fault targeting the wrong message",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"ack-equivocation missing the second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, false),
+		},
+		{
+			"ack-equivocation targeting an unsupported message kind",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, true),
+		},
+		{
+			"unknown fault kind",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", "unknown", committeeScopeCurrent, false),
+		},
+		{
+			"unknown origin protocol",
+			dkgControlMessageFaultPayloadForTest("unknown", "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"refresh pending-new accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopePendingNew, false),
+		},
+		{
+			"reshare current accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, true),
+		},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestValidateInvalidCryptoResponseStatementBindingAndAnchor(t *testing.T) {
 	report := &types.ReportEnvelope{
 		ChainId:         "chain",
@@ -2304,6 +2383,54 @@ func dkgLeaderEquivocationPayloadForTest(
 	}
 	outer := newReportCanonicalWriter()
 	outer.writeString(invalidCryptoEvidenceKindDkgLeaderEquivocation)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func writeControlMessageArtifactForTest(w *reportCanonicalWriter, marker byte) {
+	w.writeBytes(bytes.Repeat([]byte{marker}, 64))
+	w.writeBytes([]byte{marker, marker + 1, marker + 2})
+}
+
+func dkgControlMessageFaultPayloadForTest(
+	originProtocol string,
+	messageKind string,
+	faultKind string,
+	accusedScope byte,
+	hasArtifactB bool,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgControlMessageFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(originProtocol)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(messageKind)
+	statement.writeString(faultKind)
+	writeControlMessageArtifactForTest(statement, 1)
+	if hasArtifactB {
+		statement.bytes = append(statement.bytes, 1)
+		writeControlMessageArtifactForTest(statement, 2)
+	} else {
+		statement.bytes = append(statement.bytes, 0)
+	}
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgControlMessageFault)
 	outer.writeBytes(statementBytes)
 	payload, err := outer.finish()
 	if err != nil {
