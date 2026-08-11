@@ -934,9 +934,52 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGShareAcceptsAndDedupes(t *testin
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+// TestMsgServer_SubmitReport_InvalidCryptoDKGShareIndependentAttemptsGetIndependentDemerits
+// exercises RPT-16: CeremonyID (report.SessionId) is intentionally reusable
+// across retries, so two reports naming the SAME session but carrying
+// evidence from two DIFFERENT live attempts must be treated as two
+// independent faults, not collide on one dedupe record — otherwise a node
+// still in the committee for a later retry of the same ceremony could repeat
+// the same fault indefinitely after its first demerit.
+func TestMsgServer_SubmitReport_InvalidCryptoDKGShareIndependentAttemptsGetIndependentDemerits(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgshare-attempts-00", 2)
+
+	firstStatement := fixture.dkgShareStatementFields(t)
+	firstReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	firstReport.ReportType = InvalidCryptoResponseReportType
+	firstReport.SessionId = firstStatement.requestID
+	firstReport.Payload = dkgSharePayloadForTest(firstStatement.encode(), bytes.Repeat([]byte{42}, 64))
+	first := fixture.signBLSReport(t, sk, firstReport)
+
+	_, err := fixture.k.SubmitReport(fixture.ctx, first)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	secondStatement := firstStatement.with(func(s *dkgShareStatementFields) {
+		s.commitmentStatement.attemptID = bytes.Repeat([]byte{10}, 32)
+	})
+	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondReport.ReportType = InvalidCryptoResponseReportType
+	secondReport.SessionId = secondStatement.requestID
+	secondReport.Payload = dkgSharePayloadForTest(secondStatement.encode(), bytes.Repeat([]byte{43}, 64))
+	require.Equal(t, firstReport.SessionId, secondReport.SessionId, "test must reuse the same CeremonyID across attempts")
+	second := fixture.signBLSReport(t, sk, secondReport)
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.NoError(t, err, "a fault from an independent attempt of the same ceremony must not collide with the first attempt's dedupe record")
+	require.NotEqual(t, first.ReportId, second.ReportId)
+	require.Equal(t, uint64(2), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	// A retry of the SECOND attempt's exact evidence must still dedupe against itself.
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(2), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
 func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsAndDedupes(t *testing.T) {
@@ -976,6 +1019,7 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsA
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
@@ -1023,6 +1067,7 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t 
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
@@ -2143,6 +2188,7 @@ type dkgCommitmentStatementFields struct {
 	fromNodeID            uint32
 	commitment            []byte
 	sessionNonce          []byte
+	attemptID             []byte
 	cryptoBackend         string
 }
 
@@ -2167,6 +2213,7 @@ func (s dkgCommitmentStatementFields) encode() []byte {
 	w.writeU32(s.fromNodeID)
 	w.writeBytes(s.commitment)
 	w.writeBytes(s.sessionNonce)
+	w.writeBytes(s.attemptID)
 	w.writeString(s.cryptoBackend)
 	statement, err := w.finish()
 	if err != nil {
@@ -2248,6 +2295,7 @@ func dkgShareStatementForTest() dkgShareStatementFields {
 		fromNodeID:            2,
 		commitment:            []byte{1, 2, 3, 4},
 		sessionNonce:          bytes.Repeat([]byte{12}, dkgNonceLen),
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 		cryptoBackend:         "dkg/test",
 	}
 	return dkgShareStatementFields{

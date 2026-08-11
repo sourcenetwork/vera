@@ -110,6 +110,10 @@ type reportPayload struct {
 	originProtocolVersion uint64
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
+	// attemptID scopes session dedupe to the live attempt for DKG evidence
+	// kinds (see invalidCryptoResponseStatement.attemptID). nil for
+	// node_offline/unauthorized_request, which stay ceremony-scoped.
+	attemptID []byte
 }
 
 // invalidCryptoResponseStatement holds the common fields of responder- or
@@ -131,6 +135,10 @@ type invalidCryptoResponseStatement struct {
 	accusedCommitteeScope byte
 	signingCommitteeScope byte
 	endpointOrigin        []byte
+	// attemptID scopes session dedupe to the live attempt (DKG evidence kinds
+	// only — PRE/Sign responses aren't attempt-scoped, and stay collision-only
+	// against origin+session as before). nil for kinds that don't set it.
+	attemptID []byte
 }
 
 type dkgCommitmentStatement struct {
@@ -148,7 +156,14 @@ type dkgCommitmentStatement struct {
 	fromNodeID            uint32
 	commitment            []byte
 	sessionNonce          []byte
-	cryptoBackend         string
+	// attemptID is the live attempt this commitment was signed for, covered by
+	// the responder's own signature (tamper-proof the same way every other
+	// field here is). Folded into sessionDedupeID so independent faults across
+	// retries of the same CeremonyID (intentionally reusable) each get
+	// independent demerits instead of colliding on one dedupe record for the
+	// whole ceremony.
+	attemptID     []byte
+	cryptoBackend string
 }
 
 // relayRequestStatement is the relayer-signed record of a Sign/PRE request it
@@ -238,6 +253,7 @@ func (k *Keeper) validateSubmittedReport(
 			originProtocolVersion: statement.protocolVersion,
 			accusedCommitteeScope: statement.accusedCommitteeScope,
 			signingCommitteeScope: statement.signingCommitteeScope,
+			attemptID:             statement.attemptID,
 		}
 	case UnauthorizedRequestReportType:
 		statement, err := decodeUnauthorizedRequestPayload(report.Payload)
@@ -359,6 +375,17 @@ func reportEnvelopeCanonicalMessageAndID(report *types.ReportEnvelope) ([]byte, 
 	return message, hex.EncodeToString(hash[:]), nil
 }
 
+// reportSessionDedupeID binds one accepted report per (ring, report_type,
+// origin_protocol, accused, session). For DKG evidence kinds, payload.attemptID
+// additionally scopes this to the live attempt: CeremonyID (report.SessionId)
+// is intentionally reusable across retries, so without this an accused that
+// sabotages one attempt, gets demerited, and is still in the committee for a
+// later independent attempt of the same ceremony could repeat the same fault
+// indefinitely — the second report would collide with the first attempt's
+// dedupe record and be silently rejected, capping the whole ceremony's worth
+// of misbehavior at one demerit. attemptID is empty for report types that
+// aren't attempt-scoped (node_offline, unauthorized_request), so this reduces
+// to the prior ceremony-only behavior for them.
 func reportSessionDedupeID(report *types.ReportEnvelope, payload reportPayload) (string, error) {
 	w := newReportCanonicalWriter()
 	w.writeString(ReportSessionDomain)
@@ -368,6 +395,7 @@ func reportSessionDedupeID(report *types.ReportEnvelope, payload reportPayload) 
 	w.writeString(payload.originProtocol)
 	w.writeString(report.AccusedNodeKey)
 	w.writeString(report.SessionId)
+	w.writeBytes(payload.attemptID)
 	message, err := w.finish()
 	if err != nil {
 		return "", err
@@ -672,6 +700,7 @@ func decodeDkgPublicOriginFaultStatement(statementBytes []byte) (invalidCryptoRe
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 		endpointOrigin:        contributionAOrigin,
+		attemptID:             attemptID,
 	}, nil
 }
 
@@ -808,6 +837,7 @@ func decodeDkgLeaderEquivocationStatement(statementBytes []byte) (invalidCryptoR
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 		endpointOrigin:        deliveryAOrigin,
+		attemptID:             attemptID,
 	}, nil
 }
 
@@ -954,6 +984,7 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 		originProtocol:        originProtocol,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
+		attemptID:             attemptID,
 	}, nil
 }
 
@@ -1437,6 +1468,7 @@ func decodeDkgShareStatement(statementBytes []byte) (invalidCryptoResponseStatem
 		originProtocol:        originProtocol,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
+		attemptID:             commitment.attemptID,
 	}, nil
 }
 
@@ -1517,6 +1549,10 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 	if err != nil {
 		return dkgCommitmentStatement{}, err
 	}
+	attemptID, err := decoder.readBytes(fieldAttemptID)
+	if err != nil {
+		return dkgCommitmentStatement{}, err
+	}
 	cryptoBackend, err := decoder.readString(fieldCryptoBackend)
 	if err != nil {
 		return dkgCommitmentStatement{}, err
@@ -1538,6 +1574,8 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment exceeds size bound")
 	case len(sessionNonce) != dkgNonceLen:
 		return dkgCommitmentStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "DKG commitment session nonce must be %d bytes", dkgNonceLen)
+	case len(attemptID) != 32:
+		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment attempt_id must be 32 bytes")
 	case cryptoBackend == "":
 		return dkgCommitmentStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG commitment crypto backend cannot be empty")
 	}
@@ -1557,6 +1595,7 @@ func decodeDkgCommitmentStatement(statementBytes []byte) (dkgCommitmentStatement
 		fromNodeID:            fromNodeID,
 		commitment:            commitment,
 		sessionNonce:          sessionNonce,
+		attemptID:             attemptID,
 		cryptoBackend:         cryptoBackend,
 	}, nil
 }
@@ -1586,6 +1625,7 @@ func decodeDkgInvalidRefreshCommitmentStatement(statementBytes []byte) (invalidC
 		originProtocol:        commitment.originProtocol,
 		accusedCommitteeScope: commitment.accusedCommitteeScope,
 		signingCommitteeScope: commitment.signingCommitteeScope,
+		attemptID:             commitment.attemptID,
 	}, nil
 }
 
@@ -1644,6 +1684,10 @@ func decodeDkgEquivocationStatements(
 		originProtocol:        commitmentA.originProtocol,
 		accusedCommitteeScope: commitmentA.accusedCommitteeScope,
 		signingCommitteeScope: commitmentA.signingCommitteeScope,
+		// commitmentA/commitmentB are required above to share a session_nonce,
+		// which for a genuinely equivocating dealer means the same real
+		// attempt too, so either's attemptID is equivalent here.
+		attemptID: commitmentA.attemptID,
 	}, nil
 }
 
