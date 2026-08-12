@@ -103,7 +103,9 @@ const (
 	dkgControlMessageFaultKindLeaderPrepareFault = "leader_prepare_fault"
 	dkgControlMessageFaultKindAckEquivocation    = "ack_equivocation"
 
-	dkgLeaderPublicFaultKindInvalidManifest = "invalid_manifest"
+	dkgLeaderPublicFaultKindInvalidManifest      = "invalid_manifest"
+	dkgLeaderPublicFaultKindChunkIndexOutOfRange = "chunk_index_out_of_range"
+	dkgLeaderPublicFaultKindOversizedChunk       = "oversized_chunk"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -859,17 +861,19 @@ func decodeDkgLeaderEquivocationStatement(statementBytes []byte) (invalidCryptoR
 }
 
 // decodeDkgLeaderPublicFaultStatement decodes a report claiming a single
-// endpoint-authenticated Gossip broadcast (a manifest) is independently
-// provable as invalid on its own — e.g. it names the wrong origin set for
-// its phase. Unlike decodeDkgLeaderEquivocationStatement, there is no
-// conflicting counterpart to cross-check; the chain does not decode the
-// manifest bytes, recompute its phase root, or independently re-derive the
-// phase's expected origin set — every co-signer independently re-verifies
-// that off-chain (orbis-rs registry.rs's expected_leader_manifest_shape)
-// before contributing a signature share, and the chain's crypto gate
-// remains the ring threshold signature on the report envelope. What the
-// chain does check here: shape, committee/protocol policy, and that
-// fault_kind is a recognized value.
+// endpoint-authenticated Gossip broadcast (a manifest or chunk) is
+// independently provable as invalid on its own — e.g. it names the wrong
+// origin set for its phase (invalid_manifest), a chunk index outside the
+// phase's valid range (chunk_index_out_of_range), or an oversized encoded
+// chunk (oversized_chunk). Unlike decodeDkgLeaderEquivocationStatement,
+// there is no conflicting counterpart to cross-check; the chain does not
+// decode the manifest/chunk bytes, recompute a phase root, or independently
+// re-derive the phase's expected origin set or size limit — every co-signer
+// independently re-verifies that off-chain (orbis-rs registry.rs's
+// validate_dkg_leader_public_fault_evidence) before contributing a
+// signature share, and the chain's crypto gate remains the ring threshold
+// signature on the report envelope. What the chain does check here: shape,
+// committee/protocol policy, and that fault_kind is a recognized value.
 func decodeDkgLeaderPublicFaultStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
 	decoder := newReportCanonicalDecoder(statementBytes)
 	domain, err := decoder.readString(fieldDomain)
@@ -970,7 +974,9 @@ func decodeDkgLeaderPublicFaultStatement(statementBytes []byte) (invalidCryptoRe
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare leader public-fault reports require pending-new accused scope")
 	case !isDkgPublicOriginPhase(phase):
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault phase %q", phase)
-	case faultKind != dkgLeaderPublicFaultKindInvalidManifest:
+	case faultKind != dkgLeaderPublicFaultKindInvalidManifest &&
+		faultKind != dkgLeaderPublicFaultKindChunkIndexOutOfRange &&
+		faultKind != dkgLeaderPublicFaultKindOversizedChunk:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault kind %q", faultKind)
 	}
 	return invalidCryptoResponseStatement{

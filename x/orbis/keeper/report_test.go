@@ -617,6 +617,20 @@ func TestInvalidCryptoResponseDkgLeaderPublicFaultDecodeAndBinding(t *testing.T)
 	))
 	require.NoError(t, err)
 
+	// chunk_index_out_of_range and oversized_chunk are also recognized fault
+	// kinds — the chain only checks shape/policy here, not which specific
+	// single-artifact fault is claimed (that's the co-signer's job).
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindChunkIndexOutOfRange,
+		committeeScopeCurrent, origin, deliveryID,
+	))
+	require.NoError(t, err)
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindOversizedChunk,
+		committeeScopeCurrent, origin, deliveryID,
+	))
+	require.NoError(t, err)
+
 	report := &types.ReportEnvelope{
 		ChainId:         reportTestChainID,
 		RingId:          "ring-1",
