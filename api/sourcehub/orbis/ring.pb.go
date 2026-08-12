@@ -232,8 +232,12 @@ type Ring struct {
 	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
 	UpgradeInfo      *UpgradeInfo        `protobuf:"bytes,12,opt,name=upgrade_info,json=upgradeInfo,proto3" json:"upgrade_info,omitempty"`
 	Reporting        *ReportingConfig    `protobuf:"bytes,13,opt,name=reporting,proto3" json:"reporting,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	// Ed25519 did:key issuers allowed to authenticate requests for another actor.
+	TrustedAuthRelayDids []string `protobuf:"bytes,14,rep,name=trusted_auth_relay_dids,json=trustedAuthRelayDids,proto3" json:"trusted_auth_relay_dids,omitempty"`
+	// Set at creation; false permanently disables trusted authentication relays.
+	AllowTrustedAuthRelays bool `protobuf:"varint,15,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
@@ -357,6 +361,20 @@ func (x *Ring) GetReporting() *ReportingConfig {
 	return nil
 }
 
+func (x *Ring) GetTrustedAuthRelayDids() []string {
+	if x != nil {
+		return x.TrustedAuthRelayDids
+	}
+	return nil
+}
+
+func (x *Ring) GetAllowTrustedAuthRelays() bool {
+	if x != nil {
+		return x.AllowTrustedAuthRelays
+	}
+	return false
+}
+
 // RingConfirmation records a single peer's agreement on the ring public key.
 type RingConfirmation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -429,7 +447,7 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	"\x0fReportingConfig\x12K\n" +
 	"\x0edemerit_config\x18\x01 \x01(\v2\x1e.sourcehub.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
 	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
-	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xc1\x04\n" +
+	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xb3\x05\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -445,7 +463,9 @@ const file_sourcehub_orbis_ring_proto_rawDesc = "" +
 	" \x01(\tR\bpolicyId\x12G\n" +
 	"\rconfirmations\x18\v \x03(\v2!.sourcehub.orbis.RingConfirmationR\rconfirmations\x12E\n" +
 	"\fupgrade_info\x18\f \x01(\v2\x1c.sourcehub.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfo\x12D\n" +
-	"\treporting\x18\r \x01(\v2 .sourcehub.orbis.ReportingConfigB\x04\xc8\xde\x1f\x00R\treportingB\x10\n" +
+	"\treporting\x18\r \x01(\v2 .sourcehub.orbis.ReportingConfigB\x04\xc8\xde\x1f\x00R\treporting\x125\n" +
+	"\x17trusted_auth_relay_dids\x18\x0e \x03(\tR\x14trustedAuthRelayDids\x129\n" +
+	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelaysB\x10\n" +
 	"\x0e_new_threshold\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +
 	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +

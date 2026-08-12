@@ -247,11 +247,11 @@ func (k *Keeper) validateSubmittedReport(
 	if report.RingPk != ring.RingPk {
 		return nil, errorsmod.Wrap(types.ErrInvalidReport, "report ring public key is stale")
 	}
-	ringStateHash, err := reportRingStateSHA256(ring)
+	ringStateMatches, err := reportRingStateDigestMatches(ring, report.RingStateSha256)
 	if err != nil {
 		return nil, err
 	}
-	if report.RingStateSha256 != ringStateHash {
+	if !ringStateMatches {
 		return nil, errorsmod.Wrap(types.ErrInvalidReport, "report ring-state digest is stale")
 	}
 
@@ -1496,7 +1496,7 @@ func (k *Keeper) maybeScheduleAutoReshareForReport(
 	nextPeerNodeKeys = append(nextPeerNodeKeys, replacementNodeKey)
 
 	nextRing := *ring
-	nextRing.NewPeerNodeKeys = canonicalNodeKeys(nextPeerNodeKeys)
+	nextRing.NewPeerNodeKeys = canonicalStrings(nextPeerNodeKeys)
 	nextRing.XNewThreshold = nil
 	nextRing.Reporting.BackupNodeKeys = remainingBackups
 	if err := validateRing(&nextRing); err != nil {
@@ -1549,7 +1549,31 @@ func reportRingStateSHA256(ring *types.Ring) (string, error) {
 	return hex.EncodeToString(hash[:]), nil
 }
 
+func reportRingStateDigestMatches(ring *types.Ring, digest string) (bool, error) {
+	current, err := reportRingStateSHA256(ring)
+	if err != nil {
+		return false, err
+	}
+	if digest == current {
+		return true, nil
+	}
+	if ring.AllowTrustedAuthRelays || len(ring.TrustedAuthRelayDids) != 0 {
+		return false, nil
+	}
+
+	legacy, err := reportRingStateCanonicalBytesWithRelayState(ring, false)
+	if err != nil {
+		return false, err
+	}
+	legacyHash := sha256.Sum256(legacy)
+	return digest == hex.EncodeToString(legacyHash[:]), nil
+}
+
 func reportRingStateCanonicalBytes(ring *types.Ring) ([]byte, error) {
+	return reportRingStateCanonicalBytesWithRelayState(ring, true)
+}
+
+func reportRingStateCanonicalBytesWithRelayState(ring *types.Ring, includeRelayState bool) ([]byte, error) {
 	w := newReportCanonicalWriter()
 	w.writeString(ring.RingPk)
 	w.writeStringSlice(ring.PeerNodeKeys)
@@ -1572,6 +1596,10 @@ func reportRingStateCanonicalBytes(ring *types.Ring) ([]byte, error) {
 		w.writeOptionalString(nil)
 	} else {
 		w.writeOptionalString(&ring.PolicyId)
+	}
+	if includeRelayState {
+		w.writeBool(ring.AllowTrustedAuthRelays)
+		w.writeStringSlice(ring.TrustedAuthRelayDids)
 	}
 	w.writeU64(ring.UpgradeInfo.CurrentVersion)
 	if ring.UpgradeInfo.XNextVersion == nil {
@@ -1609,6 +1637,14 @@ func (w *reportCanonicalWriter) writeU64(value uint64) {
 	var buf [8]byte
 	binary.BigEndian.PutUint64(buf[:], value)
 	w.bytes = append(w.bytes, buf[:]...)
+}
+
+func (w *reportCanonicalWriter) writeBool(value bool) {
+	if value {
+		w.bytes = append(w.bytes, 1)
+		return
+	}
+	w.bytes = append(w.bytes, 0)
 }
 
 func (w *reportCanonicalWriter) writeBytes(value []byte) {
