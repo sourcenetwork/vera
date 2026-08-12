@@ -593,6 +593,77 @@ func TestInvalidCryptoResponseDkgLeaderEquivocationDecodeAndBinding(t *testing.T
 	}
 }
 
+func TestInvalidCryptoResponseDkgLeaderPublicFaultDecodeAndBinding(t *testing.T) {
+	origin := bytes.Repeat([]byte{0x22}, 32)
+	deliveryID := bytes.Repeat([]byte{0xaa}, 16)
+
+	valid := dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest,
+		committeeScopeCurrent, origin, deliveryID,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(valid)
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, origin, decoded.endpointOrigin)
+
+	// Reshare requires a pending-new accused scope instead of current.
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "reshare_participant_set", dkgLeaderPublicFaultKindInvalidManifest,
+		committeeScopePendingNew, origin, deliveryID,
+	))
+	require.NoError(t, err)
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedPeerId = strings.Repeat("33", 32)
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{
+			"unknown fault kind",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", "unknown", committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"unknown origin protocol",
+			dkgLeaderPublicFaultPayloadForTest("unknown", "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"unknown phase",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "unknown", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"refresh pending-new accused",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest, committeeScopePendingNew, origin, deliveryID),
+		},
+		{
+			"reshare current accused",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSReshare, "reshare_participant_set", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
 func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.T) {
 	leaderPrepareFault := dkgControlMessageFaultPayloadForTest(
 		offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault,
@@ -2440,6 +2511,45 @@ func dkgLeaderEquivocationPayloadForTest(
 	}
 	outer := newReportCanonicalWriter()
 	outer.writeString(invalidCryptoEvidenceKindDkgLeaderEquivocation)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func dkgLeaderPublicFaultPayloadForTest(
+	originProtocol string,
+	phase string,
+	faultKind string,
+	accusedScope byte,
+	origin []byte,
+	deliveryID []byte,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgLeaderPublicFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(originProtocol)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(phase)
+	statement.writeString(faultKind)
+	statement.writeBytes(deliveryID)
+	writeEndpointContributionForTest(statement, origin, 1)
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgLeaderPublicFault)
 	outer.writeBytes(statementBytes)
 	payload, err := outer.finish()
 	if err != nil {

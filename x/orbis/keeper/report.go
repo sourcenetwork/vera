@@ -50,6 +50,11 @@ const (
 	// leader's Prepare, or a follower equivocating on a
 	// Prepared/Activated/Begun ack.
 	DkgControlMessageFaultDomain = "orbis-dkg-control-message-fault-v1"
+	// DkgLeaderPublicFaultDomain is the normalized statement carried with a
+	// single endpoint-authenticated Gossip broadcast (a manifest) that is
+	// independently provable as invalid on its own — unlike
+	// DkgLeaderEquivocationDomain, no conflicting counterpart is required.
+	DkgLeaderPublicFaultDomain = "orbis-dkg-leader-public-fault-v1"
 	// RelayRequestDomain is the domain tag of the relayer-signed statement carried
 	// as the unauthorized_request report payload.
 	RelayRequestDomain = "orbis-relay-request-v1"
@@ -93,9 +98,12 @@ const (
 	invalidCryptoEvidenceKindDkgPublicOriginFault        = "dkg_public_origin_fault"
 	invalidCryptoEvidenceKindDkgLeaderEquivocation       = "dkg_leader_equivocation"
 	invalidCryptoEvidenceKindDkgControlMessageFault      = "dkg_control_message_fault"
+	invalidCryptoEvidenceKindDkgLeaderPublicFault        = "dkg_leader_public_fault"
 
 	dkgControlMessageFaultKindLeaderPrepareFault = "leader_prepare_fault"
 	dkgControlMessageFaultKindAckEquivocation    = "ack_equivocation"
+
+	dkgLeaderPublicFaultKindInvalidManifest = "invalid_manifest"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -562,6 +570,15 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 			return invalidCryptoResponseStatement{}, err
 		}
 		return decodeDkgControlMessageFaultStatement(statementBytes)
+	case invalidCryptoEvidenceKindDkgLeaderPublicFault:
+		statementBytes, err := outer.readBytes(fieldStatement)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if err := outer.finish(); err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		return decodeDkgLeaderPublicFaultStatement(statementBytes)
 	default:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported invalid crypto evidence kind %q", evidenceKind)
 	}
@@ -837,6 +854,138 @@ func decodeDkgLeaderEquivocationStatement(statementBytes []byte) (invalidCryptoR
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
 		endpointOrigin:        deliveryAOrigin,
+		attemptID:             attemptID,
+	}, nil
+}
+
+// decodeDkgLeaderPublicFaultStatement decodes a report claiming a single
+// endpoint-authenticated Gossip broadcast (a manifest) is independently
+// provable as invalid on its own — e.g. it names the wrong origin set for
+// its phase. Unlike decodeDkgLeaderEquivocationStatement, there is no
+// conflicting counterpart to cross-check; the chain does not decode the
+// manifest bytes, recompute its phase root, or independently re-derive the
+// phase's expected origin set — every co-signer independently re-verifies
+// that off-chain (orbis-rs registry.rs's expected_leader_manifest_shape)
+// before contributing a signature share, and the chain's crypto gate
+// remains the ring threshold signature on the report envelope. What the
+// chain does check here: shape, committee/protocol policy, and that
+// fault_kind is a recognized value.
+func decodeDkgLeaderPublicFaultStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != DkgLeaderPublicFaultDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected DKG leader public-fault domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	requestID, err := decoder.readString(fieldRequestID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	originProtocol, err := decoder.readString(fieldOriginProtocol)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	accusedScope, err := decoder.readByte(fieldAccusedCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(accusedScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown accused committee scope %d", accusedScope)
+	}
+	signingScope, err := decoder.readByte(fieldSigningCommitteeScope)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if !isValidReportCommitteeScope(signingScope) {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unknown signing committee scope %d", signingScope)
+	}
+	attemptID, err := decoder.readBytes(fieldAttemptID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	phase, err := decoder.readString(fieldPhase)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	faultKind, err := decoder.readString(fieldFaultKind)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	deliveryID, err := decoder.readBytes(fieldDeliveryID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	deliveryOrigin, _, _, err := decodeEndpointSignedContribution(decoder, "delivery")
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+
+	switch {
+	case len(attemptID) != 32:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG leader public-fault attempt_id must be 32 bytes")
+	case len(deliveryID) != 16:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG leader public-fault delivery_id must be 16 bytes")
+	case requestID == "" || responderNodeKey == "":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG leader public-fault statement has empty identity fields")
+	case originProtocol != offlineOriginProtocolPSSRefresh && originProtocol != offlineOriginProtocolPSSReshare:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault origin protocol %q", originProtocol)
+	case signingScope != committeeScopeCurrent:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG leader public-fault reports require current signing scope")
+	case originProtocol == offlineOriginProtocolPSSRefresh && accusedScope != committeeScopeCurrent:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Refresh leader public-fault reports require current accused scope")
+	case originProtocol == offlineOriginProtocolPSSReshare && accusedScope != committeeScopePendingNew:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare leader public-fault reports require pending-new accused scope")
+	case !isDkgPublicOriginPhase(phase):
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault phase %q", phase)
+	case faultKind != dkgLeaderPublicFaultKindInvalidManifest:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault kind %q", faultKind)
+	}
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             requestID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        originProtocol,
+		accusedCommitteeScope: accusedScope,
+		signingCommitteeScope: signingScope,
+		endpointOrigin:        deliveryOrigin,
 		attemptID:             attemptID,
 	}, nil
 }
@@ -2287,6 +2436,7 @@ const (
 	fieldCommitmentStatement   = "commitment_statement"
 	fieldContributionBPresent  = "contribution_b_present"
 	fieldCryptoBackend         = "crypto_backend"
+	fieldDeliveryID            = "delivery_id"
 	fieldDeliveryIDA           = "delivery_id_a"
 	fieldDeliveryIDB           = "delivery_id_b"
 	fieldDerivation            = "derivation"
