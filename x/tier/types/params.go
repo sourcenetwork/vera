@@ -78,6 +78,9 @@ func (p Params) Validate() error {
 	if err := validateInsurancePoolFee(p.InsurancePoolFee); err != nil {
 		return err
 	}
+	if p.DeveloperPoolFee+p.InsurancePoolFee > 100 {
+		return fmt.Errorf("combined developer pool fee and insurance pool fee must not exceed 100, got %d", p.DeveloperPoolFee+p.InsurancePoolFee)
+	}
 	if err := validateInsurancePoolThreshold(p.InsurancePoolThreshold); err != nil {
 		return err
 	}
