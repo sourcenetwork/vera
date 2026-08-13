@@ -116,6 +116,7 @@ const (
 	dkgLeaderPublicFaultKindInvalidManifest      = "invalid_manifest"
 	dkgLeaderPublicFaultKindChunkIndexOutOfRange = "chunk_index_out_of_range"
 	dkgLeaderPublicFaultKindOversizedChunk       = "oversized_chunk"
+	dkgLeaderPublicFaultKindDuplicateChunkOrigin = "duplicate_chunk_origin"
 
 	committeeScopeCurrent    = byte(1)
 	committeeScopePendingNew = byte(2)
@@ -1022,8 +1023,9 @@ func decodeDkgLeaderBatchMismatchStatement(statementBytes []byte) (invalidCrypto
 // endpoint-authenticated Gossip broadcast (a manifest or chunk) is
 // independently provable as invalid on its own — e.g. it names the wrong
 // origin set for its phase (invalid_manifest), a chunk index outside the
-// phase's valid range (chunk_index_out_of_range), or an oversized encoded
-// chunk (oversized_chunk). Unlike decodeDkgLeaderEquivocationStatement,
+// phase's valid range (chunk_index_out_of_range), an oversized encoded
+// chunk (oversized_chunk), or a chunk naming the same origin more than once
+// (duplicate_chunk_origin). Unlike decodeDkgLeaderEquivocationStatement,
 // there is no conflicting counterpart to cross-check; the chain does not
 // decode the manifest/chunk bytes, recompute a phase root, or independently
 // re-derive the phase's expected origin set or size limit — every co-signer
@@ -1134,7 +1136,8 @@ func decodeDkgLeaderPublicFaultStatement(statementBytes []byte) (invalidCryptoRe
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault phase %q", phase)
 	case faultKind != dkgLeaderPublicFaultKindInvalidManifest &&
 		faultKind != dkgLeaderPublicFaultKindChunkIndexOutOfRange &&
-		faultKind != dkgLeaderPublicFaultKindOversizedChunk:
+		faultKind != dkgLeaderPublicFaultKindOversizedChunk &&
+		faultKind != dkgLeaderPublicFaultKindDuplicateChunkOrigin:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG leader public-fault kind %q", faultKind)
 	}
 	return invalidCryptoResponseStatement{
