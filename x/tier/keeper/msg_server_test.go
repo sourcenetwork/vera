@@ -53,6 +53,13 @@ func TestUpdateParams(t *testing.T) {
 			insFee: params.InsurancePoolFee,
 			expErr: false,
 		},
+		{
+			name:      "int64 overflow combined fees are rejected",
+			devFee:    9223372036854775807,
+			insFee:    1,
+			expErr:    true,
+			expErrMsg: "invalid params",
+		},
 	}
 
 	for _, tt := range tests {
