@@ -785,6 +785,20 @@ func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.
 	))
 	require.NoError(t, err)
 
+	// oversized_repair_page requires exactly one artifact and, like
+	// leader_prepare_fault, is always accused via the canonical leader — so
+	// a Reshare report requires pending-new accused scope.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage,
+		committeeScopeCurrent, false,
+	))
+	require.NoError(t, err)
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage,
+		committeeScopePendingNew, false,
+	))
+	require.NoError(t, err)
+
 	report := &types.ReportEnvelope{
 		ChainId:         reportTestChainID,
 		RingId:          "ring-1",
@@ -833,6 +847,18 @@ func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.
 		{
 			"reshare leader-prepare-fault with current accused",
 			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"oversized-repair-page with a second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, true),
+		},
+		{
+			"oversized-repair-page targeting the wrong message",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, false),
+		},
+		{
+			"reshare oversized-repair-page with current accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, false),
 		},
 	}
 	for _, tc := range rejected {

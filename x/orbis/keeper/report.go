@@ -109,8 +109,9 @@ const (
 	invalidCryptoEvidenceKindDkgLeaderPublicFault        = "dkg_leader_public_fault"
 	invalidCryptoEvidenceKindDkgLeaderBatchMismatch      = "dkg_leader_batch_mismatch"
 
-	dkgControlMessageFaultKindLeaderPrepareFault = "leader_prepare_fault"
-	dkgControlMessageFaultKindAckEquivocation    = "ack_equivocation"
+	dkgControlMessageFaultKindLeaderPrepareFault  = "leader_prepare_fault"
+	dkgControlMessageFaultKindAckEquivocation     = "ack_equivocation"
+	dkgControlMessageFaultKindOversizedRepairPage = "oversized_repair_page"
 
 	dkgLeaderPublicFaultKindInvalidManifest      = "invalid_manifest"
 	dkgLeaderPublicFaultKindChunkIndexOutOfRange = "chunk_index_out_of_range"
@@ -1154,12 +1155,13 @@ func decodeDkgLeaderPublicFaultStatement(statementBytes []byte) (invalidCryptoRe
 }
 
 // decodeDkgControlMessageFaultStatement decodes a report claiming a
-// node-key-signed direct-QUIC control-handshake fault: either a
-// leader_prepare_fault (a single signed Prepare, independently provable as
-// invalid because it names a noncanonical leader) or an ack_equivocation
-// (two differently-signed acks from the same follower for the identical
-// ceremony/attempt/message_kind). As with the endpoint-signed DKG evidence
-// kinds, the chain does not re-verify the node-key signatures over
+// node-key-signed direct-QUIC control-handshake fault: a leader_prepare_fault
+// (a single signed Prepare, independently provable as invalid because it
+// names a noncanonical leader), an ack_equivocation (two differently-signed
+// acks from the same follower for the identical ceremony/attempt/message_kind),
+// or an oversized_repair_page (a single signed PublicPhaseResponse whose
+// encoded size exceeds the fixed repair-page byte limit). As with the
+// endpoint-signed DKG evidence kinds, the chain does not re-verify the node-key signatures over
 // artifact_a/artifact_b, recompute config_digest, or independently
 // re-resolve the canonical leader — every co-signer independently re-checks
 // that off-chain before contributing a signature share, and the chain's
@@ -1273,16 +1275,16 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Refresh control-message fault reports require current accused scope")
 	// ack_equivocation's accused can be a pure old-committee Reshare dealer
 	// (never a member of the new/pending committee), unlike
-	// leader_prepare_fault, whose accused is always the canonical leader and
-	// therefore always drawn from the new committee for Reshare — so only
-	// leader_prepare_fault requires pending-new accused scope here.
-	// ack_equivocation's actual accused-membership is independently
-	// re-verified by validateReportCommitteeAuthorization regardless of
-	// which scope is claimed.
+	// leader_prepare_fault/oversized_repair_page, whose accused is always
+	// the canonical leader and therefore always drawn from the new
+	// committee for Reshare — so only those two require pending-new accused
+	// scope here. ack_equivocation's actual accused-membership is
+	// independently re-verified by validateReportCommitteeAuthorization
+	// regardless of which scope is claimed.
 	case originProtocol == offlineOriginProtocolPSSReshare &&
-		faultKind == dkgControlMessageFaultKindLeaderPrepareFault &&
+		(faultKind == dkgControlMessageFaultKindLeaderPrepareFault || faultKind == dkgControlMessageFaultKindOversizedRepairPage) &&
 		accusedScope != committeeScopePendingNew:
-		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare leader-prepare-fault reports require pending-new accused scope")
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare leader-prepare-fault/oversized-repair-page reports require pending-new accused scope")
 	case faultKind == dkgControlMessageFaultKindLeaderPrepareFault && messageKind != "prepare":
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "leader-prepare-fault evidence must target the Prepare message")
 	case faultKind == dkgControlMessageFaultKindLeaderPrepareFault && artifactBPresent != 0:
@@ -1291,7 +1293,13 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG control-ack message kind %q", messageKind)
 	case faultKind == dkgControlMessageFaultKindAckEquivocation && artifactBPresent != 1:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "ack-equivocation evidence requires two artifacts")
-	case faultKind != dkgControlMessageFaultKindLeaderPrepareFault && faultKind != dkgControlMessageFaultKindAckEquivocation:
+	case faultKind == dkgControlMessageFaultKindOversizedRepairPage && messageKind != "public_phase_response":
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "oversized-repair-page evidence must target the PublicPhaseResponse message")
+	case faultKind == dkgControlMessageFaultKindOversizedRepairPage && artifactBPresent != 0:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "oversized-repair-page evidence must contain exactly one artifact")
+	case faultKind != dkgControlMessageFaultKindLeaderPrepareFault &&
+		faultKind != dkgControlMessageFaultKindAckEquivocation &&
+		faultKind != dkgControlMessageFaultKindOversizedRepairPage:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unsupported DKG control-message fault kind %q", faultKind)
 	}
 	return invalidCryptoResponseStatement{
