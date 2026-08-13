@@ -2734,6 +2734,7 @@ func dkgLeaderPublicFaultPayloadForTest(
 func writeControlMessageArtifactForTest(w *reportCanonicalWriter, marker byte) {
 	w.writeBytes(bytes.Repeat([]byte{marker}, 64))
 	w.writeBytes([]byte{marker, marker + 1, marker + 2})
+	w.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
 }
 
 func dkgControlMessageFaultPayloadForTest(

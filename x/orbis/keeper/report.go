@@ -1243,7 +1243,7 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	_, _, err = decodeControlMessageArtifact(decoder, "artifact_a")
+	_, _, _, err = decodeControlMessageArtifact(decoder, "artifact_a")
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -1254,7 +1254,7 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 	switch artifactBPresent {
 	case 0:
 	case 1:
-		_, _, err = decodeControlMessageArtifact(decoder, "artifact_b")
+		_, _, _, err = decodeControlMessageArtifact(decoder, "artifact_b")
 		if err != nil {
 			return invalidCryptoResponseStatement{}, err
 		}
@@ -1331,25 +1331,34 @@ func isDkgControlAckMessageKind(messageKind string) bool {
 }
 
 // decodeControlMessageArtifact decodes one node-key-signed control-handshake
-// artifact (`signature`, `data`). Unlike `decodeEndpointSignedContribution`,
-// there is no separate `origin` field: the signer is already bound in via
-// `responder_node_key` on the enclosing statement.
-func decodeControlMessageArtifact(decoder *reportCanonicalDecoder, prefix string) ([]byte, []byte, error) {
+// artifact (`signature`, `data`, `signed_at`). Unlike
+// `decodeEndpointSignedContribution`, there is no separate `origin` field:
+// the signer is already bound in via `responder_node_key` on the enclosing
+// statement. `signed_at` is the signer's own claimed timestamp, bound into
+// the signature itself on the orbis-rs side (`control_ack_signing_bytes`) —
+// this chain never re-verifies control-message signatures, so it only needs
+// to decode the field to stay positionally aligned with the rest of the
+// statement, not validate it.
+func decodeControlMessageArtifact(decoder *reportCanonicalDecoder, prefix string) ([]byte, []byte, uint64, error) {
 	signature, err := decoder.readBytes(prefix + "_signature")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
 	}
 	data, err := decoder.readBytes(prefix + "_data")
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, 0, err
+	}
+	signedAt, err := decoder.readU64(prefix + "_signed_at")
+	if err != nil {
+		return nil, nil, 0, err
 	}
 	if len(signature) != 64 {
-		return nil, nil, errorsmod.Wrapf(types.ErrInvalidReport, "%s signature must be 64 bytes", prefix)
+		return nil, nil, 0, errorsmod.Wrapf(types.ErrInvalidReport, "%s signature must be 64 bytes", prefix)
 	}
 	if len(data) == 0 || len(data) > dkgStatementMaxLen {
-		return nil, nil, errorsmod.Wrapf(types.ErrInvalidReport, "%s data has invalid length", prefix)
+		return nil, nil, 0, errorsmod.Wrapf(types.ErrInvalidReport, "%s data has invalid length", prefix)
 	}
-	return signature, data, nil
+	return signature, data, signedAt, nil
 }
 
 func decodeEndpointSignedContribution(decoder *reportCanonicalDecoder, prefix string) ([]byte, []byte, []byte, error) {
