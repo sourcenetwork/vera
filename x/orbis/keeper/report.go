@@ -1271,8 +1271,18 @@ func decodeDkgControlMessageFaultStatement(statementBytes []byte) (invalidCrypto
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG control-message fault reports require current signing scope")
 	case originProtocol == offlineOriginProtocolPSSRefresh && accusedScope != committeeScopeCurrent:
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Refresh control-message fault reports require current accused scope")
-	case originProtocol == offlineOriginProtocolPSSReshare && accusedScope != committeeScopePendingNew:
-		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare control-message fault reports require pending-new accused scope")
+	// ack_equivocation's accused can be a pure old-committee Reshare dealer
+	// (never a member of the new/pending committee), unlike
+	// leader_prepare_fault, whose accused is always the canonical leader and
+	// therefore always drawn from the new committee for Reshare — so only
+	// leader_prepare_fault requires pending-new accused scope here.
+	// ack_equivocation's actual accused-membership is independently
+	// re-verified by validateReportCommitteeAuthorization regardless of
+	// which scope is claimed.
+	case originProtocol == offlineOriginProtocolPSSReshare &&
+		faultKind == dkgControlMessageFaultKindLeaderPrepareFault &&
+		accusedScope != committeeScopePendingNew:
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "Reshare leader-prepare-fault reports require pending-new accused scope")
 	case faultKind == dkgControlMessageFaultKindLeaderPrepareFault && messageKind != "prepare":
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "leader-prepare-fault evidence must target the Prepare message")
 	case faultKind == dkgControlMessageFaultKindLeaderPrepareFault && artifactBPresent != 0:

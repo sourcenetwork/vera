@@ -776,6 +776,15 @@ func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.
 	))
 	require.NoError(t, err)
 
+	// Unlike leader_prepare_fault, ack_equivocation's accused can also be a
+	// pure old-committee Reshare dealer — never a member of the new/pending
+	// committee — so a current-scoped accused is valid too.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation,
+		committeeScopeCurrent, true,
+	))
+	require.NoError(t, err)
+
 	report := &types.ReportEnvelope{
 		ChainId:         reportTestChainID,
 		RingId:          "ring-1",
@@ -822,8 +831,8 @@ func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.
 			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopePendingNew, false),
 		},
 		{
-			"reshare current accused",
-			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, true),
+			"reshare leader-prepare-fault with current accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
 		},
 	}
 	for _, tc := range rejected {
