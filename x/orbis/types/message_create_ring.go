@@ -8,14 +8,25 @@ import (
 
 var _ sdk.Msg = &MsgCreateRing{}
 
-func NewMsgCreateRing(creator string, peerNodeKeys []string, threshold uint32, pssInterval uint64, policyID string, currentVersion uint64) *MsgCreateRing {
+func NewMsgCreateRing(
+	creator string,
+	peerNodeKeys []string,
+	threshold uint32,
+	pssInterval uint64,
+	policyID string,
+	currentVersion uint64,
+	allowTrustedAuthRelays bool,
+	trustedAuthRelayDIDs []string,
+) *MsgCreateRing {
 	return &MsgCreateRing{
-		Creator:        creator,
-		PeerNodeKeys:   peerNodeKeys,
-		Threshold:      threshold,
-		PssInterval:    pssInterval,
-		PolicyId:       policyID,
-		CurrentVersion: currentVersion,
+		Creator:                creator,
+		PeerNodeKeys:           peerNodeKeys,
+		Threshold:              threshold,
+		PssInterval:            pssInterval,
+		PolicyId:               policyID,
+		CurrentVersion:         currentVersion,
+		AllowTrustedAuthRelays: allowTrustedAuthRelays,
+		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
 	}
 }
 
@@ -39,6 +50,9 @@ func (msg *MsgCreateRing) ValidateBasic() error {
 		if err := ValidateReportingConfig(*msg.Reporting); err != nil {
 			return err
 		}
+	}
+	if err := ValidateTrustedAuthRelayConfig(msg.AllowTrustedAuthRelays, msg.TrustedAuthRelayDids); err != nil {
+		return err
 	}
 	return nil
 }

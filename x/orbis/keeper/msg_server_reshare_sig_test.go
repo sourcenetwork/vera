@@ -16,6 +16,27 @@ import (
 	"github.com/sourcenetwork/sourcehub/x/orbis/types"
 )
 
+func TestRingReshareSignStateHashIncludesTrustedAuthRelays(t *testing.T) {
+	ring := &types.Ring{
+		RingPk:                 "ring-pk",
+		PeerNodeKeys:           []string{"node-1"},
+		Threshold:              1,
+		AllowTrustedAuthRelays: true,
+		TrustedAuthRelayDids:   []string{testRelayDID},
+	}
+
+	withRelay, err := ringReshareSignStateHash(ring)
+	require.NoError(t, err)
+	ring.TrustedAuthRelayDids = nil
+	withoutRelay, err := ringReshareSignStateHash(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withRelay, withoutRelay)
+	ring.AllowTrustedAuthRelays = false
+	directOnly, err := ringReshareSignStateHash(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withoutRelay, directOnly)
+}
+
 func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.

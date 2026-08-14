@@ -78,7 +78,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "d33ea6fdeda388fa0e31f128a5e649714887308e75220414d7a2df96222f5cb7", ringHash)
+	require.Equal(t, "1dd783721bbfc90f5960d9f2ebd99244c22ab147113d22bd39f9bccf6bf73c39", ringHash)
 }
 
 func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) {
@@ -102,6 +102,60 @@ func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) 
 	hashB, err := reportRingStateSHA256(baseRing(2))
 	require.NoError(t, err)
 	require.NotEqual(t, hashA, hashB)
+}
+
+func TestReportRingStateSHA256IncludesTrustedAuthRelays(t *testing.T) {
+	ring := &types.Ring{
+		RingPk:                 "pk",
+		PeerNodeKeys:           []string{"a", "b"},
+		Threshold:              2,
+		PssInterval:            types.MinPSSIntervalSeconds,
+		UpgradeInfo:            types.UpgradeInfo{CurrentVersion: 0},
+		Reporting:              types.DefaultReportingConfig(),
+		AllowTrustedAuthRelays: true,
+		TrustedAuthRelayDids:   []string{testSecondRelayDID, testRelayDID},
+	}
+
+	withRelay, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.Equal(t, "6d093b9e03af27c7b679341367306e67b64b0afdb5f31ec9e0f5133ebc145ca6", withRelay)
+	ring.TrustedAuthRelayDids = []string{testRelayDID, testSecondRelayDID}
+	reordered, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withRelay, reordered)
+	ring.TrustedAuthRelayDids = nil
+	withoutRelay, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withRelay, withoutRelay)
+}
+
+func TestReportRingStateDigestMatchesLegacyEmptyRelayState(t *testing.T) {
+	ring := &types.Ring{
+		RingPk:       "pk",
+		PeerNodeKeys: []string{"a", "b"},
+		Threshold:    2,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		UpgradeInfo:  types.UpgradeInfo{CurrentVersion: 0},
+		Reporting:    types.DefaultReportingConfig(),
+	}
+	legacy, err := reportRingStateCanonicalBytesWithRelayState(ring, false)
+	require.NoError(t, err)
+	legacyHash := sha256.Sum256(legacy)
+
+	matches, err := reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.True(t, matches)
+
+	ring.TrustedAuthRelayDids = []string{testRelayDID}
+	matches, err = reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.False(t, matches)
+
+	ring.TrustedAuthRelayDids = nil
+	ring.AllowTrustedAuthRelays = true
+	matches, err = reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.False(t, matches)
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
@@ -1030,7 +1084,7 @@ func TestMsgServer_SubmitReportSchedulesAutoReshareAtKickThreshold(t *testing.T)
 
 	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
 	require.NotNil(t, ring)
-	require.Equal(t, canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey, backup1Key}), ring.NewPeerNodeKeys)
+	require.Equal(t, canonicalStrings([]string{fixture.reporterKey, fixture.validatorKey, backup1Key}), ring.NewPeerNodeKeys)
 	require.Nil(t, ring.XNewThreshold)
 	require.Equal(t, []string{backup2Key}, ring.Reporting.BackupNodeKeys)
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
@@ -1094,7 +1148,7 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWhenAlreadyPending(t *testin
 		KickThreshold:  3,
 	})
 	pendingRing := *fixture.originalRing
-	pendingRing.NewPeerNodeKeys = canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey})
+	pendingRing.NewPeerNodeKeys = canonicalStrings([]string{fixture.reporterKey, fixture.validatorKey})
 	fixture.replaceRing(t, pendingRing)
 
 	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -1620,6 +1674,18 @@ type reportTestFixture struct {
 	accusedKey   string
 	accusedPeer  string
 	originalRing *types.Ring
+}
+
+func TestMsgServer_SubmitReportAcceptsLegacyEmptyRelayDigest(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-legacy-digest", 2)
+	legacy, err := reportRingStateCanonicalBytesWithRelayState(fixture.originalRing, false)
+	require.NoError(t, err)
+	legacyHash := sha256.Sum256(legacy)
+	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.RingStateSha256 = hex.EncodeToString(legacyHash[:])
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, report))
+	require.NoError(t, err)
 }
 
 func setupReportTestFixture(t *testing.T) reportTestFixture {

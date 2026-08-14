@@ -35,6 +35,9 @@ func validateRing(ring *types.Ring) error {
 	if err := validateReportingConfig(ring.Reporting); err != nil {
 		return err
 	}
+	if err := types.ValidateTrustedAuthRelayConfig(ring.AllowTrustedAuthRelays, ring.TrustedAuthRelayDids); err != nil {
+		return err
+	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
 		return err

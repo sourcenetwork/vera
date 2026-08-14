@@ -49,6 +49,10 @@ message Ring {
   repeated RingConfirmation confirmations = 11;
   UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
   ReportingConfig reporting = 13 [(gogoproto.nullable) = false];
+  // Ed25519 did:key issuers allowed to authenticate requests for another actor.
+  repeated string trusted_auth_relay_dids = 14;
+  // Set at creation; false permanently disables trusted authentication relays.
+  bool allow_trusted_auth_relays = 15;
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key.

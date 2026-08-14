@@ -49,12 +49,14 @@ func ringReshareSignStateHash(ring *types.Ring) ([]byte, error) {
 
 func ringReshareSignState(ring *types.Ring) types.RingReshareSignState {
 	signState := types.RingReshareSignState{
-		RingPk:           ring.RingPk,
-		PeerNodeKeys:     slices.Clone(ring.PeerNodeKeys),
-		Threshold:        ring.Threshold,
-		NewPeerNodeKeys:  slices.Clone(ring.NewPeerNodeKeys),
-		BlockNumberNonce: ring.BlockNumberNonce,
-		PolicyId:         ring.PolicyId,
+		RingPk:                 ring.RingPk,
+		PeerNodeKeys:           slices.Clone(ring.PeerNodeKeys),
+		Threshold:              ring.Threshold,
+		NewPeerNodeKeys:        slices.Clone(ring.NewPeerNodeKeys),
+		BlockNumberNonce:       ring.BlockNumberNonce,
+		PolicyId:               ring.PolicyId,
+		TrustedAuthRelayDids:   slices.Clone(ring.TrustedAuthRelayDids),
+		AllowTrustedAuthRelays: ring.AllowTrustedAuthRelays,
 	}
 	if ring.XNewThreshold != nil {
 		signState.XNewThreshold = &types.RingReshareSignState_NewThreshold{
