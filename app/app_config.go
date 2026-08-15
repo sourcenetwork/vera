@@ -70,10 +70,10 @@ import (
 
 	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
 	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
-	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
-	hubmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
-	orbismodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis/module"
-	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
+	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/vera/bulletin/module"
+	coremodulev1 "github.com/sourcenetwork/sourcehub/api/vera/core/module"
+	orbismodulev1 "github.com/sourcenetwork/sourcehub/api/vera/orbis/module"
+	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/vera/tier/module/v1beta1"
 	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
 	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
 	_ "github.com/sourcenetwork/sourcehub/x/bulletin/module" // import for side-effects
@@ -324,7 +324,7 @@ var (
 			},
 			{
 				Name:   hubmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&hubmodulev1.Module{}),
+				Config: appconfig.WrapAny(&coremodulev1.Module{}),
 			},
 			{
 				Name:   acptypes.ModuleName,
