@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/x/bulletin/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 func SimulateMsgCreatePost(

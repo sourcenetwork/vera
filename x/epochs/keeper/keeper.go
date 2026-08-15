@@ -6,7 +6,7 @@ import (
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/log"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 type (

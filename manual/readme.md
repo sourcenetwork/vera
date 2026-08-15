@@ -1,1 +1,1 @@
-# SourceHub Manual
+# Vera Manual

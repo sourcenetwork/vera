@@ -41,7 +41,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ACPEngineClient interface {
-	// CreatePolicy adds a new Policy to SourceHub.
+	// CreatePolicy adds a new Policy to Vera.
 	// The Policy models an aplication's high level access control rules.
 	CreatePolicy(ctx context.Context, in *CreatePolicyRequest, opts ...grpc.CallOption) (*CreatePolicyResponse, error)
 	// GetPolicy returns a Policy with the given ID
@@ -239,7 +239,7 @@ func (c *aCPEngineClient) VerifyAccessRequest(ctx context.Context, in *VerifyAcc
 // All implementations must embed UnimplementedACPEngineServer
 // for forward compatibility
 type ACPEngineServer interface {
-	// CreatePolicy adds a new Policy to SourceHub.
+	// CreatePolicy adds a new Policy to Vera.
 	// The Policy models an aplication's high level access control rules.
 	CreatePolicy(context.Context, *CreatePolicyRequest) (*CreatePolicyResponse, error)
 	// GetPolicy returns a Policy with the given ID

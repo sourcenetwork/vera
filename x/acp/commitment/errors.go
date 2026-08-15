@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/sourcenetwork/acp_core/pkg/errors"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func errInvalidCommitment(policy string, commitment []byte) error {

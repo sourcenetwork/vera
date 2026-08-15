@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 func TestParamsQuery(t *testing.T) {

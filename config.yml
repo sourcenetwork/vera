@@ -39,4 +39,4 @@ validators:
     bonded: 100000000000000uopen # 100m open
 
 build:
-  main: cmd/sourcehubd
+  main: cmd/verad

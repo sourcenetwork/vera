@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/sourcenetwork/acp_core/pkg/errors"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // payloadSpec executes validation against a PolicyCmdPayload to ensure it should be accepted

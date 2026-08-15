@@ -37,7 +37,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 	solomachine "github.com/cosmos/ibc-go/v10/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // registerIBCModules register IBC keepers and non dependency inject modules.
@@ -131,7 +131,7 @@ func (app *App) registerIBCModules() {
 	)
 
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
-	icaHostStack := newICAHostMiddleware(app, app.HubKeeper, icaHostIBCModule)
+	icaHostStack := newICAHostMiddleware(app, app.CoreKeeper, icaHostIBCModule)
 	icaControllerStack := icacontroller.NewIBCMiddleware(app.ICAControllerKeeper)
 	transferStack := transfer.NewIBCModule(app.TransferKeeper)
 
@@ -179,12 +179,12 @@ func (app *App) setDefaultIBCParams(ctx sdk.Context) {
 	hostParams := icahosttypes.DefaultParams()
 	hostParams.HostEnabled = true
 	hostParams.AllowMessages = []string{
-		"/sourcehub.acp.MsgCreatePolicy",
-		"/sourcehub.acp.MsgEditPolicy",
-		"/sourcehub.acp.MsgCheckAccess",
-		"/sourcehub.acp.MsgSignedPolicyCmd",
-		"/sourcehub.acp.MsgBearerPolicyCmd",
-		"/sourcehub.acp.MsgDirectPolicyCmd",
+		"/vera.acp.MsgCreatePolicy",
+		"/vera.acp.MsgEditPolicy",
+		"/vera.acp.MsgCheckAccess",
+		"/vera.acp.MsgSignedPolicyCmd",
+		"/vera.acp.MsgBearerPolicyCmd",
+		"/vera.acp.MsgDirectPolicyCmd",
 	}
 	app.ICAHostKeeper.SetParams(ctx, hostParams)
 	app.TransferKeeper.SetParams(ctx, ibctransfertypes.DefaultParams())

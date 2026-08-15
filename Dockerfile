@@ -8,23 +8,23 @@ RUN go mod download
 
 # Build
 COPY . /app
-RUN --mount=type=cache,target=/root/.cache go build -o /app/build/sourcehubd ./cmd/sourcehubd
+RUN --mount=type=cache,target=/root/.cache go build -o /app/build/verad ./cmd/verad
 
 # Deployment entrypoint
 FROM debian:bookworm-slim
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY docker/faucet-key.json /etc/sourcehub/faucet-key.json
-COPY --from=builder /app/build/sourcehubd /usr/local/bin/sourcehubd
+COPY docker/faucet-key.json /etc/vera/faucet-key.json
+COPY --from=builder /app/build/verad /usr/local/bin/verad
 # Copy the default config files to override the container with
-COPY docker/configs/*.toml /etc/sourcehub/ 
+COPY docker/configs/*.toml /etc/vera/
 
-RUN useradd --create-home --home-dir /home/node node && mkdir /sourcehub && chown node:node /sourcehub && ln -s /sourcehub /home/node/.sourcehub && chown node:node -R /home/node && chmod -R 555 /etc/sourcehub
+RUN useradd --create-home --home-dir /home/node node && mkdir /vera && chown node:node /vera && ln -s /vera /home/node/.vera && chown node:node -R /home/node && chmod -R 555 /etc/vera
 
 # MONIKER sets the node moniker
 ENV MONIKER="node"
 # CHAIN_ID sets the id for the chain which will be initialized
-ENV CHAIN_ID="sourcehub-dev"
+ENV CHAIN_ID="vera-dev"
 
 # GENESIS_PATH is an optional variable which if set must point to a genesis file mounted in the container.
 # The file is copied to the configuration directory during the first container initialization
@@ -62,13 +62,13 @@ EXPOSE 26656
 # Comet RPC Port
 EXPOSE 26657
 
-# SourceHub GRPC Port
+# Vera GRPC Port
 EXPOSE 9090
 
-# SourceHub HTTP API Port
+# Vera HTTP API Port
 EXPOSE 1317
 
 USER node
-VOLUME ["/sourcehub"]
+VOLUME ["/vera"]
 ENTRYPOINT ["entrypoint.sh"]
-CMD ["sourcehubd", "start"]
+CMD ["verad", "start"]

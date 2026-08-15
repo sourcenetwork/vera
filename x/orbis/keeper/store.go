@@ -9,7 +9,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/runtime"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func (k *Keeper) SetRing(ctx context.Context, ring types.Ring) {

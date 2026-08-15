@@ -9,7 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // CrisisModuleBasic defines a wrapper of the x/crisis module AppModuleBasic to provide custom default genesis state.

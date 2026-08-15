@@ -20,10 +20,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/gogoproto/proto"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant"
 
-	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	faucettypes "github.com/sourcenetwork/vera/app/faucet/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // Faucet constants
@@ -71,7 +71,7 @@ func (app *App) RegisterFaucetRoutes(apiSvr *api.Server, apiConfig config.APICon
 // zeroFeeTxsAllowed returns true if zero fee transactions are allowed, false otherwise.
 func (app *App) zeroFeeTxsAllowed() bool {
 	ctx := sdk.NewContext(app.CommitMultiStore(), cmtproto.Header{}, false, app.Logger())
-	return app.HubKeeper != nil && app.HubKeeper.GetChainConfig(ctx).AllowZeroFeeTxs
+	return app.CoreKeeper != nil && app.CoreKeeper.GetChainConfig(ctx).AllowZeroFeeTxs
 }
 
 // hasAddressRequested checks if an address has already requested funds.
@@ -200,7 +200,7 @@ func (app *App) handleFaucetRequest(clientCtx client.Context) http.HandlerFunc {
 
 		chainID := clientCtx.ChainID
 		if chainID == "" {
-			chainID = "sourcehub-dev"
+			chainID = "vera-dev"
 		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
@@ -357,7 +357,7 @@ func (app *App) handleInitAccount(clientCtx client.Context) http.HandlerFunc {
 
 		chainID := clientCtx.ChainID
 		if chainID == "" {
-			chainID = "sourcehub-dev"
+			chainID = "vera-dev"
 		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
@@ -472,7 +472,7 @@ func (app *App) handleGrantAllowance(clientCtx client.Context) http.HandlerFunc 
 
 		chainID := clientCtx.ChainID
 		if chainID == "" {
-			chainID = "sourcehub-dev"
+			chainID = "vera-dev"
 		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).
@@ -587,7 +587,7 @@ func (app *App) handleGrantDIDAllowance(clientCtx client.Context) http.HandlerFu
 
 		chainID := clientCtx.ChainID
 		if chainID == "" {
-			chainID = "sourcehub-dev"
+			chainID = "vera-dev"
 		}
 		txf := tx.Factory{}.
 			WithTxConfig(clientCtx.TxConfig).

@@ -29,14 +29,14 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	testutil "github.com/sourcenetwork/vera/testutil"
+	epochskeeper "github.com/sourcenetwork/vera/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	feegrantkeeper "github.com/sourcenetwork/vera/x/feegrant/keeper"
+	"github.com/sourcenetwork/vera/x/tier/keeper"
+	"github.com/sourcenetwork/vera/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -146,7 +146,7 @@ func TierKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
-	ctx = ctx.WithBlockHeight(1).WithChainID("sourcehub").WithBlockTime(time.Unix(1000000000, 0))
+	ctx = ctx.WithBlockHeight(1).WithChainID("vera").WithBlockTime(time.Unix(1000000000, 0))
 
 	bondedPool := authtypes.NewEmptyModuleAccount(stakingtypes.BondedPoolName, authtypes.Burner, authtypes.Staking)
 	notBondedPool := authtypes.NewEmptyModuleAccount(stakingtypes.NotBondedPoolName, authtypes.Burner, authtypes.Staking)

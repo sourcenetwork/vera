@@ -4,7 +4,7 @@ This document explains how to test the JWS extension option functionality with D
 
 ## Prerequisites
 
-- sourcehub node running locally (e.g. `./scripts/dev-entrypoint.sh start`)
+- vera node running locally (e.g. `./scripts/dev-entrypoint.sh start`)
 - Faucet account and validator account set up in keyring (set by default when running `dev-entrypoint.sh` script)
 - Test policy file available in `./scripts/test-policy.yaml`
 
@@ -15,7 +15,7 @@ This document explains how to test the JWS extension option functionality with D
 Add a DID-based fee grant from the faucet address to the DID used in the script:
 
 ```bash
-build/sourcehubd tx feegrant grant-did source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt did:key:z6MknVX5y2APs6LH21s9FusVozvdKKwDhFAqq3jzwAr6v21a --spend-limit 1000000uopen --keyring-backend test --chain-id=sourcehub-dev --gas auto --fees 200uopen -y
+build/verad tx feegrant grant-did source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt did:key:z6MknVX5y2APs6LH21s9FusVozvdKKwDhFAqq3jzwAr6v21a --spend-limit 1000000uopen --keyring-backend test --chain-id=vera-dev --gas auto --fees 200uopen -y
 ```
 
 ### 2. Verify the feegrant (optional)
@@ -23,7 +23,7 @@ build/sourcehubd tx feegrant grant-did source12d9hjf0639k995venpv675sju9ltsvf8u5
 Check that the DID allowance was added correctly:
 
 ```bash
-build/sourcehubd q feegrant did-grant source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt did:key:z6MknVX5y2APs6LH21s9FusVozvdKKwDhFAqq3jzwAr6v21a
+build/verad q feegrant did-grant source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt did:key:z6MknVX5y2APs6LH21s9FusVozvdKKwDhFAqq3jzwAr6v21a
 ```
 
 ### 3. Run the extension options script
@@ -39,7 +39,7 @@ go run ./cmd/extension_options_tx scripts/test-policy.yaml
 Check that the policy was created successfully:
 
 ```bash
-build/sourcehubd q acp policy-ids
+build/verad q acp policy-ids
 ```
 
 ## How it works

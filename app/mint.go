@@ -20,8 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
 )
 
 var _ appmodule.AppModule = CustomMintModule{}

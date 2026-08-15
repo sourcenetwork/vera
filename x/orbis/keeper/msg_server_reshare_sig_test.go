@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/require"
 	blst "github.com/supranational/blst/bindings/go"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func TestRingReshareSignStateHashIncludesTrustedAuthRelays(t *testing.T) {

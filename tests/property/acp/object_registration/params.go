@@ -1,6 +1,6 @@
 package object_registration
 
-import "github.com/sourcenetwork/sourcehub/x/acp/types"
+import "github.com/sourcenetwork/vera/x/acp/types"
 
 // CommitmentExpirationDuration sets the default expiration time for commitments in the test setup
 var CommitmentExpirationDuration = types.Duration{

@@ -6,14 +6,14 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 const (
-	SourceHubAuthStratEnvVar string = "SOURCEHUB_ACP_TEST_AUTH"
-	SourceHubExecutorEnvVar  string = "SOURCEHUB_ACP_TEST_EXECUTOR"
-	SourceHubActorEnvVar     string = "SOURCEHUB_ACP_TEST_ACTOR"
+	VeraAuthStratEnvVar string = "VERA_ACP_TEST_AUTH"
+	VeraExecutorEnvVar  string = "VERA_ACP_TEST_EXECUTOR"
+	VeraActorEnvVar     string = "VERA_ACP_TEST_ACTOR"
 )
 
 type AccountCreator interface {
@@ -40,7 +40,7 @@ type ACPClient interface {
 
 	ObjectOwner(ctx *TestCtx, msg *types.QueryObjectOwnerRequest) (*types.QueryObjectOwnerResponse, error)
 
-	// GetLastBlockTs returns an ACP Timestamp for the last accepted block in SourceHub
+	// GetLastBlockTs returns an ACP Timestamp for the last accepted block in Vera
 	GetLastBlockTs(ctx *TestCtx) (*types.Timestamp, error)
 
 	Cleanup()
@@ -86,10 +86,10 @@ type ExecutorStrategy int
 const (
 	// Keeper calls the ACP Keeper directly without going through a consensus engine
 	Keeper ExecutorStrategy = iota
-	// CLI invokes SourceHub through the CLI client and broadcasts the Msgs
-	// to a running instance of SourceHub
+	// CLI invokes Vera through the CLI client and broadcasts the Msgs
+	// to a running instance of Vera
 	CLI
-	// SDK broadcasts Msgs to a running instance of SourceHub through the SourceHub SDK Client
+	// SDK broadcasts Msgs to a running instance of Vera through the Vera SDK Client
 	SDK
 )
 
@@ -118,7 +118,7 @@ func NewDefaultTestConfig() TestConfig {
 func MustNewTestConfigFromEnv() TestConfig {
 	config := NewDefaultTestConfig()
 
-	actor, wasSet := os.LookupEnv(SourceHubActorEnvVar)
+	actor, wasSet := os.LookupEnv(VeraActorEnvVar)
 	if wasSet {
 		key, found := ActorKeyMap[actor]
 		if !found {
@@ -127,7 +127,7 @@ func MustNewTestConfigFromEnv() TestConfig {
 		config.ActorType = key
 	}
 
-	authStratStr, wasSet := os.LookupEnv(SourceHubAuthStratEnvVar)
+	authStratStr, wasSet := os.LookupEnv(VeraAuthStratEnvVar)
 	if wasSet {
 		authStrat, found := AuthenticationStrategyMap[authStratStr]
 		if !found {
@@ -136,7 +136,7 @@ func MustNewTestConfigFromEnv() TestConfig {
 		config.AuthStrategy = authStrat
 	}
 
-	executorStr, wasSet := os.LookupEnv(SourceHubExecutorEnvVar)
+	executorStr, wasSet := os.LookupEnv(VeraExecutorEnvVar)
 	if wasSet {
 		executor, found := ExecutorStrategyMap[executorStr]
 		if !found {

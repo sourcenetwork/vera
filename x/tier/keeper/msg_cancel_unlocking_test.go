@@ -10,11 +10,11 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/tier/keeper"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 type TestCase struct {

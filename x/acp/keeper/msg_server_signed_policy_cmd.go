@@ -6,10 +6,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/keeper/policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func (k *Keeper) SignedPolicyCmd(goCtx context.Context, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {

@@ -9,19 +9,19 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/sourcenetwork/sourcehub/sdk"
+	"github.com/sourcenetwork/vera/sdk"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "tx-listener [comet-rpc-addr]",
-	Short: "listens to proposed txs and unmarshal results into structured SourceHub msgs",
-	Long: `tx-listener is a cli utility which connects to SourceHub's cometbft rpc connection
+	Short: "listens to proposed txs and unmarshal results into structured Vera msgs",
+	Long: `tx-listener is a cli utility which connects to Vera's cometbft rpc connection
 	and listens for Tx processing events.
 	The received events are expanded and the Tx results are unmarshaled into the correct
 	Msg response types.
 
-	This is meant to be used a development tool to monitor the result of executed Txs by SourceHub.
+	This is meant to be used a development tool to monitor the result of executed Txs by Vera.
 	`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {

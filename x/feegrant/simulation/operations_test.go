@@ -12,14 +12,14 @@ import (
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	_ "github.com/sourcenetwork/sourcehub/x/feegrant/module"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/simulation"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/keeper"
+	_ "github.com/sourcenetwork/vera/x/feegrant/module"
+	"github.com/sourcenetwork/vera/x/feegrant/simulation"
 
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
 	"cosmossdk.io/core/appconfig"
-	feegrantmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/feegrant/module/v1"
+	feegrantmodulev1 "github.com/sourcenetwork/vera/api/vera/feegrant/module/v1"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"

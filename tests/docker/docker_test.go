@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
-	"github.com/sourcenetwork/sourcehub/sdk"
+	"github.com/sourcenetwork/vera/sdk"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	tclog "github.com/testcontainers/testcontainers-go/log"
@@ -23,7 +23,7 @@ var (
 	genesisFileName      = "genesis.json"
 	mnemonicFileName     = "mnemonic"
 	containerBaseDir     = "/home/node"
-	sourcehubImage       = "ghcr.io/sourcenetwork/sourcehub:dev"
+	veraImage            = "ghcr.io/sourcenetwork/vera:dev"
 )
 
 var (
@@ -41,7 +41,7 @@ var (
 // The docker image should be previously built with `make docker“
 func Test_DockerContainer_Starts(t *testing.T) {
 	ctx := context.Background()
-	requireLocalImage(t, ctx, sourcehubImage)
+	requireLocalImage(t, ctx, veraImage)
 
 	// write the require state files
 	// (consensus key, p2p key, acc key, genesis)
@@ -74,7 +74,7 @@ func Test_DockerContainer_Starts(t *testing.T) {
 	testLogger := tclog.TestLogger(t)
 	container, err := testcontainers.Run(
 		ctx,
-		sourcehubImage,
+		veraImage,
 		testcontainers.WithFiles(containerFiles...),
 		testcontainers.WithEnv(map[string]string{
 			"CHAIN_ID":            "test",
@@ -110,7 +110,7 @@ func Test_DockerContainer_Starts(t *testing.T) {
 	require.NoError(t, err)
 	rpcEndpoint, err := container.PortEndpoint(ctx, "26657", "tcp")
 	require.NoError(t, err)
-	t.Logf("sourcehub endpoints: grpc=%v, rpc=%v", grpcEndpoint, rpcEndpoint)
+	t.Logf("vera endpoints: grpc=%v, rpc=%v", grpcEndpoint, rpcEndpoint)
 	err = waitForChain(t, grpcEndpoint, rpcEndpoint)
 	require.NoError(t, err)
 }
@@ -154,7 +154,7 @@ func waitForChain(t testing.TB, grpcEndpoint, cometRpcEndpoint string) error {
 	}
 }
 
-// probeChain is a readiness probe which tries to connect to SourceHub's
+// probeChain is a readiness probe which tries to connect to Vera's
 // RPC endpoint to determine if it is ready to receive connections.
 // Returns true if the probe succeeded.
 func probeChain(t testing.TB, ctx context.Context, grpcAddr, cometRpcAddr string) bool {

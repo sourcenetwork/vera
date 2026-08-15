@@ -6,25 +6,25 @@ services:
       context: ../.
       target: builder
     volumes:
-      - node1:/root/sourcehub
+      - node1:/root/vera
     depends_on:
       gentx-builder:
         condition: service_completed_successfully
-    entrypoint: /app/build/sourcehubd
+    entrypoint: /app/build/verad
     command:
       - start
       - --home
-      - /root/sourcehub
+      - /root/vera
 
   node2: 
     <<: *node
     volumes:
-      - node2:/root/sourcehub
+      - node2:/root/vera
 
   node3:
     <<: *node
     volumes:
-      - node3:/root/sourcehub
+      - node3:/root/vera
     ports:
       - 26657:26657 # tendermint rpc
       - 1317:1317 # cosmos swagger
@@ -33,23 +33,23 @@ services:
     build: *build
     entrypoint: /app/devnet/setup-node.sh
     volumes:
-      - node1:/root/sourcehub
+      - node1:/root/vera
 
   setup-node2:
     <<: *setup
     volumes:
-      - node2:/root/sourcehub
+      - node2:/root/vera
 
   setup-node3:
     <<: *setup
     volumes:
-      - node3:/root/sourcehub
+      - node3:/root/vera
 
   gentx-builder:
     build: *build
     entrypoint: /app/devnet/make-update-gentx.sh
     volumes:
-      - node1:/root/sourcehub
+      - node1:/root/vera
       - node2:/root/node2
       - node3:/root/node3
     depends_on:

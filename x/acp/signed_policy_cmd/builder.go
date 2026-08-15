@@ -11,8 +11,8 @@ import (
 	"github.com/go-jose/go-jose/v3"
 	"github.com/go-jose/go-jose/v3/cryptosigner"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func NewCmdBuilder(clock LogicalClock, params types.Params) *CmdBuilder {

@@ -8,14 +8,14 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/runtime"
 )
 
-var _ runtime.TimeService = (*SourceHubTimeProvider)(nil)
+var _ runtime.TimeService = (*VeraTimeProvider)(nil)
 
-// SourceHubTimeProvider implements acp_core's TimeService
+// VeraTimeProvider implements acp_core's TimeService
 // in order to synchronize the block time with acp_core's engine time.
-type SourceHubTimeProvider struct{}
+type VeraTimeProvider struct{}
 
 // GetNow implements TimeService
-func (p *SourceHubTimeProvider) GetNow(goCtx context.Context) (*prototypes.Timestamp, error) {
+func (p *VeraTimeProvider) GetNow(goCtx context.Context) (*prototypes.Timestamp, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	time := ctx.BlockTime()
 	ts, err := prototypes.TimestampProto(time)

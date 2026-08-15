@@ -3,10 +3,10 @@ package policy_cmd
 import (
 	"fmt"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/registration"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/utils"
 
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"

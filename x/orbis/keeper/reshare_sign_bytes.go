@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"slices"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 const RingReshareFinalizeSignDocDomain = "orbis-ring-reshare-finalize"

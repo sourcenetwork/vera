@@ -1,0 +1,34 @@
+syntax = "proto3";
+package vera.bulletin;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "vera/bulletin/params.proto";
+import "vera/bulletin/namespace.proto";
+import "vera/bulletin/collaborator.proto";
+import "vera/bulletin/post.proto";
+
+
+option go_package = "github.com/sourcenetwork/vera/x/bulletin/types";
+
+// GenesisState defines the bulletin module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  string policy_id = 2;
+  repeated Namespace namespaces = 3 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Collaborator collaborators = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  repeated Post posts = 5 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

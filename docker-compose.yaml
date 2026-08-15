@@ -1,5 +1,5 @@
 services:
-  sourcehub:
+  vera:
     build:
       context: .
     ports:
@@ -10,6 +10,6 @@ services:
     environment:
       STANDALONE: 1
     volumes:
-      - data:/sourcehub
+      - data:/vera
 volumes:
   data:

@@ -3,7 +3,7 @@ package keeper_test
 import (
 	gocontext "context"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 func (s *KeeperTestSuite) TestQueryEpochInfos() {

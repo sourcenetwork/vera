@@ -3,7 +3,7 @@ package orbis
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/orbis"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

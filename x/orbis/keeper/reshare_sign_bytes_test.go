@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
@@ -47,7 +47,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 	require.Equal(t, current.UpgradeInfo, finalized.UpgradeInfo)
 	require.Equal(t, []string{nodeC, nodeD}, finalized.PeerNodeKeys)
 
-	signBytes, err := ringReshareFinalizeSignBytes("sourcehub-test", current, finalized)
+	signBytes, err := ringReshareFinalizeSignBytes("vera-test", current, finalized)
 	require.NoError(t, err)
 
 	sameSignState := &types.Ring{
@@ -81,7 +81,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 	require.NoError(t, err)
 
 	sameSignStateBytes, err := ringReshareFinalizeSignBytes(
-		"sourcehub-test",
+		"vera-test",
 		sameSignState,
 		sameSignStateFinalized,
 	)
@@ -97,7 +97,7 @@ func TestRingReshareFinalizeSignBytesUseCanonicalOrbisSignState(t *testing.T) {
 	require.NoError(t, err)
 
 	distinctSignStateBytes, err := ringReshareFinalizeSignBytes(
-		"sourcehub-test",
+		"vera-test",
 		&distinctSignState,
 		distinctSignStateFinalized,
 	)

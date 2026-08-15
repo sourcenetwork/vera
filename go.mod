@@ -1,4 +1,4 @@
-module github.com/sourcenetwork/sourcehub
+module github.com/sourcenetwork/vera
 
 go 1.26.2
 

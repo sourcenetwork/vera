@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package vera.ante;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sourcenetwork/vera/app/ante/types";
+
+// JWSExtensionOption represents a transaction extension option with a bearer token.
+// The bearer token is a JWS containing issuer DID, authorized account, issued at, and expiration time claims.
+message JWSExtensionOption {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string bearer_token = 1 [(gogoproto.moretags) = "yaml:\"bearer_token\""];
+}

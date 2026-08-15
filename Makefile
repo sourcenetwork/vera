@@ -1,32 +1,35 @@
 IGNITE_RUN = docker run --rm -ti --volume $(PWD):/apps ignitehq/cli:latest
-UID := $(shell id --user)
-GID := $(shell id --group)
-BIN = build/sourcehubd
+UID := $(shell id -u)
+GID := $(shell id -g)
+BIN = build/verad
 DEMO_BIN = build/token-protocol-demo
 
 .PHONY: build
 build:
-	GOOS=linux GOARCH=amd64 go build -o ${BIN} ./cmd/sourcehubd
+	GOOS=linux GOARCH=amd64 go build -o ${BIN} ./cmd/verad
 
 .PHONY: build-mac
 build-mac:
-	GOOS=darwin GOARCH=arm64 go build -o ${BIN} ./cmd/sourcehubd
+	GOOS=darwin GOARCH=arm64 go build -o ${BIN} ./cmd/verad
 
 .PHONY: install
 install:
-	go install ./cmd/sourcehubd
+	go install ./cmd/verad
 
 .PHONY: proto
 proto:
 	ignite generate proto-go --yes
 	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.pulsar.yaml \
-		--exclude-path proto/sourcehub/orbis/document.proto \
-		--exclude-path proto/sourcehub/orbis/ring.proto \
-		--exclude-path proto/sourcehub/orbis/tx.proto
+		--exclude-path proto/vera/orbis/document.proto \
+		--exclude-path proto/vera/orbis/ring.proto \
+		--exclude-path proto/vera/orbis/tx.proto
 	PATH="$$(go env GOPATH)/bin:$$PATH" buf generate proto --template proto/buf.gen.orbis.optional.yaml \
-		--path proto/sourcehub/orbis/document.proto \
-		--path proto/sourcehub/orbis/ring.proto \
-		--path proto/sourcehub/orbis/tx.proto
+		--path proto/vera/orbis/document.proto \
+		--path proto/vera/orbis/ring.proto \
+		--path proto/vera/orbis/tx.proto
+	rm -f api/vera/orbis/document.pulsar.go \
+		api/vera/orbis/ring.pulsar.go \
+		api/vera/orbis/tx.pulsar.go
 
 .PHONY: test
 test:
@@ -59,4 +62,4 @@ test_env_generator:
 
 .PHONY: docker
 docker:
-	docker image build -t ghcr.io/sourcenetwork/sourcehub:dev .
+	docker image build -t ghcr.io/sourcenetwork/vera:dev .

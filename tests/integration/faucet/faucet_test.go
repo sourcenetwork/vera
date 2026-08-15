@@ -17,10 +17,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	faucettypes "github.com/sourcenetwork/sourcehub/app/faucet/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/testutil/network"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	faucettypes "github.com/sourcenetwork/vera/app/faucet/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/testutil/network"
+	"github.com/sourcenetwork/vera/x/feegrant"
 )
 
 func TestFaucetRequest(t *testing.T) {
@@ -287,7 +287,7 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		require.NoError(t, err)
 
 		// Check feegrant allowances instead of balance
-		allowanceResp, err := http.Get(fmt.Sprintf("%s/sourcehub/feegrant/v1beta1/allowances/%s", httpAddr, testAddress))
+		allowanceResp, err := http.Get(fmt.Sprintf("%s/vera/feegrant/v1beta1/allowances/%s", httpAddr, testAddress))
 		assert.Equal(t, http.StatusOK, allowanceResp.StatusCode)
 		require.NoError(t, err)
 		defer allowanceResp.Body.Close()

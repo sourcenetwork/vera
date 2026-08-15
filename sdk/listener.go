@@ -12,15 +12,15 @@ import (
 	rpctypes "github.com/cometbft/cometbft/rpc/core/types"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/vera/x/orbis/types"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 const mapperBuffSize int = 100
 
-// TxListener is a client which subscribes to Tx events in SourceHub's cometbft socket
+// TxListener is a client which subscribes to Tx events in Vera's cometbft socket
 // and parses the received events into version with unmarshaled Msg Responses.
 type TxListener struct {
 	rpc       cometclient.Client
@@ -83,7 +83,7 @@ func (l *TxListener) ListenTxs(ctx context.Context) (<-chan Event, <-chan error,
 		}
 
 		//unmarshals the msg results into their
-		// actual response values using the registered sourcehub types
+		// actual response values using the registered vera types
 		responses := make([]sdk.Msg, 0, len(msgData.MsgResponses))
 		for i, resp := range msgData.MsgResponses {
 			var msg sdk.Msg

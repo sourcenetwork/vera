@@ -2,15 +2,15 @@
 
 set -e
 
-BIN="build/sourcehubd"
+BIN="build/verad"
 
-CHAIN1_ID="sourcehub-1"
-CHAIN2_ID="sourcehub-2"
+CHAIN1_ID="vera-1"
+CHAIN2_ID="vera-2"
 
-C1V1_HOME="$HOME/.sourcehub-1-1"
-C2V1_HOME="$HOME/.sourcehub-2-1"
-C1V2_HOME="$HOME/.sourcehub-1-2"
-C2V2_HOME="$HOME/.sourcehub-2-2"
+C1V1_HOME="$HOME/.vera-1-1"
+C2V1_HOME="$HOME/.vera-2-1"
+C1V2_HOME="$HOME/.vera-1-2"
+C2V2_HOME="$HOME/.vera-2-2"
 HERMES_HOME="$HOME/.hermes"
 
 C1V1_GRPC=localhost:9091
@@ -57,7 +57,7 @@ if ! type "hermes" > /dev/null; then
 fi
 
 # Kill running processes
-killall sourcehubd 2>/dev/null || true
+killall verad 2>/dev/null || true
 killall hermes 2>/dev/null || true
 
 # Cleanup directories
@@ -78,7 +78,7 @@ cp scripts/hermes_config.toml "$HERMES_HOME/config.toml"
 # Build the binary
 make build # make build-mac
 
-echo "==> Initializing sourcehub-1..."
+echo "==> Initializing vera-1..."
 $BIN init $C1V1_NAME --chain-id $CHAIN1_ID --default-denom="uopen" --home="$C1V1_HOME"
 $BIN keys add $C1V1 --keyring-backend=test --home="$C1V1_HOME"
 VALIDATOR1_ADDR=$($BIN keys show $C1V1 -a --keyring-backend=test --home="$C1V1_HOME")
@@ -101,7 +101,7 @@ sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C1V1_HOME/config/con
 
 sleep 1
 
-echo "==> Initializing sourcehub-2..."
+echo "==> Initializing vera-2..."
 $BIN init $C2V1_NAME --chain-id $CHAIN2_ID --default-denom="uopen" --home="$C2V1_HOME"
 $BIN keys add $C2V1 --keyring-backend=test --home="$C2V1_HOME"
 VALIDATOR2_ADDR=$($BIN keys show $C2V1 -a --keyring-backend=test --home="$C2V1_HOME")
@@ -124,7 +124,7 @@ sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C2V1_HOME/config/con
 
 sleep 1
 
-echo "==> Starting sourcehub-1..."
+echo "==> Starting vera-1..."
 $BIN start \
   --home $C1V1_HOME \
   --rpc.laddr $C1V1_RPC \
@@ -133,11 +133,11 @@ $BIN start \
   --grpc.address $C1V1_GRPC \
   --address $C1V1_ADDR \
   > chain_1_1.log 2>&1 &
-echo "sourcehub-1 running"
+echo "vera-1 running"
 
 sleep 1
 
-echo "==> Starting sourcehub-2..."
+echo "==> Starting vera-2..."
 $BIN start \
   --home $C2V1_HOME \
   --rpc.laddr $C2V1_RPC \
@@ -146,17 +146,17 @@ $BIN start \
   --grpc.address $C2V1_GRPC \
   --address $C2V1_ADDR \
   > chain_2_1.log 2>&1 &
-echo "sourcehub-2 running"
+echo "vera-2 running"
 
 # Let chains start before adding more validators
 sleep 5
 
-echo "==> Initializing second validator on sourcehub-1..."
+echo "==> Initializing second validator on vera-1..."
 $BIN init $C1V2_NAME --chain-id $CHAIN1_ID --home="$C1V2_HOME"
 $BIN keys add $C1V2 --keyring-backend=test --home="$C1V2_HOME"
 VAL11_ADDR=$($BIN keys show validator1-2 -a --keyring-backend=test --home="$C1V2_HOME")
 
-rsync -a --exclude priv_validator_state.json ~/.sourcehub-1-1/data/ ~/.sourcehub-1-2/data/
+rsync -a --exclude priv_validator_state.json ~/.vera-1-1/data/ ~/.vera-1-2/data/
 VAL1_ID=$($BIN tendermint show-node-id --home="$C1V1_HOME")
 sed -i '' "s|^persistent_peers = .*|persistent_peers = \"$VAL1_ID@$C1V1_P2P\"|" "$C1V2_HOME/config/config.toml"
 
@@ -166,7 +166,7 @@ sed -i '' 's/^timeout_prevote = .*/timeout_prevote = "500ms"/' "$C1V2_HOME/confi
 sed -i '' 's/^timeout_precommit = .*/timeout_precommit = "500ms"/' "$C1V2_HOME/config/config.toml"
 sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C1V2_HOME/config/config.toml"
 
-echo "==> Funding validator 2 account on sourcehub-1..."
+echo "==> Funding validator 2 account on vera-1..."
 $BIN tx bank send source $VAL11_ADDR 10000000000uopen \
   --from source \
   --keyring-backend test \
@@ -179,7 +179,7 @@ $BIN tx bank send source $VAL11_ADDR 10000000000uopen \
 
 sleep 1
 
-echo "==> Creating validator 2 on sourcehub-1..."
+echo "==> Creating validator 2 on vera-1..."
 PUBKEY_JSON1=$($BIN tendermint show-validator --home="$C1V2_HOME")
 echo "{
   \"pubkey\": $PUBKEY_JSON1,
@@ -207,7 +207,7 @@ $BIN tx staking create-validator "$C1V2_JSON" \
 
 sleep 1
 
-echo "==> Starting validator 2 on sourcehub-1..."
+echo "==> Starting validator 2 on vera-1..."
 $BIN start \
   --home $C1V2_HOME \
   --rpc.laddr $C1V2_RPC \
@@ -219,12 +219,12 @@ $BIN start \
 
 sleep 1
 
-echo "==> Initializing validator 2 on sourcehub-2..."
+echo "==> Initializing validator 2 on vera-2..."
 $BIN init $C2V2_NAME --chain-id $CHAIN2_ID --home="$C2V2_HOME"
 $BIN keys add $C2V2 --keyring-backend=test --home="$C2V2_HOME"
 VAL22_ADDR=$($BIN keys show validator2-2 -a --keyring-backend=test --home="$C2V2_HOME")
 
-rsync -a --exclude priv_validator_state.json ~/.sourcehub-2-1/data/ ~/.sourcehub-2-2/data/
+rsync -a --exclude priv_validator_state.json ~/.vera-2-1/data/ ~/.vera-2-2/data/
 VAL2_ID=$($BIN tendermint show-node-id --home="$C2V1_HOME")
 sed -i '' "s|^persistent_peers = .*|persistent_peers = \"$VAL2_ID@$C2V1_P2P\"|" "$C2V2_HOME/config/config.toml"
 
@@ -234,7 +234,7 @@ sed -i '' 's/^timeout_prevote = .*/timeout_prevote = "500ms"/' "$C2V2_HOME/confi
 sed -i '' 's/^timeout_precommit = .*/timeout_precommit = "500ms"/' "$C2V2_HOME/config/config.toml"
 sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C2V2_HOME/config/config.toml"
 
-echo "==> Funding validator 2 account on sourcehub-2..."
+echo "==> Funding validator 2 account on vera-2..."
 $BIN tx bank send source $VAL22_ADDR 10000000000uopen \
   --from source \
   --keyring-backend test \
@@ -247,7 +247,7 @@ $BIN tx bank send source $VAL22_ADDR 10000000000uopen \
 
 sleep 1
 
-echo "==> Creating validator 2 on sourcehub-2..."
+echo "==> Creating validator 2 on vera-2..."
 PUBKEY_JSON2=$($BIN tendermint show-validator --home="$C2V2_HOME")
 echo "{
   \"pubkey\": $PUBKEY_JSON2,
@@ -275,7 +275,7 @@ $BIN tx staking create-validator "$C2V2_JSON" \
 
 sleep 1
 
-echo "==> Starting validator 2 on sourcehub-2..."
+echo "==> Starting validator 2 on vera-2..."
 $BIN start \
   --home $C2V2_HOME \
   --rpc.laddr $C2V2_RPC \
@@ -314,7 +314,7 @@ $BIN tx ibc-transfer transfer transfer channel-0 \
   $SOURCE_ADDR 1000uopen \
   --from source \
   --keyring-backend test \
-  --chain-id sourcehub-1 \
+  --chain-id vera-1 \
   --home "$C1V1_HOME" \
   --node "$C1V1_RPC" \
   --gas auto --gas-adjustment 1.3 \

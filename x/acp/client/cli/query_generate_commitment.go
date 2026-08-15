@@ -8,7 +8,7 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func CmdQueryGenerateCommitment() *cobra.Command {

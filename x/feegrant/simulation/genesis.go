@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"

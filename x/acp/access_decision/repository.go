@@ -7,9 +7,9 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	raccoon "github.com/sourcenetwork/raccoondb"
 
-	"github.com/sourcenetwork/sourcehub/utils"
-	"github.com/sourcenetwork/sourcehub/x/acp/stores"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/utils"
+	"github.com/sourcenetwork/vera/x/acp/stores"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type AccessDecisionRepository struct {

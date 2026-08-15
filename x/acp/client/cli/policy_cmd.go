@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/gogoproto/jsonpb"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/spf13/cobra"
 )
 
@@ -140,7 +140,7 @@ func CmdRevealRegistration(dispatcher dispatcher) *cobra.Command {
 func CmdCreateCommitment(dispatcher dispatcher) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-commitment policy-id hex-commitment",
-		Short: "Create a new Registration Commitment on SourceHub",
+		Short: "Create a new Registration Commitment on Vera",
 		Long:  ``,
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

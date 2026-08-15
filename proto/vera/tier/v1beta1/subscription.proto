@@ -1,0 +1,50 @@
+syntax = "proto3";
+package vera.tier.v1beta1;
+
+import "amino/amino.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/tier/types";
+
+// Developer represents a developer configuration.
+message Developer {
+  // address is the address of the developer.
+  string address = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // auto_lock_enabled indicates whether the module should automatically lock more #OPEN tokens, 
+  // so that the developer always has enough credits to cover all active user subscriptions.
+  bool auto_lock_enabled = 2;
+}
+
+// UserSubscription represents a user subscribed to a developer.
+message UserSubscription {
+  // developer is the address of the developer who registered this user.
+  string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // user_did is the DID of the registered user.
+  string user_did = 2;
+  // credit_amount is the credit amount allocated to this user.
+  uint64 credit_amount = 3;
+  // period is the subscription period duration in seconds.
+  uint64 period = 4;
+  // start_date is when the subscription started.
+  google.protobuf.Timestamp start_date = 5 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.stdtime) = true
+  ];
+  // last_renewed is when the subscription was last renewed.
+  google.protobuf.Timestamp last_renewed = 6 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (gogoproto.stdtime) = true
+  ];
+}
+
+// TotalDevGranted represents the total credit amount granted by a developer to all users.
+message TotalDevGranted {
+  // developer is the address of the developer.
+  string developer = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // total_granted is the total credit amount granted to all users.
+  uint64 total_granted = 2;
+} 

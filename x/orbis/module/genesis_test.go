@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertestutil "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	keepertestutil "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func TestInitGenesisAppliesDefaultReportingToRings(t *testing.T) {

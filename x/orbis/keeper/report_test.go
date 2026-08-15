@@ -17,12 +17,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-const reportTestChainID = "sourcehub-test"
+// This value is shared with orbis-rs golden vectors and is protocol identity,
+// not the chain ID of a disposable Vera test network.
+const reportTestChainID = "vera-test"
 const reportTestObservedAt = uint64(1_700_000_000)
 
 func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
@@ -45,7 +47,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 
 	_, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
-	require.Equal(t, "80b0f43ae215dd88a6e635de00207cd549c2492bb2086b22ceceda73a4de65f3", reportID)
+	require.Equal(t, "954c67cd1885283a0d22a074b0b6db7eb412bad414d4fcfb5ff59cd1719e6dc0", reportID)
 
 	// invalid_crypto_response payload + report_id goldens: the same
 	// values are asserted by invalid_crypto_response_payload_matches_golden_vector
@@ -56,7 +58,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	)
 	require.Equal(
 		t,
-		"00000003707265000000ff0000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a000000076163637573656400000003707265000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
+		"00000003707265000000fa0000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d763100000009766572612d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a000000076163637573656400000003707265000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
 		hex.EncodeToString(preInvalidPayload),
 	)
 	preInvalidReport := report
@@ -64,7 +66,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	preInvalidReport.Payload = preInvalidPayload
 	_, preInvalidReportID, err := reportEnvelopeCanonicalMessageAndID(&preInvalidReport)
 	require.NoError(t, err)
-	require.Equal(t, "65450d9adeeb115d5985655b0d850af988af3cf7dd5e60d0c9d55df091a983e2", preInvalidReportID)
+	require.Equal(t, "33ff49a75779aab0f43cef7e7db97adbdccc788a4c446017720c228f818debe3", preInvalidReportID)
 
 	ring := &types.Ring{
 		RingPk:       "pk",

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 func TestEpochsExportGenesis(t *testing.T) {

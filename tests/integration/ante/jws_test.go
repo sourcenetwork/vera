@@ -23,11 +23,11 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	jwstypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	"github.com/sourcenetwork/sourcehub/testutil/network"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	jwstypes "github.com/sourcenetwork/vera/app/ante/types"
+	testutil "github.com/sourcenetwork/vera/testutil"
+	"github.com/sourcenetwork/vera/testutil/network"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/feegrant"
 )
 
 // TestJWSExtensionOptionWithDIDBasedFeegrant ensures that tx with JWS extension succeeds using the DID-based feegrant.

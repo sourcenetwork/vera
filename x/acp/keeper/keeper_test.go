@@ -7,8 +7,8 @@ import (
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
 	"github.com/stretchr/testify/require"
 
-	cosmosadapter "github.com/sourcenetwork/sourcehub/x/acp/stores/cosmos"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	cosmosadapter "github.com/sourcenetwork/vera/x/acp/stores/cosmos"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // Test that an expired replay key is lazily removed and does not block resubmission.

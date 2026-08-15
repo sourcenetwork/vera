@@ -3,7 +3,7 @@ package types_test
 import (
 	"testing"
 
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 	"github.com/stretchr/testify/require"
 )
 

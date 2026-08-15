@@ -14,7 +14,7 @@ const (
 	ExpiresClaim  = "exp"
 	IssuerClaim   = "iss"
 	// AuthorizedAccountClaim is the name of the expected field in the JWS
-	// which authorizes a SourceHub account to produce Txs on behalf of the
+	// which authorizes a Vera account to produce Txs on behalf of the
 	// token issuer
 	AuthorizedAccountClaim = "authorized_account"
 )
@@ -25,7 +25,7 @@ const DefaultExpirationTime = time.Minute * 15
 type BearerToken struct {
 	// IssuerID is the Actor ID for the Token signer
 	IssuerID string `json:"iss,omitempty"`
-	// AuthorizedAccount is the SourceHub account address which is allowed to use this token
+	// AuthorizedAccount is the Vera account address which is allowed to use this token
 	AuthorizedAccount string `json:"authorized_account,omitempty"`
 	// IssuedTime is the timestamp at which the token was generated
 	IssuedTime int64 `json:"iat,omitempty"`

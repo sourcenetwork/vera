@@ -12,8 +12,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app/metrics"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 // GetAllLockups returns all lockups in the store.

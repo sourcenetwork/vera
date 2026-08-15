@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 type Keeper struct {

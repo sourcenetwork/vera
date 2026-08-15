@@ -3,9 +3,9 @@ package bulletin
 import (
 	"testing"
 
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/testutil/nullify"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/testutil/nullify"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 	"github.com/stretchr/testify/require"
 )
 

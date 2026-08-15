@@ -10,8 +10,8 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 const ringUpgradeBaseTime uint64 = 1_800_000_000

@@ -1,7 +1,7 @@
 package sdk
 
 const (
-	Testnet1            = "sourcehub-testnet-1"
+	Testnet1            = "vera-testnet-1"
 	TestnetLatest       = Testnet1
 	DefaultChainID      = TestnetLatest
 	DefaultGRPCAddr     = "localhost:9090"

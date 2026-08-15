@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/runtime"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 // GetParams gets all parameters as types.Params.

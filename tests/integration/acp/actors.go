@@ -10,24 +10,24 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/bech32"
 	secp256k1 "github.com/decred/dcrd/dcrec/secp256k1/v4"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/vera/app"
+	"github.com/sourcenetwork/vera/x/acp/did"
 )
 
-// TestActor models a SourceHub actor in the test suite
+// TestActor models a Vera actor in the test suite
 // Each actor has a keypair and a DID
-// The actor has a SourceHubAddr only if their keys are of type secp256k1
+// The actor has a VeraAddr only if their keys are of type secp256k1
 type TestActor struct {
-	Name          string
-	DID           string
-	PubKey        sdkcrypto.PubKey
-	PrivKey       sdkcrypto.PrivKey
-	SourceHubAddr string
-	Signer        stdcrypto.Signer
+	Name     string
+	DID      string
+	PubKey   sdkcrypto.PubKey
+	PrivKey  sdkcrypto.PrivKey
+	VeraAddr string
+	Signer   stdcrypto.Signer
 }
 
 // MustNewED25519ActorFromName deterministically generates a Test Actor from a string name as seed
-// The Actor carries a ed25519 key pair and has no SourceHub addr
+// The Actor carries a ed25519 key pair and has no Vera addr
 func MustNewED25519ActorFromName(name string) *TestActor {
 	privKey := sdked25519.GenPrivKeyFromSecret([]byte(name))
 
@@ -39,18 +39,18 @@ func MustNewED25519ActorFromName(name string) *TestActor {
 	stdPriv := ed25519.PrivateKey(privKey.Bytes())
 
 	return &TestActor{
-		Name:          name,
-		DID:           didStr,
-		PubKey:        privKey.PubKey(),
-		PrivKey:       privKey,
-		SourceHubAddr: "",
-		Signer:        stdPriv,
+		Name:     name,
+		DID:      didStr,
+		PubKey:   privKey.PubKey(),
+		PrivKey:  privKey,
+		VeraAddr: "",
+		Signer:   stdPriv,
 	}
 }
 
-// MustNewSourceHubActorFromName deterministically generates a Test Actor from a string name as seed
-// The Actor carries a secp256k1 key pair and a SourceHub addr
-func MustNewSourceHubActorFromName(name string) *TestActor {
+// MustNewVeraActorFromName deterministically generates a Test Actor from a string name as seed
+// The Actor carries a secp256k1 key pair and a Vera addr
+func MustNewVeraActorFromName(name string) *TestActor {
 	key := sdksecp256k1.GenPrivKeyFromSecret([]byte(name))
 	addr, err := bech32.ConvertAndEncode(app.AccountAddressPrefix, key.PubKey().Address())
 	if err != nil {
@@ -65,11 +65,11 @@ func MustNewSourceHubActorFromName(name string) *TestActor {
 	stdPrivKey := s256Priv.ToECDSA()
 
 	return &TestActor{
-		Name:          name,
-		DID:           didStr,
-		PubKey:        key.PubKey(),
-		PrivKey:       key,
-		SourceHubAddr: addr,
-		Signer:        stdPrivKey,
+		Name:     name,
+		DID:      didStr,
+		PubKey:   key.PubKey(),
+		PrivKey:  key,
+		VeraAddr: addr,
+		Signer:   stdPrivKey,
 	}
 }

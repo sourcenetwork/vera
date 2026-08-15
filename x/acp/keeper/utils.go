@@ -11,14 +11,14 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
-	hubtypes "github.com/sourcenetwork/sourcehub/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	veratypes "github.com/sourcenetwork/vera/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // IssueDIDFromAccountAddr issues a DID based on the specified address string.
 func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (string, error) {
-	sdkAddr, err := hubtypes.AccAddressFromBech32(addr)
+	sdkAddr, err := veratypes.AccAddressFromBech32(addr)
 	if err != nil {
 		return "", fmt.Errorf("IssueDIDFromAccountAddr: %v: %w", err, types.NewErrInvalidAccAddrErr(err, addr))
 	}
@@ -29,7 +29,7 @@ func (k *Keeper) IssueDIDFromAccountAddr(ctx context.Context, addr string) (stri
 	}
 
 	// Check if this is an ICA address
-	if _, found := k.hubKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), addr); found {
+	if _, found := k.coreKeeper.GetICAConnection(sdk.UnwrapSDKContext(ctx), addr); found {
 		controllerDID := did.IssueInterchainAccountDID(addr)
 		return controllerDID, nil
 	}

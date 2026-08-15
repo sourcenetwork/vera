@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 func TestMsgLockAuto(t *testing.T) {

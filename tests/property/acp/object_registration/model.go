@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/tests/property"
-	"github.com/sourcenetwork/sourcehub/utils"
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/tests/property"
+	"github.com/sourcenetwork/vera/utils"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
 

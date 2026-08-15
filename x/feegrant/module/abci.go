@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
+	"github.com/sourcenetwork/vera/x/feegrant/keeper"
 )
 
 func EndBlocker(ctx context.Context, k keeper.Keeper) error {

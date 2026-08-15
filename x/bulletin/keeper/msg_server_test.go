@@ -8,7 +8,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 func TestMsgServer(t *testing.T) {

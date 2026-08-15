@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 

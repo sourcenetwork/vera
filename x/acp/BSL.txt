@@ -7,7 +7,7 @@ Parameters
 Licensor:                   Democratized Data (D2) Foundation
 
 
-Licensed Work:              SourceHub ACP Module v0.1.0
+Licensed Work:              Vera ACP Module v0.1.0
                             The Licensed Work is (c) 2024 D2 Foundation.
 
 
@@ -15,8 +15,8 @@ Additional Use Grant:       You may only use the Licensed Work for the
                             following conditions
                             
                             For an application that is connected  to the 
-                            SourceHub network (mainnet or testnet) or 
-                            another protocol connected  to the SourceHub 
+                            Vera network (mainnet or testnet) or
+                            another protocol connected  to the Vera
                             by way of the Inter-Blockchain Communication 
                             (IBC) protocol. 
 
@@ -140,4 +140,3 @@ the Additional Use Grant; or (b) insert the text “None”.
 4. Not to modify this License in any other way.
 
 -----------------------------------------------------------------------------
-

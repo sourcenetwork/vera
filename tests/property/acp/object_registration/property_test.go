@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
-	"github.com/sourcenetwork/sourcehub/tests/property"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
+	"github.com/sourcenetwork/vera/tests/property"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -27,7 +27,7 @@ func runPropTest(t *testing.T) {
 	resp, err := ctx.Executor.CreatePolicy(ctx, &types.MsgCreatePolicy{
 		Policy:      Policy,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
-		Creator:     ctx.TxSigner.SourceHubAddr,
+		Creator:     ctx.TxSigner.VeraAddr,
 	})
 	require.NoError(t, err)
 
@@ -46,7 +46,7 @@ func runPropTest(t *testing.T) {
 		count++
 
 		result, err := ctx.Executor.DirectPolicyCmd(ctx, &types.MsgDirectPolicyCmd{
-			Creator:  op.Actor.SourceHubAddr,
+			Creator:  op.Actor.VeraAddr,
 			PolicyId: state.PolicyId,
 			Cmd:      &op.Request,
 		})

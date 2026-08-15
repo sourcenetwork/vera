@@ -12,7 +12,7 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // GovModuleBasic defines a wrapper of the x/gov module AppModuleBasic to provide custom default genesis state.

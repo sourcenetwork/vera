@@ -60,29 +60,29 @@ import (
 	"github.com/skip-mev/block-sdk/v2/block"
 	"github.com/skip-mev/block-sdk/v2/block/base"
 
-	"github.com/sourcenetwork/sourcehub/app/ante"
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	overrides "github.com/sourcenetwork/sourcehub/app/overrides"
-	sourcehubtypes "github.com/sourcenetwork/sourcehub/types"
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletinkeeper "github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	feegrantkeeper "github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	hubkeeper "github.com/sourcenetwork/sourcehub/x/hub/keeper"
-	orbiskeeper "github.com/sourcenetwork/sourcehub/x/orbis/keeper"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app/ante"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	"github.com/sourcenetwork/vera/app/metrics"
+	overrides "github.com/sourcenetwork/vera/app/overrides"
+	veratypes "github.com/sourcenetwork/vera/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	bulletinkeeper "github.com/sourcenetwork/vera/x/bulletin/keeper"
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	corekeeper "github.com/sourcenetwork/vera/x/core/keeper"
+	epochskeeper "github.com/sourcenetwork/vera/x/epochs/keeper"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	feegrantkeeper "github.com/sourcenetwork/vera/x/feegrant/keeper"
+	orbiskeeper "github.com/sourcenetwork/vera/x/orbis/keeper"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 
-	"github.com/sourcenetwork/sourcehub/docs"
+	"github.com/sourcenetwork/vera/docs"
 )
 
 const (
-	AccountAddressPrefix = sourcehubtypes.AccountAddrPrefix
-	Name                 = "sourcehub"
+	AccountAddressPrefix = veratypes.AccountAddrPrefix
+	Name                 = "vera"
 )
 
 var (
@@ -132,7 +132,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
-	HubKeeper      *hubkeeper.Keeper
+	CoreKeeper     *corekeeper.Keeper
 	AcpKeeper      *acpkeeper.Keeper
 	OrbisKeeper    *orbiskeeper.Keeper
 	BulletinKeeper *bulletinkeeper.Keeper
@@ -262,7 +262,7 @@ func New(
 		&app.GroupKeeper,
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
-		&app.HubKeeper,
+		&app.CoreKeeper,
 		&app.AcpKeeper,
 		&app.OrbisKeeper,
 		&app.BulletinKeeper,
@@ -347,7 +347,7 @@ func New(
 		app.BankKeeper,
 		app.FeeGrantKeeper,
 		app.IBCKeeper,
-		app.HubKeeper,
+		app.CoreKeeper,
 		app.txConfig.SignModeHandler(),
 		ante.DefaultSigVerificationGasConsumer,
 		app.txConfig.TxEncoder(),

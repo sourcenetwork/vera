@@ -15,10 +15,10 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	jwxjws "github.com/lestrrat-go/jwx/v2/jws"
 
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
 )
 
 // parseValidateJWS processes a JWS Bearer token by unmarshaling it and verifying its signature.
@@ -133,7 +133,7 @@ func validateBearerTokenValues(token *antetypes.BearerToken, trustedRelay bool) 
 
 	// Trusted relays bind the worker account through the transaction fee grant.
 	if !trustedRelay {
-		if err := types.IsValidSourceHubAddr(token.AuthorizedAccount); err != nil {
+		if err := types.IsValidVeraAddr(token.AuthorizedAccount); err != nil {
 			return fmt.Errorf("invalid authorized account: %v", err)
 		}
 	}

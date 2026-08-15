@@ -36,7 +36,7 @@ func AssertError(ctx *TestCtx, got, want error) bool {
 		if errors.Is(got, want) {
 			return assert.ErrorIs(ctx.T, got, want)
 		} else {
-			// Errors returned from SDK operations (RPC communication to a SourceHub node)
+			// Errors returned from SDK operations (RPC communication to a Vera node)
 			// no longer have the original errors wrapped, therefore we compare a string as fallback strat.
 			gotErrStr := got.Error()
 			wantErrStr := want.Error()

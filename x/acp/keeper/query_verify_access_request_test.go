@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type queryVerifyAccessRequestSuite struct {

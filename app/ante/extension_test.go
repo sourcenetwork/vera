@@ -17,28 +17,28 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	test "github.com/sourcenetwork/sourcehub/testutil"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	test "github.com/sourcenetwork/vera/testutil"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	coremoduletypes "github.com/sourcenetwork/vera/x/core/types"
 )
 
-type extensionHubKeeper struct {
-	chainConfig hubtypes.ChainConfig
-	params      hubtypes.Params
+type extensionCoreKeeper struct {
+	chainConfig coremoduletypes.ChainConfig
+	params      coremoduletypes.Params
 	storeErr    error
 }
 
-func (k extensionHubKeeper) GetChainConfig(context.Context) hubtypes.ChainConfig {
+func (k extensionCoreKeeper) GetChainConfig(context.Context) coremoduletypes.ChainConfig {
 	return k.chainConfig
 }
 
-func (k extensionHubKeeper) GetParams(context.Context) hubtypes.Params {
+func (k extensionCoreKeeper) GetParams(context.Context) coremoduletypes.Params {
 	return k.params
 }
 
-func (k extensionHubKeeper) StoreOrUpdateJWSToken(
+func (k extensionCoreKeeper) StoreOrUpdateJWSToken(
 	context.Context,
 	string,
 	string,
@@ -88,10 +88,10 @@ func buildExtensionTestTx(
 	return tx, userDID
 }
 
-func relayHubKeeper(trusted sdk.AccAddress) extensionHubKeeper {
-	return extensionHubKeeper{
-		chainConfig: hubtypes.ChainConfig{IgnoreBearerAuth: true},
-		params:      hubtypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
+func relayCoreKeeper(trusted sdk.AccAddress) extensionCoreKeeper {
+	return extensionCoreKeeper{
+		chainConfig: coremoduletypes.ChainConfig{IgnoreBearerAuth: true},
+		params:      coremoduletypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
 	}
 }
 
@@ -929,7 +929,7 @@ func TestExtensionOptionsDecorator_TrustedRelay(t *testing.T) {
 	feeGranter := accs[1].acc.GetAddress()
 	tx, userDID := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
 
-	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
+	newCtx, err := NewExtensionOptionsDecorator(relayCoreKeeper(feeGranter)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.NoError(t, err)
 	require.Equal(t, userDID, getExtractedDIDFromContext(newCtx))
@@ -962,7 +962,7 @@ func TestExtensionOptionsDecorator_AcceptsProviderIdentityFromTrustedRelay(t *te
 		ActorDID:     actorDID,
 	})
 
-	newCtx, err := NewExtensionOptionsDecorator(relayHubKeeper(feeGranter)).
+	newCtx, err := NewExtensionOptionsDecorator(relayCoreKeeper(feeGranter)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.NoError(t, err)
 	require.Equal(t, actorDID, getExtractedDIDFromContext(newCtx))
@@ -977,7 +977,7 @@ func TestExtensionOptionsDecorator_RejectsUntrustedRelay(t *testing.T) {
 	trusted := accs[2].acc.GetAddress()
 	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
 
-	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
+	_, err := NewExtensionOptionsDecorator(relayCoreKeeper(trusted)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.ErrorContains(t, err, "is not a trusted relay")
 }
@@ -989,7 +989,7 @@ func TestExtensionOptionsDecorator_RejectsRelayWithoutFeeGranter(t *testing.T) {
 	trusted := accs[1].acc.GetAddress()
 	tx, _ := buildExtensionTestTx(t, s, accs[0], worker.String(), nil, "", nil)
 
-	_, err := NewExtensionOptionsDecorator(relayHubKeeper(trusted)).
+	_, err := NewExtensionOptionsDecorator(relayCoreKeeper(trusted)).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.ErrorContains(t, err, "requires a trusted fee granter")
 }
@@ -1010,9 +1010,9 @@ func TestExtensionOptionsDecorator_RejectsMessageNotSignedByRelayWorker(t *testi
 	s.txBuilder.SetFeePayer(worker)
 	s.txBuilder.SetFeeGranter(trusted)
 
-	keeper := extensionHubKeeper{
-		chainConfig: hubtypes.ChainConfig{IgnoreBearerAuth: true},
-		params:      hubtypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
+	keeper := extensionCoreKeeper{
+		chainConfig: coremoduletypes.ChainConfig{IgnoreBearerAuth: true},
+		params:      coremoduletypes.Params{TrustedRelayFeeGranters: []string{trusted.String()}},
 	}
 	_, err := NewExtensionOptionsDecorator(keeper).validateRelay(s.ctx, s.txBuilder.GetTx())
 	require.ErrorContains(t, err, "does not match relay worker")
@@ -1024,7 +1024,7 @@ func TestExtensionOptionsDecorator_PropagatesTokenStoreFailure(t *testing.T) {
 	creator := accs[0].acc.GetAddress().String()
 	tx, _ := buildExtensionTestTx(t, s, accs[0], creator, nil, creator, nil)
 
-	_, err := NewExtensionOptionsDecorator(extensionHubKeeper{storeErr: errors.New("token invalidated")}).
+	_, err := NewExtensionOptionsDecorator(extensionCoreKeeper{storeErr: errors.New("token invalidated")}).
 		AnteHandle(s.ctx, tx, false, nextAnte)
 	require.ErrorContains(t, err, "bearer token is not active")
 }

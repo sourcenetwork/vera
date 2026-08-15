@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/skip-mev/block-sdk/v2/block/base"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 const (
@@ -75,24 +75,24 @@ func getPriorityGroup(tx sdk.Tx) string {
 	for _, msg := range msgs {
 		msgType := sdk.MsgTypeURL(msg)
 		switch {
-		case strings.HasPrefix(msgType, "/sourcehub.acp."):
+		case strings.HasPrefix(msgType, "/vera.acp."):
 			// Keep minPriority at 3 for acp module messages
-		case strings.HasPrefix(msgType, "/sourcehub.tier."):
+		case strings.HasPrefix(msgType, "/vera.tier."):
 			// Reduce minPriority to 2 if tier module message found
 			if minPriority > "2" {
 				minPriority = "2"
 			}
-		case strings.HasPrefix(msgType, "/sourcehub.orbis."):
+		case strings.HasPrefix(msgType, "/vera.orbis."):
 			// Reduce minPriority to 1 if orbis module message found
 			if minPriority > "1" {
 				minPriority = "1"
 			}
-		case strings.HasPrefix(msgType, "/sourcehub.bulletin."):
+		case strings.HasPrefix(msgType, "/vera.bulletin."):
 			// Reduce minPriority to 1 if bulletin module message found
 			if minPriority > "1" {
 				minPriority = "1"
 			}
-		case strings.HasPrefix(msgType, "/sourcehub.orbis."):
+		case strings.HasPrefix(msgType, "/vera.orbis."):
 			// Reduce minPriority to 1 if a orbis module message is found.
 			if minPriority > "1" {
 				minPriority = "1"

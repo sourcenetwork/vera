@@ -2,7 +2,7 @@ package metrics
 
 const (
 	// global keys
-	App      = "sourcehub"
+	App      = "vera"
 	Count    = "count"
 	Error    = "error"
 	Errors   = "errors"
@@ -75,17 +75,17 @@ const (
 )
 
 var (
-	SourcehubMethodSeconds     []string = []string{App, Method, SecondsUnit}
-	SourcehubMethodTotal       []string = []string{App, Method, CounterSuffix}
-	SourcehubMethodErrorsTotal []string = []string{App, Method, Errors, CounterSuffix}
+	VeraMethodSeconds     []string = []string{App, Method, SecondsUnit}
+	VeraMethodTotal       []string = []string{App, Method, CounterSuffix}
+	VeraMethodErrorsTotal []string = []string{App, Method, Errors, CounterSuffix}
 
-	SourcehubMsgSeconds     []string = []string{App, Msg, SecondsUnit}
-	SourcehubMsgTotal       []string = []string{App, Msg, CounterSuffix}
-	SourcehubMsgErrorsTotal []string = []string{App, Msg, Errors, CounterSuffix}
+	VeraMsgSeconds     []string = []string{App, Msg, SecondsUnit}
+	VeraMsgTotal       []string = []string{App, Msg, CounterSuffix}
+	VeraMsgErrorsTotal []string = []string{App, Msg, Errors, CounterSuffix}
 
-	SourcehubQuerySeconds     []string = []string{App, Query, SecondsUnit}
-	SourcehubQueryTotal       []string = []string{App, Query, CounterSuffix}
-	SourcehubQueryErrorsTotal []string = []string{App, Query, Errors, CounterSuffix}
+	VeraQuerySeconds     []string = []string{App, Query, SecondsUnit}
+	VeraQueryTotal       []string = []string{App, Query, CounterSuffix}
+	VeraQueryErrorsTotal []string = []string{App, Query, Errors, CounterSuffix}
 
-	SourcehubInternalErrorsTotal []string = []string{App, Errors, Internal, CounterSuffix}
+	VeraInternalErrorsTotal []string = []string{App, Errors, Internal, CounterSuffix}
 )

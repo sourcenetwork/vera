@@ -20,7 +20,7 @@ type BearerToken struct {
 	IssuerID string `json:"iss,omitempty"`
 	// ProviderToken contains provider information (provider name, user id, etc.) as a JWT string
 	ProviderToken string `json:"provider_token,omitempty"`
-	// AuthorizedAccount is the SourceHub account address which is allowed to use this token
+	// AuthorizedAccount is the Vera account address which is allowed to use this token
 	AuthorizedAccount string `json:"authorized_account,omitempty"`
 	// IssuedTime is the timestamp at which the token was generated
 	IssuedTime int64 `json:"iat,omitempty"`

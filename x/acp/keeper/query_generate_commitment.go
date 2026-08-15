@@ -7,9 +7,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/jsonpb"
-	"github.com/sourcenetwork/sourcehub/utils"
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/utils"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

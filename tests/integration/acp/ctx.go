@@ -9,9 +9,9 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/utils"
 )
 
 var DefaultTs = MustDateTimeToProto("2024-01-01 00:00:00")
@@ -45,7 +45,7 @@ func NewTestCtxFromConfig(t *testing.T, config TestConfig) *TestCtx {
 	}
 	executor := NewACPClient(t, config.ExecutorStrategy, params)
 
-	root := MustNewSourceHubActorFromName("root")
+	root := MustNewVeraActorFromName("root")
 	ctx := &TestCtx{
 		Ctx:       context.TODO(),
 		T:         t,
@@ -93,7 +93,7 @@ func (c *TestCtx) GetActor(alias string) *TestActor {
 	case Actor_ED25519:
 		return MustNewED25519ActorFromName(alias)
 	case Actor_SECP256K1:
-		acc := MustNewSourceHubActorFromName(alias)
+		acc := MustNewVeraActorFromName(alias)
 		_, err := c.Executor.GetOrCreateAccountFromActor(c, acc)
 		require.NoError(c.T, err)
 		return acc
@@ -102,8 +102,8 @@ func (c *TestCtx) GetActor(alias string) *TestActor {
 	}
 }
 
-func (c *TestCtx) GetSourceHubAccount(alias string) *TestActor {
-	acc := MustNewSourceHubActorFromName(alias)
+func (c *TestCtx) GetVeraAccount(alias string) *TestActor {
+	acc := MustNewVeraActorFromName(alias)
 	c.AccountKeeper.NewAccount(acc.PubKey)
 	return acc
 }
@@ -114,7 +114,7 @@ func (c *TestCtx) GetRecordMetadataForActor(actor string) *types.RecordMetadata 
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
 		TxHash:     utils.HashTx(c.State.GetLastTx()),
-		TxSigner:   c.TxSigner.SourceHubAddr,
+		TxSigner:   c.TxSigner.VeraAddr,
 		OwnerDid:   c.GetActor(actor).DID,
 	}
 }
@@ -125,7 +125,7 @@ func (c *TestCtx) GetSignerRecordMetadata() *types.RecordMetadata {
 	return &types.RecordMetadata{
 		CreationTs: c.GetBlockTs(),
 		TxHash:     utils.HashTx(c.State.GetLastTx()),
-		TxSigner:   c.TxSigner.SourceHubAddr,
+		TxSigner:   c.TxSigner.VeraAddr,
 		OwnerDid:   c.TxSigner.DID,
 	}
 }
@@ -138,12 +138,12 @@ func (c *TestCtx) Cleanup() {
 	c.Executor.Cleanup()
 }
 
-// WaitBlock waits until the underlying SourceHub node advances to the next block
+// WaitBlock waits until the underlying Vera node advances to the next block
 func (c *TestCtx) WaitBlock() {
 	c.Executor.WaitBlock()
 }
 
-// WaitBlock waits until the underlying SourceHub node advances to the next block
+// WaitBlock waits until the underlying Vera node advances to the next block
 func (c *TestCtx) WaitBlocks(n uint64) {
 	for i := uint64(0); i < n; i += 1 {
 		c.Executor.WaitBlock()

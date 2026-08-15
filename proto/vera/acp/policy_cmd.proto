@@ -1,0 +1,138 @@
+syntax = "proto3";
+
+package vera.acp;
+
+import "google/protobuf/timestamp.proto";
+import "vera/acp/commitment.proto";
+import "vera/acp/record.proto";
+import "vera/acp/registration.proto";
+import "sourcenetwork/acp_core/relationship.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/acp/types";
+
+// PolicyCmd models an operation to be performed against the context of a Policy
+message PolicyCmd {
+  oneof cmd {
+    SetRelationshipCmd set_relationship_cmd = 1;
+    DeleteRelationshipCmd delete_relationship_cmd = 2;
+    RegisterObjectCmd register_object_cmd = 3;
+    ArchiveObjectCmd archive_object_cmd = 4;
+    CommitRegistrationsCmd commit_registrations_cmd = 5;
+    RevealRegistrationCmd reveal_registration_cmd = 6;
+    FlagHijackAttemptCmd flag_hijack_attempt_cmd = 7;
+    UnarchiveObjectCmd unarchive_object_cmd = 8;
+  }
+}
+
+// SetRelationship creates or updates a Relationship within a Policy
+// A Relationship is a statement which ties together an object and a subjecto with a "relation",
+// which means the set of high level rules defined in the Policy will apply to these entities.
+message SetRelationshipCmd {
+  sourcenetwork.acp_core.Relationship relationship = 1;
+}
+
+// DelereRelationship removes a Relationship from a Policy.
+// If the Relationship was not found in a Policy, this Cmd is a no-op.
+message DeleteRelationshipCmd {
+  sourcenetwork.acp_core.Relationship relationship = 1;
+}
+
+// RegisterObject creates a special kind of Relationship within a Policy which ties
+// the msg's Actor as the owner of the msg's Object.
+// The Owner has complete control over the set of subjects that are related to their Object,
+// giving them autonomy to share the object and revoke acces to the object,
+// much like owners in a Discretionary Access Control model.
+//
+// Attempting to register a previously registered Object is an error,
+// Object IDs are therefore assumed to be unique within a Policy.
+message RegisterObjectCmd {
+  sourcenetwork.acp_core.Object object = 1;
+}
+
+// CommitRegistrationsCmd creates a new batched commitment to a set of Object registrations
+message CommitRegistrationsCmd {
+  bytes commitment = 1;
+}
+
+message CommitRegistrationsCmdResult {
+  RegistrationsCommitment registrations_commitment = 1;
+}
+
+message RevealRegistrationCmd {
+  uint64 registrations_commitment_id = 1;
+  RegistrationProof proof = 2;
+}
+
+message RevealRegistrationCmdResult {
+  RelationshipRecord record = 1;
+  AmendmentEvent event = 2;
+}
+
+message FlagHijackAttemptCmd {
+  uint64 event_id = 1;
+}
+
+message FlagHijackAttemptCmdResult {
+  AmendmentEvent event = 1;
+}
+
+message UnarchiveObjectCmd {
+  sourcenetwork.acp_core.Object object = 1;
+}
+
+message UnarchiveObjectCmdResult {
+  RelationshipRecord record = 1;
+  bool relationship_modified = 2;
+}
+
+// ArchiveObject let's an Object's Owner effectively "unshare" their Object.
+// This method wipes all Relationships referencing the given Object.
+//
+// A caveat is that after removing the Relationships, a record of the original Object owner
+// is maintained to prevent an "ownership hijack" attack.
+//
+// Suppose Bob owns object Foo, which is shared with Bob but not Eve.
+// Eve wants to access Foo but was not given permission to, they could "hijack" Bob's object by waiting for Bob to Archive Foo,
+// then submitting a RegisterObject Msg, effectively becoming Foo's new owner.
+// If Charlie has a copy of the object, Eve could convince Charlie to share his copy, granting Eve access to Foo.
+// The previous scenario where an unauthorized user is able to claim ownership to data previously unaccessible to them
+// is an "ownership hijack".
+message ArchiveObjectCmd {
+  sourcenetwork.acp_core.Object object = 1;
+}
+
+// SetRelationshipCmd sets a Relationship in a Policy
+message SetRelationshipCmdResult {
+  // Indicates whether the given Relationship previously existed, ie the Tx was a no op
+  bool record_existed = 1;
+  RelationshipRecord record = 2;
+}
+
+// DeleteRelationshipCmdResult removes a Relationship in a Policy
+message DeleteRelationshipCmdResult {
+  bool record_found = 1;
+}
+
+// RegisterObjectCmdResult registers an Object in a Policy
+message RegisterObjectCmdResult {
+  RelationshipRecord record = 1;
+}
+
+// ArchiveObjectCmdResult unregisters an Object in a Policy
+message ArchiveObjectCmdResult {
+  bool found = 1;
+  uint64 relationships_removed = 2;
+}
+
+message PolicyCmdResult {
+  oneof result {
+    SetRelationshipCmdResult set_relationship_result = 1;
+    DeleteRelationshipCmdResult delete_relationship_result = 2;
+    RegisterObjectCmdResult register_object_result = 3;
+    ArchiveObjectCmdResult archive_object_result = 4;
+    CommitRegistrationsCmdResult commit_registrations_result = 5;
+    RevealRegistrationCmdResult reveal_registration_result = 6;
+    FlagHijackAttemptCmdResult flag_hijack_attempt_result = 7;
+    UnarchiveObjectCmdResult unarchive_object_result = 8;
+  }
+}

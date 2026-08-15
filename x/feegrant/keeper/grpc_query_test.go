@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"google.golang.org/grpc/codes"

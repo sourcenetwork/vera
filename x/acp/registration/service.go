@@ -8,8 +8,8 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // NewRegistrationService returns an abstraction

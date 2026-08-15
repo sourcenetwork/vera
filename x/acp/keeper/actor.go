@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // GetActorDID returns the actor DID for the current transaction.

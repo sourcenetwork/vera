@@ -15800,10 +15800,10 @@ paths:
           format: byte
       tags:
         - Query
-  /sourcehub/feegrant/v1beta1/allowance/{granter}/{grantee}:
+  /vera/feegrant/v1beta1/allowance/{granter}/{grantee}:
     get:
       summary: Allowance returns granted allwance to the grantee by the granter.
-      operationId: SourcehubFeegrantV1Beta1Query_Allowance
+      operationId: VeraFeegrantV1Beta1Query_Allowance
       responses:
         '200':
           description: A successful response.
@@ -16099,10 +16099,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcehub/feegrant/v1beta1/allowances/{grantee}:
+  /vera/feegrant/v1beta1/allowances/{grantee}:
     get:
       summary: Allowances returns all the grants for the given grantee address.
-      operationId: SourcehubFeegrantV1Beta1Query_Allowances
+      operationId: VeraFeegrantV1Beta1Query_Allowances
       responses:
         '200':
           description: A successful response.
@@ -16465,11 +16465,11 @@ paths:
           type: boolean
       tags:
         - Query
-  /sourcehub/feegrant/v1beta1/issued/{granter}:
+  /vera/feegrant/v1beta1/issued/{granter}:
     get:
       summary: AllowancesByGranter returns all the grants given by an address
       description: 'Since: cosmos-sdk 0.46'
-      operationId: SourcehubFeegrantV1Beta1Query_AllowancesByGranter
+      operationId: VeraFeegrantV1Beta1Query_AllowancesByGranter
       responses:
         '200':
           description: A successful response.
@@ -16835,10 +16835,10 @@ paths:
           type: boolean
       tags:
         - Query
-  /sourcehub/feegrant/v1beta1/did_allowance/{granter}/{grantee_did}:
+  /vera/feegrant/v1beta1/did_allowance/{granter}/{grantee_did}:
     get:
       summary: DIDAllowance returns granted allowance to the DID by the granter.
-      operationId: SourcehubFeegrantV1Beta1Query_DIDAllowance
+      operationId: VeraFeegrantV1Beta1Query_DIDAllowance
       responses:
         '200':
           description: A successful response.
@@ -16894,10 +16894,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcehub/feegrant/v1beta1/did_issued/{granter}:
+  /vera/feegrant/v1beta1/did_issued/{granter}:
     get:
       summary: DIDAllowancesByGranter returns all the DID grants given by an address.
-      operationId: SourcehubFeegrantV1Beta1Query_DIDAllowancesByGranter
+      operationId: VeraFeegrantV1Beta1Query_DIDAllowancesByGranter
       responses:
         '200':
           description: A successful response.
@@ -17016,12 +17016,12 @@ paths:
           type: boolean
       tags:
         - Query
-  /sourcehub.feegrant.v1beta1.Msg/GrantAllowance:
+  /vera.feegrant.v1beta1.Msg/GrantAllowance:
     post:
       summary: |-
         GrantAllowance grants fee allowance to the grantee on the granter's
         account with the provided expiration time.
-      operationId: SourcehubFeegrantV1Beta1Msg_GrantAllowance
+      operationId: VeraFeegrantV1Beta1Msg_GrantAllowance
       responses:
         '200':
           description: A successful response.
@@ -17310,13 +17310,13 @@ paths:
               of fees from the account of Granter.
       tags:
         - Msg
-  /sourcehub.feegrant.v1beta1.Msg/PruneAllowances:
+  /vera.feegrant.v1beta1.Msg/PruneAllowances:
     post:
       summary: >-
         PruneAllowances prunes expired fee allowances, currently up to 75 at a
         time.
       description: Since cosmos-sdk 0.50
-      operationId: SourcehubFeegrantV1Beta1Msg_PruneAllowances
+      operationId: VeraFeegrantV1Beta1Msg_PruneAllowances
       responses:
         '200':
           description: A successful response.
@@ -17535,12 +17535,12 @@ paths:
               Since cosmos-sdk 0.50
       tags:
         - Msg
-  /sourcehub.feegrant.v1beta1.Msg/RevokeAllowance:
+  /vera.feegrant.v1beta1.Msg/RevokeAllowance:
     post:
       summary: |-
         RevokeAllowance revokes any fee allowance of granter's account that
         has been granted to the grantee.
-      operationId: SourcehubFeegrantV1Beta1Msg_RevokeAllowance
+      operationId: VeraFeegrantV1Beta1Msg_RevokeAllowance
       responses:
         '200':
           description: A successful response.
@@ -71270,7 +71270,7 @@ paths:
               parameters.
       tags:
         - Msg
-  /sourcehub.acp.Msg/BearerPolicyCmd:
+  /vera.acp.Msg/BearerPolicyCmd:
     post:
       summary: >-
         The Msg authenticates the actor initiating the command through a Bearer
@@ -71281,8 +71281,8 @@ paths:
 
         is used as authentication proof.
 
-        Lastly, the Bearer token MUST be bound to some SourceHub account.
-      operationId: SourcehubAcpMsg_BearerPolicyCmd
+        Lastly, the Bearer token MUST be bound to some Vera account.
+      operationId: VeraAcpMsg_BearerPolicyCmd
       responses:
         '200':
           description: A successful response.
@@ -71309,7 +71309,7 @@ paths:
                           creator:
                             type: string
                             description: >-
-                              msg_signer is the SourceHub address of the account
+                              msg_signer is the Vera address of the account
                               that submited the message responsible for this
                               record
 
@@ -71445,7 +71445,7 @@ paths:
                           creator:
                             type: string
                             description: >-
-                              msg_signer is the SourceHub address of the account
+                              msg_signer is the Vera address of the account
                               that submited the message responsible for this
                               record
 
@@ -71780,17 +71780,17 @@ paths:
                 format: date-time
       tags:
         - Msg
-  /sourcehub.acp.Msg/CheckAccess:
+  /vera.acp.Msg/CheckAccess:
     post:
       summary: >-
         CheckAccess executes an Access Request for an User and stores the result
-        of the evaluation in SourceHub.
+        of the evaluation in Vera.
 
         The resulting evaluation is used to generate a cryptographic proof that
         the given Access Request
 
         was valid at a particular block height.
-      operationId: SourcehubAcpMsg_CheckAccess
+      operationId: VeraAcpMsg_CheckAccess
       responses:
         '200':
           description: A successful response.
@@ -71933,12 +71933,12 @@ paths:
                   operations by an actor
       tags:
         - Msg
-  /sourcehub.acp.Msg/CreatePolicy:
+  /vera.acp.Msg/CreatePolicy:
     post:
       summary: |-
-        CreatePolicy adds a new Policy to SourceHub.
+        CreatePolicy adds a new Policy to Vera.
         The Policy models an aplication's high level access control rules.
-      operationId: SourcehubAcpMsg_CreatePolicy
+      operationId: VeraAcpMsg_CreatePolicy
       responses:
         '200':
           description: A successful response.
@@ -72134,12 +72134,12 @@ paths:
                 format: date-time
       tags:
         - Msg
-  /sourcehub.acp.Msg/DeleteRelationship:
+  /vera.acp.Msg/DeleteRelationship:
     post:
       summary: |-
         DelereRelationship removes a Relationship from a Policy.
         If the Relationship was not found in a Policy, this Msg is a no-op.
-      operationId: SourcehubAcpMsg_DeleteRelationship
+      operationId: VeraAcpMsg_DeleteRelationship
       responses:
         '200':
           description: A successful response.
@@ -72251,9 +72251,9 @@ paths:
                   It states that the given subject has relation with object.
       tags:
         - Msg
-  /sourcehub.acp.Msg/DirectPolicyCmd:
+  /vera.acp.Msg/DirectPolicyCmd:
     post:
-      operationId: SourcehubAcpMsg_DirectPolicyCmd
+      operationId: VeraAcpMsg_DirectPolicyCmd
       responses:
         '200':
           description: A successful response.
@@ -72288,12 +72288,12 @@ paths:
                 type: string
       tags:
         - Msg
-  /sourcehub.acp.Msg/RegisterObject:
+  /vera.acp.Msg/RegisterObject:
     post:
       summary: |-
         Attempting to register a previously registered Object is an error,
         Object IDs are therefore assumed to be unique within a Policy.
-      operationId: SourcehubAcpMsg_RegisterObject
+      operationId: VeraAcpMsg_RegisterObject
       responses:
         '200':
           description: A successful response.
@@ -72325,7 +72325,7 @@ paths:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -72458,7 +72458,7 @@ paths:
                 format: date-time
       tags:
         - Msg
-  /sourcehub.acp.Msg/SetRelationship:
+  /vera.acp.Msg/SetRelationship:
     post:
       summary: >-
         SetRelationship creates or updates a Relationship within a Policy
@@ -72468,7 +72468,7 @@ paths:
 
         which means the set of high level rules defined in the Policy will apply
         to these entities.
-      operationId: SourcehubAcpMsg_SetRelationship
+      operationId: VeraAcpMsg_SetRelationship
       responses:
         '200':
           description: A successful response.
@@ -72489,7 +72489,7 @@ paths:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -72684,14 +72684,14 @@ paths:
                   It states that the given subject has relation with object.
       tags:
         - Msg
-  /sourcehub.acp.Msg/SignedPolicyCmd:
+  /vera.acp.Msg/SignedPolicyCmd:
     post:
       summary: >-
         SignedPolicyCmd is a wrapper for a Command which is executed within the
         Context of a Policy.
 
         The Command is signed by the Actor issuing it.
-      operationId: SourcehubAcpMsg_SignedPolicyCmd
+      operationId: VeraAcpMsg_SignedPolicyCmd
       responses:
         '200':
           description: A successful response.
@@ -72718,7 +72718,7 @@ paths:
                           creator:
                             type: string
                             description: >-
-                              msg_signer is the SourceHub address of the account
+                              msg_signer is the Vera address of the account
                               that submited the message responsible for this
                               record
 
@@ -72854,7 +72854,7 @@ paths:
                           creator:
                             type: string
                             description: >-
-                              msg_signer is the SourceHub address of the account
+                              msg_signer is the Vera address of the account
                               that submited the message responsible for this
                               record
 
@@ -73001,7 +73001,7 @@ paths:
                 default: UNKNOWN
       tags:
         - Msg
-  /sourcehub.acp.Msg/UnregisterObject:
+  /vera.acp.Msg/UnregisterObject:
     post:
       summary: >-
         Suppose Bob owns object Foo, which is shared with Bob but not Eve.
@@ -73019,7 +73019,7 @@ paths:
         ownership to data previously unaccessible to them
 
         is an "ownership hijack".
-      operationId: SourcehubAcpMsg_UnregisterObject
+      operationId: VeraAcpMsg_UnregisterObject
       responses:
         '200':
           description: A successful response.
@@ -73069,12 +73069,12 @@ paths:
                   within a Policy.
       tags:
         - Msg
-  /sourcehub.acp.Msg/UpdateParams:
+  /vera.acp.Msg/UpdateParams:
     post:
       summary: |-
         UpdateParams defines a (governance) operation for updating the module
         parameters. The authority defaults to the x/gov module account.
-      operationId: SourcehubAcpMsg_UpdateParams
+      operationId: VeraAcpMsg_UpdateParams
       responses:
         '200':
           description: A successful response.
@@ -73129,12 +73129,12 @@ paths:
             description: MsgUpdateParams is the Msg/UpdateParams request type.
       tags:
         - Msg
-  /sourcenetwork/sourcehub/acp/access_decision/{id}:
+  /sourcenetwork/vera/acp/access_decision/{id}:
     get:
       summary: >-
         AccessDecision queries the system for an AccessDecision with the given
         ID.
-      operationId: SourcehubAcpQuery_AccessDecision
+      operationId: VeraAcpQuery_AccessDecision
       responses:
         '200':
           description: A successful response.
@@ -73233,10 +73233,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/filter_relationships/{policy_id}:
+  /sourcenetwork/vera/acp/filter_relationships/{policy_id}:
     get:
       summary: FilterRelationships returns filtered set of Relationships in a Policy.
-      operationId: SourcehubAcpQuery_FilterRelationships
+      operationId: VeraAcpQuery_FilterRelationships
       responses:
         '200':
           description: A successful response.
@@ -73254,7 +73254,7 @@ paths:
                     creator:
                       type: string
                       description: >-
-                        msg_signer is the SourceHub address of the account that
+                        msg_signer is the Vera address of the account that
                         submited the message responsible for this record
 
                         It's used for auditing only.
@@ -73411,10 +73411,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/object_owner/{policy_id}/{object.resource}/{object.id}:
+  /sourcenetwork/vera/acp/object_owner/{policy_id}/{object.resource}/{object.id}:
     get:
       summary: ObjectOwner returns the Actor ID of the the given Object's owner
-      operationId: SourcehubAcpQuery_ObjectOwner
+      operationId: VeraAcpQuery_ObjectOwner
       responses:
         '200':
           description: A successful response.
@@ -73458,10 +73458,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/params:
+  /sourcenetwork/vera/acp/params:
     get:
       summary: Parameters queries the parameters of the module.
-      operationId: SourcehubAcpQuery_Params
+      operationId: VeraAcpQuery_Params
       responses:
         '200':
           description: A successful response.
@@ -73501,10 +73501,10 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/policy/{id}:
+  /sourcenetwork/vera/acp/policy/{id}:
     get:
       summary: Policy returns a Policy with the given ID.
-      operationId: SourcehubAcpQuery_Policy
+      operationId: VeraAcpQuery_Policy
       responses:
         '200':
           description: A successful response.
@@ -73679,10 +73679,10 @@ paths:
           type: string
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/policy_ids:
+  /sourcenetwork/vera/acp/policy_ids:
     get:
       summary: PolicyIds returns list of Ids for Policies registered in the system.
-      operationId: SourcehubAcpQuery_PolicyIds
+      operationId: VeraAcpQuery_PolicyIds
       responses:
         '200':
           description: A successful response.
@@ -73714,12 +73714,12 @@ paths:
                   additionalProperties: {}
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/validate_policy/{policy}:
+  /sourcenetwork/vera/acp/validate_policy/{policy}:
     get:
       summary: >-
         ValidatePolicy verifies whether the given Policy definition is properly
         formatted
-      operationId: SourcehubAcpQuery_ValidatePolicy
+      operationId: VeraAcpQuery_ValidatePolicy
       responses:
         '200':
           description: A successful response.
@@ -73764,12 +73764,12 @@ paths:
           default: UNKNOWN
       tags:
         - Query
-  /sourcenetwork/sourcehub/acp/verify_access_request/{policy_id}:
+  /sourcenetwork/vera/acp/verify_access_request/{policy_id}:
     get:
       summary: >-
         VerifyAccessRequest verifies whether an Access Request is accepted with
         respect to the given Policy's Relation Graph.
-      operationId: SourcehubAcpQuery_VerifyAccessRequest
+      operationId: VeraAcpQuery_VerifyAccessRequest
       responses:
         '200':
           description: A successful response.
@@ -73807,9 +73807,9 @@ paths:
           type: string
       tags:
         - Query
-  /sourcehub.bulletin.Msg/CreatePost:
+  /vera.bulletin.Msg/CreatePost:
     post:
-      operationId: SourcehubBulletinMsg_CreatePost
+      operationId: VeraBulletinMsg_CreatePost
       responses:
         '200':
           description: A successful response.
@@ -73852,12 +73852,12 @@ paths:
                 format: byte
       tags:
         - Msg
-  /sourcehub.bulletin.Msg/UpdateParams:
+  /vera.bulletin.Msg/UpdateParams:
     post:
       summary: |-
         UpdateParams defines a (governance) operation for updating the module
         parameters. The authority defaults to the x/gov module account.
-      operationId: SourcehubBulletinMsg_UpdateParams
+      operationId: VeraBulletinMsg_UpdateParams
       responses:
         '200':
           description: A successful response.
@@ -86504,7 +86504,7 @@ definitions:
     description: >-
       QueryEvidenceResponse is the response type for the Query/Evidence RPC
       method.
-  sourcehub.feegrant.v1beta1.Grant:
+  vera.feegrant.v1beta1.Grant:
     type: object
     properties:
       granter:
@@ -86575,7 +86575,7 @@ definitions:
               used with implementation specific semantics.
         additionalProperties: {}
     title: Grant is stored in the KVStore to record a grant with full context
-  sourcehub.feegrant.v1beta1.QueryAllowanceResponse:
+  vera.feegrant.v1beta1.QueryAllowanceResponse:
     type: object
     properties:
       allowance:
@@ -86656,7 +86656,7 @@ definitions:
     description: >-
       QueryAllowanceResponse is the response type for the Query/Allowance RPC
       method.
-  sourcehub.feegrant.v1beta1.QueryAllowancesByGranterResponse:
+  vera.feegrant.v1beta1.QueryAllowancesByGranterResponse:
     type: object
     properties:
       allowances:
@@ -86763,7 +86763,7 @@ definitions:
 
 
       Since: cosmos-sdk 0.46
-  sourcehub.feegrant.v1beta1.QueryAllowancesResponse:
+  vera.feegrant.v1beta1.QueryAllowancesResponse:
     type: object
     properties:
       allowances:
@@ -86867,7 +86867,7 @@ definitions:
     description: >-
       QueryAllowancesResponse is the response type for the Query/Allowances RPC
       method.
-  sourcehub.feegrant.v1beta1.QueryDIDAllowanceResponse:
+  vera.feegrant.v1beta1.QueryDIDAllowanceResponse:
     type: object
     properties:
       allowance:
@@ -86895,7 +86895,7 @@ definitions:
     description: >-
       QueryDIDAllowanceResponse is the response type for the Query/DIDAllowance RPC
       method.
-  sourcehub.feegrant.v1beta1.QueryDIDAllowancesByGranterResponse:
+  vera.feegrant.v1beta1.QueryDIDAllowancesByGranterResponse:
     type: object
     properties:
       allowances:
@@ -86935,7 +86935,7 @@ definitions:
     description: >-
       QueryDIDAllowancesByGranterResponse is the response type for the Query/DIDAllowancesByGranter RPC
       method.
-  sourcehub.feegrant.v1beta1.MsgGrantAllowance:
+  vera.feegrant.v1beta1.MsgGrantAllowance:
     type: object
     properties:
       granter:
@@ -87008,12 +87008,12 @@ definitions:
     description: |-
       MsgGrantAllowance adds permission for Grantee to spend up to Allowance
       of fees from the account of Granter.
-  sourcehub.feegrant.v1beta1.MsgGrantAllowanceResponse:
+  vera.feegrant.v1beta1.MsgGrantAllowanceResponse:
     type: object
     description: >-
       MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response
       type.
-  sourcehub.feegrant.v1beta1.MsgPruneAllowances:
+  vera.feegrant.v1beta1.MsgPruneAllowances:
     type: object
     properties:
       pruner:
@@ -87023,7 +87023,7 @@ definitions:
       MsgPruneAllowances prunes expired fee allowances.
 
       Since cosmos-sdk 0.50
-  sourcehub.feegrant.v1beta1.MsgPruneAllowancesResponse:
+  vera.feegrant.v1beta1.MsgPruneAllowancesResponse:
     type: object
     description: >-
       MsgPruneAllowancesResponse defines the Msg/PruneAllowancesResponse
@@ -87031,7 +87031,7 @@ definitions:
 
 
       Since cosmos-sdk 0.50
-  sourcehub.feegrant.v1beta1.MsgRevokeAllowance:
+  vera.feegrant.v1beta1.MsgRevokeAllowance:
     type: object
     properties:
       granter:
@@ -87045,7 +87045,7 @@ definitions:
           grantee is the address of the user being granted an allowance of
           another user's funds.
     description: MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
-  sourcehub.feegrant.v1beta1.MsgRevokeAllowanceResponse:
+  vera.feegrant.v1beta1.MsgRevokeAllowanceResponse:
     type: object
     description: >-
       MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse
@@ -110065,7 +110065,7 @@ definitions:
   ibc.core.connection.v1.MsgUpdateParamsResponse:
     type: object
     description: MsgUpdateParamsResponse defines the MsgUpdateParams response type.
-  sourcehub.acp.AccessDecision:
+  vera.acp.AccessDecision:
     type: object
     properties:
       id:
@@ -110130,7 +110130,7 @@ definitions:
     title: >-
       AccessDecision models the result of evaluating a set of AccessRequests for
       an Actor
-  sourcehub.acp.AccessRequest:
+  vera.acp.AccessRequest:
     type: object
     properties:
       operations:
@@ -110163,13 +110163,13 @@ definitions:
     title: >-
       AccessRequest represents the wish to perform a set of operations by an
       actor
-  sourcehub.acp.Actor:
+  vera.acp.Actor:
     type: object
     properties:
       id:
         type: string
     description: Actor represents an entity which makes access requests to a Policy.
-  sourcehub.acp.ActorResource:
+  vera.acp.ActorResource:
     type: object
     properties:
       name:
@@ -110210,7 +110210,7 @@ definitions:
     description: >-
       ActorResource represents a special Resource which is reserved for Policy
       actors.
-  sourcehub.acp.ActorSet:
+  vera.acp.ActorSet:
     type: object
     properties:
       object:
@@ -110230,12 +110230,12 @@ definitions:
       It is specified through an Object, Relation pair, which represents
       all actors which have a relationship with given obj-rel pair.
       This expansion is recursive.
-  sourcehub.acp.AllActors:
+  vera.acp.AllActors:
     type: object
     description: |-
       AllActors models a special Relationship Subject which indicates
       that all Actors in the Policy are included.
-  sourcehub.acp.DecisionParams:
+  vera.acp.DecisionParams:
     type: object
     properties:
       decision_expiration_delta:
@@ -110253,7 +110253,7 @@ definitions:
     title: >-
       DecisionParams stores auxiliary information regarding the validity of a
       decision
-  sourcehub.acp.DeleteRelationshipCmd:
+  vera.acp.DeleteRelationshipCmd:
     type: object
     properties:
       relationship:
@@ -110328,13 +110328,13 @@ definitions:
           Relationship models an access control rule.
           It states that the given subject has relation with object.
     title: DeleteRelationshipCmd removes a Relationship in a Policy
-  sourcehub.acp.DeleteRelationshipCmdResult:
+  vera.acp.DeleteRelationshipCmdResult:
     type: object
     properties:
       record_found:
         type: boolean
     title: DeleteRelationshipCmdResult removes a Relationship in a Policy
-  sourcehub.acp.MsgBearerPolicyCmd:
+  vera.acp.MsgBearerPolicyCmd:
     type: object
     properties:
       creator:
@@ -110529,7 +110529,7 @@ definitions:
       creation_time:
         type: string
         format: date-time
-  sourcehub.acp.MsgBearerPolicyCmdResponse:
+  vera.acp.MsgBearerPolicyCmdResponse:
     type: object
     properties:
       result:
@@ -110552,7 +110552,7 @@ definitions:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -110676,7 +110676,7 @@ definitions:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -110775,7 +110775,7 @@ definitions:
                 type: string
                 format: uint64
             title: UnregisterObjectCmdResult unregisters an Object in a Policy
-  sourcehub.acp.MsgCheckAccess:
+  vera.acp.MsgCheckAccess:
     type: object
     properties:
       creator:
@@ -110820,7 +110820,7 @@ definitions:
         title: >-
           AccessRequest represents the wish to perform a set of operations by an
           actor
-  sourcehub.acp.MsgCheckAccessResponse:
+  vera.acp.MsgCheckAccessResponse:
     type: object
     properties:
       decision:
@@ -110890,7 +110890,7 @@ definitions:
         title: >-
           AccessDecision models the result of evaluating a set of AccessRequests
           for an Actor
-  sourcehub.acp.MsgCreatePolicy:
+  vera.acp.MsgCreatePolicy:
     type: object
     properties:
       creator:
@@ -110911,7 +110911,7 @@ definitions:
       creation_time:
         type: string
         format: date-time
-  sourcehub.acp.MsgCreatePolicyResponse:
+  vera.acp.MsgCreatePolicyResponse:
     type: object
     properties:
       policy:
@@ -111044,7 +111044,7 @@ definitions:
           control system
 
           should behave.
-  sourcehub.acp.MsgDeleteRelationship:
+  vera.acp.MsgDeleteRelationship:
     type: object
     properties:
       creator:
@@ -111122,19 +111122,19 @@ definitions:
         description: |-
           Relationship models an access control rule.
           It states that the given subject has relation with object.
-  sourcehub.acp.MsgDeleteRelationshipResponse:
+  vera.acp.MsgDeleteRelationshipResponse:
     type: object
     properties:
       record_found:
         type: boolean
-  sourcehub.acp.MsgDirectPolicyCmd:
+  vera.acp.MsgDirectPolicyCmd:
     type: object
     properties:
       creator:
         type: string
-  sourcehub.acp.MsgDirectPolicyCmdResponse:
+  vera.acp.MsgDirectPolicyCmdResponse:
     type: object
-  sourcehub.acp.MsgRegisterObject:
+  vera.acp.MsgRegisterObject:
     type: object
     properties:
       creator:
@@ -111154,7 +111154,7 @@ definitions:
       creation_time:
         type: string
         format: date-time
-  sourcehub.acp.MsgRegisterObjectResponse:
+  vera.acp.MsgRegisterObjectResponse:
     type: object
     properties:
       result:
@@ -111182,7 +111182,7 @@ definitions:
           creator:
             type: string
             description: >-
-              msg_signer is the SourceHub address of the account that submited
+              msg_signer is the Vera address of the account that submited
               the message responsible for this record
 
               It's used for auditing only.
@@ -111269,7 +111269,7 @@ definitions:
         description: >-
           RelationshipRecord represents a document contained a Relationship and
           additional data.
-  sourcehub.acp.MsgSetRelationship:
+  vera.acp.MsgSetRelationship:
     type: object
     properties:
       creator:
@@ -111350,7 +111350,7 @@ definitions:
         description: |-
           Relationship models an access control rule.
           It states that the given subject has relation with object.
-  sourcehub.acp.MsgSetRelationshipResponse:
+  vera.acp.MsgSetRelationshipResponse:
     type: object
     properties:
       record_existed:
@@ -111367,7 +111367,7 @@ definitions:
           creator:
             type: string
             description: >-
-              msg_signer is the SourceHub address of the account that submited
+              msg_signer is the Vera address of the account that submited
               the message responsible for this record
 
               It's used for auditing only.
@@ -111454,7 +111454,7 @@ definitions:
         description: >-
           RelationshipRecord represents a document contained a Relationship and
           additional data.
-  sourcehub.acp.MsgSignedPolicyCmd:
+  vera.acp.MsgSignedPolicyCmd:
     type: object
     properties:
       creator:
@@ -111467,13 +111467,13 @@ definitions:
           - UNKNOWN
           - JWS
         default: UNKNOWN
-  sourcehub.acp.MsgSignedPolicyCmd.ContentType:
+  vera.acp.MsgSignedPolicyCmd.ContentType:
     type: string
     enum:
       - UNKNOWN
       - JWS
     default: UNKNOWN
-  sourcehub.acp.MsgSignedPolicyCmdResponse:
+  vera.acp.MsgSignedPolicyCmdResponse:
     type: object
     properties:
       result:
@@ -111496,7 +111496,7 @@ definitions:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -111620,7 +111620,7 @@ definitions:
                   creator:
                     type: string
                     description: >-
-                      msg_signer is the SourceHub address of the account that
+                      msg_signer is the Vera address of the account that
                       submited the message responsible for this record
 
                       It's used for auditing only.
@@ -111719,7 +111719,7 @@ definitions:
                 type: string
                 format: uint64
             title: UnregisterObjectCmdResult unregisters an Object in a Policy
-  sourcehub.acp.MsgUnregisterObject:
+  vera.acp.MsgUnregisterObject:
     type: object
     properties:
       creator:
@@ -111736,12 +111736,12 @@ definitions:
         description: >-
           Object represents an entity which must be access controlled within a
           Policy.
-  sourcehub.acp.MsgUnregisterObjectResponse:
+  vera.acp.MsgUnregisterObjectResponse:
     type: object
     properties:
       found:
         type: boolean
-  sourcehub.acp.MsgUpdateParams:
+  vera.acp.MsgUpdateParams:
     type: object
     properties:
       authority:
@@ -111760,12 +111760,12 @@ definitions:
               policy_command_max_expiration_delta specifies a global thershold
               for how old a Command will be accepted for.
     description: MsgUpdateParams is the Msg/UpdateParams request type.
-  sourcehub.acp.MsgUpdateParamsResponse:
+  vera.acp.MsgUpdateParamsResponse:
     type: object
     description: |-
       MsgUpdateParamsResponse defines the response structure for executing a
       MsgUpdateParams message.
-  sourcehub.acp.Object:
+  vera.acp.Object:
     type: object
     properties:
       resource:
@@ -111775,7 +111775,7 @@ definitions:
     description: >-
       Object represents an entity which must be access controlled within a
       Policy.
-  sourcehub.acp.Operation:
+  vera.acp.Operation:
     type: object
     properties:
       object:
@@ -111793,7 +111793,7 @@ definitions:
         type: string
         title: permission required to perform operation
     description: Operation represents an action over an object.
-  sourcehub.acp.Params:
+  vera.acp.Params:
     type: object
     properties:
       policy_command_max_expiration_delta:
@@ -111803,7 +111803,7 @@ definitions:
           policy_command_max_expiration_delta specifies a global thershold for
           how old a Command will be accepted for.
     description: Params defines the parameters for the module.
-  sourcehub.acp.Permission:
+  vera.acp.Permission:
     type: object
     properties:
       name:
@@ -111818,7 +111818,7 @@ definitions:
 
       A permission often maps to an operation defined for a resource which an
       actor may attempt.
-  sourcehub.acp.Policy:
+  vera.acp.Policy:
     type: object
     properties:
       id:
@@ -111948,7 +111948,7 @@ definitions:
       system
 
       should behave.
-  sourcehub.acp.PolicyCmd:
+  vera.acp.PolicyCmd:
     type: object
     properties:
       set_relationship_cmd:
@@ -112131,7 +112131,7 @@ definitions:
               Object represents an entity which must be access controlled within
               a Policy.
         title: UnregisterObjectCmd unregisters an Object in a Policy
-  sourcehub.acp.PolicyCmdResult:
+  vera.acp.PolicyCmdResult:
     type: object
     properties:
       set_relationship_result:
@@ -112151,7 +112151,7 @@ definitions:
               creator:
                 type: string
                 description: >-
-                  msg_signer is the SourceHub address of the account that
+                  msg_signer is the Vera address of the account that
                   submited the message responsible for this record
 
                   It's used for auditing only.
@@ -112273,7 +112273,7 @@ definitions:
               creator:
                 type: string
                 description: >-
-                  msg_signer is the SourceHub address of the account that
+                  msg_signer is the Vera address of the account that
                   submited the message responsible for this record
 
                   It's used for auditing only.
@@ -112370,7 +112370,7 @@ definitions:
             type: string
             format: uint64
         title: UnregisterObjectCmdResult unregisters an Object in a Policy
-  sourcehub.acp.PolicyMarshalingType:
+  vera.acp.PolicyMarshalingType:
     type: string
     enum:
       - UNKNOWN
@@ -112381,7 +112381,7 @@ definitions:
 
        - UNKNOWN: Fallback value for a missing Marshaling Type
        - YAML: YAML Marshaled Policy
-  sourcehub.acp.RegisterObjectCmd:
+  vera.acp.RegisterObjectCmd:
     type: object
     properties:
       object:
@@ -112395,7 +112395,7 @@ definitions:
           Object represents an entity which must be access controlled within a
           Policy.
     title: RegisterObjectCmd registers an Object in a Policy
-  sourcehub.acp.RegisterObjectCmdResult:
+  vera.acp.RegisterObjectCmdResult:
     type: object
     properties:
       result:
@@ -112423,7 +112423,7 @@ definitions:
           creator:
             type: string
             description: >-
-              msg_signer is the SourceHub address of the account that submited
+              msg_signer is the Vera address of the account that submited
               the message responsible for this record
 
               It's used for auditing only.
@@ -112511,7 +112511,7 @@ definitions:
           RelationshipRecord represents a document contained a Relationship and
           additional data.
     title: RegisterObjectCmdResult registers an Object in a Policy
-  sourcehub.acp.RegistrationResult:
+  vera.acp.RegistrationResult:
     type: string
     enum:
       - NoOp
@@ -112527,7 +112527,7 @@ definitions:
     title: >-
       RegistrationResult encodes the possible result set from Registering an
       Object
-  sourcehub.acp.Relation:
+  vera.acp.Relation:
     type: object
     properties:
       name:
@@ -112554,7 +112554,7 @@ definitions:
             Restriction models a specification which a Relationship's actor
             should meet.
         title: value restriction types
-  sourcehub.acp.Relationship:
+  vera.acp.Relationship:
     type: object
     properties:
       object:
@@ -112619,7 +112619,7 @@ definitions:
     description: |-
       Relationship models an access control rule.
       It states that the given subject has relation with object.
-  sourcehub.acp.RelationshipRecord:
+  vera.acp.RelationshipRecord:
     type: object
     properties:
       creation_time:
@@ -112628,7 +112628,7 @@ definitions:
       creator:
         type: string
         description: >-
-          msg_signer is the SourceHub address of the account that submited the
+          msg_signer is the Vera address of the account that submited the
           message responsible for this record
 
           It's used for auditing only.
@@ -112714,7 +112714,7 @@ definitions:
     description: >-
       RelationshipRecord represents a document contained a Relationship and
       additional data.
-  sourcehub.acp.Resource:
+  vera.acp.Resource:
     type: object
     properties:
       name:
@@ -112776,7 +112776,7 @@ definitions:
       files or groups.
 
       A Resource represents a set of entities of a certain type.
-  sourcehub.acp.Restriction:
+  vera.acp.Restriction:
     type: object
     properties:
       resource_name:
@@ -112788,7 +112788,7 @@ definitions:
     description: |-
       Restriction models a specification which a Relationship's actor
       should meet.
-  sourcehub.acp.SetRelationshipCmd:
+  vera.acp.SetRelationshipCmd:
     type: object
     properties:
       relationship:
@@ -112863,7 +112863,7 @@ definitions:
           Relationship models an access control rule.
           It states that the given subject has relation with object.
     title: SetRelationshipCmd sets a Relationship in a Policy
-  sourcehub.acp.SetRelationshipCmdResult:
+  vera.acp.SetRelationshipCmdResult:
     type: object
     properties:
       record_existed:
@@ -112880,7 +112880,7 @@ definitions:
           creator:
             type: string
             description: >-
-              msg_signer is the SourceHub address of the account that submited
+              msg_signer is the Vera address of the account that submited
               the message responsible for this record
 
               It's used for auditing only.
@@ -112968,7 +112968,7 @@ definitions:
           RelationshipRecord represents a document contained a Relationship and
           additional data.
     title: SetRelationshipCmd sets a Relationship in a Policy
-  sourcehub.acp.Subject:
+  vera.acp.Subject:
     type: object
     properties:
       actor:
@@ -113013,7 +113013,7 @@ definitions:
           Object represents an entity which must be access controlled within a
           Policy.
     description: Subject specifies the target of a Relationship.
-  sourcehub.acp.UnregisterObjectCmd:
+  vera.acp.UnregisterObjectCmd:
     type: object
     properties:
       object:
@@ -113027,7 +113027,7 @@ definitions:
           Object represents an entity which must be access controlled within a
           Policy.
     title: UnregisterObjectCmd unregisters an Object in a Policy
-  sourcehub.acp.UnregisterObjectCmdResult:
+  vera.acp.UnregisterObjectCmdResult:
     type: object
     properties:
       found:
@@ -113036,7 +113036,7 @@ definitions:
         type: string
         format: uint64
     title: UnregisterObjectCmdResult unregisters an Object in a Policy
-  sourcehub.acp.ObjectSelector:
+  vera.acp.ObjectSelector:
     type: object
     properties:
       object:
@@ -113054,7 +113054,7 @@ definitions:
         title: wildcard matches any object
         type: object
     title: ObjectSelector models a filter for Relationship Objects
-  sourcehub.acp.QueryAccessDecisionResponse:
+  vera.acp.QueryAccessDecisionResponse:
     type: object
     properties:
       decision:
@@ -113124,7 +113124,7 @@ definitions:
         title: >-
           AccessDecision models the result of evaluating a set of AccessRequests
           for an Actor
-  sourcehub.acp.QueryFilterRelationshipsResponse:
+  vera.acp.QueryFilterRelationshipsResponse:
     type: object
     properties:
       records:
@@ -113138,7 +113138,7 @@ definitions:
             creator:
               type: string
               description: >-
-                msg_signer is the SourceHub address of the account that submited
+                msg_signer is the Vera address of the account that submited
                 the message responsible for this record
 
                 It's used for auditing only.
@@ -113225,14 +113225,14 @@ definitions:
           description: >-
             RelationshipRecord represents a document contained a Relationship
             and additional data.
-  sourcehub.acp.QueryObjectOwnerResponse:
+  vera.acp.QueryObjectOwnerResponse:
     type: object
     properties:
       is_registered:
         type: boolean
       owner_id:
         type: string
-  sourcehub.acp.QueryParamsResponse:
+  vera.acp.QueryParamsResponse:
     type: object
     properties:
       params:
@@ -113246,7 +113246,7 @@ definitions:
               policy_command_max_expiration_delta specifies a global thershold
               for how old a Command will be accepted for.
     description: QueryParamsResponse is response type for the Query/Params RPC method.
-  sourcehub.acp.QueryPolicyIdsResponse:
+  vera.acp.QueryPolicyIdsResponse:
     type: object
     properties:
       ids:
@@ -113254,7 +113254,7 @@ definitions:
         items:
           type: string
         title: cosmos.base.query.v1beta1.PageResponse pagination = 1;
-  sourcehub.acp.QueryPolicyResponse:
+  vera.acp.QueryPolicyResponse:
     type: object
     properties:
       policy:
@@ -113387,17 +113387,17 @@ definitions:
           control system
 
           should behave.
-  sourcehub.acp.QueryValidatePolicyResponse:
+  vera.acp.QueryValidatePolicyResponse:
     type: object
     properties:
       valid:
         type: boolean
-  sourcehub.acp.QueryVerifyAccessRequestResponse:
+  vera.acp.QueryVerifyAccessRequestResponse:
     type: object
     properties:
       valid:
         type: boolean
-  sourcehub.acp.RelationSelector:
+  vera.acp.RelationSelector:
     type: object
     properties:
       relation:
@@ -113409,7 +113409,7 @@ definitions:
         title: wildcard matches any relation
         type: object
     title: RelationsSelector models a filter for Relationship Relations
-  sourcehub.acp.RelationshipSelector:
+  vera.acp.RelationshipSelector:
     type: object
     properties:
       object_selector:
@@ -113510,7 +113510,7 @@ definitions:
       through
 
       Relationships in a Policy.
-  sourcehub.acp.SubjectSelector:
+  vera.acp.SubjectSelector:
     type: object
     properties:
       subject:
@@ -113567,10 +113567,10 @@ definitions:
         title: wildcard matches any subject in a Relationship
         type: object
     title: SubjectSelector models a filter for Relationship Subjects
-  sourcehub.acp.WildcardSelector:
+  vera.acp.WildcardSelector:
     type: object
     title: WildcardSelector matches anything in a context
-  sourcehub.bulletin.MsgCreatePost:
+  vera.bulletin.MsgCreatePost:
     type: object
     properties:
       record_existed:
@@ -113587,7 +113587,7 @@ definitions:
           creator:
             type: string
             description: >-
-              msg_signer is the SourceHub address of the account that submited
+              msg_signer is the Vera address of the account that submited
               the message responsible for this record
 
               It's used for auditing only.
@@ -113675,7 +113675,7 @@ definitions:
           RelationshipRecord represents a document contained a Relationship and
           additional data.
     title: SetRelationshipCmd sets a Relationship in a Policy
-  sourcehub.acp.UnregisterObjectCmdResult:
+  vera.acp.UnregisterObjectCmdResult:
     type: object
     properties:
       found:
@@ -113684,6 +113684,6 @@ definitions:
         type: string
         format: uint64
     title: UnregisterObjectCmdResult unregisters an Object in a Policy
-  sourcehub.bulletin.Params:
+  vera.bulletin.Params:
     type: object
     description: Params defines the parameters for the module.

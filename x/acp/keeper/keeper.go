@@ -14,16 +14,16 @@ import (
 	acpruntime "github.com/sourcenetwork/acp_core/pkg/runtime"
 	"github.com/sourcenetwork/acp_core/pkg/services"
 	"github.com/sourcenetwork/raccoondb/v2/primitives"
-	"github.com/sourcenetwork/sourcehub/x/acp/capability"
-	cosmosadapter "github.com/sourcenetwork/sourcehub/x/acp/stores/cosmos"
+	"github.com/sourcenetwork/vera/x/acp/capability"
+	cosmosadapter "github.com/sourcenetwork/vera/x/acp/stores/cosmos"
 
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/registration"
-	"github.com/sourcenetwork/sourcehub/x/acp/stores"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/access_decision"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/keeper/policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/registration"
+	"github.com/sourcenetwork/vera/x/acp/stores"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type (
@@ -38,7 +38,7 @@ type (
 
 		accountKeeper types.AccountKeeper
 		capKeeper     *capabilitykeeper.ScopedKeeper
-		hubKeeper     types.HubKeeper
+		coreKeeper    types.CoreKeeper
 	}
 )
 
@@ -49,7 +49,7 @@ func NewKeeper(
 	authority string,
 	accountKeeper types.AccountKeeper,
 	capKeeper *capabilitykeeper.ScopedKeeper,
-	hubKeeper types.HubKeeper,
+	coreKeeper types.CoreKeeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
 		panic(fmt.Sprintf("invalid authority address: %s", authority))
@@ -62,7 +62,7 @@ func NewKeeper(
 		logger:        logger,
 		accountKeeper: accountKeeper,
 		capKeeper:     capKeeper,
-		hubKeeper:     hubKeeper,
+		coreKeeper:    coreKeeper,
 	}
 }
 
@@ -92,7 +92,7 @@ func (k *Keeper) getACPEngine(ctx sdk.Context) *services.EngineService {
 	raccoonAdapted := stores.RaccoonKVFromCosmos(adapted)
 	runtime, err := acpruntime.NewRuntimeManager(
 		acpruntime.WithKVStore(raccoonAdapted),
-		acpruntime.WithTimeService(&SourceHubTimeProvider{}),
+		acpruntime.WithTimeService(&VeraTimeProvider{}),
 	)
 	if err != nil {
 		panic(err)

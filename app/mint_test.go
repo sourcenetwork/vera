@@ -19,8 +19,8 @@ import (
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	minttestutil "github.com/cosmos/cosmos-sdk/x/mint/testutil"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
-	test "github.com/sourcenetwork/sourcehub/testutil"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	test "github.com/sourcenetwork/vera/testutil"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
 )
 
 type MintTestSuite struct {

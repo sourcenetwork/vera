@@ -7,9 +7,9 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 

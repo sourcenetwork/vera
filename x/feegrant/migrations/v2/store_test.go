@@ -8,9 +8,9 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	v2 "github.com/sourcenetwork/sourcehub/x/feegrant/migrations/v2"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	v2 "github.com/sourcenetwork/vera/x/feegrant/migrations/v2"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/runtime"

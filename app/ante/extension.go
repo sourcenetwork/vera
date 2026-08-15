@@ -9,8 +9,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // ExtensionOptionsDecorator validates extension options in transactions.
@@ -18,13 +18,13 @@ import (
 // It also extracts DID from JWS extension options and stores it in context.
 // Additionally, it stores used JWS tokens for tracking and invalidation.
 type ExtensionOptionsDecorator struct {
-	hubKeeper HubKeeper
+	coreKeeper CoreKeeper
 }
 
 // NewExtensionOptionsDecorator creates a new ExtensionOptionsDecorator.
-func NewExtensionOptionsDecorator(hubKeeper HubKeeper) ExtensionOptionsDecorator {
+func NewExtensionOptionsDecorator(coreKeeper CoreKeeper) ExtensionOptionsDecorator {
 	return ExtensionOptionsDecorator{
-		hubKeeper: hubKeeper,
+		coreKeeper: coreKeeper,
 	}
 }
 
@@ -86,11 +86,11 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 	}
 
 	// Store or update the JWS token record
-	if eod.hubKeeper != nil && !simulate {
+	if eod.coreKeeper != nil && !simulate {
 		issuedAt := time.Unix(bearerToken.IssuedTime, 0)
 		expiresAt := time.Unix(bearerToken.ExpirationTime, 0)
 
-		err = eod.hubKeeper.StoreOrUpdateJWSToken(
+		err = eod.coreKeeper.StoreOrUpdateJWSToken(
 			ctx,
 			jwsOpt.BearerToken,
 			did,
@@ -142,7 +142,7 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 }
 
 func (eod ExtensionOptionsDecorator) validateRelay(ctx sdk.Context, tx sdk.Tx) (string, error) {
-	if eod.hubKeeper == nil || !eod.hubKeeper.GetChainConfig(ctx).IgnoreBearerAuth {
+	if eod.coreKeeper == nil || !eod.coreKeeper.GetChainConfig(ctx).IgnoreBearerAuth {
 		return "", nil
 	}
 
@@ -156,7 +156,7 @@ func (eod ExtensionOptionsDecorator) validateRelay(ctx sdk.Context, tx sdk.Tx) (
 	}
 
 	feeGranterAddress := sdk.AccAddress(feeGranter).String()
-	if !eod.hubKeeper.GetParams(ctx).IsTrustedRelayFeeGranter(feeGranterAddress) {
+	if !eod.coreKeeper.GetParams(ctx).IsTrustedRelayFeeGranter(feeGranterAddress) {
 		return "", errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "fee granter %s is not a trusted relay", feeGranterAddress)
 	}
 
