@@ -18,7 +18,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
+	modulev1 "github.com/sourcenetwork/sourcehub/api/vera/core/module"
 	"github.com/sourcenetwork/sourcehub/app/metrics"
 	"github.com/sourcenetwork/sourcehub/x/hub/keeper"
 	"github.com/sourcenetwork/sourcehub/x/hub/types"
