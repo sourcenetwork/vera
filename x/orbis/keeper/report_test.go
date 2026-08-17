@@ -572,156 +572,88 @@ func TestInvalidCryptoResponseDkgPublicOriginFaultDecodeAndBinding(t *testing.T)
 	}
 }
 
-func TestInvalidCryptoResponseDkgLeaderEquivocationDecodeAndBinding(t *testing.T) {
+func TestInvalidCryptoResponseDkgLeaderTwoDeliveryEvidenceDecodeAndBinding(t *testing.T) {
 	origin := bytes.Repeat([]byte{0x22}, 32)
 	otherOrigin := bytes.Repeat([]byte{0x33}, 32)
 	deliveryIDA := bytes.Repeat([]byte{0xaa}, 16)
 	deliveryIDB := bytes.Repeat([]byte{0xbb}, 16)
 
-	valid := dkgLeaderEquivocationPayloadForTest(
-		offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent,
-		origin, origin, deliveryIDA, deliveryIDB,
-	)
-	decoded, err := decodeInvalidCryptoResponsePayload(valid)
-	require.NoError(t, err)
-	require.Equal(t, reportTestChainID, decoded.chainID)
-	require.Equal(t, "ring-1", decoded.ringID)
-	require.Equal(t, "900", decoded.requestID)
-	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
-	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
-	require.Equal(t, origin, decoded.endpointOrigin)
-
-	// Reshare requires a pending-new accused scope instead of current.
-	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderEquivocationPayloadForTest(
-		offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopePendingNew,
-		origin, origin, deliveryIDA, deliveryIDB,
-	))
-	require.NoError(t, err)
-
-	report := &types.ReportEnvelope{
-		ChainId:         reportTestChainID,
-		RingId:          "ring-1",
-		RingPk:          "aabb",
-		RingStateSha256: strings.Repeat("11", 32),
-		SessionId:       "900",
-		AccusedNodeKey:  "accused",
-		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
-		ObservedAt:      reportTestObservedAt,
-	}
-	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
-	report.AccusedPeerId = strings.Repeat("33", 32)
-	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
-
-	rejected := []struct {
-		name    string
-		payload []byte
+	variants := []struct {
+		name         string
+		domain       string
+		evidenceKind string
 	}{
-		{
-			"mismatched delivery origins",
-			dkgLeaderEquivocationPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, otherOrigin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"identical delivery IDs",
-			dkgLeaderEquivocationPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDA),
-		},
-		{
-			"unknown origin protocol",
-			dkgLeaderEquivocationPayloadForTest("unknown", "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"unknown phase",
-			dkgLeaderEquivocationPayloadForTest(offlineOriginProtocolPSSRefresh, "unknown", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"refresh pending-new accused",
-			dkgLeaderEquivocationPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopePendingNew, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"reshare current accused",
-			dkgLeaderEquivocationPayloadForTest(offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
+		{"leader equivocation", DkgLeaderEquivocationDomain, invalidCryptoEvidenceKindDkgLeaderEquivocation},
+		{"leader batch mismatch", DkgLeaderBatchMismatchDomain, invalidCryptoEvidenceKindDkgLeaderBatchMismatch},
 	}
-	for _, tc := range rejected {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
-			require.ErrorIs(t, err, types.ErrInvalidReport)
-		})
-	}
-}
+	for _, variant := range variants {
+		t.Run(variant.name, func(t *testing.T) {
+			payload := func(
+				originProtocol string,
+				phase string,
+				accusedScope byte,
+				originA []byte,
+				originB []byte,
+				deliveryIDA []byte,
+				deliveryIDB []byte,
+			) []byte {
+				return dkgLeaderTwoDeliveryPayloadForTest(
+					variant.domain, variant.evidenceKind, originProtocol, phase, accusedScope,
+					originA, originB, deliveryIDA, deliveryIDB,
+				)
+			}
 
-func TestInvalidCryptoResponseDkgLeaderBatchMismatchDecodeAndBinding(t *testing.T) {
-	origin := bytes.Repeat([]byte{0x22}, 32)
-	otherOrigin := bytes.Repeat([]byte{0x33}, 32)
-	deliveryIDA := bytes.Repeat([]byte{0xaa}, 16)
-	deliveryIDB := bytes.Repeat([]byte{0xbb}, 16)
+			valid := payload(
+				offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent,
+				origin, origin, deliveryIDA, deliveryIDB,
+			)
+			decoded, err := decodeInvalidCryptoResponsePayload(valid)
+			require.NoError(t, err)
+			require.Equal(t, reportTestChainID, decoded.chainID)
+			require.Equal(t, "ring-1", decoded.ringID)
+			require.Equal(t, "900", decoded.requestID)
+			require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+			require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+			require.Equal(t, origin, decoded.endpointOrigin)
 
-	valid := dkgLeaderBatchMismatchPayloadForTest(
-		offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent,
-		origin, origin, deliveryIDA, deliveryIDB,
-	)
-	decoded, err := decodeInvalidCryptoResponsePayload(valid)
-	require.NoError(t, err)
-	require.Equal(t, reportTestChainID, decoded.chainID)
-	require.Equal(t, "ring-1", decoded.ringID)
-	require.Equal(t, "900", decoded.requestID)
-	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
-	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
-	require.Equal(t, origin, decoded.endpointOrigin)
+			// Reshare requires a pending-new accused scope instead of current.
+			_, err = decodeInvalidCryptoResponsePayload(payload(
+				offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopePendingNew,
+				origin, origin, deliveryIDA, deliveryIDB,
+			))
+			require.NoError(t, err)
 
-	// Reshare requires a pending-new accused scope instead of current.
-	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderBatchMismatchPayloadForTest(
-		offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopePendingNew,
-		origin, origin, deliveryIDA, deliveryIDB,
-	))
-	require.NoError(t, err)
+			report := &types.ReportEnvelope{
+				ChainId:         reportTestChainID,
+				RingId:          "ring-1",
+				RingPk:          "aabb",
+				RingStateSha256: strings.Repeat("11", 32),
+				SessionId:       "900",
+				AccusedNodeKey:  "accused",
+				AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+				ObservedAt:      reportTestObservedAt,
+			}
+			require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+			report.AccusedPeerId = strings.Repeat("33", 32)
+			require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
 
-	report := &types.ReportEnvelope{
-		ChainId:         reportTestChainID,
-		RingId:          "ring-1",
-		RingPk:          "aabb",
-		RingStateSha256: strings.Repeat("11", 32),
-		SessionId:       "900",
-		AccusedNodeKey:  "accused",
-		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
-		ObservedAt:      reportTestObservedAt,
-	}
-	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
-	report.AccusedPeerId = strings.Repeat("33", 32)
-	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
-
-	rejected := []struct {
-		name    string
-		payload []byte
-	}{
-		{
-			"mismatched delivery origins",
-			dkgLeaderBatchMismatchPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, otherOrigin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"identical delivery IDs",
-			dkgLeaderBatchMismatchPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDA),
-		},
-		{
-			"unknown origin protocol",
-			dkgLeaderBatchMismatchPayloadForTest("unknown", "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"unknown phase",
-			dkgLeaderBatchMismatchPayloadForTest(offlineOriginProtocolPSSRefresh, "unknown", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"refresh pending-new accused",
-			dkgLeaderBatchMismatchPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopePendingNew, origin, origin, deliveryIDA, deliveryIDB),
-		},
-		{
-			"reshare current accused",
-			dkgLeaderBatchMismatchPayloadForTest(offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB),
-		},
-	}
-	for _, tc := range rejected {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
-			require.ErrorIs(t, err, types.ErrInvalidReport)
+			rejected := []struct {
+				name    string
+				payload []byte
+			}{
+				{"mismatched delivery origins", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, otherOrigin, deliveryIDA, deliveryIDB)},
+				{"identical delivery IDs", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDA)},
+				{"unknown origin protocol", payload("unknown", "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+				{"unknown phase", payload(offlineOriginProtocolPSSRefresh, "unknown", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+				{"refresh pending-new accused", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopePendingNew, origin, origin, deliveryIDA, deliveryIDB)},
+				{"reshare current accused", payload(offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+			}
+			for _, tc := range rejected {
+				t.Run(tc.name, func(t *testing.T) {
+					_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+					require.ErrorIs(t, err, types.ErrInvalidReport)
+				})
+			}
 		})
 	}
 }
@@ -2678,7 +2610,9 @@ func writeEndpointContributionForTest(w *reportCanonicalWriter, origin []byte, m
 	w.writeBytes([]byte{marker, marker + 1, marker + 2})
 }
 
-func dkgLeaderEquivocationPayloadForTest(
+func dkgLeaderTwoDeliveryPayloadForTest(
+	domain string,
+	evidenceKind string,
 	originProtocol string,
 	phase string,
 	accusedScope byte,
@@ -2688,7 +2622,7 @@ func dkgLeaderEquivocationPayloadForTest(
 	deliveryIDB []byte,
 ) []byte {
 	statement := newReportCanonicalWriter()
-	statement.writeString(DkgLeaderEquivocationDomain)
+	statement.writeString(domain)
 	statement.writeString(reportTestChainID)
 	statement.writeString("ring-1")
 	statement.writeString("aabb")
@@ -2710,48 +2644,7 @@ func dkgLeaderEquivocationPayloadForTest(
 		panic(err)
 	}
 	outer := newReportCanonicalWriter()
-	outer.writeString(invalidCryptoEvidenceKindDkgLeaderEquivocation)
-	outer.writeBytes(statementBytes)
-	payload, err := outer.finish()
-	if err != nil {
-		panic(err)
-	}
-	return payload
-}
-
-func dkgLeaderBatchMismatchPayloadForTest(
-	originProtocol string,
-	phase string,
-	accusedScope byte,
-	originA []byte,
-	originB []byte,
-	deliveryIDA []byte,
-	deliveryIDB []byte,
-) []byte {
-	statement := newReportCanonicalWriter()
-	statement.writeString(DkgLeaderBatchMismatchDomain)
-	statement.writeString(reportTestChainID)
-	statement.writeString("ring-1")
-	statement.writeString("aabb")
-	statement.writeString(strings.Repeat("11", 32))
-	statement.writeU64(7)
-	statement.writeString("900")
-	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
-	statement.writeString("accused")
-	statement.writeString(originProtocol)
-	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
-	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
-	statement.writeString(phase)
-	statement.writeBytes(deliveryIDA)
-	writeEndpointContributionForTest(statement, originA, 1)
-	statement.writeBytes(deliveryIDB)
-	writeEndpointContributionForTest(statement, originB, 2)
-	statementBytes, err := statement.finish()
-	if err != nil {
-		panic(err)
-	}
-	outer := newReportCanonicalWriter()
-	outer.writeString(invalidCryptoEvidenceKindDkgLeaderBatchMismatch)
+	outer.writeString(evidenceKind)
 	outer.writeBytes(statementBytes)
 	payload, err := outer.finish()
 	if err != nil {
