@@ -452,6 +452,7 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 	// later timestamp, not always commitment_a's, since equivocation is only
 	// provable once the later, conflicting commitment arrives.
 	require.Equal(t, commitmentB.signedAt, decoded.signedAt)
+	require.Equal(t, commitmentA.attemptID, decoded.attemptID)
 	require.Equal(t, "accused", decoded.responderNodeKey)
 	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
 	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
@@ -494,6 +495,7 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 		{"responder mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.responderKey = "other" }).encode(), signatureB)},
 		{"origin mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolPSSReshare }).encode(), signatureB)},
 		{"from node mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.fromNodeID = 3 }).encode(), signatureB)},
+		{"attempt mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.attemptID = bytes.Repeat([]byte{10}, 32) }).encode(), signatureB)},
 		{"crypto backend mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.cryptoBackend = "dkg/other" }).encode(), signatureB)},
 		{"different session nonce", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.sessionNonce = bytes.Repeat([]byte{13}, dkgNonceLen) }).encode(), signatureB)},
 		{"identical commitments", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.commitment = commitmentA.commitment }).encode(), signatureB)},

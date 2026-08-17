@@ -2004,6 +2004,7 @@ func decodeDkgEquivocationStatements(
 		commitmentA.accusedCommitteeScope != commitmentB.accusedCommitteeScope ||
 		commitmentA.signingCommitteeScope != commitmentB.signingCommitteeScope ||
 		commitmentA.fromNodeID != commitmentB.fromNodeID ||
+		!bytes.Equal(commitmentA.attemptID, commitmentB.attemptID) ||
 		commitmentA.cryptoBackend != commitmentB.cryptoBackend {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "DKG equivocation commitment bindings do not match")
 	}
@@ -2026,9 +2027,8 @@ func decodeDkgEquivocationStatements(
 		originProtocol:        commitmentA.originProtocol,
 		accusedCommitteeScope: commitmentA.accusedCommitteeScope,
 		signingCommitteeScope: commitmentA.signingCommitteeScope,
-		// commitmentA/commitmentB are required above to share a session_nonce,
-		// which for a genuinely equivocating dealer means the same real
-		// attempt too, so either's attemptID is equivalent here.
+		// commitmentA/commitmentB are required above to share an attemptID, so
+		// either value is equivalent here.
 		attemptID: commitmentA.attemptID,
 	}, nil
 }
