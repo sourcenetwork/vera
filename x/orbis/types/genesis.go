@@ -23,6 +23,9 @@ func (gs GenesisState) Validate() error {
 	knownRings := make(map[string]struct{}, len(gs.Rings))
 	for _, r := range gs.Rings {
 		knownRings[r.Id] = struct{}{}
+		if err := ValidateTrustedAuthRelayConfig(r.AllowTrustedAuthRelays, r.TrustedAuthRelayDids); err != nil {
+			return fmt.Errorf("ring %q trusted auth relays: %w", r.Id, err)
+		}
 
 		// A zero-value reporting config means "use module defaults" and is
 		// backfilled from params during InitGenesis.

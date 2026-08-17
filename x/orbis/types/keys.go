@@ -35,20 +35,32 @@ func KeyPrefix(p string) []byte {
 }
 
 // GenerateRingID returns the stable ID for a ring's creation parameters.
-// peerNodeKeys are sorted before hashing so the ID is order-independent.
-func GenerateRingID(peerNodeKeys []string, threshold uint32, pssInterval uint64, policyID string, nonce immutable.Option[string], currentVersion uint64) string {
-	sorted := slices.Clone(peerNodeKeys)
-	if !slices.IsSorted(sorted) {
-		slices.Sort(sorted)
+func GenerateRingID(
+	peerNodeKeys []string,
+	threshold uint32,
+	pssInterval uint64,
+	policyID string,
+	nonce immutable.Option[string],
+	currentVersion uint64,
+	allowTrustedAuthRelays bool,
+	trustedAuthRelayDIDs []string,
+) string {
+	sortedPeerNodeKeys := slices.Clone(peerNodeKeys)
+	if !slices.IsSorted(sortedPeerNodeKeys) {
+		slices.Sort(sortedPeerNodeKeys)
 	}
 
 	h := newIDHasher("orbis/ring")
-	h.writeStringSlice(sorted)
+	h.writeStringSlice(sortedPeerNodeKeys)
 	h.writeUint32(threshold)
 	h.writeUint64(pssInterval)
 	h.writeString(policyID)
 	h.writeOptionalString(nonce)
 	h.writeUint64(currentVersion)
+	h.writeBool(allowTrustedAuthRelays)
+	sortedRelayDIDs := slices.Clone(trustedAuthRelayDIDs)
+	slices.Sort(sortedRelayDIDs)
+	h.writeStringSlice(sortedRelayDIDs)
 	return h.sum()
 }
 
@@ -56,6 +68,14 @@ func (h *idHasher) writeUint64(value uint64) {
 	var buf [8]byte
 	binary.BigEndian.PutUint64(buf[:], value)
 	h.bytes = append(h.bytes, buf[:]...)
+}
+
+func (h *idHasher) writeBool(value bool) {
+	if value {
+		h.bytes = append(h.bytes, 1)
+		return
+	}
+	h.bytes = append(h.bytes, 0)
 }
 
 // GenerateDocumentID returns the stable ID for an encrypted document.
