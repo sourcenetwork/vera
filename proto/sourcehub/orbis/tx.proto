@@ -26,6 +26,10 @@ service Msg {
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc SetRingReportingByAcp(MsgSetRingReportingByAcp) returns (MsgSetRingReportingByAcpResponse);
+  // Adds a trusted authentication relay to a ring.
+  rpc AddRingTrustedAuthRelayByAcp(MsgAddRingTrustedAuthRelayByAcp) returns (MsgAddRingTrustedAuthRelayByAcpResponse);
+  // Removes a trusted authentication relay from a ring.
+  rpc RemoveRingTrustedAuthRelayByAcp(MsgRemoveRingTrustedAuthRelayByAcp) returns (MsgRemoveRingTrustedAuthRelayByAcpResponse);
   rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
   rpc SubmitReport(MsgSubmitReport) returns (MsgSubmitReportResponse);
   rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
@@ -66,6 +70,10 @@ message MsgCreateRing {
   optional string nonce = 6;
   uint64 current_version = 7;
   ReportingConfig reporting = 8;
+  // Relays accepted by every committee member for delegated JWT authentication.
+  repeated string trusted_auth_relay_dids = 9;
+  // Set at creation; false permanently disables trusted authentication relays.
+  bool allow_trusted_auth_relays = 10;
 }
 
 message MsgCreateRingResponse {
@@ -147,6 +155,28 @@ message MsgSetRingReportingByAcp {
 
 message MsgSetRingReportingByAcpResponse {}
 
+// MsgAddRingTrustedAuthRelayByAcp adds a ring authentication relay.
+message MsgAddRingTrustedAuthRelayByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string relay_did = 3;
+}
+
+// MsgAddRingTrustedAuthRelayByAcpResponse is returned after relay registration.
+message MsgAddRingTrustedAuthRelayByAcpResponse {}
+
+// MsgRemoveRingTrustedAuthRelayByAcp revokes a ring authentication relay.
+message MsgRemoveRingTrustedAuthRelayByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string relay_did = 3;
+}
+
+// MsgRemoveRingTrustedAuthRelayByAcpResponse is returned after relay revocation.
+message MsgRemoveRingTrustedAuthRelayByAcpResponse {}
+
 message MsgFinalizeRingReshareByThresholdSignature {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
@@ -205,6 +235,8 @@ message RingReshareSignState {
   reserved 6;
   uint64 block_number_nonce = 7;
   string policy_id = 8;
+  repeated string trusted_auth_relay_dids = 9;
+  bool allow_trusted_auth_relays = 10;
 }
 
 message MsgStoreDocument {

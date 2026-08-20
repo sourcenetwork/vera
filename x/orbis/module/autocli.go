@@ -104,6 +104,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
+					RpcMethod:      "AddRingTrustedAuthRelayByAcp",
+					Use:            "add-ring-trusted-auth-relay-by-acp [ring_id] [relay_did]",
+					Short:          "Add a ring authentication relay via external ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "relay_did"}},
+				},
+				{
+					RpcMethod:      "RemoveRingTrustedAuthRelayByAcp",
+					Use:            "remove-ring-trusted-auth-relay-by-acp [ring_id] [relay_did]",
+					Short:          "Revoke a ring authentication relay via external ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "relay_did"}},
+				},
+				{
 					RpcMethod:      "FinalizeRingReshareByThresholdSignature",
 					Use:            "finalize-ring-reshare [ring_id] [signature_scheme] [signature]",
 					Short:          "Finalize a ring reshare using a threshold signature",

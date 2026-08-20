@@ -27,6 +27,21 @@ func TestMsgCreateRingValidateBasicPSSInterval(t *testing.T) {
 	}
 }
 
+func TestMsgCreateRingValidateBasicTrustedAuthRelays(t *testing.T) {
+	msg := MsgCreateRing{
+		Creator:              validMutationCreator,
+		PeerNodeKeys:         []string{"node-1"},
+		Threshold:            1,
+		PssInterval:          MinPSSIntervalSeconds,
+		PolicyId:             "policy-1",
+		TrustedAuthRelayDids: []string{"did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH"},
+	}
+	require.ErrorContains(t, msg.ValidateBasic(), "require allow_trusted_auth_relays")
+
+	msg.AllowTrustedAuthRelays = true
+	require.NoError(t, msg.ValidateBasic())
+}
+
 func TestMsgCreateRingValidateBasicReportingConfig(t *testing.T) {
 	msg := MsgCreateRing{
 		Creator:      validMutationCreator,
@@ -126,6 +141,16 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 			RingId:    "ring-1",
 			Reporting: DefaultReportingConfig(),
 		},
+		&MsgAddRingTrustedAuthRelayByAcp{
+			Creator:  validMutationCreator,
+			RingId:   "ring-1",
+			RelayDid: "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH",
+		},
+		&MsgRemoveRingTrustedAuthRelayByAcp{
+			Creator:  validMutationCreator,
+			RingId:   "ring-1",
+			RelayDid: "did:key:z6MkpTHR8VNsBxYAAWHut2Geadd9jSwuBV8xRoAnwWsdvktH",
+		},
 	}
 	for _, msg := range validMessages {
 		require.NoError(t, msg.ValidateBasic())
@@ -161,6 +186,14 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 		Reporting: ReportingConfig{
 			DemeritConfig: DefaultDemeritConfig(),
 		},
+	}).ValidateBasic())
+	require.Error(t, (&MsgAddRingTrustedAuthRelayByAcp{
+		Creator: validMutationCreator,
+		RingId:  "ring-1",
+	}).ValidateBasic())
+	require.Error(t, (&MsgRemoveRingTrustedAuthRelayByAcp{
+		Creator: validMutationCreator,
+		RingId:  "ring-1",
 	}).ValidateBasic())
 }
 

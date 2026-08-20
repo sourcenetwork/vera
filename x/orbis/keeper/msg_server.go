@@ -34,7 +34,8 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	}
 
 	nonce := optionalCreateRingNonce(msg)
-	peerNodeKeys := canonicalNodeKeys(msg.PeerNodeKeys)
+	peerNodeKeys := canonicalStrings(msg.PeerNodeKeys)
+	trustedAuthRelayDIDs := canonicalStrings(msg.TrustedAuthRelayDids)
 
 	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -42,7 +43,16 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		}
 	}
 
-	ringID := types.GenerateRingID(peerNodeKeys, msg.Threshold, msg.PssInterval, msg.PolicyId, nonce, msg.CurrentVersion)
+	ringID := types.GenerateRingID(
+		peerNodeKeys,
+		msg.Threshold,
+		msg.PssInterval,
+		msg.PolicyId,
+		nonce,
+		msg.CurrentVersion,
+		msg.AllowTrustedAuthRelays,
+		trustedAuthRelayDIDs,
+	)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
 	}
@@ -65,7 +75,9 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		UpgradeInfo: types.UpgradeInfo{
 			CurrentVersion: msg.CurrentVersion,
 		},
-		Reporting: *reporting,
+		Reporting:              *reporting,
+		AllowTrustedAuthRelays: msg.AllowTrustedAuthRelays,
+		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
@@ -251,7 +263,7 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 		return nil, err
 	}
 
-	newPeerNodeKeys := canonicalNodeKeys(msg.NewPeerNodeKeys)
+	newPeerNodeKeys := canonicalStrings(msg.NewPeerNodeKeys)
 	newThreshold := optionalStartRingReshareNewThreshold(msg)
 	if err := validateStartRingReshare(
 		newPeerNodeKeys,
@@ -520,6 +532,95 @@ func (k *Keeper) SetRingReportingByAcp(goCtx context.Context, msg *types.MsgSetR
 	}
 
 	return &types.MsgSetRingReportingByAcpResponse{}, nil
+}
+
+func (k *Keeper) AddRingTrustedAuthRelayByAcp(
+	goCtx context.Context,
+	msg *types.MsgAddRingTrustedAuthRelayByAcp,
+) (*types.MsgAddRingTrustedAuthRelayByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if !ring.AllowTrustedAuthRelays {
+		return nil, types.ErrRingAuthRelaysDisabled
+	}
+	if err := types.ValidateTrustedAuthRelayDIDs([]string{msg.RelayDid}); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+	if slices.Contains(ring.TrustedAuthRelayDids, msg.RelayDid) {
+		return nil, types.ErrRingAuthRelayExists
+	}
+
+	ring.TrustedAuthRelayDids = append(ring.TrustedAuthRelayDids, msg.RelayDid)
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddRingTrustedAuthRelayByAcpResponse{}, nil
+}
+
+func (k *Keeper) RemoveRingTrustedAuthRelayByAcp(
+	goCtx context.Context,
+	msg *types.MsgRemoveRingTrustedAuthRelayByAcp,
+) (*types.MsgRemoveRingTrustedAuthRelayByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if !ring.AllowTrustedAuthRelays {
+		return nil, types.ErrRingAuthRelaysDisabled
+	}
+	if err := types.ValidateTrustedAuthRelayDIDs([]string{msg.RelayDid}); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	index := slices.Index(ring.TrustedAuthRelayDids, msg.RelayDid)
+	if index < 0 {
+		return nil, types.ErrRingTrustedAuthRelayNotFound
+	}
+	ring.TrustedAuthRelayDids = slices.Delete(ring.TrustedAuthRelayDids, index, index+1)
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRemoveRingTrustedAuthRelayByAcpResponse{}, nil
 }
 
 func (k *Keeper) FinalizeRingReshareByThresholdSignature(

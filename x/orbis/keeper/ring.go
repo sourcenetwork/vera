@@ -2,8 +2,8 @@ package keeper
 
 import "slices"
 
-func canonicalNodeKeys(nodeKeys []string) []string {
-	canonical := slices.Clone(nodeKeys)
+func canonicalStrings(values []string) []string {
+	canonical := slices.Clone(values)
 	if !slices.IsSorted(canonical) {
 		slices.Sort(canonical)
 	}

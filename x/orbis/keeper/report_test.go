@@ -78,7 +78,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	}
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
-	require.Equal(t, "d33ea6fdeda388fa0e31f128a5e649714887308e75220414d7a2df96222f5cb7", ringHash)
+	require.Equal(t, "1dd783721bbfc90f5960d9f2ebd99244c22ab147113d22bd39f9bccf6bf73c39", ringHash)
 }
 
 func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) {
@@ -102,6 +102,60 @@ func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) 
 	hashB, err := reportRingStateSHA256(baseRing(2))
 	require.NoError(t, err)
 	require.NotEqual(t, hashA, hashB)
+}
+
+func TestReportRingStateSHA256IncludesTrustedAuthRelays(t *testing.T) {
+	ring := &types.Ring{
+		RingPk:                 "pk",
+		PeerNodeKeys:           []string{"a", "b"},
+		Threshold:              2,
+		PssInterval:            types.MinPSSIntervalSeconds,
+		UpgradeInfo:            types.UpgradeInfo{CurrentVersion: 0},
+		Reporting:              types.DefaultReportingConfig(),
+		AllowTrustedAuthRelays: true,
+		TrustedAuthRelayDids:   []string{testSecondRelayDID, testRelayDID},
+	}
+
+	withRelay, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.Equal(t, "6d093b9e03af27c7b679341367306e67b64b0afdb5f31ec9e0f5133ebc145ca6", withRelay)
+	ring.TrustedAuthRelayDids = []string{testRelayDID, testSecondRelayDID}
+	reordered, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withRelay, reordered)
+	ring.TrustedAuthRelayDids = nil
+	withoutRelay, err := reportRingStateSHA256(ring)
+	require.NoError(t, err)
+	require.NotEqual(t, withRelay, withoutRelay)
+}
+
+func TestReportRingStateDigestMatchesLegacyEmptyRelayState(t *testing.T) {
+	ring := &types.Ring{
+		RingPk:       "pk",
+		PeerNodeKeys: []string{"a", "b"},
+		Threshold:    2,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		UpgradeInfo:  types.UpgradeInfo{CurrentVersion: 0},
+		Reporting:    types.DefaultReportingConfig(),
+	}
+	legacy, err := reportRingStateCanonicalBytesWithRelayState(ring, false)
+	require.NoError(t, err)
+	legacyHash := sha256.Sum256(legacy)
+
+	matches, err := reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.True(t, matches)
+
+	ring.TrustedAuthRelayDids = []string{testRelayDID}
+	matches, err = reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.False(t, matches)
+
+	ring.TrustedAuthRelayDids = nil
+	ring.AllowTrustedAuthRelays = true
+	matches, err = reportRingStateDigestMatches(ring, hex.EncodeToString(legacyHash[:]))
+	require.NoError(t, err)
+	require.False(t, matches)
 }
 
 func TestNodeOfflinePayloadDecodeRejectsMalformedPayloads(t *testing.T) {
@@ -393,7 +447,12 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 	require.Equal(t, strings.Repeat("11", 32), decoded.ringStateSha256)
 	require.Equal(t, uint64(7), decoded.protocolVersion)
 	require.Equal(t, "dkg-session-1", decoded.requestID)
-	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	// commitmentB.signedAt is the later of the two (see
+	// dkgEquivocationCommitmentsForTest): the decoded anchor must be the
+	// later timestamp, not always commitment_a's, since equivocation is only
+	// provable once the later, conflicting commitment arrives.
+	require.Equal(t, commitmentB.signedAt, decoded.signedAt)
+	require.Equal(t, commitmentA.attemptID, decoded.attemptID)
 	require.Equal(t, "accused", decoded.responderNodeKey)
 	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
 	require.Equal(t, committeeScopeCurrent, decoded.accusedCommitteeScope)
@@ -436,11 +495,365 @@ func TestInvalidCryptoResponseDkgEquivocationPayloadDecodeBindsCommitments(t *te
 		{"responder mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.responderKey = "other" }).encode(), signatureB)},
 		{"origin mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.originProtocol = offlineOriginProtocolPSSReshare }).encode(), signatureB)},
 		{"from node mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.fromNodeID = 3 }).encode(), signatureB)},
+		{"attempt mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.attemptID = bytes.Repeat([]byte{10}, 32) }).encode(), signatureB)},
 		{"crypto backend mismatch", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.cryptoBackend = "dkg/other" }).encode(), signatureB)},
 		{"different session nonce", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.sessionNonce = bytes.Repeat([]byte{13}, dkgNonceLen) }).encode(), signatureB)},
 		{"identical commitments", dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.with(func(s *dkgCommitmentStatementFields) { s.commitment = commitmentA.commitment }).encode(), signatureB)},
 		{"trailing outer bytes", append(dkgEquivocationPayloadForTest(commitmentA.encode(), signatureA, commitmentB.encode(), signatureB), 0)},
 		{"trailing commitment_a bytes", dkgEquivocationPayloadForTest(append(commitmentA.encode(), 0), signatureA, commitmentB.encode(), signatureB)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
+func TestInvalidCryptoResponseDkgPublicOriginFaultDecodeAndBinding(t *testing.T) {
+	origin := bytes.Repeat([]byte{0x22}, 32)
+	valid := dkgPublicOriginFaultPayloadForTest(
+		"invalid_payload",
+		"commitments",
+		committeeScopeCurrent,
+		origin,
+		false,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(valid)
+	require.NoError(t, err)
+	goldenHash := sha256.Sum256(valid)
+	require.Equal(t, "2b1a98fd49fa0f9fc0f43ae80108b180eab351d8643654f9b5f22a939552b248", hex.EncodeToString(goldenHash[:]))
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, origin, decoded.endpointOrigin)
+	_, err = decodeInvalidCryptoResponsePayload(dkgPublicOriginFaultPayloadForTest(
+		"origin_equivocation",
+		"commitment_audit",
+		committeeScopeCurrent,
+		origin,
+		true,
+	))
+	require.NoError(t, err, "CommitmentHash origin equivocation is a reportable public-origin fault")
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedPeerId = strings.Repeat("33", 32)
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{"invalid payload with second contribution", dkgPublicOriginFaultPayloadForTest("invalid_payload", "commitments", committeeScopeCurrent, origin, true)},
+		{"equivocation without second contribution", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitment_audit", committeeScopeCurrent, origin, false)},
+		{"commitment equivocation", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitments", committeeScopeCurrent, origin, true)},
+		{"refresh pending-new accused", dkgPublicOriginFaultPayloadForTest("invalid_payload", "commitments", committeeScopePendingNew, origin, false)},
+		{"unknown fault", dkgPublicOriginFaultPayloadForTest("unknown", "commitments", committeeScopeCurrent, origin, false)},
+		{"unknown phase", dkgPublicOriginFaultPayloadForTest("invalid_payload", "unknown", committeeScopeCurrent, origin, false)},
+		{"Fresh-only commitment hashes", dkgPublicOriginFaultPayloadForTest("origin_equivocation", "commitment_hashes", committeeScopeCurrent, origin, true)},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
+func TestInvalidCryptoResponseDkgLeaderTwoDeliveryEvidenceDecodeAndBinding(t *testing.T) {
+	origin := bytes.Repeat([]byte{0x22}, 32)
+	otherOrigin := bytes.Repeat([]byte{0x33}, 32)
+	deliveryIDA := bytes.Repeat([]byte{0xaa}, 16)
+	deliveryIDB := bytes.Repeat([]byte{0xbb}, 16)
+
+	variants := []struct {
+		name         string
+		domain       string
+		evidenceKind string
+	}{
+		{"leader equivocation", DkgLeaderEquivocationDomain, invalidCryptoEvidenceKindDkgLeaderEquivocation},
+		{"leader batch mismatch", DkgLeaderBatchMismatchDomain, invalidCryptoEvidenceKindDkgLeaderBatchMismatch},
+	}
+	for _, variant := range variants {
+		t.Run(variant.name, func(t *testing.T) {
+			payload := func(
+				originProtocol string,
+				phase string,
+				accusedScope byte,
+				originA []byte,
+				originB []byte,
+				deliveryIDA []byte,
+				deliveryIDB []byte,
+			) []byte {
+				return dkgLeaderTwoDeliveryPayloadForTest(
+					variant.domain, variant.evidenceKind, originProtocol, phase, accusedScope,
+					originA, originB, deliveryIDA, deliveryIDB,
+				)
+			}
+
+			valid := payload(
+				offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent,
+				origin, origin, deliveryIDA, deliveryIDB,
+			)
+			decoded, err := decodeInvalidCryptoResponsePayload(valid)
+			require.NoError(t, err)
+			require.Equal(t, reportTestChainID, decoded.chainID)
+			require.Equal(t, "ring-1", decoded.ringID)
+			require.Equal(t, "900", decoded.requestID)
+			require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+			require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+			require.Equal(t, origin, decoded.endpointOrigin)
+
+			// Reshare requires a pending-new accused scope instead of current.
+			_, err = decodeInvalidCryptoResponsePayload(payload(
+				offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopePendingNew,
+				origin, origin, deliveryIDA, deliveryIDB,
+			))
+			require.NoError(t, err)
+
+			report := &types.ReportEnvelope{
+				ChainId:         reportTestChainID,
+				RingId:          "ring-1",
+				RingPk:          "aabb",
+				RingStateSha256: strings.Repeat("11", 32),
+				SessionId:       "900",
+				AccusedNodeKey:  "accused",
+				AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+				ObservedAt:      reportTestObservedAt,
+			}
+			require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+			report.AccusedPeerId = strings.Repeat("33", 32)
+			require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+			rejected := []struct {
+				name    string
+				payload []byte
+			}{
+				{"mismatched delivery origins", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, otherOrigin, deliveryIDA, deliveryIDB)},
+				{"identical delivery IDs", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDA)},
+				{"unknown origin protocol", payload("unknown", "commitment_audit", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+				{"unknown phase", payload(offlineOriginProtocolPSSRefresh, "unknown", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+				{"refresh pending-new accused", payload(offlineOriginProtocolPSSRefresh, "commitment_audit", committeeScopePendingNew, origin, origin, deliveryIDA, deliveryIDB)},
+				{"reshare current accused", payload(offlineOriginProtocolPSSReshare, "reshare_participant_set", committeeScopeCurrent, origin, origin, deliveryIDA, deliveryIDB)},
+			}
+			for _, tc := range rejected {
+				t.Run(tc.name, func(t *testing.T) {
+					_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+					require.ErrorIs(t, err, types.ErrInvalidReport)
+				})
+			}
+		})
+	}
+}
+
+func TestInvalidCryptoResponseDkgLeaderPublicFaultDecodeAndBinding(t *testing.T) {
+	origin := bytes.Repeat([]byte{0x22}, 32)
+	deliveryID := bytes.Repeat([]byte{0xaa}, 16)
+
+	valid := dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest,
+		committeeScopeCurrent, origin, deliveryID,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(valid)
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+	require.Equal(t, origin, decoded.endpointOrigin)
+
+	// Reshare requires a pending-new accused scope instead of current.
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "reshare_participant_set", dkgLeaderPublicFaultKindInvalidManifest,
+		committeeScopePendingNew, origin, deliveryID,
+	))
+	require.NoError(t, err)
+
+	// chunk_index_out_of_range, oversized_chunk, and duplicate_chunk_origin
+	// are also recognized fault kinds — the chain only checks shape/policy
+	// here, not which specific single-artifact fault is claimed (that's the
+	// co-signer's job).
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindChunkIndexOutOfRange,
+		committeeScopeCurrent, origin, deliveryID,
+	))
+	require.NoError(t, err)
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindOversizedChunk,
+		committeeScopeCurrent, origin, deliveryID,
+	))
+	require.NoError(t, err)
+	_, err = decodeInvalidCryptoResponsePayload(dkgLeaderPublicFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindDuplicateChunkOrigin,
+		committeeScopeCurrent, origin, deliveryID,
+	))
+	require.NoError(t, err)
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		AccusedPeerId:   hex.EncodeToString(origin) + "@127.0.0.1:4001",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedPeerId = strings.Repeat("33", 32)
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{
+			"unknown fault kind",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", "unknown", committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"unknown origin protocol",
+			dkgLeaderPublicFaultPayloadForTest("unknown", "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"unknown phase",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "unknown", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+		{
+			"refresh pending-new accused",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "commitment_audit", dkgLeaderPublicFaultKindInvalidManifest, committeeScopePendingNew, origin, deliveryID),
+		},
+		{
+			"reshare current accused",
+			dkgLeaderPublicFaultPayloadForTest(offlineOriginProtocolPSSReshare, "reshare_participant_set", dkgLeaderPublicFaultKindInvalidManifest, committeeScopeCurrent, origin, deliveryID),
+		},
+	}
+	for _, tc := range rejected {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := decodeInvalidCryptoResponsePayload(tc.payload)
+			require.ErrorIs(t, err, types.ErrInvalidReport)
+		})
+	}
+}
+
+func TestInvalidCryptoResponseDkgControlMessageFaultDecodeAndBinding(t *testing.T) {
+	leaderPrepareFault := dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault,
+		committeeScopeCurrent, false,
+	)
+	decoded, err := decodeInvalidCryptoResponsePayload(leaderPrepareFault)
+	require.NoError(t, err)
+	require.Equal(t, reportTestChainID, decoded.chainID)
+	require.Equal(t, "ring-1", decoded.ringID)
+	require.Equal(t, "900", decoded.requestID)
+	require.Equal(t, reportTestObservedAt+reportObservedAtGraceSecs, decoded.signedAt)
+	require.Equal(t, offlineOriginProtocolPSSRefresh, decoded.originProtocol)
+
+	// ack_equivocation requires two artifacts and is valid for a Reshare
+	// pending-new accused with any of the three ack message kinds.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation,
+		committeeScopePendingNew, true,
+	))
+	require.NoError(t, err)
+
+	// Unlike leader_prepare_fault, ack_equivocation's accused can also be a
+	// pure old-committee Reshare dealer — never a member of the new/pending
+	// committee — so a current-scoped accused is valid too.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "activated", dkgControlMessageFaultKindAckEquivocation,
+		committeeScopeCurrent, true,
+	))
+	require.NoError(t, err)
+
+	// oversized_repair_page requires exactly one artifact and, like
+	// leader_prepare_fault, is always accused via the canonical leader — so
+	// a Reshare report requires pending-new accused scope.
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSRefresh, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage,
+		committeeScopeCurrent, false,
+	))
+	require.NoError(t, err)
+	_, err = decodeInvalidCryptoResponsePayload(dkgControlMessageFaultPayloadForTest(
+		offlineOriginProtocolPSSReshare, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage,
+		committeeScopePendingNew, false,
+	))
+	require.NoError(t, err)
+
+	report := &types.ReportEnvelope{
+		ChainId:         reportTestChainID,
+		RingId:          "ring-1",
+		RingPk:          "aabb",
+		RingStateSha256: strings.Repeat("11", 32),
+		SessionId:       "900",
+		AccusedNodeKey:  "accused",
+		ObservedAt:      reportTestObservedAt,
+	}
+	require.NoError(t, validateInvalidCryptoResponseStatement(report, decoded))
+	report.AccusedNodeKey = "other"
+	require.ErrorIs(t, validateInvalidCryptoResponseStatement(report, decoded), types.ErrInvalidReport)
+
+	rejected := []struct {
+		name    string
+		payload []byte
+	}{
+		{
+			"leader-prepare-fault with a second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, true),
+		},
+		{
+			"leader-prepare-fault targeting the wrong message",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"ack-equivocation missing the second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, false),
+		},
+		{
+			"ack-equivocation targeting an unsupported message kind",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindAckEquivocation, committeeScopeCurrent, true),
+		},
+		{
+			"unknown fault kind",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", "unknown", committeeScopeCurrent, false),
+		},
+		{
+			"unknown origin protocol",
+			dkgControlMessageFaultPayloadForTest("unknown", "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"refresh pending-new accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopePendingNew, false),
+		},
+		{
+			"reshare leader-prepare-fault with current accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "prepare", dkgControlMessageFaultKindLeaderPrepareFault, committeeScopeCurrent, false),
+		},
+		{
+			"oversized-repair-page with a second artifact",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, true),
+		},
+		{
+			"oversized-repair-page targeting the wrong message",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSRefresh, "activated", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, false),
+		},
+		{
+			"reshare oversized-repair-page with current accused",
+			dkgControlMessageFaultPayloadForTest(offlineOriginProtocolPSSReshare, "public_phase_response", dkgControlMessageFaultKindOversizedRepairPage, committeeScopeCurrent, false),
+		},
 	}
 	for _, tc := range rejected {
 		t.Run(tc.name, func(t *testing.T) {
@@ -712,9 +1125,52 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGShareAcceptsAndDedupes(t *testin
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
+}
+
+// TestMsgServer_SubmitReport_InvalidCryptoDKGShareIndependentAttemptsGetIndependentDemerits
+// exercises RPT-16: CeremonyID (report.SessionId) is intentionally reusable
+// across retries, so two reports naming the SAME session but carrying
+// evidence from two DIFFERENT live attempts must be treated as two
+// independent faults, not collide on one dedupe record — otherwise a node
+// still in the committee for a later retry of the same ceremony could repeat
+// the same fault indefinitely after its first demerit.
+func TestMsgServer_SubmitReport_InvalidCryptoDKGShareIndependentAttemptsGetIndependentDemerits(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgshare-attempts-00", 2)
+
+	firstStatement := fixture.dkgShareStatementFields(t)
+	firstReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	firstReport.ReportType = InvalidCryptoResponseReportType
+	firstReport.SessionId = firstStatement.requestID
+	firstReport.Payload = dkgSharePayloadForTest(firstStatement.encode(), bytes.Repeat([]byte{42}, 64))
+	first := fixture.signBLSReport(t, sk, firstReport)
+
+	_, err := fixture.k.SubmitReport(fixture.ctx, first)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	secondStatement := firstStatement.with(func(s *dkgShareStatementFields) {
+		s.commitmentStatement.attemptID = bytes.Repeat([]byte{10}, 32)
+	})
+	secondReport := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	secondReport.ReportType = InvalidCryptoResponseReportType
+	secondReport.SessionId = secondStatement.requestID
+	secondReport.Payload = dkgSharePayloadForTest(secondStatement.encode(), bytes.Repeat([]byte{43}, 64))
+	require.Equal(t, firstReport.SessionId, secondReport.SessionId, "test must reuse the same CeremonyID across attempts")
+	second := fixture.signBLSReport(t, sk, secondReport)
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.NoError(t, err, "a fault from an independent attempt of the same ceremony must not collide with the first attempt's dedupe record")
+	require.NotEqual(t, first.ReportId, second.ReportId)
+	require.Equal(t, uint64(2), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
+
+	// A retry of the SECOND attempt's exact evidence must still dedupe against itself.
+	_, err = fixture.k.SubmitReport(fixture.ctx, second)
+	require.ErrorIs(t, err, types.ErrReportAlreadyAccepted)
+	require.Equal(t, uint64(2), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
 func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsAndDedupes(t *testing.T) {
@@ -754,6 +1210,7 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsA
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
@@ -761,6 +1218,11 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGInvalidRefreshCommitmentAcceptsA
 
 func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t *testing.T) {
 	fixture, sk := setupBLSReportFixture(t, "orbis-report-dkgequiv-ikm0", 2)
+	// validDkgEquivocationReport anchors observed_at to the later of the two
+	// commitments' signed_at (5s after reportTestObservedAt), so block time
+	// must advance to match or the envelope would be rejected as being from
+	// the future.
+	fixture.ctx = fixture.ctx.WithBlockTime(time.Unix(int64(reportTestObservedAt+5), 0))
 
 	report := fixture.validDkgEquivocationReport(t)
 	msg := fixture.signBLSReport(t, sk, report)
@@ -796,6 +1258,7 @@ func TestMsgServer_SubmitReport_InvalidCryptoDKGEquivocationAcceptsAndDedupes(t 
 		originProtocolVersion: 0,
 		accusedCommitteeScope: committeeScopeCurrent,
 		signingCommitteeScope: committeeScopeCurrent,
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 	})
 	require.NoError(t, err)
 	require.True(t, fixture.k.HasAcceptedReportSession(fixture.ctx, sessionID))
@@ -1030,7 +1493,7 @@ func TestMsgServer_SubmitReportSchedulesAutoReshareAtKickThreshold(t *testing.T)
 
 	ring := fixture.k.GetRing(fixture.ctx, fixture.ringID)
 	require.NotNil(t, ring)
-	require.Equal(t, canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey, backup1Key}), ring.NewPeerNodeKeys)
+	require.Equal(t, canonicalStrings([]string{fixture.reporterKey, fixture.validatorKey, backup1Key}), ring.NewPeerNodeKeys)
 	require.Nil(t, ring.XNewThreshold)
 	require.Equal(t, []string{backup2Key}, ring.Reporting.BackupNodeKeys)
 	require.Equal(t, uint64(3), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
@@ -1094,7 +1557,7 @@ func TestMsgServer_SubmitReportSuppressesAutoReshareWhenAlreadyPending(t *testin
 		KickThreshold:  3,
 	})
 	pendingRing := *fixture.originalRing
-	pendingRing.NewPeerNodeKeys = canonicalNodeKeys([]string{fixture.reporterKey, fixture.validatorKey})
+	pendingRing.NewPeerNodeKeys = canonicalStrings([]string{fixture.reporterKey, fixture.validatorKey})
 	fixture.replaceRing(t, pendingRing)
 
 	msg := fixture.signBLSReport(t, sk, fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0))
@@ -1622,6 +2085,18 @@ type reportTestFixture struct {
 	originalRing *types.Ring
 }
 
+func TestMsgServer_SubmitReportAcceptsLegacyEmptyRelayDigest(t *testing.T) {
+	fixture, sk := setupBLSReportFixture(t, "orbis-report-legacy-digest", 2)
+	legacy, err := reportRingStateCanonicalBytesWithRelayState(fixture.originalRing, false)
+	require.NoError(t, err)
+	legacyHash := sha256.Sum256(legacy)
+	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
+	report.RingStateSha256 = hex.EncodeToString(legacyHash[:])
+
+	_, err = fixture.k.SubmitReport(fixture.ctx, fixture.signBLSReport(t, sk, report))
+	require.NoError(t, err)
+}
+
 func setupReportTestFixture(t *testing.T) reportTestFixture {
 	t.Helper()
 	k, authKeeper, ctx := setupOrbisKeeper(t)
@@ -1916,6 +2391,7 @@ type dkgCommitmentStatementFields struct {
 	fromNodeID            uint32
 	commitment            []byte
 	sessionNonce          []byte
+	attemptID             []byte
 	cryptoBackend         string
 }
 
@@ -1940,6 +2416,7 @@ func (s dkgCommitmentStatementFields) encode() []byte {
 	w.writeU32(s.fromNodeID)
 	w.writeBytes(s.commitment)
 	w.writeBytes(s.sessionNonce)
+	w.writeBytes(s.attemptID)
 	w.writeString(s.cryptoBackend)
 	statement, err := w.finish()
 	if err != nil {
@@ -2021,6 +2498,7 @@ func dkgShareStatementForTest() dkgShareStatementFields {
 		fromNodeID:            2,
 		commitment:            []byte{1, 2, 3, 4},
 		sessionNonce:          bytes.Repeat([]byte{12}, dkgNonceLen),
+		attemptID:             bytes.Repeat([]byte{9}, 32),
 		cryptoBackend:         "dkg/test",
 	}
 	return dkgShareStatementFields{
@@ -2077,6 +2555,186 @@ func dkgEquivocationPayloadForTest(
 	w.writeBytes(commitmentBStatement)
 	w.writeBytes(commitmentBSignature)
 	payload, err := w.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func dkgPublicOriginFaultPayloadForTest(
+	faultKind string,
+	phase string,
+	accusedScope byte,
+	origin []byte,
+	includeSecond bool,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgPublicOriginFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(offlineOriginProtocolPSSRefresh)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(phase)
+	statement.writeString(faultKind)
+	writeEndpointContributionForTest(statement, origin, 1)
+	if includeSecond {
+		statement.bytes = append(statement.bytes, 1)
+		writeEndpointContributionForTest(statement, origin, 2)
+	} else {
+		statement.bytes = append(statement.bytes, 0)
+	}
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgPublicOriginFault)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func writeEndpointContributionForTest(w *reportCanonicalWriter, origin []byte, marker byte) {
+	w.writeBytes(origin)
+	w.writeBytes(bytes.Repeat([]byte{marker}, 64))
+	w.writeBytes([]byte{marker, marker + 1, marker + 2})
+}
+
+func dkgLeaderTwoDeliveryPayloadForTest(
+	domain string,
+	evidenceKind string,
+	originProtocol string,
+	phase string,
+	accusedScope byte,
+	originA []byte,
+	originB []byte,
+	deliveryIDA []byte,
+	deliveryIDB []byte,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(domain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(originProtocol)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(phase)
+	statement.writeBytes(deliveryIDA)
+	writeEndpointContributionForTest(statement, originA, 1)
+	statement.writeBytes(deliveryIDB)
+	writeEndpointContributionForTest(statement, originB, 2)
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(evidenceKind)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func dkgLeaderPublicFaultPayloadForTest(
+	originProtocol string,
+	phase string,
+	faultKind string,
+	accusedScope byte,
+	origin []byte,
+	deliveryID []byte,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgLeaderPublicFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(originProtocol)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(phase)
+	statement.writeString(faultKind)
+	statement.writeBytes(deliveryID)
+	writeEndpointContributionForTest(statement, origin, 1)
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgLeaderPublicFault)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
+	if err != nil {
+		panic(err)
+	}
+	return payload
+}
+
+func writeControlMessageArtifactForTest(w *reportCanonicalWriter, marker byte) {
+	w.writeBytes(bytes.Repeat([]byte{marker}, 64))
+	w.writeBytes([]byte{marker, marker + 1, marker + 2})
+	w.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+}
+
+func dkgControlMessageFaultPayloadForTest(
+	originProtocol string,
+	messageKind string,
+	faultKind string,
+	accusedScope byte,
+	hasArtifactB bool,
+) []byte {
+	statement := newReportCanonicalWriter()
+	statement.writeString(DkgControlMessageFaultDomain)
+	statement.writeString(reportTestChainID)
+	statement.writeString("ring-1")
+	statement.writeString("aabb")
+	statement.writeString(strings.Repeat("11", 32))
+	statement.writeU64(7)
+	statement.writeString("900")
+	statement.writeU64(reportTestObservedAt + reportObservedAtGraceSecs)
+	statement.writeString("accused")
+	statement.writeString(originProtocol)
+	statement.bytes = append(statement.bytes, accusedScope, committeeScopeCurrent)
+	statement.writeBytes(bytes.Repeat([]byte{9}, 32))
+	statement.writeString(messageKind)
+	statement.writeString(faultKind)
+	writeControlMessageArtifactForTest(statement, 1)
+	if hasArtifactB {
+		statement.bytes = append(statement.bytes, 1)
+		writeControlMessageArtifactForTest(statement, 2)
+	} else {
+		statement.bytes = append(statement.bytes, 0)
+	}
+	statementBytes, err := statement.finish()
+	if err != nil {
+		panic(err)
+	}
+	outer := newReportCanonicalWriter()
+	outer.writeString(invalidCryptoEvidenceKindDkgControlMessageFault)
+	outer.writeBytes(statementBytes)
+	payload, err := outer.finish()
 	if err != nil {
 		panic(err)
 	}
@@ -2378,6 +3036,13 @@ func (f reportTestFixture) validDkgEquivocationReport(t *testing.T) types.Report
 		commitmentB.encode(),
 		bytes.Repeat([]byte{43}, 64),
 	)
+	// commitmentB.signedAt is the later of the two (see
+	// dkgEquivocationCommitmentsForTest), so it — not commitmentA's, which
+	// f.validReport's default ObservedAt is anchored to — is what the
+	// envelope must now be anchored to.
+	anchoredAt := max(commitmentA.signedAt, commitmentB.signedAt)
+	report.ObservedAt = anchoredAt - reportObservedAtGraceSecs
+	report.ExpiresAt = report.ObservedAt + ReportTTLSeconds
 	return report
 }
 

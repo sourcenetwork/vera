@@ -17,6 +17,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgScheduleRingUpgradeByAcp{},
 		&MsgCancelRingUpgradeByAcp{},
 		&MsgSetRingReportingByAcp{},
+		&MsgAddRingTrustedAuthRelayByAcp{},
+		&MsgRemoveRingTrustedAuthRelayByAcp{},
 		&MsgFinalizeRingReshareByThresholdSignature{},
 		&MsgSubmitReport{},
 		&MsgStoreDocument{},

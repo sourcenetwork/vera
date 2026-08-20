@@ -28,6 +28,8 @@ const (
 	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/sourcehub.orbis.Msg/ScheduleRingUpgradeByAcp"
 	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/sourcehub.orbis.Msg/CancelRingUpgradeByAcp"
 	Msg_SetRingReportingByAcp_FullMethodName                   = "/sourcehub.orbis.Msg/SetRingReportingByAcp"
+	Msg_AddRingTrustedAuthRelayByAcp_FullMethodName            = "/sourcehub.orbis.Msg/AddRingTrustedAuthRelayByAcp"
+	Msg_RemoveRingTrustedAuthRelayByAcp_FullMethodName         = "/sourcehub.orbis.Msg/RemoveRingTrustedAuthRelayByAcp"
 	Msg_FinalizeRingReshareByThresholdSignature_FullMethodName = "/sourcehub.orbis.Msg/FinalizeRingReshareByThresholdSignature"
 	Msg_SubmitReport_FullMethodName                            = "/sourcehub.orbis.Msg/SubmitReport"
 	Msg_StoreDocument_FullMethodName                           = "/sourcehub.orbis.Msg/StoreDocument"
@@ -56,6 +58,10 @@ type MsgClient interface {
 	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	SetRingReportingByAcp(ctx context.Context, in *MsgSetRingReportingByAcp, opts ...grpc.CallOption) (*MsgSetRingReportingByAcpResponse, error)
+	// Adds a trusted authentication relay to a ring.
+	AddRingTrustedAuthRelayByAcp(ctx context.Context, in *MsgAddRingTrustedAuthRelayByAcp, opts ...grpc.CallOption) (*MsgAddRingTrustedAuthRelayByAcpResponse, error)
+	// Removes a trusted authentication relay from a ring.
+	RemoveRingTrustedAuthRelayByAcp(ctx context.Context, in *MsgRemoveRingTrustedAuthRelayByAcp, opts ...grpc.CallOption) (*MsgRemoveRingTrustedAuthRelayByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(ctx context.Context, in *MsgFinalizeRingReshareByThresholdSignature, opts ...grpc.CallOption) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	SubmitReport(ctx context.Context, in *MsgSubmitReport, opts ...grpc.CallOption) (*MsgSubmitReportResponse, error)
 	StoreDocument(ctx context.Context, in *MsgStoreDocument, opts ...grpc.CallOption) (*MsgStoreDocumentResponse, error)
@@ -160,6 +166,26 @@ func (c *msgClient) SetRingReportingByAcp(ctx context.Context, in *MsgSetRingRep
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgSetRingReportingByAcpResponse)
 	err := c.cc.Invoke(ctx, Msg_SetRingReportingByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) AddRingTrustedAuthRelayByAcp(ctx context.Context, in *MsgAddRingTrustedAuthRelayByAcp, opts ...grpc.CallOption) (*MsgAddRingTrustedAuthRelayByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgAddRingTrustedAuthRelayByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_AddRingTrustedAuthRelayByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) RemoveRingTrustedAuthRelayByAcp(ctx context.Context, in *MsgRemoveRingTrustedAuthRelayByAcp, opts ...grpc.CallOption) (*MsgRemoveRingTrustedAuthRelayByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgRemoveRingTrustedAuthRelayByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_RemoveRingTrustedAuthRelayByAcp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -282,6 +308,10 @@ type MsgServer interface {
 	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	SetRingReportingByAcp(context.Context, *MsgSetRingReportingByAcp) (*MsgSetRingReportingByAcpResponse, error)
+	// Adds a trusted authentication relay to a ring.
+	AddRingTrustedAuthRelayByAcp(context.Context, *MsgAddRingTrustedAuthRelayByAcp) (*MsgAddRingTrustedAuthRelayByAcpResponse, error)
+	// Removes a trusted authentication relay from a ring.
+	RemoveRingTrustedAuthRelayByAcp(context.Context, *MsgRemoveRingTrustedAuthRelayByAcp) (*MsgRemoveRingTrustedAuthRelayByAcpResponse, error)
 	FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error)
 	SubmitReport(context.Context, *MsgSubmitReport) (*MsgSubmitReportResponse, error)
 	StoreDocument(context.Context, *MsgStoreDocument) (*MsgStoreDocumentResponse, error)
@@ -328,6 +358,12 @@ func (UnimplementedMsgServer) CancelRingUpgradeByAcp(context.Context, *MsgCancel
 }
 func (UnimplementedMsgServer) SetRingReportingByAcp(context.Context, *MsgSetRingReportingByAcp) (*MsgSetRingReportingByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetRingReportingByAcp not implemented")
+}
+func (UnimplementedMsgServer) AddRingTrustedAuthRelayByAcp(context.Context, *MsgAddRingTrustedAuthRelayByAcp) (*MsgAddRingTrustedAuthRelayByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRingTrustedAuthRelayByAcp not implemented")
+}
+func (UnimplementedMsgServer) RemoveRingTrustedAuthRelayByAcp(context.Context, *MsgRemoveRingTrustedAuthRelayByAcp) (*MsgRemoveRingTrustedAuthRelayByAcpResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RemoveRingTrustedAuthRelayByAcp not implemented")
 }
 func (UnimplementedMsgServer) FinalizeRingReshareByThresholdSignature(context.Context, *MsgFinalizeRingReshareByThresholdSignature) (*MsgFinalizeRingReshareByThresholdSignatureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FinalizeRingReshareByThresholdSignature not implemented")
@@ -538,6 +574,42 @@ func _Msg_SetRingReportingByAcp_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).SetRingReportingByAcp(ctx, req.(*MsgSetRingReportingByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_AddRingTrustedAuthRelayByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddRingTrustedAuthRelayByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddRingTrustedAuthRelayByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_AddRingTrustedAuthRelayByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddRingTrustedAuthRelayByAcp(ctx, req.(*MsgAddRingTrustedAuthRelayByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_RemoveRingTrustedAuthRelayByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgRemoveRingTrustedAuthRelayByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).RemoveRingTrustedAuthRelayByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_RemoveRingTrustedAuthRelayByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).RemoveRingTrustedAuthRelayByAcp(ctx, req.(*MsgRemoveRingTrustedAuthRelayByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -764,6 +836,14 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetRingReportingByAcp",
 			Handler:    _Msg_SetRingReportingByAcp_Handler,
+		},
+		{
+			MethodName: "AddRingTrustedAuthRelayByAcp",
+			Handler:    _Msg_AddRingTrustedAuthRelayByAcp_Handler,
+		},
+		{
+			MethodName: "RemoveRingTrustedAuthRelayByAcp",
+			Handler:    _Msg_RemoveRingTrustedAuthRelayByAcp_Handler,
 		},
 		{
 			MethodName: "FinalizeRingReshareByThresholdSignature",
