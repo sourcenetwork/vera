@@ -158,6 +158,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Remove one policy or ring from a node whitelist",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
 				},
+				{
+					RpcMethod:      "DrainNodeKey",
+					Use:            "drain-node-key [node_key]",
+					Short:          "Drain a node key's account balance to the controller key",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
+				},
 			},
 		},
 	}

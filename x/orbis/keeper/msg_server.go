@@ -856,6 +856,48 @@ func (k *Keeper) RemoveNodeFromWhitelist(goCtx context.Context, msg *types.MsgRe
 	return &types.MsgRemoveNodeFromWhitelistResponse{}, nil
 }
 
+// DrainNodeKey sweeps the full spendable balance of a node key's account to its
+// controller key's own account. It is authorized the same way every other
+// controller-signed node operation is: the tx signer's public key must match
+// NodeInfo.ControllerKey, which the node key itself set (and thereby authorized)
+// when it signed CreateNodeInfo. This lets a controller recover funds stranded in
+// a node key's account after the node (and the node key material inside it) is lost.
+func (k *Keeper) DrainNodeKey(goCtx context.Context, msg *types.MsgDrainNodeKey) (*types.MsgDrainNodeKeyResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if _, err := k.authorizeNodeInfoUpdate(goCtx, ctx, msg.NodeKey, msg.Creator); err != nil {
+		return nil, err
+	}
+
+	nodeAddr, err := nodeKeyAccAddress(msg.NodeKey)
+	if err != nil {
+		return nil, err
+	}
+	controllerAddr, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrInvalidNodeInfo, "invalid creator address: %s", err)
+	}
+
+	balance := k.bankKeeper.SpendableCoins(goCtx, nodeAddr)
+	if balance.IsZero() {
+		return nil, types.ErrNodeKeyBalanceEmpty
+	}
+
+	if err := k.bankKeeper.SendCoins(goCtx, nodeAddr, controllerAddr, balance); err != nil {
+		return nil, err
+	}
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventNodeKeyDrained{
+		NodeKey:   msg.NodeKey,
+		Recipient: msg.Creator,
+		Amount:    balance,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgDrainNodeKeyResponse{Amount: balance}, nil
+}
+
 func (k *Keeper) StoreKeyDerivation(goCtx context.Context, msg *types.MsgStoreKeyDerivation) (*types.MsgStoreKeyDerivationResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

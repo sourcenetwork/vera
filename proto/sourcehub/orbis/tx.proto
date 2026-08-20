@@ -3,6 +3,7 @@ syntax = "proto3";
 package sourcehub.orbis;
 
 import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
@@ -34,6 +35,7 @@ service Msg {
   rpc TransferNodeController(MsgTransferNodeController) returns (MsgTransferNodeControllerResponse);
   rpc AddNodeToWhitelist(MsgAddNodeToWhitelist) returns (MsgAddNodeToWhitelistResponse);
   rpc RemoveNodeFromWhitelist(MsgRemoveNodeFromWhitelist) returns (MsgRemoveNodeFromWhitelistResponse);
+  rpc DrainNodeKey(MsgDrainNodeKey) returns (MsgDrainNodeKeyResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -290,3 +292,20 @@ message MsgRemoveNodeFromWhitelist {
 }
 
 message MsgRemoveNodeFromWhitelistResponse {}
+
+// MsgDrainNodeKey is signed by a node's controller key. It sweeps the full
+// spendable balance of the node key's account to the controller key's own
+// account — recovery for funds stranded when a node (and its node key) is lost.
+message MsgDrainNodeKey {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+}
+
+message MsgDrainNodeKeyResponse {
+  repeated cosmos.base.v1beta1.Coin amount = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (amino.encoding) = "legacy_coins"
+  ];
+}

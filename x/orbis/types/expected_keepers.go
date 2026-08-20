@@ -11,3 +11,8 @@ type AccountKeeper interface {
 	GetModuleAccount(context.Context, string) sdk.ModuleAccountI
 	SetAccount(context.Context, sdk.AccountI)
 }
+
+type BankKeeper interface {
+	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+	SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
+}
