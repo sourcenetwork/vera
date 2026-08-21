@@ -56,7 +56,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	)
 	require.Equal(
 		t,
-		"00000003707265000000ff0000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a000000076163637573656400000003707265000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f74657374000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
+		"00000003707265000001010000001f6f726269732d7072652d7265656e63727970742d726573706f6e73652d76310000000e736f757263656875622d746573740000000672696e672d310000000461616262000000403131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313100000000000000070000000d7072652d726571756573742d31000000006553f10a000000076163637573656400000003707265000000086f626a6563742d310000000301020301000000030405060000000200000002070800000002090a000000020b0c0000000c656c67616d616c2f746573740000000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a",
 		hex.EncodeToString(preInvalidPayload),
 	)
 	preInvalidReport := report
@@ -64,7 +64,7 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	preInvalidReport.Payload = preInvalidPayload
 	_, preInvalidReportID, err := reportEnvelopeCanonicalMessageAndID(&preInvalidReport)
 	require.NoError(t, err)
-	require.Equal(t, "65450d9adeeb115d5985655b0d850af988af3cf7dd5e60d0c9d55df091a983e2", preInvalidReportID)
+	require.Equal(t, "f4d53931b2b116aaf4b8f97992060977970e5bf0a13cf7cb0fdbf4eac0a33cde", preInvalidReportID)
 
 	ring := &types.Ring{
 		RingPk:       "pk",
@@ -2296,6 +2296,8 @@ func (s preInvalidProofStatementFields) encode() []byte {
 	w.writeBytes(s.challenge)
 	w.writeBytes(s.proof)
 	w.writeString(s.cryptoBackend)
+	w.writeOptionalU64(nil) // timestamp: none of these fixtures exercise it
+	w.writeBool(false)      // inline_document: none of these fixtures exercise the inline-document path
 	statement, err := w.finish()
 	if err != nil {
 		panic(err)
@@ -2823,6 +2825,7 @@ func (s relayRequestStatementFields) encode() []byte {
 	w.writeOptionalU64(s.validWindowStart)
 	w.writeOptionalU64(s.validWindowEnd)
 	w.writeOptionalU64(s.timestamp)
+	w.writeBool(false) // inline_document: none of these fixtures exercise the inline-document path
 	statement, err := w.finish()
 	if err != nil {
 		panic(err)
