@@ -628,6 +628,94 @@ func (*MsgStartRingReshareByAcpResponse) Descriptor() ([]byte, []int) {
 	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{9}
 }
 
+type MsgCancelRingReshareByAcp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Creator       string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId        string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MsgCancelRingReshareByAcp) Reset() {
+	*x = MsgCancelRingReshareByAcp{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgCancelRingReshareByAcp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgCancelRingReshareByAcp) ProtoMessage() {}
+
+func (x *MsgCancelRingReshareByAcp) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgCancelRingReshareByAcp.ProtoReflect.Descriptor instead.
+func (*MsgCancelRingReshareByAcp) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *MsgCancelRingReshareByAcp) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
+}
+
+func (x *MsgCancelRingReshareByAcp) GetRingId() string {
+	if x != nil {
+		return x.RingId
+	}
+	return ""
+}
+
+type MsgCancelRingReshareByAcpResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MsgCancelRingReshareByAcpResponse) Reset() {
+	*x = MsgCancelRingReshareByAcpResponse{}
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgCancelRingReshareByAcpResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgCancelRingReshareByAcpResponse) ProtoMessage() {}
+
+func (x *MsgCancelRingReshareByAcpResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgCancelRingReshareByAcpResponse.ProtoReflect.Descriptor instead.
+func (*MsgCancelRingReshareByAcpResponse) Descriptor() ([]byte, []int) {
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{11}
+}
+
 type MsgSetRingPssIntervalByAcp struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	Creator string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -640,7 +728,7 @@ type MsgSetRingPssIntervalByAcp struct {
 
 func (x *MsgSetRingPssIntervalByAcp) Reset() {
 	*x = MsgSetRingPssIntervalByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[10]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -652,7 +740,7 @@ func (x *MsgSetRingPssIntervalByAcp) String() string {
 func (*MsgSetRingPssIntervalByAcp) ProtoMessage() {}
 
 func (x *MsgSetRingPssIntervalByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[10]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -665,7 +753,7 @@ func (x *MsgSetRingPssIntervalByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSetRingPssIntervalByAcp.ProtoReflect.Descriptor instead.
 func (*MsgSetRingPssIntervalByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{10}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *MsgSetRingPssIntervalByAcp) GetCreator() string {
@@ -697,7 +785,7 @@ type MsgSetRingPssIntervalByAcpResponse struct {
 
 func (x *MsgSetRingPssIntervalByAcpResponse) Reset() {
 	*x = MsgSetRingPssIntervalByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[11]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -709,7 +797,7 @@ func (x *MsgSetRingPssIntervalByAcpResponse) String() string {
 func (*MsgSetRingPssIntervalByAcpResponse) ProtoMessage() {}
 
 func (x *MsgSetRingPssIntervalByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[11]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -722,7 +810,7 @@ func (x *MsgSetRingPssIntervalByAcpResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use MsgSetRingPssIntervalByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgSetRingPssIntervalByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{11}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{13}
 }
 
 type MsgScheduleRingUpgradeByAcp struct {
@@ -738,7 +826,7 @@ type MsgScheduleRingUpgradeByAcp struct {
 
 func (x *MsgScheduleRingUpgradeByAcp) Reset() {
 	*x = MsgScheduleRingUpgradeByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[12]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -750,7 +838,7 @@ func (x *MsgScheduleRingUpgradeByAcp) String() string {
 func (*MsgScheduleRingUpgradeByAcp) ProtoMessage() {}
 
 func (x *MsgScheduleRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[12]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -763,7 +851,7 @@ func (x *MsgScheduleRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgScheduleRingUpgradeByAcp.ProtoReflect.Descriptor instead.
 func (*MsgScheduleRingUpgradeByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{12}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *MsgScheduleRingUpgradeByAcp) GetCreator() string {
@@ -802,7 +890,7 @@ type MsgScheduleRingUpgradeByAcpResponse struct {
 
 func (x *MsgScheduleRingUpgradeByAcpResponse) Reset() {
 	*x = MsgScheduleRingUpgradeByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -814,7 +902,7 @@ func (x *MsgScheduleRingUpgradeByAcpResponse) String() string {
 func (*MsgScheduleRingUpgradeByAcpResponse) ProtoMessage() {}
 
 func (x *MsgScheduleRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[13]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -827,7 +915,7 @@ func (x *MsgScheduleRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use MsgScheduleRingUpgradeByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgScheduleRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{13}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{15}
 }
 
 type MsgCancelRingUpgradeByAcp struct {
@@ -840,7 +928,7 @@ type MsgCancelRingUpgradeByAcp struct {
 
 func (x *MsgCancelRingUpgradeByAcp) Reset() {
 	*x = MsgCancelRingUpgradeByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +940,7 @@ func (x *MsgCancelRingUpgradeByAcp) String() string {
 func (*MsgCancelRingUpgradeByAcp) ProtoMessage() {}
 
 func (x *MsgCancelRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[14]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +953,7 @@ func (x *MsgCancelRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCancelRingUpgradeByAcp.ProtoReflect.Descriptor instead.
 func (*MsgCancelRingUpgradeByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{14}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MsgCancelRingUpgradeByAcp) GetCreator() string {
@@ -890,7 +978,7 @@ type MsgCancelRingUpgradeByAcpResponse struct {
 
 func (x *MsgCancelRingUpgradeByAcpResponse) Reset() {
 	*x = MsgCancelRingUpgradeByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -902,7 +990,7 @@ func (x *MsgCancelRingUpgradeByAcpResponse) String() string {
 func (*MsgCancelRingUpgradeByAcpResponse) ProtoMessage() {}
 
 func (x *MsgCancelRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[15]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -915,7 +1003,7 @@ func (x *MsgCancelRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use MsgCancelRingUpgradeByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgCancelRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{15}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{17}
 }
 
 type MsgSetRingReportingByAcp struct {
@@ -929,7 +1017,7 @@ type MsgSetRingReportingByAcp struct {
 
 func (x *MsgSetRingReportingByAcp) Reset() {
 	*x = MsgSetRingReportingByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -941,7 +1029,7 @@ func (x *MsgSetRingReportingByAcp) String() string {
 func (*MsgSetRingReportingByAcp) ProtoMessage() {}
 
 func (x *MsgSetRingReportingByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[16]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -954,7 +1042,7 @@ func (x *MsgSetRingReportingByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSetRingReportingByAcp.ProtoReflect.Descriptor instead.
 func (*MsgSetRingReportingByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{16}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *MsgSetRingReportingByAcp) GetCreator() string {
@@ -986,7 +1074,7 @@ type MsgSetRingReportingByAcpResponse struct {
 
 func (x *MsgSetRingReportingByAcpResponse) Reset() {
 	*x = MsgSetRingReportingByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[17]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -998,7 +1086,7 @@ func (x *MsgSetRingReportingByAcpResponse) String() string {
 func (*MsgSetRingReportingByAcpResponse) ProtoMessage() {}
 
 func (x *MsgSetRingReportingByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[17]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1011,7 +1099,7 @@ func (x *MsgSetRingReportingByAcpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSetRingReportingByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgSetRingReportingByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{17}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{19}
 }
 
 // MsgAddRingTrustedAuthRelayByAcp adds a ring authentication relay.
@@ -1026,7 +1114,7 @@ type MsgAddRingTrustedAuthRelayByAcp struct {
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) Reset() {
 	*x = MsgAddRingTrustedAuthRelayByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[18]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1038,7 +1126,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcp) String() string {
 func (*MsgAddRingTrustedAuthRelayByAcp) ProtoMessage() {}
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[18]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1051,7 +1139,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddRingTrustedAuthRelayByAcp.ProtoReflect.Descriptor instead.
 func (*MsgAddRingTrustedAuthRelayByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{18}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) GetCreator() string {
@@ -1084,7 +1172,7 @@ type MsgAddRingTrustedAuthRelayByAcpResponse struct {
 
 func (x *MsgAddRingTrustedAuthRelayByAcpResponse) Reset() {
 	*x = MsgAddRingTrustedAuthRelayByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[19]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1096,7 +1184,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcpResponse) String() string {
 func (*MsgAddRingTrustedAuthRelayByAcpResponse) ProtoMessage() {}
 
 func (x *MsgAddRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[19]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1109,7 +1197,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use MsgAddRingTrustedAuthRelayByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddRingTrustedAuthRelayByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{19}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{21}
 }
 
 // MsgRemoveRingTrustedAuthRelayByAcp revokes a ring authentication relay.
@@ -1124,7 +1212,7 @@ type MsgRemoveRingTrustedAuthRelayByAcp struct {
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) Reset() {
 	*x = MsgRemoveRingTrustedAuthRelayByAcp{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[20]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1136,7 +1224,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcp) String() string {
 func (*MsgRemoveRingTrustedAuthRelayByAcp) ProtoMessage() {}
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[20]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1149,7 +1237,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use MsgRemoveRingTrustedAuthRelayByAcp.ProtoReflect.Descriptor instead.
 func (*MsgRemoveRingTrustedAuthRelayByAcp) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{20}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) GetCreator() string {
@@ -1182,7 +1270,7 @@ type MsgRemoveRingTrustedAuthRelayByAcpResponse struct {
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) Reset() {
 	*x = MsgRemoveRingTrustedAuthRelayByAcpResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[21]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1194,7 +1282,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) String() string {
 func (*MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoMessage() {}
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[21]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1207,7 +1295,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect
 
 // Deprecated: Use MsgRemoveRingTrustedAuthRelayByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveRingTrustedAuthRelayByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{21}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{23}
 }
 
 type MsgFinalizeRingReshareByThresholdSignature struct {
@@ -1222,7 +1310,7 @@ type MsgFinalizeRingReshareByThresholdSignature struct {
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) Reset() {
 	*x = MsgFinalizeRingReshareByThresholdSignature{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[22]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1234,7 +1322,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignature) String() string {
 func (*MsgFinalizeRingReshareByThresholdSignature) ProtoMessage() {}
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[22]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1247,7 +1335,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignature) ProtoReflect() protoreflect
 
 // Deprecated: Use MsgFinalizeRingReshareByThresholdSignature.ProtoReflect.Descriptor instead.
 func (*MsgFinalizeRingReshareByThresholdSignature) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{22}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) GetCreator() string {
@@ -1286,7 +1374,7 @@ type MsgFinalizeRingReshareByThresholdSignatureResponse struct {
 
 func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) Reset() {
 	*x = MsgFinalizeRingReshareByThresholdSignatureResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[23]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1298,7 +1386,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) String() string {
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoMessage() {}
 
 func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[23]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1311,7 +1399,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoReflect() prot
 
 // Deprecated: Use MsgFinalizeRingReshareByThresholdSignatureResponse.ProtoReflect.Descriptor instead.
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{23}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{25}
 }
 
 type MsgSubmitReport struct {
@@ -1327,7 +1415,7 @@ type MsgSubmitReport struct {
 
 func (x *MsgSubmitReport) Reset() {
 	*x = MsgSubmitReport{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[24]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1339,7 +1427,7 @@ func (x *MsgSubmitReport) String() string {
 func (*MsgSubmitReport) ProtoMessage() {}
 
 func (x *MsgSubmitReport) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[24]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1352,7 +1440,7 @@ func (x *MsgSubmitReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSubmitReport.ProtoReflect.Descriptor instead.
 func (*MsgSubmitReport) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{24}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MsgSubmitReport) GetCreator() string {
@@ -1399,7 +1487,7 @@ type MsgSubmitReportResponse struct {
 
 func (x *MsgSubmitReportResponse) Reset() {
 	*x = MsgSubmitReportResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[25]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1411,7 +1499,7 @@ func (x *MsgSubmitReportResponse) String() string {
 func (*MsgSubmitReportResponse) ProtoMessage() {}
 
 func (x *MsgSubmitReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[25]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1424,7 +1512,7 @@ func (x *MsgSubmitReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSubmitReportResponse.ProtoReflect.Descriptor instead.
 func (*MsgSubmitReportResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{25}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *MsgSubmitReportResponse) GetReportId() string {
@@ -1455,7 +1543,7 @@ type ReportEnvelope struct {
 
 func (x *ReportEnvelope) Reset() {
 	*x = ReportEnvelope{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[26]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1467,7 +1555,7 @@ func (x *ReportEnvelope) String() string {
 func (*ReportEnvelope) ProtoMessage() {}
 
 func (x *ReportEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[26]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1480,7 +1568,7 @@ func (x *ReportEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEnvelope.ProtoReflect.Descriptor instead.
 func (*ReportEnvelope) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{26}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ReportEnvelope) GetDomain() string {
@@ -1589,7 +1677,7 @@ type RingReshareFinalizeSignDoc struct {
 
 func (x *RingReshareFinalizeSignDoc) Reset() {
 	*x = RingReshareFinalizeSignDoc{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[27]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1601,7 +1689,7 @@ func (x *RingReshareFinalizeSignDoc) String() string {
 func (*RingReshareFinalizeSignDoc) ProtoMessage() {}
 
 func (x *RingReshareFinalizeSignDoc) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[27]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1614,7 +1702,7 @@ func (x *RingReshareFinalizeSignDoc) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingReshareFinalizeSignDoc.ProtoReflect.Descriptor instead.
 func (*RingReshareFinalizeSignDoc) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{27}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *RingReshareFinalizeSignDoc) GetDomain() string {
@@ -1683,7 +1771,7 @@ type RingReshareSignState struct {
 
 func (x *RingReshareSignState) Reset() {
 	*x = RingReshareSignState{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[28]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1695,7 +1783,7 @@ func (x *RingReshareSignState) String() string {
 func (*RingReshareSignState) ProtoMessage() {}
 
 func (x *RingReshareSignState) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[28]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1708,7 +1796,7 @@ func (x *RingReshareSignState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingReshareSignState.ProtoReflect.Descriptor instead.
 func (*RingReshareSignState) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{28}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *RingReshareSignState) GetRingPk() string {
@@ -1793,7 +1881,7 @@ type MsgStoreDocument struct {
 
 func (x *MsgStoreDocument) Reset() {
 	*x = MsgStoreDocument{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[29]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1805,7 +1893,7 @@ func (x *MsgStoreDocument) String() string {
 func (*MsgStoreDocument) ProtoMessage() {}
 
 func (x *MsgStoreDocument) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[29]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1818,7 +1906,7 @@ func (x *MsgStoreDocument) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreDocument.ProtoReflect.Descriptor instead.
 func (*MsgStoreDocument) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{29}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *MsgStoreDocument) GetCreator() string {
@@ -1893,7 +1981,7 @@ type MsgStoreDocumentResponse struct {
 
 func (x *MsgStoreDocumentResponse) Reset() {
 	*x = MsgStoreDocumentResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[30]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1905,7 +1993,7 @@ func (x *MsgStoreDocumentResponse) String() string {
 func (*MsgStoreDocumentResponse) ProtoMessage() {}
 
 func (x *MsgStoreDocumentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[30]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1918,7 +2006,7 @@ func (x *MsgStoreDocumentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreDocumentResponse.ProtoReflect.Descriptor instead.
 func (*MsgStoreDocumentResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{30}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *MsgStoreDocumentResponse) GetDocumentId() string {
@@ -1942,7 +2030,7 @@ type MsgStoreKeyDerivation struct {
 
 func (x *MsgStoreKeyDerivation) Reset() {
 	*x = MsgStoreKeyDerivation{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[31]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1954,7 +2042,7 @@ func (x *MsgStoreKeyDerivation) String() string {
 func (*MsgStoreKeyDerivation) ProtoMessage() {}
 
 func (x *MsgStoreKeyDerivation) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[31]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1967,7 +2055,7 @@ func (x *MsgStoreKeyDerivation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreKeyDerivation.ProtoReflect.Descriptor instead.
 func (*MsgStoreKeyDerivation) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{31}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *MsgStoreKeyDerivation) GetCreator() string {
@@ -2021,7 +2109,7 @@ type MsgStoreKeyDerivationResponse struct {
 
 func (x *MsgStoreKeyDerivationResponse) Reset() {
 	*x = MsgStoreKeyDerivationResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[32]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2033,7 +2121,7 @@ func (x *MsgStoreKeyDerivationResponse) String() string {
 func (*MsgStoreKeyDerivationResponse) ProtoMessage() {}
 
 func (x *MsgStoreKeyDerivationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[32]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2046,7 +2134,7 @@ func (x *MsgStoreKeyDerivationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreKeyDerivationResponse.ProtoReflect.Descriptor instead.
 func (*MsgStoreKeyDerivationResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{32}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *MsgStoreKeyDerivationResponse) GetKeyDerivationId() string {
@@ -2069,7 +2157,7 @@ type MsgCreateNodeInfo struct {
 
 func (x *MsgCreateNodeInfo) Reset() {
 	*x = MsgCreateNodeInfo{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[33]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2081,7 +2169,7 @@ func (x *MsgCreateNodeInfo) String() string {
 func (*MsgCreateNodeInfo) ProtoMessage() {}
 
 func (x *MsgCreateNodeInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[33]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2094,7 +2182,7 @@ func (x *MsgCreateNodeInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCreateNodeInfo.ProtoReflect.Descriptor instead.
 func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{33}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *MsgCreateNodeInfo) GetCreator() string {
@@ -2140,7 +2228,7 @@ type MsgCreateNodeInfoResponse struct {
 
 func (x *MsgCreateNodeInfoResponse) Reset() {
 	*x = MsgCreateNodeInfoResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[34]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2152,7 +2240,7 @@ func (x *MsgCreateNodeInfoResponse) String() string {
 func (*MsgCreateNodeInfoResponse) ProtoMessage() {}
 
 func (x *MsgCreateNodeInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[34]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2165,7 +2253,7 @@ func (x *MsgCreateNodeInfoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCreateNodeInfoResponse.ProtoReflect.Descriptor instead.
 func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{34}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{36}
 }
 
 type MsgUpdateNodePeerId struct {
@@ -2179,7 +2267,7 @@ type MsgUpdateNodePeerId struct {
 
 func (x *MsgUpdateNodePeerId) Reset() {
 	*x = MsgUpdateNodePeerId{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[35]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2191,7 +2279,7 @@ func (x *MsgUpdateNodePeerId) String() string {
 func (*MsgUpdateNodePeerId) ProtoMessage() {}
 
 func (x *MsgUpdateNodePeerId) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[35]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2204,7 +2292,7 @@ func (x *MsgUpdateNodePeerId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgUpdateNodePeerId.ProtoReflect.Descriptor instead.
 func (*MsgUpdateNodePeerId) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{35}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *MsgUpdateNodePeerId) GetCreator() string {
@@ -2236,7 +2324,7 @@ type MsgUpdateNodePeerIdResponse struct {
 
 func (x *MsgUpdateNodePeerIdResponse) Reset() {
 	*x = MsgUpdateNodePeerIdResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[36]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2248,7 +2336,7 @@ func (x *MsgUpdateNodePeerIdResponse) String() string {
 func (*MsgUpdateNodePeerIdResponse) ProtoMessage() {}
 
 func (x *MsgUpdateNodePeerIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[36]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2261,7 +2349,7 @@ func (x *MsgUpdateNodePeerIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgUpdateNodePeerIdResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateNodePeerIdResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{36}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{38}
 }
 
 type MsgTransferNodeController struct {
@@ -2275,7 +2363,7 @@ type MsgTransferNodeController struct {
 
 func (x *MsgTransferNodeController) Reset() {
 	*x = MsgTransferNodeController{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[37]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2287,7 +2375,7 @@ func (x *MsgTransferNodeController) String() string {
 func (*MsgTransferNodeController) ProtoMessage() {}
 
 func (x *MsgTransferNodeController) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[37]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2300,7 +2388,7 @@ func (x *MsgTransferNodeController) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgTransferNodeController.ProtoReflect.Descriptor instead.
 func (*MsgTransferNodeController) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{37}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *MsgTransferNodeController) GetCreator() string {
@@ -2332,7 +2420,7 @@ type MsgTransferNodeControllerResponse struct {
 
 func (x *MsgTransferNodeControllerResponse) Reset() {
 	*x = MsgTransferNodeControllerResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[38]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2344,7 +2432,7 @@ func (x *MsgTransferNodeControllerResponse) String() string {
 func (*MsgTransferNodeControllerResponse) ProtoMessage() {}
 
 func (x *MsgTransferNodeControllerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[38]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2357,7 +2445,7 @@ func (x *MsgTransferNodeControllerResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use MsgTransferNodeControllerResponse.ProtoReflect.Descriptor instead.
 func (*MsgTransferNodeControllerResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{38}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{40}
 }
 
 type MsgAddNodeToWhitelist struct {
@@ -2375,7 +2463,7 @@ type MsgAddNodeToWhitelist struct {
 
 func (x *MsgAddNodeToWhitelist) Reset() {
 	*x = MsgAddNodeToWhitelist{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[39]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2387,7 +2475,7 @@ func (x *MsgAddNodeToWhitelist) String() string {
 func (*MsgAddNodeToWhitelist) ProtoMessage() {}
 
 func (x *MsgAddNodeToWhitelist) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[39]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2400,7 +2488,7 @@ func (x *MsgAddNodeToWhitelist) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddNodeToWhitelist.ProtoReflect.Descriptor instead.
 func (*MsgAddNodeToWhitelist) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{39}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *MsgAddNodeToWhitelist) GetCreator() string {
@@ -2466,7 +2554,7 @@ type MsgAddNodeToWhitelistResponse struct {
 
 func (x *MsgAddNodeToWhitelistResponse) Reset() {
 	*x = MsgAddNodeToWhitelistResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[40]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2478,7 +2566,7 @@ func (x *MsgAddNodeToWhitelistResponse) String() string {
 func (*MsgAddNodeToWhitelistResponse) ProtoMessage() {}
 
 func (x *MsgAddNodeToWhitelistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[40]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2491,7 +2579,7 @@ func (x *MsgAddNodeToWhitelistResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddNodeToWhitelistResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddNodeToWhitelistResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{40}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{42}
 }
 
 type MsgRemoveNodeFromWhitelist struct {
@@ -2509,7 +2597,7 @@ type MsgRemoveNodeFromWhitelist struct {
 
 func (x *MsgRemoveNodeFromWhitelist) Reset() {
 	*x = MsgRemoveNodeFromWhitelist{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[41]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2521,7 +2609,7 @@ func (x *MsgRemoveNodeFromWhitelist) String() string {
 func (*MsgRemoveNodeFromWhitelist) ProtoMessage() {}
 
 func (x *MsgRemoveNodeFromWhitelist) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[41]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2534,7 +2622,7 @@ func (x *MsgRemoveNodeFromWhitelist) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgRemoveNodeFromWhitelist.ProtoReflect.Descriptor instead.
 func (*MsgRemoveNodeFromWhitelist) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{41}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *MsgRemoveNodeFromWhitelist) GetCreator() string {
@@ -2600,7 +2688,7 @@ type MsgRemoveNodeFromWhitelistResponse struct {
 
 func (x *MsgRemoveNodeFromWhitelistResponse) Reset() {
 	*x = MsgRemoveNodeFromWhitelistResponse{}
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[42]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2612,7 +2700,7 @@ func (x *MsgRemoveNodeFromWhitelistResponse) String() string {
 func (*MsgRemoveNodeFromWhitelistResponse) ProtoMessage() {}
 
 func (x *MsgRemoveNodeFromWhitelistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_orbis_tx_proto_msgTypes[42]
+	mi := &file_sourcehub_orbis_tx_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2625,7 +2713,7 @@ func (x *MsgRemoveNodeFromWhitelistResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use MsgRemoveNodeFromWhitelistResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveNodeFromWhitelistResponse) Descriptor() ([]byte, []int) {
-	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{42}
+	return file_sourcehub_orbis_tx_proto_rawDescGZIP(), []int{44}
 }
 
 var File_sourcehub_orbis_tx_proto protoreflect.FileDescriptor
@@ -2668,7 +2756,11 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x12new_peer_node_keys\x18\x03 \x03(\tR\x0fnewPeerNodeKeys\x12(\n" +
 	"\rnew_threshold\x18\x04 \x01(\rH\x00R\fnewThreshold\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\x10\n" +
 	"\x0e_new_threshold\"\"\n" +
-	" MsgStartRingReshareByAcpResponse\"\x80\x01\n" +
+	" MsgStartRingReshareByAcpResponse\"\\\n" +
+	"\x19MsgCancelRingReshareByAcp\x12\x18\n" +
+	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
+	"\aring_id\x18\x02 \x01(\tR\x06ringId:\f\x82\xe7\xb0*\acreator\"#\n" +
+	"!MsgCancelRingReshareByAcpResponse\"\x80\x01\n" +
 	"\x1aMsgSetRingPssIntervalByAcp\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12!\n" +
@@ -2818,7 +2910,7 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\vUNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15CONFIRMATION_RECORDED\x10\x01\x12\x12\n" +
 	"\x0eRING_FINALIZED\x10\x02\x12\x14\n" +
-	"\x10CONFLICT_DELETED\x10\x032\x93\x12\n" +
+	"\x10CONFLICT_DELETED\x10\x032\x8d\x13\n" +
 	"\x03Msg\x12Z\n" +
 	"\fUpdateParams\x12 .sourcehub.orbis.MsgUpdateParams\x1a(.sourcehub.orbis.MsgUpdateParamsResponse\x12T\n" +
 	"\n" +
@@ -2828,7 +2920,8 @@ const file_sourcehub_orbis_tx_proto_rawDesc = "" +
 	"\x15StartRingReshareByAcp\x12).sourcehub.orbis.MsgStartRingReshareByAcp\x1a1.sourcehub.orbis.MsgStartRingReshareByAcpResponse\x12{\n" +
 	"\x17SetRingPssIntervalByAcp\x12+.sourcehub.orbis.MsgSetRingPssIntervalByAcp\x1a3.sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse\x12~\n" +
 	"\x18ScheduleRingUpgradeByAcp\x12,.sourcehub.orbis.MsgScheduleRingUpgradeByAcp\x1a4.sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse\x12x\n" +
-	"\x16CancelRingUpgradeByAcp\x12*.sourcehub.orbis.MsgCancelRingUpgradeByAcp\x1a2.sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse\x12u\n" +
+	"\x16CancelRingUpgradeByAcp\x12*.sourcehub.orbis.MsgCancelRingUpgradeByAcp\x1a2.sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse\x12x\n" +
+	"\x16CancelRingReshareByAcp\x12*.sourcehub.orbis.MsgCancelRingReshareByAcp\x1a2.sourcehub.orbis.MsgCancelRingReshareByAcpResponse\x12u\n" +
 	"\x15SetRingReportingByAcp\x12).sourcehub.orbis.MsgSetRingReportingByAcp\x1a1.sourcehub.orbis.MsgSetRingReportingByAcpResponse\x12\x8a\x01\n" +
 	"\x1cAddRingTrustedAuthRelayByAcp\x120.sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcp\x1a8.sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcpResponse\x12\x93\x01\n" +
 	"\x1fRemoveRingTrustedAuthRelayByAcp\x123.sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcp\x1a;.sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse\x12\xab\x01\n" +
@@ -2856,7 +2949,7 @@ func file_sourcehub_orbis_tx_proto_rawDescGZIP() []byte {
 }
 
 var file_sourcehub_orbis_tx_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_sourcehub_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
+var file_sourcehub_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 45)
 var file_sourcehub_orbis_tx_proto_goTypes = []any{
 	(FinalizeRingOutcome)(0),                                   // 0: sourcehub.orbis.FinalizeRingOutcome
 	(*MsgUpdateParams)(nil),                                    // 1: sourcehub.orbis.MsgUpdateParams
@@ -2869,90 +2962,94 @@ var file_sourcehub_orbis_tx_proto_goTypes = []any{
 	(*MsgCancelPendingRingResponse)(nil),                       // 8: sourcehub.orbis.MsgCancelPendingRingResponse
 	(*MsgStartRingReshareByAcp)(nil),                           // 9: sourcehub.orbis.MsgStartRingReshareByAcp
 	(*MsgStartRingReshareByAcpResponse)(nil),                   // 10: sourcehub.orbis.MsgStartRingReshareByAcpResponse
-	(*MsgSetRingPssIntervalByAcp)(nil),                         // 11: sourcehub.orbis.MsgSetRingPssIntervalByAcp
-	(*MsgSetRingPssIntervalByAcpResponse)(nil),                 // 12: sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
-	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 13: sourcehub.orbis.MsgScheduleRingUpgradeByAcp
-	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 14: sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
-	(*MsgCancelRingUpgradeByAcp)(nil),                          // 15: sourcehub.orbis.MsgCancelRingUpgradeByAcp
-	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 16: sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
-	(*MsgSetRingReportingByAcp)(nil),                           // 17: sourcehub.orbis.MsgSetRingReportingByAcp
-	(*MsgSetRingReportingByAcpResponse)(nil),                   // 18: sourcehub.orbis.MsgSetRingReportingByAcpResponse
-	(*MsgAddRingTrustedAuthRelayByAcp)(nil),                    // 19: sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcp
-	(*MsgAddRingTrustedAuthRelayByAcpResponse)(nil),            // 20: sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
-	(*MsgRemoveRingTrustedAuthRelayByAcp)(nil),                 // 21: sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcp
-	(*MsgRemoveRingTrustedAuthRelayByAcpResponse)(nil),         // 22: sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
-	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 23: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
-	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 24: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	(*MsgSubmitReport)(nil),                                    // 25: sourcehub.orbis.MsgSubmitReport
-	(*MsgSubmitReportResponse)(nil),                            // 26: sourcehub.orbis.MsgSubmitReportResponse
-	(*ReportEnvelope)(nil),                                     // 27: sourcehub.orbis.ReportEnvelope
-	(*RingReshareFinalizeSignDoc)(nil),                         // 28: sourcehub.orbis.RingReshareFinalizeSignDoc
-	(*RingReshareSignState)(nil),                               // 29: sourcehub.orbis.RingReshareSignState
-	(*MsgStoreDocument)(nil),                                   // 30: sourcehub.orbis.MsgStoreDocument
-	(*MsgStoreDocumentResponse)(nil),                           // 31: sourcehub.orbis.MsgStoreDocumentResponse
-	(*MsgStoreKeyDerivation)(nil),                              // 32: sourcehub.orbis.MsgStoreKeyDerivation
-	(*MsgStoreKeyDerivationResponse)(nil),                      // 33: sourcehub.orbis.MsgStoreKeyDerivationResponse
-	(*MsgCreateNodeInfo)(nil),                                  // 34: sourcehub.orbis.MsgCreateNodeInfo
-	(*MsgCreateNodeInfoResponse)(nil),                          // 35: sourcehub.orbis.MsgCreateNodeInfoResponse
-	(*MsgUpdateNodePeerId)(nil),                                // 36: sourcehub.orbis.MsgUpdateNodePeerId
-	(*MsgUpdateNodePeerIdResponse)(nil),                        // 37: sourcehub.orbis.MsgUpdateNodePeerIdResponse
-	(*MsgTransferNodeController)(nil),                          // 38: sourcehub.orbis.MsgTransferNodeController
-	(*MsgTransferNodeControllerResponse)(nil),                  // 39: sourcehub.orbis.MsgTransferNodeControllerResponse
-	(*MsgAddNodeToWhitelist)(nil),                              // 40: sourcehub.orbis.MsgAddNodeToWhitelist
-	(*MsgAddNodeToWhitelistResponse)(nil),                      // 41: sourcehub.orbis.MsgAddNodeToWhitelistResponse
-	(*MsgRemoveNodeFromWhitelist)(nil),                         // 42: sourcehub.orbis.MsgRemoveNodeFromWhitelist
-	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 43: sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
-	(*Params)(nil),                                             // 44: sourcehub.orbis.Params
-	(*ReportingConfig)(nil),                                    // 45: sourcehub.orbis.ReportingConfig
+	(*MsgCancelRingReshareByAcp)(nil),                          // 11: sourcehub.orbis.MsgCancelRingReshareByAcp
+	(*MsgCancelRingReshareByAcpResponse)(nil),                  // 12: sourcehub.orbis.MsgCancelRingReshareByAcpResponse
+	(*MsgSetRingPssIntervalByAcp)(nil),                         // 13: sourcehub.orbis.MsgSetRingPssIntervalByAcp
+	(*MsgSetRingPssIntervalByAcpResponse)(nil),                 // 14: sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
+	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 15: sourcehub.orbis.MsgScheduleRingUpgradeByAcp
+	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 16: sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
+	(*MsgCancelRingUpgradeByAcp)(nil),                          // 17: sourcehub.orbis.MsgCancelRingUpgradeByAcp
+	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 18: sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
+	(*MsgSetRingReportingByAcp)(nil),                           // 19: sourcehub.orbis.MsgSetRingReportingByAcp
+	(*MsgSetRingReportingByAcpResponse)(nil),                   // 20: sourcehub.orbis.MsgSetRingReportingByAcpResponse
+	(*MsgAddRingTrustedAuthRelayByAcp)(nil),                    // 21: sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcp
+	(*MsgAddRingTrustedAuthRelayByAcpResponse)(nil),            // 22: sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
+	(*MsgRemoveRingTrustedAuthRelayByAcp)(nil),                 // 23: sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcp
+	(*MsgRemoveRingTrustedAuthRelayByAcpResponse)(nil),         // 24: sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
+	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 25: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
+	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 26: sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	(*MsgSubmitReport)(nil),                                    // 27: sourcehub.orbis.MsgSubmitReport
+	(*MsgSubmitReportResponse)(nil),                            // 28: sourcehub.orbis.MsgSubmitReportResponse
+	(*ReportEnvelope)(nil),                                     // 29: sourcehub.orbis.ReportEnvelope
+	(*RingReshareFinalizeSignDoc)(nil),                         // 30: sourcehub.orbis.RingReshareFinalizeSignDoc
+	(*RingReshareSignState)(nil),                               // 31: sourcehub.orbis.RingReshareSignState
+	(*MsgStoreDocument)(nil),                                   // 32: sourcehub.orbis.MsgStoreDocument
+	(*MsgStoreDocumentResponse)(nil),                           // 33: sourcehub.orbis.MsgStoreDocumentResponse
+	(*MsgStoreKeyDerivation)(nil),                              // 34: sourcehub.orbis.MsgStoreKeyDerivation
+	(*MsgStoreKeyDerivationResponse)(nil),                      // 35: sourcehub.orbis.MsgStoreKeyDerivationResponse
+	(*MsgCreateNodeInfo)(nil),                                  // 36: sourcehub.orbis.MsgCreateNodeInfo
+	(*MsgCreateNodeInfoResponse)(nil),                          // 37: sourcehub.orbis.MsgCreateNodeInfoResponse
+	(*MsgUpdateNodePeerId)(nil),                                // 38: sourcehub.orbis.MsgUpdateNodePeerId
+	(*MsgUpdateNodePeerIdResponse)(nil),                        // 39: sourcehub.orbis.MsgUpdateNodePeerIdResponse
+	(*MsgTransferNodeController)(nil),                          // 40: sourcehub.orbis.MsgTransferNodeController
+	(*MsgTransferNodeControllerResponse)(nil),                  // 41: sourcehub.orbis.MsgTransferNodeControllerResponse
+	(*MsgAddNodeToWhitelist)(nil),                              // 42: sourcehub.orbis.MsgAddNodeToWhitelist
+	(*MsgAddNodeToWhitelistResponse)(nil),                      // 43: sourcehub.orbis.MsgAddNodeToWhitelistResponse
+	(*MsgRemoveNodeFromWhitelist)(nil),                         // 44: sourcehub.orbis.MsgRemoveNodeFromWhitelist
+	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 45: sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
+	(*Params)(nil),                                             // 46: sourcehub.orbis.Params
+	(*ReportingConfig)(nil),                                    // 47: sourcehub.orbis.ReportingConfig
 }
 var file_sourcehub_orbis_tx_proto_depIdxs = []int32{
-	44, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
-	45, // 1: sourcehub.orbis.MsgCreateRing.reporting:type_name -> sourcehub.orbis.ReportingConfig
+	46, // 0: sourcehub.orbis.MsgUpdateParams.params:type_name -> sourcehub.orbis.Params
+	47, // 1: sourcehub.orbis.MsgCreateRing.reporting:type_name -> sourcehub.orbis.ReportingConfig
 	0,  // 2: sourcehub.orbis.MsgFinalizeRingResponse.outcome:type_name -> sourcehub.orbis.FinalizeRingOutcome
-	45, // 3: sourcehub.orbis.MsgSetRingReportingByAcp.reporting:type_name -> sourcehub.orbis.ReportingConfig
-	27, // 4: sourcehub.orbis.MsgSubmitReport.report:type_name -> sourcehub.orbis.ReportEnvelope
+	47, // 3: sourcehub.orbis.MsgSetRingReportingByAcp.reporting:type_name -> sourcehub.orbis.ReportingConfig
+	29, // 4: sourcehub.orbis.MsgSubmitReport.report:type_name -> sourcehub.orbis.ReportEnvelope
 	1,  // 5: sourcehub.orbis.Msg.UpdateParams:input_type -> sourcehub.orbis.MsgUpdateParams
 	3,  // 6: sourcehub.orbis.Msg.CreateRing:input_type -> sourcehub.orbis.MsgCreateRing
 	5,  // 7: sourcehub.orbis.Msg.FinalizeRing:input_type -> sourcehub.orbis.MsgFinalizeRing
 	7,  // 8: sourcehub.orbis.Msg.CancelPendingRing:input_type -> sourcehub.orbis.MsgCancelPendingRing
 	9,  // 9: sourcehub.orbis.Msg.StartRingReshareByAcp:input_type -> sourcehub.orbis.MsgStartRingReshareByAcp
-	11, // 10: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
-	13, // 11: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
-	15, // 12: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
-	17, // 13: sourcehub.orbis.Msg.SetRingReportingByAcp:input_type -> sourcehub.orbis.MsgSetRingReportingByAcp
-	19, // 14: sourcehub.orbis.Msg.AddRingTrustedAuthRelayByAcp:input_type -> sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcp
-	21, // 15: sourcehub.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:input_type -> sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcp
-	23, // 16: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
-	25, // 17: sourcehub.orbis.Msg.SubmitReport:input_type -> sourcehub.orbis.MsgSubmitReport
-	30, // 18: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
-	32, // 19: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
-	34, // 20: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
-	36, // 21: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
-	38, // 22: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
-	40, // 23: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
-	42, // 24: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
-	2,  // 25: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
-	4,  // 26: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
-	6,  // 27: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
-	8,  // 28: sourcehub.orbis.Msg.CancelPendingRing:output_type -> sourcehub.orbis.MsgCancelPendingRingResponse
-	10, // 29: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
-	12, // 30: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
-	14, // 31: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
-	16, // 32: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
-	18, // 33: sourcehub.orbis.Msg.SetRingReportingByAcp:output_type -> sourcehub.orbis.MsgSetRingReportingByAcpResponse
-	20, // 34: sourcehub.orbis.Msg.AddRingTrustedAuthRelayByAcp:output_type -> sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
-	22, // 35: sourcehub.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:output_type -> sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
-	24, // 36: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	26, // 37: sourcehub.orbis.Msg.SubmitReport:output_type -> sourcehub.orbis.MsgSubmitReportResponse
-	31, // 38: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
-	33, // 39: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
-	35, // 40: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
-	37, // 41: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
-	39, // 42: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
-	41, // 43: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
-	43, // 44: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
-	25, // [25:45] is the sub-list for method output_type
-	5,  // [5:25] is the sub-list for method input_type
+	13, // 10: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:input_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcp
+	15, // 11: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcp
+	17, // 12: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:input_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcp
+	11, // 13: sourcehub.orbis.Msg.CancelRingReshareByAcp:input_type -> sourcehub.orbis.MsgCancelRingReshareByAcp
+	19, // 14: sourcehub.orbis.Msg.SetRingReportingByAcp:input_type -> sourcehub.orbis.MsgSetRingReportingByAcp
+	21, // 15: sourcehub.orbis.Msg.AddRingTrustedAuthRelayByAcp:input_type -> sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcp
+	23, // 16: sourcehub.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:input_type -> sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcp
+	25, // 17: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignature
+	27, // 18: sourcehub.orbis.Msg.SubmitReport:input_type -> sourcehub.orbis.MsgSubmitReport
+	32, // 19: sourcehub.orbis.Msg.StoreDocument:input_type -> sourcehub.orbis.MsgStoreDocument
+	34, // 20: sourcehub.orbis.Msg.StoreKeyDerivation:input_type -> sourcehub.orbis.MsgStoreKeyDerivation
+	36, // 21: sourcehub.orbis.Msg.CreateNodeInfo:input_type -> sourcehub.orbis.MsgCreateNodeInfo
+	38, // 22: sourcehub.orbis.Msg.UpdateNodePeerId:input_type -> sourcehub.orbis.MsgUpdateNodePeerId
+	40, // 23: sourcehub.orbis.Msg.TransferNodeController:input_type -> sourcehub.orbis.MsgTransferNodeController
+	42, // 24: sourcehub.orbis.Msg.AddNodeToWhitelist:input_type -> sourcehub.orbis.MsgAddNodeToWhitelist
+	44, // 25: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:input_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelist
+	2,  // 26: sourcehub.orbis.Msg.UpdateParams:output_type -> sourcehub.orbis.MsgUpdateParamsResponse
+	4,  // 27: sourcehub.orbis.Msg.CreateRing:output_type -> sourcehub.orbis.MsgCreateRingResponse
+	6,  // 28: sourcehub.orbis.Msg.FinalizeRing:output_type -> sourcehub.orbis.MsgFinalizeRingResponse
+	8,  // 29: sourcehub.orbis.Msg.CancelPendingRing:output_type -> sourcehub.orbis.MsgCancelPendingRingResponse
+	10, // 30: sourcehub.orbis.Msg.StartRingReshareByAcp:output_type -> sourcehub.orbis.MsgStartRingReshareByAcpResponse
+	14, // 31: sourcehub.orbis.Msg.SetRingPssIntervalByAcp:output_type -> sourcehub.orbis.MsgSetRingPssIntervalByAcpResponse
+	16, // 32: sourcehub.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgScheduleRingUpgradeByAcpResponse
+	18, // 33: sourcehub.orbis.Msg.CancelRingUpgradeByAcp:output_type -> sourcehub.orbis.MsgCancelRingUpgradeByAcpResponse
+	12, // 34: sourcehub.orbis.Msg.CancelRingReshareByAcp:output_type -> sourcehub.orbis.MsgCancelRingReshareByAcpResponse
+	20, // 35: sourcehub.orbis.Msg.SetRingReportingByAcp:output_type -> sourcehub.orbis.MsgSetRingReportingByAcpResponse
+	22, // 36: sourcehub.orbis.Msg.AddRingTrustedAuthRelayByAcp:output_type -> sourcehub.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
+	24, // 37: sourcehub.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:output_type -> sourcehub.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
+	26, // 38: sourcehub.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> sourcehub.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	28, // 39: sourcehub.orbis.Msg.SubmitReport:output_type -> sourcehub.orbis.MsgSubmitReportResponse
+	33, // 40: sourcehub.orbis.Msg.StoreDocument:output_type -> sourcehub.orbis.MsgStoreDocumentResponse
+	35, // 41: sourcehub.orbis.Msg.StoreKeyDerivation:output_type -> sourcehub.orbis.MsgStoreKeyDerivationResponse
+	37, // 42: sourcehub.orbis.Msg.CreateNodeInfo:output_type -> sourcehub.orbis.MsgCreateNodeInfoResponse
+	39, // 43: sourcehub.orbis.Msg.UpdateNodePeerId:output_type -> sourcehub.orbis.MsgUpdateNodePeerIdResponse
+	41, // 44: sourcehub.orbis.Msg.TransferNodeController:output_type -> sourcehub.orbis.MsgTransferNodeControllerResponse
+	43, // 45: sourcehub.orbis.Msg.AddNodeToWhitelist:output_type -> sourcehub.orbis.MsgAddNodeToWhitelistResponse
+	45, // 46: sourcehub.orbis.Msg.RemoveNodeFromWhitelist:output_type -> sourcehub.orbis.MsgRemoveNodeFromWhitelistResponse
+	26, // [26:47] is the sub-list for method output_type
+	5,  // [5:26] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -2967,13 +3064,13 @@ func file_sourcehub_orbis_tx_proto_init() {
 	file_sourcehub_orbis_ring_proto_init()
 	file_sourcehub_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
 	file_sourcehub_orbis_tx_proto_msgTypes[8].OneofWrappers = []any{}
-	file_sourcehub_orbis_tx_proto_msgTypes[28].OneofWrappers = []any{}
-	file_sourcehub_orbis_tx_proto_msgTypes[29].OneofWrappers = []any{}
-	file_sourcehub_orbis_tx_proto_msgTypes[39].OneofWrappers = []any{
+	file_sourcehub_orbis_tx_proto_msgTypes[30].OneofWrappers = []any{}
+	file_sourcehub_orbis_tx_proto_msgTypes[31].OneofWrappers = []any{}
+	file_sourcehub_orbis_tx_proto_msgTypes[41].OneofWrappers = []any{
 		(*MsgAddNodeToWhitelist_PolicyId)(nil),
 		(*MsgAddNodeToWhitelist_RingId)(nil),
 	}
-	file_sourcehub_orbis_tx_proto_msgTypes[41].OneofWrappers = []any{
+	file_sourcehub_orbis_tx_proto_msgTypes[43].OneofWrappers = []any{
 		(*MsgRemoveNodeFromWhitelist_PolicyId)(nil),
 		(*MsgRemoveNodeFromWhitelist_RingId)(nil),
 	}
@@ -2983,7 +3080,7 @@ func file_sourcehub_orbis_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_sourcehub_orbis_tx_proto_rawDesc), len(file_sourcehub_orbis_tx_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   43,
+			NumMessages:   45,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

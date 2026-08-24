@@ -315,6 +315,62 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 	return &types.MsgStartRingReshareByAcpResponse{}, nil
 }
 
+// CancelRingReshareByAcp clears a ring's pending reshare (NewPeerNodeKeys/XNewThreshold)
+// without applying them, reverting to the current committee/threshold. This is a general
+// escape hatch for a reshare that can never finalize (e.g. the new committee can't complete
+// the DKG ceremony) — SourceHub otherwise has no way to un-stick a ring once a reshare is
+// pending, since validateStartRingReshare unconditionally rejects a new attempt while one is
+// in progress. Deliberately does not touch ring.Reporting.BackupNodeKeys: if the pending
+// reshare originated from the auto-kick path, the promoted backup was already permanently
+// spliced out of BackupNodeKeys at schedule time, and there is no stored record of which
+// origin produced a given pending reshare for this handler to reliably undo.
+func (k *Keeper) CancelRingReshareByAcp(goCtx context.Context, msg *types.MsgCancelRingReshareByAcp) (*types.MsgCancelRingReshareByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	if len(ring.NewPeerNodeKeys) == 0 && ring.XNewThreshold == nil {
+		return nil, types.ErrReshareNotInProgress
+	}
+
+	ring.NewPeerNodeKeys = nil
+	ring.XNewThreshold = nil
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingReshareCancelled{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCancelRingReshareByAcpResponse{}, nil
+}
+
 func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSetRingPssIntervalByAcp) (*types.MsgSetRingPssIntervalByAcpResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

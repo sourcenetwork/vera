@@ -80,6 +80,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
 				},
 				{
+					RpcMethod:      "CancelRingReshareByAcp",
+					Use:            "cancel-ring-reshare-by-acp [ring_id]",
+					Short:          "Cancel a pending ring reshare via external ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
+				},
+				{
 					RpcMethod:      "SetRingPssIntervalByAcp",
 					Use:            "set-ring-pss-interval-by-acp [ring_id] [pss_interval]",
 					Short:          "Set a ring PSS interval via external ACP policy",

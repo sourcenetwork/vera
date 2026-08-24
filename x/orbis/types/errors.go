@@ -44,4 +44,5 @@ var (
 	ErrRingTrustedAuthRelayNotFound = sdkerrors.Register(ModuleName, 1241, "trusted auth relay is not configured on ring")
 	ErrRingAuthRelaysDisabled       = sdkerrors.Register(ModuleName, 1242, "trusted auth relays are disabled for ring")
 	ErrRingAuthRelayExists          = sdkerrors.Register(ModuleName, 1243, "trusted auth relay is already configured on ring")
+	ErrReshareNotInProgress         = sdkerrors.Register(ModuleName, 1244, "no reshare in progress to cancel")
 )
