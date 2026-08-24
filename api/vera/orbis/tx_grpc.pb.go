@@ -27,6 +27,7 @@ const (
 	Msg_SetRingPssIntervalByAcp_FullMethodName                 = "/vera.orbis.Msg/SetRingPssIntervalByAcp"
 	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/vera.orbis.Msg/ScheduleRingUpgradeByAcp"
 	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/vera.orbis.Msg/CancelRingUpgradeByAcp"
+	Msg_CancelRingReshareByAcp_FullMethodName                  = "/vera.orbis.Msg/CancelRingReshareByAcp"
 	Msg_SetRingReportingByAcp_FullMethodName                   = "/vera.orbis.Msg/SetRingReportingByAcp"
 	Msg_AddRingTrustedAuthRelayByAcp_FullMethodName            = "/vera.orbis.Msg/AddRingTrustedAuthRelayByAcp"
 	Msg_RemoveRingTrustedAuthRelayByAcp_FullMethodName         = "/vera.orbis.Msg/RemoveRingTrustedAuthRelayByAcp"
@@ -57,6 +58,7 @@ type MsgClient interface {
 	SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
+	CancelRingReshareByAcp(ctx context.Context, in *MsgCancelRingReshareByAcp, opts ...grpc.CallOption) (*MsgCancelRingReshareByAcpResponse, error)
 	SetRingReportingByAcp(ctx context.Context, in *MsgSetRingReportingByAcp, opts ...grpc.CallOption) (*MsgSetRingReportingByAcpResponse, error)
 	// Adds a trusted authentication relay to a ring.
 	AddRingTrustedAuthRelayByAcp(ctx context.Context, in *MsgAddRingTrustedAuthRelayByAcp, opts ...grpc.CallOption) (*MsgAddRingTrustedAuthRelayByAcpResponse, error)
@@ -156,6 +158,16 @@ func (c *msgClient) CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRin
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgCancelRingUpgradeByAcpResponse)
 	err := c.cc.Invoke(ctx, Msg_CancelRingUpgradeByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) CancelRingReshareByAcp(ctx context.Context, in *MsgCancelRingReshareByAcp, opts ...grpc.CallOption) (*MsgCancelRingReshareByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgCancelRingReshareByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_CancelRingReshareByAcp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -307,6 +319,7 @@ type MsgServer interface {
 	SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
+	CancelRingReshareByAcp(context.Context, *MsgCancelRingReshareByAcp) (*MsgCancelRingReshareByAcpResponse, error)
 	SetRingReportingByAcp(context.Context, *MsgSetRingReportingByAcp) (*MsgSetRingReportingByAcpResponse, error)
 	// Adds a trusted authentication relay to a ring.
 	AddRingTrustedAuthRelayByAcp(context.Context, *MsgAddRingTrustedAuthRelayByAcp) (*MsgAddRingTrustedAuthRelayByAcpResponse, error)
@@ -355,6 +368,9 @@ func (UnimplementedMsgServer) ScheduleRingUpgradeByAcp(context.Context, *MsgSche
 }
 func (UnimplementedMsgServer) CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CancelRingUpgradeByAcp not implemented")
+}
+func (UnimplementedMsgServer) CancelRingReshareByAcp(context.Context, *MsgCancelRingReshareByAcp) (*MsgCancelRingReshareByAcpResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelRingReshareByAcp not implemented")
 }
 func (UnimplementedMsgServer) SetRingReportingByAcp(context.Context, *MsgSetRingReportingByAcp) (*MsgSetRingReportingByAcpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetRingReportingByAcp not implemented")
@@ -556,6 +572,24 @@ func _Msg_CancelRingUpgradeByAcp_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).CancelRingUpgradeByAcp(ctx, req.(*MsgCancelRingUpgradeByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_CancelRingReshareByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCancelRingReshareByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CancelRingReshareByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_CancelRingReshareByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CancelRingReshareByAcp(ctx, req.(*MsgCancelRingReshareByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -832,6 +866,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CancelRingUpgradeByAcp",
 			Handler:    _Msg_CancelRingUpgradeByAcp_Handler,
+		},
+		{
+			MethodName: "CancelRingReshareByAcp",
+			Handler:    _Msg_CancelRingReshareByAcp_Handler,
 		},
 		{
 			MethodName: "SetRingReportingByAcp",

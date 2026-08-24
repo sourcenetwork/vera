@@ -63,6 +63,12 @@ message EventRingUpgradeCancelled {
   uint64 current_version = 2;
 }
 
+// EventRingReshareCancelled is emitted when a pending ring reshare is cancelled.
+message EventRingReshareCancelled {
+  string ring_id = 1;
+  string updater_did = 2;
+}
+
 // EventRingUpgradeNormalized is emitted when a scheduled upgrade becomes active.
 message EventRingUpgradeNormalized {
   string ring_id = 1;

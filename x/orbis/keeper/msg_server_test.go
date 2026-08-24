@@ -1551,6 +1551,12 @@ func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 
+	_, err = k.CancelRingReshareByAcp(outsiderCtx, &types.MsgCancelRingReshareByAcp{
+		Creator: outsiderAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
 	_, err = k.SetRingReportingByAcp(outsiderCtx, &types.MsgSetRingReportingByAcp{
 		Creator:   outsiderAddr,
 		RingId:    createRingResp.RingId,
@@ -1564,6 +1570,8 @@ func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	require.Equal(t, types.DefaultReportingConfig(), ring.Reporting)
 	require.Nil(t, ring.UpgradeInfo.XNextVersion)
 	require.Nil(t, ring.UpgradeInfo.XActivationTime)
+	require.Empty(t, ring.NewPeerNodeKeys)
+	require.Nil(t, ring.XNewThreshold)
 }
 
 func TestMsgServer_RingMutationUsesRingPolicy(t *testing.T) {
@@ -1679,6 +1687,157 @@ func TestMsgServer_StartRingReshareByAcpAllowsOperatorRelation(t *testing.T) {
 	require.Equal(t, policyID, ring.PolicyId)
 	require.Equal(t, canonicalStrings([]string{peer3Key, peer4Key}), ring.NewPeerNodeKeys)
 	require.Equal(t, uint32(1), ring.GetNewThreshold())
+}
+
+func TestMsgServer_CancelRingReshareByAcpClearsPendingReshareAndPreservesBackupNodeKeys(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	backupAddr, backupKey := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWBackup1")
+	newPeer1Addr, newPeer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWNewPeer1")
+	newPeer2Addr, newPeer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWNewPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	updatePeerNodeWhitelists(t, k, ctx, backupAddr, backupKey, []string{policyID}, nil)
+	updatePeerNodeWhitelists(t, k, ctx, newPeer1Addr, newPeer1Key, []string{policyID}, nil)
+	updatePeerNodeWhitelists(t, k, ctx, newPeer2Addr, newPeer2Key, []string{policyID}, nil)
+
+	reporting := types.ReportingConfig{
+		DemeritConfig:  types.DefaultDemeritConfig(),
+		BackupNodeKeys: []string{backupKey},
+		KickThreshold:  types.DefaultReportingConfig().KickThreshold,
+	}
+	_, err = k.SetRingReportingByAcp(ctx.WithEventManager(sdk.NewEventManager()), &types.MsgSetRingReportingByAcp{
+		Creator:   creatorAddr,
+		RingId:    createRingResp.RingId,
+		Reporting: reporting,
+	})
+	require.NoError(t, err)
+
+	_, err = k.StartRingReshareByAcp(ctx.WithEventManager(sdk.NewEventManager()), &types.MsgStartRingReshareByAcp{
+		Creator:         creatorAddr,
+		RingId:          createRingResp.RingId,
+		NewPeerNodeKeys: []string{newPeer1Key, newPeer2Key},
+	})
+	require.NoError(t, err)
+
+	pending := k.GetRing(ctx, createRingResp.RingId)
+	require.NotEmpty(t, pending.NewPeerNodeKeys)
+
+	cancelCtx := ctx.WithEventManager(sdk.NewEventManager())
+	_, err = k.CancelRingReshareByAcp(cancelCtx, &types.MsgCancelRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.NoError(t, err)
+
+	events := parseTypedEvents(t, cancelCtx)
+	require.Equal(t, []proto.Message{
+		&types.EventRingUpdated{
+			RingId:     createRingResp.RingId,
+			UpdaterDid: testDID,
+		},
+		&types.EventRingReshareCancelled{
+			RingId:     createRingResp.RingId,
+			UpdaterDid: testDID,
+		},
+	}, events)
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.NotNil(t, ring)
+	require.Empty(t, ring.NewPeerNodeKeys)
+	require.Nil(t, ring.XNewThreshold)
+	require.Equal(t, canonicalStrings([]string{peer1Key, peer2Key}), ring.PeerNodeKeys)
+	require.Equal(t, uint32(1), ring.Threshold)
+	require.Equal(t, []string{backupKey}, ring.Reporting.BackupNodeKeys)
+}
+
+func TestMsgServer_CancelRingReshareByAcpFailsWithoutPendingReshare(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	cancelCtx := ctx.WithEventManager(sdk.NewEventManager())
+	_, err = k.CancelRingReshareByAcp(cancelCtx, &types.MsgCancelRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.ErrorIs(t, err, types.ErrReshareNotInProgress)
+	require.Empty(t, parseTypedEvents(t, cancelCtx))
+}
+
+func TestMsgServer_CancelRingReshareByAcpFailsForUnknownRing(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, err := k.CancelRingReshareByAcp(ctx, &types.MsgCancelRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  "does-not-exist",
+	})
+	require.ErrorIs(t, err, types.ErrRingNotFound)
+}
+
+func TestMsgServer_CancelRingReshareByAcpFailsForUnfinalizedRing(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.CancelRingReshareByAcp(ctx, &types.MsgCancelRingReshareByAcp{
+		Creator: creatorAddr,
+		RingId:  createRingResp.RingId,
+	})
+	require.ErrorIs(t, err, types.ErrRingNotFinalized)
 }
 
 func TestMsgServer_FinalizeRingReshareRequiresPendingUpdate(t *testing.T) {
