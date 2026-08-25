@@ -39,6 +39,7 @@ const (
 	Msg_TransferNodeController_FullMethodName                  = "/vera.orbis.Msg/TransferNodeController"
 	Msg_AddNodeToWhitelist_FullMethodName                      = "/vera.orbis.Msg/AddNodeToWhitelist"
 	Msg_RemoveNodeFromWhitelist_FullMethodName                 = "/vera.orbis.Msg/RemoveNodeFromWhitelist"
+	Msg_DrainNodeKey_FullMethodName                            = "/vera.orbis.Msg/DrainNodeKey"
 )
 
 // MsgClient is the client API for Msg service.
@@ -70,6 +71,7 @@ type MsgClient interface {
 	TransferNodeController(ctx context.Context, in *MsgTransferNodeController, opts ...grpc.CallOption) (*MsgTransferNodeControllerResponse, error)
 	AddNodeToWhitelist(ctx context.Context, in *MsgAddNodeToWhitelist, opts ...grpc.CallOption) (*MsgAddNodeToWhitelistResponse, error)
 	RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNodeFromWhitelist, opts ...grpc.CallOption) (*MsgRemoveNodeFromWhitelistResponse, error)
+	DrainNodeKey(ctx context.Context, in *MsgDrainNodeKey, opts ...grpc.CallOption) (*MsgDrainNodeKeyResponse, error)
 }
 
 type msgClient struct {
@@ -280,6 +282,16 @@ func (c *msgClient) RemoveNodeFromWhitelist(ctx context.Context, in *MsgRemoveNo
 	return out, nil
 }
 
+func (c *msgClient) DrainNodeKey(ctx context.Context, in *MsgDrainNodeKey, opts ...grpc.CallOption) (*MsgDrainNodeKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgDrainNodeKeyResponse)
+	err := c.cc.Invoke(ctx, Msg_DrainNodeKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility.
@@ -309,6 +321,7 @@ type MsgServer interface {
 	TransferNodeController(context.Context, *MsgTransferNodeController) (*MsgTransferNodeControllerResponse, error)
 	AddNodeToWhitelist(context.Context, *MsgAddNodeToWhitelist) (*MsgAddNodeToWhitelistResponse, error)
 	RemoveNodeFromWhitelist(context.Context, *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error)
+	DrainNodeKey(context.Context, *MsgDrainNodeKey) (*MsgDrainNodeKeyResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -378,6 +391,9 @@ func (UnimplementedMsgServer) AddNodeToWhitelist(context.Context, *MsgAddNodeToW
 }
 func (UnimplementedMsgServer) RemoveNodeFromWhitelist(context.Context, *MsgRemoveNodeFromWhitelist) (*MsgRemoveNodeFromWhitelistResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveNodeFromWhitelist not implemented")
+}
+func (UnimplementedMsgServer) DrainNodeKey(context.Context, *MsgDrainNodeKey) (*MsgDrainNodeKeyResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DrainNodeKey not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 func (UnimplementedMsgServer) testEmbeddedByValue()             {}
@@ -760,6 +776,24 @@ func _Msg_RemoveNodeFromWhitelist_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_DrainNodeKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDrainNodeKey)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DrainNodeKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_DrainNodeKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DrainNodeKey(ctx, req.(*MsgDrainNodeKey))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -846,6 +880,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveNodeFromWhitelist",
 			Handler:    _Msg_RemoveNodeFromWhitelist_Handler,
+		},
+		{
+			MethodName: "DrainNodeKey",
+			Handler:    _Msg_DrainNodeKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

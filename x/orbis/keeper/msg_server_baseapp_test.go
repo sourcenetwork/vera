@@ -78,6 +78,7 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T
 		authority.String(),
 		accountKeeper,
 		nil,
+		nil,
 	)
 	orbistypes.RegisterMsgServer(bApp.MsgServiceRouter(), &orbisKeeper)
 
@@ -190,6 +191,7 @@ func TestMsgServer_CancelPendingRing_DeletesRingThroughBaseApp(t *testing.T) {
 		log.NewNopLogger(),
 		authority.String(),
 		accountKeeper,
+		nil,
 		nil,
 	)
 	orbistypes.RegisterMsgServer(bApp.MsgServiceRouter(), &orbisKeeper)
