@@ -16,6 +16,7 @@ FROM debian:bookworm-slim
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY docker/faucet-key.json /etc/vera/faucet-key.json
 COPY --from=builder /app/build/verad /usr/local/bin/verad
+RUN ln -s verad /usr/local/bin/sourcehubd
 # Copy the default config files to override the container with
 COPY docker/configs/*.toml /etc/vera/
 
