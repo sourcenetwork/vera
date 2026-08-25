@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package vera.acp;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "vera/acp/params.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/acp/types";
+
+// GenesisState defines the acp module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

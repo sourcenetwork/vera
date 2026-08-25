@@ -14,9 +14,9 @@ import (
 	"github.com/sourcenetwork/immutable"
 	"github.com/stretchr/testify/require"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 const testDID = "did:example:orbis-creator"

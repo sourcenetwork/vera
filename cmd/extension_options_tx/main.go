@@ -28,10 +28,10 @@ import (
 	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	jwstypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	acp "github.com/sourcenetwork/sourcehub/x/acp/module"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	jwstypes "github.com/sourcenetwork/vera/app/ante/types"
+	testutil "github.com/sourcenetwork/vera/testutil"
+	acp "github.com/sourcenetwork/vera/x/acp/module"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func main() {
@@ -68,8 +68,8 @@ func main() {
 
 	// Setup client context
 	clientCtx := client.Context{}.
-		WithChainID("sourcehub-dev").
-		WithKeyringDir(".sourcehub").
+		WithChainID("vera-dev").
+		WithKeyringDir(".vera").
 		WithTxConfig(encodingConfig.TxConfig).
 		WithCodec(encodingConfig.Codec).
 		WithClient(rpcClient).
@@ -80,7 +80,7 @@ func main() {
 		WithSkipConfirmation(true)
 
 	// Load keyring from home directory
-	homeDir := os.Getenv("HOME") + "/.sourcehub"
+	homeDir := os.Getenv("HOME") + "/.vera"
 	kr, err := keyring.New(sdk.KeyringServiceName(), "test", homeDir, nil, encodingConfig.Codec)
 	if err != nil {
 		log.Fatal("Failed to create keyring:", err)

@@ -3,7 +3,7 @@ package tier
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/v1beta1"
+	modulev1beta1 "github.com/sourcenetwork/vera/api/vera/tier/v1beta1"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package vera.core;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/core/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "vera/x/core/Params";
+  option (gogoproto.equal) = true;
+
+  // trusted_relay_fee_granters are service accounts whose fee grants authorize
+  // workers to relay bearer-authenticated transactions.
+  repeated string trusted_relay_fee_granters = 1;
+}

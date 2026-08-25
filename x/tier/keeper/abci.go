@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app/metrics"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 // BeginBlocker handles slashing events and processes tier module staking rewards.

@@ -10,7 +10,7 @@ import (
 	"github.com/mizufinance/decaf377-go/orbisfrost"
 	blst "github.com/supranational/blst/bindings/go"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 const (

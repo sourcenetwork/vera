@@ -1,0 +1,44 @@
+syntax = "proto3";
+package vera.acp;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+import "vera/acp/time.proto";
+import "sourcenetwork/acp_core/relationship.proto";
+import "sourcenetwork/acp_core/request.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/acp/types";
+
+// AccessDecision models the result of evaluating a set of AccessRequests for an Actor
+message AccessDecision {
+  string id = 1;
+
+  string policy_id = 2; // used as part of id generation
+
+  string creator = 3; // used as part of id generation
+
+  uint64 creator_acc_sequence = 4; // used as part of id generation
+
+  repeated sourcenetwork.acp_core.Operation operations = 5; // used as part of id generation
+
+  string actor = 6; // used as part of id generation
+
+  DecisionParams params = 7; // used as part of id generation
+
+  Timestamp creation_time = 8;
+
+  // issued_height stores the block height when the Decision was evaluated
+  uint64 issued_height = 9;
+}
+
+// DecisionParams stores auxiliary information regarding the validity of a decision
+message DecisionParams {
+  // number of blocks a Decision is valid for
+  uint64 decision_expiration_delta = 1;
+
+  // number of blocks a DecisionProof is valid for
+  uint64 proof_expiration_delta = 2;
+
+  // number of blocks an AccessTicket is valid for
+  uint64 ticket_expiration_delta = 3;
+}

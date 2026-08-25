@@ -3,7 +3,7 @@ package keeper
 import (
 	"github.com/sourcenetwork/immutable"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func optionalCreateRingNonce(msg *types.MsgCreateRing) immutable.Option[string] {

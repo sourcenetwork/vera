@@ -15,10 +15,10 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 type mockTx struct {

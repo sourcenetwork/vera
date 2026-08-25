@@ -8,9 +8,9 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/utils"
 )
 
 func TestEndBlocker(t *testing.T) {
@@ -33,7 +33,7 @@ func TestEndBlocker(t *testing.T) {
 		Policy: `
 name: test
 `,
-	MarshalType: coretypes.PolicyMarshalingType_YAML,
+		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	})
 	require.NoError(t, err)
 

@@ -1,9 +1,9 @@
 package sdk
 
 import (
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/vera/x/orbis/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

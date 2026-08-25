@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
 )
 
 func TestGetParams(t *testing.T) {

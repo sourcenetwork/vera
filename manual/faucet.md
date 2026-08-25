@@ -1,6 +1,6 @@
 # Faucet
 
-The SourceHub chain includes a faucet for requesting test funds.
+The Vera chain includes a faucet for requesting test funds.
 
 ## Setup
 
@@ -101,10 +101,10 @@ Grants a fee allowance from the faucet account to the specified DID. This allows
 **Query DID allowance via CLI:**
 ```bash
 # Query specific DID allowance
-build/sourcehubd q feegrant did-grant $(curl -s http://localhost:1317/faucet/info | jq -r '.address') did:key:alice
+build/verad q feegrant did-grant $(curl -s http://localhost:1317/faucet/info | jq -r '.address') did:key:alice
 
 # List all DID allowances by granter
-build/sourcehubd q feegrant did-grants-by-granter $(curl -s http://localhost:1317/faucet/info | jq -r '.address')
+build/verad q feegrant did-grants-by-granter $(curl -s http://localhost:1317/faucet/info | jq -r '.address')
 ```
 
 ## Configuration
@@ -135,6 +135,6 @@ The CLI faucet script (`./scripts/faucet.sh`) operates independently of the `ena
 ## Security
 
 - For development and testing purposes only.
-- Uses mnemonic from `scripts/faucet-key.json` that is copied into node config directory (e.g. `$HOME/.sourcehub/config`).
+- Uses mnemonic from `scripts/faucet-key.json` that is copied into node config directory (e.g. `$HOME/.vera/config`).
 - `/faucet/request` is limited to one request of 1,000 $OPEN per address.
 - `./scripts/faucet.sh` is not limited and can be used to request arbitrary token amounts.

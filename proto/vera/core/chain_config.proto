@@ -1,0 +1,21 @@
+syntax = "proto3";
+package vera.core;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/core/types";
+
+// ChainConfig specifies flags and parameters which
+// tune the chain behavior during genesis creation
+message ChainConfig {
+  option (gogoproto.equal) = true;
+
+  // allow_zero_fee_txs if true configures the ante handler
+  // to not reject txs with 0 fees
+  bool allow_zero_fee_txs = 1 [(amino.dont_omitempty) = true];
+
+  // ignore_bearer_auth permits trusted relay workers to replace the
+  // `authorized_account` binding with an on-chain fee grant.
+  bool ignore_bearer_auth = 2 [(amino.dont_omitempty) = true];
+}

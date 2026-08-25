@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-rm -rf "$HOME/.sourcehub" || true
+rm -rf "$HOME/.vera" || true
 
 sedi() {
   if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -11,22 +11,22 @@ sedi() {
   fi
 }
 
-CHAIN_ID="sourcehub-dev"
+CHAIN_ID="vera-dev"
 VALIDATOR="validator"
 FAUCET="faucet"
 RELAY="relay"
 NODE_NAME="node"
-BIN="build/sourcehubd"
-GENESIS="$HOME/.sourcehub/config/genesis.json"
-FAUCET_KEY="$HOME/.sourcehub/config/faucet-key.json"
-RELAY_KEY="$HOME/.sourcehub/config/relay-key.json"
-APP_TOML="$HOME/.sourcehub/config/app.toml"
-CONFIG_TOML="$HOME/.sourcehub/config/config.toml"
+BIN="build/verad"
+GENESIS="$HOME/.vera/config/genesis.json"
+FAUCET_KEY="$HOME/.vera/config/faucet-key.json"
+RELAY_KEY="$HOME/.vera/config/relay-key.json"
+APP_TOML="$HOME/.vera/config/app.toml"
+CONFIG_TOML="$HOME/.vera/config/config.toml"
 
 $BIN init $NODE_NAME --chain-id $CHAIN_ID --default-denom="uopen"
 
 # Copy faucet key to config and add it to the keyring
-mkdir -p "$HOME/.sourcehub/config" && cp scripts/faucet-key.json "$FAUCET_KEY"
+mkdir -p "$HOME/.vera/config" && cp scripts/faucet-key.json "$FAUCET_KEY"
 FAUCET_MNEMONIC=$(jq -r '.mnemonic' "$FAUCET_KEY")
 echo "$FAUCET_MNEMONIC" | $BIN keys add $FAUCET --recover --keyring-backend test
 FAUCET_ADDR=$($BIN keys show $FAUCET -a --keyring-backend test)
@@ -50,9 +50,9 @@ jq '.app_state.transfer.port_id = "transfer"' "$GENESIS" > tmp.json && mv tmp.js
 jq '.app_state.transfer += {"params": {"send_enabled": true, "receive_enabled": true}}' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # Enable/disable zero-fee transactions
-jq '.app_state.hub.chain_config.allow_zero_fee_txs = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
-jq '.app_state.hub.chain_config.ignore_bearer_auth = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
-jq --arg relay "$RELAY_ADDR" '.app_state.hub.params.trusted_relay_fee_granters = [$relay]' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
+jq '.app_state.core.chain_config.allow_zero_fee_txs = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
+jq '.app_state.core.chain_config.ignore_bearer_auth = true' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
+jq --arg relay "$RELAY_ADDR" '.app_state.core.params.trusted_relay_fee_granters = [$relay]' "$GENESIS" > tmp.json && mv tmp.json "$GENESIS"
 
 # app.toml
 sedi 's/minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' "$APP_TOML"

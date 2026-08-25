@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 const separator = "."

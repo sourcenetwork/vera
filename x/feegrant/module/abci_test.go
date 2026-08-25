@@ -8,10 +8,10 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
-	feegranttestutil "github.com/sourcenetwork/sourcehub/x/feegrant/testutil"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/keeper"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
+	feegranttestutil "github.com/sourcenetwork/vera/x/feegrant/testutil"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec/address"

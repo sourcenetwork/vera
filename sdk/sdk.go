@@ -17,19 +17,19 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ignite/cli/v28/ignite/pkg/cosmosclient"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	orbistypes "github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 // Opt configures the construction of a Client
 type Opt func(*Client) error
 
-// WithGRPCAddr sets the GRPC Address of a SourceHub node which the Client will connect to.
+// WithGRPCAddr sets the GRPC Address of a Vera node which the Client will connect to.
 // If not specified defaults to DefaultGRPCAddr
 // Note: Cosmos queries are not verifiable therefore only trusted RPC nodes should be used.
 func WithGRPCAddr(addr string) Opt {
@@ -39,7 +39,7 @@ func WithGRPCAddr(addr string) Opt {
 	}
 }
 
-// WithCometRPCAddr sets the CometBFT RPC Address of a SourceHub node which the Client will connect to.
+// WithCometRPCAddr sets the CometBFT RPC Address of a Vera node which the Client will connect to.
 // If not set defaults to DefaultCometHTTPAddr
 func WithCometRPCAddr(addr string) Opt {
 	return func(c *Client) error {
@@ -48,7 +48,7 @@ func WithCometRPCAddr(addr string) Opt {
 	}
 }
 
-// WithGRPCOpts specifies the dial options which will be used to dial SourceHub's GRPC (queries) service
+// WithGRPCOpts specifies the dial options which will be used to dial Vera's GRPC (queries) service
 func WithGRPCOpts(opts ...grpc.DialOption) Opt {
 	return func(c *Client) error {
 		c.grpcOpts = opts
@@ -56,7 +56,7 @@ func WithGRPCOpts(opts ...grpc.DialOption) Opt {
 	}
 }
 
-// NewClient returns a new SourceHub SDK client
+// NewClient returns a new Vera SDK client
 func NewClient(opts ...Opt) (*Client, error) {
 	client := &Client{
 		grpcAddr:     DefaultGRPCAddr,
@@ -75,7 +75,7 @@ func NewClient(opts ...Opt) (*Client, error) {
 	dialOpts = append(dialOpts, client.grpcOpts...)
 	conn, err := grpc.Dial(client.grpcAddr, dialOpts...)
 	if err != nil {
-		return nil, fmt.Errorf("sourcehub grpc dial: %w", err)
+		return nil, fmt.Errorf("vera grpc dial: %w", err)
 	}
 
 	cometClient, err := http.New(client.cometRPCAddr, abciSocketPath)
@@ -95,9 +95,9 @@ func NewClient(opts ...Opt) (*Client, error) {
 	return client, nil
 }
 
-// Client abstracts a set of connections to a SourceHub node.
+// Client abstracts a set of connections to a Vera node.
 // The Client type provides access to module specific clients and functionalities to
-// interact with SourceHub such as performing module Queries (GRPC), Broadcast Txs
+// interact with Vera such as performing module Queries (GRPC), Broadcast Txs
 // and interact with CometBFT
 type Client struct {
 	grpcAddr     string
@@ -111,7 +111,7 @@ type Client struct {
 	listener    TxListener
 }
 
-// BroadcastTx broadcasts a signed Tx to a SourceHub node and returns the node's response.
+// BroadcastTx broadcasts a signed Tx to a Vera node and returns the node's response.
 // Callers can use TxResponse.TxHash to await or listen until the Tx is accepted and executed.
 func (b *Client) BroadcastTx(ctx context.Context, tx xauthsigning.Tx) (*sdk.TxResponse, error) {
 	encoder := authtx.DefaultTxEncoder()

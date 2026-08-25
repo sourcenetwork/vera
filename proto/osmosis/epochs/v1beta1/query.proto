@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "osmosis/epochs/v1beta1/genesis.proto";
 
-option go_package = "github.com/sourcenetwork/sourcehub/x/epochs/types";
+option go_package = "github.com/sourcenetwork/vera/x/epochs/types";
 
 // Query defines the gRPC querier service.
 service Query {

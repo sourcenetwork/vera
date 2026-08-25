@@ -1,0 +1,29 @@
+syntax = "proto3";
+package vera.core;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "vera/core/chain_config.proto";
+import "vera/core/ica_connection.proto";
+import "vera/core/jws_token.proto";
+import "vera/core/params.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/core/types";
+
+// GenesisState defines the core module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  // ica_connections defines the list of ICA connections.
+  repeated ICAConnection ica_connections = 2 [(gogoproto.nullable) = false];
+  // jws_tokens defines the list of JWS token records.
+  repeated JWSTokenRecord jws_tokens = 3 [(gogoproto.nullable) = false];
+
+  ChainConfig chain_config = 4 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

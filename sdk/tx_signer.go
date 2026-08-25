@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 
-	"github.com/sourcenetwork/sourcehub/types"
+	"github.com/sourcenetwork/vera/types"
 )
 
 var secp256k1MsgTypeUrl = cdctypes.MsgTypeURL(&secp256k1.PubKey{})

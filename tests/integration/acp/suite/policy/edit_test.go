@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
 )
 
 func TestEditPolicy_CanEditPolicy(t *testing.T) {

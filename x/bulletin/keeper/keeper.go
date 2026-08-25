@@ -12,8 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 type (

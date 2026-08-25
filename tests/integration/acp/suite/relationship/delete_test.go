@@ -6,8 +6,8 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 var deletePolicy = `

@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	storetypes "cosmossdk.io/store/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
 
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"

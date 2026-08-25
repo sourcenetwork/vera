@@ -1,11 +1,11 @@
 # Policy Command Authentication
 
-In SourceHub, a Policy is defined alongside a set of relationships, which are used to derive authorization decisions for the Policy.
+In Vera, a Policy is defined alongside a set of relationships, which are used to derive authorization decisions for the Policy.
 Relationships in a Policy are mutate (created, deleted or updated) through a Policy Command.
 The command is created and sent by the Policy end users (actors) directly (as opposed to an administrator as is often the case in Access Control systems).
  
 In order to execute these commands, it's necessary to authenticate the entity sending them.
-As it is the end user crafting said commands, actor authentication may be completely isolated from SourceHub and Tx authentcation. 
+As it is the end user crafting said commands, actor authentication may be completely isolated from Vera and Tx authentcation.
 
 Currently, there are 3 supported authentication schemes for Policy Commands: direct, signed command and Bearer.
 
@@ -33,7 +33,7 @@ This string MUST be the DID of the Actor issuing the JWS.
 The DID MUST resolve to a DID Document containing a Verification Method which is a Public Key.
 This public key is used to validate the JWS signature.
 
-The `authorized_account` claim MUST contain a valid SourceHub address (ie a bech32 encoded Cosmos Account with the `source` prefix).
+The `authorized_account` claim MUST contain a valid Vera address (ie a bech32 encoded Cosmos Account with the `source` prefix).
 The address specified in this claim is used to limit which account can use the Bearer JWS.
 A Policy Cmd is only accepted and processed if it is submitted in a Tx signed by the SAME account as the one set in the claim.
 This is done to prevent malicious actors from extracting Bearer JWSs from the public ledger and impersonating an Actor.
@@ -67,13 +67,13 @@ eyJhbGciOiJFZERTQSJ9.eyJpc3MiOiJkaWQ6a2V5Ono2TWtrSHNRYnAzdFhFQ3FtVUpvQ0p3eXV4U0t
 ### Usage Recommendation
 
 A Bearer JWS allows the holder with the `authorized_account` to issue *any* Policy Commands on behalf of the issuer for the lifespan of the token.
-As such, we recommend that SourceHub users use this method ONLY if they truly 100% trust the Account owner to act on their behalf.
+As such, we recommend that Vera users use this method ONLY if they truly 100% trust the Account owner to act on their behalf.
 
 Furthermore, a short JWS validity (~15 mins) is still RECOMMENDED to minimize the risk if the `authorized_account` gets compromised.
 
-### Notes for SourceHub developers
+### Notes for Vera developers
 
 The Bearer JWS uses the standard timestamping mechanisms defined in JWT (`iat` and `exp`) to ease user adoption.
-Note however that under no circumstance the validation must rely under the local time of the machine running sourcehub.
+Note however that under no circumstance the validation must rely under the local time of the machine running vera.
 The `Block Time` (available through the sdk ctx) MUST be used as the reference time in the system.
 Due to clock skew, this is necessary to maintain the deterministic execution of the blockchain.

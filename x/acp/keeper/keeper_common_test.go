@@ -22,11 +22,11 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 var timestamp, _ = prototypes.TimestampProto(time.Date(2024, time.January, 1, 0, 0, 0, 0, time.UTC))
@@ -66,7 +66,7 @@ func setupKeeperWithCapability(t *testing.T) (sdk.Context, Keeper, *testutil.Acc
 		authority.String(),
 		accKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

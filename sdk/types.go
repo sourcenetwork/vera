@@ -19,7 +19,7 @@ func newTxExecResult(result *rpctypes.ResultTx) *TxExecResult {
 	}
 }
 
-// TxExecResult models the outcome of a Tx evaluated by SourceHub.
+// TxExecResult models the outcome of a Tx evaluated by Vera.
 // The Tx was either successfully included or an error happened while handling one of its Msgs.
 type TxExecResult struct {
 	result *rpctypes.ResultTx
@@ -43,7 +43,7 @@ func newListenResult(result *TxExecResult, err error) *ListenResult {
 	}
 }
 
-// ListenResult represents the result of waiting for a Tx to be executed by SourceHub
+// ListenResult represents the result of waiting for a Tx to be executed by Vera
 // Can either error, meaning timeout or network error, or return the Tx object queried from the chain state
 type ListenResult struct {
 	result *TxExecResult
@@ -53,5 +53,5 @@ type ListenResult struct {
 // Error return the error of the ListenResult, returns nil if successful
 func (r *ListenResult) Error() error { return r.err }
 
-// GetTxResult returns the outcome of the executed Tx by SourceHub
+// GetTxResult returns the outcome of the executed Tx by Vera
 func (r *ListenResult) GetTxResult() *TxExecResult { return r.result }

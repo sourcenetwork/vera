@@ -13,7 +13,7 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	jwxjws "github.com/lestrrat-go/jwx/v2/jws"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/did"
 )
 
 var requiredClaims = []string{

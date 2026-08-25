@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"cosmossdk.io/math"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/simulation"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
+	"github.com/sourcenetwork/vera/x/feegrant/simulation"
 
 	moduletypes "github.com/cosmos/cosmos-sdk/types/module"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"

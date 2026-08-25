@@ -16,7 +16,7 @@ clear_interval = 100
 clear_on_start = true
 
 [[chains]]
-id = 'sourcehub-1'
+id = 'vera-1'
 type = 'CosmosSdk'
 rpc_addr = 'http://127.0.0.1:26667'
 grpc_addr = 'http://127.0.0.1:9091'
@@ -36,7 +36,7 @@ trust_threshold = '2/3'
 address_type = { derivation = 'cosmos' }
 
 [[chains]]
-id = 'sourcehub-2'
+id = 'vera-2'
 type = 'CosmosSdk'
 rpc_addr = 'http://127.0.0.1:26670'
 grpc_addr = 'http://127.0.0.1:9092'

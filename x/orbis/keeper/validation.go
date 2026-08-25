@@ -8,7 +8,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"github.com/sourcenetwork/immutable"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func requireRingFinalized(ring *types.Ring) error {

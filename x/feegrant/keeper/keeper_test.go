@@ -10,10 +10,10 @@ import (
 	"cosmossdk.io/math"
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/keeper"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
-	feegranttestutil "github.com/sourcenetwork/sourcehub/x/feegrant/testutil"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/keeper"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
+	feegranttestutil "github.com/sourcenetwork/vera/x/feegrant/testutil"
 
 	codecaddress "github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/runtime"
@@ -22,7 +22,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 type KeeperTestSuite struct {

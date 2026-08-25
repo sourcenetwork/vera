@@ -5,7 +5,7 @@ import (
 
 	signerextraction "github.com/skip-mev/block-sdk/v2/adapters/signer_extraction_adapter"
 	"github.com/skip-mev/block-sdk/v2/block/base"
-	"github.com/sourcenetwork/sourcehub/app/lanes"
+	"github.com/sourcenetwork/vera/app/lanes"
 )
 
 // CreatePriorityLane creates a lane that matches all txs and occupies 100% of the block space.

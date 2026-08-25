@@ -31,7 +31,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	)
 
 	registry.RegisterInterface(
-		"sourcehub.feegrant.v1beta1.FeeAllowanceI",
+		"vera.feegrant.v1beta1.FeeAllowanceI",
 		(*FeeAllowanceI)(nil),
 		&BasicAllowance{},
 		&PeriodicAllowance{},

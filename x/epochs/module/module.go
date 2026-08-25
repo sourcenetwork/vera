@@ -33,10 +33,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
+	modulev1beta1 "github.com/sourcenetwork/vera/api/osmosis/epochs/module/v1beta1"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/keeper"
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/keeper"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 var (

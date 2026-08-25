@@ -3,7 +3,7 @@ package bulletin
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/bulletin"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.

@@ -2,10 +2,10 @@
 
 set -e
 
-C1V1_HOME="$HOME/.sourcehub-1-1"
-C2V1_HOME="$HOME/.sourcehub-2-1"
-C1V2_HOME="$HOME/.sourcehub-1-2"
-C2V2_HOME="$HOME/.sourcehub-2-2"
+C1V1_HOME="$HOME/.vera-1-1"
+C2V1_HOME="$HOME/.vera-2-1"
+C1V2_HOME="$HOME/.vera-1-2"
+C2V2_HOME="$HOME/.vera-2-2"
 HERMES_HOME="$HOME/.hermes"
 
 C1V2_JSON="scripts/validator1-2.json"
@@ -13,9 +13,9 @@ C2V2_JSON="scripts/validator2-2.json"
 
 ICA_PACKET_JSON="scripts/ica_packet.json"
 
-ps aux | grep sourcehubd
+ps aux | grep verad
 
-killall sourcehubd 2>/dev/null || true
+killall verad 2>/dev/null || true
 killall hermes 2>/dev/null || true
 
 sleep 1

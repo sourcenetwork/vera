@@ -6,9 +6,9 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/bearer_token"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCmd *types.PolicyCmd) (result *types.PolicyCmdResult, err error) {
@@ -19,14 +19,14 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		ts := ctx.State.TokenIssueTs
 		token := bearer_token.BearerToken{
 			IssuerID:          actor.DID,
-			AuthorizedAccount: ctx.TxSigner.SourceHubAddr,
+			AuthorizedAccount: ctx.TxSigner.VeraAddr,
 			IssuedTime:        ts.Unix(),
 			ExpirationTime:    ts.Add(bearer_token.DefaultExpirationTime).Unix(),
 		}
 		jws, jwsErr := token.ToJWS(actor.Signer)
 		require.NoError(ctx.T, jwsErr)
 		msg := &types.MsgBearerPolicyCmd{
-			Creator:     ctx.TxSigner.SourceHubAddr,
+			Creator:     ctx.TxSigner.VeraAddr,
 			BearerToken: jws,
 			PolicyId:    policyId,
 			Cmd:         policyCmd,
@@ -48,7 +48,7 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		require.NoError(ctx.T, err)
 
 		msg := &types.MsgSignedPolicyCmd{
-			Creator: ctx.TxSigner.SourceHubAddr,
+			Creator: ctx.TxSigner.VeraAddr,
 			Payload: jws,
 			Type:    types.MsgSignedPolicyCmd_JWS,
 		}
@@ -61,7 +61,7 @@ func dispatchPolicyCmd(ctx *TestCtx, policyId string, actor *TestActor, policyCm
 		// For Direct Authentication we use the action Actor as the signer
 		ctx.TxSigner = actor
 		msg := &types.MsgDirectPolicyCmd{
-			Creator:  actor.SourceHubAddr,
+			Creator:  actor.VeraAddr,
 			PolicyId: policyId,
 			Cmd:      policyCmd,
 		}

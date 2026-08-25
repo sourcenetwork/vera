@@ -8,7 +8,7 @@ import (
 	prototypes "github.com/cosmos/gogoproto/types"
 
 	"github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/utils"
+	"github.com/sourcenetwork/vera/utils"
 )
 
 // ProduceId uses all fields in an AccessDecision (ignoring the ID) to produce an ID

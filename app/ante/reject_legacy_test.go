@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func TestRejectLegacyTxDecorator_RejectsLegacyAmino(t *testing.T) {

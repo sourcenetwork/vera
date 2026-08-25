@@ -5,7 +5,7 @@ import "cosmos/app/v1alpha1/module.proto";
 
 // Module is the config object for the module.
 message Module {
-  option (cosmos.app.v1alpha1.module) = {go_import: "github.com/sourcenetwork/sourcehub/x/epochs"};
+  option (cosmos.app.v1alpha1.module) = {go_import: "github.com/sourcenetwork/vera/x/epochs"};
 
   // hooks_order specifies the order of epochs hooks and should be a list
   // of module names which provide a epochs hooks instance. If no order is

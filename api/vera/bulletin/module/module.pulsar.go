@@ -19,8 +19,8 @@ var (
 )
 
 func init() {
-	file_sourcehub_bulletin_module_module_proto_init()
-	md_Module = File_sourcehub_bulletin_module_module_proto.Messages().ByName("Module")
+	file_vera_bulletin_module_module_proto_init()
+	md_Module = File_vera_bulletin_module_module_proto.Messages().ByName("Module")
 	fd_Module_authority = md_Module.Fields().ByName("authority")
 }
 
@@ -33,7 +33,7 @@ func (x *Module) ProtoReflect() protoreflect.Message {
 }
 
 func (x *Module) slowProtoReflect() protoreflect.Message {
-	mi := &file_sourcehub_bulletin_module_module_proto_msgTypes[0]
+	mi := &file_vera_bulletin_module_module_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -110,13 +110,13 @@ func (x *fastReflection_Module) Range(f func(protoreflect.FieldDescriptor, proto
 // a repeated field is populated if it is non-empty.
 func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
+	case "vera.bulletin.module.Module.authority":
 		return x.Authority != ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -128,13 +128,13 @@ func (x *fastReflection_Module) Has(fd protoreflect.FieldDescriptor) bool {
 // Clear is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
+	case "vera.bulletin.module.Module.authority":
 		x.Authority = ""
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -146,14 +146,14 @@ func (x *fastReflection_Module) Clear(fd protoreflect.FieldDescriptor) {
 // of the value; to obtain a mutable reference, use Mutable.
 func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
 	switch descriptor.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
+	case "vera.bulletin.module.Module.authority":
 		value := x.Authority
 		return protoreflect.ValueOfString(value)
 	default:
 		if descriptor.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", descriptor.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", descriptor.FullName()))
 	}
 }
 
@@ -169,13 +169,13 @@ func (x *fastReflection_Module) Get(descriptor protoreflect.FieldDescriptor) pro
 // Set is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
+	case "vera.bulletin.module.Module.authority":
 		x.Authority = value.Interface().(string)
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -191,13 +191,13 @@ func (x *fastReflection_Module) Set(fd protoreflect.FieldDescriptor, value proto
 // Mutable is a mutating operation and unsafe for concurrent use.
 func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
-		panic(fmt.Errorf("field authority of message sourcehub.bulletin.module.Module is not mutable"))
+	case "vera.bulletin.module.Module.authority":
+		panic(fmt.Errorf("field authority of message vera.bulletin.module.Module is not mutable"))
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -206,13 +206,13 @@ func (x *fastReflection_Module) Mutable(fd protoreflect.FieldDescriptor) protore
 // For lists, maps, and messages, this returns a new, empty, mutable value.
 func (x *fastReflection_Module) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
 	switch fd.FullName() {
-	case "sourcehub.bulletin.module.Module.authority":
+	case "vera.bulletin.module.Module.authority":
 		return protoreflect.ValueOfString("")
 	default:
 		if fd.IsExtension() {
-			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.bulletin.module.Module"))
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.bulletin.module.Module"))
 		}
-		panic(fmt.Errorf("message sourcehub.bulletin.module.Module does not contain field %s", fd.FullName()))
+		panic(fmt.Errorf("message vera.bulletin.module.Module does not contain field %s", fd.FullName()))
 	}
 }
 
@@ -222,7 +222,7 @@ func (x *fastReflection_Module) NewField(fd protoreflect.FieldDescriptor) protor
 func (x *fastReflection_Module) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
 	switch d.FullName() {
 	default:
-		panic(fmt.Errorf("%s is not a oneof field in sourcehub.bulletin.module.Module", d.FullName()))
+		panic(fmt.Errorf("%s is not a oneof field in vera.bulletin.module.Module", d.FullName()))
 	}
 	panic("unreachable")
 }
@@ -437,7 +437,7 @@ func (x *fastReflection_Module) ProtoMethods() *protoiface.Methods {
 // versions:
 // 	protoc-gen-go v1.27.0
 // 	protoc        (unknown)
-// source: sourcehub/bulletin/module/module.proto
+// source: vera/bulletin/module/module.proto
 
 const (
 	// Verify that this generated code is sufficiently up-to-date.
@@ -459,7 +459,7 @@ type Module struct {
 func (x *Module) Reset() {
 	*x = Module{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_sourcehub_bulletin_module_module_proto_msgTypes[0]
+		mi := &file_vera_bulletin_module_module_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -473,7 +473,7 @@ func (*Module) ProtoMessage() {}
 
 // Deprecated: Use Module.ProtoReflect.Descriptor instead.
 func (*Module) Descriptor() ([]byte, []int) {
-	return file_sourcehub_bulletin_module_module_proto_rawDescGZIP(), []int{0}
+	return file_vera_bulletin_module_module_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Module) GetAuthority() string {
@@ -483,55 +483,52 @@ func (x *Module) GetAuthority() string {
 	return ""
 }
 
-var File_sourcehub_bulletin_module_module_proto protoreflect.FileDescriptor
+var File_vera_bulletin_module_module_proto protoreflect.FileDescriptor
 
-var file_sourcehub_bulletin_module_module_proto_rawDesc = []byte{
-	0x0a, 0x26, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2f, 0x6d, 0x6f, 0x64, 0x75,
-	0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x19, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x6d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0x1a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2f, 0x61, 0x70, 0x70, 0x2f,
-	0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e,
-	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x5d, 0x0a, 0x06, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12,
-	0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69, 0x74, 0x79, 0x3a, 0x35, 0xba,
-	0xc0, 0x96, 0xda, 0x01, 0x2f, 0x0a, 0x2d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f,
-	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2f, 0x78, 0x2f, 0x62, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x42, 0xde, 0x01, 0x0a, 0x1d, 0x63, 0x6f, 0x6d, 0x2e, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e,
-	0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x72,
-	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x2a, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b,
-	0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75,
-	0x62, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c,
-	0x65, 0xa2, 0x02, 0x03, 0x53, 0x42, 0x4d, 0xaa, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d, 0x6f, 0x64,
-	0x75, 0x6c, 0x65, 0xca, 0x02, 0x19, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c,
-	0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xe2,
-	0x02, 0x25, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x5c, 0x42, 0x75, 0x6c, 0x6c,
-	0x65, 0x74, 0x69, 0x6e, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x1b, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x68, 0x75, 0x62, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x3a, 0x3a, 0x4d,
-	0x6f, 0x64, 0x75, 0x6c, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+var file_vera_bulletin_module_module_proto_rawDesc = []byte{
+	0x0a, 0x21, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2f,
+	0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72,
+	0x6f, 0x74, 0x6f, 0x12, 0x14, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74,
+	0x69, 0x6e, 0x2e, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x1a, 0x20, 0x63, 0x6f, 0x73, 0x6d, 0x6f,
+	0x73, 0x2f, 0x61, 0x70, 0x70, 0x2f, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68, 0x61, 0x31, 0x2f, 0x6d,
+	0x6f, 0x64, 0x75, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x58, 0x0a, 0x06, 0x4d,
+	0x6f, 0x64, 0x75, 0x6c, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72, 0x69,
+	0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x61, 0x75, 0x74, 0x68, 0x6f, 0x72,
+	0x69, 0x74, 0x79, 0x3a, 0x30, 0xba, 0xc0, 0x96, 0xda, 0x01, 0x2a, 0x0a, 0x28, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x78, 0x2f, 0x62, 0x75, 0x6c,
+	0x6c, 0x65, 0x74, 0x69, 0x6e, 0x42, 0xc0, 0x01, 0x0a, 0x18, 0x63, 0x6f, 0x6d, 0x2e, 0x76, 0x65,
+	0x72, 0x61, 0x2e, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x6d, 0x6f, 0x64, 0x75,
+	0x6c, 0x65, 0x42, 0x0b, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
+	0x01, 0x5a, 0x25, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f,
+	0x61, 0x70, 0x69, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x62, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69,
+	0x6e, 0x2f, 0x6d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xa2, 0x02, 0x03, 0x56, 0x42, 0x4d, 0xaa, 0x02,
+	0x14, 0x56, 0x65, 0x72, 0x61, 0x2e, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x2e, 0x4d,
+	0x6f, 0x64, 0x75, 0x6c, 0x65, 0xca, 0x02, 0x14, 0x56, 0x65, 0x72, 0x61, 0x5c, 0x42, 0x75, 0x6c,
+	0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0xe2, 0x02, 0x20, 0x56,
+	0x65, 0x72, 0x61, 0x5c, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e, 0x5c, 0x4d, 0x6f, 0x64,
+	0x75, 0x6c, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
+	0x02, 0x16, 0x56, 0x65, 0x72, 0x61, 0x3a, 0x3a, 0x42, 0x75, 0x6c, 0x6c, 0x65, 0x74, 0x69, 0x6e,
+	0x3a, 0x3a, 0x4d, 0x6f, 0x64, 0x75, 0x6c, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
-	file_sourcehub_bulletin_module_module_proto_rawDescOnce sync.Once
-	file_sourcehub_bulletin_module_module_proto_rawDescData = file_sourcehub_bulletin_module_module_proto_rawDesc
+	file_vera_bulletin_module_module_proto_rawDescOnce sync.Once
+	file_vera_bulletin_module_module_proto_rawDescData = file_vera_bulletin_module_module_proto_rawDesc
 )
 
-func file_sourcehub_bulletin_module_module_proto_rawDescGZIP() []byte {
-	file_sourcehub_bulletin_module_module_proto_rawDescOnce.Do(func() {
-		file_sourcehub_bulletin_module_module_proto_rawDescData = protoimpl.X.CompressGZIP(file_sourcehub_bulletin_module_module_proto_rawDescData)
+func file_vera_bulletin_module_module_proto_rawDescGZIP() []byte {
+	file_vera_bulletin_module_module_proto_rawDescOnce.Do(func() {
+		file_vera_bulletin_module_module_proto_rawDescData = protoimpl.X.CompressGZIP(file_vera_bulletin_module_module_proto_rawDescData)
 	})
-	return file_sourcehub_bulletin_module_module_proto_rawDescData
+	return file_vera_bulletin_module_module_proto_rawDescData
 }
 
-var file_sourcehub_bulletin_module_module_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_sourcehub_bulletin_module_module_proto_goTypes = []interface{}{
-	(*Module)(nil), // 0: sourcehub.bulletin.module.Module
+var file_vera_bulletin_module_module_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_vera_bulletin_module_module_proto_goTypes = []interface{}{
+	(*Module)(nil), // 0: vera.bulletin.module.Module
 }
-var file_sourcehub_bulletin_module_module_proto_depIdxs = []int32{
+var file_vera_bulletin_module_module_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -539,13 +536,13 @@ var file_sourcehub_bulletin_module_module_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_sourcehub_bulletin_module_module_proto_init() }
-func file_sourcehub_bulletin_module_module_proto_init() {
-	if File_sourcehub_bulletin_module_module_proto != nil {
+func init() { file_vera_bulletin_module_module_proto_init() }
+func file_vera_bulletin_module_module_proto_init() {
+	if File_vera_bulletin_module_module_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_sourcehub_bulletin_module_module_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_vera_bulletin_module_module_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Module); i {
 			case 0:
 				return &v.state
@@ -562,18 +559,18 @@ func file_sourcehub_bulletin_module_module_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_sourcehub_bulletin_module_module_proto_rawDesc,
+			RawDescriptor: file_vera_bulletin_module_module_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_sourcehub_bulletin_module_module_proto_goTypes,
-		DependencyIndexes: file_sourcehub_bulletin_module_module_proto_depIdxs,
-		MessageInfos:      file_sourcehub_bulletin_module_module_proto_msgTypes,
+		GoTypes:           file_vera_bulletin_module_module_proto_goTypes,
+		DependencyIndexes: file_vera_bulletin_module_module_proto_depIdxs,
+		MessageInfos:      file_vera_bulletin_module_module_proto_msgTypes,
 	}.Build()
-	File_sourcehub_bulletin_module_module_proto = out.File
-	file_sourcehub_bulletin_module_module_proto_rawDesc = nil
-	file_sourcehub_bulletin_module_module_proto_goTypes = nil
-	file_sourcehub_bulletin_module_module_proto_depIdxs = nil
+	File_vera_bulletin_module_module_proto = out.File
+	file_vera_bulletin_module_module_proto_rawDesc = nil
+	file_vera_bulletin_module_module_proto_goTypes = nil
+	file_vera_bulletin_module_module_proto_depIdxs = nil
 }

@@ -23,10 +23,10 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 // testMintModuleName is a fictitious module account used only by tests to mint
@@ -113,7 +113,7 @@ func setupOrbisKeeperWithBank(t testing.TB) (Keeper, authkeeper.AccountKeeper, b
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	k := NewKeeper(

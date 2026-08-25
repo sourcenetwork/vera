@@ -6,8 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
 )
 
 var TestDeveloperAddrs = []string{

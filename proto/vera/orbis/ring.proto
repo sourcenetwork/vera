@@ -1,0 +1,62 @@
+syntax = "proto3";
+package vera.orbis;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/orbis/types";
+
+// UpgradeInfo stores the active protocol epoch and an optional pending upgrade.
+message UpgradeInfo {
+  uint64 current_version = 1;
+  optional uint64 next_version = 2;
+  // Unix timestamp in seconds when next_version becomes effective.
+  optional uint64 activation_time = 3;
+}
+
+// DemeritConfig stores the number of demerit points assigned per report type.
+message DemeritConfig {
+  option (gogoproto.equal) = true;
+
+  uint64 node_offline_demerits = 1;
+  uint64 reset_interval_seconds = 2;
+  uint64 invalid_crypto_response_demerits = 3;
+  uint64 unauthorized_request_demerits = 4;
+}
+
+// ReportingConfig stores fault-report policy and automatic replacement settings for a ring.
+message ReportingConfig {
+  option (gogoproto.equal) = true;
+
+  DemeritConfig demerit_config = 1 [(gogoproto.nullable) = false];
+  repeated string backup_node_keys = 2;
+  uint64 kick_threshold = 3;
+}
+
+// Ring stores the active and pending committee metadata for an Orbis ring.
+message Ring {
+  string id = 1;
+  string creator_did = 2;
+  string ring_pk = 3;
+  repeated string peer_node_keys = 4;
+  uint32 threshold = 5;
+  repeated string new_peer_node_keys = 6;
+  // Absent means no pending threshold update.
+  optional uint32 new_threshold = 7;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 8;
+  uint64 block_number_nonce = 9;
+  string policy_id = 10;
+  repeated RingConfirmation confirmations = 11;
+  UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
+  ReportingConfig reporting = 13 [(gogoproto.nullable) = false];
+  // Ed25519 did:key issuers allowed to authenticate requests for another actor.
+  repeated string trusted_auth_relay_dids = 14;
+  // Set at creation; false permanently disables trusted authentication relays.
+  bool allow_trusted_auth_relays = 15;
+}
+
+// RingConfirmation records a single peer's agreement on the ring public key.
+message RingConfirmation {
+  string node_key = 1;
+  string ring_pk = 2;
+}

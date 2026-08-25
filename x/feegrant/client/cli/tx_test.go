@@ -14,10 +14,10 @@ import (
 
 	_ "cosmossdk.io/api/cosmos/gov/v1beta1"
 	sdkmath "cosmossdk.io/math"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	_ "github.com/sourcenetwork/sourcehub/x/feegrant"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/client/cli"
-	"github.com/sourcenetwork/sourcehub/x/feegrant/module"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	_ "github.com/sourcenetwork/vera/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant/client/cli"
+	"github.com/sourcenetwork/vera/x/feegrant/module"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"

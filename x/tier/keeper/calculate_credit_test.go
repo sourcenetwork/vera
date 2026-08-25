@@ -8,7 +8,7 @@ import (
 
 	"cosmossdk.io/math"
 
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 func TestCalculateCredit(t *testing.T) {

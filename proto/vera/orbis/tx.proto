@@ -1,0 +1,343 @@
+syntax = "proto3";
+
+package vera.orbis;
+
+import "amino/amino.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "vera/orbis/params.proto";
+import "vera/orbis/ring.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/orbis/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+
+  // UpdateParams defines a governance operation for updating module parameters.
+  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  rpc CreateRing(MsgCreateRing) returns (MsgCreateRingResponse);
+  rpc FinalizeRing(MsgFinalizeRing) returns (MsgFinalizeRingResponse);
+  rpc CancelPendingRing(MsgCancelPendingRing) returns (MsgCancelPendingRingResponse);
+  rpc StartRingReshareByAcp(MsgStartRingReshareByAcp) returns (MsgStartRingReshareByAcpResponse);
+  rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
+  rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
+  rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
+  rpc SetRingReportingByAcp(MsgSetRingReportingByAcp) returns (MsgSetRingReportingByAcpResponse);
+  // Adds a trusted authentication relay to a ring.
+  rpc AddRingTrustedAuthRelayByAcp(MsgAddRingTrustedAuthRelayByAcp) returns (MsgAddRingTrustedAuthRelayByAcpResponse);
+  // Removes a trusted authentication relay from a ring.
+  rpc RemoveRingTrustedAuthRelayByAcp(MsgRemoveRingTrustedAuthRelayByAcp) returns (MsgRemoveRingTrustedAuthRelayByAcpResponse);
+  rpc FinalizeRingReshareByThresholdSignature(MsgFinalizeRingReshareByThresholdSignature) returns (MsgFinalizeRingReshareByThresholdSignatureResponse);
+  rpc SubmitReport(MsgSubmitReport) returns (MsgSubmitReportResponse);
+  rpc StoreDocument(MsgStoreDocument) returns (MsgStoreDocumentResponse);
+  rpc StoreKeyDerivation(MsgStoreKeyDerivation) returns (MsgStoreKeyDerivationResponse);
+  rpc CreateNodeInfo(MsgCreateNodeInfo) returns (MsgCreateNodeInfoResponse);
+  rpc UpdateNodePeerId(MsgUpdateNodePeerId) returns (MsgUpdateNodePeerIdResponse);
+  rpc TransferNodeController(MsgTransferNodeController) returns (MsgTransferNodeControllerResponse);
+  rpc AddNodeToWhitelist(MsgAddNodeToWhitelist) returns (MsgAddNodeToWhitelistResponse);
+  rpc RemoveNodeFromWhitelist(MsgRemoveNodeFromWhitelist) returns (MsgRemoveNodeFromWhitelistResponse);
+  rpc DrainNodeKey(MsgDrainNodeKey) returns (MsgDrainNodeKeyResponse);
+}
+
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (amino.name) = "vera/x/orbis/MsgUpdateParams";
+
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  Params params = 2 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// MsgUpdateParamsResponse defines the response structure for MsgUpdateParams.
+message MsgUpdateParamsResponse {}
+
+message MsgCreateRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 4;
+  string policy_id = 5;
+  // Absent means no nonce. Provide a nonce to disambiguate rings with identical settings.
+  optional string nonce = 6;
+  uint64 current_version = 7;
+  ReportingConfig reporting = 8;
+  // Relays accepted by every committee member for delegated JWT authentication.
+  repeated string trusted_auth_relay_dids = 9;
+  // Set at creation; false permanently disables trusted authentication relays.
+  bool allow_trusted_auth_relays = 10;
+}
+
+message MsgCreateRingResponse {
+  string ring_id = 1;
+}
+
+message MsgFinalizeRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string ring_pk = 3;
+}
+
+enum FinalizeRingOutcome {
+  UNSPECIFIED = 0;
+  CONFIRMATION_RECORDED = 1;
+  RING_FINALIZED = 2;
+  CONFLICT_DELETED = 3;
+}
+
+message MsgFinalizeRingResponse {
+  FinalizeRingOutcome outcome = 1;
+}
+
+message MsgCancelPendingRing {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgCancelPendingRingResponse {}
+
+message MsgStartRingReshareByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  repeated string new_peer_node_keys = 3;
+  // Absent means no pending threshold update.
+  optional uint32 new_threshold = 4;
+}
+
+message MsgStartRingReshareByAcpResponse {}
+
+message MsgSetRingPssIntervalByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  // Interval in seconds. Must be at least 86400.
+  uint64 pss_interval = 3;
+}
+
+message MsgSetRingPssIntervalByAcpResponse {}
+
+message MsgScheduleRingUpgradeByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  uint64 next_version = 3;
+  // Unix timestamp in seconds. Must be at least 10 minutes in the future.
+  uint64 activation_time = 4;
+}
+
+message MsgScheduleRingUpgradeByAcpResponse {}
+
+message MsgCancelRingUpgradeByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgCancelRingUpgradeByAcpResponse {}
+
+message MsgSetRingReportingByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  ReportingConfig reporting = 3 [(gogoproto.nullable) = false];
+}
+
+message MsgSetRingReportingByAcpResponse {}
+
+// MsgAddRingTrustedAuthRelayByAcp adds a ring authentication relay.
+message MsgAddRingTrustedAuthRelayByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string relay_did = 3;
+}
+
+// MsgAddRingTrustedAuthRelayByAcpResponse is returned after relay registration.
+message MsgAddRingTrustedAuthRelayByAcpResponse {}
+
+// MsgRemoveRingTrustedAuthRelayByAcp revokes a ring authentication relay.
+message MsgRemoveRingTrustedAuthRelayByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string relay_did = 3;
+}
+
+// MsgRemoveRingTrustedAuthRelayByAcpResponse is returned after relay revocation.
+message MsgRemoveRingTrustedAuthRelayByAcpResponse {}
+
+message MsgFinalizeRingReshareByThresholdSignature {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string signature_scheme = 3;
+  bytes signature = 4;
+}
+
+message MsgFinalizeRingReshareByThresholdSignatureResponse {}
+
+message MsgSubmitReport {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  ReportEnvelope report = 2 [(gogoproto.nullable) = false];
+  string report_id = 3;
+  string signature_scheme = 4;
+  bytes signature = 5;
+}
+
+message MsgSubmitReportResponse {
+  string report_id = 1;
+}
+
+message ReportEnvelope {
+  string domain = 1;
+  string report_type = 2;
+  string chain_id = 3;
+  string ring_id = 4;
+  string ring_pk = 5;
+  string ring_state_sha256 = 6;
+  string reporter_node_key = 7;
+  string accused_node_key = 8;
+  string accused_peer_id = 9;
+  uint64 observed_at = 10;
+  uint64 expires_at = 11;
+  bytes payload = 12;
+  string session_id = 13;
+}
+
+message RingReshareFinalizeSignDoc {
+  string domain = 1;
+  string chain_id = 2;
+  string ring_id = 3;
+  string ring_pk = 4;
+  bytes current_ring_sha256 = 5;
+  bytes finalized_ring_sha256 = 6;
+  uint64 block_number_nonce = 7;
+}
+
+message RingReshareSignState {
+  string ring_pk = 1;
+  repeated string peer_node_keys = 2;
+  uint32 threshold = 3;
+  repeated string new_peer_node_keys = 4;
+  optional uint32 new_threshold = 5;
+  reserved 6;
+  uint64 block_number_nonce = 7;
+  string policy_id = 8;
+  repeated string trusted_auth_relay_dids = 9;
+  bool allow_trusted_auth_relays = 10;
+}
+
+message MsgStoreDocument {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string document = 3;
+  string proof = 4;
+  string policy_id = 5;
+  string resource = 6;
+  string permission = 7;
+  // Absent means no tier.
+  optional string tier = 8;
+  // Absent means no timestamp.
+  optional uint64 timestamp = 9;
+}
+
+message MsgStoreDocumentResponse {
+  string document_id = 1;
+}
+
+message MsgStoreKeyDerivation {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  string derivation = 3;
+  string policy_id = 4;
+  string resource = 5;
+  string permission = 6;
+}
+
+message MsgStoreKeyDerivationResponse {
+  string key_derivation_id = 1;
+}
+
+message MsgCreateNodeInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string peer_id = 2;
+  string controller_key = 3;
+  repeated string whitelisted_policy_ids = 4;
+  repeated string whitelisted_ring_ids = 5;
+}
+
+message MsgCreateNodeInfoResponse {}
+
+message MsgUpdateNodePeerId {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  string peer_id = 3;
+}
+
+message MsgUpdateNodePeerIdResponse {}
+
+message MsgTransferNodeController {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  string controller_key = 3;
+}
+
+message MsgTransferNodeControllerResponse {}
+
+message MsgAddNodeToWhitelist {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  oneof target {
+    string policy_id = 3;
+    string ring_id = 4;
+  }
+}
+
+message MsgAddNodeToWhitelistResponse {}
+
+message MsgRemoveNodeFromWhitelist {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+  oneof target {
+    string policy_id = 3;
+    string ring_id = 4;
+  }
+}
+
+message MsgRemoveNodeFromWhitelistResponse {}
+
+// MsgDrainNodeKey is signed by a node's controller key. It sweeps the full
+// spendable balance of the node key's account to the controller key's own
+// account — recovery for funds stranded when a node (and its node key) is lost.
+message MsgDrainNodeKey {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string node_key = 2;
+}
+
+message MsgDrainNodeKeyResponse {
+  repeated cosmos.base.v1beta1.Coin amount = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true,
+    (amino.encoding) = "legacy_coins"
+  ];
+}

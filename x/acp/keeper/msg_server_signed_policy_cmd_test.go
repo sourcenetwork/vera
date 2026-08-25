@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func TestSignedPolicyCmd_ReplayProtection(t *testing.T) {

@@ -83,7 +83,7 @@ app-db-backend = ""
 [telemetry]
 
 # Prefixed with keys to separate services.
-service-name = "sourcehub"
+service-name = "vera"
 
 # Enabled enables the application telemetry functionality. When enabled,
 # an in-memory sink is also enabled by default. Operators may also enabled

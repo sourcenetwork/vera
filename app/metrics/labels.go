@@ -7,11 +7,11 @@ import (
 )
 
 // commonLabels models a set of labels which should be added
-// to every Sourcehub meter
+// to every Vera meter
 var commonLabels []metrics.Label
 
 // AddCommonLabel appends the given name, value pair
-// to the list of labels which are added to all Sourcehub meters
+// to the list of labels which are added to all Vera meters
 func AddCommonLabel(name, value string) {
 	label := metrics.Label{
 		Name:  name,

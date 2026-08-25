@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type queryPolicySuite struct {

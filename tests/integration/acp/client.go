@@ -22,17 +22,17 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	prototypes "github.com/cosmos/gogoproto/types"
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	hubsdk "github.com/sourcenetwork/sourcehub/sdk"
-	"github.com/sourcenetwork/sourcehub/testutil/e2e"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	verasdk "github.com/sourcenetwork/vera/sdk"
+	"github.com/sourcenetwork/vera/testutil/e2e"
+	"github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 type KeeperACPClient struct {
@@ -189,7 +189,7 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 		authority.String(),
 		accKeeper,
 		&capabilitykeeper.ScopedKeeper{},
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
@@ -213,9 +213,9 @@ func newKeeperExecutor(params types.Params) (ACPClient, error) {
 }
 
 func newSDKExecutor(network *e2e.TestNetwork) (*SDKClientExecutor, error) {
-	txBuilder, err := hubsdk.NewTxBuilder(
-		hubsdk.WithSDKClient(network.Client),
-		hubsdk.WithChainID(network.GetChainID()),
+	txBuilder, err := verasdk.NewTxBuilder(
+		verasdk.WithSDKClient(network.Client),
+		verasdk.WithChainID(network.GetChainID()),
 	)
 
 	if err != nil {
@@ -229,11 +229,11 @@ func newSDKExecutor(network *e2e.TestNetwork) (*SDKClientExecutor, error) {
 
 type SDKClientExecutor struct {
 	Network   *e2e.TestNetwork
-	txBuilder *hubsdk.TxBuilder
+	txBuilder *verasdk.TxBuilder
 }
 
 func (e *SDKClientExecutor) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPolicyCmd) (*types.MsgBearerPolicyCmdResponse, error) {
-	set := hubsdk.MsgSet{}
+	set := verasdk.MsgSet{}
 	mapper := set.WithBearerPolicyCmd(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
@@ -245,7 +245,7 @@ func (e *SDKClientExecutor) BearerPolicyCmd(ctx *TestCtx, msg *types.MsgBearerPo
 }
 
 func (e *SDKClientExecutor) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPolicyCmd) (*types.MsgSignedPolicyCmdResponse, error) {
-	set := hubsdk.MsgSet{}
+	set := verasdk.MsgSet{}
 	mapper := set.WithSignedPolicyCmd(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
@@ -257,7 +257,7 @@ func (e *SDKClientExecutor) SignedPolicyCmd(ctx *TestCtx, msg *types.MsgSignedPo
 }
 
 func (e *SDKClientExecutor) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {
-	set := hubsdk.MsgSet{}
+	set := verasdk.MsgSet{}
 	mapper := set.WithDirectPolicyCmd(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
@@ -269,7 +269,7 @@ func (e *SDKClientExecutor) DirectPolicyCmd(ctx *TestCtx, msg *types.MsgDirectPo
 }
 
 func (e *SDKClientExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolicy) (*types.MsgCreatePolicyResponse, error) {
-	set := hubsdk.MsgSet{}
+	set := verasdk.MsgSet{}
 	mapper := set.WithCreatePolicy(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
@@ -281,7 +281,7 @@ func (e *SDKClientExecutor) CreatePolicy(ctx *TestCtx, msg *types.MsgCreatePolic
 }
 
 func (e *SDKClientExecutor) EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (*types.MsgEditPolicyResponse, error) {
-	set := hubsdk.MsgSet{}
+	set := verasdk.MsgSet{}
 	mapper := set.WithEditPolicy(msg)
 	result := e.broadcastTx(ctx, &set)
 	if result.Error() != nil {
@@ -295,7 +295,7 @@ func (e *SDKClientExecutor) EditPolicy(ctx *TestCtx, msg *types.MsgEditPolicy) (
 func (e *SDKClientExecutor) GetOrCreateAccountFromActor(ctx *TestCtx, actor *TestActor) (sdk.AccountI, error) {
 	client := e.Network.Client
 	resp, err := client.AuthQueryClient().AccountInfo(ctx, &authtypes.QueryAccountInfoRequest{
-		Address: actor.SourceHubAddr,
+		Address: actor.VeraAddr,
 	})
 	if resp != nil {
 		return resp.Info, nil
@@ -316,11 +316,11 @@ func (e *SDKClientExecutor) GetOrCreateAccountFromActor(ctx *TestCtx, actor *Tes
 
 	msg := banktypes.MsgSend{
 		FromAddress: e.Network.GetValidatorAddr(),
-		ToAddress:   actor.SourceHubAddr,
+		ToAddress:   actor.VeraAddr,
 		Amount:      defaultSendAmt,
 	}
 	tx, err := e.txBuilder.BuildFromMsgs(ctx,
-		hubsdk.TxSignerFromCosmosKey(e.Network.GetValidatorKey()),
+		verasdk.TxSignerFromCosmosKey(e.Network.GetValidatorKey()),
 		&msg,
 	)
 	require.NoError(ctx.T, err)
@@ -330,17 +330,17 @@ func (e *SDKClientExecutor) GetOrCreateAccountFromActor(ctx *TestCtx, actor *Tes
 	e.Network.Network.WaitForNextBlock()
 
 	resp, err = client.AuthQueryClient().AccountInfo(ctx, &authtypes.QueryAccountInfoRequest{
-		Address: actor.SourceHubAddr,
+		Address: actor.VeraAddr,
 	})
 	require.NoError(ctx.T, err)
 	return resp.Info, nil
 }
 
-func (e *SDKClientExecutor) broadcastTx(ctx *TestCtx, msgSet *hubsdk.MsgSet) *hubsdk.TxExecResult {
+func (e *SDKClientExecutor) broadcastTx(ctx *TestCtx, msgSet *verasdk.MsgSet) *verasdk.TxExecResult {
 	_, err := e.GetOrCreateAccountFromActor(ctx, ctx.TxSigner)
 	require.NoError(ctx.T, err)
 
-	signer := hubsdk.TxSignerFromCosmosKey(ctx.TxSigner.PrivKey)
+	signer := verasdk.TxSignerFromCosmosKey(ctx.TxSigner.PrivKey)
 
 	tx, err := e.txBuilder.Build(ctx, signer, msgSet)
 	require.NoError(ctx.T, err)

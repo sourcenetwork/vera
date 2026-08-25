@@ -19,11 +19,11 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	"github.com/sourcenetwork/sourcehub/x/acp/client/cli"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/acp/module"
+	"github.com/sourcenetwork/vera/app/metrics"
+	"github.com/sourcenetwork/vera/x/acp/client/cli"
+	"github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 var (
@@ -203,7 +203,7 @@ type ModuleInputs struct {
 
 	AccountKeeper types.AccountKeeper
 	BankKeeper    types.BankKeeper
-	HubKeeper     types.HubKeeper
+	CoreKeeper    types.CoreKeeper
 }
 
 type ModuleOutputs struct {
@@ -226,7 +226,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		authority.String(),
 		in.AccountKeeper,
 		nil, // cap keeper is initialized after depinject is finished executing
-		in.HubKeeper,
+		in.CoreKeeper,
 	)
 	m := NewAppModule(
 		in.Cdc,

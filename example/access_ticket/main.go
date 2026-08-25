@@ -13,9 +13,9 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/spf13/cobra"
 
-	"github.com/sourcenetwork/sourcehub/sdk"
-	"github.com/sourcenetwork/sourcehub/x/acp/access_ticket"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/sdk"
+	"github.com/sourcenetwork/vera/x/acp/access_ticket"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 const nodeAddrDefault = "tcp://localhost:26657"
@@ -46,7 +46,7 @@ func main() {
 		},
 	}
 	flags := cmd.Flags()
-	flags.String(chainIdFlag, "sourcehub-dev", "sets the chain-id")
+	flags.String(chainIdFlag, "vera-dev", "sets the chain-id")
 	flags.String(nodeAddrFlag, nodeAddrDefault, "sets the address of the node to communicate with")
 
 	cmd.Execute()
@@ -114,7 +114,7 @@ func getSigner(accAddr string) sdk.TxSigner {
 	reg := cdctypes.NewInterfaceRegistry()
 	cryptocdc.RegisterInterfaces(reg)
 	cdc := codec.NewProtoCodec(reg)
-	keyring, err := keyring.New("sourcehub", keyring.BackendTest, "~/.sourcehub", nil, cdc)
+	keyring, err := keyring.New("vera", keyring.BackendTest, "~/.vera", nil, cdc)
 	if err != nil {
 		log.Fatalf("could not load keyring: %v", err)
 	}

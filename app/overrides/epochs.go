@@ -5,9 +5,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 
-	epochsmodule "github.com/sourcenetwork/sourcehub/x/epochs/module"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	epochsmodule "github.com/sourcenetwork/vera/x/epochs/module"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 // EpochsModuleBasic defines a wrapper of the x/epochs module AppModuleBasic to provide custom default genesis state.

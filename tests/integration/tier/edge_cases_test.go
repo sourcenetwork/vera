@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 type EdgeCasesTestSuite struct {

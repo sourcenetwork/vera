@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	tierkeeper "github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	tierkeeper "github.com/sourcenetwork/vera/x/tier/keeper"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 type FeegrantIntegrationTestSuite struct {

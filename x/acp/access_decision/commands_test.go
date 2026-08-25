@@ -13,10 +13,10 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/auth_engine"
-	"github.com/sourcenetwork/sourcehub/x/acp/policy"
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/auth_engine"
+	"github.com/sourcenetwork/vera/x/acp/policy"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 var timestamp = testutil.MustDateTimeToProto("2023-07-26 14:08:30")

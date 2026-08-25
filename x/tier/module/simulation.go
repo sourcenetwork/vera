@@ -8,9 +8,9 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/sourcenetwork/sourcehub/testutil/sample"
-	tiersimulation "github.com/sourcenetwork/sourcehub/x/tier/simulation"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/testutil/sample"
+	tiersimulation "github.com/sourcenetwork/vera/x/tier/simulation"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 // avoid unused import issue

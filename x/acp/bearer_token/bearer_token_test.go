@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	acpdid "github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	acpdid "github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
 
-const validSourceHubAddr = "source19djduggm345yf2dn0y0jqqgkr5q0pt234dkyvd"
-const msgCreator = validSourceHubAddr
+const validVeraAddr = "source19djduggm345yf2dn0y0jqqgkr5q0pt234dkyvd"
+const msgCreator = validVeraAddr
 
 // bearerValidationTestVector models a test case which generates a JWS from the BearerToken definition
 // and verifies whether the Token is valid or not
@@ -35,7 +35,7 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          "",
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
 				IssuedTime:        mustUnixTime("2024-06-17 14:00:00"),
-				AuthorizedAccount: validSourceHubAddr,
+				AuthorizedAccount: validVeraAddr,
 			},
 			ExpectedError: ErrMissingClaim,
 			Signer:        signer,
@@ -59,7 +59,7 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          validDID,
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
 				IssuedTime:        0,
-				AuthorizedAccount: validSourceHubAddr,
+				AuthorizedAccount: validVeraAddr,
 			},
 			ExpectedError: ErrMissingClaim,
 			Signer:        signer,
@@ -71,7 +71,7 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          validDID,
 				ExpirationTime:    0,
 				IssuedTime:        mustUnixTime("2024-06-17 14:00:00"),
-				AuthorizedAccount: validSourceHubAddr,
+				AuthorizedAccount: validVeraAddr,
 			},
 			ExpectedError: ErrMissingClaim,
 			Signer:        signer,
@@ -83,14 +83,14 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          "did:invalid",
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
 				IssuedTime:        mustUnixTime("2024-06-17 14:00:00"),
-				AuthorizedAccount: validSourceHubAddr,
+				AuthorizedAccount: validVeraAddr,
 			},
 			ExpectedError: ErrInvalidIssuer,
 			Signer:        signer,
 			ServerTime:    mustTime("2024-06-17 14:10:00"),
 		},
 		{
-			Description: "authorization_account invalid sourcehub addr rejected",
+			Description: "authorization_account invalid Vera addr rejected",
 			Token: BearerToken{
 				IssuerID:          validDID,
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
@@ -107,7 +107,7 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          validDID,
 				IssuedTime:        mustUnixTime("2024-06-17 14:00:00"),
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
-				AuthorizedAccount: validSourceHubAddr,
+				AuthorizedAccount: validVeraAddr,
 			},
 			ExpectedError: ErrTokenExpired,
 			Signer:        signer,

@@ -7,10 +7,10 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	"github.com/sourcenetwork/sourcehub/sdk"
-	testutil "github.com/sourcenetwork/sourcehub/testutil"
-	"github.com/sourcenetwork/sourcehub/testutil/e2e"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/sdk"
+	testutil "github.com/sourcenetwork/vera/testutil"
+	"github.com/sourcenetwork/vera/testutil/e2e"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
 

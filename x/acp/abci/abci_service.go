@@ -9,7 +9,7 @@ import (
 	"github.com/cometbft/cometbft/rpc/client/http"
 	bfttypes "github.com/cometbft/cometbft/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 const (

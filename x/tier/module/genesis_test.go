@@ -5,11 +5,11 @@ import (
 	"time"
 
 	"cosmossdk.io/math"
-	"github.com/sourcenetwork/sourcehub/app"
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/testutil/nullify"
-	tier "github.com/sourcenetwork/sourcehub/x/tier/module"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/app"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/testutil/nullify"
+	tier "github.com/sourcenetwork/vera/x/tier/module"
+	"github.com/sourcenetwork/vera/x/tier/types"
 	"github.com/stretchr/testify/require"
 )
 

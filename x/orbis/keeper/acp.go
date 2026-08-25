@@ -6,8 +6,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func (k *Keeper) registerRingACPObject(goCtx context.Context, creator string, policyID string, ringID string) error {
