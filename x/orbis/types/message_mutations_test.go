@@ -236,6 +236,10 @@ func TestNodeMutationMessagesValidateBasic(t *testing.T) {
 			NodeKey: "node-1",
 			Target:  &MsgRemoveNodeFromWhitelist_RingId{RingId: "ring-1"},
 		},
+		&MsgDrainNodeKey{
+			Creator: validMutationCreator,
+			NodeKey: "node-1",
+		},
 	}
 	for _, msg := range validMessages {
 		require.NoError(t, msg.ValidateBasic())
@@ -257,5 +261,8 @@ func TestNodeMutationMessagesValidateBasic(t *testing.T) {
 		Creator: validMutationCreator,
 		NodeKey: "node-1",
 		Target:  &MsgRemoveNodeFromWhitelist_PolicyId{},
+	}).ValidateBasic())
+	require.Error(t, (&MsgDrainNodeKey{
+		Creator: validMutationCreator,
 	}).ValidateBasic())
 }

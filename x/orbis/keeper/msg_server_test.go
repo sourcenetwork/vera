@@ -1934,6 +1934,79 @@ func TestMsgServer_TransferNodeController(t *testing.T) {
 	require.Equal(t, newControllerKey, k.GetNodeInfo(ctx, nodePubKeyHex).ControllerKey)
 }
 
+func TestMsgServer_DrainNodeKey(t *testing.T) {
+	k, authKeeper, bankKeeper, ctx := setupOrbisKeeperWithBank(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	nodeAddr, nodePubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	controllerAddr, controllerPubKeyHex := testAccountWithPubKey(t, ctx, authKeeper)
+	wrongAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+	_, err := k.CreateNodeInfo(ctx, &types.MsgCreateNodeInfo{
+		Creator:       nodeAddr,
+		PeerId:        "peer-1",
+		ControllerKey: controllerPubKeyHex,
+	})
+	require.NoError(t, err)
+
+	// No balance to drain yet.
+	_, err = k.DrainNodeKey(ctx, &types.MsgDrainNodeKey{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+	})
+	require.ErrorIs(t, err, types.ErrNodeKeyBalanceEmpty)
+
+	// A signer that isn't the controller cannot drain.
+	_, err = k.DrainNodeKey(ctx, &types.MsgDrainNodeKey{
+		Creator: wrongAddr,
+		NodeKey: nodePubKeyHex,
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedNodeInfoUpdate)
+
+	// Draining an unregistered node key fails.
+	_, err = k.DrainNodeKey(ctx, &types.MsgDrainNodeKey{
+		Creator: controllerAddr,
+		NodeKey: "missing",
+	})
+	require.ErrorIs(t, err, types.ErrNodeInfoNotFound)
+
+	nodeAccAddr, err := sdk.AccAddressFromBech32(nodeAddr)
+	require.NoError(t, err)
+	controllerAccAddr, err := sdk.AccAddressFromBech32(controllerAddr)
+	require.NoError(t, err)
+	balance := sdk.NewCoins(sdk.NewInt64Coin(appparams.DefaultBondDenom, 1000))
+	fundAccount(t, ctx, bankKeeper, nodeAccAddr, balance)
+	require.True(t, bankKeeper.SpendableCoins(ctx, nodeAccAddr).Equal(balance))
+
+	ctx = ctx.WithEventManager(sdk.NewEventManager())
+	resp, err := k.DrainNodeKey(ctx, &types.MsgDrainNodeKey{
+		Creator: controllerAddr,
+		NodeKey: nodePubKeyHex,
+	})
+	require.NoError(t, err)
+	require.True(t, sdk.Coins(resp.Amount).Equal(balance))
+	require.True(t, bankKeeper.SpendableCoins(ctx, nodeAccAddr).IsZero())
+	require.True(t, bankKeeper.SpendableCoins(ctx, controllerAccAddr).Equal(balance))
+
+	// SendCoins also emits bank's own legacy (non-typed) events alongside our typed
+	// event, so filter for EventNodeKeyDrained specifically rather than requiring
+	// every emitted event to be a typed proto event.
+	var drained *types.EventNodeKeyDrained
+	for _, event := range ctx.EventManager().Events().ToABCIEvents() {
+		typedEvent, parseErr := sdk.ParseTypedEvent(event)
+		if parseErr != nil {
+			continue
+		}
+		if e, ok := typedEvent.(*types.EventNodeKeyDrained); ok {
+			drained = e
+		}
+	}
+	require.Equal(t, &types.EventNodeKeyDrained{
+		NodeKey:   nodePubKeyHex,
+		Recipient: controllerAddr,
+		Amount:    balance,
+	}, drained)
+}
+
 func TestMsgServer_AddAndRemoveNodeWhitelistEntries(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)

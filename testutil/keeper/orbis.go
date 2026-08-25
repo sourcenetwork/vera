@@ -93,6 +93,7 @@ func OrbisKeeperFull(t testing.TB) (keeper.Keeper, authkeeper.AccountKeeper, sdk
 		log.NewNopLogger(),
 		authority.String(),
 		accountKeeper,
+		nil,
 		&acpKeeper,
 	)
 

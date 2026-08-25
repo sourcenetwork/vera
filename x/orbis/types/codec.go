@@ -28,6 +28,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgTransferNodeController{},
 		&MsgAddNodeToWhitelist{},
 		&MsgRemoveNodeFromWhitelist{},
+		&MsgDrainNodeKey{},
 		&MsgUpdateParams{},
 	)
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

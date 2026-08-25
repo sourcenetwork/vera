@@ -20,6 +20,7 @@ type Keeper struct {
 	authority string
 
 	accountKeeper types.AccountKeeper
+	bankKeeper    types.BankKeeper
 	acpKeeper     *acpkeeper.Keeper
 }
 
@@ -29,6 +30,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
+	bankKeeper types.BankKeeper,
 	acpKeeper *acpkeeper.Keeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
@@ -41,6 +43,7 @@ func NewKeeper(
 		logger:        logger,
 		authority:     authority,
 		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
 		acpKeeper:     acpKeeper,
 	}
 }

@@ -269,7 +269,6 @@ type Ring struct {
 	Threshold       uint32   `protobuf:"varint,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
 	NewPeerNodeKeys []string `protobuf:"bytes,6,rep,name=new_peer_node_keys,json=newPeerNodeKeys,proto3" json:"new_peer_node_keys,omitempty"`
 	// Types that are valid to be assigned to XNewThreshold:
-	//
 	//	*Ring_NewThreshold
 	XNewThreshold isRing_XNewThreshold `protobuf_oneof:"_new_threshold"`
 	// Interval in seconds. Must be at least 86400.
