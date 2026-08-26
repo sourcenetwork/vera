@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package vera.orbis;
+
+import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/orbis/types";
+
+// EventRingCreated is emitted when a ring is created.
+message EventRingCreated {
+  string ring_id = 1;
+  string creator_did = 2;
+}
+
+// EventRingUpdated is emitted when a ring is updated in place.
+message EventRingUpdated {
+  string ring_id = 1;
+  string updater_did = 2;
+}
+
+// EventDocumentStored is emitted when an encrypted document is stored.
+message EventDocumentStored {
+  string document_id = 1;
+  string creator_did = 2;
+}
+
+// EventKeyDerivationStored is emitted when a key derivation is stored.
+message EventKeyDerivationStored {
+  string key_derivation_id = 1;
+  string creator_did = 2;
+}
+
+// EventNodeInfoCreated is emitted when a node info record is created.
+message EventNodeInfoCreated {
+  string peer_id = 1;
+  string controller_key = 2;
+}
+
+// EventNodeInfoUpdated is emitted when a node info record is updated.
+message EventNodeInfoUpdated {
+  string peer_id = 1;
+  string controller_key = 2;
+}
+
+// EventRingDeleted is emitted when a ring is removed from state.
+message EventRingDeleted {
+  string ring_id = 1;
+  string reason = 2;
+}
+
+// EventRingUpgradeScheduled is emitted when a future ring upgrade is scheduled.
+message EventRingUpgradeScheduled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+  uint64 next_version = 3;
+  uint64 activation_time = 4;
+}
+
+// EventRingUpgradeCancelled is emitted when a pending ring upgrade is cancelled.
+message EventRingUpgradeCancelled {
+  string ring_id = 1;
+  uint64 current_version = 2;
+}
+
+// EventRingReshareCancelled is emitted when a pending ring reshare is cancelled.
+message EventRingReshareCancelled {
+  string ring_id = 1;
+  string updater_did = 2;
+}
+
+// EventRingUpgradeNormalized is emitted when a scheduled upgrade becomes active.
+message EventRingUpgradeNormalized {
+  string ring_id = 1;
+  uint64 previous_version = 2;
+  uint64 current_version = 3;
+  uint64 activation_time = 4;
+}
+
+// EventReportAccepted is emitted after an MPC fault report passes security validation.
+message EventReportAccepted {
+  string report_id = 1;
+  string ring_id = 2;
+  string report_type = 3;
+  string reporter_node_key = 4;
+  string accused_node_key = 5;
+}
+
+// EventRingAutoReshareScheduled is emitted when accepted reports trigger a replacement reshare.
+message EventRingAutoReshareScheduled {
+  string ring_id = 1;
+  string accused_node_key = 2;
+  string replacement_node_key = 3;
+  uint64 kick_threshold = 4;
+  uint64 demerits = 5;
+}
+
+// EventNodeKeyDrained is emitted when a node key's balance is drained to its controller.
+message EventNodeKeyDrained {
+  string node_key = 1;
+  string recipient = 2;
+  repeated cosmos.base.v1beta1.Coin amount = 3 [(gogoproto.nullable) = false];
+}

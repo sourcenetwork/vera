@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/gogoproto/proto"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 
 	"cosmossdk.io/store/prefix"
 	storetypes "cosmossdk.io/store/types"

@@ -18,14 +18,14 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	modulev1beta1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
+	modulev1beta1 "github.com/sourcenetwork/vera/api/vera/tier/module/v1beta1"
+	"github.com/sourcenetwork/vera/app/metrics"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
 
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/x/tier/keeper"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 var (

@@ -4,8 +4,8 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/commitment"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/commitment"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type CreatePolicyAction struct {
@@ -18,7 +18,7 @@ type CreatePolicyAction struct {
 func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	msg := &types.MsgCreatePolicy{
 		Policy:      a.Policy,
-		Creator:     a.Creator.SourceHubAddr,
+		Creator:     a.Creator.VeraAddr,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	response, err := ctx.Executor.CreatePolicy(ctx, msg)
@@ -29,7 +29,7 @@ func (a *CreatePolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 		AssertValue(ctx, response.Record.Policy, a.Expected)
 	}
 	if response != nil {
-		ctx.State.PolicyCreator = a.Creator.SourceHubAddr
+		ctx.State.PolicyCreator = a.Creator.VeraAddr
 		ctx.State.PolicyId = response.Record.Policy.Id
 		return response.Record.Policy
 	}
@@ -49,7 +49,7 @@ func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 	msg := &types.MsgEditPolicy{
 		PolicyId:    a.Id,
 		Policy:      a.Policy,
-		Creator:     a.Creator.SourceHubAddr,
+		Creator:     a.Creator.VeraAddr,
 		MarshalType: coretypes.PolicyMarshalingType_YAML,
 	}
 	response, err := ctx.Executor.EditPolicy(ctx, msg)
@@ -66,7 +66,7 @@ func (a *EditPolicyAction) Run(ctx *TestCtx) *coretypes.Policy {
 		require.Equal(ctx.T, a.Expected, getResponse.Record.Policy)
 	}
 	if response != nil {
-		ctx.State.PolicyCreator = a.Creator.SourceHubAddr
+		ctx.State.PolicyCreator = a.Creator.VeraAddr
 		ctx.State.PolicyId = response.Record.Policy.Id
 		return response.Record.Policy
 	}

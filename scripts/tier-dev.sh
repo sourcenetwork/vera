@@ -1,7 +1,7 @@
 #!/bin/bash
 
-CHAINID=sourcehub
-CMD=sourcehubd
+CHAINID=vera
+CMD=verad
 
 # Get account address from account name.
 sh-acc-addr() {

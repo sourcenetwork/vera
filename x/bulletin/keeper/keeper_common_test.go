@@ -22,11 +22,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/capability"
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	"github.com/sourcenetwork/vera/x/acp/capability"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
@@ -78,7 +78,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	k := NewKeeper(
@@ -92,7 +92,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())
-	
+
 	require.NoError(t, k.SetParams(ctx, types.DefaultParams()))
 
 	return k, ctx

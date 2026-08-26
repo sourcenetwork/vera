@@ -8,8 +8,8 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func TestMsgServer_CancelPendingRing_CreatorDeletesRingAndCanRetryWithNonce(t *testing.T) {

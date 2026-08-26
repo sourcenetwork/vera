@@ -6,7 +6,7 @@
 ###############################################################################
 
 # The network chain ID
-chain-id = "sourcehub-dev"
+chain-id = "vera-dev"
 # The keyring's backend, where the keys are stored (os|file|kwallet|pass|test|memory)
 keyring-backend = "test"
 # CLI output format (text|json)

@@ -9,7 +9,7 @@ set -e
 
 AMOUNT="100000000000sourcebucks"
 PATH="/app/build:$PATH"
-STATE_DIR="/root/sourcehub"
+STATE_DIR="/root/vera"
 
 if [ -e $STATE_DIR/GENESIS_BUILT ];
 then
@@ -24,19 +24,19 @@ echo "Validator 2: $VALIDATOR2_ADDR"
 echo "Validator 3: $VALIDATOR3_ADDR"
 
 echo 'Adding Validator Accounts'
-sourcehubd genesis add-genesis-account $VALIDATOR2_ADDR $AMOUNT --home $STATE_DIR
-sourcehubd genesis add-genesis-account $VALIDATOR3_ADDR $AMOUNT --home $STATE_DIR
+verad genesis add-genesis-account $VALIDATOR2_ADDR $AMOUNT --home $STATE_DIR
+verad genesis add-genesis-account $VALIDATOR3_ADDR $AMOUNT --home $STATE_DIR
 
-cp /root/node2/config/gentx/* /root/sourcehub/config/gentx/
-cp /root/node3/config/gentx/* /root/sourcehub/config/gentx/
+cp /root/node2/config/gentx/* /root/vera/config/gentx/
+cp /root/node3/config/gentx/* /root/vera/config/gentx/
 
-sourcehubd genesis collect-gentxs --home $STATE_DIR
-touch /root/sourcehub/GENESIS_BUILT
+verad genesis collect-gentxs --home $STATE_DIR
+touch /root/vera/GENESIS_BUILT
 
 # Mission critical step: make the sourcebucks
-sed -i 's/stake/sourcebucks/g' /root/sourcehub/config/genesis.json
+sed -i 's/stake/sourcebucks/g' /root/vera/config/genesis.json
 
-cp /root/sourcehub/config/genesis.json /root/node2/config/
-cp /root/sourcehub/config/genesis.json /root/node3/config/
+cp /root/vera/config/genesis.json /root/node2/config/
+cp /root/vera/config/genesis.json /root/node3/config/
 
 echo 'GenesisTx generated'

@@ -5,8 +5,8 @@ import (
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func TestQuery_Policy_ReturnsPolicyAndRaw(t *testing.T) {

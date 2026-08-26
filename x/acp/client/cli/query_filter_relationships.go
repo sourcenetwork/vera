@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func CmdQueryFilterRelationships() *cobra.Command {

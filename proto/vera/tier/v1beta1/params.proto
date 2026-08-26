@@ -1,0 +1,36 @@
+syntax = "proto3";
+package vera.tier.v1beta1;
+
+import "amino/amino.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/tier/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "vera/x/tier/Params";
+
+  google.protobuf.Duration epoch_duration = 1 [(gogoproto.stdduration) = true];
+  int64 unlocking_epochs = 2;
+  int64 developer_pool_fee = 3;
+  int64 insurance_pool_fee = 4;
+  int64 insurance_pool_threshold = 5;
+  int64 process_rewards_interval = 6;
+  repeated Rate reward_rates = 7 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+// Rate defines the rate for a specific locked stake.
+message Rate {
+  // amount of locked stake required for earning rewards at this rate.
+  string amount = 1 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+  int64 rate = 2;
+}

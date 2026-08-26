@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	"github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/vera/app"
+	"github.com/sourcenetwork/vera/app/params"
 )
 
 type (

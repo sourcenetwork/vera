@@ -20,10 +20,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	"github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 func TestCreatePolicyCommittedRootHashIsDeterministicAcrossStores(t *testing.T) {
@@ -102,7 +102,7 @@ func setupACPCommitStore(t *testing.T) (sdk.Context, keeper.Keeper, storetypes.C
 		authority.String(),
 		accKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(cms, cmtproto.Header{}, false, log.NewNopLogger())

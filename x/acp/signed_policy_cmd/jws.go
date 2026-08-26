@@ -13,8 +13,8 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jwa"
 	jwxjws "github.com/lestrrat-go/jwx/v2/jws"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func newJWSVerifier(resolver did.Resolver) jwsVerifier {

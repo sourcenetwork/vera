@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func TestGetActorDID_WithExtractedDID(t *testing.T) {

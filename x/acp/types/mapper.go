@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
+	"github.com/sourcenetwork/vera/x/acp/utils"
 )
 
 // BuildRecordMetadata returns a RecordMetadata from an sdk Context
@@ -24,7 +24,7 @@ func BuildRecordMetadata(ctx sdk.Context, actorDID string, msgCreator string) (*
 }
 
 // BuildACPSuppliedMetadata returns an acp SuppliedMetadata
-// object which embeds a SourceHub RecordMetadata
+// object which embeds a Vera RecordMetadata
 // built from ctx, actorDID and msgCreator
 func BuildACPSuppliedMetadata(ctx sdk.Context, actorDID string, msgCreator string) (*coretypes.SuppliedMetadata, error) {
 	metadata, err := BuildRecordMetadata(ctx, actorDID, msgCreator)
@@ -41,7 +41,7 @@ func BuildACPSuppliedMetadata(ctx sdk.Context, actorDID string, msgCreator strin
 }
 
 // BuildACPSuppliedMetadataWithTime returns an acp SuppliedMetadata
-// object which embeds a SourceHub RecordMetadata
+// object which embeds a Vera RecordMetadata
 // built from ctx, ts, actorDID and msgCreator
 func BuildACPSuppliedMetadataWithTime(ctx sdk.Context, ts *Timestamp, actorDID string, msgCreator string) (*coretypes.SuppliedMetadata, error) {
 	metadata := &RecordMetadata{
@@ -71,7 +71,7 @@ func ExtractRecordMetadata(md *coretypes.RecordMetadata) (*RecordMetadata, error
 }
 
 // MapRelationshipRecord maps an acp_core RelationshipRecord
-// into a SourceHub RelationshipRecord
+// into a Vera RelationshipRecord
 func MapRelationshipRecord(rec *coretypes.RelationshipRecord) (*RelationshipRecord, error) {
 	metadata, err := ExtractRecordMetadata(rec.Metadata)
 	if err != nil {
@@ -86,7 +86,7 @@ func MapRelationshipRecord(rec *coretypes.RelationshipRecord) (*RelationshipReco
 	}, nil
 }
 
-// MapPolicy maps an acp core PolicyRecord into a SourceHub
+// MapPolicy maps an acp core PolicyRecord into a Vera
 // PolicyRecord
 func MapPolicy(rec *coretypes.PolicyRecord) (*PolicyRecord, error) {
 	metadata, err := ExtractRecordMetadata(rec.Metadata)

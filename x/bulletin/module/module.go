@@ -18,11 +18,11 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/bulletin/module"
+	"github.com/sourcenetwork/vera/app/metrics"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 var (

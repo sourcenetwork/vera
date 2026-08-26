@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 var _ types.QueryServer = &Keeper{}

@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/keeper/policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func (k *Keeper) DirectPolicyCmd(goCtx context.Context, msg *types.MsgDirectPolicyCmd) (*types.MsgDirectPolicyCmdResponse, error) {

@@ -15,8 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	test "github.com/sourcenetwork/sourcehub/testutil"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	test "github.com/sourcenetwork/vera/testutil"
 )
 
 // createCustomDecoratorWithMockDIDKeeper creates a custom decorator with DID-based mock keeper

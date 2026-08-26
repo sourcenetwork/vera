@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/signed_policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/signed_policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // NewCmdBuilder returns a builder for PolicyCmd objects from a client.
 //
-// The client is used to fetch the latest ACP module params from SourceHub
+// The client is used to fetch the latest ACP module params from Vera
 // and as a block height fetcher.
 func NewCmdBuilder(ctx context.Context, client *Client) (*signed_policy_cmd.CmdBuilder, error) {
 	acpClient := client.ACPQueryClient()

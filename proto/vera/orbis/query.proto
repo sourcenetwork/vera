@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package vera.orbis;
+
+import "amino/amino.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "vera/orbis/document.proto";
+import "vera/orbis/key_derivation.proto";
+import "vera/orbis/node_info.proto";
+import "vera/orbis/params.proto";
+import "vera/orbis/ring.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/orbis/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/params";
+  }
+
+  // Ring queries a ring by id.
+  rpc Ring(QueryRingRequest) returns (QueryRingResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/ring/{id}";
+  }
+
+  // Rings queries rings.
+  rpc Rings(QueryRingsRequest) returns (QueryRingsResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/rings";
+  }
+
+  // Document queries an encrypted document by id.
+  rpc Document(QueryDocumentRequest) returns (QueryDocumentResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/document/{id}";
+  }
+
+  // Documents queries encrypted documents.
+  rpc Documents(QueryDocumentsRequest) returns (QueryDocumentsResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/documents";
+  }
+
+  // KeyDerivation queries a key derivation by id.
+  rpc KeyDerivation(QueryKeyDerivationRequest) returns (QueryKeyDerivationResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/key_derivation/{id}";
+  }
+
+  // KeyDerivations queries key derivations.
+  rpc KeyDerivations(QueryKeyDerivationsRequest) returns (QueryKeyDerivationsResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/key_derivations";
+  }
+
+  // NodeInfo queries node info by node key.
+  rpc NodeInfo(QueryNodeInfoRequest) returns (QueryNodeInfoResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/node_info/{node_key}";
+  }
+
+  // NodeDemerits queries a node's demerit score in a ring.
+  rpc NodeDemerits(QueryNodeDemeritsRequest) returns (QueryNodeDemeritsResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/node_demerits/{ring_id}/{node_key}";
+  }
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}
+
+message QueryRingRequest {
+  string id = 1;
+}
+
+message QueryRingResponse {
+  Ring ring = 1;
+}
+
+message QueryRingsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryRingsResponse {
+  repeated Ring rings = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryDocumentRequest {
+  string id = 1;
+}
+
+message QueryDocumentResponse {
+  Document document = 1;
+}
+
+message QueryDocumentsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryDocumentsResponse {
+  repeated Document documents = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryKeyDerivationRequest {
+  string id = 1;
+}
+
+message QueryKeyDerivationResponse {
+  KeyDerivation key_derivation = 1;
+}
+
+message QueryKeyDerivationsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryKeyDerivationsResponse {
+  repeated KeyDerivation key_derivations = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryNodeInfoRequest {
+  string node_key = 1;
+}
+
+message QueryNodeInfoResponse {
+  NodeInfo node_info = 1;
+}
+
+message QueryNodeDemeritsRequest {
+  string ring_id = 1;
+  string node_key = 2;
+}
+
+message QueryNodeDemeritsResponse {
+  uint64 points = 1;
+}

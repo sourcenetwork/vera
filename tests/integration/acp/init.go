@@ -1,7 +1,7 @@
 package test
 
 import (
-	"github.com/sourcenetwork/sourcehub/app"
+	"github.com/sourcenetwork/vera/app"
 )
 
 var initialized bool = false

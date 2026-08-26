@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
 
-rm -rf ~/.sourcehub-full || true
+rm -rf ~/.vera-full || true
 
-BIN="build/sourcehubd"
-CHAIN_ID="sourcehub-dev"
-HOME_DIR="$HOME/.sourcehub-full"
+BIN="build/verad"
+CHAIN_ID="vera-dev"
+HOME_DIR="$HOME/.vera-full"
 SNAPSHOT_INTERVAL=50
 P2P=tcp://0.0.0.0:27684
 ADDR=tcp://0.0.0.0:27685
@@ -24,7 +24,7 @@ sedi() {
 echo "Initializing full node..."
 $BIN init full-node --chain-id $CHAIN_ID --home $HOME_DIR
 
-rsync -a --exclude priv_validator_state.json ~/.sourcehub/data/ $HOME_DIR/data/
+rsync -a --exclude priv_validator_state.json ~/.vera/data/ $HOME_DIR/data/
 
 sedi 's/^minimum-gas-prices = .*/minimum-gas-prices = "0.001uopen,0.001ucredit"/' $HOME_DIR/config/app.toml
 sedi 's/^enable = .*/enable = true/' $HOME_DIR/config/app.toml
@@ -32,7 +32,7 @@ sedi 's/^enable = .*/enable = true/' $HOME_DIR/config/app.toml
 # Enable storing snapshots
 sedi "s/^snapshot-interval = .*/snapshot-interval = $SNAPSHOT_INTERVAL/" $HOME_DIR/config/app.toml
 
-NODE_ID=$($BIN tendermint show-node-id --home ~/.sourcehub)
+NODE_ID=$($BIN tendermint show-node-id --home ~/.vera)
 # NODE_ID=$(curl -s http://localhost:26657/status | jq -r '.result.node_info.id')
 sedi "s|^#* *persistent_peers *=.*|persistent_peers = \"$NODE_ID@0.0.0.0:26656\"|" $HOME_DIR/config/config.toml
 

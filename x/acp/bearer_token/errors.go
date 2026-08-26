@@ -11,7 +11,7 @@ var ErrInvalidBearerToken = errors.Wrap("invalid bearer token", errors.ErrorType
 var ErrMsgUnauthorized = errors.Wrap("bearer policy msg: authorized_account doesn't match", errors.ErrorType_UNAUTHORIZED)
 
 var ErrInvalidIssuer = errors.Wrap("invalid issuer: expected did", ErrInvalidBearerToken)
-var ErrInvalidAuhtorizedAccount = errors.Wrap("invalid authorized_account: expects SourceHub address", ErrInvalidBearerToken)
+var ErrInvalidAuhtorizedAccount = errors.Wrap("invalid authorized_account: expects Vera address", ErrInvalidBearerToken)
 var ErrTokenExpired = errors.Wrap("token expired", ErrInvalidBearerToken)
 var ErrMissingClaim = errors.Wrap("required claim not found", ErrInvalidBearerToken)
 var ErrJSONSerializationUnsupported = errors.Wrap("JWS JSON Serialization not supported", ErrInvalidBearerToken)

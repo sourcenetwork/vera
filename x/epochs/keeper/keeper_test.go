@@ -16,8 +16,8 @@ import (
 
 	cdcutil "github.com/cosmos/cosmos-sdk/codec/testutil"
 
-	epochskeeper "github.com/sourcenetwork/sourcehub/x/epochs/keeper"
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	epochskeeper "github.com/sourcenetwork/vera/x/epochs/keeper"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 type KeeperTestSuite struct {

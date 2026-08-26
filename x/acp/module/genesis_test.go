@@ -3,10 +3,10 @@ package acp_test
 import (
 	"testing"
 
-	keepertest "github.com/sourcenetwork/sourcehub/testutil/keeper"
-	"github.com/sourcenetwork/sourcehub/testutil/nullify"
-	acp "github.com/sourcenetwork/sourcehub/x/acp/module"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	keepertest "github.com/sourcenetwork/vera/testutil/keeper"
+	"github.com/sourcenetwork/vera/testutil/nullify"
+	acp "github.com/sourcenetwork/vera/x/acp/module"
+	"github.com/sourcenetwork/vera/x/acp/types"
 	"github.com/stretchr/testify/require"
 )
 

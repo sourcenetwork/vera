@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 type Keeper struct {
@@ -20,6 +20,7 @@ type Keeper struct {
 	authority string
 
 	accountKeeper types.AccountKeeper
+	bankKeeper    types.BankKeeper
 	acpKeeper     *acpkeeper.Keeper
 }
 
@@ -29,6 +30,7 @@ func NewKeeper(
 	logger log.Logger,
 	authority string,
 	accountKeeper types.AccountKeeper,
+	bankKeeper types.BankKeeper,
 	acpKeeper *acpkeeper.Keeper,
 ) Keeper {
 	if _, err := sdk.AccAddressFromBech32(authority); err != nil {
@@ -41,6 +43,7 @@ func NewKeeper(
 		logger:        logger,
 		authority:     authority,
 		accountKeeper: accountKeeper,
+		bankKeeper:    bankKeeper,
 		acpKeeper:     acpKeeper,
 	}
 }

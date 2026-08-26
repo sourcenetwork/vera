@@ -6,11 +6,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/capability"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper/policy_cmd"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/utils"
+	"github.com/sourcenetwork/vera/x/acp/capability"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	"github.com/sourcenetwork/vera/x/acp/keeper/policy_cmd"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/utils"
 )
 
 // CreateModulePolicy creates a new Policy within the ACP module, bound to some calling module.
@@ -99,7 +99,7 @@ func (k *Keeper) EditModulePolicy(goCtx context.Context, cap *capability.PolicyC
 }
 
 // ModulePolicyCmdForActorAccount issues a policy command for the policy bound to the provided capability.
-// The command skips authentication and is assumed to be issued by actorAcc, which must be a valid sourcehub account address.
+// The command skips authentication and is assumed to be issued by actorAcc, which must be a valid Vera account address.
 func (k *Keeper) ModulePolicyCmdForActorAccount(goCtx context.Context, cap *capability.PolicyCapability, cmd *types.PolicyCmd, actorAcc string, txSigner string) (*types.PolicyCmdResult, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 

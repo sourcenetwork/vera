@@ -3,7 +3,7 @@ date: 2024-03-07
 ---
 
 This ADR registers design decisions regarding the MsgPolicyCmd transaction.
-MsgPolicyCmd enables the ACP module to accept Commands to a Policy from users that do not have a SourceHub account.
+MsgPolicyCmd enables the ACP module to accept Commands to a Policy from users that do not have a Vera account.
 This feature works by introducing a payload which contains the command, the actor's DID, metadata and a signature issued by the Actor.
 To execute the command the payload's signature is validated using the DID's `VerificationMethod` and a series of checks are performed, iff the payload is valid the ACP module extracts the command and executes it.
 
@@ -12,7 +12,7 @@ Intro
 =====
 
 This ADR registers design decisions regarding the MsgPolicyCmd transaction.
-MsgPolicyCmd enables the ACP module to accept Commands to a Policy from users that do not have a SourceHub account.
+MsgPolicyCmd enables the ACP module to accept Commands to a Policy from users that do not have a Vera account.
 This feature works by introducing a payload which contains the command, the actor's DID, metadata and a signature issued by the Actor.
 To execute the command the payload's signature is validated using the DID's `VerificationMethod` and a series of checks are performed, iff the payload is valid the ACP module extracts the command and executes it.
 
@@ -21,11 +21,11 @@ To execute the command the payload's signature is validated using the DID's `Ver
 Body
 ====
 
-## Removing the need for SourceHub accounts
+## Removing the need for Vera accounts
 
-Prior to this message, any operation done under a Policy required the Actor to issue a Tx signed from a SourceHub account.
-The ACP Module messages would issue each SourceHub address a DID which would be used as the Subject for the Relationships.
-This system imposed a great limitation upon the identifiers a Policy was able to accept, since effectively only SourceHub accounts could be Actors under a Policy.
+Prior to this message, any operation done under a Policy required the Actor to issue a Tx signed from a Vera account.
+The ACP Module messages would issue each Vera address a DID which would be used as the Subject for the Relationships.
+This system imposed a great limitation upon the identifiers a Policy was able to accept, since effectively only Vera accounts could be Actors under a Policy.
 
 The MsgPolicyCmd solves this problem by decoupling the Tx signer from the Msg issuer by introducing a signed payload to the system.
 This signed payload was designed to accept any DID Actor, so long as the DID is resolvable to a DID Document which contains some VerificationMethod / public key.
@@ -44,7 +44,7 @@ Ths signed payload is simply a data-signature pair which contains a Command for 
 The signature is used to guarantee integrity and authenticate the issuer at the same time.
 The nature of DIDs means they are resolved to a Public Key which is used to verify the signature - thus verifying integrity and authenticating all at once.
 
-The signed payload is by design a single use entity which is sent only once, from an Actor to SourceHub.
+The signed payload is by design a single use entity which is sent only once, from an Actor to Vera.
 Upon accepting a payload, the ACP module must not process it again, otherwise the system is vulnerable to replay attacks.
 See section on preventing attacks for an overview of the protection systems in place.
 
@@ -52,8 +52,8 @@ See section on preventing attacks for an overview of the protection systems in p
 
 - id: id MUST be an UUID v4 identifier to uniquely identify the payload. v4 is chosen to preserve user privacy
 - actor: actor MUST be a valid did string which contains a "VerificationMethod".
-- issued_height: issued_height acts as metadata for users indicating the SourceHub block height for which the payload was generated
-- expiration_height: expiration_height defines an upperbound at which the payload will be accepted. If SourceHub's current height is greater than expiration_height, the payload MUST be rejected.
+- issued_height: issued_height acts as metadata for users indicating the Vera block height for which the payload was generated
+- expiration_height: expiration_height defines an upperbound at which the payload will be accepted. If Vera's current height is greater than expiration_height, the payload MUST be rejected.
 - command: command is an oneof field containing the command the ACP module will execute.
 
 A related question might be: why not JWT fields?

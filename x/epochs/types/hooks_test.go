@@ -11,7 +11,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 )
 
 type KeeperTestSuite struct {

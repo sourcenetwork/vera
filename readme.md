@@ -1,22 +1,22 @@
-# SourceHub
+# Vera
 
 Source's Trust Layer
 
 ## Getting Started
 
-To quickly spin up a standalone SourceHub network, we recommend using Docker.
-This repository contains a Dockerfile which if run with the environment variable `STANDALONE=1`, spins up a new single node SourceHub network.
+To quickly spin up a standalone Vera network, we recommend using Docker.
+This repository contains a Dockerfile which if run with the environment variable `STANDALONE=1`, spins up a new single node Vera network.
 
 To get started build the docker image with,
 
 ```
-docker image build -t sourcehub:latest .
+docker image build -t vera:latest .
 ```
 
 and start it with:
 
 ```
-docker run -p 9090:9090 -p 26657:26657 -p 26656:26656 -p 1317:1317 -e STANDALONE=1 sourcehub:latest
+docker run -p 9090:9090 -p 26657:26657 -p 26656:26656 -p 1317:1317 -e STANDALONE=1 vera:latest
 ```
 
 The container will start a new network with no fees and a funded faucet account which can be used.
@@ -52,13 +52,13 @@ make install
 ### Running the Chain Locally
 
 ```bash
-# Run build/sourcehubd directly
+# Run build/verad directly
 ./scripts/dev-entrypoint.sh start
 # or using Docker
 docker-compose up
 ```
 
-The `./scripts/dev-entrypoint.sh` script runs `./scripts/genesis-setup.sh` internally and automatically initializes a new node with chain ID `sourcehub-dev`, creates validator and faucet keys, and configures dev settings.
+The `./scripts/dev-entrypoint.sh` script runs `./scripts/genesis-setup.sh` internally and automatically initializes a new node with chain ID `vera-dev`, creates validator and faucet keys, and configures dev settings.
 
 ### Configuration
 
@@ -71,6 +71,8 @@ The `./scripts/genesis-setup.sh` script configures:
 - **CORS**: CORS enabled to interact with API locally
 - **Metrics**: Prometheus metrics enabled
 - **Faucet**: Built-in faucet with test funds
+
+Nodes use `$HOME/.vera` by default.
 
 ### Testing
 

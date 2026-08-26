@@ -3,8 +3,8 @@ package acp
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

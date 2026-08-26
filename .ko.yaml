@@ -4,7 +4,7 @@ defaultPlatforms:
   - linux/amd64
 
 builds:
-  - main: ./cmd/sourcehubd
+  - main: ./cmd/verad
     ldflags:
       - -s -w
       - -buildid=

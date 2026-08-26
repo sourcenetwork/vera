@@ -7,7 +7,7 @@ import (
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 	"github.com/stretchr/testify/require"
 
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
 )
 
 func TestCreatePolicy_ValidPolicyIsCreated(t *testing.T) {

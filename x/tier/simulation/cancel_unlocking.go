@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/sourcenetwork/sourcehub/x/tier/keeper"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/x/tier/keeper"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 func SimulateMsgCancelUnlockingStake(

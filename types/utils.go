@@ -7,9 +7,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-// IsValidSourceHubAddr verifies whether addr is a valid bech32 prefixed by
-// SourceHub's prefix
-func IsValidSourceHubAddr(addr string) error {
+// IsValidVeraAddr verifies whether addr is a valid bech32 prefixed by
+// Vera's prefix
+func IsValidVeraAddr(addr string) error {
 	bz, err := sdk.GetFromBech32(addr, AccountAddrPrefix)
 	if err != nil {
 		return err
@@ -21,7 +21,7 @@ func IsValidSourceHubAddr(addr string) error {
 	return nil
 }
 
-// AccAddressFromBech32 returns an AccAddress from a Bech32 SourceHub address string
+// AccAddressFromBech32 returns an AccAddress from a Bech32 Vera address string
 func AccAddressFromBech32(address string) (addr sdk.AccAddress, err error) {
 	if len(strings.TrimSpace(address)) == 0 {
 		return sdk.AccAddress{}, errors.New("empty address string is not allowed")

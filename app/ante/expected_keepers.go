@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
+	coretypes "github.com/sourcenetwork/vera/x/core/types"
 )
 
-// HubKeeper is an interface for the x/hub module keeper.
-type HubKeeper interface {
-	GetChainConfig(context.Context) hubtypes.ChainConfig
-	GetParams(context.Context) hubtypes.Params
+// CoreKeeper is an interface for the x/core module keeper.
+type CoreKeeper interface {
+	GetChainConfig(context.Context) coretypes.ChainConfig
+	GetParams(context.Context) coretypes.Params
 
 	// JWS token management
 	StoreOrUpdateJWSToken(

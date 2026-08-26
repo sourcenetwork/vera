@@ -10,10 +10,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	"github.com/sourcenetwork/sourcehub/sdk"
-	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/sdk"
+	"github.com/sourcenetwork/vera/x/acp/bearer_token"
+	"github.com/sourcenetwork/vera/x/acp/did"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 
 	txBuilder, err := sdk.NewTxBuilder(
 		sdk.WithSDKClient(client),
-		sdk.WithChainID("sourcehub-dev"),
+		sdk.WithChainID("vera-dev"),
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -35,7 +35,7 @@ func main() {
 	reg := cdctypes.NewInterfaceRegistry()
 	cryptocdc.RegisterInterfaces(reg)
 	cdc := codec.NewProtoCodec(reg)
-	keyring, err := keyring.New("sourcehub", keyring.BackendTest, "~/.sourcehub", nil, cdc)
+	keyring, err := keyring.New("vera", keyring.BackendTest, "~/.vera", nil, cdc)
 	if err != nil {
 		log.Fatalf("could not load keyring: %v", err)
 	}

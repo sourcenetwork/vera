@@ -3,7 +3,7 @@ package acp
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/acp"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.
@@ -71,8 +71,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Short:          "Query HijackAttemptsByPolicy",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
 				},
-
-				},
+			},
 		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
 			Service:              modulev1.Msg_ServiceDesc.ServiceName,
@@ -82,7 +81,7 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
-				},
+			},
 		},
 	}
 }

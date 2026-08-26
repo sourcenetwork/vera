@@ -35,7 +35,7 @@ func IsValidDID(didStr string) error {
 	return nil
 }
 
-// IssueDID produces a DID for a SourceHub account.
+// IssueDID produces a DID for a Vera account.
 func IssueDID(acc sdk.AccountI) (string, error) {
 	return DIDFromPubKey(acc.GetPubKey())
 }
@@ -80,7 +80,7 @@ func DIDFromPubKey(pk cryptotypes.PubKey) (string, error) {
 	return did.String(), nil
 }
 
-// IssueModuleDID produces a DID for a SourceHub module, based on its name.
+// IssueModuleDID produces a DID for a Vera module, based on its name.
 //
 // The issued did uses a pseudo-method named "module", which simply appends the module name.
 func IssueModuleDID(moduleName string) string {

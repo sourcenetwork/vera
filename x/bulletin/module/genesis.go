@@ -3,8 +3,8 @@ package bulletin
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/x/bulletin/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

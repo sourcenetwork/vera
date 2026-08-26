@@ -1,7 +1,7 @@
 package keeper
 
 import (
-	v2 "github.com/sourcenetwork/sourcehub/x/feegrant/migrations/v2"
+	v2 "github.com/sourcenetwork/vera/x/feegrant/migrations/v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )

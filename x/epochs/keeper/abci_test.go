@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/osmoutils"
-	"github.com/sourcenetwork/sourcehub/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/epochs/osmoutils"
+	"github.com/sourcenetwork/vera/x/epochs/types"
 
 	"golang.org/x/exp/maps"
 )

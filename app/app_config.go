@@ -63,29 +63,29 @@ import (
 	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v10/modules/apps/transfer/types"
 	ibcexported "github.com/cosmos/ibc-go/v10/modules/core/exported"
-	feegrantmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/feegrant/module/v1"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
-	_ "github.com/sourcenetwork/sourcehub/x/feegrant/module" // import for side-effects
+	feegrantmodulev1 "github.com/sourcenetwork/vera/api/vera/feegrant/module/v1"
+	"github.com/sourcenetwork/vera/x/feegrant"
+	_ "github.com/sourcenetwork/vera/x/feegrant/module" // import for side-effects
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	epochsmodulev1 "github.com/sourcenetwork/sourcehub/api/osmosis/epochs/module/v1beta1"
-	acpmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/acp/module"
-	bulletinmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/bulletin/module"
-	hubmodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/hub/module"
-	orbismodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis/module"
-	tiermodulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/tier/module/v1beta1"
-	_ "github.com/sourcenetwork/sourcehub/x/acp/module" // import for side-effects
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	_ "github.com/sourcenetwork/sourcehub/x/bulletin/module" // import for side-effects
-	bulletintypes "github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	_ "github.com/sourcenetwork/sourcehub/x/epochs/module"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	_ "github.com/sourcenetwork/sourcehub/x/hub/module"
-	hubmoduletypes "github.com/sourcenetwork/sourcehub/x/hub/types"
-	_ "github.com/sourcenetwork/sourcehub/x/orbis/module" // import for side-effects
-	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
-	_ "github.com/sourcenetwork/sourcehub/x/tier/module"
-	tiertypes "github.com/sourcenetwork/sourcehub/x/tier/types"
+	epochsmodulev1 "github.com/sourcenetwork/vera/api/osmosis/epochs/module/v1beta1"
+	acpmodulev1 "github.com/sourcenetwork/vera/api/vera/acp/module"
+	bulletinmodulev1 "github.com/sourcenetwork/vera/api/vera/bulletin/module"
+	coremodulev1 "github.com/sourcenetwork/vera/api/vera/core/module"
+	orbismodulev1 "github.com/sourcenetwork/vera/api/vera/orbis/module"
+	tiermodulev1 "github.com/sourcenetwork/vera/api/vera/tier/module/v1beta1"
+	_ "github.com/sourcenetwork/vera/x/acp/module" // import for side-effects
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	_ "github.com/sourcenetwork/vera/x/bulletin/module" // import for side-effects
+	bulletintypes "github.com/sourcenetwork/vera/x/bulletin/types"
+	_ "github.com/sourcenetwork/vera/x/core/module"
+	coremoduletypes "github.com/sourcenetwork/vera/x/core/types"
+	_ "github.com/sourcenetwork/vera/x/epochs/module"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	_ "github.com/sourcenetwork/vera/x/orbis/module" // import for side-effects
+	orbistypes "github.com/sourcenetwork/vera/x/orbis/types"
+	_ "github.com/sourcenetwork/vera/x/tier/module"
+	tiertypes "github.com/sourcenetwork/vera/x/tier/types"
 )
 
 var (
@@ -121,7 +121,7 @@ var (
 		consensusparamtypes.ModuleName,
 		circuittypes.ModuleName,
 		// chain modules
-		hubmoduletypes.ModuleName,
+		coremoduletypes.ModuleName,
 		acptypes.ModuleName,
 		orbistypes.ModuleName,
 		bulletintypes.ModuleName,
@@ -149,7 +149,7 @@ var (
 		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
-		hubmoduletypes.ModuleName,
+		coremoduletypes.ModuleName,
 		acptypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
@@ -169,7 +169,7 @@ var (
 		capabilitytypes.ModuleName,
 		icatypes.ModuleName,
 		// chain modules
-		hubmoduletypes.ModuleName,
+		coremoduletypes.ModuleName,
 		acptypes.ModuleName,
 		epochstypes.ModuleName,
 		tiertypes.ModuleName,
@@ -323,8 +323,8 @@ var (
 				Config: appconfig.WrapAny(&circuitmodulev1.Module{}),
 			},
 			{
-				Name:   hubmoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&hubmodulev1.Module{}),
+				Name:   coremoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&coremodulev1.Module{}),
 			},
 			{
 				Name:   acptypes.ModuleName,

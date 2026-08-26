@@ -15,9 +15,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	"github.com/sourcenetwork/sourcehub/app/params"
-	hubtypes "github.com/sourcenetwork/sourcehub/x/hub/types"
+	"github.com/sourcenetwork/vera/app"
+	"github.com/sourcenetwork/vera/app/params"
+	coretypes "github.com/sourcenetwork/vera/x/core/types"
 )
 
 const (
@@ -47,7 +47,7 @@ func setupFaucetKeyFiles(val network.ValidatorI) error {
 	if err != nil {
 		return fmt.Errorf("failed to get user home directory: %w", err)
 	}
-	defaultNodeHome := filepath.Join(userHomeDir, ".sourcehub")
+	defaultNodeHome := filepath.Join(userHomeDir, ".vera")
 	defaultFaucetKeyPath := filepath.Join(defaultNodeHome, configDir, faucetKeyFile)
 	if err := os.MkdirAll(filepath.Dir(defaultFaucetKeyPath), defaultDirPerm); err != nil {
 		return fmt.Errorf("failed to create default faucet key directory: %w", err)
@@ -60,13 +60,13 @@ func setupFaucetKeyFiles(val network.ValidatorI) error {
 
 // setupFaucetInGenesis sets up the faucet account and balance in the genesis state.
 func setupFaucetInGenesis(cfg *network.Config) error {
-	hubGenesis := hubtypes.DefaultGenesis()
-	hubGenesis.ChainConfig.AllowZeroFeeTxs = true
-	bz, err := json.Marshal(&hubGenesis)
+	coreGenesis := coretypes.DefaultGenesis()
+	coreGenesis.ChainConfig.AllowZeroFeeTxs = true
+	bz, err := json.Marshal(&coreGenesis)
 	if err != nil {
-		return fmt.Errorf("could not marshal x/hub/ChainConfig: %w", err)
+		return fmt.Errorf("could not marshal x/core/ChainConfig: %w", err)
 	}
-	cfg.GenesisState[hubtypes.ModuleName] = bz
+	cfg.GenesisState[coretypes.ModuleName] = bz
 
 	if err := addFaucetAccountToGenesis(cfg); err != nil {
 		return fmt.Errorf("failed to add faucet account to genesis: %w", err)

@@ -6,14 +6,14 @@ const (
 	OpenDenom           = "open"
 	OpenName            = "Source Open"
 	OpenSymbol          = "OPEN"
-	OpenDescription     = "OPEN is the native staking token of SourceHub."
+	OpenDescription     = "OPEN is the native staking token of Vera."
 
 	MicroCreditDenom      = "ucredit"
 	MicroCreditDenomAlias = "microcredit"
 	CreditDenom           = "credit"
 	CreditName            = "Source Credit"
 	CreditSymbol          = "CREDIT"
-	CreditDescription     = "Credit is the utility token for access services on SourceHub. Non-transferable."
+	CreditDescription     = "Credit is the utility token for access services on Vera. Non-transferable."
 	CreditFeeMultiplier   = 10
 
 	DefaultBondDenom   = MicroOpenDenom

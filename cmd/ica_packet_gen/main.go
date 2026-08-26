@@ -9,7 +9,7 @@ import (
 	gogoproto "github.com/cosmos/gogoproto/proto"
 	icatypes "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/types"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func main() {

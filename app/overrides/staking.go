@@ -7,7 +7,7 @@ import (
 
 	staking "github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // StakingModuleBasic defines a wrapper of the x/staking module AppModuleBasic to provide custom default genesis state.

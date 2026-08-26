@@ -14,7 +14,7 @@ func WrapMsgServerServiceDescriptor(moduleName string, desc grpc.ServiceDesc) gr
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgServerHandler(moduleName, method.MethodName,
-			SourcehubMsgSeconds, SourcehubMsgTotal, SourcehubMsgErrorsTotal,
+			VeraMsgSeconds, VeraMsgTotal, VeraMsgErrorsTotal,
 			method.Handler)
 		method.Handler = handler
 		methods = append(methods, method)
@@ -28,7 +28,7 @@ func WrapQueryServiceDescriptor(moduleName string, desc grpc.ServiceDesc) grpc.S
 	methods := make([]grpc.MethodDesc, 0, len(desc.Methods))
 	for _, method := range desc.Methods {
 		handler := wrapMsgServerHandler(moduleName, method.MethodName,
-			SourcehubQuerySeconds, SourcehubQueryTotal, SourcehubQueryErrorsTotal,
+			VeraQuerySeconds, VeraQueryTotal, VeraQueryErrorsTotal,
 			method.Handler)
 		method.Handler = handler
 		methods = append(methods, method)

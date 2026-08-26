@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/hd"
 	"github.com/stretchr/testify/require"
 
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
 )
 
 // NewBearerTokenNow creates a new BearerToken with current time and default expiration

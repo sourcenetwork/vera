@@ -21,11 +21,11 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	acptypes "github.com/sourcenetwork/sourcehub/x/acp/types"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/keeper"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	"github.com/sourcenetwork/vera/x/bulletin/keeper"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
@@ -77,7 +77,7 @@ func BulletinKeeper(t testing.TB) (keeper.Keeper, sdk.Context) {
 		authority.String(),
 		accountKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	k := keeper.NewKeeper(

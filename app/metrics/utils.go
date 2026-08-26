@@ -28,14 +28,14 @@ func ModuleMeasureSinceWithCounter(moduleName, methodName string, start time.Tim
 	labels = append(labels, extraLabels...)
 
 	// Track message handling latency
-	gometrics.MeasureSinceWithLabels(SourcehubMethodSeconds, start, labels)
+	gometrics.MeasureSinceWithLabels(VeraMethodSeconds, start, labels)
 
 	// Increment message count
-	gometrics.IncrCounterWithLabels(SourcehubMethodTotal, 1, labels)
+	gometrics.IncrCounterWithLabels(VeraMethodTotal, 1, labels)
 
 	if err != nil {
 		// Increment error count
-		gometrics.IncrCounterWithLabels(SourcehubMethodErrorsTotal, 1, labels)
+		gometrics.IncrCounterWithLabels(VeraMethodErrorsTotal, 1, labels)
 	}
 }
 
@@ -52,6 +52,6 @@ func ModuleIncrInternalErrorCounter(moduleName, methodName string, err error) {
 	labels = append(labels, commonLabels...)
 
 	if err != nil {
-		gometrics.IncrCounterWithLabels(SourcehubInternalErrorsTotal, 1, labels)
+		gometrics.IncrCounterWithLabels(VeraInternalErrorsTotal, 1, labels)
 	}
 }

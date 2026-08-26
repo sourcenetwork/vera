@@ -7,9 +7,10 @@ import (
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 const compressedPubKeyLen = 33
@@ -107,6 +108,18 @@ func (k *Keeper) authorizeNodeInfoUpdate(goCtx context.Context, ctx sdk.Context,
 		return nil, types.ErrUnauthorizedNodeInfoUpdate
 	}
 	return nodeInfo, nil
+}
+
+// nodeKeyAccAddress derives the account address controlled by a node key from its
+// hex-encoded compressed secp256k1 public key.
+func nodeKeyAccAddress(nodeKey string) (sdk.AccAddress, error) {
+	keyHex := strings.TrimPrefix(nodeKey, "0x")
+	decoded, err := hex.DecodeString(keyHex)
+	if err != nil || len(decoded) != compressedPubKeyLen {
+		return nil, errorsmod.Wrapf(types.ErrInvalidNodeInfo, "invalid node_key encoding: %q", nodeKey)
+	}
+	pubKey := &secp256k1.PubKey{Key: decoded}
+	return sdk.AccAddress(pubKey.Address()), nil
 }
 
 // signerPublicKeyHex returns the hex-encoded compressed public key for a bech32 address.

@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // BankModuleBasic defines a wrapper of the x/bank module AppModuleBasic to provide custom default genesis state.

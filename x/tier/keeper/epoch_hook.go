@@ -5,8 +5,8 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 func (k *Keeper) EpochHooks() epochstypes.EpochHooks {

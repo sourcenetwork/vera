@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type queryAccessDecisionSuite struct {

@@ -11,8 +11,8 @@ import (
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/golang/mock/gomock"
-	epochstypes "github.com/sourcenetwork/sourcehub/x/epochs/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	epochstypes "github.com/sourcenetwork/vera/x/epochs/types"
+	"github.com/sourcenetwork/vera/x/feegrant"
 )
 
 // Mock bank keeper

@@ -7,8 +7,8 @@ import (
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	coretypes "github.com/sourcenetwork/acp_core/pkg/types"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/access_decision"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/access_decision"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func (k *Keeper) CheckAccess(goCtx context.Context, msg *types.MsgCheckAccess) (*types.MsgCheckAccessResponse, error) {

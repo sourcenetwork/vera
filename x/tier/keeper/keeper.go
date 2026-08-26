@@ -14,10 +14,10 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/vera/app/metrics"
+	appparams "github.com/sourcenetwork/vera/app/params"
 
-	"github.com/sourcenetwork/sourcehub/x/tier/types"
+	"github.com/sourcenetwork/vera/x/tier/types"
 )
 
 type (

@@ -13,9 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil/sims"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	"github.com/sourcenetwork/sourcehub/sdk"
+	"github.com/sourcenetwork/vera/app"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	"github.com/sourcenetwork/vera/sdk"
 )
 
 type TestNetwork struct {

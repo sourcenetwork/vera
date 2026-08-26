@@ -3,7 +3,7 @@ package epochs
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/sourcenetwork/sourcehub/x/epochs/keeper"
+	"github.com/sourcenetwork/vera/x/epochs/keeper"
 )
 
 // BeginBlocker delegates to the keeper's BeginBlocker.

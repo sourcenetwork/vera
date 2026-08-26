@@ -2,7 +2,7 @@ package policy_cmd
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 func NewPolicyCmdCtx(ctx sdk.Context, policyId string, actorDID string, signer string, params types.Params) (PolicyCmdCtx, error) {

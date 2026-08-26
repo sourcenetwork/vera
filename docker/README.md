@@ -1,6 +1,6 @@
-# SourceHub Dockerfile
+# Vera Dockerfile
 
-Dockerfile designed to make getting started with SourceHub easily.
+Dockerfile designed to make getting started with Vera easily.
 
 Dockerfile can be used to join a pre-existing network or used for a standalone test envrionment.
 
@@ -11,9 +11,9 @@ Validator, comet p2p and comet validator keys can be recovered and loaded for pr
 ## Usage modes
 
 ### Validator Recovery mode
-Validator recovery mode configures the sourcehub node to recover a validator credentials
+Validator recovery mode configures the vera node to recover a validator credentials
 
-Set env var `MNEMONIC_PATH` to recover the sourcehub validator key.
+Set env var `MNEMONIC_PATH` to recover the vera validator key.
 Set env var `CONSENSUS_KEY_PATH` to recover the CometBFT consensus key (ie. `priv_validator_key.json`).
 Set env var `COMET_NODE_KEY_PATH` to recover the CometBFT p2p key (ie. `node_key.json`)
 Set `GENESIS_PATH` to initialize the genesis file.
@@ -61,5 +61,5 @@ Set `STANDALONE=1` at time of container creation to force standalone mode, all r
 - `APP_CONFIG_PATH` is an optional variable which, if set, will overwrite
   the default app.toml with the provided file.
 
-- `STANDALONE` if set to `1` will initialize a new SourceHub network / genesis for local usage.
+- `STANDALONE` if set to `1` will initialize a new Vera network / genesis for local usage.
   The network will with no fees, a single validator and a funded faucet account.

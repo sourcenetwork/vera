@@ -9,7 +9,7 @@ import (
 	"github.com/TBD54566975/ssi-sdk/did/key"
 	"github.com/spf13/cobra"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/bearer_token"
+	"github.com/sourcenetwork/vera/x/acp/bearer_token"
 )
 
 func main() {

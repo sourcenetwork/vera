@@ -10,8 +10,8 @@ import (
 	"github.com/sourcenetwork/raccoondb/v2/table"
 	rctypes "github.com/sourcenetwork/raccoondb/v2/types"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/stores"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/stores"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 const commitmentObjsPrefix = "/objs"

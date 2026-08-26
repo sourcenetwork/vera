@@ -6,14 +6,14 @@ import (
 	"strconv"
 	"strings"
 
-	test "github.com/sourcenetwork/sourcehub/tests/integration/acp"
-	"github.com/sourcenetwork/sourcehub/utils"
+	test "github.com/sourcenetwork/vera/tests/integration/acp"
+	"github.com/sourcenetwork/vera/utils"
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "test_env_generator {permutation}",
-	Short: "test_env_generator permutates through SourceHub's test suite environment variables",
+	Short: "test_env_generator permutates through Vera's test suite environment variables",
 	Long: `
 	test_env_generator outputs the set of environment variables which should be set for each test permutation.
 		   
@@ -77,9 +77,9 @@ func genEnvirons() []string {
 				}
 
 				builder := strings.Builder{}
-				writeKV(&builder, test.SourceHubActorEnvVar, actorKeyVar)
-				writeKV(&builder, test.SourceHubExecutorEnvVar, executorVar)
-				writeKV(&builder, test.SourceHubAuthStratEnvVar, authStratVar)
+				writeKV(&builder, test.VeraActorEnvVar, actorKeyVar)
+				writeKV(&builder, test.VeraExecutorEnvVar, executorVar)
+				writeKV(&builder, test.VeraAuthStratEnvVar, authStratVar)
 				environ := builder.String()
 				environs = append(environs, environ)
 			}

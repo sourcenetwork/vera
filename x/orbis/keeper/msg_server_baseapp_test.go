@@ -26,7 +26,7 @@ import (
 	"github.com/cosmos/gogoproto/proto"
 	"github.com/stretchr/testify/require"
 
-	orbistypes "github.com/sourcenetwork/sourcehub/x/orbis/types"
+	orbistypes "github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T) {
@@ -78,6 +78,7 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T
 		authority.String(),
 		accountKeeper,
 		nil,
+		nil,
 	)
 	orbistypes.RegisterMsgServer(bApp.MsgServiceRouter(), &orbisKeeper)
 
@@ -128,7 +129,7 @@ func TestMsgServer_FinalizeRing_PkConflictDeletesRingThroughBaseApp(t *testing.T
 
 	var ringDeletedEvent *orbistypes.EventRingDeleted
 	for _, event := range result.Events {
-		if event.Type != "sourcehub.orbis.EventRingDeleted" {
+		if event.Type != "vera.orbis.EventRingDeleted" {
 			continue
 		}
 		typedEvent, err := sdk.ParseTypedEvent(event)
@@ -191,6 +192,7 @@ func TestMsgServer_CancelPendingRing_DeletesRingThroughBaseApp(t *testing.T) {
 		authority.String(),
 		accountKeeper,
 		nil,
+		nil,
 	)
 	orbistypes.RegisterMsgServer(bApp.MsgServiceRouter(), &orbisKeeper)
 
@@ -232,7 +234,7 @@ func TestMsgServer_CancelPendingRing_DeletesRingThroughBaseApp(t *testing.T) {
 
 	var ringDeletedEvent *orbistypes.EventRingDeleted
 	for _, event := range result.Events {
-		if event.Type != "sourcehub.orbis.EventRingDeleted" {
+		if event.Type != "vera.orbis.EventRingDeleted" {
 			continue
 		}
 		typedEvent, err := sdk.ParseTypedEvent(event)

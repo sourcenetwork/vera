@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 // TxFeeChecker validates provided fee and returns the effective fee and tx priority.
@@ -25,7 +25,7 @@ type CustomDeductFeeDecorator struct {
 	bankKeeper     types.BankKeeper
 	feegrantKeeper ante.FeegrantKeeper
 	txFeeChecker   TxFeeChecker
-	hubKeeper      HubKeeper
+	coreKeeper     CoreKeeper
 }
 
 // NewCustomDeductFeeDecorator initializes custom deduct fee decorator with a fee checker.
@@ -33,7 +33,7 @@ func NewCustomDeductFeeDecorator(
 	ak ante.AccountKeeper,
 	bk types.BankKeeper,
 	fk ante.FeegrantKeeper,
-	hk HubKeeper,
+	hk CoreKeeper,
 	tfc TxFeeChecker,
 ) CustomDeductFeeDecorator {
 
@@ -47,7 +47,7 @@ func NewCustomDeductFeeDecorator(
 		accountKeeper:  ak,
 		bankKeeper:     bk,
 		feegrantKeeper: fk,
-		hubKeeper:      hk,
+		coreKeeper:     hk,
 		txFeeChecker:   tfc,
 	}
 }
@@ -97,7 +97,7 @@ func (cdfd CustomDeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 // checkTxFeeWithMinGasPrices checks if the tx fee with denom fee multiplier >= min gas price of the validator.
 // Enforces the DefaultMinGasPrice to prevent spam if minimum gas price was set to 0 by the validator.
 // NOTE: Always returns 0 for transaction priority because we handle TxPriority in priority_lane.go.
-func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, hubKeeper HubKeeper) (sdk.Coins, int64, error) {
+func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, coreKeeper CoreKeeper) (sdk.Coins, int64, error) {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return nil, 0, errorsmod.Wrap(sdkerrors.ErrTxDecode, "tx must be a FeeTx")
@@ -108,7 +108,7 @@ func checkTxFeeWithMinGasPrices(ctx sdk.Context, tx sdk.Tx, hubKeeper HubKeeper)
 
 	// Allow zero-fee transactions if allowed by app config and the "--fees" flag is omitted
 	if fees.Empty() {
-		if hubKeeper != nil && hubKeeper.GetChainConfig(ctx).AllowZeroFeeTxs {
+		if coreKeeper != nil && coreKeeper.GetChainConfig(ctx).AllowZeroFeeTxs {
 			return fees, 0, nil
 		}
 		return nil, 0, sdkerrors.ErrInsufficientFee.Wrap("zero fees are not allowed")

@@ -3,7 +3,7 @@ package access_decision
 import (
 	"context"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 type Repository interface {

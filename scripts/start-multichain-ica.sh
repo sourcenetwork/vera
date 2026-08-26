@@ -2,13 +2,13 @@
 
 set -e
 
-BIN="build/sourcehubd"
+BIN="build/verad"
 
-CHAIN1_ID="sourcehub-1"
-CHAIN2_ID="sourcehub-2"
+CHAIN1_ID="vera-1"
+CHAIN2_ID="vera-2"
 
-C1V1_HOME="$HOME/.sourcehub-1-1"
-C2V1_HOME="$HOME/.sourcehub-2-1"
+C1V1_HOME="$HOME/.vera-1-1"
+C2V1_HOME="$HOME/.vera-2-1"
 HERMES_HOME="$HOME/.hermes"
 
 C1V1_GRPC=localhost:9091
@@ -42,7 +42,7 @@ if ! type "hermes" > /dev/null; then
 fi
 
 # Kill running processes
-killall sourcehubd 2>/dev/null || true
+killall verad 2>/dev/null || true
 killall hermes 2>/dev/null || true
 
 # Cleanup directories
@@ -60,7 +60,7 @@ cp scripts/hermes_config.toml "$HERMES_HOME/config.toml"
 # Build the binary
 make build # make build-mac
 
-echo "==> Initializing sourcehub-1..."
+echo "==> Initializing vera-1..."
 $BIN init $C1V1_NAME --chain-id $CHAIN1_ID --default-denom="uopen" --home="$C1V1_HOME"
 $BIN keys add $C1V1 --keyring-backend=test --home="$C1V1_HOME"
 VALIDATOR1_ADDR=$($BIN keys show $C1V1 -a --keyring-backend=test --home="$C1V1_HOME")
@@ -83,7 +83,7 @@ sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C1V1_HOME/config/con
 
 sleep 1
 
-echo "==> Initializing sourcehub-2..."
+echo "==> Initializing vera-2..."
 $BIN init $C2V1_NAME --chain-id $CHAIN2_ID --default-denom="uopen" --home="$C2V1_HOME"
 $BIN keys add $C2V1 --keyring-backend=test --home="$C2V1_HOME"
 VALIDATOR2_ADDR=$($BIN keys show $C2V1 -a --keyring-backend=test --home="$C2V1_HOME")
@@ -106,7 +106,7 @@ sed -i '' 's/^timeout_commit = .*/timeout_commit = "1s"/' "$C2V1_HOME/config/con
 
 sleep 1
 
-echo "==> Starting sourcehub-1..."
+echo "==> Starting vera-1..."
 $BIN start \
   --home $C1V1_HOME \
   --rpc.laddr $C1V1_RPC \
@@ -115,11 +115,11 @@ $BIN start \
   --grpc.address $C1V1_GRPC \
   --address $C1V1_ADDR \
   > chain_1_1.log 2>&1 &
-echo "sourcehub-1 running"
+echo "vera-1 running"
 
 sleep 1
 
-echo "==> Starting sourcehub-2..."
+echo "==> Starting vera-2..."
 $BIN start \
   --home $C2V1_HOME \
   --rpc.laddr $C2V1_RPC \
@@ -128,7 +128,7 @@ $BIN start \
   --grpc.address $C2V1_GRPC \
   --address $C2V1_ADDR \
   > chain_2_1.log 2>&1 &
-echo "sourcehub-2 running"
+echo "vera-2 running"
 
 sleep 10
 

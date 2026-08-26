@@ -18,11 +18,11 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis/module"
-	"github.com/sourcenetwork/sourcehub/app/metrics"
-	acpkeeper "github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/orbis/keeper"
-	"github.com/sourcenetwork/sourcehub/x/orbis/types"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/orbis/module"
+	"github.com/sourcenetwork/vera/app/metrics"
+	acpkeeper "github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/orbis/keeper"
+	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
 var (
@@ -132,6 +132,7 @@ type ModuleInputs struct {
 	Logger       log.Logger
 
 	AccountKeeper types.AccountKeeper
+	BankKeeper    types.BankKeeper
 	AcpKeeper     *acpkeeper.Keeper
 }
 
@@ -153,6 +154,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 		in.AccountKeeper,
+		in.BankKeeper,
 		in.AcpKeeper,
 	)
 	m := NewAppModule(in.Cdc, &k)

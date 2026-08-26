@@ -26,9 +26,9 @@ import (
 	txtestutil "github.com/cosmos/cosmos-sdk/x/auth/tx/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/golang/mock/gomock"
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	test "github.com/sourcenetwork/sourcehub/testutil"
-	hubtypes "github.com/sourcenetwork/sourcehub/types"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	test "github.com/sourcenetwork/vera/testutil"
+	veratypes "github.com/sourcenetwork/vera/types"
 	"github.com/stretchr/testify/require"
 )
 
@@ -85,8 +85,8 @@ func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 		runtime.NewKVStoreService(key),
 		types.ProtoBaseAccount,
 		maccPerms,
-		authcodec.NewBech32Codec(hubtypes.AccountAddrPrefix),
-		hubtypes.AccountAddrPrefix,
+		authcodec.NewBech32Codec(veratypes.AccountAddrPrefix),
+		veratypes.AccountAddrPrefix,
 		types.NewModuleAddress("gov").String(),
 	)
 	suite.accountKeeper.GetModuleAccount(suite.ctx, types.FeeCollectorName)

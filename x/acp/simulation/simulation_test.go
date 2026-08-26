@@ -20,10 +20,10 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/x/acp/keeper"
-	"github.com/sourcenetwork/sourcehub/x/acp/testutil"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
-	hubtestutil "github.com/sourcenetwork/sourcehub/x/hub/testutil"
+	"github.com/sourcenetwork/vera/x/acp/keeper"
+	"github.com/sourcenetwork/vera/x/acp/testutil"
+	"github.com/sourcenetwork/vera/x/acp/types"
+	coretestutil "github.com/sourcenetwork/vera/x/core/testutil"
 )
 
 func setupSimKeeper(t *testing.T) (sdk.Context, *keeper.Keeper) {
@@ -52,7 +52,7 @@ func setupSimKeeper(t *testing.T) (sdk.Context, *keeper.Keeper) {
 		authority.String(),
 		accKeeper,
 		&acpCapKeeper,
-		hubtestutil.NewHubKeeperStub(),
+		coretestutil.NewCoreKeeperStub(),
 	)
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger())

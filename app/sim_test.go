@@ -27,15 +27,15 @@ import (
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/sourcenetwork/sourcehub/x/feegrant"
+	"github.com/sourcenetwork/vera/x/feegrant"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 
-	"github.com/sourcenetwork/sourcehub/app"
+	"github.com/sourcenetwork/vera/app"
 )
 
 const (
-	SimAppChainID = "sourcehub-simapp"
+	SimAppChainID = "vera-simapp"
 )
 
 var FlagEnableStreamingValue bool

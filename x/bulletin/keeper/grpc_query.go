@@ -6,8 +6,8 @@ import (
 	"cosmossdk.io/store/prefix"
 	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/sourcenetwork/sourcehub/utils"
-	"github.com/sourcenetwork/sourcehub/x/bulletin/types"
+	"github.com/sourcenetwork/vera/utils"
+	"github.com/sourcenetwork/vera/x/bulletin/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

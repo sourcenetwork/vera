@@ -1,0 +1,24 @@
+syntax = "proto3";
+package vera.orbis;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "vera/orbis/ring.proto";
+
+option go_package = "github.com/sourcenetwork/vera/x/orbis/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "vera/x/orbis/Params";
+  option (gogoproto.equal) = true;
+
+  ReportingDefaults default_reporting = 1 [(gogoproto.nullable) = false];
+}
+
+// ReportingDefaults stores module defaults copied into rings at creation time.
+message ReportingDefaults {
+  option (gogoproto.equal) = true;
+
+  DemeritConfig demerit_config = 1 [(gogoproto.nullable) = false];
+  uint64 kick_threshold = 2;
+}

@@ -3,7 +3,7 @@ package orbis
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 
-	modulev1 "github.com/sourcenetwork/sourcehub/api/sourcehub/orbis"
+	modulev1 "github.com/sourcenetwork/vera/api/vera/orbis"
 )
 
 // AutoCLIOptions implements the autocli.HasAutoCLIConfig interface.
@@ -174,6 +174,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod:      "RemoveNodeFromWhitelist",
 					Use:            "remove-node-from-whitelist [node_key]",
 					Short:          "Remove one policy or ring from a node whitelist",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
+				},
+				{
+					RpcMethod:      "DrainNodeKey",
+					Use:            "drain-node-key [node_key]",
+					Short:          "Drain a node key's account balance to the controller key",
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "node_key"}},
 				},
 			},

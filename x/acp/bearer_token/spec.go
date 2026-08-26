@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	hubtypes "github.com/sourcenetwork/sourcehub/types"
-	"github.com/sourcenetwork/sourcehub/x/acp/did"
+	veratypes "github.com/sourcenetwork/vera/types"
+	"github.com/sourcenetwork/vera/x/acp/did"
 )
 
 func validateBearerTokenValues(token *BearerToken) error {
@@ -13,7 +13,7 @@ func validateBearerTokenValues(token *BearerToken) error {
 		return ErrInvalidIssuer
 	}
 
-	if err := hubtypes.IsValidSourceHubAddr(token.AuthorizedAccount); err != nil {
+	if err := veratypes.IsValidVeraAddr(token.AuthorizedAccount); err != nil {
 		return fmt.Errorf("%v: %w", err, ErrInvalidAuhtorizedAccount)
 	}
 

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/sourcenetwork/sourcehub/app/ante"
+	"github.com/sourcenetwork/vera/app/ante"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
-	test "github.com/sourcenetwork/sourcehub/testutil"
-	"github.com/sourcenetwork/sourcehub/testutil/sample"
+	appparams "github.com/sourcenetwork/vera/app/params"
+	test "github.com/sourcenetwork/vera/testutil"
+	"github.com/sourcenetwork/vera/testutil/sample"
 	"github.com/stretchr/testify/require"
 )
 

@@ -17,10 +17,10 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/sourcenetwork/sourcehub/app"
-	antetypes "github.com/sourcenetwork/sourcehub/app/ante/types"
-	"github.com/sourcenetwork/sourcehub/app/params"
-	appparams "github.com/sourcenetwork/sourcehub/app/params"
+	"github.com/sourcenetwork/vera/app"
+	antetypes "github.com/sourcenetwork/vera/app/ante/types"
+	"github.com/sourcenetwork/vera/app/params"
+	appparams "github.com/sourcenetwork/vera/app/params"
 )
 
 type TxBuilder struct {
@@ -69,13 +69,13 @@ func NewTxBuilder(opts ...TxBuilderOpt) (TxBuilder, error) {
 	return builder, nil
 }
 
-// Build builds a SourceHub Tx containing msgs in MsgSet.
+// Build builds a Vera Tx containing msgs in MsgSet.
 // The returned Tx can then be broadcast.
 func (b *TxBuilder) Build(ctx context.Context, signer TxSigner, set *MsgSet) (xauthsigning.Tx, error) {
 	return b.BuildFromMsgs(ctx, signer, set.GetMsgs()...)
 }
 
-// BuildFromMsgs builds a SourceHub Tx containing msgs.
+// BuildFromMsgs builds a Vera Tx containing msgs.
 // The returned Tx can then be broadcast.
 func (b *TxBuilder) BuildFromMsgs(ctx context.Context, signer TxSigner, msgs ...sdk.Msg) (xauthsigning.Tx, error) {
 	builder, err := b.initTx(ctx, signer, msgs...)
@@ -248,7 +248,7 @@ func (c *TxBuilder) getAccount(ctx context.Context, addr string) (authtypes.Base
 type TxBuilderOpt func(*TxBuilder) error
 
 // WithChainID specifies the ChainID to which the Tx will be signed to.
-// Defaults to the most recent SourceHub chain deployment
+// Defaults to the most recent Vera chain deployment
 func WithChainID(id string) TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.chainID = id
@@ -272,7 +272,7 @@ func WithMicroCredit() TxBuilderOpt {
 	}
 }
 
-// WithTestnetChainID specifies the ChainID to be SourceHub's latest test net
+// WithTestnetChainID specifies the ChainID to be Vera's latest test net
 func WithTestnetChainID() TxBuilderOpt {
 	return func(b *TxBuilder) error {
 		b.chainID = TestnetLatest
@@ -321,7 +321,7 @@ func WithFeeGranter(acc string) TxBuilderOpt {
 }
 
 // WithGRPCConnection sets the GRPC Connection to be used in the Builder.
-// The connection should point to a trusted  SourceHub node which will be used to perform
+// The connection should point to a trusted  Vera node which will be used to perform
 // Cosmos Query client queries.
 // Note: Cosmos queries are not verifiable therefore only trusted RPC nodes should be used.
 func WithAuthQueryClient(client authtypes.QueryClient) TxBuilderOpt {

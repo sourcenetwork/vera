@@ -15,7 +15,7 @@ func NewAnteHandler(
 	bankKeeper bankkeeper.Keeper,
 	feegrantKeeper ante.FeegrantKeeper,
 	channelKeeper *ibckeeper.Keeper,
-	hubKeeper HubKeeper,
+	coreKeeper CoreKeeper,
 	signModeHandler *signing.HandlerMap,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	TxEncoder sdk.TxEncoder,
@@ -29,7 +29,7 @@ func NewAnteHandler(
 		NewRejectLegacyTxDecorator(),
 		// Validates extension options and extracts DID for feegrant usage.
 		// Also stores JWS tokens for tracking and invalidation.
-		NewExtensionOptionsDecorator(hubKeeper),
+		NewExtensionOptionsDecorator(coreKeeper),
 		// Performs basic validation on the transaction.
 		ante.NewValidateBasicDecorator(),
 		// Ensures that the tx has not exceeded the height timeout.
@@ -41,7 +41,7 @@ func NewAnteHandler(
 		// Ensures that the fee payer has enough funds to pay for the tx, validates tx fees based on denom
 		// (e.g. ucredit fees are higher than uopen fees) and deducts the fees. Does not affect tx priority.
 		// Enforces DefaultMinGasPrice if min gas price was set to 0 by the validator to prevent spam.
-		NewCustomDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, hubKeeper, nil),
+		NewCustomDeductFeeDecorator(accountKeeper, bankKeeper, feegrantKeeper, coreKeeper, nil),
 		// Sets public keys in the context for the fee payer and signers. Must happen before signature checks.
 		ante.NewSetPubKeyDecorator(accountKeeper),
 		// Ensures that the number of signatures does not exceed the tx's signature limit.

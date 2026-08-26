@@ -7,7 +7,7 @@ import (
 	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
 	"github.com/sourcenetwork/acp_core/pkg/errors"
 	"github.com/sourcenetwork/raccoondb/v2/utils"
-	"github.com/sourcenetwork/sourcehub/x/acp/types"
+	"github.com/sourcenetwork/vera/x/acp/types"
 )
 
 // Overall this would work and is a nice abstraction wrt to the capability name,

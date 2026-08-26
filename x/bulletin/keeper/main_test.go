@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/sourcenetwork/sourcehub/app"
+	"github.com/sourcenetwork/vera/app"
 )
 
 func TestMain(m *testing.M) {
