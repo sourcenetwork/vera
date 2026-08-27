@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const validVeraAddr = "source19djduggm345yf2dn0y0jqqgkr5q0pt234dkyvd"
+const validVeraAddr = "vera19djduggm345yf2dn0y0jqqgkr5q0pt2398lkv2"
 const msgCreator = validVeraAddr
 
 // bearerValidationTestVector models a test case which generates a JWS from the BearerToken definition
@@ -119,7 +119,7 @@ func Test_AuthorizeMsg_Errors(t *testing.T) {
 				IssuerID:          validDID,
 				IssuedTime:        mustUnixTime("2024-06-17 14:00:00"),
 				ExpirationTime:    mustUnixTime("2024-06-17 14:20:00"),
-				AuthorizedAccount: "source1dsc8ah9rytxrzhq0suj994anwuhvq7yjeh67dp",
+				AuthorizedAccount: "vera1dsc8ah9rytxrzhq0suj994anwuhvq7yjfanvdx",
 			},
 			ExpectedError: ErrMsgUnauthorized,
 			Signer:        signer,

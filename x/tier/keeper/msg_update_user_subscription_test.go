@@ -22,10 +22,10 @@ func TestMsgUpdateUserSubscription(t *testing.T) {
 
 	userDid := "did:key:alice"
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	keepertest.InitializeDelegator(t, &k, sdkCtx, developerAddr, math.NewInt(10000))
@@ -163,10 +163,10 @@ func TestMsgUpdateUserSubscription_ProgressiveUpdates(t *testing.T) {
 
 	userDid := "did:key:alice"
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	keepertest.InitializeDelegator(t, &k, sdkCtx, developerAddr, math.NewInt(10000))
@@ -233,7 +233,7 @@ func TestMsgUpdateUserSubscription_NonExistentDeveloper(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	nonExistentDeveloperAddr := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
+	nonExistentDeveloperAddr := "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr"
 	userDid := "did:key:alice"
 
 	validAmount := uint64(100)

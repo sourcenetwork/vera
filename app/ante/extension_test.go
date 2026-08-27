@@ -789,7 +789,7 @@ func TestExtensionOptionsDecorator_IncorrectAuthorizedAccount(t *testing.T) {
 	require.NoError(t, s.txBuilder.SetMsgs(msg))
 
 	// Create JWS token with authorized account NOT matching the transaction signer
-	wrongAuthorizedAccount := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+	wrongAuthorizedAccount := "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"
 	bearerToken, _ := test.GenerateSignedJWSWithMatchingDID(t, wrongAuthorizedAccount)
 	jwsOpt := &antetypes.JWSExtensionOption{
 		BearerToken: bearerToken,

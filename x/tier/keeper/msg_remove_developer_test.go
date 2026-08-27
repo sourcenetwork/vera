@@ -20,7 +20,7 @@ func TestMsgRemoveDeveloper(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 	err := k.CreateDeveloper(ctx, developerAddr, true)
@@ -58,7 +58,7 @@ func TestMsgRemoveDeveloper(t *testing.T) {
 		{
 			name: "non-existent developer",
 			input: &types.MsgRemoveDeveloper{
-				Developer: "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer: "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 			},
 			expErr:    true,
 			expErrMsg: "remove developer",
@@ -110,10 +110,10 @@ func TestMsgRemoveDeveloper_WithSubscriptions(t *testing.T) {
 
 	userDid := "did:key:alice"
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	keepertest.InitializeDelegator(t, &k, sdkCtx, developerAddr, math.NewInt(5000))
@@ -153,7 +153,7 @@ func TestMsgRemoveDeveloper_AlreadyRemoved(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 	err := k.CreateDeveloper(ctx, developerAddr, true)

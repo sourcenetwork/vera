@@ -18,9 +18,9 @@ func TestSetAndGetLockup(t *testing.T) {
 	creationHeight := int64(10)
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
@@ -41,9 +41,9 @@ func TestAddLockup(t *testing.T) {
 
 	amount := math.NewInt(500)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, amount)
@@ -60,9 +60,9 @@ func TestSubtractLockup(t *testing.T) {
 	partialSubtractAmount := math.NewInt(500)
 	invalidSubtractAmount := math.NewInt(2000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, lockupAmount)
@@ -95,14 +95,14 @@ func TestGetAllLockups(t *testing.T) {
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 
-	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr1, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
-	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr2, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	k.setLockup(ctx, delAddr1, valAddr1, amount1)
@@ -129,14 +129,14 @@ func TestGetAllUnlockingLockups(t *testing.T) {
 	amount1 := math.NewInt(1000)
 	amount2 := math.NewInt(500)
 
-	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr1, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
-	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr2, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	k.SetUnlockingLockup(ctx, delAddr1, valAddr1, creationHeight1, amount1, timestamp1, timestamp1)
@@ -165,9 +165,9 @@ func TestMustIterateLockups(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, amount)
@@ -189,17 +189,17 @@ func TestMustIterateUnlockingLockups(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.SetUnlockingLockup(ctx, delAddr, valAddr, 1, amount, time.Time{}, time.Time{})
 
 	count := 0
 	k.mustIterateUnlockingLockups(ctx, func(delAddr sdk.AccAddress, valAddr sdk.ValAddress, creationHeight int64, lockup types.UnlockingLockup) {
-		require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", delAddr.String())
-		require.Equal(t, "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm", valAddr.String())
+		require.Equal(t, "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz", delAddr.String())
+		require.Equal(t, "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0", valAddr.String())
 		require.Equal(t, creationHeight, lockup.CreationHeight)
 		require.Equal(t, amount, lockup.Amount)
 		count++
@@ -217,14 +217,14 @@ func TestIterateUnlockingLockups(t *testing.T) {
 	timestamp4 := time.Date(2006, time.January, 2, 15, 4, 5, 4, time.UTC)
 	timestamp5 := time.Date(2006, time.January, 2, 15, 4, 5, 5, time.UTC)
 
-	delAddr1, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr1, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
-	delAddr2, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr2, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(1)
@@ -264,14 +264,14 @@ func TestIterateUnlockingLockups(t *testing.T) {
 func TestTotalAmountByAddr(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr1, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr1, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
-	delAddr2, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr2, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr1, valAddr1, math.NewInt(1000))
@@ -287,7 +287,7 @@ func TestTotalAmountByAddr(t *testing.T) {
 	totalDel2 := k.totalLockedAmountByAddr(ctx, delAddr2)
 	require.Equal(t, math.NewInt(700), totalDel2, "delAddr2 should have a total of 700")
 
-	delAddr3, err := sdk.AccAddressFromBech32("source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy")
+	delAddr3, err := sdk.AccAddressFromBech32("vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr")
 	require.NoError(t, err)
 	totalDel3 := k.totalLockedAmountByAddr(ctx, delAddr3)
 	require.True(t, totalDel3.IsZero(), "delAddr3 should have no lockups")
@@ -296,9 +296,9 @@ func TestTotalAmountByAddr(t *testing.T) {
 func TestHasLockup(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	require.False(t, k.hasLockup(ctx, delAddr, valAddr))
@@ -317,9 +317,9 @@ func TestHasUnlockingLockup(t *testing.T) {
 	creationHeight := int64(1)
 	timestamp := time.Date(2006, time.January, 2, 15, 4, 5, 1, time.UTC)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	require.False(t, k.HasUnlockingLockup(ctx, delAddr, valAddr, int64(1)))
@@ -341,9 +341,9 @@ func TestGetUnlockingLockup(t *testing.T) {
 	creationHeight := int64(10)
 	amount := math.NewInt(300)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
@@ -370,9 +370,9 @@ func TestGetLockup(t *testing.T) {
 	creationHeight := int64(10)
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(now)
@@ -386,7 +386,7 @@ func TestGetLockup(t *testing.T) {
 	require.Equal(t, valAddr.String(), lockup.ValidatorAddress, "validator address should match")
 	require.Equal(t, amount, lockup.Amount, "amount should match")
 
-	nonExistentValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	nonExistentValAddr, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	nonExistentLockup := k.GetLockup(ctx, delAddr, nonExistentValAddr)
@@ -403,9 +403,9 @@ func TestSubtractUnlockingLockup(t *testing.T) {
 	cancelUnlockAmount2 := math.NewInt(2000)
 	creationHeight := int64(10)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	ctx = ctx.WithBlockHeight(creationHeight).WithBlockTime(time.Now())
@@ -457,9 +457,9 @@ func TestAddLockupUpdatesTotalLockups(t *testing.T) {
 	amount1 := math.NewInt(500)
 	amount2 := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, amount1)
@@ -481,9 +481,9 @@ func TestSubtractLockupUpdatesTotalLockups(t *testing.T) {
 	initialAmount := math.NewInt(5000)
 	subtractAmount := math.NewInt(1500)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, initialAmount)
@@ -505,9 +505,9 @@ func TestRemoveLockupUpdatesTotalLockups(t *testing.T) {
 	initialAmount := math.NewInt(5000)
 	subtractAmount := math.NewInt(5000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	err = k.AddLockup(ctx, delAddr, valAddr, initialAmount)

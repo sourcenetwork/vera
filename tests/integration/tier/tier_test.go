@@ -47,7 +47,7 @@ func (s *BaseTierTestSuite) setupDeveloperWithLockup(developer sdk.AccAddress, l
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, lockAmount.MulRaw(1000))

@@ -59,7 +59,7 @@ func (s *AutoLockIntegrationTestSuite) TestAutoLockDisabledInsufficientCredits()
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(500))
 
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr := sdk.ValAddress("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1000000))
@@ -91,7 +91,7 @@ func (s *AutoLockIntegrationTestSuite) TestAutoLockEnabledWithLockup() {
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(10000000))
 
-	valAddr := sdk.ValAddress("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr := sdk.ValAddress("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1000000))
 
 	s.ctx = s.ctx.WithBlockHeight(1).WithBlockTime(time.Now())
@@ -119,7 +119,7 @@ func (s *AutoLockIntegrationTestSuite) TestAutoLockEnabledWithSufficientCredits(
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2000))
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeValidator(s.T(), s.keeper.GetStakingKeeper().(*stakingkeeper.Keeper), s.ctx, valAddr, math.NewInt(1_000_000))

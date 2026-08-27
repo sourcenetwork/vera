@@ -55,9 +55,9 @@ type AnteTestSuite struct {
 // SetupTest inits a new test, with new app, context, and anteHandler.
 func SetupTestSuite(t *testing.T, isCheckTx bool) *AnteTestSuite {
 	sdkConfig := sdk.GetConfig()
-	sdkConfig.SetBech32PrefixForAccount("source", "sourcepub")
-	sdkConfig.SetBech32PrefixForValidator("sourcevaloper", "sourcevaloperpub")
-	sdkConfig.SetBech32PrefixForConsensusNode("sourcevalcons", "sourcevalconspub")
+	sdkConfig.SetBech32PrefixForAccount(veratypes.AccountAddrPrefix, veratypes.AccountAddrPrefix+"pub")
+	sdkConfig.SetBech32PrefixForValidator(veratypes.AccountAddrPrefix+"valoper", veratypes.AccountAddrPrefix+"valoperpub")
+	sdkConfig.SetBech32PrefixForConsensusNode(veratypes.AccountAddrPrefix+"valcons", veratypes.AccountAddrPrefix+"valconspub")
 
 	suite := &AnteTestSuite{}
 	ctrl := gomock.NewController(t)

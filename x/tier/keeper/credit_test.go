@@ -37,13 +37,13 @@ func TestMintCredit(t *testing.T) {
 	}{
 		{
 			name:    "Mint valid credit",
-			addr:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+			addr:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 			amt:     100,
 			wantErr: false,
 		},
 		{
 			name:    "Mint zero credit",
-			addr:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+			addr:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 			amt:     0,
 			wantErr: true,
 		},
@@ -333,8 +333,8 @@ func TestProratedCredit(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	delAddr := sdk.MustAccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	delAddr := sdk.MustAccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	for _, tc := range cases {
@@ -373,7 +373,7 @@ func TestBurnAllCredits(t *testing.T) {
 		{
 			name: "Burn all credits successfully (single address)",
 			lockups: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100,
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 100,
 			},
 			openBalances: map[string]int64{},
 			wantErr:      false,
@@ -387,8 +387,8 @@ func TestBurnAllCredits(t *testing.T) {
 		{
 			name: "Multiple addresses with credits",
 			lockups: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 50,
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 150,
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 50,
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": 150,
 			},
 			openBalances: map[string]int64{},
 			wantErr:      false,
@@ -396,18 +396,18 @@ func TestBurnAllCredits(t *testing.T) {
 		{
 			name: "Burn credits when addresses also hold uopen",
 			lockups: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 80,
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 200,
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 80,
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": 200,
 			},
 			openBalances: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 9999,
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": 888,
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 9999,
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": 888,
 			},
 			wantErr: false,
 		},
 	}
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	for _, tt := range tests {
@@ -472,10 +472,10 @@ func TestResetAllCredits(t *testing.T) {
 		{
 			name: "Reset all credits successfully (single address, single lockup)",
 			lockups: map[string][]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {100},
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": {100},
 			},
 			expectedCredit: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100,
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 100,
 			},
 			wantErr: false,
 		},
@@ -488,57 +488,57 @@ func TestResetAllCredits(t *testing.T) {
 		{
 			name: "Multiple addresses with multiple lockups",
 			lockups: map[string][]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {50, 50},
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {10, 20},
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {10, 10, 30},
-				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": {50, 50},
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": {10, 20},
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": {10, 10, 30},
+				"vera1cy0p47z24ejzvq55pu3lesxwf73xnrndl4d5m7": {},
 			},
 			expectedCredit: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 100, // 50 + 50
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 30,  // 10 + 20
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": 50,  // 10 + 10 + 30
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 100, // 50 + 50
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": 30,  // 10 + 20
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": 50,  // 10 + 10 + 30
 			},
 			wantErr: false,
 		},
 		{
 			name: "Multiple addresses with multiple lockups (with reward rates)",
 			lockups: map[string][]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {100, 100},
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {100, 200, 300},
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {500, 1000},
-				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": {100, 100},
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": {100, 200, 300},
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": {500, 1000},
+				"vera1cy0p47z24ejzvq55pu3lesxwf73xnrndl4d5m7": {},
 			},
 			expectedCredit: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 210,  // 100 + 100 + (10 rewards)
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 780,  // 100 + 200 + 300 + (180 rewards)
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": 2130, // 500 + 1000 + (630 rewards)
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 210,  // 100 + 100 + (10 rewards)
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": 780,  // 100 + 200 + 300 + (180 rewards)
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": 2130, // 500 + 1000 + (630 rewards)
 			},
 			wantErr: false,
 		},
 		{
 			name: "Multiple addresses with multiple lockups (with reward rates) and insurance lockups",
 			lockups: map[string][]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {100, 100},
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {100, 200, 300},
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {500, 1000},
-				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": {100, 100},
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": {100, 200, 300},
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": {500, 1000},
+				"vera1cy0p47z24ejzvq55pu3lesxwf73xnrndl4d5m7": {},
 			},
 			insuranceLockups: map[string][]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": {10},
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": {20},
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": {30},
-				"source1cy0p47z24ejzvq55pu3lesxwf73xnrnd0lyxme": {},
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": {10},
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": {20},
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": {30},
+				"vera1cy0p47z24ejzvq55pu3lesxwf73xnrndl4d5m7": {},
 			},
 			expectedCredit: map[string]int64{
-				"source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et": 222,  // 100 + 100 + 10 + (12 rewards)
-				"source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9": 810,  // 100 + 200 + 300 + 20 + (190 rewards)
-				"source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy": 2175, // 500 + 1000 + 30 (645 rewards)
+				"vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev": 222,  // 100 + 100 + 10 + (12 rewards)
+				"vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz": 810,  // 100 + 200 + 300 + 20 + (190 rewards)
+				"vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr": 2175, // 500 + 1000 + 30 (645 rewards)
 			},
 			wantErr: false,
 		},
 	}
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	for _, tt := range tests {

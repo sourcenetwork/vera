@@ -23,9 +23,9 @@ func TestBeginBlocker(t *testing.T) {
 
 	insurancePoolBalance := math.NewInt(500_000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(20_000_000_000_000)
@@ -68,11 +68,11 @@ func TestHandleSlashingEvents(t *testing.T) {
 	tierModuleAddr := authtypes.NewModuleAddress(types.ModuleName)
 	insurancePoolAddr := authtypes.NewModuleAddress(types.InsurancePoolName)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	delAddr2, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr2, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)

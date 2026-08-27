@@ -48,7 +48,7 @@ func TestFaucetRequest(t *testing.T) {
 	})
 
 	t.Run("FaucetRequest", func(t *testing.T) {
-		testAddress := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+		testAddress := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 		request := &faucettypes.FaucetRequest{
 			Address: testAddress,
@@ -148,7 +148,7 @@ func TestFaucetInitAccount(t *testing.T) {
 	})
 
 	t.Run("FaucetInitAccount", func(t *testing.T) {
-		testAddress := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+		testAddress := "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"
 
 		request := &faucettypes.InitAccountRequest{
 			Address: testAddress,
@@ -249,7 +249,7 @@ func TestFaucetGrantAllowance(t *testing.T) {
 	})
 
 	t.Run("FaucetGrantAllowance", func(t *testing.T) {
-		testAddress := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+		testAddress := "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"
 
 		request := &faucettypes.GrantAllowanceRequest{
 			Address: testAddress,

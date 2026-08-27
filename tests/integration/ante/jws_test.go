@@ -61,7 +61,7 @@ func TestJWSExtensionOptionWithDIDBasedFeegrant(t *testing.T) {
 
 	// Add DID-based allowance from validator to DID
 	valAddr := sdk.AccAddress(val.Address)
-	faucetAddr := sdk.MustAccAddressFromBech32("source12d9hjf0639k995venpv675sju9ltsvf8u5c9jt")
+	faucetAddr := sdk.MustAccAddressFromBech32("vera12d9hjf0639k995venpv675sju9ltsvf8v73hjv")
 
 	// Create basic allowance for the DID
 	basicAllowance := &feegrant.BasicAllowance{
