@@ -2299,7 +2299,7 @@ func (s preInvalidProofStatementFields) encode() []byte {
 	w.writeBytes(s.proof)
 	w.writeString(s.cryptoBackend)
 	w.writeOptionalU64(nil) // timestamp: none of these fixtures exercise it
-	w.writeBool(false)      // inline_document: none of these fixtures exercise the inline-document path
+	w.writeBool(false)      // document_inline: none of these fixtures exercise the inline-document path
 	statement, err := w.finish()
 	if err != nil {
 		panic(err)
@@ -2827,7 +2827,7 @@ func (s relayRequestStatementFields) encode() []byte {
 	w.writeOptionalU64(s.validWindowStart)
 	w.writeOptionalU64(s.validWindowEnd)
 	w.writeOptionalU64(s.timestamp)
-	w.writeBool(false) // inline_document: none of these fixtures exercise the inline-document path
+	w.writeBool(false) // document_inline: none of these fixtures exercise the inline-document path
 	statement, err := w.finish()
 	if err != nil {
 		panic(err)
