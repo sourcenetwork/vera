@@ -44,6 +44,6 @@ var (
 	ErrRingTrustedAuthRelayNotFound = sdkerrors.Register(ModuleName, 1241, "trusted auth relay is not configured on ring")
 	ErrRingAuthRelaysDisabled       = sdkerrors.Register(ModuleName, 1242, "trusted auth relays are disabled for ring")
 	ErrRingAuthRelayExists          = sdkerrors.Register(ModuleName, 1243, "trusted auth relay is already configured on ring")
-	ErrNodeKeyBalanceEmpty        = sdkerrors.Register(ModuleName, 1244, "node key account has no spendable balance to drain")
-
+	ErrNodeKeyBalanceEmpty          = sdkerrors.Register(ModuleName, 1244, "node key account has no spendable balance to drain")
+	ErrReshareNotInProgress         = sdkerrors.Register(ModuleName, 1245, "no reshare in progress to cancel")
 )

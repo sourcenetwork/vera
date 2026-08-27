@@ -25,6 +25,7 @@ service Msg {
   rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
+  rpc CancelRingReshareByAcp(MsgCancelRingReshareByAcp) returns (MsgCancelRingReshareByAcpResponse);
   rpc SetRingReportingByAcp(MsgSetRingReportingByAcp) returns (MsgSetRingReportingByAcpResponse);
   // Adds a trusted authentication relay to a ring.
   rpc AddRingTrustedAuthRelayByAcp(MsgAddRingTrustedAuthRelayByAcp) returns (MsgAddRingTrustedAuthRelayByAcpResponse);
@@ -116,6 +117,14 @@ message MsgStartRingReshareByAcp {
 }
 
 message MsgStartRingReshareByAcpResponse {}
+
+message MsgCancelRingReshareByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+}
+
+message MsgCancelRingReshareByAcpResponse {}
 
 message MsgSetRingPssIntervalByAcp {
   option (cosmos.msg.v1.signer) = "creator";
