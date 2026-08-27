@@ -372,6 +372,9 @@ func (UnimplementedMsgServer) CancelRingUpgradeByAcp(context.Context, *MsgCancel
 func (UnimplementedMsgServer) CancelRingReshareByAcp(context.Context, *MsgCancelRingReshareByAcp) (*MsgCancelRingReshareByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelRingReshareByAcp not implemented")
 }
+func (UnimplementedMsgServer) CancelRingReshareByAcp(context.Context, *MsgCancelRingReshareByAcp) (*MsgCancelRingReshareByAcpResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CancelRingReshareByAcp not implemented")
+}
 func (UnimplementedMsgServer) SetRingReportingByAcp(context.Context, *MsgSetRingReportingByAcp) (*MsgSetRingReportingByAcpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetRingReportingByAcp not implemented")
 }

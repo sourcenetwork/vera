@@ -318,7 +318,7 @@ func (k *Keeper) StartRingReshareByAcp(goCtx context.Context, msg *types.MsgStar
 // CancelRingReshareByAcp clears a ring's pending reshare (NewPeerNodeKeys/XNewThreshold)
 // without applying them, reverting to the current committee/threshold. This is a general
 // escape hatch for a reshare that can never finalize (e.g. the new committee can't complete
-// the DKG ceremony) — SourceHub otherwise has no way to un-stick a ring once a reshare is
+// the DKG ceremony) — Vera otherwise has no way to un-stick a ring once a reshare is
 // pending, since validateStartRingReshare unconditionally rejects a new attempt while one is
 // in progress. Deliberately does not touch ring.Reporting.BackupNodeKeys: if the pending
 // reshare originated from the auto-kick path, the promoted backup was already permanently
