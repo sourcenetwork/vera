@@ -36,8 +36,8 @@ func TestMsgUnlock(t *testing.T) {
 	initialDelegatorBalance := math.NewInt(2000)
 	initialValidatorBalance := math.NewInt(1000)
 
-	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	valAddr := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
+	delAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
+	valAddr := "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0"
 
 	delAddress, err := sdk.AccAddressFromBech32(delAddr)
 	require.NoError(t, err)
@@ -108,7 +108,7 @@ func TestMsgUnlock(t *testing.T) {
 		{
 			name: "non-existent lockup",
 			input: &types.MsgUnlock{
-				DelegatorAddress: "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				DelegatorAddress: "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				ValidatorAddress: valAddr,
 				Stake:            validCoin,
 			},

@@ -118,10 +118,12 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 
 	cdc := codec.NewProtoCodec(registry)
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)
-	bech32Prefix := "source"
+	bech32Prefix := "vera"
 	addressCodec := authcodec.NewBech32Codec(bech32Prefix)
 	valOperCodec := authcodec.NewBech32Codec(bech32Prefix + "valoper")
 	valConsCodec := authcodec.NewBech32Codec(bech32Prefix + "valcons")
+	authorityStr, err := addressCodec.BytesToString(authority)
+	require.NoError(t, err)
 
 	maccPerms := map[string][]string{
 		authtypes.FeeCollectorName:     nil,
@@ -141,7 +143,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		maccPerms,
 		addressCodec,
 		bech32Prefix,
-		authority.String(),
+		authorityStr,
 	)
 
 	blockedAddrs := make(map[string]bool)
@@ -153,7 +155,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		runtime.NewKVStoreService(bankStoreKey),
 		authKeeper,
 		blockedAddrs,
-		authority.String(),
+		authorityStr,
 		log.NewNopLogger(),
 	)
 
@@ -195,7 +197,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		runtime.NewKVStoreService(stakingStoreKey),
 		authKeeper,
 		bankKeeper,
-		authority.String(),
+		authorityStr,
 		valOperCodec,
 		valConsCodec,
 	)
@@ -211,7 +213,7 @@ func setupKeeper(t testing.TB) (Keeper, sdk.Context) {
 		bankKeeper,
 		stakingKeeper,
 		authtypes.FeeCollectorName,
-		authority.String(),
+		authorityStr,
 	)
 
 	epochsKeeper := epochskeeper.NewKeeper(

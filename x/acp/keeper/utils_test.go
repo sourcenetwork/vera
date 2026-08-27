@@ -36,7 +36,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 	})
 
 	t.Run("valid address but account not found", func(t *testing.T) {
-		nonExistentAddr := "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+		nonExistentAddr := "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"
 
 		did, err := k.IssueDIDFromAccountAddr(ctx, nonExistentAddr)
 		require.Error(t, err)
@@ -61,7 +61,7 @@ func TestIssueDIDFromAccountAddr(t *testing.T) {
 	})
 
 	t.Run("ICA address without account should still fail", func(t *testing.T) {
-		icaAddress := "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy"
+		icaAddress := "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr"
 		controllerAddress := "shinzo1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
 		controllerChainID := "shinzo-1"
 		connectionID := "connection-1"

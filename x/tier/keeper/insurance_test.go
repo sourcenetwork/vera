@@ -14,9 +14,9 @@ func TestGetAllInsuranceLockups(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, amount)
@@ -33,9 +33,9 @@ func TestAddInsuranceLockup_New(t *testing.T) {
 
 	amount := math.NewInt(500)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.AddInsuranceLockup(ctx, delAddr, valAddr, amount)
@@ -49,9 +49,9 @@ func TestAddInsuranceLockup_Append(t *testing.T) {
 
 	amount := math.NewInt(800)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, math.NewInt(500))
@@ -66,9 +66,9 @@ func TestGetInsuranceLockup(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, amount)
@@ -81,9 +81,9 @@ func TestGetInsuranceLockup(t *testing.T) {
 func TestGetInsuranceLockup_NotFound(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	lockup := k.getInsuranceLockup(ctx, delAddr, valAddr)
@@ -93,9 +93,9 @@ func TestGetInsuranceLockup_NotFound(t *testing.T) {
 func TestGetInsuranceLockupAmount_ZeroIfNotFound(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	insuredAmt := k.getInsuranceLockupAmount(ctx, delAddr, valAddr)
@@ -107,9 +107,9 @@ func TestSetInsuranceLockup(t *testing.T) {
 
 	amount := math.NewInt(1500)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, amount)
@@ -123,9 +123,9 @@ func TestRemoveInsuranceLockup(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, amount)
@@ -142,11 +142,11 @@ func TestTotalInsuredAmountByAddr(t *testing.T) {
 	amount2 := math.NewInt(500)
 	amount3 := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr1, amount1)
@@ -162,9 +162,9 @@ func TestMustIterateInsuranceLockups(t *testing.T) {
 
 	amount := math.NewInt(5000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	k.setInsuranceLockup(ctx, delAddr, valAddr, amount)

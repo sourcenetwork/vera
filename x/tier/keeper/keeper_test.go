@@ -20,9 +20,9 @@ func TestLock(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
@@ -63,11 +63,11 @@ func TestLockAuto(t *testing.T) {
 
 	amount := math.NewInt(1000)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr1, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr1, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	valAddr2, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	valAddr2, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(5000)
@@ -142,9 +142,9 @@ func TestUnlock(t *testing.T) {
 	unlockAmount := math.NewInt(500)
 	invalidUnlockAmount := math.NewInt(-500)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
@@ -192,11 +192,11 @@ func TestRedelegate(t *testing.T) {
 	amount := math.NewInt(1000)
 	invalidAmount := math.NewInt(-100)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
-	srcValAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	srcValAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	dstValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	dstValAddr, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(2000)
@@ -242,9 +242,9 @@ func TestCompleteUnlocking(t *testing.T) {
 	lockAmount := math.NewInt(123_456)
 	unlockAmount := math.NewInt(123_456)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
@@ -325,9 +325,9 @@ func TestCancelUnlocking(t *testing.T) {
 	partialUnlockAmount := math.NewInt(200)
 	remainingUnlockAmount := math.NewInt(300)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	delAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initialDelegatorBalance := math.NewInt(200_000)
@@ -435,7 +435,7 @@ func TestCancelUnlocking(t *testing.T) {
 func TestCreateDeveloper(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	err = k.CreateDeveloper(ctx, developerAddr, true)
@@ -455,7 +455,7 @@ func TestCreateDeveloper(t *testing.T) {
 func TestUpdateDeveloper(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	err = k.CreateDeveloper(ctx, developerAddr, true)
@@ -479,7 +479,7 @@ func TestUpdateDeveloper(t *testing.T) {
 func TestRemoveDeveloper(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	err = k.RemoveDeveloper(ctx, developerAddr)
@@ -503,9 +503,9 @@ func TestRemoveDeveloper(t *testing.T) {
 func TestAddUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -540,9 +540,9 @@ func TestAddUserSubscription(t *testing.T) {
 func TestUpdateUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -587,9 +587,9 @@ func TestUpdateUserSubscription(t *testing.T) {
 func TestRemoveUserSubscription(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -625,9 +625,9 @@ func TestRemoveUserSubscription(t *testing.T) {
 func TestAddUserSubscriptionAutoLock(t *testing.T) {
 	k, ctx := keepertest.TierKeeper(t)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 

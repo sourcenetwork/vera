@@ -16,7 +16,7 @@ func TestMsgCreateDeveloper(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	testCases := []struct {
 		name      string
@@ -100,7 +100,7 @@ func TestMsgCreateDeveloper_DuplicateDeveloper(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	msg := &types.MsgCreateDeveloper{
 		Developer:       validDeveloperAddr,

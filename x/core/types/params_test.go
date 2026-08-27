@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testRelayAddress = "source1r5v5srda7xfth3hn2s26txvrcrntldjuac798p"
+const testRelayAddress = "vera1r5v5srda7xfth3hn2s26txvrcrntldjudjhh8x"
 
 func TestParamsValidateTrustedRelayFeeGranters(t *testing.T) {
 	require.NoError(t, DefaultParams().Validate())
@@ -18,5 +18,5 @@ func TestParamsValidateTrustedRelayFeeGranters(t *testing.T) {
 func TestParamsIsTrustedRelayFeeGranter(t *testing.T) {
 	params := Params{TrustedRelayFeeGranters: []string{testRelayAddress}}
 	require.True(t, params.IsTrustedRelayFeeGranter(testRelayAddress))
-	require.False(t, params.IsTrustedRelayFeeGranter("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"))
+	require.False(t, params.IsTrustedRelayFeeGranter("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"))
 }

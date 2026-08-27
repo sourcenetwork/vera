@@ -17,6 +17,7 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/gogoproto/proto"
+	veratypes "github.com/sourcenetwork/vera/types"
 	"github.com/stretchr/testify/require"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -54,7 +55,9 @@ func CreateTestValidator(
 		math.LegacyMustNewDecFromStr("0.01"), // max change rate
 	)
 
-	validator, err := stakingtypes.NewValidator(operatorAddress.String(), pubKey, description)
+	operatorAddressStr, err := stakingKeeper.ValidatorAddressCodec().BytesToString(operatorAddress)
+	require.NoError(t, err)
+	validator, err := stakingtypes.NewValidator(operatorAddressStr, pubKey, description)
 	require.NoError(t, err)
 
 	validator.Commission = commission
@@ -70,8 +73,8 @@ func CreateTestEncodingConfig() EncodingConfig {
 	interfaceRegistry, err := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
 		ProtoFiles: proto.HybridResolver,
 		SigningOptions: txsigning.Options{
-			AddressCodec:          addresscodec.NewBech32Codec("source"),
-			ValidatorAddressCodec: addresscodec.NewBech32Codec("sourcevaloper"),
+			AddressCodec:          addresscodec.NewBech32Codec(veratypes.AccountAddrPrefix),
+			ValidatorAddressCodec: addresscodec.NewBech32Codec(veratypes.AccountAddrPrefix + "valoper"),
 		},
 	})
 	if err != nil {

@@ -1,3 +1,3 @@
 package types
 
-const AccountAddrPrefix = "source"
+const AccountAddrPrefix = "vera"

@@ -37,9 +37,9 @@ func TestMsgLockAuto(t *testing.T) {
 	initialDelegatorBalance := math.NewInt(2000)
 	initialValidatorBalance := math.NewInt(1000)
 
-	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	valAddr1 := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
-	valAddr2 := "sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f"
+	delAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
+	valAddr1 := "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0"
+	valAddr2 := "veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa"
 
 	delAddress, err := sdk.AccAddressFromBech32(delAddr)
 	require.NoError(t, err)
@@ -155,9 +155,9 @@ func TestMsgLockAutoValidatorSelection(t *testing.T) {
 	}
 	k.GetEpochsKeeper().SetEpochInfo(ctx, epoch)
 
-	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	valAddr1 := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
-	valAddr2 := "sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f"
+	delAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
+	valAddr1 := "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0"
+	valAddr2 := "veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa"
 
 	delAddress, err := sdk.AccAddressFromBech32(delAddr)
 	require.NoError(t, err)

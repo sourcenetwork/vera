@@ -37,9 +37,9 @@ func TestMsgRedelegate(t *testing.T) {
 	initialSrcValidatorBalance := math.NewInt(1000)
 	initialDstValidatorBalance := math.NewInt(500)
 
-	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	srcValAddr := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
-	dstValAddr := "sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f"
+	delAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
+	srcValAddr := "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0"
+	dstValAddr := "veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa"
 
 	delAddress, err := sdk.AccAddressFromBech32(delAddr)
 	require.NoError(t, err)
@@ -117,7 +117,7 @@ func TestMsgRedelegate(t *testing.T) {
 		{
 			name: "non-existent lockup",
 			input: &types.MsgRedelegate{
-				DelegatorAddress:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				DelegatorAddress:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				SrcValidatorAddress: srcValAddr,
 				DstValidatorAddress: dstValAddr,
 				Stake:               validCoin,

@@ -45,7 +45,7 @@ func TestEdgeCasesTestSuite(t *testing.T) {
 
 func (s *EdgeCasesTestSuite) TestInvalidDeveloperAddressInCreateDeveloper() {
 	msg := &tiertypes.MsgCreateDeveloper{
-		Developer:       "source1invalidaddress123456789012345678901234567890",
+		Developer:       "vera1invalidaddress123456789012345678901234567890",
 		AutoLockEnabled: true,
 	}
 
@@ -98,7 +98,7 @@ func (s *EdgeCasesTestSuite) TestMaximumAmountSubscription() {
 
 	maxBalance := math.NewInt(1000000000000000000)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, maxBalance)
@@ -136,7 +136,7 @@ func (s *EdgeCasesTestSuite) TestMaximumPeriodValue() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -175,7 +175,7 @@ func (s *EdgeCasesTestSuite) TestMultipleSubscriptionsForSameUser() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(1_000_000))
@@ -218,7 +218,7 @@ func (s *EdgeCasesTestSuite) TestUpdateThenRemoveSubscription() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(1_000_000))
@@ -269,7 +269,7 @@ func (s *EdgeCasesTestSuite) TestDeveloperRemovalCleansUpAllState() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -333,7 +333,7 @@ func (s *EdgeCasesTestSuite) TestSubscriptionAmountsAndTotalsAreConsistent() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -396,7 +396,7 @@ func (s *EdgeCasesTestSuite) TestDeveloperWithManySubscriptions() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))

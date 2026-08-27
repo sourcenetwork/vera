@@ -16,7 +16,7 @@ func TestMsgUpdateDeveloper(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 	err := k.CreateDeveloper(ctx, developerAddr, false)
@@ -65,7 +65,7 @@ func TestMsgUpdateDeveloper(t *testing.T) {
 		{
 			name: "non-existent developer (should fail)",
 			input: &types.MsgUpdateDeveloper{
-				Developer:       "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer:       "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				AutoLockEnabled: true,
 			},
 			expErr:    true,
@@ -109,7 +109,7 @@ func TestMsgUpdateDeveloper_ToggleAutoLock(t *testing.T) {
 	p := types.DefaultParams()
 	require.NoError(t, k.SetParams(ctx, p))
 
-	validDeveloperAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
+	validDeveloperAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
 
 	developerAddr := sdk.MustAccAddressFromBech32(validDeveloperAddr)
 	err := k.CreateDeveloper(ctx, developerAddr, false)
