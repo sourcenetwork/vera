@@ -46,7 +46,7 @@ type testDelegation struct {
 
 func (td testDelegation) GetValidatorAddr() string { return td.validatorAddr }
 func (td testDelegation) GetDelegatorAddr() string {
-	return "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et"
+	return "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev"
 }
 func (td testDelegation) GetShares() math.LegacyDec { return math.LegacyOneDec() }
 func (td testDelegation) GetBondedTokens() math.Int { return math.ZeroInt() }
@@ -87,7 +87,7 @@ func (suite *KeeperTestSuite) SetupTest() {
 	err := suite.tierKeeper.SetParams(suite.ctx, types.DefaultParams())
 	suite.Require().NoError(err)
 
-	suite.valAddr, _ = sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	suite.valAddr, _ = sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 }
 
 // TestLock is using mock keepers to verify that required function calls are made as expected on Lock().
@@ -97,9 +97,9 @@ func (suite *KeeperTestSuite) TestLock() {
 	coins := sdk.NewCoins(sdk.NewCoin(appparams.DefaultBondDenom, amount))
 	creditCoins := sdk.NewCoins(sdk.NewCoin(appparams.MicroCreditDenom, math.NewInt(230)))
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	suite.Require().NoError(err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	suite.Require().NoError(err)
 
 	validator := stakingtypes.Validator{
@@ -161,9 +161,9 @@ func (suite *KeeperTestSuite) TestUnlock() {
 	expectedCompletionTime := suite.ctx.BlockTime().Add(time.Hour * 24 * 21)
 	expectedUnlockTime := suite.ctx.BlockTime().Add(time.Duration(params.UnlockingEpochs) * *params.EpochDuration)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	suite.Require().NoError(err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	suite.Require().NoError(err)
 
 	// confirm that keeper methods are called as expected
@@ -217,11 +217,11 @@ func (suite *KeeperTestSuite) TestRedelegate() {
 	shares := math.LegacyNewDecFromInt(amount)
 	expectedCompletionTime := suite.ctx.BlockTime().Add(time.Hour * 24 * 21)
 
-	delAddr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	delAddr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	suite.Require().NoError(err)
-	srcValAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	srcValAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	suite.Require().NoError(err)
-	dstValAddr, err := sdk.ValAddressFromBech32("sourcevaloper13fj7t2yptf9k6ad6fv38434znzay4s4pjk0r4f")
+	dstValAddr, err := sdk.ValAddressFromBech32("veravaloper13fj7t2yptf9k6ad6fv38434znzay4s4pp0cewa")
 	suite.Require().NoError(err)
 
 	// add initial lockup to the source validator

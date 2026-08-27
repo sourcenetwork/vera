@@ -16,7 +16,7 @@ import (
 func TestGetAndSetDeveloper(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	developer := k.GetDeveloper(ctx, developerAddr)
@@ -37,7 +37,7 @@ func TestGetAndSetDeveloper(t *testing.T) {
 func TestRemoveDeveloper(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	developer := &types.Developer{
@@ -58,7 +58,7 @@ func TestRemoveDeveloper(t *testing.T) {
 func TestGetAndSetUserSubscription(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -92,7 +92,7 @@ func TestGetAndSetUserSubscription(t *testing.T) {
 func TestRemoveUserSubscription(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -121,9 +121,9 @@ func TestRemoveUserSubscription(t *testing.T) {
 func TestMustIterateUserSubscriptions(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	dev1Addr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	dev1Addr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	dev2Addr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	dev2Addr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
 	user1Did := "did:key:alice"
 	user2Did := "did:key:bob"
@@ -179,9 +179,9 @@ func TestMustIterateUserSubscriptions(t *testing.T) {
 func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	dev1Addr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	dev1Addr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	dev2Addr, err := sdk.AccAddressFromBech32("source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et")
+	dev2Addr, err := sdk.AccAddressFromBech32("vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev")
 	require.NoError(t, err)
 	user1Did := "did:key:alice"
 	user2Did := "did:key:bob"
@@ -236,7 +236,7 @@ func TestMustIterateUserSubscriptionsForDeveloper(t *testing.T) {
 func TestGetTotalDevGranted(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	total, err := k.getTotalDevGranted(ctx, developerAddr)
@@ -255,7 +255,7 @@ func TestGetTotalDevGranted(t *testing.T) {
 func TestUpdateDeveloperTotalGranted(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	total, err := k.getTotalDevGranted(ctx, developerAddr)
@@ -291,9 +291,9 @@ func TestUpdateDeveloperTotalGranted(t *testing.T) {
 func TestValidateDeveloperCredits(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initializeDelegator(t, &k, ctx, developerAddr, math.NewInt(1400))
@@ -320,9 +320,9 @@ func TestValidateDeveloperCredits(t *testing.T) {
 func TestGrantPeriodicAllowance(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	granterAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	granterAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -352,9 +352,9 @@ func TestGrantPeriodicAllowance(t *testing.T) {
 func TestExpireAllowance(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	granterAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	granterAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -416,9 +416,9 @@ func TestExpireAllowance(t *testing.T) {
 func TestCheckDeveloperCredits(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 	userDid := "did:key:alice"
 
@@ -469,9 +469,9 @@ func TestCheckDeveloperCredits(t *testing.T) {
 func TestAutoLockDeveloperCredits(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initializeDelegator(t, &k, ctx, developerAddr, math.NewInt(1000))
@@ -497,12 +497,12 @@ func TestAutoLockDeveloperCredits(t *testing.T) {
 func TestAddLockupForRegistration(t *testing.T) {
 	k, ctx := setupKeeper(t)
 
-	developerAddr, err := sdk.AccAddressFromBech32("source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9")
+	developerAddr, err := sdk.AccAddressFromBech32("vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz")
 	require.NoError(t, err)
 
 	initializeDelegator(t, &k, ctx, developerAddr, math.NewInt(500))
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(t, err)
 
 	initializeValidator(t, k.GetStakingKeeper().(*stakingkeeper.Keeper), ctx, valAddr, math.NewInt(1_000_000))

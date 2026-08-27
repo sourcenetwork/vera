@@ -56,7 +56,7 @@ func (s *FeegrantIntegrationTestSuite) TestPeriodicAllowanceCreation() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -99,7 +99,7 @@ func (s *FeegrantIntegrationTestSuite) TestPeriodicAllowanceWithZeroPeriod() {
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -145,7 +145,7 @@ func (s *FeegrantIntegrationTestSuite) TestAllowanceUpdateOnSubscriptionUpdate()
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(5_000_000))
@@ -202,7 +202,7 @@ func (s *FeegrantIntegrationTestSuite) TestAllowanceRemovalOnSubscriptionRemoval
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(2_000_000))
@@ -273,7 +273,7 @@ func (s *FeegrantIntegrationTestSuite) TestAllowanceCleanupOnDeveloperRemoval() 
 	_, err := s.msgServer.CreateDeveloper(s.ctx, createMsg)
 	require.NoError(s.T(), err)
 
-	valAddr, err := sdk.ValAddressFromBech32("sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm")
+	valAddr, err := sdk.ValAddressFromBech32("veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0")
 	require.NoError(s.T(), err)
 
 	keepertest.InitializeDelegator(s.T(), &s.keeper, s.ctx, developer, math.NewInt(5_000_000))

@@ -29,41 +29,41 @@ func TestGenesis(t *testing.T) {
 		Params: types.DefaultParams(),
 		Lockups: []types.Lockup{
 			{
-				DelegatorAddress: "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(1000),
 			},
 			{
-				DelegatorAddress: "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(500),
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(2000),
 			},
 		},
 		UnlockingLockups: []types.UnlockingLockup{
 			{
-				DelegatorAddress: "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(1000),
 				CreationHeight:   1,
 				CompletionTime:   timestamp1,
 				UnlockTime:       timestamp4,
 			},
 			{
-				DelegatorAddress: "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(500),
 				CreationHeight:   2,
 				CompletionTime:   timestamp2,
 				UnlockTime:       timestamp5,
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(2000),
 				CreationHeight:   3,
 				CompletionTime:   timestamp3,
@@ -72,21 +72,21 @@ func TestGenesis(t *testing.T) {
 		},
 		Developers: []types.Developer{
 			{
-				Address:         "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Address:         "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				AutoLockEnabled: true,
 			},
 			{
-				Address:         "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				Address:         "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
 				AutoLockEnabled: false,
 			},
 			{
-				Address:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				Address:         "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
 				AutoLockEnabled: true,
 			},
 		},
 		UserSubscriptions: []types.UserSubscription{
 			{
-				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				UserDid:      "did:key:alice",
 				CreditAmount: uint64(1000),
 				Period:       30,
@@ -94,7 +94,7 @@ func TestGenesis(t *testing.T) {
 				LastRenewed:  timestamp2,
 			},
 			{
-				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				UserDid:      "did:key:bob",
 				CreditAmount: uint64(500),
 				Period:       60,
@@ -102,7 +102,7 @@ func TestGenesis(t *testing.T) {
 				LastRenewed:  timestamp4,
 			},
 			{
-				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				Developer:    "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
 				UserDid:      "did:key:charlie",
 				CreditAmount: uint64(2000),
 				Period:       90,
@@ -159,18 +159,18 @@ func TestInitWithMultipleIdenticalLockups(t *testing.T) {
 		Params: types.DefaultParams(),
 		Lockups: []types.Lockup{
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(1000),
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(2000),
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(3000),
 			},
 		},
@@ -202,24 +202,24 @@ func TestInitWithMultipleIdenticalUnlockingLockups(t *testing.T) {
 		Params: types.DefaultParams(),
 		UnlockingLockups: []types.UnlockingLockup{
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(1000),
 				CreationHeight:   1,
 				CompletionTime:   timestamp1,
 				UnlockTime:       timestamp4,
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(2000),
 				CreationHeight:   2,
 				CompletionTime:   timestamp2,
 				UnlockTime:       timestamp5,
 			},
 			{
-				DelegatorAddress: "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
-				ValidatorAddress: "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm",
+				DelegatorAddress: "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
+				ValidatorAddress: "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0",
 				Amount:           math.NewInt(3000),
 				CreationHeight:   3,
 				CompletionTime:   timestamp3,
@@ -249,15 +249,15 @@ func TestInitWithMultipleDevelopers(t *testing.T) {
 		Params: types.DefaultParams(),
 		Developers: []types.Developer{
 			{
-				Address:         "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Address:         "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				AutoLockEnabled: true,
 			},
 			{
-				Address:         "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				Address:         "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
 				AutoLockEnabled: false,
 			},
 			{
-				Address:         "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9",
+				Address:         "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz",
 				AutoLockEnabled: true,
 			},
 		},
@@ -271,11 +271,11 @@ func TestInitWithMultipleDevelopers(t *testing.T) {
 
 	// All developers should be exported correctly
 	require.Equal(t, 3, len(got.Developers))
-	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.Developers[0].Address)
+	require.Equal(t, "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev", got.Developers[0].Address)
 	require.Equal(t, true, got.Developers[0].AutoLockEnabled)
-	require.Equal(t, "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy", got.Developers[1].Address)
+	require.Equal(t, "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr", got.Developers[1].Address)
 	require.Equal(t, false, got.Developers[1].AutoLockEnabled)
-	require.Equal(t, "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9", got.Developers[2].Address)
+	require.Equal(t, "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz", got.Developers[2].Address)
 	require.Equal(t, true, got.Developers[2].AutoLockEnabled)
 
 	nullify.Fill(&genesisState)
@@ -291,7 +291,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 		Params: types.DefaultParams(),
 		UserSubscriptions: []types.UserSubscription{
 			{
-				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				UserDid:      "did:key:alice",
 				CreditAmount: uint64(1000),
 				Period:       30,
@@ -299,7 +299,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 				LastRenewed:  timestamp2,
 			},
 			{
-				Developer:    "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et",
+				Developer:    "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev",
 				UserDid:      "did:key:bob",
 				CreditAmount: uint64(500),
 				Period:       60,
@@ -307,7 +307,7 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 				LastRenewed:  timestamp3,
 			},
 			{
-				Developer:    "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy",
+				Developer:    "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr",
 				UserDid:      "did:key:charlie",
 				CreditAmount: uint64(2000),
 				Period:       90,
@@ -325,15 +325,15 @@ func TestInitWithMultipleUserSubscriptions(t *testing.T) {
 
 	// All user subscriptions should be exported correctly
 	require.Equal(t, 3, len(got.UserSubscriptions))
-	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[0].Developer)
+	require.Equal(t, "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev", got.UserSubscriptions[0].Developer)
 	require.Equal(t, "did:key:alice", got.UserSubscriptions[0].UserDid)
 	require.Equal(t, uint64(1000), got.UserSubscriptions[0].CreditAmount)
 	require.Equal(t, uint64(30), got.UserSubscriptions[0].Period)
-	require.Equal(t, "source1wjj5v5rlf57kayyeskncpu4hwev25ty645p2et", got.UserSubscriptions[1].Developer)
+	require.Equal(t, "vera1wjj5v5rlf57kayyeskncpu4hwev25ty697gcev", got.UserSubscriptions[1].Developer)
 	require.Equal(t, "did:key:bob", got.UserSubscriptions[1].UserDid)
 	require.Equal(t, uint64(500), got.UserSubscriptions[1].CreditAmount)
 	require.Equal(t, uint64(60), got.UserSubscriptions[1].Period)
-	require.Equal(t, "source1n34fvpteuanu2nx2a4hql4jvcrcnal3gsrjppy", got.UserSubscriptions[2].Developer)
+	require.Equal(t, "vera1n34fvpteuanu2nx2a4hql4jvcrcnal3gqfmnpr", got.UserSubscriptions[2].Developer)
 	require.Equal(t, "did:key:charlie", got.UserSubscriptions[2].UserDid)
 	require.Equal(t, uint64(2000), got.UserSubscriptions[2].CreditAmount)
 	require.Equal(t, uint64(90), got.UserSubscriptions[2].Period)

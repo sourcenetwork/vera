@@ -76,8 +76,8 @@ func TestMsgCancelUnlocking(t *testing.T) {
 	initialDelegatorBalance := math.NewInt(2000)
 	initialValidatorBalance := math.NewInt(1000)
 
-	delAddr := "source1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s68fcw9"
-	valAddr := "sourcevaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnd0pzkqm"
+	delAddr := "vera1m4f5a896t7fzd9vc7pfgmc3fxkj8n24s2dq2wz"
+	valAddr := "veravaloper1cy0p47z24ejzvq55pu3lesxwf73xnrnduc4vm0"
 
 	delAddress, err := sdk.AccAddressFromBech32(delAddr)
 	require.NoError(t, err)

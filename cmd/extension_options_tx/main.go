@@ -47,7 +47,7 @@ func main() {
 
 	// Initialize SDK config
 	sdkConfig := sdk.GetConfig()
-	sdkConfig.SetBech32PrefixForAccount("source", "sourcepub")
+	sdkConfig.SetBech32PrefixForAccount("vera", "verapub")
 	sdkConfig.Seal()
 
 	// Setup encoding config with auth and acp modules
