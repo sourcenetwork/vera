@@ -55,6 +55,7 @@ if [ ! -f /sourcehub/config/genesis.json ]; then
         sourcehubd genesis gentx validator 1000000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 1b open
         sourcehubd genesis collect-gentxs
         sed -i 's/"allow_zero_fee_txs": false,/"allow_zero_fee_txs": true,/' /sourcehub/config/genesis.json
+        sed -i 's/"allow_any_relay": false/"allow_any_relay": true/' /sourcehub/config/genesis.json
         cp /etc/sourcehub/faucet-key.json /sourcehub/config/faucet-key.json
         echo "initialized sourcehub genesis"
     else 
