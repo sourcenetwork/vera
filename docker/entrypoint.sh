@@ -54,8 +54,9 @@ if [ ! -f /vera/config/genesis.json ]; then
         verad genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen # 100m open
         verad genesis gentx validator 1000000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 1b open
         verad genesis collect-gentxs
-        sed -i 's/"allow_zero_fee_txs": false,/"allow_zero_fee_txs": true,/' /vera/config/genesis.json
+        sed -i 's/"allow_zero_fee_txs": false/"allow_zero_fee_txs": true/' /vera/config/genesis.json
         sed -i 's/"allow_any_relay": false/"allow_any_relay": true/' /vera/config/genesis.json
+        sed -i 's/"ignore_bearer_auth": false/"ignore_bearer_auth": true/' /vera/config/genesis.json
         cp /etc/vera/faucet-key.json /vera/config/faucet-key.json
         echo "initialized vera genesis"
     else 
