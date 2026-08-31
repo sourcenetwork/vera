@@ -11,6 +11,7 @@ func DefaultGenesis() *GenesisState {
 		ChainConfig: ChainConfig{
 			AllowZeroFeeTxs:  false,
 			IgnoreBearerAuth: false,
+			AllowAnyRelay:    false,
 		},
 	}
 }

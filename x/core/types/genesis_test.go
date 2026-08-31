@@ -35,3 +35,7 @@ func TestGenesisState_Validate(t *testing.T) {
 		})
 	}
 }
+
+func TestDefaultGenesis_DisablesAllowAnyRelay(t *testing.T) {
+	require.False(t, types.DefaultGenesis().ChainConfig.AllowAnyRelay)
+}
