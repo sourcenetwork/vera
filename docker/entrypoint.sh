@@ -82,4 +82,4 @@ if [ -n "$APP_CONFIG_PATH" ]; then
     cp $APP_CONFIG_PATH /vera/config/app.toml
 fi
 
-exec $@
+exec "$@"
