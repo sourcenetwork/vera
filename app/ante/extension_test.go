@@ -95,6 +95,15 @@ func relayHubKeeper(trusted sdk.AccAddress) extensionHubKeeper {
 	}
 }
 
+func anyRelayCoreKeeper() extensionHubKeeper {
+	return extensionHubKeeper{
+		chainConfig: hubtypes.ChainConfig{
+			IgnoreBearerAuth: true,
+			AllowAnyRelay:    true,
+		},
+	}
+}
+
 func nextAnte(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
 	return ctx, nil
 }
@@ -1016,6 +1025,20 @@ func TestExtensionOptionsDecorator_RejectsMessageNotSignedByRelayWorker(t *testi
 	}
 	_, err := NewExtensionOptionsDecorator(keeper).validateRelay(s.ctx, s.txBuilder.GetTx())
 	require.ErrorContains(t, err, "does not match relay worker")
+}
+
+func TestExtensionOptionsDecorator_AllowsUnlistedRelayWhenAllowAnyRelay(t *testing.T) {
+	s := SetupTestSuite(t, true)
+	accs := s.CreateTestAccounts(2)
+	worker := accs[0].acc.GetAddress()
+	feeGranter := accs[1].acc.GetAddress()
+	tx, userDID := buildExtensionTestTx(t, s, accs[0], worker.String(), feeGranter, "", nil)
+
+	newCtx, err := NewExtensionOptionsDecorator(anyRelayCoreKeeper()).
+		AnteHandle(s.ctx, tx, false, nextAnte)
+	require.NoError(t, err)
+	require.Equal(t, userDID, getExtractedDIDFromContext(newCtx))
+	require.Equal(t, feeGranter.String(), getTrustedRelayFeeGranterFromContext(newCtx))
 }
 
 func TestExtensionOptionsDecorator_PropagatesTokenStoreFailure(t *testing.T) {

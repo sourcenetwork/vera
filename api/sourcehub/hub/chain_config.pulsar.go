@@ -18,6 +18,7 @@ var (
 	md_ChainConfig                    protoreflect.MessageDescriptor
 	fd_ChainConfig_allow_zero_fee_txs protoreflect.FieldDescriptor
 	fd_ChainConfig_ignore_bearer_auth protoreflect.FieldDescriptor
+	fd_ChainConfig_allow_any_relay    protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -25,6 +26,7 @@ func init() {
 	md_ChainConfig = File_sourcehub_hub_chain_config_proto.Messages().ByName("ChainConfig")
 	fd_ChainConfig_allow_zero_fee_txs = md_ChainConfig.Fields().ByName("allow_zero_fee_txs")
 	fd_ChainConfig_ignore_bearer_auth = md_ChainConfig.Fields().ByName("ignore_bearer_auth")
+	fd_ChainConfig_allow_any_relay = md_ChainConfig.Fields().ByName("allow_any_relay")
 }
 
 var _ protoreflect.Message = (*fastReflection_ChainConfig)(nil)
@@ -104,6 +106,12 @@ func (x *fastReflection_ChainConfig) Range(f func(protoreflect.FieldDescriptor, 
 			return
 		}
 	}
+	if x.AllowAnyRelay != false {
+		value := protoreflect.ValueOfBool(x.AllowAnyRelay)
+		if !f(fd_ChainConfig_allow_any_relay, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -123,6 +131,8 @@ func (x *fastReflection_ChainConfig) Has(fd protoreflect.FieldDescriptor) bool {
 		return x.AllowZeroFeeTxs != false
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
 		return x.IgnoreBearerAuth != false
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
+		return x.AllowAnyRelay != false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.hub.ChainConfig"))
@@ -143,6 +153,8 @@ func (x *fastReflection_ChainConfig) Clear(fd protoreflect.FieldDescriptor) {
 		x.AllowZeroFeeTxs = false
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
 		x.IgnoreBearerAuth = false
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
+		x.AllowAnyRelay = false
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.hub.ChainConfig"))
@@ -164,6 +176,9 @@ func (x *fastReflection_ChainConfig) Get(descriptor protoreflect.FieldDescriptor
 		return protoreflect.ValueOfBool(value)
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
 		value := x.IgnoreBearerAuth
+		return protoreflect.ValueOfBool(value)
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
+		value := x.AllowAnyRelay
 		return protoreflect.ValueOfBool(value)
 	default:
 		if descriptor.IsExtension() {
@@ -189,6 +204,8 @@ func (x *fastReflection_ChainConfig) Set(fd protoreflect.FieldDescriptor, value 
 		x.AllowZeroFeeTxs = value.Bool()
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
 		x.IgnoreBearerAuth = value.Bool()
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
+		x.AllowAnyRelay = value.Bool()
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.hub.ChainConfig"))
@@ -213,6 +230,8 @@ func (x *fastReflection_ChainConfig) Mutable(fd protoreflect.FieldDescriptor) pr
 		panic(fmt.Errorf("field allow_zero_fee_txs of message sourcehub.hub.ChainConfig is not mutable"))
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
 		panic(fmt.Errorf("field ignore_bearer_auth of message sourcehub.hub.ChainConfig is not mutable"))
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
+		panic(fmt.Errorf("field allow_any_relay of message sourcehub.hub.ChainConfig is not mutable"))
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: sourcehub.hub.ChainConfig"))
@@ -229,6 +248,8 @@ func (x *fastReflection_ChainConfig) NewField(fd protoreflect.FieldDescriptor) p
 	case "sourcehub.hub.ChainConfig.allow_zero_fee_txs":
 		return protoreflect.ValueOfBool(false)
 	case "sourcehub.hub.ChainConfig.ignore_bearer_auth":
+		return protoreflect.ValueOfBool(false)
+	case "sourcehub.hub.ChainConfig.allow_any_relay":
 		return protoreflect.ValueOfBool(false)
 	default:
 		if fd.IsExtension() {
@@ -305,6 +326,9 @@ func (x *fastReflection_ChainConfig) ProtoMethods() *protoiface.Methods {
 		if x.IgnoreBearerAuth {
 			n += 2
 		}
+		if x.AllowAnyRelay {
+			n += 2
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -333,6 +357,16 @@ func (x *fastReflection_ChainConfig) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.AllowAnyRelay {
+			i--
+			if x.AllowAnyRelay {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x18
 		}
 		if x.IgnoreBearerAuth {
 			i--
@@ -443,6 +477,26 @@ func (x *fastReflection_ChainConfig) ProtoMethods() *protoiface.Methods {
 					}
 				}
 				x.IgnoreBearerAuth = bool(v != 0)
+			case 3:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AllowAnyRelay", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.AllowAnyRelay = bool(v != 0)
 			default:
 				iNdEx = preIndex
 				skippy, err := runtime.Skip(dAtA[iNdEx:])
@@ -504,6 +558,12 @@ type ChainConfig struct {
 	// ignore_bearer_auth permits trusted relay workers to replace the
 	// `authorized_account` binding with an on-chain fee grant.
 	IgnoreBearerAuth bool `protobuf:"varint,2,opt,name=ignore_bearer_auth,json=ignoreBearerAuth,proto3" json:"ignore_bearer_auth,omitempty"`
+	// allow_any_relay disables the  `trusted_relay_fee_granters` allowlist,
+	// letting any fee granter act as a trusted relay.
+	//
+	// Intended for private networks ONLY,
+	// otherwise relay may assert arbitrary actor DIDs through provider tokens
+	AllowAnyRelay bool `protobuf:"varint,3,opt,name=allow_any_relay,json=allowAnyRelay,proto3" json:"allow_any_relay,omitempty"`
 }
 
 func (x *ChainConfig) Reset() {
@@ -540,6 +600,13 @@ func (x *ChainConfig) GetIgnoreBearerAuth() bool {
 	return false
 }
 
+func (x *ChainConfig) GetAllowAnyRelay() bool {
+	if x != nil {
+		return x.AllowAnyRelay
+	}
+	return false
+}
+
 var File_sourcehub_hub_chain_config_proto protoreflect.FileDescriptor
 
 var file_sourcehub_hub_chain_config_proto_rawDesc = []byte{
@@ -548,15 +615,18 @@ var file_sourcehub_hub_chain_config_proto_rawDesc = []byte{
 	0x74, 0x6f, 0x12, 0x0d, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x68, 0x75,
 	0x62, 0x1a, 0x11, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2f, 0x61, 0x6d, 0x69, 0x6e, 0x6f, 0x2e, 0x70,
 	0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f,
-	0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x7c, 0x0a, 0x0b, 0x43, 0x68,
-	0x61, 0x69, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x32, 0x0a, 0x12, 0x61, 0x6c, 0x6c,
-	0x6f, 0x77, 0x5f, 0x7a, 0x65, 0x72, 0x6f, 0x5f, 0x66, 0x65, 0x65, 0x5f, 0x74, 0x78, 0x73, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x08, 0x42, 0x05, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0f, 0x61, 0x6c,
-	0x6c, 0x6f, 0x77, 0x5a, 0x65, 0x72, 0x6f, 0x46, 0x65, 0x65, 0x54, 0x78, 0x73, 0x12, 0x33, 0x0a,
-	0x12, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x5f, 0x62, 0x65, 0x61, 0x72, 0x65, 0x72, 0x5f, 0x61,
-	0x75, 0x74, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x42, 0x05, 0xa8, 0xe7, 0xb0, 0x2a, 0x01,
-	0x52, 0x10, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x42, 0x65, 0x61, 0x72, 0x65, 0x72, 0x41, 0x75,
-	0x74, 0x68, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x42, 0x9a, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d,
+	0x67, 0x6f, 0x67, 0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0xab, 0x01, 0x0a, 0x0b, 0x43,
+	0x68, 0x61, 0x69, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x12, 0x32, 0x0a, 0x12, 0x61, 0x6c,
+	0x6c, 0x6f, 0x77, 0x5f, 0x7a, 0x65, 0x72, 0x6f, 0x5f, 0x66, 0x65, 0x65, 0x5f, 0x74, 0x78, 0x73,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x42, 0x05, 0xa8, 0xe7, 0xb0, 0x2a, 0x01, 0x52, 0x0f, 0x61,
+	0x6c, 0x6c, 0x6f, 0x77, 0x5a, 0x65, 0x72, 0x6f, 0x46, 0x65, 0x65, 0x54, 0x78, 0x73, 0x12, 0x33,
+	0x0a, 0x12, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x5f, 0x62, 0x65, 0x61, 0x72, 0x65, 0x72, 0x5f,
+	0x61, 0x75, 0x74, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x42, 0x05, 0xa8, 0xe7, 0xb0, 0x2a,
+	0x01, 0x52, 0x10, 0x69, 0x67, 0x6e, 0x6f, 0x72, 0x65, 0x42, 0x65, 0x61, 0x72, 0x65, 0x72, 0x41,
+	0x75, 0x74, 0x68, 0x12, 0x2d, 0x0a, 0x0f, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x61, 0x6e, 0x79,
+	0x5f, 0x72, 0x65, 0x6c, 0x61, 0x79, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x42, 0x05, 0xa8, 0xe7,
+	0xb0, 0x2a, 0x01, 0x52, 0x0d, 0x61, 0x6c, 0x6c, 0x6f, 0x77, 0x41, 0x6e, 0x79, 0x52, 0x65, 0x6c,
+	0x61, 0x79, 0x3a, 0x04, 0xe8, 0xa0, 0x1f, 0x01, 0x42, 0x9a, 0x01, 0x0a, 0x11, 0x63, 0x6f, 0x6d,
 	0x2e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x68, 0x75, 0x62, 0x2e, 0x68, 0x75, 0x62, 0x42, 0x10,
 	0x43, 0x68, 0x61, 0x69, 0x6e, 0x43, 0x6f, 0x6e, 0x66, 0x69, 0x67, 0x50, 0x72, 0x6f, 0x74, 0x6f,
 	0x50, 0x01, 0x5a, 0x1e, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f,

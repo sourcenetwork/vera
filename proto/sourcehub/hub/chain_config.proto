@@ -22,4 +22,11 @@ message ChainConfig {
   bool ignore_bearer_auth = 2 [
     (amino.dont_omitempty) = true
   ];
+
+  // allow_any_relay disables the  `trusted_relay_fee_granters` allowlist,
+  // letting any fee granter act as a trusted relay.
+  //
+  // Intended for private networks ONLY, 
+  // otherwise relay may assert arbitrary actor DIDs through provider tokens
+  bool allow_any_relay = 3 [(amino.dont_omitempty) = true];
 }
