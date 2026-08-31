@@ -7,7 +7,7 @@ name: Docker
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "dev", "feat/allow-any-relay" ]
     tags:
       - 'v*.*.*'
 
