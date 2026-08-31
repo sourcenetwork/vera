@@ -54,8 +54,9 @@ if [ ! -f /sourcehub/config/genesis.json ]; then
         sourcehubd genesis add-genesis-account $FAUCET_ADDR 100000000000000uopen # 100m open
         sourcehubd genesis gentx validator 1000000000000000uopen --chain-id $CHAIN_ID --keyring-backend test # 1b open
         sourcehubd genesis collect-gentxs
-        sed -i 's/"allow_zero_fee_txs": false,/"allow_zero_fee_txs": true,/' /sourcehub/config/genesis.json
+        sed -i 's/"allow_zero_fee_txs": false/"allow_zero_fee_txs": true/' /sourcehub/config/genesis.json
         sed -i 's/"allow_any_relay": false/"allow_any_relay": true/' /sourcehub/config/genesis.json
+        sed -i 's/"ignore_bearer_auth": false/"ignore_bearer_auth": true/' /sourcehub/config/genesis.json
         cp /etc/sourcehub/faucet-key.json /sourcehub/config/faucet-key.json
         echo "initialized sourcehub genesis"
     else 
@@ -82,4 +83,4 @@ if [ -n "$APP_CONFIG_PATH" ]; then
     cp $APP_CONFIG_PATH /sourcehub/config/app.toml
 fi
 
-exec $@
+exec "$@"
