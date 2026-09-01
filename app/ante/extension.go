@@ -142,7 +142,12 @@ func (eod ExtensionOptionsDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simu
 }
 
 func (eod ExtensionOptionsDecorator) validateRelay(ctx sdk.Context, tx sdk.Tx) (string, error) {
-	if eod.coreKeeper == nil || !eod.coreKeeper.GetChainConfig(ctx).IgnoreBearerAuth {
+	if eod.coreKeeper == nil {
+		return "", nil
+	}
+
+	chainConfig := eod.coreKeeper.GetChainConfig(ctx)
+	if !chainConfig.IgnoreBearerAuth {
 		return "", nil
 	}
 
@@ -156,7 +161,8 @@ func (eod ExtensionOptionsDecorator) validateRelay(ctx sdk.Context, tx sdk.Tx) (
 	}
 
 	feeGranterAddress := sdk.AccAddress(feeGranter).String()
-	if !eod.coreKeeper.GetParams(ctx).IsTrustedRelayFeeGranter(feeGranterAddress) {
+	if !chainConfig.AllowAnyRelay &&
+		!eod.coreKeeper.GetParams(ctx).IsTrustedRelayFeeGranter(feeGranterAddress) {
 		return "", errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "fee granter %s is not a trusted relay", feeGranterAddress)
 	}
 
