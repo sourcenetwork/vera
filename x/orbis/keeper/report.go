@@ -1113,41 +1113,6 @@ func decodeEndpointSignedContribution(decoder *reportCanonicalDecoder, prefix st
 	return origin, signature, data, nil
 }
 
-// decodeReportedDocumentEvidence decodes the document fields a caller-supplied PRE
-// document (one never posted to the bulletin) carries as `inline_document`. The chain
-// never uses this content for anything: the ACP re-check and PRE proof re-verification
-// that need it run entirely off-chain, among Orbis co-signers, before a report reaches
-// on-chain submission at all. Every caller here decodes and discards the result, purely
-// to stay in sync with the canonical byte layout — the same way relay/response signatures
-// are decoded and length-checked but never cryptographically re-verified on this side.
-func decodeReportedDocumentEvidence(decoder *reportCanonicalDecoder, prefix string) (document, proof, policyID, resource, permission string, tier *string, err error) {
-	document, err = decoder.readString(prefix + "_document")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	proof, err = decoder.readString(prefix + "_proof")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	policyID, err = decoder.readString(prefix + "_policy_id")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	resource, err = decoder.readString(prefix + "_resource")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	permission, err = decoder.readString(prefix + "_permission")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	tier, err = decoder.readOptionalString(prefix + "_tier")
-	if err != nil {
-		return "", "", "", "", "", nil, err
-	}
-	return document, proof, policyID, resource, permission, tier, nil
-}
-
 func isDkgPublicOriginPhase(phase string) bool {
 	switch phase {
 	case "commitments", "commitment_audit", "refresh_health_check", "reshare_participant_set":
@@ -1261,27 +1226,17 @@ func decodePreReencryptResponseStatement(statementBytes []byte) (invalidCryptoRe
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PRE response crypto backend cannot be empty")
 	}
 	// timestamp is the document's ACP timestamp; only the off-chain refutation needs it
-	// (to independently re-derive object_id alongside inline_document below), so the chain
-	// decodes it purely to stay in sync with the canonical byte layout and discards it.
+	// (to independently re-derive object_id from the inline document), so the chain decodes
+	// it purely to stay in sync with the canonical byte layout and discards it.
 	if _, err := decoder.readOptionalU64(fieldTimestamp); err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
-	// inline_document carries the caller-supplied PRE document for a request whose
-	// document was never posted to the bulletin. Only the off-chain PRE proof refutation
-	// needs its content, so the chain decodes it purely to stay in sync with the canonical
-	// byte layout and discards it.
-	inlineDocumentPresent, err := decoder.readByte(fieldInlineDocumentPresent)
-	if err != nil {
+	// document_inline marks a PRE request whose document was supplied inline (never posted to
+	// the bulletin). The document itself is not carried here or anywhere on chain — it reaches
+	// the off-chain co-signers out of band. The chain decodes this bool only to stay in sync
+	// with the canonical byte layout and discards it.
+	if _, err := decoder.readByteBool(fieldDocumentInline); err != nil {
 		return invalidCryptoResponseStatement{}, err
-	}
-	switch inlineDocumentPresent {
-	case 0:
-	case 1:
-		if _, _, _, _, _, _, err := decodeReportedDocumentEvidence(decoder, "inline_document"); err != nil {
-			return invalidCryptoResponseStatement{}, err
-		}
-	default:
-		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional inline_document tag %d", inlineDocumentPresent)
 	}
 	if err := decoder.finish(); err != nil {
 		return invalidCryptoResponseStatement{}, err
@@ -1971,22 +1926,12 @@ func decodeRelayRequestStatement(statementBytes []byte) (relayRequestStatement, 
 	if _, err := decoder.readOptionalU64(fieldTimestamp); err != nil {
 		return relayRequestStatement{}, err
 	}
-	// inline_document carries the caller-supplied PRE document for a request whose
-	// document was never posted to the bulletin. Only the off-chain ACP refutation needs
-	// its content (to independently re-derive object_id and re-run the ACP check), so the
-	// chain decodes it purely to stay in sync with the canonical byte layout and discards it.
-	inlineDocumentPresent, err := decoder.readByte(fieldInlineDocumentPresent)
-	if err != nil {
+	// document_inline marks a PRE request whose document was supplied inline (never posted to
+	// the bulletin). The document itself is not carried here or anywhere on chain — it reaches
+	// the off-chain co-signers out of band. The chain decodes this bool only to stay in sync
+	// with the canonical byte layout and discards it.
+	if _, err := decoder.readByteBool(fieldDocumentInline); err != nil {
 		return relayRequestStatement{}, err
-	}
-	switch inlineDocumentPresent {
-	case 0:
-	case 1:
-		if _, _, _, _, _, _, err := decodeReportedDocumentEvidence(decoder, "inline_document"); err != nil {
-			return relayRequestStatement{}, err
-		}
-	default:
-		return relayRequestStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional inline_document tag %d", inlineDocumentPresent)
 	}
 	if err := decoder.finish(); err != nil {
 		return relayRequestStatement{}, err
@@ -2481,7 +2426,7 @@ const (
 	fieldEvidenceKind          = "evidence_kind"
 	fieldFromNodeID            = "from_node_id"
 	fieldFaultKind             = "fault_kind"
-	fieldInlineDocumentPresent = "inline_document_present"
+	fieldDocumentInline        = "document_inline"
 	fieldMessage               = "message"
 	fieldMessageKind           = "message_kind"
 	fieldMetadata              = "metadata"
@@ -2533,6 +2478,22 @@ func (d *reportCanonicalDecoder) readByte(label string) (byte, error) {
 	value := d.bytes[d.cursor]
 	d.cursor++
 	return value, nil
+}
+
+// readByteBool reads a single canonical bool byte (0 or 1) and rejects any other value.
+func (d *reportCanonicalDecoder) readByteBool(label string) (bool, error) {
+	value, err := d.readByte(label)
+	if err != nil {
+		return false, err
+	}
+	switch value {
+	case 0:
+		return false, nil
+	case 1:
+		return true, nil
+	default:
+		return false, errorsmod.Wrapf(types.ErrInvalidReport, "invalid bool %s tag %d", label, value)
+	}
 }
 
 func (d *reportCanonicalDecoder) readU32(label string) (uint32, error) {
@@ -2607,25 +2568,6 @@ func (d *reportCanonicalDecoder) readOptionalU64(label string) (*uint64, error) 
 		return nil, nil
 	case 1:
 		value, err := d.readU64(label)
-		if err != nil {
-			return nil, err
-		}
-		return &value, nil
-	default:
-		return nil, errorsmod.Wrapf(types.ErrInvalidReport, "invalid optional %s tag %d", label, tag)
-	}
-}
-
-func (d *reportCanonicalDecoder) readOptionalString(label string) (*string, error) {
-	tag, err := d.readByte(label + "_present")
-	if err != nil {
-		return nil, err
-	}
-	switch tag {
-	case 0:
-		return nil, nil
-	case 1:
-		value, err := d.readString(label)
 		if err != nil {
 			return nil, err
 		}
