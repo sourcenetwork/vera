@@ -101,19 +101,36 @@ func (b *idBytes) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// idDocumentSecret / idDocumentProof mirror the orbis-rs crypto `Secret` /
-// `EncryptionProof` — only the fields needed to derive a canonical,
-// serialization-independent document id. Pointer fields so a missing field is
-// rejected rather than silently treated as empty (matching the Rust side).
-type idDocumentSecret struct {
-	EncCmt        *idBytes `json:"enc_cmt"`
-	EncryptedData *idBytes `json:"encrypted_data"`
-	Nonce         *idBytes `json:"nonce"`
-}
-
-type idDocumentProof struct {
-	Challenge *idBytes `json:"challenge"`
-	Response  *idBytes `json:"response"`
+// decodeIDByteFields parses `raw` as a JSON object that must contain *exactly*
+// the fields in `want` (same names, same case, nothing extra) and decodes each
+// value as a serde-style byte array.
+//
+// The exact-key requirement matters: Go's encoding/json matches struct fields
+// case-insensitively, so a struct decode of `{"enc_cmt":[1],"ENC_CMT":[9]}`
+// would yield [9] here while Serde on the orbis-rs side yields [1] — one
+// ciphertext, two object ids. Decoding through a map keyed on the exact JSON
+// string, and rejecting any key not in `want`, keeps both sides in agreement.
+func decodeIDByteFields(raw string, want []string) (map[string][]byte, error) {
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal([]byte(raw), &m); err != nil {
+		return nil, err
+	}
+	if len(m) != len(want) {
+		return nil, fmt.Errorf("expected exactly fields %v, got %d fields", want, len(m))
+	}
+	out := make(map[string][]byte, len(want))
+	for _, key := range want {
+		v, ok := m[key]
+		if !ok {
+			return nil, fmt.Errorf("missing or misnamed field %q", key)
+		}
+		var b idBytes
+		if err := b.UnmarshalJSON(v); err != nil {
+			return nil, fmt.Errorf("field %q: %w", key, err)
+		}
+		out[key] = b
+	}
+	return out, nil
 }
 
 // GenerateDocumentID returns the stable ID for an encrypted document.
@@ -122,7 +139,7 @@ type idDocumentProof struct {
 // parsed and re-encoded into a canonical length-prefixed form before hashing, so
 // two byte-different JSON encodings of the *same* ciphertext produce the *same*
 // id — a semantic ciphertext has exactly one authorization identity. Returns an
-// error if either blob is not the expected shape.
+// error if either blob is not exactly the expected shape.
 func GenerateDocumentID(
 	ringID string,
 	document string,
@@ -133,28 +150,22 @@ func GenerateDocumentID(
 	tier immutable.Option[string],
 	timestamp immutable.Option[uint64],
 ) (string, error) {
-	var secret idDocumentSecret
-	if err := json.Unmarshal([]byte(document), &secret); err != nil {
+	secret, err := decodeIDByteFields(document, []string{"enc_cmt", "encrypted_data", "nonce"})
+	if err != nil {
 		return "", fmt.Errorf("malformed document: %w", err)
 	}
-	if secret.EncCmt == nil || secret.EncryptedData == nil || secret.Nonce == nil {
-		return "", fmt.Errorf("malformed document: missing enc_cmt, encrypted_data, or nonce")
-	}
-	var pf idDocumentProof
-	if err := json.Unmarshal([]byte(proof), &pf); err != nil {
+	pf, err := decodeIDByteFields(proof, []string{"challenge", "response"})
+	if err != nil {
 		return "", fmt.Errorf("malformed proof: %w", err)
-	}
-	if pf.Challenge == nil || pf.Response == nil {
-		return "", fmt.Errorf("malformed proof: missing challenge or response")
 	}
 
 	h := newIDHasher("orbis/document/v2")
 	h.writeString(ringID)
-	h.writeBytes(*secret.EncCmt)
-	h.writeBytes(*secret.EncryptedData)
-	h.writeBytes(*secret.Nonce)
-	h.writeBytes(*pf.Challenge)
-	h.writeBytes(*pf.Response)
+	h.writeBytes(secret["enc_cmt"])
+	h.writeBytes(secret["encrypted_data"])
+	h.writeBytes(secret["nonce"])
+	h.writeBytes(pf["challenge"])
+	h.writeBytes(pf["response"])
 	h.writeString(policyID)
 	h.writeString(resource)
 	h.writeString(permission)
