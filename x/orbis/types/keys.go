@@ -4,6 +4,8 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"encoding/hex"
+	"encoding/json"
+	"fmt"
 	"slices"
 
 	"github.com/sourcenetwork/immutable"
@@ -78,7 +80,49 @@ func (h *idHasher) writeBool(value bool) {
 	h.bytes = append(h.bytes, 0)
 }
 
+// idBytes decodes a serde_json-encoded Rust Vec<u8>: a JSON array of integers in
+// 0-255. (Go's encoding/json would natively expect base64 for []byte, which is
+// why a custom decoder is needed to interoperate with orbis-rs.)
+type idBytes []byte
+
+func (b *idBytes) UnmarshalJSON(data []byte) error {
+	var nums []uint16
+	if err := json.Unmarshal(data, &nums); err != nil {
+		return err
+	}
+	out := make([]byte, len(nums))
+	for i, n := range nums {
+		if n > 255 {
+			return fmt.Errorf("byte value %d out of range 0-255", n)
+		}
+		out[i] = byte(n)
+	}
+	*b = out
+	return nil
+}
+
+// idDocumentSecret / idDocumentProof mirror the orbis-rs crypto `Secret` /
+// `EncryptionProof` — only the fields needed to derive a canonical,
+// serialization-independent document id. Pointer fields so a missing field is
+// rejected rather than silently treated as empty (matching the Rust side).
+type idDocumentSecret struct {
+	EncCmt        *idBytes `json:"enc_cmt"`
+	EncryptedData *idBytes `json:"encrypted_data"`
+	Nonce         *idBytes `json:"nonce"`
+}
+
+type idDocumentProof struct {
+	Challenge *idBytes `json:"challenge"`
+	Response  *idBytes `json:"response"`
+}
+
 // GenerateDocumentID returns the stable ID for an encrypted document.
+//
+// `document` and `proof` are the JSON blobs from MsgStoreDocument. They are
+// parsed and re-encoded into a canonical length-prefixed form before hashing, so
+// two byte-different JSON encodings of the *same* ciphertext produce the *same*
+// id — a semantic ciphertext has exactly one authorization identity. Returns an
+// error if either blob is not the expected shape.
 func GenerateDocumentID(
 	ringID string,
 	document string,
@@ -88,17 +132,35 @@ func GenerateDocumentID(
 	permission string,
 	tier immutable.Option[string],
 	timestamp immutable.Option[uint64],
-) string {
-	h := newIDHasher("orbis/document/v1")
+) (string, error) {
+	var secret idDocumentSecret
+	if err := json.Unmarshal([]byte(document), &secret); err != nil {
+		return "", fmt.Errorf("malformed document: %w", err)
+	}
+	if secret.EncCmt == nil || secret.EncryptedData == nil || secret.Nonce == nil {
+		return "", fmt.Errorf("malformed document: missing enc_cmt, encrypted_data, or nonce")
+	}
+	var pf idDocumentProof
+	if err := json.Unmarshal([]byte(proof), &pf); err != nil {
+		return "", fmt.Errorf("malformed proof: %w", err)
+	}
+	if pf.Challenge == nil || pf.Response == nil {
+		return "", fmt.Errorf("malformed proof: missing challenge or response")
+	}
+
+	h := newIDHasher("orbis/document/v2")
 	h.writeString(ringID)
-	h.writeString(document)
-	h.writeString(proof)
+	h.writeBytes(*secret.EncCmt)
+	h.writeBytes(*secret.EncryptedData)
+	h.writeBytes(*secret.Nonce)
+	h.writeBytes(*pf.Challenge)
+	h.writeBytes(*pf.Response)
 	h.writeString(policyID)
 	h.writeString(resource)
 	h.writeString(permission)
 	h.writeOptionalString(tier)
 	h.writeOptionalUint64(timestamp)
-	return h.sum()
+	return h.sum(), nil
 }
 
 // GenerateKeyDerivationID returns the stable ID for a key derivation.
