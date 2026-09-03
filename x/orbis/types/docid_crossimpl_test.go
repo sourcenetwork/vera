@@ -25,7 +25,7 @@ func TestGenerateDocumentID_CrossImplVectorAndMalleability(t *testing.T) {
 	id2, err := id(d2, p)
 	require.NoError(t, err)
 	require.Equal(t, id1, id2, "whitespace/order must not change the id")
-	require.Equal(t, "a5f065b5d5e02043d5427455daa3809b59d85990b60e7b5fa11dbcbbe2692fbe", id1)
+	require.Equal(t, "e555cfcb145edf3d4cd8acbae93e05dc3a48eb0162b3af90f42064ab837c9a06", id1)
 
 	// Rejections — each must fail identically on the Rust side.
 	_, err = id("{}", p)

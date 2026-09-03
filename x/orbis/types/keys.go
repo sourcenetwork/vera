@@ -220,7 +220,7 @@ func GenerateDocumentID(
 		return "", fmt.Errorf("malformed proof: %w", err)
 	}
 
-	h := newIDHasher("orbis/document/v2")
+	h := newIDHasher("orbis/document/v1")
 	h.writeString(ringID)
 	h.writeBytes(secret["enc_cmt"])
 	h.writeBytes(secret["encrypted_data"])
