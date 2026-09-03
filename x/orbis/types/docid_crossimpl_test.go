@@ -38,4 +38,12 @@ func TestGenerateDocumentID_CrossImplVectorAndMalleability(t *testing.T) {
 	require.Error(t, err, "case-variant duplicate key must not be foldable into a second id")
 	_, err = id(d1, `{"challenge":[7,8],"response":[9,10],"Response":[0]}`)
 	require.Error(t, err, "case-variant duplicate key in proof")
+	_, err = id(`{"enc_cmt":[1,2,3],"enc_cmt":[9,9,9],"encrypted_data":[4,5,6],"nonce":[0,0,0,0,0,0,0,0,0,0,0,0]}`, p)
+	require.Error(t, err, "exact duplicate key must not collapse silently (Serde errors 'duplicate field')")
+	_, err = id(`{"enc_cmt":null,"encrypted_data":[4,5,6],"nonce":[0,0,0,0,0,0,0,0,0,0,0,0]}`, p)
+	require.Error(t, err, "explicit null value (Serde rejects null for Vec<u8>)")
+	_, err = id(`{"enc_cmt":[1,null,3],"encrypted_data":[4,5,6],"nonce":[0,0,0,0,0,0,0,0,0,0,0,0]}`, p)
+	require.Error(t, err, "null array element (Serde rejects null for u8)")
+	_, err = id(d1, p+"  trailing")
+	require.Error(t, err, "trailing data after the JSON object")
 }
