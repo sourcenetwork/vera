@@ -797,7 +797,10 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	tier := optionalStoreDocumentTier(msg)
 	timestamp := optionalStoreDocumentTimestamp(msg)
 
-	documentID := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
+	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
+	if err != nil {
+		return nil, errorsmod.Wrap(types.ErrInvalidDocument, err.Error())
+	}
 	if existing := k.GetDocument(goCtx, documentID); existing != nil {
 		return nil, types.ErrDocumentAlreadyExists
 	}

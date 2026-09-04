@@ -19,6 +19,11 @@ import (
 	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
+// Well-formed orbis-rs `Secret` / `EncryptionProof` JSON for StoreDocument tests
+// (GenerateDocumentID now parses these to derive a serialization-independent id).
+const testDocumentJSON = `{"enc_cmt":[1,2,3],"encrypted_data":[4,5,6],"nonce":[0,0,0,0,0,0,0,0,0,0,0,0]}`
+const testProofJSON = `{"challenge":[7,8],"response":[9,10]}`
+
 const testDID = "did:example:orbis-creator"
 const testPolicyOwnerDID = "did:example:orbis-policy-owner"
 const testOperatorDID = "did:example:orbis-operator"
@@ -119,8 +124,8 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	storeDocumentMsg := &types.MsgStoreDocument{
 		Creator:    creatorAddr,
 		RingId:     createRingResp.RingId,
-		Document:   "ciphertext",
-		Proof:      "proof",
+		Document:   testDocumentJSON,
+		Proof:      testProofJSON,
 		PolicyId:   "policy-doc",
 		Resource:   "secret",
 		Permission: "decrypt",
@@ -133,11 +138,9 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	}
 	storeDocumentResp, err := k.StoreDocument(ctx, storeDocumentMsg)
 	require.NoError(t, err)
-	require.Equal(
-		t,
-		types.GenerateDocumentID(createRingResp.RingId, "ciphertext", "proof", "policy-doc", "secret", "decrypt", immutable.Some(tier), immutable.Some(timestamp)),
-		storeDocumentResp.DocumentId,
-	)
+	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.Some(tier), immutable.Some(timestamp))
+	require.NoError(t, err)
+	require.Equal(t, expectedDocID, storeDocumentResp.DocumentId)
 
 	document := k.GetDocument(ctx, storeDocumentResp.DocumentId)
 	require.NotNil(t, document)
@@ -875,18 +878,16 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	storeDocumentResp, err := k.StoreDocument(ctx, &types.MsgStoreDocument{
 		Creator:    creatorAddr,
 		RingId:     createRingResp.RingId,
-		Document:   "ciphertext",
-		Proof:      "proof",
+		Document:   testDocumentJSON,
+		Proof:      testProofJSON,
 		PolicyId:   "policy-doc",
 		Resource:   "secret",
 		Permission: "decrypt",
 	})
 	require.NoError(t, err)
-	require.Equal(
-		t,
-		types.GenerateDocumentID(createRingResp.RingId, "ciphertext", "proof", "policy-doc", "secret", "decrypt", immutable.None[string](), immutable.None[uint64]()),
-		storeDocumentResp.DocumentId,
-	)
+	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.None[string](), immutable.None[uint64]())
+	require.NoError(t, err)
+	require.Equal(t, expectedDocID, storeDocumentResp.DocumentId)
 }
 
 func TestMsgServer_CreateRingRejectsPSSIntervalBelowMinimum(t *testing.T) {
