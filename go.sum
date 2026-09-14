@@ -677,6 +677,8 @@ cosmossdk.io/x/upgrade v0.1.4/go.mod h1:9v0Aj+fs97O+Ztw+tG3/tp5JSlrmT7IcFhAebQHm
 dario.cat/mergo v1.0.2 h1:85+piFYR1tMbRrLcDwR18y4UKJ3aH1Tbzi24VRW1TK8=
 dario.cat/mergo v1.0.2/go.mod h1:E/hbnu0NxMFBjpMIE34DRGLWqDy0g5FuKDhCb31ngxA=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
+filippo.io/bigmod v0.1.1-0.20260103110540-f8a47775ebe5 h1:JA0fFr+kxpqTdxR9LOBiTWpGNchqmkcsgmdeJZRclZ0=
+filippo.io/bigmod v0.1.1-0.20260103110540-f8a47775ebe5/go.mod h1:OjOXDNlClLblvXdwgFFOQFJEocLhhtai8vGLy0JCZlI=
 filippo.io/edwards25519 v1.2.0 h1:crnVqOiS4jqYleHd9vaKZ+HKtHfllngJIiOpNpoJsjo=
 filippo.io/edwards25519 v1.2.0/go.mod h1:xzAOLCNug/yB62zG1bQ8uziwrIqIuxhctzJT18Q77mc=
 gioui.org v0.0.0-20210308172011-57750fc8a0a6/go.mod h1:RSH6KIUZ0p2xy5zHDxgAM4zumjgTw83q2ge/PI+yyw8=
@@ -1931,8 +1933,8 @@ github.com/mitchellh/mapstructure v1.5.0 h1:jeMsZIYE/09sWLaz43PL7Gy6RuMjD2eJVyua
 github.com/mitchellh/mapstructure v1.5.0/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
 github.com/mitchellh/reflectwalk v1.0.1/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx0jmZXqmk4esnw=
-github.com/mizufinance/decaf377-go v0.2.0 h1:izT9ymso5nOvn3YtQk4RipU/hQm950d/WfDBZFklm/0=
-github.com/mizufinance/decaf377-go v0.2.0/go.mod h1:tApKZYqMgt6XZW7EWvPolaHxD1Adp4b2Ub1XxZxje9w=
+github.com/mizufinance/decaf377-go v0.2.1-0.20260914183201-e7f5d091fb13 h1:Lo7bWoqxd8UXlbIA5MSoKRBhSe4MJzUJiJBqXD67fpc=
+github.com/mizufinance/decaf377-go v0.2.1-0.20260914183201-e7f5d091fb13/go.mod h1:5NRrR/srVQld3zTMB4foH+O6ivXoxA+NpXB66/yxRBs=
 github.com/moby/docker-image-spec v1.3.1 h1:jMKff3w6PgbfSa69GfNg+zN/XLhfXJGnEx3Nl2EsFP0=
 github.com/moby/docker-image-spec v1.3.1/go.mod h1:eKmb5VW8vQEh/BAr2yvVNvuiJuY6UIocYsFu/DxxRpo=
 github.com/moby/go-archive v0.2.0 h1:zg5QDUM2mi0JIM9fdQZWC7U8+2ZfixfTYoHL7rWUcP8=
