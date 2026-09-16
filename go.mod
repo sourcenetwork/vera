@@ -47,7 +47,7 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
-	github.com/mizufinance/decaf377-go v0.2.0
+	github.com/mizufinance/decaf377-go v0.2.1-0.20260914183201-e7f5d091fb13
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.2
 	github.com/sourcenetwork/immutable v0.3.0
@@ -95,6 +95,7 @@ require (
 	connectrpc.com/otelconnect v0.8.0 // indirect
 	cosmossdk.io/collections v0.4.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
+	filippo.io/bigmod v0.1.1-0.20260103110540-f8a47775ebe5 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/4meepo/tagalign v1.3.4 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect

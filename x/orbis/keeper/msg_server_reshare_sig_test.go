@@ -46,7 +46,9 @@ func TestDecaf377IdentityPublicKeyForgeryRejected(t *testing.T) {
 	z := big.NewInt(42)
 	generator, err := decaf377.Generator()
 	require.NoError(t, err)
-	rPoint, err := decaf377.ScalarMul(generator, z)
+	zScalar, err := decaf377.ScalarFromCanonicalBytes(scalarToLittleEndian32(z))
+	require.NoError(t, err)
+	rPoint, err := decaf377.ScalarMul(generator, zScalar)
 	require.NoError(t, err)
 	rBytes, err := decaf377.Encode(rPoint)
 	require.NoError(t, err)
@@ -230,12 +232,17 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 }
 
 // decaf377PublicKeyBytes returns the encoded public key point x·G for the given secret scalar.
+// x must already be reduced mod decaf377.ScalarOrder().
 func decaf377PublicKeyBytes(x *big.Int) ([]byte, error) {
 	g, err := decaf377.Generator()
 	if err != nil {
 		return nil, err
 	}
-	pub, err := decaf377.ScalarMul(g, x)
+	xScalar, err := decaf377.ScalarFromCanonicalBytes(scalarToLittleEndian32(x))
+	if err != nil {
+		return nil, err
+	}
+	pub, err := decaf377.ScalarMul(g, xScalar)
 	if err != nil {
 		return nil, err
 	}
@@ -253,10 +260,11 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 	// Deterministic nonce: k = H(x || msg) mod order
 	nonceInput := append(scalarToLittleEndian32(x), msg...)
 	nonceHash := sha512.Sum512(nonceInput)
-	k := decaf377.ScalarFromUniformBytes(nonceHash[:])
+	kScalar := decaf377.ScalarFromUniformBytes(nonceHash[:])
+	k := bigIntFromLittleEndianScalar(kScalar)
 
 	// R = k·G
-	rPoint, err := decaf377.ScalarMul(g, k)
+	rPoint, err := decaf377.ScalarMul(g, kScalar)
 	if err != nil {
 		return nil, err
 	}
@@ -271,7 +279,7 @@ func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
 	h.Write(rBytes)
 	h.Write(pubKeyBytes)
 	h.Write(msg)
-	c := decaf377.ScalarFromUniformBytes(h.Sum(nil))
+	c := bigIntFromLittleEndianScalar(decaf377.ScalarFromUniformBytes(h.Sum(nil)))
 
 	// z = (k + c·x) mod order
 	order := decaf377.ScalarOrder()
@@ -290,4 +298,15 @@ func scalarToLittleEndian32(x *big.Int) []byte {
 		le[len(be)-1-i] = b
 	}
 	return le
+}
+
+// bigIntFromLittleEndianScalar interprets a decaf377.Scalar's fixed-width
+// little-endian bytes as a big.Int, for test-only modular arithmetic —
+// decaf377.Scalar itself exposes no arithmetic, only ScalarMul consumes it.
+func bigIntFromLittleEndianScalar(s decaf377.Scalar) *big.Int {
+	be := make([]byte, len(s))
+	for i, b := range s {
+		be[len(s)-1-i] = b
+	}
+	return new(big.Int).SetBytes(be)
 }
