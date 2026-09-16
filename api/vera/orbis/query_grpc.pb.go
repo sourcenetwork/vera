@@ -19,15 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Query_Params_FullMethodName         = "/vera.orbis.Query/Params"
-	Query_Ring_FullMethodName           = "/vera.orbis.Query/Ring"
-	Query_Rings_FullMethodName          = "/vera.orbis.Query/Rings"
-	Query_Document_FullMethodName       = "/vera.orbis.Query/Document"
-	Query_Documents_FullMethodName      = "/vera.orbis.Query/Documents"
-	Query_KeyDerivation_FullMethodName  = "/vera.orbis.Query/KeyDerivation"
-	Query_KeyDerivations_FullMethodName = "/vera.orbis.Query/KeyDerivations"
-	Query_NodeInfo_FullMethodName       = "/vera.orbis.Query/NodeInfo"
-	Query_NodeDemerits_FullMethodName   = "/vera.orbis.Query/NodeDemerits"
+	Query_Params_FullMethodName                = "/vera.orbis.Query/Params"
+	Query_Ring_FullMethodName                  = "/vera.orbis.Query/Ring"
+	Query_Rings_FullMethodName                 = "/vera.orbis.Query/Rings"
+	Query_Document_FullMethodName              = "/vera.orbis.Query/Document"
+	Query_Documents_FullMethodName             = "/vera.orbis.Query/Documents"
+	Query_KeyDerivation_FullMethodName         = "/vera.orbis.Query/KeyDerivation"
+	Query_KeyDerivations_FullMethodName        = "/vera.orbis.Query/KeyDerivations"
+	Query_NodeInfo_FullMethodName              = "/vera.orbis.Query/NodeInfo"
+	Query_NodeDemerits_FullMethodName          = "/vera.orbis.Query/NodeDemerits"
+	Query_AcceptedReportSession_FullMethodName = "/vera.orbis.Query/AcceptedReportSession"
 )
 
 // QueryClient is the client API for Query service.
@@ -54,6 +55,11 @@ type QueryClient interface {
 	NodeInfo(ctx context.Context, in *QueryNodeInfoRequest, opts ...grpc.CallOption) (*QueryNodeInfoResponse, error)
 	// NodeDemerits queries a node's demerit score in a ring.
 	NodeDemerits(ctx context.Context, in *QueryNodeDemeritsRequest, opts ...grpc.CallOption) (*QueryNodeDemeritsResponse, error)
+	// AcceptedReportSession queries whether a fault report for this
+	// (ring, report_type, origin_protocol, accused, session) has already been
+	// accepted on-chain, so a reporter can skip re-running a threshold-signing
+	// round for an incident that is already recorded.
+	AcceptedReportSession(ctx context.Context, in *QueryAcceptedReportSessionRequest, opts ...grpc.CallOption) (*QueryAcceptedReportSessionResponse, error)
 }
 
 type queryClient struct {
@@ -154,6 +160,16 @@ func (c *queryClient) NodeDemerits(ctx context.Context, in *QueryNodeDemeritsReq
 	return out, nil
 }
 
+func (c *queryClient) AcceptedReportSession(ctx context.Context, in *QueryAcceptedReportSessionRequest, opts ...grpc.CallOption) (*QueryAcceptedReportSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryAcceptedReportSessionResponse)
+	err := c.cc.Invoke(ctx, Query_AcceptedReportSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility.
@@ -178,6 +194,11 @@ type QueryServer interface {
 	NodeInfo(context.Context, *QueryNodeInfoRequest) (*QueryNodeInfoResponse, error)
 	// NodeDemerits queries a node's demerit score in a ring.
 	NodeDemerits(context.Context, *QueryNodeDemeritsRequest) (*QueryNodeDemeritsResponse, error)
+	// AcceptedReportSession queries whether a fault report for this
+	// (ring, report_type, origin_protocol, accused, session) has already been
+	// accepted on-chain, so a reporter can skip re-running a threshold-signing
+	// round for an incident that is already recorded.
+	AcceptedReportSession(context.Context, *QueryAcceptedReportSessionRequest) (*QueryAcceptedReportSessionResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -214,6 +235,9 @@ func (UnimplementedQueryServer) NodeInfo(context.Context, *QueryNodeInfoRequest)
 }
 func (UnimplementedQueryServer) NodeDemerits(context.Context, *QueryNodeDemeritsRequest) (*QueryNodeDemeritsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method NodeDemerits not implemented")
+}
+func (UnimplementedQueryServer) AcceptedReportSession(context.Context, *QueryAcceptedReportSessionRequest) (*QueryAcceptedReportSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcceptedReportSession not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 func (UnimplementedQueryServer) testEmbeddedByValue()               {}
@@ -398,6 +422,24 @@ func _Query_NodeDemerits_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_AcceptedReportSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAcceptedReportSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).AcceptedReportSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_AcceptedReportSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).AcceptedReportSession(ctx, req.(*QueryAcceptedReportSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -440,6 +482,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "NodeDemerits",
 			Handler:    _Query_NodeDemerits_Handler,
+		},
+		{
+			MethodName: "AcceptedReportSession",
+			Handler:    _Query_AcceptedReportSession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

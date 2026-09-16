@@ -152,6 +152,55 @@ func (k *Keeper) NodeDemerits(ctx context.Context, req *types.QueryNodeDemeritsR
 	}, nil
 }
 
+// AcceptedReportSession lets a reporter check, before spending a threshold-signing
+// round, whether this exact (ring, report_type, origin_protocol, accused, session)
+// incident has already been accepted on-chain — see HasAcceptedReportSession and
+// reportSessionDedupeID for the underlying dedupe key this mirrors.
+func (k *Keeper) AcceptedReportSession(ctx context.Context, req *types.QueryAcceptedReportSessionRequest) (*types.QueryAcceptedReportSessionResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	if req.RingId == "" {
+		return nil, status.Error(codes.InvalidArgument, types.ErrInvalidRingId.Error())
+	}
+	if req.ReportType == "" {
+		return nil, status.Error(codes.InvalidArgument, "report_type is required")
+	}
+	if req.OriginProtocol == "" {
+		return nil, status.Error(codes.InvalidArgument, "origin_protocol is required")
+	}
+	if req.AccusedNodeKey == "" {
+		return nil, status.Error(codes.InvalidArgument, "accused_node_key is required")
+	}
+	if req.SessionId == "" {
+		return nil, status.Error(codes.InvalidArgument, "session_id is required")
+	}
+
+	// The chain's own id, not a caller-supplied one: validateSubmittedReport
+	// rejects any report whose chain_id doesn't match ctx.ChainID(), so a
+	// session dedupe key can never legitimately use anything else.
+	sessionDedupeID, err := reportSessionDedupeID(
+		&types.ReportEnvelope{
+			ChainId:        sdk.UnwrapSDKContext(ctx).ChainID(),
+			RingId:         req.RingId,
+			ReportType:     req.ReportType,
+			AccusedNodeKey: req.AccusedNodeKey,
+			SessionId:      req.SessionId,
+		},
+		reportPayload{
+			originProtocol: req.OriginProtocol,
+			attemptID:      req.AttemptId,
+		},
+	)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryAcceptedReportSessionResponse{
+		Accepted: k.HasAcceptedReportSession(ctx, sessionDedupeID),
+	}, nil
+}
+
 func (k *Keeper) KeyDerivations(ctx context.Context, req *types.QueryKeyDerivationsRequest) (*types.QueryKeyDerivationsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

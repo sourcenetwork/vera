@@ -60,6 +60,14 @@ service Query {
   rpc NodeDemerits(QueryNodeDemeritsRequest) returns (QueryNodeDemeritsResponse) {
     option (google.api.http).get = "/sourcenetwork/vera/orbis/node_demerits/{ring_id}/{node_key}";
   }
+
+  // AcceptedReportSession queries whether a fault report for this
+  // (ring, report_type, origin_protocol, accused, session) has already been
+  // accepted on-chain, so a reporter can skip re-running a threshold-signing
+  // round for an incident that is already recorded.
+  rpc AcceptedReportSession(QueryAcceptedReportSessionRequest) returns (QueryAcceptedReportSessionResponse) {
+    option (google.api.http).get = "/sourcenetwork/vera/orbis/accepted_report_session";
+  }
 }
 
 // QueryParamsRequest is request type for the Query/Params RPC method.
@@ -148,4 +156,20 @@ message QueryNodeDemeritsRequest {
 
 message QueryNodeDemeritsResponse {
   uint64 points = 1;
+}
+
+message QueryAcceptedReportSessionRequest {
+  string ring_id = 1;
+  string report_type = 2;
+  string origin_protocol = 3;
+  string accused_node_key = 4;
+  string session_id = 5;
+  // Scopes the dedupe check to a live attempt for attempt-scoped report
+  // kinds. Leave empty for ceremony-scoped kinds (node_offline,
+  // unauthorized_request) — see reportPayload.attemptID in x/orbis/keeper.
+  bytes attempt_id = 6;
+}
+
+message QueryAcceptedReportSessionResponse {
+  bool accepted = 1;
 }

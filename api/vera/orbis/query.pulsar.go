@@ -8139,6 +8139,1158 @@ func (x *fastReflection_QueryNodeDemeritsResponse) ProtoMethods() *protoiface.Me
 	}
 }
 
+var (
+	md_QueryAcceptedReportSessionRequest                  protoreflect.MessageDescriptor
+	fd_QueryAcceptedReportSessionRequest_ring_id          protoreflect.FieldDescriptor
+	fd_QueryAcceptedReportSessionRequest_report_type      protoreflect.FieldDescriptor
+	fd_QueryAcceptedReportSessionRequest_origin_protocol  protoreflect.FieldDescriptor
+	fd_QueryAcceptedReportSessionRequest_accused_node_key protoreflect.FieldDescriptor
+	fd_QueryAcceptedReportSessionRequest_session_id       protoreflect.FieldDescriptor
+	fd_QueryAcceptedReportSessionRequest_attempt_id       protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_vera_orbis_query_proto_init()
+	md_QueryAcceptedReportSessionRequest = File_vera_orbis_query_proto.Messages().ByName("QueryAcceptedReportSessionRequest")
+	fd_QueryAcceptedReportSessionRequest_ring_id = md_QueryAcceptedReportSessionRequest.Fields().ByName("ring_id")
+	fd_QueryAcceptedReportSessionRequest_report_type = md_QueryAcceptedReportSessionRequest.Fields().ByName("report_type")
+	fd_QueryAcceptedReportSessionRequest_origin_protocol = md_QueryAcceptedReportSessionRequest.Fields().ByName("origin_protocol")
+	fd_QueryAcceptedReportSessionRequest_accused_node_key = md_QueryAcceptedReportSessionRequest.Fields().ByName("accused_node_key")
+	fd_QueryAcceptedReportSessionRequest_session_id = md_QueryAcceptedReportSessionRequest.Fields().ByName("session_id")
+	fd_QueryAcceptedReportSessionRequest_attempt_id = md_QueryAcceptedReportSessionRequest.Fields().ByName("attempt_id")
+}
+
+var _ protoreflect.Message = (*fastReflection_QueryAcceptedReportSessionRequest)(nil)
+
+type fastReflection_QueryAcceptedReportSessionRequest QueryAcceptedReportSessionRequest
+
+func (x *QueryAcceptedReportSessionRequest) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryAcceptedReportSessionRequest)(x)
+}
+
+func (x *QueryAcceptedReportSessionRequest) slowProtoReflect() protoreflect.Message {
+	mi := &file_vera_orbis_query_proto_msgTypes[18]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QueryAcceptedReportSessionRequest_messageType fastReflection_QueryAcceptedReportSessionRequest_messageType
+var _ protoreflect.MessageType = fastReflection_QueryAcceptedReportSessionRequest_messageType{}
+
+type fastReflection_QueryAcceptedReportSessionRequest_messageType struct{}
+
+func (x fastReflection_QueryAcceptedReportSessionRequest_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryAcceptedReportSessionRequest)(nil)
+}
+func (x fastReflection_QueryAcceptedReportSessionRequest_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryAcceptedReportSessionRequest)
+}
+func (x fastReflection_QueryAcceptedReportSessionRequest_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAcceptedReportSessionRequest
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAcceptedReportSessionRequest
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Type() protoreflect.MessageType {
+	return _fastReflection_QueryAcceptedReportSessionRequest_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) New() protoreflect.Message {
+	return new(fastReflection_QueryAcceptedReportSessionRequest)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Interface() protoreflect.ProtoMessage {
+	return (*QueryAcceptedReportSessionRequest)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.RingId != "" {
+		value := protoreflect.ValueOfString(x.RingId)
+		if !f(fd_QueryAcceptedReportSessionRequest_ring_id, value) {
+			return
+		}
+	}
+	if x.ReportType != "" {
+		value := protoreflect.ValueOfString(x.ReportType)
+		if !f(fd_QueryAcceptedReportSessionRequest_report_type, value) {
+			return
+		}
+	}
+	if x.OriginProtocol != "" {
+		value := protoreflect.ValueOfString(x.OriginProtocol)
+		if !f(fd_QueryAcceptedReportSessionRequest_origin_protocol, value) {
+			return
+		}
+	}
+	if x.AccusedNodeKey != "" {
+		value := protoreflect.ValueOfString(x.AccusedNodeKey)
+		if !f(fd_QueryAcceptedReportSessionRequest_accused_node_key, value) {
+			return
+		}
+	}
+	if x.SessionId != "" {
+		value := protoreflect.ValueOfString(x.SessionId)
+		if !f(fd_QueryAcceptedReportSessionRequest_session_id, value) {
+			return
+		}
+	}
+	if len(x.AttemptId) != 0 {
+		value := protoreflect.ValueOfBytes(x.AttemptId)
+		if !f(fd_QueryAcceptedReportSessionRequest_attempt_id, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		return x.RingId != ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		return x.ReportType != ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		return x.OriginProtocol != ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		return x.AccusedNodeKey != ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		return x.SessionId != ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		return len(x.AttemptId) != 0
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		x.RingId = ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		x.ReportType = ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		x.OriginProtocol = ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		x.AccusedNodeKey = ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		x.SessionId = ""
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		x.AttemptId = nil
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		value := x.RingId
+		return protoreflect.ValueOfString(value)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		value := x.ReportType
+		return protoreflect.ValueOfString(value)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		value := x.OriginProtocol
+		return protoreflect.ValueOfString(value)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		value := x.AccusedNodeKey
+		return protoreflect.ValueOfString(value)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		value := x.SessionId
+		return protoreflect.ValueOfString(value)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		value := x.AttemptId
+		return protoreflect.ValueOfBytes(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		x.RingId = value.Interface().(string)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		x.ReportType = value.Interface().(string)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		x.OriginProtocol = value.Interface().(string)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		x.AccusedNodeKey = value.Interface().(string)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		x.SessionId = value.Interface().(string)
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		x.AttemptId = value.Bytes()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		panic(fmt.Errorf("field ring_id of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		panic(fmt.Errorf("field report_type of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		panic(fmt.Errorf("field origin_protocol of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		panic(fmt.Errorf("field accused_node_key of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		panic(fmt.Errorf("field session_id of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		panic(fmt.Errorf("field attempt_id of message vera.orbis.QueryAcceptedReportSessionRequest is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionRequest.ring_id":
+		return protoreflect.ValueOfString("")
+	case "vera.orbis.QueryAcceptedReportSessionRequest.report_type":
+		return protoreflect.ValueOfString("")
+	case "vera.orbis.QueryAcceptedReportSessionRequest.origin_protocol":
+		return protoreflect.ValueOfString("")
+	case "vera.orbis.QueryAcceptedReportSessionRequest.accused_node_key":
+		return protoreflect.ValueOfString("")
+	case "vera.orbis.QueryAcceptedReportSessionRequest.session_id":
+		return protoreflect.ValueOfString("")
+	case "vera.orbis.QueryAcceptedReportSessionRequest.attempt_id":
+		return protoreflect.ValueOfBytes(nil)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionRequest"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionRequest does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in vera.orbis.QueryAcceptedReportSessionRequest", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QueryAcceptedReportSessionRequest) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionRequest)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		l = len(x.RingId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.ReportType)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.OriginProtocol)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.AccusedNodeKey)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.SessionId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		l = len(x.AttemptId)
+		if l > 0 {
+			n += 1 + l + runtime.Sov(uint64(l))
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionRequest)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.AttemptId) > 0 {
+			i -= len(x.AttemptId)
+			copy(dAtA[i:], x.AttemptId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AttemptId)))
+			i--
+			dAtA[i] = 0x32
+		}
+		if len(x.SessionId) > 0 {
+			i -= len(x.SessionId)
+			copy(dAtA[i:], x.SessionId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.SessionId)))
+			i--
+			dAtA[i] = 0x2a
+		}
+		if len(x.AccusedNodeKey) > 0 {
+			i -= len(x.AccusedNodeKey)
+			copy(dAtA[i:], x.AccusedNodeKey)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.AccusedNodeKey)))
+			i--
+			dAtA[i] = 0x22
+		}
+		if len(x.OriginProtocol) > 0 {
+			i -= len(x.OriginProtocol)
+			copy(dAtA[i:], x.OriginProtocol)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.OriginProtocol)))
+			i--
+			dAtA[i] = 0x1a
+		}
+		if len(x.ReportType) > 0 {
+			i -= len(x.ReportType)
+			copy(dAtA[i:], x.ReportType)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.ReportType)))
+			i--
+			dAtA[i] = 0x12
+		}
+		if len(x.RingId) > 0 {
+			i -= len(x.RingId)
+			copy(dAtA[i:], x.RingId)
+			i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RingId)))
+			i--
+			dAtA[i] = 0xa
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionRequest)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryAcceptedReportSessionRequest: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryAcceptedReportSessionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RingId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.RingId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 2:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field ReportType", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.ReportType = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field OriginProtocol", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.OriginProtocol = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 4:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AccusedNodeKey", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.AccusedNodeKey = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 5:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field SessionId", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.SessionId = string(dAtA[iNdEx:postIndex])
+				iNdEx = postIndex
+			case 6:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field AttemptId", wireType)
+				}
+				var byteLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					byteLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if byteLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + byteLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.AttemptId = append(x.AttemptId[:0], dAtA[iNdEx:postIndex]...)
+				if x.AttemptId == nil {
+					x.AttemptId = []byte{}
+				}
+				iNdEx = postIndex
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
+var (
+	md_QueryAcceptedReportSessionResponse          protoreflect.MessageDescriptor
+	fd_QueryAcceptedReportSessionResponse_accepted protoreflect.FieldDescriptor
+)
+
+func init() {
+	file_vera_orbis_query_proto_init()
+	md_QueryAcceptedReportSessionResponse = File_vera_orbis_query_proto.Messages().ByName("QueryAcceptedReportSessionResponse")
+	fd_QueryAcceptedReportSessionResponse_accepted = md_QueryAcceptedReportSessionResponse.Fields().ByName("accepted")
+}
+
+var _ protoreflect.Message = (*fastReflection_QueryAcceptedReportSessionResponse)(nil)
+
+type fastReflection_QueryAcceptedReportSessionResponse QueryAcceptedReportSessionResponse
+
+func (x *QueryAcceptedReportSessionResponse) ProtoReflect() protoreflect.Message {
+	return (*fastReflection_QueryAcceptedReportSessionResponse)(x)
+}
+
+func (x *QueryAcceptedReportSessionResponse) slowProtoReflect() protoreflect.Message {
+	mi := &file_vera_orbis_query_proto_msgTypes[19]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+var _fastReflection_QueryAcceptedReportSessionResponse_messageType fastReflection_QueryAcceptedReportSessionResponse_messageType
+var _ protoreflect.MessageType = fastReflection_QueryAcceptedReportSessionResponse_messageType{}
+
+type fastReflection_QueryAcceptedReportSessionResponse_messageType struct{}
+
+func (x fastReflection_QueryAcceptedReportSessionResponse_messageType) Zero() protoreflect.Message {
+	return (*fastReflection_QueryAcceptedReportSessionResponse)(nil)
+}
+func (x fastReflection_QueryAcceptedReportSessionResponse_messageType) New() protoreflect.Message {
+	return new(fastReflection_QueryAcceptedReportSessionResponse)
+}
+func (x fastReflection_QueryAcceptedReportSessionResponse_messageType) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAcceptedReportSessionResponse
+}
+
+// Descriptor returns message descriptor, which contains only the protobuf
+// type information for the message.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Descriptor() protoreflect.MessageDescriptor {
+	return md_QueryAcceptedReportSessionResponse
+}
+
+// Type returns the message type, which encapsulates both Go and protobuf
+// type information. If the Go type information is not needed,
+// it is recommended that the message descriptor be used instead.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Type() protoreflect.MessageType {
+	return _fastReflection_QueryAcceptedReportSessionResponse_messageType
+}
+
+// New returns a newly allocated and mutable empty message.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) New() protoreflect.Message {
+	return new(fastReflection_QueryAcceptedReportSessionResponse)
+}
+
+// Interface unwraps the message reflection interface and
+// returns the underlying ProtoMessage interface.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Interface() protoreflect.ProtoMessage {
+	return (*QueryAcceptedReportSessionResponse)(x)
+}
+
+// Range iterates over every populated field in an undefined order,
+// calling f for each field descriptor and value encountered.
+// Range returns immediately if f returns false.
+// While iterating, mutating operations may only be performed
+// on the current field descriptor.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Range(f func(protoreflect.FieldDescriptor, protoreflect.Value) bool) {
+	if x.Accepted != false {
+		value := protoreflect.ValueOfBool(x.Accepted)
+		if !f(fd_QueryAcceptedReportSessionResponse_accepted, value) {
+			return
+		}
+	}
+}
+
+// Has reports whether a field is populated.
+//
+// Some fields have the property of nullability where it is possible to
+// distinguish between the default value of a field and whether the field
+// was explicitly populated with the default value. Singular message fields,
+// member fields of a oneof, and proto2 scalar fields are nullable. Such
+// fields are populated only if explicitly set.
+//
+// In other cases (aside from the nullable cases above),
+// a proto3 scalar field is populated if it contains a non-zero value, and
+// a repeated field is populated if it is non-empty.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Has(fd protoreflect.FieldDescriptor) bool {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		return x.Accepted != false
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Clear clears the field such that a subsequent Has call reports false.
+//
+// Clearing an extension field clears both the extension type and value
+// associated with the given field number.
+//
+// Clear is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Clear(fd protoreflect.FieldDescriptor) {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		x.Accepted = false
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Get retrieves the value for a field.
+//
+// For unpopulated scalars, it returns the default value, where
+// the default value of a bytes scalar is guaranteed to be a copy.
+// For unpopulated composite types, it returns an empty, read-only view
+// of the value; to obtain a mutable reference, use Mutable.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Get(descriptor protoreflect.FieldDescriptor) protoreflect.Value {
+	switch descriptor.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		value := x.Accepted
+		return protoreflect.ValueOfBool(value)
+	default:
+		if descriptor.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", descriptor.FullName()))
+	}
+}
+
+// Set stores the value for a field.
+//
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType.
+// When setting a composite type, it is unspecified whether the stored value
+// aliases the source's memory in any way. If the composite value is an
+// empty, read-only value, then it panics.
+//
+// Set is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Set(fd protoreflect.FieldDescriptor, value protoreflect.Value) {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		x.Accepted = value.Bool()
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// Mutable returns a mutable reference to a composite type.
+//
+// If the field is unpopulated, it may allocate a composite value.
+// For a field belonging to a oneof, it implicitly clears any other field
+// that may be currently set within the same oneof.
+// For extension fields, it implicitly stores the provided ExtensionType
+// if not already stored.
+// It panics if the field does not contain a composite type.
+//
+// Mutable is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) Mutable(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		panic(fmt.Errorf("field accepted of message vera.orbis.QueryAcceptedReportSessionResponse is not mutable"))
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// NewField returns a new value that is assignable to the field
+// for the given descriptor. For scalars, this returns the default value.
+// For lists, maps, and messages, this returns a new, empty, mutable value.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) NewField(fd protoreflect.FieldDescriptor) protoreflect.Value {
+	switch fd.FullName() {
+	case "vera.orbis.QueryAcceptedReportSessionResponse.accepted":
+		return protoreflect.ValueOfBool(false)
+	default:
+		if fd.IsExtension() {
+			panic(fmt.Errorf("proto3 declared messages do not support extensions: vera.orbis.QueryAcceptedReportSessionResponse"))
+		}
+		panic(fmt.Errorf("message vera.orbis.QueryAcceptedReportSessionResponse does not contain field %s", fd.FullName()))
+	}
+}
+
+// WhichOneof reports which field within the oneof is populated,
+// returning nil if none are populated.
+// It panics if the oneof descriptor does not belong to this message.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) WhichOneof(d protoreflect.OneofDescriptor) protoreflect.FieldDescriptor {
+	switch d.FullName() {
+	default:
+		panic(fmt.Errorf("%s is not a oneof field in vera.orbis.QueryAcceptedReportSessionResponse", d.FullName()))
+	}
+	panic("unreachable")
+}
+
+// GetUnknown retrieves the entire list of unknown fields.
+// The caller may only mutate the contents of the RawFields
+// if the mutated bytes are stored back into the message with SetUnknown.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) GetUnknown() protoreflect.RawFields {
+	return x.unknownFields
+}
+
+// SetUnknown stores an entire list of unknown fields.
+// The raw fields must be syntactically valid according to the wire format.
+// An implementation may panic if this is not the case.
+// Once stored, the caller must not mutate the content of the RawFields.
+// An empty RawFields may be passed to clear the fields.
+//
+// SetUnknown is a mutating operation and unsafe for concurrent use.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) SetUnknown(fields protoreflect.RawFields) {
+	x.unknownFields = fields
+}
+
+// IsValid reports whether the message is valid.
+//
+// An invalid message is an empty, read-only value.
+//
+// An invalid message often corresponds to a nil pointer of the concrete
+// message type, but the details are implementation dependent.
+// Validity is not part of the protobuf data model, and may not
+// be preserved in marshaling or other operations.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) IsValid() bool {
+	return x != nil
+}
+
+// ProtoMethods returns optional fastReflectionFeature-path implementations of various operations.
+// This method may return nil.
+//
+// The returned methods type is identical to
+// "google.golang.org/protobuf/runtime/protoiface".Methods.
+// Consult the protoiface package documentation for details.
+func (x *fastReflection_QueryAcceptedReportSessionResponse) ProtoMethods() *protoiface.Methods {
+	size := func(input protoiface.SizeInput) protoiface.SizeOutput {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionResponse)
+		if x == nil {
+			return protoiface.SizeOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Size:              0,
+			}
+		}
+		options := runtime.SizeInputToOptions(input)
+		_ = options
+		var n int
+		var l int
+		_ = l
+		if x.Accepted {
+			n += 2
+		}
+		if x.unknownFields != nil {
+			n += len(x.unknownFields)
+		}
+		return protoiface.SizeOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Size:              n,
+		}
+	}
+
+	marshal := func(input protoiface.MarshalInput) (protoiface.MarshalOutput, error) {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionResponse)
+		if x == nil {
+			return protoiface.MarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Buf:               input.Buf,
+			}, nil
+		}
+		options := runtime.MarshalInputToOptions(input)
+		_ = options
+		size := options.Size(x)
+		dAtA := make([]byte, size)
+		i := len(dAtA)
+		_ = i
+		var l int
+		_ = l
+		if x.unknownFields != nil {
+			i -= len(x.unknownFields)
+			copy(dAtA[i:], x.unknownFields)
+		}
+		if x.Accepted {
+			i--
+			if x.Accepted {
+				dAtA[i] = 1
+			} else {
+				dAtA[i] = 0
+			}
+			i--
+			dAtA[i] = 0x8
+		}
+		if input.Buf != nil {
+			input.Buf = append(input.Buf, dAtA...)
+		} else {
+			input.Buf = dAtA
+		}
+		return protoiface.MarshalOutput{
+			NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+			Buf:               input.Buf,
+		}, nil
+	}
+	unmarshal := func(input protoiface.UnmarshalInput) (protoiface.UnmarshalOutput, error) {
+		x := input.Message.Interface().(*QueryAcceptedReportSessionResponse)
+		if x == nil {
+			return protoiface.UnmarshalOutput{
+				NoUnkeyedLiterals: input.NoUnkeyedLiterals,
+				Flags:             input.Flags,
+			}, nil
+		}
+		options := runtime.UnmarshalInputToOptions(input)
+		_ = options
+		dAtA := input.Buf
+		l := len(dAtA)
+		iNdEx := 0
+		for iNdEx < l {
+			preIndex := iNdEx
+			var wire uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				wire |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			fieldNum := int32(wire >> 3)
+			wireType := int(wire & 0x7)
+			if wireType == 4 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryAcceptedReportSessionResponse: wiretype end group for non-group")
+			}
+			if fieldNum <= 0 {
+				return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: QueryAcceptedReportSessionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			}
+			switch fieldNum {
+			case 1:
+				if wireType != 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field Accepted", wireType)
+				}
+				var v int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				x.Accepted = bool(v != 0)
+			default:
+				iNdEx = preIndex
+				skippy, err := runtime.Skip(dAtA[iNdEx:])
+				if err != nil {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
+				}
+				if (skippy < 0) || (iNdEx+skippy) < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if (iNdEx + skippy) > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				if !options.DiscardUnknown {
+					x.unknownFields = append(x.unknownFields, dAtA[iNdEx:iNdEx+skippy]...)
+				}
+				iNdEx += skippy
+			}
+		}
+
+		if iNdEx > l {
+			return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+		}
+		return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, nil
+	}
+	return &protoiface.Methods{
+		NoUnkeyedLiterals: struct{}{},
+		Flags:             protoiface.SupportMarshalDeterministic | protoiface.SupportUnmarshalDiscardUnknown,
+		Size:              size,
+		Marshal:           marshal,
+		Unmarshal:         unmarshal,
+		Merge:             nil,
+		CheckInitialized:  nil,
+	}
+}
+
 // Code generated by protoc-gen-go. DO NOT EDIT.
 // versions:
 // 	protoc-gen-go v1.27.0
@@ -8807,6 +9959,119 @@ func (x *QueryNodeDemeritsResponse) GetPoints() uint64 {
 	return 0
 }
 
+type QueryAcceptedReportSessionRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	RingId         string `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	ReportType     string `protobuf:"bytes,2,opt,name=report_type,json=reportType,proto3" json:"report_type,omitempty"`
+	OriginProtocol string `protobuf:"bytes,3,opt,name=origin_protocol,json=originProtocol,proto3" json:"origin_protocol,omitempty"`
+	AccusedNodeKey string `protobuf:"bytes,4,opt,name=accused_node_key,json=accusedNodeKey,proto3" json:"accused_node_key,omitempty"`
+	SessionId      string `protobuf:"bytes,5,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	// Scopes the dedupe check to a live attempt for attempt-scoped report
+	// kinds. Leave empty for ceremony-scoped kinds (node_offline,
+	// unauthorized_request) — see reportPayload.attemptID in x/orbis/keeper.
+	AttemptId []byte `protobuf:"bytes,6,opt,name=attempt_id,json=attemptId,proto3" json:"attempt_id,omitempty"`
+}
+
+func (x *QueryAcceptedReportSessionRequest) Reset() {
+	*x = QueryAcceptedReportSessionRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vera_orbis_query_proto_msgTypes[18]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryAcceptedReportSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryAcceptedReportSessionRequest) ProtoMessage() {}
+
+// Deprecated: Use QueryAcceptedReportSessionRequest.ProtoReflect.Descriptor instead.
+func (*QueryAcceptedReportSessionRequest) Descriptor() ([]byte, []int) {
+	return file_vera_orbis_query_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetRingId() string {
+	if x != nil {
+		return x.RingId
+	}
+	return ""
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetReportType() string {
+	if x != nil {
+		return x.ReportType
+	}
+	return ""
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetOriginProtocol() string {
+	if x != nil {
+		return x.OriginProtocol
+	}
+	return ""
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetAccusedNodeKey() string {
+	if x != nil {
+		return x.AccusedNodeKey
+	}
+	return ""
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *QueryAcceptedReportSessionRequest) GetAttemptId() []byte {
+	if x != nil {
+		return x.AttemptId
+	}
+	return nil
+}
+
+type QueryAcceptedReportSessionResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Accepted bool `protobuf:"varint,1,opt,name=accepted,proto3" json:"accepted,omitempty"`
+}
+
+func (x *QueryAcceptedReportSessionResponse) Reset() {
+	*x = QueryAcceptedReportSessionResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_vera_orbis_query_proto_msgTypes[19]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *QueryAcceptedReportSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryAcceptedReportSessionResponse) ProtoMessage() {}
+
+// Deprecated: Use QueryAcceptedReportSessionResponse.ProtoReflect.Descriptor instead.
+func (*QueryAcceptedReportSessionResponse) Descriptor() ([]byte, []int) {
+	return file_vera_orbis_query_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *QueryAcceptedReportSessionResponse) GetAccepted() bool {
+	if x != nil {
+		return x.Accepted
+	}
+	return false
+}
+
 var File_vera_orbis_query_proto protoreflect.FileDescriptor
 
 var file_vera_orbis_query_proto_rawDesc = []byte{
@@ -8921,92 +10186,122 @@ var file_vera_orbis_query_proto_rawDesc = []byte{
 	0x4b, 0x65, 0x79, 0x22, 0x33, 0x0a, 0x19, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4e, 0x6f, 0x64, 0x65,
 	0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x12, 0x16, 0x0a, 0x06, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04,
-	0x52, 0x06, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x32, 0xc0, 0x09, 0x0a, 0x05, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x12, 0x73, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x1e, 0x2e, 0x76,
-	0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50,
-	0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1f, 0x2e, 0x76,
-	0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50,
-	0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x28, 0x82,
-	0xd3, 0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65,
-	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73,
-	0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x70, 0x0a, 0x04, 0x52, 0x69, 0x6e, 0x67, 0x12,
-	0x1c, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65,
-	0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e,
-	0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
-	0x52, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2b, 0x82, 0xd3,
-	0xe4, 0x93, 0x02, 0x25, 0x12, 0x23, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74,
-	0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f,
-	0x72, 0x69, 0x6e, 0x67, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x6f, 0x0a, 0x05, 0x52, 0x69, 0x6e,
-	0x67, 0x73, 0x12, 0x1d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e,
-	0x51, 0x75, 0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x1e, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x27, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x21, 0x12, 0x1f, 0x2f, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f,
-	0x72, 0x62, 0x69, 0x73, 0x2f, 0x72, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x80, 0x01, 0x0a, 0x08, 0x44,
-	0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x20, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f,
-	0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65,
-	0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x76, 0x65, 0x72, 0x61,
-	0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x6f, 0x63, 0x75,
-	0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2f, 0x82, 0xd3,
-	0xe4, 0x93, 0x02, 0x29, 0x12, 0x27, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74,
-	0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f,
-	0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x7f, 0x0a,
-	0x09, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x21, 0x2e, 0x76, 0x65, 0x72,
+	0x52, 0x06, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x73, 0x22, 0xee, 0x01, 0x0a, 0x21, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x17,
+	0x0a, 0x07, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x72, 0x69, 0x6e, 0x67, 0x49, 0x64, 0x12, 0x1f, 0x0a, 0x0b, 0x72, 0x65, 0x70, 0x6f, 0x72,
+	0x74, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x65,
+	0x70, 0x6f, 0x72, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x27, 0x0a, 0x0f, 0x6f, 0x72, 0x69, 0x67,
+	0x69, 0x6e, 0x5f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f, 0x6c, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x0e, 0x6f, 0x72, 0x69, 0x67, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x6f,
+	0x6c, 0x12, 0x28, 0x0a, 0x10, 0x61, 0x63, 0x63, 0x75, 0x73, 0x65, 0x64, 0x5f, 0x6e, 0x6f, 0x64,
+	0x65, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x61, 0x63, 0x63,
+	0x75, 0x73, 0x65, 0x64, 0x4e, 0x6f, 0x64, 0x65, 0x4b, 0x65, 0x79, 0x12, 0x1d, 0x0a, 0x0a, 0x73,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x09, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x61, 0x74,
+	0x74, 0x65, 0x6d, 0x70, 0x74, 0x5f, 0x69, 0x64, 0x18, 0x06, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09,
+	0x61, 0x74, 0x74, 0x65, 0x6d, 0x70, 0x74, 0x49, 0x64, 0x22, 0x40, 0x0a, 0x22, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x1a, 0x0a, 0x08, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x08, 0x61, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x32, 0xf4, 0x0a, 0x0a, 0x05,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x12, 0x73, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12,
+	0x1e, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1f, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x28, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x22, 0x12, 0x20, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63,
+	0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72,
+	0x62, 0x69, 0x73, 0x2f, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x12, 0x70, 0x0a, 0x04, 0x52, 0x69,
+	0x6e, 0x67, 0x12, 0x1c, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e,
+	0x51, 0x75, 0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x25, 0x12, 0x23, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62,
+	0x69, 0x73, 0x2f, 0x72, 0x69, 0x6e, 0x67, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x6f, 0x0a, 0x05,
+	0x52, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x1d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62,
+	0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69,
+	0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x52, 0x69, 0x6e, 0x67, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x27, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x21, 0x12, 0x1f, 0x2f, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72,
+	0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x72, 0x69, 0x6e, 0x67, 0x73, 0x12, 0x80, 0x01,
+	0x0a, 0x08, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x20, 0x2e, 0x76, 0x65, 0x72,
 	0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44, 0x6f, 0x63,
-	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x22, 0x2e,
+	0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x76,
+	0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x44,
+	0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
+	0x2f, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x29, 0x12, 0x27, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
+	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62,
+	0x69, 0x73, 0x2f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x2f, 0x7b, 0x69, 0x64, 0x7d,
+	0x12, 0x7f, 0x0a, 0x09, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x21, 0x2e,
 	0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
-	0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x25, 0x12, 0x23, 0x2f, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f,
-	0x72, 0x62, 0x69, 0x73, 0x2f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x12, 0x95,
-	0x01, 0x0a, 0x0d, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x12, 0x25, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75,
-	0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f,
-	0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72,
-	0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2f, 0x12, 0x2d, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62,
-	0x69, 0x73, 0x2f, 0x6b, 0x65, 0x79, 0x5f, 0x64, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x94, 0x01, 0x0a, 0x0e, 0x4b, 0x65, 0x79, 0x44, 0x65,
-	0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x26, 0x2e, 0x76, 0x65, 0x72, 0x61,
-	0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44,
-	0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x27, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51,
-	0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x31, 0x82, 0xd3, 0xe4, 0x93,
-	0x02, 0x2b, 0x12, 0x29, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f,
-	0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x6b, 0x65,
-	0x79, 0x5f, 0x64, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x87, 0x01,
-	0x0a, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x20, 0x2e, 0x76, 0x65, 0x72,
-	0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4e, 0x6f, 0x64,
-	0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x76,
-	0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4e,
-	0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22,
-	0x36, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62,
-	0x69, 0x73, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x2f, 0x7b, 0x6e, 0x6f,
-	0x64, 0x65, 0x5f, 0x6b, 0x65, 0x79, 0x7d, 0x12, 0xa1, 0x01, 0x0a, 0x0c, 0x4e, 0x6f, 0x64, 0x65,
-	0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x12, 0x24, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e,
-	0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x44,
-	0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25,
-	0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72,
-	0x79, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x44, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x3e, 0x12, 0x3c, 0x2f,
-	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65,
-	0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x64, 0x65,
-	0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x2f, 0x7b, 0x72, 0x69, 0x6e, 0x67, 0x5f, 0x69, 0x64, 0x7d,
-	0x2f, 0x7b, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x6b, 0x65, 0x79, 0x7d, 0x42, 0x82, 0x01, 0x0a, 0x0e,
-	0x63, 0x6f, 0x6d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0a,
-	0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x1b, 0x63, 0x6f,
-	0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69, 0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76,
-	0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0xa2, 0x02, 0x03, 0x56, 0x4f, 0x58, 0xaa,
-	0x02, 0x0a, 0x56, 0x65, 0x72, 0x61, 0x2e, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xca, 0x02, 0x0a, 0x56,
-	0x65, 0x72, 0x61, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0xe2, 0x02, 0x16, 0x56, 0x65, 0x72, 0x61,
-	0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61,
-	0x74, 0x61, 0xea, 0x02, 0x0b, 0x56, 0x65, 0x72, 0x61, 0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73,
-	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x22, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75,
+	0x65, 0x72, 0x79, 0x44, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x2b, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x25, 0x12, 0x23, 0x2f, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72,
+	0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x64, 0x6f, 0x63, 0x75, 0x6d, 0x65, 0x6e, 0x74,
+	0x73, 0x12, 0x95, 0x01, 0x0a, 0x0d, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x12, 0x25, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73,
+	0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x76, 0x65, 0x72,
+	0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79,
+	0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x35, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x2f, 0x12, 0x2d, 0x2f, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f,
+	0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x6b, 0x65, 0x79, 0x5f, 0x64, 0x65, 0x72, 0x69, 0x76, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x2f, 0x7b, 0x69, 0x64, 0x7d, 0x12, 0x94, 0x01, 0x0a, 0x0e, 0x4b, 0x65,
+	0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x26, 0x2e, 0x76,
+	0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b,
+	0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69,
+	0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4b, 0x65, 0x79, 0x44, 0x65, 0x72, 0x69, 0x76, 0x61,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x31, 0x82,
+	0xd3, 0xe4, 0x93, 0x02, 0x2b, 0x12, 0x29, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65,
+	0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73,
+	0x2f, 0x6b, 0x65, 0x79, 0x5f, 0x64, 0x65, 0x72, 0x69, 0x76, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73,
+	0x12, 0x87, 0x01, 0x0a, 0x08, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x20, 0x2e,
+	0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79,
+	0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x21, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65,
+	0x72, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x22, 0x36, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x30, 0x12, 0x2e, 0x2f, 0x73, 0x6f, 0x75,
+	0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f,
+	0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x69, 0x6e, 0x66, 0x6f, 0x2f,
+	0x7b, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x6b, 0x65, 0x79, 0x7d, 0x12, 0xa1, 0x01, 0x0a, 0x0c, 0x4e,
+	0x6f, 0x64, 0x65, 0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x12, 0x24, 0x2e, 0x76, 0x65,
+	0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x4e, 0x6f,
+	0x64, 0x65, 0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x25, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51,
+	0x75, 0x65, 0x72, 0x79, 0x4e, 0x6f, 0x64, 0x65, 0x44, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x44, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x3e,
+	0x12, 0x3c, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b,
+	0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x6e, 0x6f, 0x64, 0x65,
+	0x5f, 0x64, 0x65, 0x6d, 0x65, 0x72, 0x69, 0x74, 0x73, 0x2f, 0x7b, 0x72, 0x69, 0x6e, 0x67, 0x5f,
+	0x69, 0x64, 0x7d, 0x2f, 0x7b, 0x6e, 0x6f, 0x64, 0x65, 0x5f, 0x6b, 0x65, 0x79, 0x7d, 0x12, 0xb1,
+	0x01, 0x0a, 0x15, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74, 0x65, 0x64, 0x52, 0x65, 0x70, 0x6f, 0x72,
+	0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e,
+	0x6f, 0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x63, 0x63, 0x65, 0x70,
+	0x74, 0x65, 0x64, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e, 0x6f,
+	0x72, 0x62, 0x69, 0x73, 0x2e, 0x51, 0x75, 0x65, 0x72, 0x79, 0x41, 0x63, 0x63, 0x65, 0x70, 0x74,
+	0x65, 0x64, 0x52, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x39, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x33, 0x12,
+	0x31, 0x2f, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f,
+	0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73, 0x2f, 0x61, 0x63, 0x63, 0x65, 0x70,
+	0x74, 0x65, 0x64, 0x5f, 0x72, 0x65, 0x70, 0x6f, 0x72, 0x74, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x42, 0x82, 0x01, 0x0a, 0x0e, 0x63, 0x6f, 0x6d, 0x2e, 0x76, 0x65, 0x72, 0x61, 0x2e,
+	0x6f, 0x72, 0x62, 0x69, 0x73, 0x42, 0x0a, 0x51, 0x75, 0x65, 0x72, 0x79, 0x50, 0x72, 0x6f, 0x74,
+	0x6f, 0x50, 0x01, 0x5a, 0x1b, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x73, 0x64, 0x6b, 0x2e, 0x69,
+	0x6f, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x65, 0x72, 0x61, 0x2f, 0x6f, 0x72, 0x62, 0x69, 0x73,
+	0xa2, 0x02, 0x03, 0x56, 0x4f, 0x58, 0xaa, 0x02, 0x0a, 0x56, 0x65, 0x72, 0x61, 0x2e, 0x4f, 0x72,
+	0x62, 0x69, 0x73, 0xca, 0x02, 0x0a, 0x56, 0x65, 0x72, 0x61, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73,
+	0xe2, 0x02, 0x16, 0x56, 0x65, 0x72, 0x61, 0x5c, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x5c, 0x47, 0x50,
+	0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0b, 0x56, 0x65, 0x72, 0x61,
+	0x3a, 0x3a, 0x4f, 0x72, 0x62, 0x69, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -9021,49 +10316,51 @@ func file_vera_orbis_query_proto_rawDescGZIP() []byte {
 	return file_vera_orbis_query_proto_rawDescData
 }
 
-var file_vera_orbis_query_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_vera_orbis_query_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_vera_orbis_query_proto_goTypes = []interface{}{
-	(*QueryParamsRequest)(nil),          // 0: vera.orbis.QueryParamsRequest
-	(*QueryParamsResponse)(nil),         // 1: vera.orbis.QueryParamsResponse
-	(*QueryRingRequest)(nil),            // 2: vera.orbis.QueryRingRequest
-	(*QueryRingResponse)(nil),           // 3: vera.orbis.QueryRingResponse
-	(*QueryRingsRequest)(nil),           // 4: vera.orbis.QueryRingsRequest
-	(*QueryRingsResponse)(nil),          // 5: vera.orbis.QueryRingsResponse
-	(*QueryDocumentRequest)(nil),        // 6: vera.orbis.QueryDocumentRequest
-	(*QueryDocumentResponse)(nil),       // 7: vera.orbis.QueryDocumentResponse
-	(*QueryDocumentsRequest)(nil),       // 8: vera.orbis.QueryDocumentsRequest
-	(*QueryDocumentsResponse)(nil),      // 9: vera.orbis.QueryDocumentsResponse
-	(*QueryKeyDerivationRequest)(nil),   // 10: vera.orbis.QueryKeyDerivationRequest
-	(*QueryKeyDerivationResponse)(nil),  // 11: vera.orbis.QueryKeyDerivationResponse
-	(*QueryKeyDerivationsRequest)(nil),  // 12: vera.orbis.QueryKeyDerivationsRequest
-	(*QueryKeyDerivationsResponse)(nil), // 13: vera.orbis.QueryKeyDerivationsResponse
-	(*QueryNodeInfoRequest)(nil),        // 14: vera.orbis.QueryNodeInfoRequest
-	(*QueryNodeInfoResponse)(nil),       // 15: vera.orbis.QueryNodeInfoResponse
-	(*QueryNodeDemeritsRequest)(nil),    // 16: vera.orbis.QueryNodeDemeritsRequest
-	(*QueryNodeDemeritsResponse)(nil),   // 17: vera.orbis.QueryNodeDemeritsResponse
-	(*Params)(nil),                      // 18: vera.orbis.Params
-	(*Ring)(nil),                        // 19: vera.orbis.Ring
-	(*v1beta1.PageRequest)(nil),         // 20: cosmos.base.query.v1beta1.PageRequest
-	(*v1beta1.PageResponse)(nil),        // 21: cosmos.base.query.v1beta1.PageResponse
-	(*Document)(nil),                    // 22: vera.orbis.Document
-	(*KeyDerivation)(nil),               // 23: vera.orbis.KeyDerivation
-	(*NodeInfo)(nil),                    // 24: vera.orbis.NodeInfo
+	(*QueryParamsRequest)(nil),                 // 0: vera.orbis.QueryParamsRequest
+	(*QueryParamsResponse)(nil),                // 1: vera.orbis.QueryParamsResponse
+	(*QueryRingRequest)(nil),                   // 2: vera.orbis.QueryRingRequest
+	(*QueryRingResponse)(nil),                  // 3: vera.orbis.QueryRingResponse
+	(*QueryRingsRequest)(nil),                  // 4: vera.orbis.QueryRingsRequest
+	(*QueryRingsResponse)(nil),                 // 5: vera.orbis.QueryRingsResponse
+	(*QueryDocumentRequest)(nil),               // 6: vera.orbis.QueryDocumentRequest
+	(*QueryDocumentResponse)(nil),              // 7: vera.orbis.QueryDocumentResponse
+	(*QueryDocumentsRequest)(nil),              // 8: vera.orbis.QueryDocumentsRequest
+	(*QueryDocumentsResponse)(nil),             // 9: vera.orbis.QueryDocumentsResponse
+	(*QueryKeyDerivationRequest)(nil),          // 10: vera.orbis.QueryKeyDerivationRequest
+	(*QueryKeyDerivationResponse)(nil),         // 11: vera.orbis.QueryKeyDerivationResponse
+	(*QueryKeyDerivationsRequest)(nil),         // 12: vera.orbis.QueryKeyDerivationsRequest
+	(*QueryKeyDerivationsResponse)(nil),        // 13: vera.orbis.QueryKeyDerivationsResponse
+	(*QueryNodeInfoRequest)(nil),               // 14: vera.orbis.QueryNodeInfoRequest
+	(*QueryNodeInfoResponse)(nil),              // 15: vera.orbis.QueryNodeInfoResponse
+	(*QueryNodeDemeritsRequest)(nil),           // 16: vera.orbis.QueryNodeDemeritsRequest
+	(*QueryNodeDemeritsResponse)(nil),          // 17: vera.orbis.QueryNodeDemeritsResponse
+	(*QueryAcceptedReportSessionRequest)(nil),  // 18: vera.orbis.QueryAcceptedReportSessionRequest
+	(*QueryAcceptedReportSessionResponse)(nil), // 19: vera.orbis.QueryAcceptedReportSessionResponse
+	(*Params)(nil),                             // 20: vera.orbis.Params
+	(*Ring)(nil),                               // 21: vera.orbis.Ring
+	(*v1beta1.PageRequest)(nil),                // 22: cosmos.base.query.v1beta1.PageRequest
+	(*v1beta1.PageResponse)(nil),               // 23: cosmos.base.query.v1beta1.PageResponse
+	(*Document)(nil),                           // 24: vera.orbis.Document
+	(*KeyDerivation)(nil),                      // 25: vera.orbis.KeyDerivation
+	(*NodeInfo)(nil),                           // 26: vera.orbis.NodeInfo
 }
 var file_vera_orbis_query_proto_depIdxs = []int32{
-	18, // 0: vera.orbis.QueryParamsResponse.params:type_name -> vera.orbis.Params
-	19, // 1: vera.orbis.QueryRingResponse.ring:type_name -> vera.orbis.Ring
-	20, // 2: vera.orbis.QueryRingsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
-	19, // 3: vera.orbis.QueryRingsResponse.rings:type_name -> vera.orbis.Ring
-	21, // 4: vera.orbis.QueryRingsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
-	22, // 5: vera.orbis.QueryDocumentResponse.document:type_name -> vera.orbis.Document
-	20, // 6: vera.orbis.QueryDocumentsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
-	22, // 7: vera.orbis.QueryDocumentsResponse.documents:type_name -> vera.orbis.Document
-	21, // 8: vera.orbis.QueryDocumentsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
-	23, // 9: vera.orbis.QueryKeyDerivationResponse.key_derivation:type_name -> vera.orbis.KeyDerivation
-	20, // 10: vera.orbis.QueryKeyDerivationsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
-	23, // 11: vera.orbis.QueryKeyDerivationsResponse.key_derivations:type_name -> vera.orbis.KeyDerivation
-	21, // 12: vera.orbis.QueryKeyDerivationsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
-	24, // 13: vera.orbis.QueryNodeInfoResponse.node_info:type_name -> vera.orbis.NodeInfo
+	20, // 0: vera.orbis.QueryParamsResponse.params:type_name -> vera.orbis.Params
+	21, // 1: vera.orbis.QueryRingResponse.ring:type_name -> vera.orbis.Ring
+	22, // 2: vera.orbis.QueryRingsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
+	21, // 3: vera.orbis.QueryRingsResponse.rings:type_name -> vera.orbis.Ring
+	23, // 4: vera.orbis.QueryRingsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
+	24, // 5: vera.orbis.QueryDocumentResponse.document:type_name -> vera.orbis.Document
+	22, // 6: vera.orbis.QueryDocumentsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
+	24, // 7: vera.orbis.QueryDocumentsResponse.documents:type_name -> vera.orbis.Document
+	23, // 8: vera.orbis.QueryDocumentsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
+	25, // 9: vera.orbis.QueryKeyDerivationResponse.key_derivation:type_name -> vera.orbis.KeyDerivation
+	22, // 10: vera.orbis.QueryKeyDerivationsRequest.pagination:type_name -> cosmos.base.query.v1beta1.PageRequest
+	25, // 11: vera.orbis.QueryKeyDerivationsResponse.key_derivations:type_name -> vera.orbis.KeyDerivation
+	23, // 12: vera.orbis.QueryKeyDerivationsResponse.pagination:type_name -> cosmos.base.query.v1beta1.PageResponse
+	26, // 13: vera.orbis.QueryNodeInfoResponse.node_info:type_name -> vera.orbis.NodeInfo
 	0,  // 14: vera.orbis.Query.Params:input_type -> vera.orbis.QueryParamsRequest
 	2,  // 15: vera.orbis.Query.Ring:input_type -> vera.orbis.QueryRingRequest
 	4,  // 16: vera.orbis.Query.Rings:input_type -> vera.orbis.QueryRingsRequest
@@ -9073,17 +10370,19 @@ var file_vera_orbis_query_proto_depIdxs = []int32{
 	12, // 20: vera.orbis.Query.KeyDerivations:input_type -> vera.orbis.QueryKeyDerivationsRequest
 	14, // 21: vera.orbis.Query.NodeInfo:input_type -> vera.orbis.QueryNodeInfoRequest
 	16, // 22: vera.orbis.Query.NodeDemerits:input_type -> vera.orbis.QueryNodeDemeritsRequest
-	1,  // 23: vera.orbis.Query.Params:output_type -> vera.orbis.QueryParamsResponse
-	3,  // 24: vera.orbis.Query.Ring:output_type -> vera.orbis.QueryRingResponse
-	5,  // 25: vera.orbis.Query.Rings:output_type -> vera.orbis.QueryRingsResponse
-	7,  // 26: vera.orbis.Query.Document:output_type -> vera.orbis.QueryDocumentResponse
-	9,  // 27: vera.orbis.Query.Documents:output_type -> vera.orbis.QueryDocumentsResponse
-	11, // 28: vera.orbis.Query.KeyDerivation:output_type -> vera.orbis.QueryKeyDerivationResponse
-	13, // 29: vera.orbis.Query.KeyDerivations:output_type -> vera.orbis.QueryKeyDerivationsResponse
-	15, // 30: vera.orbis.Query.NodeInfo:output_type -> vera.orbis.QueryNodeInfoResponse
-	17, // 31: vera.orbis.Query.NodeDemerits:output_type -> vera.orbis.QueryNodeDemeritsResponse
-	23, // [23:32] is the sub-list for method output_type
-	14, // [14:23] is the sub-list for method input_type
+	18, // 23: vera.orbis.Query.AcceptedReportSession:input_type -> vera.orbis.QueryAcceptedReportSessionRequest
+	1,  // 24: vera.orbis.Query.Params:output_type -> vera.orbis.QueryParamsResponse
+	3,  // 25: vera.orbis.Query.Ring:output_type -> vera.orbis.QueryRingResponse
+	5,  // 26: vera.orbis.Query.Rings:output_type -> vera.orbis.QueryRingsResponse
+	7,  // 27: vera.orbis.Query.Document:output_type -> vera.orbis.QueryDocumentResponse
+	9,  // 28: vera.orbis.Query.Documents:output_type -> vera.orbis.QueryDocumentsResponse
+	11, // 29: vera.orbis.Query.KeyDerivation:output_type -> vera.orbis.QueryKeyDerivationResponse
+	13, // 30: vera.orbis.Query.KeyDerivations:output_type -> vera.orbis.QueryKeyDerivationsResponse
+	15, // 31: vera.orbis.Query.NodeInfo:output_type -> vera.orbis.QueryNodeInfoResponse
+	17, // 32: vera.orbis.Query.NodeDemerits:output_type -> vera.orbis.QueryNodeDemeritsResponse
+	19, // 33: vera.orbis.Query.AcceptedReportSession:output_type -> vera.orbis.QueryAcceptedReportSessionResponse
+	24, // [24:34] is the sub-list for method output_type
+	14, // [14:24] is the sub-list for method input_type
 	14, // [14:14] is the sub-list for extension type_name
 	14, // [14:14] is the sub-list for extension extendee
 	0,  // [0:14] is the sub-list for field type_name
@@ -9316,6 +10615,30 @@ func file_vera_orbis_query_proto_init() {
 				return nil
 			}
 		}
+		file_vera_orbis_query_proto_msgTypes[18].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryAcceptedReportSessionRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_vera_orbis_query_proto_msgTypes[19].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*QueryAcceptedReportSessionResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -9323,7 +10646,7 @@ func file_vera_orbis_query_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_vera_orbis_query_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   18,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
