@@ -54,6 +54,30 @@ func optionalStoreDocumentPetTagProof(msg *types.MsgStoreDocument) immutable.Opt
 	return immutable.Some(value)
 }
 
+func optionalFinalizeRingPetPk(msg *types.MsgFinalizeRing) immutable.Option[string] {
+	if msg.XPetPk == nil {
+		return immutable.None[string]()
+	}
+	value := msg.GetPetPk()
+	return immutable.Some(value)
+}
+
+func setRingConfirmationPetPk(confirmation *types.RingConfirmation, value immutable.Option[string]) {
+	if !value.HasValue() {
+		confirmation.XPetPk = nil
+		return
+	}
+	confirmation.XPetPk = &types.RingConfirmation_PetPk{PetPk: value.Value()}
+}
+
+func setRingPetPk(ring *types.Ring, value immutable.Option[string]) {
+	if !value.HasValue() {
+		ring.XPetPk = nil
+		return
+	}
+	ring.XPetPk = &types.Ring_PetPk{PetPk: value.Value()}
+}
+
 func setRingNewThreshold(ring *types.Ring, value immutable.Option[uint32]) {
 	if !value.HasValue() {
 		ring.XNewThreshold = nil

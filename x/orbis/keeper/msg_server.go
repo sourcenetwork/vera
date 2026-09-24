@@ -129,6 +129,23 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, err
 	}
 
+	// A requires_pet ring's local fresh-DKG ceremony always runs both keys
+	// sequentially before either is submitted, so a finalize for such a ring
+	// must carry both together — never just ring_pk, and never a pet_pk on a
+	// ring that doesn't require one.
+	petPk := optionalFinalizeRingPetPk(msg)
+	if ring.RequiresPet && !petPk.HasValue() {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pet_pk is required to finalize a ring that requires PET")
+	}
+	if !ring.RequiresPet && petPk.HasValue() {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pet_pk is not accepted for a ring that does not require PET")
+	}
+	if petPk.HasValue() {
+		if err := rejectIdentityRingPublicKey(petPk.Value()); err != nil {
+			return nil, err
+		}
+	}
+
 	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
 	if err != nil {
 		return nil, err
@@ -154,10 +171,17 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		}
 	}
 
-	// Check for a conflicting ring_pk from a prior confirmation by a
-	// different node. This is a genuine BFT violation — delete the ring.
+	// Check for a conflicting ring_pk or (on a requires_pet ring) pet_pk from
+	// a prior confirmation by a different node. This is a genuine BFT
+	// violation — delete the ring. Both keys are checked together: disagreement
+	// on either one means the committee did not honestly compute the same
+	// ceremony output.
 	for _, c := range ring.Confirmations {
-		if c.RingPk != msg.RingPk {
+		conflict := c.RingPk != msg.RingPk
+		if ring.RequiresPet {
+			conflict = conflict || c.GetPetPk() != petPk.Value()
+		}
+		if conflict {
 			k.DeleteRing(goCtx, ring.Id)
 			if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
 				RingId: ring.Id,
@@ -171,10 +195,12 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		}
 	}
 
-	ring.Confirmations = append(ring.Confirmations, &types.RingConfirmation{
+	confirmation := &types.RingConfirmation{
 		NodeKey: signerKey,
 		RingPk:  msg.RingPk,
-	})
+	}
+	setRingConfirmationPetPk(confirmation, petPk)
+	ring.Confirmations = append(ring.Confirmations, confirmation)
 
 	if len(ring.Confirmations) < len(ring.PeerNodeKeys) {
 		k.SetRing(goCtx, *ring)
@@ -190,6 +216,7 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	}
 
 	ring.RingPk = msg.RingPk
+	setRingPetPk(ring, petPk)
 	ring.Confirmations = nil
 	if err := validateRing(ring); err != nil {
 		return nil, err

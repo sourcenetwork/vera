@@ -90,6 +90,10 @@ message MsgFinalizeRing {
   string creator = 1;
   string ring_id = 2;
   string ring_pk = 3;
+  // Required, and only accepted, when the ring's requires_pet is true: the
+  // signer's local fresh-DKG PET key ceremony completed alongside the main
+  // one, and both are submitted together in this one finalize message.
+  optional string pet_pk = 4;
 }
 
 enum FinalizeRingOutcome {

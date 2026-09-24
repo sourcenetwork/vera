@@ -46,6 +46,9 @@ message Ring {
   uint64 pss_interval = 8;
   uint64 block_number_nonce = 9;
   string policy_id = 10;
+  // One entry per peer that has submitted a finalize confirmation. On a
+  // requires_pet ring, each entry's pet_pk is populated too — a peer submits
+  // both keys together in one MsgFinalizeRing, not as two separate rounds.
   repeated RingConfirmation confirmations = 11;
   UpgradeInfo upgrade_info = 12 [(gogoproto.nullable) = false];
   ReportingConfig reporting = 13 [(gogoproto.nullable) = false];
@@ -61,14 +64,14 @@ message Ring {
   // fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
   // never used for signing). Not yet reachable: requires_pet is always false.
   optional string pet_pk = 17;
-  // Confirmations for the PET key's fresh-DKG finalization. Mirrors
-  // `confirmations`, which tracks the main key's finalization independently.
-  // Not yet reachable: requires_pet is always false.
-  repeated RingConfirmation pet_confirmations = 18;
 }
 
-// RingConfirmation records a single peer's agreement on the ring public key.
+// RingConfirmation records a single peer's agreement on the ring public key
+// (and, on a requires_pet ring, the PET public key too — submitted together
+// in one finalize message, not as an independent confirmation round).
 message RingConfirmation {
   string node_key = 1;
   string ring_pk = 2;
+  // Present only when finalizing a requires_pet ring.
+  optional string pet_pk = 3;
 }

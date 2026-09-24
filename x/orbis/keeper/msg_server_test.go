@@ -938,6 +938,133 @@ func TestMsgServer_CreateRingRejectsPSSIntervalBelowMinimum(t *testing.T) {
 	}
 }
 
+func TestMsgServer_FinalizeRing_RequiresPetNeedsBothKeysTogether(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	requiresPetRingID := "pet-ring"
+	k.SetRing(ctx, types.Ring{
+		Id:           requiresPetRingID,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+		PolicyId:     "policy",
+		RequiresPet:  true,
+	})
+
+	// Missing pet_pk on a requires_pet ring is rejected.
+	_, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: requiresPetRingID, RingPk: "ring-pk"})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+	require.Empty(t, k.GetRing(ctx, requiresPetRingID).Confirmations)
+
+	ordinaryRingID := "ordinary-ring"
+	k.SetRing(ctx, types.Ring{
+		Id:           ordinaryRingID,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+		PolicyId:     "policy",
+		RequiresPet:  false,
+	})
+
+	// A pet_pk on a ring that does not require PET is rejected.
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer1Addr,
+		RingId:  ordinaryRingID,
+		RingPk:  "ring-pk",
+		XPetPk:  &types.MsgFinalizeRing_PetPk{PetPk: "pet-pk"},
+	})
+	require.ErrorIs(t, err, types.ErrInvalidRing)
+}
+
+func TestMsgServer_FinalizeRing_RequiresPetFinalizesBothKeysTogether(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	ringID := "pet-ring"
+	k.SetRing(ctx, types.Ring{
+		Id:           ringID,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+		PolicyId:     "policy",
+		RequiresPet:  true,
+		Reporting: types.ReportingConfig{
+			DemeritConfig: types.DemeritConfig{
+				NodeOfflineDemerits:           1,
+				ResetIntervalSeconds:          86400,
+				InvalidCryptoResponseDemerits: 1,
+				UnauthorizedRequestDemerits:   1,
+			},
+			KickThreshold: 3,
+		},
+	})
+
+	finalizeResp, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer1Addr,
+		RingId:  ringID,
+		RingPk:  "ring-pk",
+		XPetPk:  &types.MsgFinalizeRing_PetPk{PetPk: "pet-pk"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
+	require.Empty(t, k.GetRing(ctx, ringID).RingPk)
+
+	finalizeResp, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer2Addr,
+		RingId:  ringID,
+		RingPk:  "ring-pk",
+		XPetPk:  &types.MsgFinalizeRing_PetPk{PetPk: "pet-pk"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_RING_FINALIZED, finalizeResp.Outcome)
+
+	ring := k.GetRing(ctx, ringID)
+	require.Equal(t, "ring-pk", ring.RingPk)
+	require.Equal(t, "pet-pk", ring.GetPetPk())
+	require.Empty(t, ring.Confirmations)
+}
+
+func TestMsgServer_FinalizeRing_RequiresPetPetPkConflictDeletesRing(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+
+	ringID := "pet-ring"
+	k.SetRing(ctx, types.Ring{
+		Id:           ringID,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    2,
+		PolicyId:     "policy",
+		RequiresPet:  true,
+	})
+
+	finalizeResp, err := k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer1Addr,
+		RingId:  ringID,
+		RingPk:  "ring-pk",
+		XPetPk:  &types.MsgFinalizeRing_PetPk{PetPk: "pet-pk-version-A"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFIRMATION_RECORDED, finalizeResp.Outcome)
+
+	// peer2 agrees on ring_pk but disagrees on pet_pk -> still a BFT violation.
+	finalizeResp, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
+		Creator: peer2Addr,
+		RingId:  ringID,
+		RingPk:  "ring-pk",
+		XPetPk:  &types.MsgFinalizeRing_PetPk{PetPk: "pet-pk-version-B"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, types.FinalizeRingOutcome_CONFLICT_DELETED, finalizeResp.Outcome)
+	require.Nil(t, k.GetRing(ctx, ringID))
+}
+
 func TestMsgServer_CreateRingRejectsRequiresPet(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)

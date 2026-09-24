@@ -344,10 +344,14 @@ func (x *MsgCreateRingResponse) GetRingId() string {
 }
 
 type MsgFinalizeRing struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Creator       string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	RingId        string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	RingPk        string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Creator string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId  string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	RingPk  string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	// Required, and only accepted, when the ring's requires_pet is true: the
+	// signer's local fresh-DKG PET key ceremony completed alongside the main
+	// one, and both are submitted together in this one finalize message.
+	PetPk         *string `protobuf:"bytes,4,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -399,6 +403,13 @@ func (x *MsgFinalizeRing) GetRingId() string {
 func (x *MsgFinalizeRing) GetRingPk() string {
 	if x != nil {
 		return x.RingPk
+	}
+	return ""
+}
+
+func (x *MsgFinalizeRing) GetPetPk() string {
+	if x != nil && x.PetPk != nil {
+		return *x.PetPk
 	}
 	return ""
 }
@@ -2874,11 +2885,13 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\frequires_pet\x18\v \x01(\bR\vrequiresPet:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
-	"\aring_id\x18\x01 \x01(\tR\x06ringId\"k\n" +
+	"\aring_id\x18\x01 \x01(\tR\x06ringId\"\x92\x01\n" +
 	"\x0fMsgFinalizeRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x17\n" +
-	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"T\n" +
+	"\aring_pk\x18\x03 \x01(\tR\x06ringPk\x12\x1a\n" +
+	"\x06pet_pk\x18\x04 \x01(\tH\x00R\x05petPk\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\t\n" +
+	"\a_pet_pk\"T\n" +
 	"\x17MsgFinalizeRingResponse\x129\n" +
 	"\aoutcome\x18\x01 \x01(\x0e2\x1f.vera.orbis.FinalizeRingOutcomeR\aoutcome\"W\n" +
 	"\x14MsgCancelPendingRing\x12\x18\n" +
@@ -3218,6 +3231,7 @@ func file_vera_orbis_tx_proto_init() {
 	file_vera_orbis_params_proto_init()
 	file_vera_orbis_ring_proto_init()
 	file_vera_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
+	file_vera_orbis_tx_proto_msgTypes[4].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[8].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[30].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[31].OneofWrappers = []any{}
