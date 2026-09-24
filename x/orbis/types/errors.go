@@ -46,5 +46,4 @@ var (
 	ErrRingAuthRelayExists          = sdkerrors.Register(ModuleName, 1243, "trusted auth relay is already configured on ring")
 	ErrReshareNotInProgress         = sdkerrors.Register(ModuleName, 1244, "no reshare in progress to cancel")
 	ErrNodeKeyBalanceEmpty          = sdkerrors.Register(ModuleName, 1245, "node key account has no spendable balance to drain")
-	ErrPetNotYetSupported           = sdkerrors.Register(ModuleName, 1246, "PET-enabled rings are not yet supported")
 )

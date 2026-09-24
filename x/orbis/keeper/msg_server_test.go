@@ -1065,7 +1065,7 @@ func TestMsgServer_FinalizeRing_RequiresPetPetPkConflictDeletesRing(t *testing.T
 	require.Nil(t, k.GetRing(ctx, ringID))
 }
 
-func TestMsgServer_CreateRingRejectsRequiresPet(t *testing.T) {
+func TestMsgServer_CreateRingAllowsRequiresPet(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
@@ -1075,7 +1075,7 @@ func TestMsgServer_CreateRingRejectsRequiresPet(t *testing.T) {
 	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
 	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
 
-	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key, peer2Key},
 		Threshold:    1,
@@ -1083,7 +1083,13 @@ func TestMsgServer_CreateRingRejectsRequiresPet(t *testing.T) {
 		PolicyId:     policyID,
 		RequiresPet:  true,
 	})
-	require.ErrorIs(t, err, types.ErrPetNotYetSupported)
+	require.NoError(t, err)
+
+	ring := k.GetRing(ctx, resp.RingId)
+	require.NotNil(t, ring)
+	require.True(t, ring.RequiresPet)
+	require.Empty(t, ring.RingPk)
+	require.Empty(t, ring.GetPetPk())
 }
 
 func TestMsgServer_SetRingPssIntervalByAcpAllowsRingOwner(t *testing.T) {

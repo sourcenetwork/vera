@@ -33,10 +33,6 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
-	if msg.RequiresPet {
-		return nil, types.ErrPetNotYetSupported
-	}
-
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalStrings(msg.PeerNodeKeys)
 	trustedAuthRelayDIDs := canonicalStrings(msg.TrustedAuthRelayDids)
