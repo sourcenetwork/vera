@@ -53,6 +53,18 @@ message Ring {
   repeated string trusted_auth_relay_dids = 14;
   // Set at creation; false permanently disables trusted authentication relays.
   bool allow_trusted_auth_relays = 15;
+  // Set at creation; true means this ring requires a PET check before PRE
+  // release, applying to every document in the ring. Immutable for the
+  // ring's lifetime. Not yet reachable: MsgCreateRing currently rejects true.
+  bool requires_pet = 16;
+  // The ring's independently-generated PET public key. Absent until its own
+  // fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
+  // never used for signing). Not yet reachable: requires_pet is always false.
+  optional string pet_pk = 17;
+  // Confirmations for the PET key's fresh-DKG finalization. Mirrors
+  // `confirmations`, which tracks the main key's finalization independently.
+  // Not yet reachable: requires_pet is always false.
+  repeated RingConfirmation pet_confirmations = 18;
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key.

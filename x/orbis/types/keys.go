@@ -49,6 +49,7 @@ func GenerateRingID(
 	currentVersion uint64,
 	allowTrustedAuthRelays bool,
 	trustedAuthRelayDIDs []string,
+	requiresPet bool,
 ) string {
 	sortedPeerNodeKeys := slices.Clone(peerNodeKeys)
 	if !slices.IsSorted(sortedPeerNodeKeys) {
@@ -66,6 +67,7 @@ func GenerateRingID(
 	sortedRelayDIDs := slices.Clone(trustedAuthRelayDIDs)
 	slices.Sort(sortedRelayDIDs)
 	h.writeStringSlice(sortedRelayDIDs)
+	h.writeBool(requiresPet)
 	return h.sum()
 }
 

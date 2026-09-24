@@ -184,8 +184,12 @@ type MsgCreateRing struct {
 	TrustedAuthRelayDids []string `protobuf:"bytes,9,rep,name=trusted_auth_relay_dids,json=trustedAuthRelayDids,proto3" json:"trusted_auth_relay_dids,omitempty"`
 	// Set at creation; false permanently disables trusted authentication relays.
 	AllowTrustedAuthRelays bool `protobuf:"varint,10,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Opt this ring into requiring a PET check before PRE release, applying to
+	// every document in the ring (no per-document opt-out). Immutable once set.
+	// Not yet supported: rejected until the PET checking-key lifecycle ships.
+	RequiresPet   bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MsgCreateRing) Reset() {
@@ -284,6 +288,13 @@ func (x *MsgCreateRing) GetTrustedAuthRelayDids() []string {
 func (x *MsgCreateRing) GetAllowTrustedAuthRelays() bool {
 	if x != nil {
 		return x.AllowTrustedAuthRelays
+	}
+	return false
+}
+
+func (x *MsgCreateRing) GetRequiresPet() bool {
+	if x != nil {
+		return x.RequiresPet
 	}
 	return false
 }
@@ -2847,7 +2858,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x125\n" +
 	"\x06params\x18\x02 \x01(\v2\x12.vera.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:/\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*\x1cvera/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xb6\x03\n" +
+	"\x17MsgUpdateParamsResponse\"\xd9\x03\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
@@ -2859,7 +2870,8 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\treporting\x18\b \x01(\v2\x1b.vera.orbis.ReportingConfigR\treporting\x125\n" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
-	" \x01(\bR\x16allowTrustedAuthRelays:\f\x82\xe7\xb0*\acreatorB\b\n" +
+	" \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
+	"\frequires_pet\x18\v \x01(\bR\vrequiresPet:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
 	"\aring_id\x18\x01 \x01(\tR\x06ringId\"k\n" +

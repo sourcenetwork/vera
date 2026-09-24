@@ -236,8 +236,20 @@ type Ring struct {
 	TrustedAuthRelayDids []string `protobuf:"bytes,14,rep,name=trusted_auth_relay_dids,json=trustedAuthRelayDids,proto3" json:"trusted_auth_relay_dids,omitempty"`
 	// Set at creation; false permanently disables trusted authentication relays.
 	AllowTrustedAuthRelays bool `protobuf:"varint,15,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Set at creation; true means this ring requires a PET check before PRE
+	// release, applying to every document in the ring. Immutable for the
+	// ring's lifetime. Not yet reachable: MsgCreateRing currently rejects true.
+	RequiresPet bool `protobuf:"varint,16,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	// The ring's independently-generated PET public key. Absent until its own
+	// fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
+	// never used for signing). Not yet reachable: requires_pet is always false.
+	PetPk *string `protobuf:"bytes,17,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
+	// Confirmations for the PET key's fresh-DKG finalization. Mirrors
+	// `confirmations`, which tracks the main key's finalization independently.
+	// Not yet reachable: requires_pet is always false.
+	PetConfirmations []*RingConfirmation `protobuf:"bytes,18,rep,name=pet_confirmations,json=petConfirmations,proto3" json:"pet_confirmations,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
@@ -375,6 +387,27 @@ func (x *Ring) GetAllowTrustedAuthRelays() bool {
 	return false
 }
 
+func (x *Ring) GetRequiresPet() bool {
+	if x != nil {
+		return x.RequiresPet
+	}
+	return false
+}
+
+func (x *Ring) GetPetPk() string {
+	if x != nil && x.PetPk != nil {
+		return *x.PetPk
+	}
+	return ""
+}
+
+func (x *Ring) GetPetConfirmations() []*RingConfirmation {
+	if x != nil {
+		return x.PetConfirmations
+	}
+	return nil
+}
+
 // RingConfirmation records a single peer's agreement on the ring public key.
 type RingConfirmation struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -448,7 +481,7 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\x0fReportingConfig\x12F\n" +
 	"\x0edemerit_config\x18\x01 \x01(\v2\x19.vera.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
 	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
-	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xa4\x05\n" +
+	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xb9\x06\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -466,8 +499,12 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\fupgrade_info\x18\f \x01(\v2\x17.vera.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfo\x12?\n" +
 	"\treporting\x18\r \x01(\v2\x1b.vera.orbis.ReportingConfigB\x04\xc8\xde\x1f\x00R\treporting\x125\n" +
 	"\x17trusted_auth_relay_dids\x18\x0e \x03(\tR\x14trustedAuthRelayDids\x129\n" +
-	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelaysB\x10\n" +
-	"\x0e_new_threshold\"F\n" +
+	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
+	"\frequires_pet\x18\x10 \x01(\bR\vrequiresPet\x12\x1a\n" +
+	"\x06pet_pk\x18\x11 \x01(\tH\x01R\x05petPk\x88\x01\x01\x12I\n" +
+	"\x11pet_confirmations\x18\x12 \x03(\v2\x1c.vera.orbis.RingConfirmationR\x10petConfirmationsB\x10\n" +
+	"\x0e_new_thresholdB\t\n" +
+	"\a_pet_pk\"F\n" +
 	"\x10RingConfirmation\x12\x19\n" +
 	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +
 	"\aring_pk\x18\x02 \x01(\tR\x06ringPkB\x81\x01\n" +
@@ -500,11 +537,12 @@ var file_vera_orbis_ring_proto_depIdxs = []int32{
 	4, // 1: vera.orbis.Ring.confirmations:type_name -> vera.orbis.RingConfirmation
 	0, // 2: vera.orbis.Ring.upgrade_info:type_name -> vera.orbis.UpgradeInfo
 	2, // 3: vera.orbis.Ring.reporting:type_name -> vera.orbis.ReportingConfig
-	4, // [4:4] is the sub-list for method output_type
-	4, // [4:4] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 4: vera.orbis.Ring.pet_confirmations:type_name -> vera.orbis.RingConfirmation
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_vera_orbis_ring_proto_init() }

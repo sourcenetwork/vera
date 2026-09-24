@@ -33,6 +33,10 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		return nil, err
 	}
 
+	if msg.RequiresPet {
+		return nil, types.ErrPetNotYetSupported
+	}
+
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalStrings(msg.PeerNodeKeys)
 	trustedAuthRelayDIDs := canonicalStrings(msg.TrustedAuthRelayDids)
@@ -52,6 +56,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		msg.CurrentVersion,
 		msg.AllowTrustedAuthRelays,
 		trustedAuthRelayDIDs,
+		msg.RequiresPet,
 	)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
@@ -78,6 +83,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		Reporting:              *reporting,
 		AllowTrustedAuthRelays: msg.AllowTrustedAuthRelays,
 		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
+		RequiresPet:            msg.RequiresPet,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
