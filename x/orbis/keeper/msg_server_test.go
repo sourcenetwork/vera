@@ -138,7 +138,7 @@ func TestMsgServer_CreateRingStoreDocumentAndKeyDerivation(t *testing.T) {
 	}
 	storeDocumentResp, err := k.StoreDocument(ctx, storeDocumentMsg)
 	require.NoError(t, err)
-	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.Some(tier), immutable.Some(timestamp))
+	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.Some(tier), immutable.Some(timestamp), immutable.None[string](), immutable.None[string]())
 	require.NoError(t, err)
 	require.Equal(t, expectedDocID, storeDocumentResp.DocumentId)
 
@@ -911,7 +911,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 		Permission: "decrypt",
 	})
 	require.NoError(t, err)
-	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.None[string](), immutable.None[uint64]())
+	expectedDocID, err := types.GenerateDocumentID(createRingResp.RingId, testDocumentJSON, testProofJSON, "policy-doc", "secret", "decrypt", immutable.None[string](), immutable.None[uint64](), immutable.None[string](), immutable.None[string]())
 	require.NoError(t, err)
 	require.Equal(t, expectedDocID, storeDocumentResp.DocumentId)
 }

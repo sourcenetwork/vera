@@ -17,4 +17,12 @@ message Document {
   optional string tier = 9;
   // Absent means no timestamp.
   optional uint64 timestamp = 10;
+  // PET tag ciphertext, present only when the ring requires PET. JSON of
+  // {ephemeral_point, masked_fingerprint} (compressed group points). Present
+  // and absent together with pet_tag_proof. Not yet enforced: no PET ring can
+  // exist yet, and this field is not included in authorization.
+  optional string pet_tag = 11;
+  // Public knowledge proof for pet_tag's r_tag, present only alongside
+  // pet_tag. JSON of {challenge, response}.
+  optional string pet_tag_proof = 12;
 }

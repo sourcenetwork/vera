@@ -1875,7 +1875,15 @@ type MsgStoreDocument struct {
 	// Absent means no tier.
 	Tier *string `protobuf:"bytes,8,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
 	// Absent means no timestamp.
-	Timestamp     *uint64 `protobuf:"varint,9,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	Timestamp *uint64 `protobuf:"varint,9,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	// PET tag ciphertext, present only when the ring requires PET. JSON of
+	// {ephemeral_point, masked_fingerprint} (compressed group points). Present
+	// and absent together with pet_tag_proof. Not yet enforced: no PET ring can
+	// exist yet, and this field is not included in authorization.
+	PetTag *string `protobuf:"bytes,10,opt,name=pet_tag,json=petTag,proto3,oneof" json:"pet_tag,omitempty"`
+	// Public knowledge proof for pet_tag's r_tag, present only alongside
+	// pet_tag. JSON of {challenge, response}.
+	PetTagProof   *string `protobuf:"bytes,11,opt,name=pet_tag_proof,json=petTagProof,proto3,oneof" json:"pet_tag_proof,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1971,6 +1979,20 @@ func (x *MsgStoreDocument) GetTimestamp() uint64 {
 		return *x.Timestamp
 	}
 	return 0
+}
+
+func (x *MsgStoreDocument) GetPetTag() string {
+	if x != nil && x.PetTag != nil {
+		return *x.PetTag
+	}
+	return ""
+}
+
+func (x *MsgStoreDocument) GetPetTagProof() string {
+	if x != nil && x.PetTagProof != nil {
+		return *x.PetTagProof
+	}
+	return ""
 }
 
 type MsgStoreDocumentResponse struct {
@@ -2944,7 +2966,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
 	" \x01(\bR\x16allowTrustedAuthRelaysB\x10\n" +
-	"\x0e_new_thresholdJ\x04\b\x06\x10\a\"\xb1\x02\n" +
+	"\x0e_new_thresholdJ\x04\b\x06\x10\a\"\x96\x03\n" +
 	"\x10MsgStoreDocument\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x1a\n" +
@@ -2956,10 +2978,16 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"permission\x18\a \x01(\tR\n" +
 	"permission\x12\x17\n" +
 	"\x04tier\x18\b \x01(\tH\x00R\x04tier\x88\x01\x01\x12!\n" +
-	"\ttimestamp\x18\t \x01(\x04H\x01R\ttimestamp\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\a\n" +
+	"\ttimestamp\x18\t \x01(\x04H\x01R\ttimestamp\x88\x01\x01\x12\x1c\n" +
+	"\apet_tag\x18\n" +
+	" \x01(\tH\x02R\x06petTag\x88\x01\x01\x12'\n" +
+	"\rpet_tag_proof\x18\v \x01(\tH\x03R\vpetTagProof\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\a\n" +
 	"\x05_tierB\f\n" +
 	"\n" +
-	"_timestamp\";\n" +
+	"_timestampB\n" +
+	"\n" +
+	"\b_pet_tagB\x10\n" +
+	"\x0e_pet_tag_proof\";\n" +
 	"\x18MsgStoreDocumentResponse\x12\x1f\n" +
 	"\vdocument_id\x18\x01 \x01(\tR\n" +
 	"documentId\"\xd1\x01\n" +

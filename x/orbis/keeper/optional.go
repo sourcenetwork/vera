@@ -38,6 +38,22 @@ func optionalStoreDocumentTimestamp(msg *types.MsgStoreDocument) immutable.Optio
 	return immutable.Some(value)
 }
 
+func optionalStoreDocumentPetTag(msg *types.MsgStoreDocument) immutable.Option[string] {
+	if msg.XPetTag == nil {
+		return immutable.None[string]()
+	}
+	value := msg.GetPetTag()
+	return immutable.Some(value)
+}
+
+func optionalStoreDocumentPetTagProof(msg *types.MsgStoreDocument) immutable.Option[string] {
+	if msg.XPetTagProof == nil {
+		return immutable.None[string]()
+	}
+	value := msg.GetPetTagProof()
+	return immutable.Some(value)
+}
+
 func setRingNewThreshold(ring *types.Ring, value immutable.Option[uint32]) {
 	if !value.HasValue() {
 		ring.XNewThreshold = nil
@@ -60,4 +76,20 @@ func setDocumentTimestamp(document *types.Document, value immutable.Option[uint6
 		return
 	}
 	document.XTimestamp = &types.Document_Timestamp{Timestamp: value.Value()}
+}
+
+func setDocumentPetTag(document *types.Document, value immutable.Option[string]) {
+	if !value.HasValue() {
+		document.XPetTag = nil
+		return
+	}
+	document.XPetTag = &types.Document_PetTag{PetTag: value.Value()}
+}
+
+func setDocumentPetTagProof(document *types.Document, value immutable.Option[string]) {
+	if !value.HasValue() {
+		document.XPetTagProof = nil
+		return
+	}
+	document.XPetTagProof = &types.Document_PetTagProof{PetTagProof: value.Value()}
 }

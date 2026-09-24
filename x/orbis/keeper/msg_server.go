@@ -799,8 +799,10 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 
 	tier := optionalStoreDocumentTier(msg)
 	timestamp := optionalStoreDocumentTimestamp(msg)
+	petTag := optionalStoreDocumentPetTag(msg)
+	petTagProof := optionalStoreDocumentPetTagProof(msg)
 
-	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
+	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp, petTag, petTagProof)
 	if err != nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidDocument, err.Error())
 	}
@@ -820,6 +822,8 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	}
 	setDocumentTier(&document, tier)
 	setDocumentTimestamp(&document, timestamp)
+	setDocumentPetTag(&document, petTag)
+	setDocumentPetTagProof(&document, petTagProof)
 	if err := validateDocument(&document); err != nil {
 		return nil, err
 	}
