@@ -75,6 +75,9 @@ message MsgCreateRing {
   repeated string trusted_auth_relay_dids = 9;
   // Set at creation; false permanently disables trusted authentication relays.
   bool allow_trusted_auth_relays = 10;
+  // Opt this ring into requiring a PET check before PRE release, applying to
+  // every document in the ring (no per-document opt-out). Immutable once set.
+  bool requires_pet = 11;
 }
 
 message MsgCreateRingResponse {
@@ -86,6 +89,10 @@ message MsgFinalizeRing {
   string creator = 1;
   string ring_id = 2;
   string ring_pk = 3;
+  // Required, and only accepted, when the ring's requires_pet is true: the
+  // signer's local fresh-DKG PET key ceremony completed alongside the main
+  // one, and both are submitted together in this one finalize message.
+  optional string pet_pk = 4;
 }
 
 enum FinalizeRingOutcome {
@@ -261,6 +268,14 @@ message MsgStoreDocument {
   optional string tier = 8;
   // Absent means no timestamp.
   optional uint64 timestamp = 9;
+  // PET tag ciphertext, present only when the ring requires PET. JSON of
+  // {ephemeral_point, masked_fingerprint} (compressed group points). Present
+  // and absent together with pet_tag_proof. Not yet enforced: no PET ring can
+  // exist yet, and this field is not included in authorization.
+  optional string pet_tag = 10;
+  // Public knowledge proof for pet_tag's r_tag, present only alongside
+  // pet_tag. JSON of {challenge, response}.
+  optional string pet_tag_proof = 11;
 }
 
 message MsgStoreDocumentResponse {

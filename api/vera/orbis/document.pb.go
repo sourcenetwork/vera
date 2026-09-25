@@ -35,7 +35,15 @@ type Document struct {
 	// Absent means no tier.
 	Tier *string `protobuf:"bytes,9,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
 	// Absent means no timestamp.
-	Timestamp     *uint64 `protobuf:"varint,10,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	Timestamp *uint64 `protobuf:"varint,10,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	// PET tag ciphertext, present only when the ring requires PET. JSON of
+	// {ephemeral_point, masked_fingerprint} (compressed group points). Present
+	// and absent together with pet_tag_proof. Not yet enforced: no PET ring can
+	// exist yet, and this field is not included in authorization.
+	PetTag *string `protobuf:"bytes,11,opt,name=pet_tag,json=petTag,proto3,oneof" json:"pet_tag,omitempty"`
+	// Public knowledge proof for pet_tag's r_tag, present only alongside
+	// pet_tag. JSON of {challenge, response}.
+	PetTagProof   *string `protobuf:"bytes,12,opt,name=pet_tag_proof,json=petTagProof,proto3,oneof" json:"pet_tag_proof,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -140,12 +148,26 @@ func (x *Document) GetTimestamp() uint64 {
 	return 0
 }
 
+func (x *Document) GetPetTag() string {
+	if x != nil && x.PetTag != nil {
+		return *x.PetTag
+	}
+	return ""
+}
+
+func (x *Document) GetPetTagProof() string {
+	if x != nil && x.PetTagProof != nil {
+		return *x.PetTagProof
+	}
+	return ""
+}
+
 var File_vera_orbis_document_proto protoreflect.FileDescriptor
 
 const file_vera_orbis_document_proto_rawDesc = "" +
 	"\n" +
 	"\x19vera/orbis/document.proto\x12\n" +
-	"vera.orbis\"\xb2\x02\n" +
+	"vera.orbis\"\x97\x03\n" +
 	"\bDocument\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -160,10 +182,15 @@ const file_vera_orbis_document_proto_rawDesc = "" +
 	"permission\x12\x17\n" +
 	"\x04tier\x18\t \x01(\tH\x00R\x04tier\x88\x01\x01\x12!\n" +
 	"\ttimestamp\x18\n" +
-	" \x01(\x04H\x01R\ttimestamp\x88\x01\x01B\a\n" +
+	" \x01(\x04H\x01R\ttimestamp\x88\x01\x01\x12\x1c\n" +
+	"\apet_tag\x18\v \x01(\tH\x02R\x06petTag\x88\x01\x01\x12'\n" +
+	"\rpet_tag_proof\x18\f \x01(\tH\x03R\vpetTagProof\x88\x01\x01B\a\n" +
 	"\x05_tierB\f\n" +
 	"\n" +
-	"_timestampB\x85\x01\n" +
+	"_timestampB\n" +
+	"\n" +
+	"\b_pet_tagB\x10\n" +
+	"\x0e_pet_tag_proofB\x85\x01\n" +
 	"\x0ecom.vera.orbisB\rDocumentProtoP\x01Z\x1bcosmossdk.io/api/vera/orbis\xa2\x02\x03VOX\xaa\x02\n" +
 	"Vera.Orbis\xca\x02\n" +
 	"Vera\\Orbis\xe2\x02\x16Vera\\Orbis\\GPBMetadata\xea\x02\vVera::Orbisb\x06proto3"

@@ -52,6 +52,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		msg.CurrentVersion,
 		msg.AllowTrustedAuthRelays,
 		trustedAuthRelayDIDs,
+		msg.RequiresPet,
 	)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
@@ -78,6 +79,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		Reporting:              *reporting,
 		AllowTrustedAuthRelays: msg.AllowTrustedAuthRelays,
 		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
+		RequiresPet:            msg.RequiresPet,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
@@ -123,6 +125,23 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		return nil, err
 	}
 
+	// A requires_pet ring's local fresh-DKG ceremony always runs both keys
+	// sequentially before either is submitted, so a finalize for such a ring
+	// must carry both together — never just ring_pk, and never a pet_pk on a
+	// ring that doesn't require one.
+	petPk := optionalFinalizeRingPetPk(msg)
+	if ring.RequiresPet && !petPk.HasValue() {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pet_pk is required to finalize a ring that requires PET")
+	}
+	if !ring.RequiresPet && petPk.HasValue() {
+		return nil, errorsmod.Wrap(types.ErrInvalidRing, "pet_pk is not accepted for a ring that does not require PET")
+	}
+	if petPk.HasValue() {
+		if err := rejectIdentityRingPublicKey(petPk.Value()); err != nil {
+			return nil, err
+		}
+	}
+
 	signerKey, err := signerPublicKeyHex(ctx, k, msg.Creator)
 	if err != nil {
 		return nil, err
@@ -148,10 +167,17 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		}
 	}
 
-	// Check for a conflicting ring_pk from a prior confirmation by a
-	// different node. This is a genuine BFT violation — delete the ring.
+	// Check for a conflicting ring_pk or (on a requires_pet ring) pet_pk from
+	// a prior confirmation by a different node. This is a genuine BFT
+	// violation — delete the ring. Both keys are checked together: disagreement
+	// on either one means the committee did not honestly compute the same
+	// ceremony output.
 	for _, c := range ring.Confirmations {
-		if c.RingPk != msg.RingPk {
+		conflict := c.RingPk != msg.RingPk
+		if ring.RequiresPet {
+			conflict = conflict || c.GetPetPk() != petPk.Value()
+		}
+		if conflict {
 			k.DeleteRing(goCtx, ring.Id)
 			if err := ctx.EventManager().EmitTypedEvent(&types.EventRingDeleted{
 				RingId: ring.Id,
@@ -165,10 +191,12 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 		}
 	}
 
-	ring.Confirmations = append(ring.Confirmations, &types.RingConfirmation{
+	confirmation := &types.RingConfirmation{
 		NodeKey: signerKey,
 		RingPk:  msg.RingPk,
-	})
+	}
+	setRingConfirmationPetPk(confirmation, petPk)
+	ring.Confirmations = append(ring.Confirmations, confirmation)
 
 	if len(ring.Confirmations) < len(ring.PeerNodeKeys) {
 		k.SetRing(goCtx, *ring)
@@ -184,6 +212,7 @@ func (k *Keeper) FinalizeRing(goCtx context.Context, msg *types.MsgFinalizeRing)
 	}
 
 	ring.RingPk = msg.RingPk
+	setRingPetPk(ring, petPk)
 	ring.Confirmations = nil
 	if err := validateRing(ring); err != nil {
 		return nil, err
@@ -799,8 +828,10 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 
 	tier := optionalStoreDocumentTier(msg)
 	timestamp := optionalStoreDocumentTimestamp(msg)
+	petTag := optionalStoreDocumentPetTag(msg)
+	petTagProof := optionalStoreDocumentPetTagProof(msg)
 
-	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp)
+	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp, petTag, petTagProof)
 	if err != nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidDocument, err.Error())
 	}
@@ -820,6 +851,8 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	}
 	setDocumentTier(&document, tier)
 	setDocumentTimestamp(&document, timestamp)
+	setDocumentPetTag(&document, petTag)
+	setDocumentPetTagProof(&document, petTagProof)
 	if err := validateDocument(&document); err != nil {
 		return nil, err
 	}

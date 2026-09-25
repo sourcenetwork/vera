@@ -226,18 +226,29 @@ type Ring struct {
 	// Absent means no pending threshold update.
 	NewThreshold *uint32 `protobuf:"varint,7,opt,name=new_threshold,json=newThreshold,proto3,oneof" json:"new_threshold,omitempty"`
 	// Interval in seconds. Must be at least 86400.
-	PssInterval      uint64              `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
-	BlockNumberNonce uint64              `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
-	PolicyId         string              `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
-	Confirmations    []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
-	UpgradeInfo      *UpgradeInfo        `protobuf:"bytes,12,opt,name=upgrade_info,json=upgradeInfo,proto3" json:"upgrade_info,omitempty"`
-	Reporting        *ReportingConfig    `protobuf:"bytes,13,opt,name=reporting,proto3" json:"reporting,omitempty"`
+	PssInterval      uint64 `protobuf:"varint,8,opt,name=pss_interval,json=pssInterval,proto3" json:"pss_interval,omitempty"`
+	BlockNumberNonce uint64 `protobuf:"varint,9,opt,name=block_number_nonce,json=blockNumberNonce,proto3" json:"block_number_nonce,omitempty"`
+	PolicyId         string `protobuf:"bytes,10,opt,name=policy_id,json=policyId,proto3" json:"policy_id,omitempty"`
+	// One entry per peer that has submitted a finalize confirmation. On a
+	// requires_pet ring, each entry's pet_pk is populated too — a peer submits
+	// both keys together in one MsgFinalizeRing, not as two separate rounds.
+	Confirmations []*RingConfirmation `protobuf:"bytes,11,rep,name=confirmations,proto3" json:"confirmations,omitempty"`
+	UpgradeInfo   *UpgradeInfo        `protobuf:"bytes,12,opt,name=upgrade_info,json=upgradeInfo,proto3" json:"upgrade_info,omitempty"`
+	Reporting     *ReportingConfig    `protobuf:"bytes,13,opt,name=reporting,proto3" json:"reporting,omitempty"`
 	// Ed25519 did:key issuers allowed to authenticate requests for another actor.
 	TrustedAuthRelayDids []string `protobuf:"bytes,14,rep,name=trusted_auth_relay_dids,json=trustedAuthRelayDids,proto3" json:"trusted_auth_relay_dids,omitempty"`
 	// Set at creation; false permanently disables trusted authentication relays.
 	AllowTrustedAuthRelays bool `protobuf:"varint,15,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Set at creation; true means this ring requires a PET check before PRE
+	// release, applying to every document in the ring. Immutable for the
+	// ring's lifetime. Not yet reachable: MsgCreateRing currently rejects true.
+	RequiresPet bool `protobuf:"varint,16,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	// The ring's independently-generated PET public key. Absent until its own
+	// fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
+	// never used for signing). Not yet reachable: requires_pet is always false.
+	PetPk         *string `protobuf:"bytes,17,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
@@ -375,11 +386,29 @@ func (x *Ring) GetAllowTrustedAuthRelays() bool {
 	return false
 }
 
-// RingConfirmation records a single peer's agreement on the ring public key.
+func (x *Ring) GetRequiresPet() bool {
+	if x != nil {
+		return x.RequiresPet
+	}
+	return false
+}
+
+func (x *Ring) GetPetPk() string {
+	if x != nil && x.PetPk != nil {
+		return *x.PetPk
+	}
+	return ""
+}
+
+// RingConfirmation records a single peer's agreement on the ring public key
+// (and, on a requires_pet ring, the PET public key too — submitted together
+// in one finalize message, not as an independent confirmation round).
 type RingConfirmation struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeKey       string                 `protobuf:"bytes,1,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
-	RingPk        string                 `protobuf:"bytes,2,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	NodeKey string                 `protobuf:"bytes,1,opt,name=node_key,json=nodeKey,proto3" json:"node_key,omitempty"`
+	RingPk  string                 `protobuf:"bytes,2,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	// Present only when finalizing a requires_pet ring.
+	PetPk         *string `protobuf:"bytes,3,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -428,6 +457,13 @@ func (x *RingConfirmation) GetRingPk() string {
 	return ""
 }
 
+func (x *RingConfirmation) GetPetPk() string {
+	if x != nil && x.PetPk != nil {
+		return *x.PetPk
+	}
+	return ""
+}
+
 var File_vera_orbis_ring_proto protoreflect.FileDescriptor
 
 const file_vera_orbis_ring_proto_rawDesc = "" +
@@ -448,7 +484,7 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\x0fReportingConfig\x12F\n" +
 	"\x0edemerit_config\x18\x01 \x01(\v2\x19.vera.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
 	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
-	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xa4\x05\n" +
+	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xee\x05\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -466,11 +502,16 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\fupgrade_info\x18\f \x01(\v2\x17.vera.orbis.UpgradeInfoB\x04\xc8\xde\x1f\x00R\vupgradeInfo\x12?\n" +
 	"\treporting\x18\r \x01(\v2\x1b.vera.orbis.ReportingConfigB\x04\xc8\xde\x1f\x00R\treporting\x125\n" +
 	"\x17trusted_auth_relay_dids\x18\x0e \x03(\tR\x14trustedAuthRelayDids\x129\n" +
-	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelaysB\x10\n" +
-	"\x0e_new_threshold\"F\n" +
+	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
+	"\frequires_pet\x18\x10 \x01(\bR\vrequiresPet\x12\x1a\n" +
+	"\x06pet_pk\x18\x11 \x01(\tH\x01R\x05petPk\x88\x01\x01B\x10\n" +
+	"\x0e_new_thresholdB\t\n" +
+	"\a_pet_pk\"m\n" +
 	"\x10RingConfirmation\x12\x19\n" +
 	"\bnode_key\x18\x01 \x01(\tR\anodeKey\x12\x17\n" +
-	"\aring_pk\x18\x02 \x01(\tR\x06ringPkB\x81\x01\n" +
+	"\aring_pk\x18\x02 \x01(\tR\x06ringPk\x12\x1a\n" +
+	"\x06pet_pk\x18\x03 \x01(\tH\x00R\x05petPk\x88\x01\x01B\t\n" +
+	"\a_pet_pkB\x81\x01\n" +
 	"\x0ecom.vera.orbisB\tRingProtoP\x01Z\x1bcosmossdk.io/api/vera/orbis\xa2\x02\x03VOX\xaa\x02\n" +
 	"Vera.Orbis\xca\x02\n" +
 	"Vera\\Orbis\xe2\x02\x16Vera\\Orbis\\GPBMetadata\xea\x02\vVera::Orbisb\x06proto3"
@@ -514,6 +555,7 @@ func file_vera_orbis_ring_proto_init() {
 	}
 	file_vera_orbis_ring_proto_msgTypes[0].OneofWrappers = []any{}
 	file_vera_orbis_ring_proto_msgTypes[3].OneofWrappers = []any{}
+	file_vera_orbis_ring_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
