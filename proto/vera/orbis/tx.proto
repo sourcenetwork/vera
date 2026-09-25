@@ -77,7 +77,6 @@ message MsgCreateRing {
   bool allow_trusted_auth_relays = 10;
   // Opt this ring into requiring a PET check before PRE release, applying to
   // every document in the ring (no per-document opt-out). Immutable once set.
-  // Not yet supported: rejected until the PET checking-key lifecycle ships.
   bool requires_pet = 11;
 }
 

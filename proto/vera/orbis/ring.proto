@@ -58,11 +58,11 @@ message Ring {
   bool allow_trusted_auth_relays = 15;
   // Set at creation; true means this ring requires a PET check before PRE
   // release, applying to every document in the ring. Immutable for the
-  // ring's lifetime. Not yet reachable: MsgCreateRing currently rejects true.
+  // ring's lifetime.
   bool requires_pet = 16;
   // The ring's independently-generated PET public key. Absent until its own
   // fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
-  // never used for signing). Not yet reachable: requires_pet is always false.
+  // never used for signing).
   optional string pet_pk = 17;
 }
 
