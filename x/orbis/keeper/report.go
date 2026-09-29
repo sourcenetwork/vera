@@ -32,6 +32,14 @@ const (
 	// SignResponseDomain is the domain tag of the responder-signed Sign response
 	// statement carried as invalid_crypto_response/sign evidence.
 	SignResponseDomain = "orbis-sign-response-v1"
+	// PetBlindRevealResponseDomain is the domain tag of the responder-signed PET
+	// blind-equality-test reveal-phase statement carried as
+	// invalid_crypto_response/pet_blind_reveal evidence.
+	PetBlindRevealResponseDomain = "orbis-pet-blind-reveal-response-v1"
+	// PetBlindDecryptResponseDomain is the domain tag of the responder-signed PET
+	// blind-equality-test decrypt-phase statement carried as
+	// invalid_crypto_response/pet_blind_decrypt evidence.
+	PetBlindDecryptResponseDomain = "orbis-pet-blind-decrypt-response-v1"
 	// DkgCommitmentDomain is the domain tag of the responder-signed raw DKG
 	// commitment statement nested inside invalid_crypto_response DKG evidence.
 	DkgCommitmentDomain = "orbis-dkg-commitment-v1"
@@ -91,6 +99,7 @@ const (
 	dkgCommitmentMaxLen           = 1024 * 1024
 	dkgShareMaxElementLen         = 4096
 	dkgNonceLen                   = 16
+	petBlindMaxElementLen         = 512
 
 	offlineOriginProtocolPRE        = "pre"
 	offlineOriginProtocolSign       = "sign"
@@ -100,6 +109,8 @@ const (
 
 	invalidCryptoEvidenceKindPRE                         = "pre"
 	invalidCryptoEvidenceKindSign                        = "sign"
+	invalidCryptoEvidenceKindPetBlindReveal              = "pet_blind_reveal"
+	invalidCryptoEvidenceKindPetBlindDecrypt             = "pet_blind_decrypt"
 	invalidCryptoEvidenceKindDkgShare                    = "dkg_share"
 	invalidCryptoEvidenceKindDkgInvalidRefreshCommitment = "dkg_invalid_refresh_commitment"
 	invalidCryptoEvidenceKindDkgEquivocation             = "dkg_equivocation"
@@ -515,6 +526,24 @@ func decodeInvalidCryptoResponsePayload(payload []byte) (invalidCryptoResponseSt
 			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
 		}
 		return decodeSignResponseStatement(statementBytes)
+	case invalidCryptoEvidenceKindPetBlindReveal:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodePetBlindRevealStatement(statementBytes)
+	case invalidCryptoEvidenceKindPetBlindDecrypt:
+		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
+		if err != nil {
+			return invalidCryptoResponseStatement{}, err
+		}
+		if len(responseSignature) != 64 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "response signature must be 64 bytes")
+		}
+		return decodePetBlindDecryptStatement(statementBytes)
 	case invalidCryptoEvidenceKindDkgShare:
 		statementBytes, responseSignature, err := decodeSingleStatementInvalidCryptoPayloadTail(outer)
 		if err != nil {
@@ -1395,6 +1424,240 @@ func decodeSignResponseStatement(statementBytes []byte) (invalidCryptoResponseSt
 		originProtocol:        originProtocol,
 		accusedCommitteeScope: accusedScope,
 		signingCommitteeScope: signingScope,
+	}, nil
+}
+
+// decodePetBlindRevealStatement decodes a PET blind-equality-test reveal-phase statement
+// (audit finding #2's replacement for the old single-round Pet evidence). Unlike PRE/Sign, the
+// statement binds only an opaque context_digest/selection_digest — a report validator has no
+// other way to resolve the tag/target these bind, but that full context (which carries the audit
+// target's object id) travels out-of-band to off-chain co-signers, never on chain, so it is not
+// decoded here. chain_id/ring_id/ring_pk/ring_state_sha256/protocol_version are carried directly
+// on the statement (mirroring PRE/Sign) purely so this chain-side binding check has something to
+// compare against report.ChainId/etc — none of the four leak anything, since they're already
+// plaintext, top-level ReportEnvelope fields on the same submission. PET has no refresh/reshare
+// yet, so committee scope is always current, exactly like Pre.
+func decodePetBlindRevealStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != PetBlindRevealResponseDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected PET blind-reveal domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	attemptID, err := decoder.readString(fieldAttemptID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if _, err := decoder.readFixed32(fieldContextDigest); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if _, err := decoder.readFixed32(fieldSelectionDigest); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if attemptID == "" || responderNodeKey == "" {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-reveal statement has empty identity fields")
+	}
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	commitment, err := decoder.readBytes(fieldCommitment)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	blindedR, err := decoder.readBytes(fieldBlindedR)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	// blinded_diff may legitimately be empty — it encodes an exact pre-blinding match (the
+	// identity point), unlike blinded_r, which is guaranteed nonidentity.
+	blindedDiff, err := decoder.readBytes(fieldBlindedDiff)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if _, err := decoder.readFixed32(fieldCommitSalt); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	challenge, err := decoder.readBytes(fieldChallenge)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	proof, err := decoder.readBytes(fieldProof)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	for label, blob := range map[string][]byte{
+		"commitment": commitment,
+		"blinded_r":  blindedR,
+		"challenge":  challenge,
+		"proof":      proof,
+	} {
+		if len(blob) == 0 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PET blind-reveal %s cannot be empty", label)
+		}
+		if len(blob) > petBlindMaxElementLen {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PET blind-reveal %s exceeds size bound", label)
+		}
+	}
+	if len(blindedDiff) > petBlindMaxElementLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-reveal blinded_diff exceeds size bound")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             attemptID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        invalidCryptoEvidenceKindPetBlindReveal,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	}, nil
+}
+
+// decodePetBlindDecryptStatement decodes a PET blind-equality-test decrypt-phase statement. See
+// decodePetBlindRevealStatement's doc comment — same rationale for every field here.
+func decodePetBlindDecryptStatement(statementBytes []byte) (invalidCryptoResponseStatement, error) {
+	decoder := newReportCanonicalDecoder(statementBytes)
+	domain, err := decoder.readString(fieldDomain)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if domain != PetBlindDecryptResponseDomain {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "unexpected PET blind-decrypt domain %q", domain)
+	}
+	chainID, err := decoder.readString(fieldChainID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringID, err := decoder.readString(fieldRingID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringPk, err := decoder.readString(fieldRingPk)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	ringStateSha256, err := decoder.readString(fieldRingStateSha256)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	protocolVersion, err := decoder.readU64(fieldProtocolVersion)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	attemptID, err := decoder.readString(fieldAttemptID)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if _, err := decoder.readFixed32(fieldContextDigest); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if _, err := decoder.readFixed32(fieldCertificateDigest); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	responderNodeKey, err := decoder.readString(fieldResponderNodeKey)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if attemptID == "" || responderNodeKey == "" {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-decrypt statement has empty identity fields")
+	}
+	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	aggregateR, err := decoder.readBytes(fieldAggregateR)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	// aggregate_diff may legitimately be empty — same identity-point case as blinded_diff above.
+	aggregateDiff, err := decoder.readBytes(fieldAggregateDiff)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	partial, err := decoder.readBytes(fieldPartial)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	challenge, err := decoder.readBytes(fieldChallenge)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	proof, err := decoder.readBytes(fieldProof)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	signedAt, err := decoder.readU64(fieldSignedAt)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	if err := decoder.finish(); err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
+	for label, blob := range map[string][]byte{
+		"aggregate_r": aggregateR,
+		"partial":     partial,
+		"challenge":   challenge,
+		"proof":       proof,
+	} {
+		if len(blob) == 0 {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PET blind-decrypt %s cannot be empty", label)
+		}
+		if len(blob) > petBlindMaxElementLen {
+			return invalidCryptoResponseStatement{}, errorsmod.Wrapf(types.ErrInvalidReport, "PET blind-decrypt %s exceeds size bound", label)
+		}
+	}
+	if len(aggregateDiff) > petBlindMaxElementLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-decrypt aggregate_diff exceeds size bound")
+	}
+
+	return invalidCryptoResponseStatement{
+		chainID:               chainID,
+		ringID:                ringID,
+		ringPk:                ringPk,
+		ringStateSha256:       ringStateSha256,
+		protocolVersion:       protocolVersion,
+		requestID:             attemptID,
+		signedAt:              signedAt,
+		responderNodeKey:      responderNodeKey,
+		originProtocol:        invalidCryptoEvidenceKindPetBlindDecrypt,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
 	}, nil
 }
 
@@ -2404,11 +2667,17 @@ func (w *reportCanonicalWriter) setErr(err error) {
 const (
 	fieldAccusedCommitteeScope = "accused_committee_scope"
 	fieldActorID               = "actor_id"
+	fieldAggregateDiff         = "aggregate_diff"
+	fieldAggregateR            = "aggregate_r"
 	fieldArtifactBPresent      = "artifact_b_present"
 	fieldAttemptID             = "attempt_id"
+	fieldBlindedDiff           = "blinded_diff"
+	fieldBlindedR              = "blinded_r"
+	fieldCertificateDigest     = "certificate_digest"
 	fieldChainID               = "chain_id"
 	fieldChallenge             = "challenge"
 	fieldCheckedAtAnchor       = "checked_at_anchor"
+	fieldCommitSalt            = "commit_salt"
 	fieldCommitment            = "commitment"
 	fieldCommitmentASignature  = "commitment_a_signature"
 	fieldCommitmentAStatement  = "commitment_a_statement"
@@ -2416,6 +2685,7 @@ const (
 	fieldCommitmentBStatement  = "commitment_b_statement"
 	fieldCommitmentSignature   = "commitment_signature"
 	fieldCommitmentStatement   = "commitment_statement"
+	fieldContextDigest         = "context_digest"
 	fieldContributionBPresent  = "contribution_b_present"
 	fieldCryptoBackend         = "crypto_backend"
 	fieldDeliveryID            = "delivery_id"
@@ -2434,6 +2704,7 @@ const (
 	fieldObjectID              = "object_id"
 	fieldOriginProtocol        = "origin_protocol"
 	fieldOriginProtocolVersion = "origin_protocol_version"
+	fieldPartial               = "partial"
 	fieldProof                 = "proof"
 	fieldPhase                 = "phase"
 	fieldProtocolVersion       = "protocol_version"
@@ -2447,6 +2718,7 @@ const (
 	fieldRingID                = "ring_id"
 	fieldRingPk                = "ring_pk"
 	fieldRingStateSha256       = "ring_state_sha256"
+	fieldSelectionDigest       = "selection_digest"
 	fieldSessionNonce          = "session_nonce"
 	fieldShare                 = "share"
 	fieldShareValue            = "share_value"
@@ -2478,6 +2750,21 @@ func (d *reportCanonicalDecoder) readByte(label string) (byte, error) {
 	value := d.bytes[d.cursor]
 	d.cursor++
 	return value, nil
+}
+
+// readFixed32 reads exactly 32 raw bytes with no length prefix — the wire shape orbis-rs's
+// write_fixed_32/read_fixed_32 use for PET's digest fields (context_digest, selection_digest,
+// certificate_digest, commit_salt). Unlike every other fixed-size field elsewhere in this file
+// (e.g. DKG's attempt_id/session_nonce), which is length-prefixed like any other byte slice, PET
+// digests never need a length check since their size is fixed by construction.
+func (d *reportCanonicalDecoder) readFixed32(label string) ([32]byte, error) {
+	var out [32]byte
+	if len(d.bytes)-d.cursor < 32 {
+		return out, errorsmod.Wrapf(types.ErrInvalidReport, "truncated %s", label)
+	}
+	copy(out[:], d.bytes[d.cursor:d.cursor+32])
+	d.cursor += 32
+	return out, nil
 }
 
 // readByteBool reads a single canonical bool byte (0 or 1) and rejects any other value.
