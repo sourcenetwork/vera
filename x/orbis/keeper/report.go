@@ -1626,6 +1626,14 @@ func decodePetBlindDecryptStatement(statementBytes []byte) (invalidCryptoRespons
 	if err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
+	// The responder's own claimed public polynomial — the Rust side
+	// authenticates this against the ring's known pet_pk before trusting it
+	// for anything; this decoder only needs shape validation, the same as
+	// every other field here.
+	publicPolynomial, err := decoder.readBytes(fieldPublicPolynomial)
+	if err != nil {
+		return invalidCryptoResponseStatement{}, err
+	}
 	if err := decoder.finish(); err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}
@@ -1644,6 +1652,15 @@ func decodePetBlindDecryptStatement(statementBytes []byte) (invalidCryptoRespons
 	}
 	if len(aggregateDiff) > petBlindMaxElementLen {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-decrypt aggregate_diff exceeds size bound")
+	}
+	// Sized like dkgCommitmentMaxLen, not petBlindMaxElementLen: a
+	// polynomial commitment has one coefficient per committee member, up to
+	// the max committee size, unlike the single-element fields above.
+	if len(publicPolynomial) == 0 {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-decrypt public_polynomial cannot be empty")
+	}
+	if len(publicPolynomial) > dkgCommitmentMaxLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-decrypt public_polynomial exceeds size bound")
 	}
 
 	return invalidCryptoResponseStatement{
@@ -2708,6 +2725,7 @@ const (
 	fieldProof                 = "proof"
 	fieldPhase                 = "phase"
 	fieldProtocolVersion       = "protocol_version"
+	fieldPublicPolynomial      = "public_polynomial"
 	fieldRdrPk                 = "rdr_pk"
 	fieldReceiverNodeKey       = "receiver_node_key"
 	fieldRelaySignature        = "relay_signature"
