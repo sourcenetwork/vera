@@ -16,6 +16,7 @@ import (
 
 	appparams "github.com/sourcenetwork/vera/app/params"
 	acptypes "github.com/sourcenetwork/vera/x/acp/types"
+	jubjub "github.com/sourcenetwork/vera/x/orbis/jubjub"
 	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
@@ -707,7 +708,7 @@ func TestMsgServer_FinalizeRing_RejectsIdentityPublicKey(t *testing.T) {
 	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{
 		Creator: peerAddr,
 		RingId:  createRingResp.RingId,
-		RingPk:  strings.Repeat("00", decaf377PublicKeySize),
+		RingPk:  hex.EncodeToString(jubjub.IdentityBytes[:]),
 	})
 	require.ErrorIs(t, err, types.ErrInvalidRing)
 	require.Empty(t, k.GetRing(ctx, createRingResp.RingId).Confirmations)
