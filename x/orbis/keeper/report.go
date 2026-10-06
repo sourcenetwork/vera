@@ -1483,6 +1483,9 @@ func decodePetBlindRevealStatement(statementBytes []byte) (invalidCryptoResponse
 	if attemptID == "" || responderNodeKey == "" {
 		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-reveal statement has empty identity fields")
 	}
+	if len(attemptID) > petBlindMaxElementLen {
+		return invalidCryptoResponseStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "PET blind-reveal attempt_id exceeds size bound")
+	}
 	if _, err := decoder.readU32(fieldFromNodeID); err != nil {
 		return invalidCryptoResponseStatement{}, err
 	}

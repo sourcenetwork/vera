@@ -831,6 +831,18 @@ func (k *Keeper) StoreDocument(goCtx context.Context, msg *types.MsgStoreDocumen
 	petTag := optionalStoreDocumentPetTag(msg)
 	petTagProof := optionalStoreDocumentPetTagProof(msg)
 
+	// GenerateDocumentID below only enforces that the tag and its proof are present or
+	// absent together; it has no notion of the ring's own requirement. Without this
+	// check a requires_pet ring could end up storing a document with no tag at all
+	// (silently skipping the PET ownership gate for that document later), or a
+	// non-PET ring could end up storing a document carrying a tag it will never check.
+	if ring.RequiresPet && (!petTag.HasValue() || !petTagProof.HasValue()) {
+		return nil, errorsmod.Wrap(types.ErrInvalidDocument, "pet_tag and pet_tag_proof are required for a ring that requires PET")
+	}
+	if !ring.RequiresPet && (petTag.HasValue() || petTagProof.HasValue()) {
+		return nil, errorsmod.Wrap(types.ErrInvalidDocument, "pet_tag and pet_tag_proof are not accepted for a ring that does not require PET")
+	}
+
 	documentID, err := types.GenerateDocumentID(msg.RingId, msg.Document, msg.Proof, msg.PolicyId, msg.Resource, msg.Permission, tier, timestamp, petTag, petTagProof)
 	if err != nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidDocument, err.Error())
