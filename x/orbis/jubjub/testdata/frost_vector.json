@@ -1,0 +1,9 @@
+{
+  "description": "Public test vector generated independently with affine twisted-Edwards arithmetic; secret scalar 7 and nonce scalar 13 are for testing only.",
+  "scheme": "jubjub_frost",
+  "generator": "cb550cd538ea0cc1138480408e6eaab9b36c613f0dd3f7784fdb6eea837b13d7",
+  "public_key": "26c69cc492e137a38ab29d807387ccd70021ab143c208ed121e97d92cf0c1018",
+  "message": "6f726269732d6a75626a75622d696e7465726f702d7631",
+  "challenge": "94ed64c2b9e5f86f39d4c72343ec8f8e1eadae488ac3d603422fd2b93975050d",
+  "signature": "d4cdab997110c2f1e02bb16ebef816c9d0a6025386825581a688b9bfa326360acf72f746dbf1432c816ac62d5fb27effd1598df5c1f673f4d72c89b515f73304"
+}

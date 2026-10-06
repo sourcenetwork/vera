@@ -184,8 +184,12 @@ type MsgCreateRing struct {
 	TrustedAuthRelayDids []string `protobuf:"bytes,9,rep,name=trusted_auth_relay_dids,json=trustedAuthRelayDids,proto3" json:"trusted_auth_relay_dids,omitempty"`
 	// Set at creation; false permanently disables trusted authentication relays.
 	AllowTrustedAuthRelays bool `protobuf:"varint,10,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	// Opt this ring into requiring a PET check before PRE release, applying to
+	// every document in the ring (no per-document opt-out). Immutable once set.
+	// Not yet supported: rejected until the PET checking-key lifecycle ships.
+	RequiresPet   bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MsgCreateRing) Reset() {
@@ -288,6 +292,13 @@ func (x *MsgCreateRing) GetAllowTrustedAuthRelays() bool {
 	return false
 }
 
+func (x *MsgCreateRing) GetRequiresPet() bool {
+	if x != nil {
+		return x.RequiresPet
+	}
+	return false
+}
+
 type MsgCreateRingResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	RingId        string                 `protobuf:"bytes,1,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
@@ -333,10 +344,14 @@ func (x *MsgCreateRingResponse) GetRingId() string {
 }
 
 type MsgFinalizeRing struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Creator       string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	RingId        string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
-	RingPk        string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Creator string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId  string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	RingPk  string                 `protobuf:"bytes,3,opt,name=ring_pk,json=ringPk,proto3" json:"ring_pk,omitempty"`
+	// Required, and only accepted, when the ring's requires_pet is true: the
+	// signer's local fresh-DKG PET key ceremony completed alongside the main
+	// one, and both are submitted together in this one finalize message.
+	PetPk         *string `protobuf:"bytes,4,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -388,6 +403,13 @@ func (x *MsgFinalizeRing) GetRingId() string {
 func (x *MsgFinalizeRing) GetRingPk() string {
 	if x != nil {
 		return x.RingPk
+	}
+	return ""
+}
+
+func (x *MsgFinalizeRing) GetPetPk() string {
+	if x != nil && x.PetPk != nil {
+		return *x.PetPk
 	}
 	return ""
 }
@@ -1875,7 +1897,15 @@ type MsgStoreDocument struct {
 	// Absent means no tier.
 	Tier *string `protobuf:"bytes,8,opt,name=tier,proto3,oneof" json:"tier,omitempty"`
 	// Absent means no timestamp.
-	Timestamp     *uint64 `protobuf:"varint,9,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	Timestamp *uint64 `protobuf:"varint,9,opt,name=timestamp,proto3,oneof" json:"timestamp,omitempty"`
+	// PET tag ciphertext, present only when the ring requires PET. JSON of
+	// {ephemeral_point, masked_fingerprint} (compressed group points). Present
+	// and absent together with pet_tag_proof. Not yet enforced: no PET ring can
+	// exist yet, and this field is not included in authorization.
+	PetTag *string `protobuf:"bytes,10,opt,name=pet_tag,json=petTag,proto3,oneof" json:"pet_tag,omitempty"`
+	// Public knowledge proof for pet_tag's r_tag, present only alongside
+	// pet_tag. JSON of {challenge, response}.
+	PetTagProof   *string `protobuf:"bytes,11,opt,name=pet_tag_proof,json=petTagProof,proto3,oneof" json:"pet_tag_proof,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1971,6 +2001,20 @@ func (x *MsgStoreDocument) GetTimestamp() uint64 {
 		return *x.Timestamp
 	}
 	return 0
+}
+
+func (x *MsgStoreDocument) GetPetTag() string {
+	if x != nil && x.PetTag != nil {
+		return *x.PetTag
+	}
+	return ""
+}
+
+func (x *MsgStoreDocument) GetPetTagProof() string {
+	if x != nil && x.PetTagProof != nil {
+		return *x.PetTagProof
+	}
+	return ""
 }
 
 type MsgStoreDocumentResponse struct {
@@ -2825,7 +2869,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x125\n" +
 	"\x06params\x18\x02 \x01(\v2\x12.vera.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:/\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*\x1cvera/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xb6\x03\n" +
+	"\x17MsgUpdateParamsResponse\"\xd9\x03\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
@@ -2837,14 +2881,17 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\treporting\x18\b \x01(\v2\x1b.vera.orbis.ReportingConfigR\treporting\x125\n" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
-	" \x01(\bR\x16allowTrustedAuthRelays:\f\x82\xe7\xb0*\acreatorB\b\n" +
+	" \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
+	"\frequires_pet\x18\v \x01(\bR\vrequiresPet:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
-	"\aring_id\x18\x01 \x01(\tR\x06ringId\"k\n" +
+	"\aring_id\x18\x01 \x01(\tR\x06ringId\"\x92\x01\n" +
 	"\x0fMsgFinalizeRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x17\n" +
-	"\aring_pk\x18\x03 \x01(\tR\x06ringPk:\f\x82\xe7\xb0*\acreator\"T\n" +
+	"\aring_pk\x18\x03 \x01(\tR\x06ringPk\x12\x1a\n" +
+	"\x06pet_pk\x18\x04 \x01(\tH\x00R\x05petPk\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\t\n" +
+	"\a_pet_pk\"T\n" +
 	"\x17MsgFinalizeRingResponse\x129\n" +
 	"\aoutcome\x18\x01 \x01(\x0e2\x1f.vera.orbis.FinalizeRingOutcomeR\aoutcome\"W\n" +
 	"\x14MsgCancelPendingRing\x12\x18\n" +
@@ -2944,7 +2991,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
 	" \x01(\bR\x16allowTrustedAuthRelaysB\x10\n" +
-	"\x0e_new_thresholdJ\x04\b\x06\x10\a\"\xb1\x02\n" +
+	"\x0e_new_thresholdJ\x04\b\x06\x10\a\"\x96\x03\n" +
 	"\x10MsgStoreDocument\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12\x1a\n" +
@@ -2956,10 +3003,16 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"permission\x18\a \x01(\tR\n" +
 	"permission\x12\x17\n" +
 	"\x04tier\x18\b \x01(\tH\x00R\x04tier\x88\x01\x01\x12!\n" +
-	"\ttimestamp\x18\t \x01(\x04H\x01R\ttimestamp\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\a\n" +
+	"\ttimestamp\x18\t \x01(\x04H\x01R\ttimestamp\x88\x01\x01\x12\x1c\n" +
+	"\apet_tag\x18\n" +
+	" \x01(\tH\x02R\x06petTag\x88\x01\x01\x12'\n" +
+	"\rpet_tag_proof\x18\v \x01(\tH\x03R\vpetTagProof\x88\x01\x01:\f\x82\xe7\xb0*\acreatorB\a\n" +
 	"\x05_tierB\f\n" +
 	"\n" +
-	"_timestamp\";\n" +
+	"_timestampB\n" +
+	"\n" +
+	"\b_pet_tagB\x10\n" +
+	"\x0e_pet_tag_proof\";\n" +
 	"\x18MsgStoreDocumentResponse\x12\x1f\n" +
 	"\vdocument_id\x18\x01 \x01(\tR\n" +
 	"documentId\"\xd1\x01\n" +
@@ -3178,6 +3231,7 @@ func file_vera_orbis_tx_proto_init() {
 	file_vera_orbis_params_proto_init()
 	file_vera_orbis_ring_proto_init()
 	file_vera_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
+	file_vera_orbis_tx_proto_msgTypes[4].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[8].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[30].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[31].OneofWrappers = []any{}

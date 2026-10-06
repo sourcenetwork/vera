@@ -7,12 +7,13 @@ import (
 	"testing"
 	"time"
 
-	decaf377 "github.com/mizufinance/decaf377-go"
-	"github.com/mizufinance/decaf377-go/orbisfrost"
 	"github.com/stretchr/testify/require"
 	blst "github.com/supranational/blst/bindings/go"
 
 	appparams "github.com/sourcenetwork/vera/app/params"
+	jubjub "github.com/sourcenetwork/vera/x/orbis/jubjub"
+	"github.com/sourcenetwork/vera/x/orbis/jubjub/jubjubfrost"
+	"github.com/sourcenetwork/vera/x/orbis/jubjub/jubjubtest"
 	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
@@ -37,28 +38,29 @@ func TestRingReshareSignStateHashIncludesTrustedAuthRelays(t *testing.T) {
 	require.NotEqual(t, withoutRelay, directOnly)
 }
 
-func TestDecaf377IdentityPublicKeyForgeryRejected(t *testing.T) {
-	identityBytes, err := decaf377.Encode(decaf377.Identity())
-	require.NoError(t, err)
+func TestJubjubIdentityPublicKeyForgeryRejected(t *testing.T) {
+	identityBytes := jubjub.IdentityBytes[:]
 
-	// The underlying Schnorr equation accepts this construction for Y = 0:
-	// choose z, then publish R = z*G. No signing secret is needed.
+	// The underlying Schnorr equation would accept this construction for
+	// Y = 0: choose z, then publish R = z*G. No signing secret is needed.
+	//
+	// Unlike decaf377's bare orbisfrost.Verify, jubjubfrost.Verify's
+	// underlying verify_core already rejects the identity public key by
+	// itself — it mirrors orbis-rs's real ThresholdJubjubSigner::verify,
+	// which has this check built in (decaf377's primitive didn't, which is
+	// why that backend needed the check pushed up to this layer). So this
+	// test demonstrates the safety property holds end-to-end, at every
+	// layer, rather than proving a lower layer alone is forgeable.
 	z := big.NewInt(42)
-	generator, err := decaf377.Generator()
+	rPoint, err := jubjubtest.DerivePublicKey(scalarToLittleEndian32(z)) // R = z*G
 	require.NoError(t, err)
-	zScalar, err := decaf377.ScalarFromCanonicalBytes(scalarToLittleEndian32(z))
-	require.NoError(t, err)
-	rPoint, err := decaf377.ScalarMul(generator, zScalar)
-	require.NoError(t, err)
-	rBytes, err := decaf377.Encode(rPoint)
-	require.NoError(t, err)
-	forgedSignature := append(rBytes, scalarToLittleEndian32(z)...)
+	forgedSignature := append(append([]byte{}, rPoint...), scalarToLittleEndian32(z)...)
 
-	ok, err := orbisfrost.Verify(identityBytes, []byte("identity-key forgery"), forgedSignature)
+	ok, err := jubjubfrost.Verify(identityBytes, []byte("identity-key forgery"), forgedSignature)
 	require.NoError(t, err)
-	require.True(t, ok, "regression setup must exercise the underlying identity-key vulnerability")
+	require.False(t, ok, "verify_core already rejects the identity public key by itself")
 
-	err = verifyDecaf377FROSTThresholdSignature(
+	err = verifyJubjubFROSTThresholdSignature(
 		hex.EncodeToString(identityBytes),
 		[]byte("identity-key forgery"),
 		forgedSignature,
@@ -155,15 +157,20 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_BLS12381(t *testing.T
 	require.Equal(t, ringUpgradeBaseTime+MinRingUpgradeLeadSeconds, updated.UpgradeInfo.GetActivationTime())
 }
 
-func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *testing.T) {
+func TestMsgServer_FinalizeRingReshareByThresholdSignature_JubjubFROST(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
 
-	// Decaf377-FROST key pair — secret scalar, public key = x·G.
-	secretScalar := new(big.Int).SetBytes([]byte("orbis-test-decaf377-secret-key00"))
-	secretScalar.Mod(secretScalar, decaf377.ScalarOrder())
+	// Jubjub-FROST key pair — secret scalar, public key = x·G. The seed
+	// string is wide-reduced (via the same Fr::from_bytes_wide operation
+	// production code uses) rather than hand-reduced against a hardcoded
+	// modulus constant, so this test never needs to know the scalar order.
+	seedHash := sha512.Sum512([]byte("orbis-test-jubjub-secret-key0000"))
+	secretBytes, err := jubjubtest.ReduceScalarWide(seedHash[:])
+	require.NoError(t, err)
+	secretScalar := bigIntFromLittleEndianScalar(secretBytes)
 
-	ringPkBytes, err := decaf377PublicKeyBytes(secretScalar)
+	ringPkBytes, err := jubjubPublicKeyBytes(secretScalar)
 	require.NoError(t, err)
 	ringPk := hex.EncodeToString(ringPkBytes)
 
@@ -207,18 +214,18 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 	signBytes, err := ringReshareFinalizeSignBytes(ctx.ChainID(), ring, finalizedRing)
 	require.NoError(t, err)
 
-	sigBytes, err := decaf377SchnorrSign(secretScalar, ringPkBytes, signBytes)
+	sigBytes, err := jubjubSchnorrSign(secretScalar, ringPkBytes, signBytes)
 	require.NoError(t, err)
 
 	// Sanity-check our signing helper before submitting.
-	ok, err := orbisfrost.Verify(ringPkBytes, signBytes, sigBytes)
+	ok, err := jubjubfrost.Verify(ringPkBytes, signBytes, sigBytes)
 	require.NoError(t, err)
 	require.True(t, ok)
 
 	_, err = k.FinalizeRingReshareByThresholdSignature(ctx, &types.MsgFinalizeRingReshareByThresholdSignature{
 		Creator:         creatorAddr,
 		RingId:          ringID,
-		SignatureScheme: ThresholdSignatureSchemeDecaf377FROST,
+		SignatureScheme: ThresholdSignatureSchemeJubjubFROST,
 		Signature:       sigBytes,
 	})
 	require.NoError(t, err)
@@ -231,63 +238,18 @@ func TestMsgServer_FinalizeRingReshareByThresholdSignature_Decaf377FROST(t *test
 	require.Equal(t, uint64(ctx.BlockHeight()), updated.BlockNumberNonce)
 }
 
-// decaf377PublicKeyBytes returns the encoded public key point x·G for the given secret scalar.
-// x must already be reduced mod decaf377.ScalarOrder().
-func decaf377PublicKeyBytes(x *big.Int) ([]byte, error) {
-	g, err := decaf377.Generator()
-	if err != nil {
-		return nil, err
-	}
-	xScalar, err := decaf377.ScalarFromCanonicalBytes(scalarToLittleEndian32(x))
-	if err != nil {
-		return nil, err
-	}
-	pub, err := decaf377.ScalarMul(g, xScalar)
-	if err != nil {
-		return nil, err
-	}
-	return decaf377.Encode(pub)
+// jubjubPublicKeyBytes returns the encoded public key point x·G for the
+// given secret scalar. x must already be reduced mod the Jubjub scalar
+// order (see jubjubtest.ReduceScalarWide).
+func jubjubPublicKeyBytes(x *big.Int) ([]byte, error) {
+	return jubjubtest.DerivePublicKey(scalarToLittleEndian32(x))
 }
 
-// decaf377SchnorrSign produces a signature (R || z) compatible with orbisfrost.Verify.
-// It uses a deterministic nonce derived from the secret and message.
-func decaf377SchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
-	g, err := decaf377.Generator()
-	if err != nil {
-		return nil, err
-	}
-
-	// Deterministic nonce: k = H(x || msg) mod order
-	nonceInput := append(scalarToLittleEndian32(x), msg...)
-	nonceHash := sha512.Sum512(nonceInput)
-	kScalar := decaf377.ScalarFromUniformBytes(nonceHash[:])
-	k := bigIntFromLittleEndianScalar(kScalar)
-
-	// R = k·G
-	rPoint, err := decaf377.ScalarMul(g, kScalar)
-	if err != nil {
-		return nil, err
-	}
-	rBytes, err := decaf377.Encode(rPoint)
-	if err != nil {
-		return nil, err
-	}
-
-	// c = H(domain || R || pubKey || msg)
-	h := sha512.New()
-	h.Write([]byte(orbisfrost.ChallengeDomain))
-	h.Write(rBytes)
-	h.Write(pubKeyBytes)
-	h.Write(msg)
-	c := bigIntFromLittleEndianScalar(decaf377.ScalarFromUniformBytes(h.Sum(nil)))
-
-	// z = (k + c·x) mod order
-	order := decaf377.ScalarOrder()
-	z := new(big.Int).Mul(c, x)
-	z.Add(z, k)
-	z.Mod(z, order)
-
-	return append(rBytes, scalarToLittleEndian32(z)...), nil
+// jubjubSchnorrSign produces a signature (R || z) compatible with
+// jubjubfrost.Verify, via a deterministic nonce derived from the secret and
+// message (see jubjub-wasm's test_sign_core doc comment for why).
+func jubjubSchnorrSign(x *big.Int, pubKeyBytes, msg []byte) ([]byte, error) {
+	return jubjubtest.Sign(scalarToLittleEndian32(x), pubKeyBytes, msg)
 }
 
 // scalarToLittleEndian32 encodes a big.Int as a 32-byte little-endian scalar.
@@ -300,10 +262,9 @@ func scalarToLittleEndian32(x *big.Int) []byte {
 	return le
 }
 
-// bigIntFromLittleEndianScalar interprets a decaf377.Scalar's fixed-width
-// little-endian bytes as a big.Int, for test-only modular arithmetic —
-// decaf377.Scalar itself exposes no arithmetic, only ScalarMul consumes it.
-func bigIntFromLittleEndianScalar(s decaf377.Scalar) *big.Int {
+// bigIntFromLittleEndianScalar interprets a fixed-width 32-byte
+// little-endian scalar as a big.Int, for test-only modular arithmetic.
+func bigIntFromLittleEndianScalar(s []byte) *big.Int {
 	be := make([]byte, len(s))
 	for i, b := range s {
 		be[len(s)-1-i] = b
