@@ -35,11 +35,11 @@ const (
 	// PetBlindRevealResponseDomain is the domain tag of the responder-signed PET
 	// blind-equality-test reveal-phase statement carried as
 	// invalid_crypto_response/pet_blind_reveal evidence.
-	PetBlindRevealResponseDomain = "orbis-pet-blind-reveal-response-v1"
+	PetBlindRevealResponseDomain = "orbis-pet-blind-reveal-response-v2"
 	// PetBlindDecryptResponseDomain is the domain tag of the responder-signed PET
 	// blind-equality-test decrypt-phase statement carried as
 	// invalid_crypto_response/pet_blind_decrypt evidence.
-	PetBlindDecryptResponseDomain = "orbis-pet-blind-decrypt-response-v1"
+	PetBlindDecryptResponseDomain = "orbis-pet-blind-decrypt-response-v2"
 	// DkgCommitmentDomain is the domain tag of the responder-signed raw DKG
 	// commitment statement nested inside invalid_crypto_response DKG evidence.
 	DkgCommitmentDomain = "orbis-dkg-commitment-v1"
