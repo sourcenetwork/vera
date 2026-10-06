@@ -46,6 +46,7 @@ func ensureCompiled(ctx context.Context) error {
 type moduleInstance struct {
 	mod    api.Module
 	bufPtr uint32
+	bufLen uint32
 }
 
 func newInstance(ctx context.Context) (*moduleInstance, error) {
@@ -57,12 +58,18 @@ func newInstance(ctx context.Context) (*moduleInstance, error) {
 		return nil, fmt.Errorf("jubjub: failed to instantiate wasm module: %w", err)
 	}
 	bufPtrFn := mod.ExportedFunction("buf_ptr")
-	results, err := bufPtrFn.Call(ctx)
+	ptrResults, err := bufPtrFn.Call(ctx)
 	if err != nil {
 		_ = mod.Close(ctx)
 		return nil, fmt.Errorf("%w: buf_ptr: %w", ErrWasmTrap, err)
 	}
-	return &moduleInstance{mod: mod, bufPtr: uint32(results[0])}, nil
+	bufLenFn := mod.ExportedFunction("buf_len")
+	lenResults, err := bufLenFn.Call(ctx)
+	if err != nil {
+		_ = mod.Close(ctx)
+		return nil, fmt.Errorf("%w: buf_len: %w", ErrWasmTrap, err)
+	}
+	return &moduleInstance{mod: mod, bufPtr: uint32(ptrResults[0]), bufLen: uint32(lenResults[0])}, nil
 }
 
 func (m *moduleInstance) close(ctx context.Context) {
@@ -70,7 +77,16 @@ func (m *moduleInstance) close(ctx context.Context) {
 }
 
 // writeInputs writes buf starting at this instance's shared buffer address.
+// Rejected up front if buf wouldn't fit in the module's shared static buffer
+// (reported by the wasm side's own buf_len export): Memory().Write only
+// bounds-checks against the whole linear memory, which is typically several
+// times larger than the buffer itself, so an oversized buf would otherwise
+// write silently past the buffer into unrelated wasm memory instead of
+// failing here.
 func (m *moduleInstance) writeInputs(buf []byte) error {
+	if uint32(len(buf)) > m.bufLen {
+		return fmt.Errorf("jubjub: input length %d exceeds wasm shared buffer capacity %d", len(buf), m.bufLen)
+	}
 	if !m.mod.Memory().Write(m.bufPtr, buf) {
 		return fmt.Errorf("jubjub: wasm memory write out of range (len=%d)", len(buf))
 	}
