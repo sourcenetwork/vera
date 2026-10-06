@@ -12,10 +12,13 @@ import (
 
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 
 	faucettypes "github.com/sourcenetwork/vera/app/faucet/types"
 	appparams "github.com/sourcenetwork/vera/app/params"
@@ -272,8 +275,8 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.NotEmpty(t, response.Message)
-		assert.NotEmpty(t, response.Txhash)
-		assert.Equal(t, uint32(0), response.Code)
+		require.NotEmpty(t, response.Txhash)
+		require.Equal(t, uint32(0), response.Code, "grant transaction CheckTx failed: %s", response.RawLog)
 		assert.NotEmpty(t, response.Granter)
 		assert.NotEmpty(t, response.Grantee)
 		assert.NotEmpty(t, response.AmountLimit.Amount)
@@ -283,8 +286,32 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		expectedExpiration := time.Now().AddDate(0, 0, 30)
 		assert.WithinDuration(t, expectedExpiration, *response.Expiration, time.Minute, "Expiration should be 30 days from now")
 
-		_, err = net.WaitForHeight(3)
+		// The faucet returns after CheckTx; wait for this transaction's committed result.
+		conn, err := grpc.NewClient(net.Validators[0].AppConfig.GRPC.Address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		require.NoError(t, err)
+		defer conn.Close()
+		txClient := txtypes.NewServiceClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		ticker := time.NewTicker(100 * time.Millisecond)
+		defer ticker.Stop()
+		var committed *txtypes.GetTxResponse
+		for {
+			committed, err = txClient.GetTx(ctx, &txtypes.GetTxRequest{Hash: response.Txhash})
+			if status.Code(err) != codes.NotFound {
+				require.NoError(t, err, "query grant transaction %s", response.Txhash)
+				break
+			}
+			select {
+			case <-ctx.Done():
+				t.Fatalf("grant transaction %s was not committed: %v", response.Txhash, ctx.Err())
+			case <-ticker.C:
+			}
+		}
+		require.NotNil(t, committed)
+		require.NotNil(t, committed.TxResponse)
+		require.Positive(t, committed.TxResponse.Height)
+		require.Equal(t, uint32(0), committed.TxResponse.Code, "grant transaction failed in block: %s", committed.TxResponse.RawLog)
 
 		// Check feegrant allowances instead of balance
 		allowanceResp, err := http.Get(fmt.Sprintf("%s/vera/feegrant/v1beta1/allowances/%s", httpAddr, testAddress))
@@ -298,7 +325,7 @@ func TestFaucetGrantAllowance(t *testing.T) {
 
 		assert.Contains(t, allowanceResponse, "allowances")
 		allowances := allowanceResponse["allowances"].([]any)
-		assert.NotEmpty(t, allowances, "Should have at least one allowance")
+		require.NotEmpty(t, allowances, "Should have at least one allowance")
 
 		allowance := allowances[0].(map[string]any)
 		assert.Contains(t, allowance, "granter")
