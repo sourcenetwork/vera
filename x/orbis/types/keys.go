@@ -49,6 +49,7 @@ func GenerateRingID(
 	currentVersion uint64,
 	allowTrustedAuthRelays bool,
 	trustedAuthRelayDIDs []string,
+	requiresPet bool,
 ) string {
 	sortedPeerNodeKeys := slices.Clone(peerNodeKeys)
 	if !slices.IsSorted(sortedPeerNodeKeys) {
@@ -66,6 +67,7 @@ func GenerateRingID(
 	sortedRelayDIDs := slices.Clone(trustedAuthRelayDIDs)
 	slices.Sort(sortedRelayDIDs)
 	h.writeStringSlice(sortedRelayDIDs)
+	h.writeBool(requiresPet)
 	return h.sum()
 }
 
@@ -201,6 +203,13 @@ func decodeIDByteFields(raw string, want []string) (map[string][]byte, error) {
 // two byte-different JSON encodings of the *same* ciphertext produce the *same*
 // id — a semantic ciphertext has exactly one authorization identity. Returns an
 // error if either blob is not exactly the expected shape.
+//
+// `petTag`/`petTagProof` are the JSON blobs from MsgStoreDocument's optional PET
+// attachment (absent on an ordinary, non-PET document). They must be present or
+// absent *together*; one without the other is rejected. When both are absent,
+// nothing is hashed for them at all — not even a presence marker — so an
+// ordinary document's id is unchanged from before this attachment existed. See
+// [writeOptionalPetTag].
 func GenerateDocumentID(
 	ringID string,
 	document string,
@@ -210,6 +219,8 @@ func GenerateDocumentID(
 	permission string,
 	tier immutable.Option[string],
 	timestamp immutable.Option[uint64],
+	petTag immutable.Option[string],
+	petTagProof immutable.Option[string],
 ) (string, error) {
 	secret, err := decodeIDByteFields(document, []string{"enc_cmt", "encrypted_data", "nonce"})
 	if err != nil {
@@ -232,6 +243,9 @@ func GenerateDocumentID(
 	h.writeString(permission)
 	h.writeOptionalString(tier)
 	h.writeOptionalUint64(timestamp)
+	if err := h.writeOptionalPetTag(petTag, petTagProof); err != nil {
+		return "", err
+	}
 	return h.sum(), nil
 }
 
@@ -300,6 +314,34 @@ func (h *idHasher) writeBytes(value []byte) {
 	binary.BigEndian.PutUint32(buf[:], uint32(len(value)))
 	h.bytes = append(h.bytes, buf[:]...)
 	h.bytes = append(h.bytes, value...)
+}
+
+// writeOptionalPetTag folds the optional PET tag attachment and its knowledge
+// proof into the hash. Absent (both empty) hashes nothing at all — unlike
+// every other optional field in this file, not even a presence marker — so an
+// ordinary (non-PET) document's id is unchanged from before this attachment
+// existed. Present requires both petTag and petTagProof; one without the
+// other is rejected as malformed.
+func (h *idHasher) writeOptionalPetTag(petTag, petTagProof immutable.Option[string]) error {
+	if !petTag.HasValue() && !petTagProof.HasValue() {
+		return nil
+	}
+	if !petTag.HasValue() || !petTagProof.HasValue() {
+		return fmt.Errorf("pet_tag and pet_tag_proof must be present or absent together")
+	}
+	tag, err := decodeIDByteFields(petTag.Value(), []string{"ephemeral_point", "masked_fingerprint"})
+	if err != nil {
+		return fmt.Errorf("malformed pet_tag: %w", err)
+	}
+	proof, err := decodeIDByteFields(petTagProof.Value(), []string{"challenge", "response"})
+	if err != nil {
+		return fmt.Errorf("malformed pet_tag_proof: %w", err)
+	}
+	h.writeBytes(tag["ephemeral_point"])
+	h.writeBytes(tag["masked_fingerprint"])
+	h.writeBytes(proof["challenge"])
+	h.writeBytes(proof["response"])
+	return nil
 }
 
 func (h *idHasher) sum() string {

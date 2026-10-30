@@ -47,7 +47,6 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ignite/cli/v28 v28.6.1
 	github.com/lestrrat-go/jwx/v2 v2.1.6
-	github.com/mizufinance/decaf377-go v0.2.1-0.20260914183201-e7f5d091fb13
 	github.com/skip-mev/block-sdk/v2 v2.1.5
 	github.com/sourcenetwork/acp_core v0.8.2
 	github.com/sourcenetwork/immutable v0.3.0
@@ -60,6 +59,7 @@ require (
 	github.com/supranational/blst v0.3.16
 	github.com/tendermint/tendermint v0.35.9
 	github.com/testcontainers/testcontainers-go v0.41.0
+	github.com/tetratelabs/wazero v1.12.0
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546
 	golang.org/x/tools v0.41.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260120221211-b8f7ae30c516
@@ -68,6 +68,8 @@ require (
 	google.golang.org/protobuf v1.36.11
 	gotest.tools/v3 v3.5.2
 )
+
+require github.com/google/pprof v0.0.0-20250820193118-f64d9cf942d6 // indirect
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect
@@ -95,7 +97,6 @@ require (
 	connectrpc.com/otelconnect v0.8.0 // indirect
 	cosmossdk.io/collections v0.4.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
-	filippo.io/bigmod v0.1.1-0.20260103110540-f8a47775ebe5 // indirect
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/4meepo/tagalign v1.3.4 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -163,7 +164,6 @@ require (
 	github.com/cockroachdb/redact v1.1.6 // indirect
 	github.com/cockroachdb/tokenbucket v0.0.0-20250429170803-42689b6311bb // indirect
 	github.com/cometbft/cometbft-db v0.14.1 // indirect
-	github.com/consensys/gnark-crypto v0.19.2 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
@@ -420,7 +420,6 @@ require (
 	github.com/tdakkota/asciicheck v0.2.0 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tetafro/godot v1.4.16 // indirect
-	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tidwall/btree v1.7.0 // indirect
 	github.com/timakin/bodyclose v0.0.0-20230421092635-574207250966 // indirect
 	github.com/timonwong/loggercheck v0.9.4 // indirect
@@ -468,7 +467,7 @@ require (
 	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
-	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/telemetry v0.0.0-20260109210033-bd525da824e2 // indirect
 	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect

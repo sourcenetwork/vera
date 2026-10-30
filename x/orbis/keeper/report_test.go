@@ -3,20 +3,20 @@ package keeper
 import (
 	"bytes"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
-	"math/big"
 	"strings"
 	"testing"
 	"time"
 
-	decaf377 "github.com/mizufinance/decaf377-go"
-	"github.com/mizufinance/decaf377-go/orbisfrost"
 	"github.com/stretchr/testify/require"
 	blst "github.com/supranational/blst/bindings/go"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
+	"github.com/sourcenetwork/vera/x/orbis/jubjub/jubjubfrost"
+	"github.com/sourcenetwork/vera/x/orbis/jubjub/jubjubtest"
 	"github.com/sourcenetwork/vera/x/orbis/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -81,6 +81,52 @@ func TestReportCanonicalEncodingMatchesRustGoldenVectors(t *testing.T) {
 	ringHash, err := reportRingStateSHA256(ring)
 	require.NoError(t, err)
 	require.Equal(t, "1dd783721bbfc90f5960d9f2ebd99244c22ab147113d22bd39f9bccf6bf73c39", ringHash)
+}
+
+// These two golden vectors are shared with orbis-rs
+// invalid_crypto_response_pet_blind_reveal_payload_matches_golden_vector /
+// invalid_crypto_response_pet_blind_decrypt_payload_matches_golden_vector
+// (bin/orbis-node/src/reporting/v0/types/tests.rs) — regenerate both sides together. Unlike the
+// PRE/Sign goldens above, PET blind evidence had no Go-side decoder at all until
+// decodePetBlindRevealStatement/decodePetBlindDecryptStatement, so this is this evidence kind's
+// first real cross-language proof that the two decoders agree field-for-field, not just that
+// each language's own encoder/decoder round-trips against itself.
+func TestReportPetBlindEvidenceDecodingMatchesRustGoldenVectors(t *testing.T) {
+	revealPayload, err := hex.DecodeString("000000107065745f626c696e645f72657665616c00000133000000226f726269732d7065742d626c696e642d72657665616c2d726573706f6e73652d763100000009766572612d746573740000000672696e672d3100000004616162620000004031313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131000000000000000700000009617474656d70742d31010101010101010101010101010101010101010101010101010101010101010102020202020202020202020202020202020202020202020202020202020202020000000761636375736564000000020000000203040000000205060000000207080909090909090909090909090909090909090909090909090909090909090909000000020a0b000000020c0d000000006553f10a000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a")
+	require.NoError(t, err)
+	revealStatement, err := decodeInvalidCryptoResponsePayload(revealPayload)
+	require.NoError(t, err)
+	require.Equal(t, invalidCryptoResponseStatement{
+		chainID:               "vera-test",
+		ringID:                "ring-1",
+		ringPk:                "aabb",
+		ringStateSha256:       strings.Repeat("11", 32),
+		protocolVersion:       7,
+		requestID:             "attempt-1",
+		signedAt:              reportTestObservedAt + reportObservedAtGraceSecs,
+		responderNodeKey:      "accused",
+		originProtocol:        invalidCryptoEvidenceKindPetBlindReveal,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	}, revealStatement)
+
+	decryptPayload, err := hex.DecodeString("000000117065745f626c696e645f646563727970740000011a000000236f726269732d7065742d626c696e642d646563727970742d726573706f6e73652d763100000009766572612d746573740000000672696e672d3100000004616162620000004031313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131313131000000000000000700000009617474656d70742d310101010101010101010101010101010101010101010101010101010101010101020202020202020202020202020202020202020202020202020202020202020200000007616363757365640000000200000002030400000002050600000002070800000002090a000000020b0c000000006553f10a000000020d0e000000402a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a")
+	require.NoError(t, err)
+	decryptStatement, err := decodeInvalidCryptoResponsePayload(decryptPayload)
+	require.NoError(t, err)
+	require.Equal(t, invalidCryptoResponseStatement{
+		chainID:               "vera-test",
+		ringID:                "ring-1",
+		ringPk:                "aabb",
+		ringStateSha256:       strings.Repeat("11", 32),
+		protocolVersion:       7,
+		requestID:             "attempt-1",
+		signedAt:              reportTestObservedAt + reportObservedAtGraceSecs,
+		responderNodeKey:      "accused",
+		originProtocol:        invalidCryptoEvidenceKindPetBlindDecrypt,
+		accusedCommitteeScope: committeeScopeCurrent,
+		signingCommitteeScope: committeeScopeCurrent,
+	}, decryptStatement)
 }
 
 func TestReportRingStateSHA256IncludesUnauthorizedRequestDemerits(t *testing.T) {
@@ -1342,21 +1388,23 @@ func TestMsgServer_SubmitReport_InvalidCryptoPRERejectsTamperedStatements(t *tes
 	})
 }
 
-func TestMsgServer_SubmitReport_InvalidCryptoPREDecaf377FROSTAccepts(t *testing.T) {
+func TestMsgServer_SubmitReport_InvalidCryptoPREJubjubFROSTAccepts(t *testing.T) {
 	fixture := setupReportTestFixture(t)
-	secretScalar := new(big.Int).SetBytes([]byte("orbis-preproof-decaf377-secret-k"))
-	secretScalar.Mod(secretScalar, decaf377.ScalarOrder())
+	seedHash := sha512.Sum512([]byte("orbis-preproof-jubjub-secret-key"))
+	secretBytes, err := jubjubtest.ReduceScalarWide(seedHash[:])
+	require.NoError(t, err)
+	secretScalar := bigIntFromLittleEndianScalar(secretBytes)
 
-	ringPkBytes, err := decaf377PublicKeyBytes(secretScalar)
+	ringPkBytes, err := jubjubPublicKeyBytes(secretScalar)
 	require.NoError(t, err)
 	fixture.setRing(t, hex.EncodeToString(ringPkBytes), 2)
 
 	report := fixture.validPreInvalidProofReport(t)
 	message, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
-	signature, err := decaf377SchnorrSign(secretScalar, ringPkBytes, message)
+	signature, err := jubjubSchnorrSign(secretScalar, ringPkBytes, message)
 	require.NoError(t, err)
-	ok, err := orbisfrost.Verify(ringPkBytes, message, signature)
+	ok, err := jubjubfrost.Verify(ringPkBytes, message, signature)
 	require.NoError(t, err)
 	require.True(t, ok)
 
@@ -1364,7 +1412,7 @@ func TestMsgServer_SubmitReport_InvalidCryptoPREDecaf377FROSTAccepts(t *testing.
 		Creator:         fixture.creator,
 		Report:          report,
 		ReportId:        reportID,
-		SignatureScheme: ThresholdSignatureSchemeDecaf377FROST,
+		SignatureScheme: ThresholdSignatureSchemeJubjubFROST,
 		Signature:       signature,
 	})
 	require.NoError(t, err)
@@ -1816,21 +1864,23 @@ func TestMsgServer_SubmitReportRejectedReportDoesNotIncrementDemerits(t *testing
 	require.Equal(t, uint64(0), fixture.k.GetNodeDemerits(fixture.ctx, fixture.ringID, fixture.accusedKey))
 }
 
-func TestMsgServer_SubmitReport_Decaf377FROSTAccepts(t *testing.T) {
+func TestMsgServer_SubmitReport_JubjubFROSTAccepts(t *testing.T) {
 	fixture := setupReportTestFixture(t)
-	secretScalar := new(big.Int).SetBytes([]byte("orbis-report-decaf377-secret-key"))
-	secretScalar.Mod(secretScalar, decaf377.ScalarOrder())
+	seedHash := sha512.Sum512([]byte("orbis-report-jubjub-secret-key00"))
+	secretBytes, err := jubjubtest.ReduceScalarWide(seedHash[:])
+	require.NoError(t, err)
+	secretScalar := bigIntFromLittleEndianScalar(secretBytes)
 
-	ringPkBytes, err := decaf377PublicKeyBytes(secretScalar)
+	ringPkBytes, err := jubjubPublicKeyBytes(secretScalar)
 	require.NoError(t, err)
 	fixture.setRing(t, hex.EncodeToString(ringPkBytes), 2)
 
 	report := fixture.validReport(t, committeeScopeCurrent, committeeScopeCurrent, 0)
 	message, reportID, err := reportEnvelopeCanonicalMessageAndID(&report)
 	require.NoError(t, err)
-	signature, err := decaf377SchnorrSign(secretScalar, ringPkBytes, message)
+	signature, err := jubjubSchnorrSign(secretScalar, ringPkBytes, message)
 	require.NoError(t, err)
-	ok, err := orbisfrost.Verify(ringPkBytes, message, signature)
+	ok, err := jubjubfrost.Verify(ringPkBytes, message, signature)
 	require.NoError(t, err)
 	require.True(t, ok)
 
@@ -1838,7 +1888,7 @@ func TestMsgServer_SubmitReport_Decaf377FROSTAccepts(t *testing.T) {
 		Creator:         fixture.creator,
 		Report:          report,
 		ReportId:        reportID,
-		SignatureScheme: ThresholdSignatureSchemeDecaf377FROST,
+		SignatureScheme: ThresholdSignatureSchemeJubjubFROST,
 		Signature:       signature,
 	})
 	require.NoError(t, err)

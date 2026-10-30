@@ -1,15 +1,16 @@
 package keeper
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"strings"
 
 	errorsmod "cosmossdk.io/errors"
-	decaf377 "github.com/mizufinance/decaf377-go"
-	"github.com/mizufinance/decaf377-go/orbisfrost"
 	blst "github.com/supranational/blst/bindings/go"
 
+	jubjub "github.com/sourcenetwork/vera/x/orbis/jubjub"
+	"github.com/sourcenetwork/vera/x/orbis/jubjub/jubjubfrost"
 	"github.com/sourcenetwork/vera/x/orbis/types"
 )
 
@@ -21,14 +22,14 @@ const (
 	// lockstep with orbis-rs `crypto::THRESHOLD_SIGNATURE_SCHEME`. The
 	// pre-augmentation scheme string was "bls12_381_g1_pk_g2_sig_nul".
 	ThresholdSignatureSchemeBLS12381G1PKG2SigAugV1 = "bls12_381_g1_pk_g2_sig_aug_v1"
-	ThresholdSignatureSchemeDecaf377FROST          = "decaf377_frost"
+	ThresholdSignatureSchemeJubjubFROST            = "jubjub_frost"
 
 	bls12381PublicKeySize = 48
 	bls12381SignatureSize = 96
 	// AUG_ ciphersuite DST (matches orbis-rs `bls12_381::sign::BLS_SIG_DOMAIN`).
 	bls12381G2SignatureAugDST = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_AUG_"
-	decaf377PublicKeySize     = decaf377.ElementSize
-	decaf377SignatureSize     = decaf377.ElementSize + decaf377.ScalarSize
+	jubjubPublicKeySize       = jubjub.ElementSize
+	jubjubSignatureSize       = jubjub.ElementSize + jubjub.ScalarSize
 )
 
 func verifyThresholdSignatureForRingUpdate(ring *types.Ring, message []byte, scheme string, signature []byte) error {
@@ -39,8 +40,8 @@ func verifyThresholdSignature(scheme string, ringPK string, message []byte, sign
 	switch normalizeThresholdSignatureScheme(scheme) {
 	case ThresholdSignatureSchemeBLS12381G1PKG2SigAugV1:
 		return verifyBLS12381ThresholdSignature(ringPK, message, signature)
-	case ThresholdSignatureSchemeDecaf377FROST:
-		return verifyDecaf377FROSTThresholdSignature(ringPK, message, signature)
+	case ThresholdSignatureSchemeJubjubFROST:
+		return verifyJubjubFROSTThresholdSignature(ringPK, message, signature)
 	default:
 		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "unsupported threshold signature scheme %q", scheme)
 	}
@@ -82,29 +83,29 @@ func verifyBLS12381ThresholdSignature(ringPK string, message []byte, signature [
 	return nil
 }
 
-func verifyDecaf377FROSTThresholdSignature(ringPK string, message []byte, signature []byte) error {
+func verifyJubjubFROSTThresholdSignature(ringPK string, message []byte, signature []byte) error {
 	publicKey, err := decodeHexBytes(ringPK)
 	if err != nil {
-		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid decaf377 public key encoding: %s", err)
+		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid jubjub public key encoding: %s", err)
 	}
-	if len(publicKey) != decaf377PublicKeySize {
-		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid decaf377 public key length %d", len(publicKey))
+	if len(publicKey) != jubjubPublicKeySize {
+		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid jubjub public key length %d", len(publicKey))
 	}
-	if len(signature) != decaf377SignatureSize {
-		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid decaf377 signature length %d", len(signature))
-	}
-
-	point, err := decaf377.Decode(publicKey)
-	if err != nil {
-		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid decaf377 public key: %s", err)
-	}
-	if decaf377.Equivalent(point, decaf377.Identity()) {
-		return errorsmod.Wrap(types.ErrInvalidThresholdSignature, "decaf377 public key is the identity")
+	if len(signature) != jubjubSignatureSize {
+		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid jubjub signature length %d", len(signature))
 	}
 
-	ok, err := orbisfrost.Verify(publicKey, message, signature)
+	isIdentity, err := jubjub.CallIsIdentityPubkey(context.Background(), publicKey)
 	if err != nil {
-		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid decaf377 signature: %s", err)
+		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid jubjub public key: %s", err)
+	}
+	if isIdentity {
+		return errorsmod.Wrap(types.ErrInvalidThresholdSignature, "jubjub public key is the identity")
+	}
+
+	ok, err := jubjubfrost.Verify(publicKey, message, signature)
+	if err != nil {
+		return errorsmod.Wrapf(types.ErrInvalidThresholdSignature, "invalid jubjub signature: %s", err)
 	}
 	if !ok {
 		return types.ErrInvalidThresholdSignature
@@ -124,10 +125,10 @@ func rejectIdentityRingPublicKey(ringPK string) error {
 	}
 
 	switch len(publicKey) {
-	case decaf377PublicKeySize:
-		point, err := decaf377.Decode(publicKey)
-		if err == nil && decaf377.Equivalent(point, decaf377.Identity()) {
-			return errorsmod.Wrap(types.ErrInvalidRing, "decaf377 ring public key is the identity")
+	case jubjubPublicKeySize:
+		isIdentity, err := jubjub.CallIsIdentityPubkey(context.Background(), publicKey)
+		if err == nil && isIdentity {
+			return errorsmod.Wrap(types.ErrInvalidRing, "jubjub ring public key is the identity")
 		}
 	case bls12381PublicKeySize:
 		point := new(blst.P1Affine).Uncompress(publicKey)
