@@ -272,8 +272,8 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.NotEmpty(t, response.Message)
-		assert.NotEmpty(t, response.Txhash)
-		assert.Equal(t, uint32(0), response.Code)
+		require.NotEmpty(t, response.Txhash)
+		require.Equal(t, uint32(0), response.Code, "grant transaction CheckTx failed: %s", response.RawLog)
 		assert.NotEmpty(t, response.Granter)
 		assert.NotEmpty(t, response.Grantee)
 		assert.NotEmpty(t, response.AmountLimit.Amount)
@@ -283,8 +283,10 @@ func TestFaucetGrantAllowance(t *testing.T) {
 		expectedExpiration := time.Now().AddDate(0, 0, 30)
 		assert.WithinDuration(t, expectedExpiration, *response.Expiration, time.Minute, "Expiration should be 30 days from now")
 
-		_, err = net.WaitForHeight(3)
+		conn, err := grpc.NewClient(net.Validators[0].AppConfig.GRPC.Address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		require.NoError(t, err)
+		defer conn.Close()
+		requireCommittedFaucetTx(t, conn, response.Txhash)
 
 		// Check feegrant allowances instead of balance
 		allowanceResp, err := http.Get(fmt.Sprintf("%s/vera/feegrant/v1beta1/allowances/%s", httpAddr, testAddress))
@@ -298,7 +300,7 @@ func TestFaucetGrantAllowance(t *testing.T) {
 
 		assert.Contains(t, allowanceResponse, "allowances")
 		allowances := allowanceResponse["allowances"].([]any)
-		assert.NotEmpty(t, allowances, "Should have at least one allowance")
+		require.NotEmpty(t, allowances, "Should have at least one allowance")
 
 		allowance := allowances[0].(map[string]any)
 		assert.Contains(t, allowance, "granter")
@@ -380,8 +382,8 @@ func TestFaucetGrantDIDAllowance(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.NotEmpty(t, response.Message)
-	assert.NotEmpty(t, response.Txhash)
-	assert.Equal(t, uint32(0), response.Code)
+	require.NotEmpty(t, response.Txhash)
+	require.Equal(t, uint32(0), response.Code, "grant transaction CheckTx failed: %s", response.RawLog)
 	assert.Equal(t, info.Address, response.Granter)
 	assert.Equal(t, testDID, response.GranteeDid)
 	assert.NotEmpty(t, response.AmountLimit.Amount)
@@ -391,14 +393,12 @@ func TestFaucetGrantDIDAllowance(t *testing.T) {
 	expectedExpiration := time.Now().AddDate(0, 0, 30)
 	assert.WithinDuration(t, expectedExpiration, *response.Expiration, time.Minute, "Expiration should be 30 days from now")
 
-	_, err = net.WaitForHeight(3)
-	require.NoError(t, err)
-
 	// Verify the grant was successful by querying it via gRPC
 	grpcAddr := net.Validators[0].AppConfig.GRPC.Address
 	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	defer conn.Close()
+	requireCommittedFaucetTx(t, conn, response.Txhash)
 
 	feegrantClient := feegrant.NewQueryClient(conn)
 	queryResp, err := feegrantClient.DIDAllowance(context.Background(), &feegrant.QueryDIDAllowanceRequest{
