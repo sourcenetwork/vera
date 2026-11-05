@@ -186,10 +186,13 @@ type MsgCreateRing struct {
 	AllowTrustedAuthRelays bool `protobuf:"varint,10,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
 	// Opt this ring into requiring a PET check before PRE release, applying to
 	// every document in the ring (no per-document opt-out). Immutable once set.
-	// Not yet supported: rejected until the PET checking-key lifecycle ships.
-	RequiresPet   bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequiresPet bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	// DefraDB HTTP base URLs. When non-empty, PRE responders store their
+	// signed reencryption share in Defra instead of returning it directly to
+	// the relayer. Empty keeps the direct-response PRE path unchanged.
+	PreShareEndpoints []string `protobuf:"bytes,12,rep,name=pre_share_endpoints,json=preShareEndpoints,proto3" json:"pre_share_endpoints,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *MsgCreateRing) Reset() {
@@ -297,6 +300,13 @@ func (x *MsgCreateRing) GetRequiresPet() bool {
 		return x.RequiresPet
 	}
 	return false
+}
+
+func (x *MsgCreateRing) GetPreShareEndpoints() []string {
+	if x != nil {
+		return x.PreShareEndpoints
+	}
+	return nil
 }
 
 type MsgCreateRingResponse struct {
@@ -2869,7 +2879,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x125\n" +
 	"\x06params\x18\x02 \x01(\v2\x12.vera.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:/\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*\x1cvera/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xd9\x03\n" +
+	"\x17MsgUpdateParamsResponse\"\x89\x04\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
@@ -2882,7 +2892,8 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
 	" \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
-	"\frequires_pet\x18\v \x01(\bR\vrequiresPet:\f\x82\xe7\xb0*\acreatorB\b\n" +
+	"\frequires_pet\x18\v \x01(\bR\vrequiresPet\x12.\n" +
+	"\x13pre_share_endpoints\x18\f \x03(\tR\x11preShareEndpoints:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
 	"\aring_id\x18\x01 \x01(\tR\x06ringId\"\x92\x01\n" +
