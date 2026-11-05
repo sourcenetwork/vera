@@ -388,7 +388,7 @@ func TestMsgServer_CreateRing_PeerKeyOrderDoesNotAffectRingID(t *testing.T) {
 	require.NoError(t, err)
 
 	// GenerateRingID with keys in the opposite order must produce the same ID
-	require.Equal(t, types.GenerateRingID(canonicalCommittee, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false), resp.RingId)
+	require.Equal(t, types.GenerateRingID(canonicalCommittee, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false, nil), resp.RingId)
 	require.Equal(t, []string{canonicalCommittee[1], canonicalCommittee[0]}, submittedCommittee)
 	require.Equal(t, canonicalCommittee, k.GetRing(ctx, resp.RingId).PeerNodeKeys)
 }
@@ -431,7 +431,7 @@ func TestMsgServer_UpdateRingTrustedAuthRelaysByAcp(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peerKey}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, true, []string{testSecondRelayDID}, false),
+		types.GenerateRingID([]string{peerKey}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, true, []string{testSecondRelayDID}, false, nil),
 		createResp.RingId,
 	)
 
@@ -527,7 +527,7 @@ func TestMsgServer_CreateRingRequiresExistingRingPolicy(t *testing.T) {
 	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, "missing-policy", immutable.None[string](), 0, false, nil, false)
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, "missing-policy", immutable.None[string](), 0, false, nil, false, nil)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -547,7 +547,7 @@ func TestMsgServer_CreateRingRequiresRegisteredRingPolicyControlObject(t *testin
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testOrbisRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false)
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false, nil)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -567,7 +567,7 @@ func TestMsgServer_CreateRingRequiresPolicyWithRingResource(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
 	policyID := createACPPolicy(t, k, ctx, creatorAddr, testNonRingPolicy)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false)
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false, nil)
 	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -589,7 +589,7 @@ func TestMsgServer_CreateRingRejectsActorWithoutCreatePermission(t *testing.T) {
 	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, policyOwnerCtx, "12D3KooWPeer1")
 	policyID := createOrbisRingPolicy(t, k, policyOwnerCtx, policyOwnerAddr)
 
-	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false)
+	ringID := types.GenerateRingID([]string{peer1Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false, nil)
 	_, err := k.CreateRing(creatorCtx, &types.MsgCreateRing{
 		Creator:      creatorAddr,
 		PeerNodeKeys: []string{peer1Key},
@@ -893,7 +893,7 @@ func TestMsgServer_AbsentOptionalFieldsAreTreatedAsNone(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(
 		t,
-		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false),
+		types.GenerateRingID([]string{peer1Key, peer2Key}, 1, types.MinPSSIntervalSeconds, policyID, immutable.None[string](), 0, false, nil, false, nil),
 		createRingResp.RingId,
 	)
 
@@ -1091,6 +1091,52 @@ func TestMsgServer_CreateRingAllowsRequiresPet(t *testing.T) {
 	require.True(t, ring.RequiresPet)
 	require.Empty(t, ring.RingPk)
 	require.Empty(t, ring.GetPetPk())
+}
+
+func TestMsgServer_CreateRingAllowsPreShareEndpoints(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	_, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	endpoints := []string{"https://defra-b.example", "https://defra-a.example"}
+	resp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:           creatorAddr,
+		PeerNodeKeys:      []string{peer1Key, peer2Key},
+		Threshold:         1,
+		PssInterval:       types.MinPSSIntervalSeconds,
+		PolicyId:          policyID,
+		PreShareEndpoints: endpoints,
+	})
+	require.NoError(t, err)
+
+	ring := k.GetRing(ctx, resp.RingId)
+	require.NotNil(t, ring)
+	require.ElementsMatch(t, endpoints, ring.PreShareEndpoints)
+}
+
+func TestMsgServer_CreateRingRejectsInvalidPreShareEndpoint(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctx.WithValue(appparams.ExtractedDIDContextKey, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	_, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	_, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:           creatorAddr,
+		PeerNodeKeys:      []string{peer1Key},
+		Threshold:         1,
+		PssInterval:       types.MinPSSIntervalSeconds,
+		PolicyId:          policyID,
+		PreShareEndpoints: []string{"not-a-url"},
+	})
+	require.ErrorContains(t, err, "must use http or https")
 }
 
 func TestMsgServer_SetRingPssIntervalByAcpAllowsRingOwner(t *testing.T) {

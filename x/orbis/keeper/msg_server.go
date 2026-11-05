@@ -36,6 +36,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalStrings(msg.PeerNodeKeys)
 	trustedAuthRelayDIDs := canonicalStrings(msg.TrustedAuthRelayDids)
+	preShareEndpoints := canonicalStrings(msg.PreShareEndpoints)
 
 	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -53,6 +54,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		msg.AllowTrustedAuthRelays,
 		trustedAuthRelayDIDs,
 		msg.RequiresPet,
+		preShareEndpoints,
 	)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
@@ -80,6 +82,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		AllowTrustedAuthRelays: msg.AllowTrustedAuthRelays,
 		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
 		RequiresPet:            msg.RequiresPet,
+		PreShareEndpoints:      preShareEndpoints,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err

@@ -78,6 +78,10 @@ message MsgCreateRing {
   // Opt this ring into requiring a PET check before PRE release, applying to
   // every document in the ring (no per-document opt-out). Immutable once set.
   bool requires_pet = 11;
+  // DefraDB HTTP base URLs. When non-empty, PRE responders store their
+  // signed reencryption share in Defra instead of returning it directly to
+  // the relayer. Empty keeps the direct-response PRE path unchanged.
+  repeated string pre_share_endpoints = 12;
 }
 
 message MsgCreateRingResponse {

@@ -38,6 +38,9 @@ func validateRing(ring *types.Ring) error {
 	if err := types.ValidateTrustedAuthRelayConfig(ring.AllowTrustedAuthRelays, ring.TrustedAuthRelayDids); err != nil {
 		return err
 	}
+	if err := types.ValidatePreShareEndpoints(ring.PreShareEndpoints); err != nil {
+		return err
+	}
 
 	if err := validateUniquePeerNodeKeys(ring.PeerNodeKeys); err != nil {
 		return err
