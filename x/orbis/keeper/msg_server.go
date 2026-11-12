@@ -36,6 +36,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 	nonce := optionalCreateRingNonce(msg)
 	peerNodeKeys := canonicalStrings(msg.PeerNodeKeys)
 	trustedAuthRelayDIDs := canonicalStrings(msg.TrustedAuthRelayDids)
+	preShareEndpoints := canonicalStrings(msg.PreShareEndpoints)
 
 	for _, nodeKey := range peerNodeKeys {
 		if k.GetNodeInfo(goCtx, nodeKey) == nil {
@@ -53,6 +54,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		msg.AllowTrustedAuthRelays,
 		trustedAuthRelayDIDs,
 		msg.RequiresPet,
+		preShareEndpoints,
 	)
 	if existing := k.GetRing(goCtx, ringID); existing != nil {
 		return nil, types.ErrRingAlreadyExists
@@ -80,6 +82,7 @@ func (k *Keeper) CreateRing(goCtx context.Context, msg *types.MsgCreateRing) (*t
 		AllowTrustedAuthRelays: msg.AllowTrustedAuthRelays,
 		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
 		RequiresPet:            msg.RequiresPet,
+		PreShareEndpoints:      preShareEndpoints,
 	}
 	if err := validateRingPSSInterval(&ring); err != nil {
 		return nil, err
@@ -455,6 +458,61 @@ func (k *Keeper) SetRingPssIntervalByAcp(goCtx context.Context, msg *types.MsgSe
 	}
 
 	return &types.MsgSetRingPssIntervalByAcpResponse{}, nil
+}
+
+func (k *Keeper) SetRingPreShareEndpointsByAcp(goCtx context.Context, msg *types.MsgSetRingPreShareEndpointsByAcp) (*types.MsgSetRingPreShareEndpointsByAcpResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	ring := k.GetRing(goCtx, msg.RingId)
+	if ring == nil {
+		return nil, types.ErrRingNotFound
+	}
+	if err := requireRingFinalized(ring); err != nil {
+		return nil, err
+	}
+
+	updaterDID, err := k.GetAcpKeeper().GetActorDID(ctx, msg.Creator)
+	if err != nil {
+		return nil, err
+	}
+	if err := k.ensureRingUpdatePermission(goCtx, ring, updaterDID); err != nil {
+		return nil, err
+	}
+
+	upgradeNormalizedEvent, err := maybeNormalizeMaturedRingUpgrade(ring, ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	preShareEndpoints := canonicalStrings(msg.PreShareEndpoints)
+	nextRing := *ring
+	nextRing.PreShareEndpoints = preShareEndpoints
+	if err := validateRingPreShareEndpoints(&nextRing); err != nil {
+		return nil, err
+	}
+	if slices.Equal(ring.PreShareEndpoints, preShareEndpoints) {
+		return nil, types.ErrRingPreShareEndpointsUnchanged
+	}
+
+	ring.PreShareEndpoints = preShareEndpoints
+	if err := validateRing(ring); err != nil {
+		return nil, err
+	}
+	k.SetRing(goCtx, *ring)
+
+	if err := ctx.EventManager().EmitTypedEvent(&types.EventRingUpdated{
+		RingId:     ring.Id,
+		UpdaterDid: updaterDID,
+	}); err != nil {
+		return nil, err
+	}
+	if upgradeNormalizedEvent != nil {
+		if err := ctx.EventManager().EmitTypedEvent(upgradeNormalizedEvent); err != nil {
+			return nil, err
+		}
+	}
+
+	return &types.MsgSetRingPreShareEndpointsByAcpResponse{}, nil
 }
 
 func (k *Keeper) ScheduleRingUpgradeByAcp(goCtx context.Context, msg *types.MsgScheduleRingUpgradeByAcp) (*types.MsgScheduleRingUpgradeByAcpResponse, error) {

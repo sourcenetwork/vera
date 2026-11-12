@@ -2090,11 +2090,13 @@ func validateInvalidCryptoResponseStatement(report *types.ReportEnvelope, statem
 }
 
 // decodeUnauthorizedRequestPayload decodes the unauthorized_request payload: the
-// relayer-signed statement, its 64-byte secp256k1 signature, and the acceptor's
-// opaque ACP anchor. The chain does not re-run the ACP check or verify the relay
-// signature — that anti-framing refutation runs off-chain in the orbis co-signer
-// set; the chain's crypto gate remains the ring threshold signature on the
-// report envelope. The field order matches orbis-rs UnauthorizedRequestPayload.
+// relayer-signed statement and its 64-byte secp256k1 signature. The chain does
+// not re-run the ACP check or verify the relay signature — that anti-framing
+// refutation runs off-chain in the orbis co-signer set, against a captured ACP
+// evidence bundle carried out-of-band (never in this payload, same reasoning as
+// inline document evidence) — the chain's crypto gate remains the ring
+// threshold signature on the report envelope. The field order matches orbis-rs
+// UnauthorizedRequestPayload.
 func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, error) {
 	outer := newReportCanonicalDecoder(payload)
 	statementBytes, err := outer.readBytes(fieldStatement)
@@ -2105,18 +2107,11 @@ func decodeUnauthorizedRequestPayload(payload []byte) (relayRequestStatement, er
 	if err != nil {
 		return relayRequestStatement{}, err
 	}
-	checkedAtAnchor, err := outer.readString(fieldCheckedAtAnchor)
-	if err != nil {
-		return relayRequestStatement{}, err
-	}
 	if err := outer.finish(); err != nil {
 		return relayRequestStatement{}, err
 	}
 	if len(relaySignature) != 64 {
 		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay signature must be 64 bytes")
-	}
-	if checkedAtAnchor == "" {
-		return relayRequestStatement{}, errorsmod.Wrap(types.ErrInvalidReport, "relay request checked_at_anchor cannot be empty")
 	}
 	return decodeRelayRequestStatement(statementBytes)
 }
@@ -2696,7 +2691,6 @@ const (
 	fieldCertificateDigest     = "certificate_digest"
 	fieldChainID               = "chain_id"
 	fieldChallenge             = "challenge"
-	fieldCheckedAtAnchor       = "checked_at_anchor"
 	fieldCommitSalt            = "commit_salt"
 	fieldCommitment            = "commitment"
 	fieldCommitmentASignature  = "commitment_a_signature"

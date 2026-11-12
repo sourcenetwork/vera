@@ -23,6 +23,7 @@ service Msg {
   rpc CancelPendingRing(MsgCancelPendingRing) returns (MsgCancelPendingRingResponse);
   rpc StartRingReshareByAcp(MsgStartRingReshareByAcp) returns (MsgStartRingReshareByAcpResponse);
   rpc SetRingPssIntervalByAcp(MsgSetRingPssIntervalByAcp) returns (MsgSetRingPssIntervalByAcpResponse);
+  rpc SetRingPreShareEndpointsByAcp(MsgSetRingPreShareEndpointsByAcp) returns (MsgSetRingPreShareEndpointsByAcpResponse);
   rpc ScheduleRingUpgradeByAcp(MsgScheduleRingUpgradeByAcp) returns (MsgScheduleRingUpgradeByAcpResponse);
   rpc CancelRingUpgradeByAcp(MsgCancelRingUpgradeByAcp) returns (MsgCancelRingUpgradeByAcpResponse);
   rpc CancelRingReshareByAcp(MsgCancelRingReshareByAcp) returns (MsgCancelRingReshareByAcpResponse);
@@ -78,6 +79,10 @@ message MsgCreateRing {
   // Opt this ring into requiring a PET check before PRE release, applying to
   // every document in the ring (no per-document opt-out). Immutable once set.
   bool requires_pet = 11;
+  // DefraDB HTTP base URLs. When non-empty, PRE responders store their
+  // signed reencryption share in Defra instead of returning it directly to
+  // the relayer. Empty keeps the direct-response PRE path unchanged.
+  repeated string pre_share_endpoints = 12;
 }
 
 message MsgCreateRingResponse {
@@ -142,6 +147,15 @@ message MsgSetRingPssIntervalByAcp {
 }
 
 message MsgSetRingPssIntervalByAcpResponse {}
+
+message MsgSetRingPreShareEndpointsByAcp {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string ring_id = 2;
+  repeated string pre_share_endpoints = 3;
+}
+
+message MsgSetRingPreShareEndpointsByAcpResponse {}
 
 message MsgScheduleRingUpgradeByAcp {
   option (cosmos.msg.v1.signer) = "creator";

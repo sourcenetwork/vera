@@ -15,6 +15,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgStartRingReshareByAcp{},
 		&MsgCancelRingReshareByAcp{},
 		&MsgSetRingPssIntervalByAcp{},
+		&MsgSetRingPreShareEndpointsByAcp{},
 		&MsgScheduleRingUpgradeByAcp{},
 		&MsgCancelRingUpgradeByAcp{},
 		&MsgSetRingReportingByAcp{},

@@ -92,6 +92,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}, {ProtoField: "pss_interval"}},
 				},
 				{
+					RpcMethod:      "SetRingPreShareEndpointsByAcp",
+					Use:            "set-ring-pre-share-endpoints-by-acp [ring_id]",
+					Short:          "Set a ring's Defra PRE-share endpoints via external ACP policy",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "ring_id"}},
+				},
+				{
 					RpcMethod:      "ScheduleRingUpgradeByAcp",
 					Use:            "schedule-ring-upgrade-by-acp [ring_id] [next_version] [activation_time]",
 					Short:          "Schedule a ring protocol upgrade via external ACP policy",

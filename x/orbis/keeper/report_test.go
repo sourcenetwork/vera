@@ -976,7 +976,7 @@ func TestUnauthorizedRequestPayloadDecodeAcceptsAndRejectsMalformed(t *testing.T
 	valid := validRelayRequestStatementFields()
 
 	statement, err := decodeUnauthorizedRequestPayload(
-		unauthorizedRequestPayloadForTest(valid.encode(), validSig, "42"),
+		unauthorizedRequestPayloadForTest(valid.encode(), validSig),
 	)
 	require.NoError(t, err)
 	require.Equal(t, offlineOriginProtocolPRE, statement.originProtocol)
@@ -986,7 +986,7 @@ func TestUnauthorizedRequestPayloadDecodeAcceptsAndRejectsMalformed(t *testing.T
 	// The sign origin is equally valid.
 	_, err = decodeUnauthorizedRequestPayload(unauthorizedRequestPayloadForTest(
 		valid.with(func(s *relayRequestStatementFields) { s.originProtocol = offlineOriginProtocolSign }).encode(),
-		validSig, "42",
+		validSig,
 	))
 	require.NoError(t, err)
 
@@ -994,17 +994,16 @@ func TestUnauthorizedRequestPayloadDecodeAcceptsAndRejectsMalformed(t *testing.T
 		name    string
 		payload []byte
 	}{
-		{"short signature", unauthorizedRequestPayloadForTest(valid.encode(), make([]byte, 63), "42")},
-		{"empty anchor", unauthorizedRequestPayloadForTest(valid.encode(), validSig, "")},
-		{"wrong domain", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.domain = "other" }).encode(), validSig, "42")},
-		{"bad origin", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.originProtocol = "dkg" }).encode(), validSig, "42")},
-		{"non-current accused scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.accusedScope = committeeScopePendingNew }).encode(), validSig, "42")},
-		{"non-current signing scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.signingScope = committeeScopePendingNew }).encode(), validSig, "42")},
-		{"zero from_node_id", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.fromNodeID = 0 }).encode(), validSig, "42")},
-		{"empty actor", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.actorID = "" }).encode(), validSig, "42")},
-		{"empty object", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.objectID = "" }).encode(), validSig, "42")},
-		{"half-set window", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { v := uint64(1); s.validWindowStart = &v }).encode(), validSig, "42")},
-		{"drift exceeds max", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.userSignedAt = s.signedAt - relayCheckMaxDriftSecs - 1 }).encode(), validSig, "42")},
+		{"short signature", unauthorizedRequestPayloadForTest(valid.encode(), make([]byte, 63))},
+		{"wrong domain", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.domain = "other" }).encode(), validSig)},
+		{"bad origin", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.originProtocol = "dkg" }).encode(), validSig)},
+		{"non-current accused scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.accusedScope = committeeScopePendingNew }).encode(), validSig)},
+		{"non-current signing scope", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.signingScope = committeeScopePendingNew }).encode(), validSig)},
+		{"zero from_node_id", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.fromNodeID = 0 }).encode(), validSig)},
+		{"empty actor", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.actorID = "" }).encode(), validSig)},
+		{"empty object", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.objectID = "" }).encode(), validSig)},
+		{"half-set window", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { v := uint64(1); s.validWindowStart = &v }).encode(), validSig)},
+		{"drift exceeds max", unauthorizedRequestPayloadForTest(valid.with(func(s *relayRequestStatementFields) { s.userSignedAt = s.signedAt - relayCheckMaxDriftSecs - 1 }).encode(), validSig)},
 	}
 	for _, tc := range rejected {
 		t.Run(tc.name, func(t *testing.T) {
@@ -2905,11 +2904,10 @@ func (s relayRequestStatementFields) encode() []byte {
 	return statement
 }
 
-func unauthorizedRequestPayloadForTest(statement []byte, signature []byte, anchor string) []byte {
+func unauthorizedRequestPayloadForTest(statement []byte, signature []byte) []byte {
 	w := newReportCanonicalWriter()
 	w.writeBytes(statement)
 	w.writeBytes(signature)
-	w.writeString(anchor)
 	payload, err := w.finish()
 	if err != nil {
 		panic(err)
@@ -3017,7 +3015,6 @@ func (f reportTestFixture) validUnauthorizedRequestReport(t *testing.T) types.Re
 	report.Payload = unauthorizedRequestPayloadForTest(
 		statement.encode(),
 		bytes.Repeat([]byte{42}, 64),
-		"42",
 	)
 	return report
 }

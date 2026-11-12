@@ -17,6 +17,7 @@ func NewMsgCreateRing(
 	currentVersion uint64,
 	allowTrustedAuthRelays bool,
 	trustedAuthRelayDIDs []string,
+	preShareEndpoints []string,
 ) *MsgCreateRing {
 	return &MsgCreateRing{
 		Creator:                creator,
@@ -27,6 +28,7 @@ func NewMsgCreateRing(
 		CurrentVersion:         currentVersion,
 		AllowTrustedAuthRelays: allowTrustedAuthRelays,
 		TrustedAuthRelayDids:   trustedAuthRelayDIDs,
+		PreShareEndpoints:      preShareEndpoints,
 	}
 }
 
@@ -52,6 +54,9 @@ func (msg *MsgCreateRing) ValidateBasic() error {
 		}
 	}
 	if err := ValidateTrustedAuthRelayConfig(msg.AllowTrustedAuthRelays, msg.TrustedAuthRelayDids); err != nil {
+		return err
+	}
+	if err := ValidatePreShareEndpoints(msg.PreShareEndpoints); err != nil {
 		return err
 	}
 	return nil

@@ -64,6 +64,10 @@ message Ring {
   // fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
   // never used for signing).
   optional string pet_pk = 17;
+  // DefraDB HTTP base URLs. When non-empty, PRE responders store their
+  // signed reencryption share in Defra instead of returning it directly to
+  // the relayer. Empty keeps the direct-response PRE path unchanged.
+  repeated string pre_share_endpoints = 18;
 }
 
 // RingConfirmation records a single peer's agreement on the ring public key

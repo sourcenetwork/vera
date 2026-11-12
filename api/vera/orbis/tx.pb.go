@@ -186,10 +186,13 @@ type MsgCreateRing struct {
 	AllowTrustedAuthRelays bool `protobuf:"varint,10,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
 	// Opt this ring into requiring a PET check before PRE release, applying to
 	// every document in the ring (no per-document opt-out). Immutable once set.
-	// Not yet supported: rejected until the PET checking-key lifecycle ships.
-	RequiresPet   bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequiresPet bool `protobuf:"varint,11,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
+	// DefraDB HTTP base URLs. When non-empty, PRE responders store their
+	// signed reencryption share in Defra instead of returning it directly to
+	// the relayer. Empty keeps the direct-response PRE path unchanged.
+	PreShareEndpoints []string `protobuf:"bytes,12,rep,name=pre_share_endpoints,json=preShareEndpoints,proto3" json:"pre_share_endpoints,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *MsgCreateRing) Reset() {
@@ -297,6 +300,13 @@ func (x *MsgCreateRing) GetRequiresPet() bool {
 		return x.RequiresPet
 	}
 	return false
+}
+
+func (x *MsgCreateRing) GetPreShareEndpoints() []string {
+	if x != nil {
+		return x.PreShareEndpoints
+	}
+	return nil
 }
 
 type MsgCreateRingResponse struct {
@@ -836,6 +846,102 @@ func (*MsgSetRingPssIntervalByAcpResponse) Descriptor() ([]byte, []int) {
 	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{13}
 }
 
+type MsgSetRingPreShareEndpointsByAcp struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Creator           string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	RingId            string                 `protobuf:"bytes,2,opt,name=ring_id,json=ringId,proto3" json:"ring_id,omitempty"`
+	PreShareEndpoints []string               `protobuf:"bytes,3,rep,name=pre_share_endpoints,json=preShareEndpoints,proto3" json:"pre_share_endpoints,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) Reset() {
+	*x = MsgSetRingPreShareEndpointsByAcp{}
+	mi := &file_vera_orbis_tx_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgSetRingPreShareEndpointsByAcp) ProtoMessage() {}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) ProtoReflect() protoreflect.Message {
+	mi := &file_vera_orbis_tx_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgSetRingPreShareEndpointsByAcp.ProtoReflect.Descriptor instead.
+func (*MsgSetRingPreShareEndpointsByAcp) Descriptor() ([]byte, []int) {
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) GetCreator() string {
+	if x != nil {
+		return x.Creator
+	}
+	return ""
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) GetRingId() string {
+	if x != nil {
+		return x.RingId
+	}
+	return ""
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcp) GetPreShareEndpoints() []string {
+	if x != nil {
+		return x.PreShareEndpoints
+	}
+	return nil
+}
+
+type MsgSetRingPreShareEndpointsByAcpResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcpResponse) Reset() {
+	*x = MsgSetRingPreShareEndpointsByAcpResponse{}
+	mi := &file_vera_orbis_tx_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *MsgSetRingPreShareEndpointsByAcpResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MsgSetRingPreShareEndpointsByAcpResponse) ProtoMessage() {}
+
+func (x *MsgSetRingPreShareEndpointsByAcpResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_vera_orbis_tx_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MsgSetRingPreShareEndpointsByAcpResponse.ProtoReflect.Descriptor instead.
+func (*MsgSetRingPreShareEndpointsByAcpResponse) Descriptor() ([]byte, []int) {
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{15}
+}
+
 type MsgScheduleRingUpgradeByAcp struct {
 	state       protoimpl.MessageState `protogen:"open.v1"`
 	Creator     string                 `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
@@ -849,7 +955,7 @@ type MsgScheduleRingUpgradeByAcp struct {
 
 func (x *MsgScheduleRingUpgradeByAcp) Reset() {
 	*x = MsgScheduleRingUpgradeByAcp{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[14]
+	mi := &file_vera_orbis_tx_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -861,7 +967,7 @@ func (x *MsgScheduleRingUpgradeByAcp) String() string {
 func (*MsgScheduleRingUpgradeByAcp) ProtoMessage() {}
 
 func (x *MsgScheduleRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[14]
+	mi := &file_vera_orbis_tx_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -874,7 +980,7 @@ func (x *MsgScheduleRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgScheduleRingUpgradeByAcp.ProtoReflect.Descriptor instead.
 func (*MsgScheduleRingUpgradeByAcp) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{14}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *MsgScheduleRingUpgradeByAcp) GetCreator() string {
@@ -913,7 +1019,7 @@ type MsgScheduleRingUpgradeByAcpResponse struct {
 
 func (x *MsgScheduleRingUpgradeByAcpResponse) Reset() {
 	*x = MsgScheduleRingUpgradeByAcpResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[15]
+	mi := &file_vera_orbis_tx_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -925,7 +1031,7 @@ func (x *MsgScheduleRingUpgradeByAcpResponse) String() string {
 func (*MsgScheduleRingUpgradeByAcpResponse) ProtoMessage() {}
 
 func (x *MsgScheduleRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[15]
+	mi := &file_vera_orbis_tx_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -938,7 +1044,7 @@ func (x *MsgScheduleRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use MsgScheduleRingUpgradeByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgScheduleRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{15}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{17}
 }
 
 type MsgCancelRingUpgradeByAcp struct {
@@ -951,7 +1057,7 @@ type MsgCancelRingUpgradeByAcp struct {
 
 func (x *MsgCancelRingUpgradeByAcp) Reset() {
 	*x = MsgCancelRingUpgradeByAcp{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[16]
+	mi := &file_vera_orbis_tx_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -963,7 +1069,7 @@ func (x *MsgCancelRingUpgradeByAcp) String() string {
 func (*MsgCancelRingUpgradeByAcp) ProtoMessage() {}
 
 func (x *MsgCancelRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[16]
+	mi := &file_vera_orbis_tx_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -976,7 +1082,7 @@ func (x *MsgCancelRingUpgradeByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCancelRingUpgradeByAcp.ProtoReflect.Descriptor instead.
 func (*MsgCancelRingUpgradeByAcp) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{16}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *MsgCancelRingUpgradeByAcp) GetCreator() string {
@@ -1001,7 +1107,7 @@ type MsgCancelRingUpgradeByAcpResponse struct {
 
 func (x *MsgCancelRingUpgradeByAcpResponse) Reset() {
 	*x = MsgCancelRingUpgradeByAcpResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[17]
+	mi := &file_vera_orbis_tx_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1013,7 +1119,7 @@ func (x *MsgCancelRingUpgradeByAcpResponse) String() string {
 func (*MsgCancelRingUpgradeByAcpResponse) ProtoMessage() {}
 
 func (x *MsgCancelRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[17]
+	mi := &file_vera_orbis_tx_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1026,7 +1132,7 @@ func (x *MsgCancelRingUpgradeByAcpResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use MsgCancelRingUpgradeByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgCancelRingUpgradeByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{17}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{19}
 }
 
 type MsgSetRingReportingByAcp struct {
@@ -1040,7 +1146,7 @@ type MsgSetRingReportingByAcp struct {
 
 func (x *MsgSetRingReportingByAcp) Reset() {
 	*x = MsgSetRingReportingByAcp{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[18]
+	mi := &file_vera_orbis_tx_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1052,7 +1158,7 @@ func (x *MsgSetRingReportingByAcp) String() string {
 func (*MsgSetRingReportingByAcp) ProtoMessage() {}
 
 func (x *MsgSetRingReportingByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[18]
+	mi := &file_vera_orbis_tx_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1065,7 +1171,7 @@ func (x *MsgSetRingReportingByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSetRingReportingByAcp.ProtoReflect.Descriptor instead.
 func (*MsgSetRingReportingByAcp) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{18}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *MsgSetRingReportingByAcp) GetCreator() string {
@@ -1097,7 +1203,7 @@ type MsgSetRingReportingByAcpResponse struct {
 
 func (x *MsgSetRingReportingByAcpResponse) Reset() {
 	*x = MsgSetRingReportingByAcpResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[19]
+	mi := &file_vera_orbis_tx_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1109,7 +1215,7 @@ func (x *MsgSetRingReportingByAcpResponse) String() string {
 func (*MsgSetRingReportingByAcpResponse) ProtoMessage() {}
 
 func (x *MsgSetRingReportingByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[19]
+	mi := &file_vera_orbis_tx_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1122,7 +1228,7 @@ func (x *MsgSetRingReportingByAcpResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSetRingReportingByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgSetRingReportingByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{19}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{21}
 }
 
 // MsgAddRingTrustedAuthRelayByAcp adds a ring authentication relay.
@@ -1137,7 +1243,7 @@ type MsgAddRingTrustedAuthRelayByAcp struct {
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) Reset() {
 	*x = MsgAddRingTrustedAuthRelayByAcp{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[20]
+	mi := &file_vera_orbis_tx_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1149,7 +1255,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcp) String() string {
 func (*MsgAddRingTrustedAuthRelayByAcp) ProtoMessage() {}
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[20]
+	mi := &file_vera_orbis_tx_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1162,7 +1268,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddRingTrustedAuthRelayByAcp.ProtoReflect.Descriptor instead.
 func (*MsgAddRingTrustedAuthRelayByAcp) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{20}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *MsgAddRingTrustedAuthRelayByAcp) GetCreator() string {
@@ -1195,7 +1301,7 @@ type MsgAddRingTrustedAuthRelayByAcpResponse struct {
 
 func (x *MsgAddRingTrustedAuthRelayByAcpResponse) Reset() {
 	*x = MsgAddRingTrustedAuthRelayByAcpResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[21]
+	mi := &file_vera_orbis_tx_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1207,7 +1313,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcpResponse) String() string {
 func (*MsgAddRingTrustedAuthRelayByAcpResponse) ProtoMessage() {}
 
 func (x *MsgAddRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[21]
+	mi := &file_vera_orbis_tx_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1220,7 +1326,7 @@ func (x *MsgAddRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Me
 
 // Deprecated: Use MsgAddRingTrustedAuthRelayByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddRingTrustedAuthRelayByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{21}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{23}
 }
 
 // MsgRemoveRingTrustedAuthRelayByAcp revokes a ring authentication relay.
@@ -1235,7 +1341,7 @@ type MsgRemoveRingTrustedAuthRelayByAcp struct {
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) Reset() {
 	*x = MsgRemoveRingTrustedAuthRelayByAcp{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[22]
+	mi := &file_vera_orbis_tx_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1247,7 +1353,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcp) String() string {
 func (*MsgRemoveRingTrustedAuthRelayByAcp) ProtoMessage() {}
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[22]
+	mi := &file_vera_orbis_tx_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1260,7 +1366,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcp) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use MsgRemoveRingTrustedAuthRelayByAcp.ProtoReflect.Descriptor instead.
 func (*MsgRemoveRingTrustedAuthRelayByAcp) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{22}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcp) GetCreator() string {
@@ -1293,7 +1399,7 @@ type MsgRemoveRingTrustedAuthRelayByAcpResponse struct {
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) Reset() {
 	*x = MsgRemoveRingTrustedAuthRelayByAcpResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[23]
+	mi := &file_vera_orbis_tx_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1305,7 +1411,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) String() string {
 func (*MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoMessage() {}
 
 func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[23]
+	mi := &file_vera_orbis_tx_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1318,7 +1424,7 @@ func (x *MsgRemoveRingTrustedAuthRelayByAcpResponse) ProtoReflect() protoreflect
 
 // Deprecated: Use MsgRemoveRingTrustedAuthRelayByAcpResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveRingTrustedAuthRelayByAcpResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{23}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{25}
 }
 
 type MsgFinalizeRingReshareByThresholdSignature struct {
@@ -1333,7 +1439,7 @@ type MsgFinalizeRingReshareByThresholdSignature struct {
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) Reset() {
 	*x = MsgFinalizeRingReshareByThresholdSignature{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[24]
+	mi := &file_vera_orbis_tx_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1345,7 +1451,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignature) String() string {
 func (*MsgFinalizeRingReshareByThresholdSignature) ProtoMessage() {}
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[24]
+	mi := &file_vera_orbis_tx_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1358,7 +1464,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignature) ProtoReflect() protoreflect
 
 // Deprecated: Use MsgFinalizeRingReshareByThresholdSignature.ProtoReflect.Descriptor instead.
 func (*MsgFinalizeRingReshareByThresholdSignature) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{24}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MsgFinalizeRingReshareByThresholdSignature) GetCreator() string {
@@ -1397,7 +1503,7 @@ type MsgFinalizeRingReshareByThresholdSignatureResponse struct {
 
 func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) Reset() {
 	*x = MsgFinalizeRingReshareByThresholdSignatureResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[25]
+	mi := &file_vera_orbis_tx_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1409,7 +1515,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) String() string {
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoMessage() {}
 
 func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[25]
+	mi := &file_vera_orbis_tx_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1422,7 +1528,7 @@ func (x *MsgFinalizeRingReshareByThresholdSignatureResponse) ProtoReflect() prot
 
 // Deprecated: Use MsgFinalizeRingReshareByThresholdSignatureResponse.ProtoReflect.Descriptor instead.
 func (*MsgFinalizeRingReshareByThresholdSignatureResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{25}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{27}
 }
 
 type MsgSubmitReport struct {
@@ -1438,7 +1544,7 @@ type MsgSubmitReport struct {
 
 func (x *MsgSubmitReport) Reset() {
 	*x = MsgSubmitReport{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[26]
+	mi := &file_vera_orbis_tx_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1450,7 +1556,7 @@ func (x *MsgSubmitReport) String() string {
 func (*MsgSubmitReport) ProtoMessage() {}
 
 func (x *MsgSubmitReport) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[26]
+	mi := &file_vera_orbis_tx_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1463,7 +1569,7 @@ func (x *MsgSubmitReport) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSubmitReport.ProtoReflect.Descriptor instead.
 func (*MsgSubmitReport) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{26}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *MsgSubmitReport) GetCreator() string {
@@ -1510,7 +1616,7 @@ type MsgSubmitReportResponse struct {
 
 func (x *MsgSubmitReportResponse) Reset() {
 	*x = MsgSubmitReportResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[27]
+	mi := &file_vera_orbis_tx_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1522,7 +1628,7 @@ func (x *MsgSubmitReportResponse) String() string {
 func (*MsgSubmitReportResponse) ProtoMessage() {}
 
 func (x *MsgSubmitReportResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[27]
+	mi := &file_vera_orbis_tx_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1535,7 +1641,7 @@ func (x *MsgSubmitReportResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgSubmitReportResponse.ProtoReflect.Descriptor instead.
 func (*MsgSubmitReportResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{27}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *MsgSubmitReportResponse) GetReportId() string {
@@ -1566,7 +1672,7 @@ type ReportEnvelope struct {
 
 func (x *ReportEnvelope) Reset() {
 	*x = ReportEnvelope{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[28]
+	mi := &file_vera_orbis_tx_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1578,7 +1684,7 @@ func (x *ReportEnvelope) String() string {
 func (*ReportEnvelope) ProtoMessage() {}
 
 func (x *ReportEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[28]
+	mi := &file_vera_orbis_tx_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1591,7 +1697,7 @@ func (x *ReportEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportEnvelope.ProtoReflect.Descriptor instead.
 func (*ReportEnvelope) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{28}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *ReportEnvelope) GetDomain() string {
@@ -1700,7 +1806,7 @@ type RingReshareFinalizeSignDoc struct {
 
 func (x *RingReshareFinalizeSignDoc) Reset() {
 	*x = RingReshareFinalizeSignDoc{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[29]
+	mi := &file_vera_orbis_tx_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1712,7 +1818,7 @@ func (x *RingReshareFinalizeSignDoc) String() string {
 func (*RingReshareFinalizeSignDoc) ProtoMessage() {}
 
 func (x *RingReshareFinalizeSignDoc) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[29]
+	mi := &file_vera_orbis_tx_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1725,7 +1831,7 @@ func (x *RingReshareFinalizeSignDoc) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingReshareFinalizeSignDoc.ProtoReflect.Descriptor instead.
 func (*RingReshareFinalizeSignDoc) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{29}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *RingReshareFinalizeSignDoc) GetDomain() string {
@@ -1794,7 +1900,7 @@ type RingReshareSignState struct {
 
 func (x *RingReshareSignState) Reset() {
 	*x = RingReshareSignState{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[30]
+	mi := &file_vera_orbis_tx_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1806,7 +1912,7 @@ func (x *RingReshareSignState) String() string {
 func (*RingReshareSignState) ProtoMessage() {}
 
 func (x *RingReshareSignState) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[30]
+	mi := &file_vera_orbis_tx_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1819,7 +1925,7 @@ func (x *RingReshareSignState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RingReshareSignState.ProtoReflect.Descriptor instead.
 func (*RingReshareSignState) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{30}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *RingReshareSignState) GetRingPk() string {
@@ -1912,7 +2018,7 @@ type MsgStoreDocument struct {
 
 func (x *MsgStoreDocument) Reset() {
 	*x = MsgStoreDocument{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[31]
+	mi := &file_vera_orbis_tx_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1924,7 +2030,7 @@ func (x *MsgStoreDocument) String() string {
 func (*MsgStoreDocument) ProtoMessage() {}
 
 func (x *MsgStoreDocument) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[31]
+	mi := &file_vera_orbis_tx_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1937,7 +2043,7 @@ func (x *MsgStoreDocument) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreDocument.ProtoReflect.Descriptor instead.
 func (*MsgStoreDocument) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{31}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *MsgStoreDocument) GetCreator() string {
@@ -2026,7 +2132,7 @@ type MsgStoreDocumentResponse struct {
 
 func (x *MsgStoreDocumentResponse) Reset() {
 	*x = MsgStoreDocumentResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[32]
+	mi := &file_vera_orbis_tx_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2038,7 +2144,7 @@ func (x *MsgStoreDocumentResponse) String() string {
 func (*MsgStoreDocumentResponse) ProtoMessage() {}
 
 func (x *MsgStoreDocumentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[32]
+	mi := &file_vera_orbis_tx_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2051,7 +2157,7 @@ func (x *MsgStoreDocumentResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreDocumentResponse.ProtoReflect.Descriptor instead.
 func (*MsgStoreDocumentResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{32}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *MsgStoreDocumentResponse) GetDocumentId() string {
@@ -2075,7 +2181,7 @@ type MsgStoreKeyDerivation struct {
 
 func (x *MsgStoreKeyDerivation) Reset() {
 	*x = MsgStoreKeyDerivation{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[33]
+	mi := &file_vera_orbis_tx_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2087,7 +2193,7 @@ func (x *MsgStoreKeyDerivation) String() string {
 func (*MsgStoreKeyDerivation) ProtoMessage() {}
 
 func (x *MsgStoreKeyDerivation) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[33]
+	mi := &file_vera_orbis_tx_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2100,7 +2206,7 @@ func (x *MsgStoreKeyDerivation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreKeyDerivation.ProtoReflect.Descriptor instead.
 func (*MsgStoreKeyDerivation) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{33}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *MsgStoreKeyDerivation) GetCreator() string {
@@ -2154,7 +2260,7 @@ type MsgStoreKeyDerivationResponse struct {
 
 func (x *MsgStoreKeyDerivationResponse) Reset() {
 	*x = MsgStoreKeyDerivationResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[34]
+	mi := &file_vera_orbis_tx_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2166,7 +2272,7 @@ func (x *MsgStoreKeyDerivationResponse) String() string {
 func (*MsgStoreKeyDerivationResponse) ProtoMessage() {}
 
 func (x *MsgStoreKeyDerivationResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[34]
+	mi := &file_vera_orbis_tx_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2179,7 +2285,7 @@ func (x *MsgStoreKeyDerivationResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgStoreKeyDerivationResponse.ProtoReflect.Descriptor instead.
 func (*MsgStoreKeyDerivationResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{34}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *MsgStoreKeyDerivationResponse) GetKeyDerivationId() string {
@@ -2202,7 +2308,7 @@ type MsgCreateNodeInfo struct {
 
 func (x *MsgCreateNodeInfo) Reset() {
 	*x = MsgCreateNodeInfo{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[35]
+	mi := &file_vera_orbis_tx_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2214,7 +2320,7 @@ func (x *MsgCreateNodeInfo) String() string {
 func (*MsgCreateNodeInfo) ProtoMessage() {}
 
 func (x *MsgCreateNodeInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[35]
+	mi := &file_vera_orbis_tx_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2227,7 +2333,7 @@ func (x *MsgCreateNodeInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCreateNodeInfo.ProtoReflect.Descriptor instead.
 func (*MsgCreateNodeInfo) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{35}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *MsgCreateNodeInfo) GetCreator() string {
@@ -2273,7 +2379,7 @@ type MsgCreateNodeInfoResponse struct {
 
 func (x *MsgCreateNodeInfoResponse) Reset() {
 	*x = MsgCreateNodeInfoResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[36]
+	mi := &file_vera_orbis_tx_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2285,7 +2391,7 @@ func (x *MsgCreateNodeInfoResponse) String() string {
 func (*MsgCreateNodeInfoResponse) ProtoMessage() {}
 
 func (x *MsgCreateNodeInfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[36]
+	mi := &file_vera_orbis_tx_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2298,7 +2404,7 @@ func (x *MsgCreateNodeInfoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgCreateNodeInfoResponse.ProtoReflect.Descriptor instead.
 func (*MsgCreateNodeInfoResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{36}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{38}
 }
 
 type MsgUpdateNodePeerId struct {
@@ -2312,7 +2418,7 @@ type MsgUpdateNodePeerId struct {
 
 func (x *MsgUpdateNodePeerId) Reset() {
 	*x = MsgUpdateNodePeerId{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[37]
+	mi := &file_vera_orbis_tx_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2324,7 +2430,7 @@ func (x *MsgUpdateNodePeerId) String() string {
 func (*MsgUpdateNodePeerId) ProtoMessage() {}
 
 func (x *MsgUpdateNodePeerId) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[37]
+	mi := &file_vera_orbis_tx_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2337,7 +2443,7 @@ func (x *MsgUpdateNodePeerId) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgUpdateNodePeerId.ProtoReflect.Descriptor instead.
 func (*MsgUpdateNodePeerId) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{37}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *MsgUpdateNodePeerId) GetCreator() string {
@@ -2369,7 +2475,7 @@ type MsgUpdateNodePeerIdResponse struct {
 
 func (x *MsgUpdateNodePeerIdResponse) Reset() {
 	*x = MsgUpdateNodePeerIdResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[38]
+	mi := &file_vera_orbis_tx_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2381,7 +2487,7 @@ func (x *MsgUpdateNodePeerIdResponse) String() string {
 func (*MsgUpdateNodePeerIdResponse) ProtoMessage() {}
 
 func (x *MsgUpdateNodePeerIdResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[38]
+	mi := &file_vera_orbis_tx_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2394,7 +2500,7 @@ func (x *MsgUpdateNodePeerIdResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgUpdateNodePeerIdResponse.ProtoReflect.Descriptor instead.
 func (*MsgUpdateNodePeerIdResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{38}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{40}
 }
 
 type MsgTransferNodeController struct {
@@ -2408,7 +2514,7 @@ type MsgTransferNodeController struct {
 
 func (x *MsgTransferNodeController) Reset() {
 	*x = MsgTransferNodeController{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[39]
+	mi := &file_vera_orbis_tx_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2420,7 +2526,7 @@ func (x *MsgTransferNodeController) String() string {
 func (*MsgTransferNodeController) ProtoMessage() {}
 
 func (x *MsgTransferNodeController) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[39]
+	mi := &file_vera_orbis_tx_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2433,7 +2539,7 @@ func (x *MsgTransferNodeController) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgTransferNodeController.ProtoReflect.Descriptor instead.
 func (*MsgTransferNodeController) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{39}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *MsgTransferNodeController) GetCreator() string {
@@ -2465,7 +2571,7 @@ type MsgTransferNodeControllerResponse struct {
 
 func (x *MsgTransferNodeControllerResponse) Reset() {
 	*x = MsgTransferNodeControllerResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[40]
+	mi := &file_vera_orbis_tx_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2477,7 +2583,7 @@ func (x *MsgTransferNodeControllerResponse) String() string {
 func (*MsgTransferNodeControllerResponse) ProtoMessage() {}
 
 func (x *MsgTransferNodeControllerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[40]
+	mi := &file_vera_orbis_tx_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2490,7 +2596,7 @@ func (x *MsgTransferNodeControllerResponse) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use MsgTransferNodeControllerResponse.ProtoReflect.Descriptor instead.
 func (*MsgTransferNodeControllerResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{40}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{42}
 }
 
 type MsgAddNodeToWhitelist struct {
@@ -2508,7 +2614,7 @@ type MsgAddNodeToWhitelist struct {
 
 func (x *MsgAddNodeToWhitelist) Reset() {
 	*x = MsgAddNodeToWhitelist{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[41]
+	mi := &file_vera_orbis_tx_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2520,7 +2626,7 @@ func (x *MsgAddNodeToWhitelist) String() string {
 func (*MsgAddNodeToWhitelist) ProtoMessage() {}
 
 func (x *MsgAddNodeToWhitelist) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[41]
+	mi := &file_vera_orbis_tx_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2533,7 +2639,7 @@ func (x *MsgAddNodeToWhitelist) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddNodeToWhitelist.ProtoReflect.Descriptor instead.
 func (*MsgAddNodeToWhitelist) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{41}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *MsgAddNodeToWhitelist) GetCreator() string {
@@ -2599,7 +2705,7 @@ type MsgAddNodeToWhitelistResponse struct {
 
 func (x *MsgAddNodeToWhitelistResponse) Reset() {
 	*x = MsgAddNodeToWhitelistResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[42]
+	mi := &file_vera_orbis_tx_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2611,7 +2717,7 @@ func (x *MsgAddNodeToWhitelistResponse) String() string {
 func (*MsgAddNodeToWhitelistResponse) ProtoMessage() {}
 
 func (x *MsgAddNodeToWhitelistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[42]
+	mi := &file_vera_orbis_tx_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2624,7 +2730,7 @@ func (x *MsgAddNodeToWhitelistResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgAddNodeToWhitelistResponse.ProtoReflect.Descriptor instead.
 func (*MsgAddNodeToWhitelistResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{42}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{44}
 }
 
 type MsgRemoveNodeFromWhitelist struct {
@@ -2642,7 +2748,7 @@ type MsgRemoveNodeFromWhitelist struct {
 
 func (x *MsgRemoveNodeFromWhitelist) Reset() {
 	*x = MsgRemoveNodeFromWhitelist{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[43]
+	mi := &file_vera_orbis_tx_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2654,7 +2760,7 @@ func (x *MsgRemoveNodeFromWhitelist) String() string {
 func (*MsgRemoveNodeFromWhitelist) ProtoMessage() {}
 
 func (x *MsgRemoveNodeFromWhitelist) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[43]
+	mi := &file_vera_orbis_tx_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2667,7 +2773,7 @@ func (x *MsgRemoveNodeFromWhitelist) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgRemoveNodeFromWhitelist.ProtoReflect.Descriptor instead.
 func (*MsgRemoveNodeFromWhitelist) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{43}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *MsgRemoveNodeFromWhitelist) GetCreator() string {
@@ -2733,7 +2839,7 @@ type MsgRemoveNodeFromWhitelistResponse struct {
 
 func (x *MsgRemoveNodeFromWhitelistResponse) Reset() {
 	*x = MsgRemoveNodeFromWhitelistResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[44]
+	mi := &file_vera_orbis_tx_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2745,7 +2851,7 @@ func (x *MsgRemoveNodeFromWhitelistResponse) String() string {
 func (*MsgRemoveNodeFromWhitelistResponse) ProtoMessage() {}
 
 func (x *MsgRemoveNodeFromWhitelistResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[44]
+	mi := &file_vera_orbis_tx_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2758,7 +2864,7 @@ func (x *MsgRemoveNodeFromWhitelistResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use MsgRemoveNodeFromWhitelistResponse.ProtoReflect.Descriptor instead.
 func (*MsgRemoveNodeFromWhitelistResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{44}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{46}
 }
 
 // MsgDrainNodeKey is signed by a node's controller key. It sweeps the full
@@ -2774,7 +2880,7 @@ type MsgDrainNodeKey struct {
 
 func (x *MsgDrainNodeKey) Reset() {
 	*x = MsgDrainNodeKey{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[45]
+	mi := &file_vera_orbis_tx_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2786,7 +2892,7 @@ func (x *MsgDrainNodeKey) String() string {
 func (*MsgDrainNodeKey) ProtoMessage() {}
 
 func (x *MsgDrainNodeKey) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[45]
+	mi := &file_vera_orbis_tx_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2799,7 +2905,7 @@ func (x *MsgDrainNodeKey) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgDrainNodeKey.ProtoReflect.Descriptor instead.
 func (*MsgDrainNodeKey) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{45}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *MsgDrainNodeKey) GetCreator() string {
@@ -2825,7 +2931,7 @@ type MsgDrainNodeKeyResponse struct {
 
 func (x *MsgDrainNodeKeyResponse) Reset() {
 	*x = MsgDrainNodeKeyResponse{}
-	mi := &file_vera_orbis_tx_proto_msgTypes[46]
+	mi := &file_vera_orbis_tx_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2837,7 +2943,7 @@ func (x *MsgDrainNodeKeyResponse) String() string {
 func (*MsgDrainNodeKeyResponse) ProtoMessage() {}
 
 func (x *MsgDrainNodeKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_vera_orbis_tx_proto_msgTypes[46]
+	mi := &file_vera_orbis_tx_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2850,7 +2956,7 @@ func (x *MsgDrainNodeKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MsgDrainNodeKeyResponse.ProtoReflect.Descriptor instead.
 func (*MsgDrainNodeKeyResponse) Descriptor() ([]byte, []int) {
-	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{46}
+	return file_vera_orbis_tx_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *MsgDrainNodeKeyResponse) GetAmount() []*v1beta1.Coin {
@@ -2869,7 +2975,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x0fMsgUpdateParams\x126\n" +
 	"\tauthority\x18\x01 \x01(\tB\x18Ҵ-\x14cosmos.AddressStringR\tauthority\x125\n" +
 	"\x06params\x18\x02 \x01(\v2\x12.vera.orbis.ParamsB\t\xc8\xde\x1f\x00\xa8\xe7\xb0*\x01R\x06params:/\x82\xe7\xb0*\tauthority\x8a\xe7\xb0*\x1cvera/x/orbis/MsgUpdateParams\"\x19\n" +
-	"\x17MsgUpdateParamsResponse\"\xd9\x03\n" +
+	"\x17MsgUpdateParamsResponse\"\x89\x04\n" +
 	"\rMsgCreateRing\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12$\n" +
 	"\x0epeer_node_keys\x18\x02 \x03(\tR\fpeerNodeKeys\x12\x1c\n" +
@@ -2882,7 +2988,8 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\x17trusted_auth_relay_dids\x18\t \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\n" +
 	" \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
-	"\frequires_pet\x18\v \x01(\bR\vrequiresPet:\f\x82\xe7\xb0*\acreatorB\b\n" +
+	"\frequires_pet\x18\v \x01(\bR\vrequiresPet\x12.\n" +
+	"\x13pre_share_endpoints\x18\f \x03(\tR\x11preShareEndpoints:\f\x82\xe7\xb0*\acreatorB\b\n" +
 	"\x06_nonce\"0\n" +
 	"\x15MsgCreateRingResponse\x12\x17\n" +
 	"\aring_id\x18\x01 \x01(\tR\x06ringId\"\x92\x01\n" +
@@ -2913,7 +3020,12 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12!\n" +
 	"\fpss_interval\x18\x03 \x01(\x04R\vpssInterval:\f\x82\xe7\xb0*\acreator\"$\n" +
-	"\"MsgSetRingPssIntervalByAcpResponse\"\xaa\x01\n" +
+	"\"MsgSetRingPssIntervalByAcpResponse\"\x93\x01\n" +
+	" MsgSetRingPreShareEndpointsByAcp\x12\x18\n" +
+	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
+	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12.\n" +
+	"\x13pre_share_endpoints\x18\x03 \x03(\tR\x11preShareEndpoints:\f\x82\xe7\xb0*\acreator\"*\n" +
+	"(MsgSetRingPreShareEndpointsByAcpResponse\"\xaa\x01\n" +
 	"\x1bMsgScheduleRingUpgradeByAcp\x12\x18\n" +
 	"\acreator\x18\x01 \x01(\tR\acreator\x12\x17\n" +
 	"\aring_id\x18\x02 \x01(\tR\x06ringId\x12!\n" +
@@ -3069,7 +3181,7 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\vUNSPECIFIED\x10\x00\x12\x19\n" +
 	"\x15CONFIRMATION_RECORDED\x10\x01\x12\x12\n" +
 	"\x0eRING_FINALIZED\x10\x02\x12\x14\n" +
-	"\x10CONFLICT_DELETED\x10\x032\x8d\x12\n" +
+	"\x10CONFLICT_DELETED\x10\x032\x93\x13\n" +
 	"\x03Msg\x12P\n" +
 	"\fUpdateParams\x12\x1b.vera.orbis.MsgUpdateParams\x1a#.vera.orbis.MsgUpdateParamsResponse\x12J\n" +
 	"\n" +
@@ -3077,7 +3189,8 @@ const file_vera_orbis_tx_proto_rawDesc = "" +
 	"\fFinalizeRing\x12\x1b.vera.orbis.MsgFinalizeRing\x1a#.vera.orbis.MsgFinalizeRingResponse\x12_\n" +
 	"\x11CancelPendingRing\x12 .vera.orbis.MsgCancelPendingRing\x1a(.vera.orbis.MsgCancelPendingRingResponse\x12k\n" +
 	"\x15StartRingReshareByAcp\x12$.vera.orbis.MsgStartRingReshareByAcp\x1a,.vera.orbis.MsgStartRingReshareByAcpResponse\x12q\n" +
-	"\x17SetRingPssIntervalByAcp\x12&.vera.orbis.MsgSetRingPssIntervalByAcp\x1a..vera.orbis.MsgSetRingPssIntervalByAcpResponse\x12t\n" +
+	"\x17SetRingPssIntervalByAcp\x12&.vera.orbis.MsgSetRingPssIntervalByAcp\x1a..vera.orbis.MsgSetRingPssIntervalByAcpResponse\x12\x83\x01\n" +
+	"\x1dSetRingPreShareEndpointsByAcp\x12,.vera.orbis.MsgSetRingPreShareEndpointsByAcp\x1a4.vera.orbis.MsgSetRingPreShareEndpointsByAcpResponse\x12t\n" +
 	"\x18ScheduleRingUpgradeByAcp\x12'.vera.orbis.MsgScheduleRingUpgradeByAcp\x1a/.vera.orbis.MsgScheduleRingUpgradeByAcpResponse\x12n\n" +
 	"\x16CancelRingUpgradeByAcp\x12%.vera.orbis.MsgCancelRingUpgradeByAcp\x1a-.vera.orbis.MsgCancelRingUpgradeByAcpResponse\x12n\n" +
 	"\x16CancelRingReshareByAcp\x12%.vera.orbis.MsgCancelRingReshareByAcp\x1a-.vera.orbis.MsgCancelRingReshareByAcpResponse\x12k\n" +
@@ -3111,7 +3224,7 @@ func file_vera_orbis_tx_proto_rawDescGZIP() []byte {
 }
 
 var file_vera_orbis_tx_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_vera_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_vera_orbis_tx_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_vera_orbis_tx_proto_goTypes = []any{
 	(FinalizeRingOutcome)(0),                                   // 0: vera.orbis.FinalizeRingOutcome
 	(*MsgUpdateParams)(nil),                                    // 1: vera.orbis.MsgUpdateParams
@@ -3128,96 +3241,100 @@ var file_vera_orbis_tx_proto_goTypes = []any{
 	(*MsgCancelRingReshareByAcpResponse)(nil),                  // 12: vera.orbis.MsgCancelRingReshareByAcpResponse
 	(*MsgSetRingPssIntervalByAcp)(nil),                         // 13: vera.orbis.MsgSetRingPssIntervalByAcp
 	(*MsgSetRingPssIntervalByAcpResponse)(nil),                 // 14: vera.orbis.MsgSetRingPssIntervalByAcpResponse
-	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 15: vera.orbis.MsgScheduleRingUpgradeByAcp
-	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 16: vera.orbis.MsgScheduleRingUpgradeByAcpResponse
-	(*MsgCancelRingUpgradeByAcp)(nil),                          // 17: vera.orbis.MsgCancelRingUpgradeByAcp
-	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 18: vera.orbis.MsgCancelRingUpgradeByAcpResponse
-	(*MsgSetRingReportingByAcp)(nil),                           // 19: vera.orbis.MsgSetRingReportingByAcp
-	(*MsgSetRingReportingByAcpResponse)(nil),                   // 20: vera.orbis.MsgSetRingReportingByAcpResponse
-	(*MsgAddRingTrustedAuthRelayByAcp)(nil),                    // 21: vera.orbis.MsgAddRingTrustedAuthRelayByAcp
-	(*MsgAddRingTrustedAuthRelayByAcpResponse)(nil),            // 22: vera.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
-	(*MsgRemoveRingTrustedAuthRelayByAcp)(nil),                 // 23: vera.orbis.MsgRemoveRingTrustedAuthRelayByAcp
-	(*MsgRemoveRingTrustedAuthRelayByAcpResponse)(nil),         // 24: vera.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
-	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 25: vera.orbis.MsgFinalizeRingReshareByThresholdSignature
-	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 26: vera.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	(*MsgSubmitReport)(nil),                                    // 27: vera.orbis.MsgSubmitReport
-	(*MsgSubmitReportResponse)(nil),                            // 28: vera.orbis.MsgSubmitReportResponse
-	(*ReportEnvelope)(nil),                                     // 29: vera.orbis.ReportEnvelope
-	(*RingReshareFinalizeSignDoc)(nil),                         // 30: vera.orbis.RingReshareFinalizeSignDoc
-	(*RingReshareSignState)(nil),                               // 31: vera.orbis.RingReshareSignState
-	(*MsgStoreDocument)(nil),                                   // 32: vera.orbis.MsgStoreDocument
-	(*MsgStoreDocumentResponse)(nil),                           // 33: vera.orbis.MsgStoreDocumentResponse
-	(*MsgStoreKeyDerivation)(nil),                              // 34: vera.orbis.MsgStoreKeyDerivation
-	(*MsgStoreKeyDerivationResponse)(nil),                      // 35: vera.orbis.MsgStoreKeyDerivationResponse
-	(*MsgCreateNodeInfo)(nil),                                  // 36: vera.orbis.MsgCreateNodeInfo
-	(*MsgCreateNodeInfoResponse)(nil),                          // 37: vera.orbis.MsgCreateNodeInfoResponse
-	(*MsgUpdateNodePeerId)(nil),                                // 38: vera.orbis.MsgUpdateNodePeerId
-	(*MsgUpdateNodePeerIdResponse)(nil),                        // 39: vera.orbis.MsgUpdateNodePeerIdResponse
-	(*MsgTransferNodeController)(nil),                          // 40: vera.orbis.MsgTransferNodeController
-	(*MsgTransferNodeControllerResponse)(nil),                  // 41: vera.orbis.MsgTransferNodeControllerResponse
-	(*MsgAddNodeToWhitelist)(nil),                              // 42: vera.orbis.MsgAddNodeToWhitelist
-	(*MsgAddNodeToWhitelistResponse)(nil),                      // 43: vera.orbis.MsgAddNodeToWhitelistResponse
-	(*MsgRemoveNodeFromWhitelist)(nil),                         // 44: vera.orbis.MsgRemoveNodeFromWhitelist
-	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 45: vera.orbis.MsgRemoveNodeFromWhitelistResponse
-	(*MsgDrainNodeKey)(nil),                                    // 46: vera.orbis.MsgDrainNodeKey
-	(*MsgDrainNodeKeyResponse)(nil),                            // 47: vera.orbis.MsgDrainNodeKeyResponse
-	(*Params)(nil),                                             // 48: vera.orbis.Params
-	(*ReportingConfig)(nil),                                    // 49: vera.orbis.ReportingConfig
-	(*v1beta1.Coin)(nil),                                       // 50: cosmos.base.v1beta1.Coin
+	(*MsgSetRingPreShareEndpointsByAcp)(nil),                   // 15: vera.orbis.MsgSetRingPreShareEndpointsByAcp
+	(*MsgSetRingPreShareEndpointsByAcpResponse)(nil),           // 16: vera.orbis.MsgSetRingPreShareEndpointsByAcpResponse
+	(*MsgScheduleRingUpgradeByAcp)(nil),                        // 17: vera.orbis.MsgScheduleRingUpgradeByAcp
+	(*MsgScheduleRingUpgradeByAcpResponse)(nil),                // 18: vera.orbis.MsgScheduleRingUpgradeByAcpResponse
+	(*MsgCancelRingUpgradeByAcp)(nil),                          // 19: vera.orbis.MsgCancelRingUpgradeByAcp
+	(*MsgCancelRingUpgradeByAcpResponse)(nil),                  // 20: vera.orbis.MsgCancelRingUpgradeByAcpResponse
+	(*MsgSetRingReportingByAcp)(nil),                           // 21: vera.orbis.MsgSetRingReportingByAcp
+	(*MsgSetRingReportingByAcpResponse)(nil),                   // 22: vera.orbis.MsgSetRingReportingByAcpResponse
+	(*MsgAddRingTrustedAuthRelayByAcp)(nil),                    // 23: vera.orbis.MsgAddRingTrustedAuthRelayByAcp
+	(*MsgAddRingTrustedAuthRelayByAcpResponse)(nil),            // 24: vera.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
+	(*MsgRemoveRingTrustedAuthRelayByAcp)(nil),                 // 25: vera.orbis.MsgRemoveRingTrustedAuthRelayByAcp
+	(*MsgRemoveRingTrustedAuthRelayByAcpResponse)(nil),         // 26: vera.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
+	(*MsgFinalizeRingReshareByThresholdSignature)(nil),         // 27: vera.orbis.MsgFinalizeRingReshareByThresholdSignature
+	(*MsgFinalizeRingReshareByThresholdSignatureResponse)(nil), // 28: vera.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	(*MsgSubmitReport)(nil),                                    // 29: vera.orbis.MsgSubmitReport
+	(*MsgSubmitReportResponse)(nil),                            // 30: vera.orbis.MsgSubmitReportResponse
+	(*ReportEnvelope)(nil),                                     // 31: vera.orbis.ReportEnvelope
+	(*RingReshareFinalizeSignDoc)(nil),                         // 32: vera.orbis.RingReshareFinalizeSignDoc
+	(*RingReshareSignState)(nil),                               // 33: vera.orbis.RingReshareSignState
+	(*MsgStoreDocument)(nil),                                   // 34: vera.orbis.MsgStoreDocument
+	(*MsgStoreDocumentResponse)(nil),                           // 35: vera.orbis.MsgStoreDocumentResponse
+	(*MsgStoreKeyDerivation)(nil),                              // 36: vera.orbis.MsgStoreKeyDerivation
+	(*MsgStoreKeyDerivationResponse)(nil),                      // 37: vera.orbis.MsgStoreKeyDerivationResponse
+	(*MsgCreateNodeInfo)(nil),                                  // 38: vera.orbis.MsgCreateNodeInfo
+	(*MsgCreateNodeInfoResponse)(nil),                          // 39: vera.orbis.MsgCreateNodeInfoResponse
+	(*MsgUpdateNodePeerId)(nil),                                // 40: vera.orbis.MsgUpdateNodePeerId
+	(*MsgUpdateNodePeerIdResponse)(nil),                        // 41: vera.orbis.MsgUpdateNodePeerIdResponse
+	(*MsgTransferNodeController)(nil),                          // 42: vera.orbis.MsgTransferNodeController
+	(*MsgTransferNodeControllerResponse)(nil),                  // 43: vera.orbis.MsgTransferNodeControllerResponse
+	(*MsgAddNodeToWhitelist)(nil),                              // 44: vera.orbis.MsgAddNodeToWhitelist
+	(*MsgAddNodeToWhitelistResponse)(nil),                      // 45: vera.orbis.MsgAddNodeToWhitelistResponse
+	(*MsgRemoveNodeFromWhitelist)(nil),                         // 46: vera.orbis.MsgRemoveNodeFromWhitelist
+	(*MsgRemoveNodeFromWhitelistResponse)(nil),                 // 47: vera.orbis.MsgRemoveNodeFromWhitelistResponse
+	(*MsgDrainNodeKey)(nil),                                    // 48: vera.orbis.MsgDrainNodeKey
+	(*MsgDrainNodeKeyResponse)(nil),                            // 49: vera.orbis.MsgDrainNodeKeyResponse
+	(*Params)(nil),                                             // 50: vera.orbis.Params
+	(*ReportingConfig)(nil),                                    // 51: vera.orbis.ReportingConfig
+	(*v1beta1.Coin)(nil),                                       // 52: cosmos.base.v1beta1.Coin
 }
 var file_vera_orbis_tx_proto_depIdxs = []int32{
-	48, // 0: vera.orbis.MsgUpdateParams.params:type_name -> vera.orbis.Params
-	49, // 1: vera.orbis.MsgCreateRing.reporting:type_name -> vera.orbis.ReportingConfig
+	50, // 0: vera.orbis.MsgUpdateParams.params:type_name -> vera.orbis.Params
+	51, // 1: vera.orbis.MsgCreateRing.reporting:type_name -> vera.orbis.ReportingConfig
 	0,  // 2: vera.orbis.MsgFinalizeRingResponse.outcome:type_name -> vera.orbis.FinalizeRingOutcome
-	49, // 3: vera.orbis.MsgSetRingReportingByAcp.reporting:type_name -> vera.orbis.ReportingConfig
-	29, // 4: vera.orbis.MsgSubmitReport.report:type_name -> vera.orbis.ReportEnvelope
-	50, // 5: vera.orbis.MsgDrainNodeKeyResponse.amount:type_name -> cosmos.base.v1beta1.Coin
+	51, // 3: vera.orbis.MsgSetRingReportingByAcp.reporting:type_name -> vera.orbis.ReportingConfig
+	31, // 4: vera.orbis.MsgSubmitReport.report:type_name -> vera.orbis.ReportEnvelope
+	52, // 5: vera.orbis.MsgDrainNodeKeyResponse.amount:type_name -> cosmos.base.v1beta1.Coin
 	1,  // 6: vera.orbis.Msg.UpdateParams:input_type -> vera.orbis.MsgUpdateParams
 	3,  // 7: vera.orbis.Msg.CreateRing:input_type -> vera.orbis.MsgCreateRing
 	5,  // 8: vera.orbis.Msg.FinalizeRing:input_type -> vera.orbis.MsgFinalizeRing
 	7,  // 9: vera.orbis.Msg.CancelPendingRing:input_type -> vera.orbis.MsgCancelPendingRing
 	9,  // 10: vera.orbis.Msg.StartRingReshareByAcp:input_type -> vera.orbis.MsgStartRingReshareByAcp
 	13, // 11: vera.orbis.Msg.SetRingPssIntervalByAcp:input_type -> vera.orbis.MsgSetRingPssIntervalByAcp
-	15, // 12: vera.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> vera.orbis.MsgScheduleRingUpgradeByAcp
-	17, // 13: vera.orbis.Msg.CancelRingUpgradeByAcp:input_type -> vera.orbis.MsgCancelRingUpgradeByAcp
-	11, // 14: vera.orbis.Msg.CancelRingReshareByAcp:input_type -> vera.orbis.MsgCancelRingReshareByAcp
-	19, // 15: vera.orbis.Msg.SetRingReportingByAcp:input_type -> vera.orbis.MsgSetRingReportingByAcp
-	21, // 16: vera.orbis.Msg.AddRingTrustedAuthRelayByAcp:input_type -> vera.orbis.MsgAddRingTrustedAuthRelayByAcp
-	23, // 17: vera.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:input_type -> vera.orbis.MsgRemoveRingTrustedAuthRelayByAcp
-	25, // 18: vera.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> vera.orbis.MsgFinalizeRingReshareByThresholdSignature
-	27, // 19: vera.orbis.Msg.SubmitReport:input_type -> vera.orbis.MsgSubmitReport
-	32, // 20: vera.orbis.Msg.StoreDocument:input_type -> vera.orbis.MsgStoreDocument
-	34, // 21: vera.orbis.Msg.StoreKeyDerivation:input_type -> vera.orbis.MsgStoreKeyDerivation
-	36, // 22: vera.orbis.Msg.CreateNodeInfo:input_type -> vera.orbis.MsgCreateNodeInfo
-	38, // 23: vera.orbis.Msg.UpdateNodePeerId:input_type -> vera.orbis.MsgUpdateNodePeerId
-	40, // 24: vera.orbis.Msg.TransferNodeController:input_type -> vera.orbis.MsgTransferNodeController
-	42, // 25: vera.orbis.Msg.AddNodeToWhitelist:input_type -> vera.orbis.MsgAddNodeToWhitelist
-	44, // 26: vera.orbis.Msg.RemoveNodeFromWhitelist:input_type -> vera.orbis.MsgRemoveNodeFromWhitelist
-	46, // 27: vera.orbis.Msg.DrainNodeKey:input_type -> vera.orbis.MsgDrainNodeKey
-	2,  // 28: vera.orbis.Msg.UpdateParams:output_type -> vera.orbis.MsgUpdateParamsResponse
-	4,  // 29: vera.orbis.Msg.CreateRing:output_type -> vera.orbis.MsgCreateRingResponse
-	6,  // 30: vera.orbis.Msg.FinalizeRing:output_type -> vera.orbis.MsgFinalizeRingResponse
-	8,  // 31: vera.orbis.Msg.CancelPendingRing:output_type -> vera.orbis.MsgCancelPendingRingResponse
-	10, // 32: vera.orbis.Msg.StartRingReshareByAcp:output_type -> vera.orbis.MsgStartRingReshareByAcpResponse
-	14, // 33: vera.orbis.Msg.SetRingPssIntervalByAcp:output_type -> vera.orbis.MsgSetRingPssIntervalByAcpResponse
-	16, // 34: vera.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> vera.orbis.MsgScheduleRingUpgradeByAcpResponse
-	18, // 35: vera.orbis.Msg.CancelRingUpgradeByAcp:output_type -> vera.orbis.MsgCancelRingUpgradeByAcpResponse
-	12, // 36: vera.orbis.Msg.CancelRingReshareByAcp:output_type -> vera.orbis.MsgCancelRingReshareByAcpResponse
-	20, // 37: vera.orbis.Msg.SetRingReportingByAcp:output_type -> vera.orbis.MsgSetRingReportingByAcpResponse
-	22, // 38: vera.orbis.Msg.AddRingTrustedAuthRelayByAcp:output_type -> vera.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
-	24, // 39: vera.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:output_type -> vera.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
-	26, // 40: vera.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> vera.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
-	28, // 41: vera.orbis.Msg.SubmitReport:output_type -> vera.orbis.MsgSubmitReportResponse
-	33, // 42: vera.orbis.Msg.StoreDocument:output_type -> vera.orbis.MsgStoreDocumentResponse
-	35, // 43: vera.orbis.Msg.StoreKeyDerivation:output_type -> vera.orbis.MsgStoreKeyDerivationResponse
-	37, // 44: vera.orbis.Msg.CreateNodeInfo:output_type -> vera.orbis.MsgCreateNodeInfoResponse
-	39, // 45: vera.orbis.Msg.UpdateNodePeerId:output_type -> vera.orbis.MsgUpdateNodePeerIdResponse
-	41, // 46: vera.orbis.Msg.TransferNodeController:output_type -> vera.orbis.MsgTransferNodeControllerResponse
-	43, // 47: vera.orbis.Msg.AddNodeToWhitelist:output_type -> vera.orbis.MsgAddNodeToWhitelistResponse
-	45, // 48: vera.orbis.Msg.RemoveNodeFromWhitelist:output_type -> vera.orbis.MsgRemoveNodeFromWhitelistResponse
-	47, // 49: vera.orbis.Msg.DrainNodeKey:output_type -> vera.orbis.MsgDrainNodeKeyResponse
-	28, // [28:50] is the sub-list for method output_type
-	6,  // [6:28] is the sub-list for method input_type
+	15, // 12: vera.orbis.Msg.SetRingPreShareEndpointsByAcp:input_type -> vera.orbis.MsgSetRingPreShareEndpointsByAcp
+	17, // 13: vera.orbis.Msg.ScheduleRingUpgradeByAcp:input_type -> vera.orbis.MsgScheduleRingUpgradeByAcp
+	19, // 14: vera.orbis.Msg.CancelRingUpgradeByAcp:input_type -> vera.orbis.MsgCancelRingUpgradeByAcp
+	11, // 15: vera.orbis.Msg.CancelRingReshareByAcp:input_type -> vera.orbis.MsgCancelRingReshareByAcp
+	21, // 16: vera.orbis.Msg.SetRingReportingByAcp:input_type -> vera.orbis.MsgSetRingReportingByAcp
+	23, // 17: vera.orbis.Msg.AddRingTrustedAuthRelayByAcp:input_type -> vera.orbis.MsgAddRingTrustedAuthRelayByAcp
+	25, // 18: vera.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:input_type -> vera.orbis.MsgRemoveRingTrustedAuthRelayByAcp
+	27, // 19: vera.orbis.Msg.FinalizeRingReshareByThresholdSignature:input_type -> vera.orbis.MsgFinalizeRingReshareByThresholdSignature
+	29, // 20: vera.orbis.Msg.SubmitReport:input_type -> vera.orbis.MsgSubmitReport
+	34, // 21: vera.orbis.Msg.StoreDocument:input_type -> vera.orbis.MsgStoreDocument
+	36, // 22: vera.orbis.Msg.StoreKeyDerivation:input_type -> vera.orbis.MsgStoreKeyDerivation
+	38, // 23: vera.orbis.Msg.CreateNodeInfo:input_type -> vera.orbis.MsgCreateNodeInfo
+	40, // 24: vera.orbis.Msg.UpdateNodePeerId:input_type -> vera.orbis.MsgUpdateNodePeerId
+	42, // 25: vera.orbis.Msg.TransferNodeController:input_type -> vera.orbis.MsgTransferNodeController
+	44, // 26: vera.orbis.Msg.AddNodeToWhitelist:input_type -> vera.orbis.MsgAddNodeToWhitelist
+	46, // 27: vera.orbis.Msg.RemoveNodeFromWhitelist:input_type -> vera.orbis.MsgRemoveNodeFromWhitelist
+	48, // 28: vera.orbis.Msg.DrainNodeKey:input_type -> vera.orbis.MsgDrainNodeKey
+	2,  // 29: vera.orbis.Msg.UpdateParams:output_type -> vera.orbis.MsgUpdateParamsResponse
+	4,  // 30: vera.orbis.Msg.CreateRing:output_type -> vera.orbis.MsgCreateRingResponse
+	6,  // 31: vera.orbis.Msg.FinalizeRing:output_type -> vera.orbis.MsgFinalizeRingResponse
+	8,  // 32: vera.orbis.Msg.CancelPendingRing:output_type -> vera.orbis.MsgCancelPendingRingResponse
+	10, // 33: vera.orbis.Msg.StartRingReshareByAcp:output_type -> vera.orbis.MsgStartRingReshareByAcpResponse
+	14, // 34: vera.orbis.Msg.SetRingPssIntervalByAcp:output_type -> vera.orbis.MsgSetRingPssIntervalByAcpResponse
+	16, // 35: vera.orbis.Msg.SetRingPreShareEndpointsByAcp:output_type -> vera.orbis.MsgSetRingPreShareEndpointsByAcpResponse
+	18, // 36: vera.orbis.Msg.ScheduleRingUpgradeByAcp:output_type -> vera.orbis.MsgScheduleRingUpgradeByAcpResponse
+	20, // 37: vera.orbis.Msg.CancelRingUpgradeByAcp:output_type -> vera.orbis.MsgCancelRingUpgradeByAcpResponse
+	12, // 38: vera.orbis.Msg.CancelRingReshareByAcp:output_type -> vera.orbis.MsgCancelRingReshareByAcpResponse
+	22, // 39: vera.orbis.Msg.SetRingReportingByAcp:output_type -> vera.orbis.MsgSetRingReportingByAcpResponse
+	24, // 40: vera.orbis.Msg.AddRingTrustedAuthRelayByAcp:output_type -> vera.orbis.MsgAddRingTrustedAuthRelayByAcpResponse
+	26, // 41: vera.orbis.Msg.RemoveRingTrustedAuthRelayByAcp:output_type -> vera.orbis.MsgRemoveRingTrustedAuthRelayByAcpResponse
+	28, // 42: vera.orbis.Msg.FinalizeRingReshareByThresholdSignature:output_type -> vera.orbis.MsgFinalizeRingReshareByThresholdSignatureResponse
+	30, // 43: vera.orbis.Msg.SubmitReport:output_type -> vera.orbis.MsgSubmitReportResponse
+	35, // 44: vera.orbis.Msg.StoreDocument:output_type -> vera.orbis.MsgStoreDocumentResponse
+	37, // 45: vera.orbis.Msg.StoreKeyDerivation:output_type -> vera.orbis.MsgStoreKeyDerivationResponse
+	39, // 46: vera.orbis.Msg.CreateNodeInfo:output_type -> vera.orbis.MsgCreateNodeInfoResponse
+	41, // 47: vera.orbis.Msg.UpdateNodePeerId:output_type -> vera.orbis.MsgUpdateNodePeerIdResponse
+	43, // 48: vera.orbis.Msg.TransferNodeController:output_type -> vera.orbis.MsgTransferNodeControllerResponse
+	45, // 49: vera.orbis.Msg.AddNodeToWhitelist:output_type -> vera.orbis.MsgAddNodeToWhitelistResponse
+	47, // 50: vera.orbis.Msg.RemoveNodeFromWhitelist:output_type -> vera.orbis.MsgRemoveNodeFromWhitelistResponse
+	49, // 51: vera.orbis.Msg.DrainNodeKey:output_type -> vera.orbis.MsgDrainNodeKeyResponse
+	29, // [29:52] is the sub-list for method output_type
+	6,  // [6:29] is the sub-list for method input_type
 	6,  // [6:6] is the sub-list for extension type_name
 	6,  // [6:6] is the sub-list for extension extendee
 	0,  // [0:6] is the sub-list for field type_name
@@ -3233,13 +3350,13 @@ func file_vera_orbis_tx_proto_init() {
 	file_vera_orbis_tx_proto_msgTypes[2].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[4].OneofWrappers = []any{}
 	file_vera_orbis_tx_proto_msgTypes[8].OneofWrappers = []any{}
-	file_vera_orbis_tx_proto_msgTypes[30].OneofWrappers = []any{}
-	file_vera_orbis_tx_proto_msgTypes[31].OneofWrappers = []any{}
-	file_vera_orbis_tx_proto_msgTypes[41].OneofWrappers = []any{
+	file_vera_orbis_tx_proto_msgTypes[32].OneofWrappers = []any{}
+	file_vera_orbis_tx_proto_msgTypes[33].OneofWrappers = []any{}
+	file_vera_orbis_tx_proto_msgTypes[43].OneofWrappers = []any{
 		(*MsgAddNodeToWhitelist_PolicyId)(nil),
 		(*MsgAddNodeToWhitelist_RingId)(nil),
 	}
-	file_vera_orbis_tx_proto_msgTypes[43].OneofWrappers = []any{
+	file_vera_orbis_tx_proto_msgTypes[45].OneofWrappers = []any{
 		(*MsgRemoveNodeFromWhitelist_PolicyId)(nil),
 		(*MsgRemoveNodeFromWhitelist_RingId)(nil),
 	}
@@ -3249,7 +3366,7 @@ func file_vera_orbis_tx_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_vera_orbis_tx_proto_rawDesc), len(file_vera_orbis_tx_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   47,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

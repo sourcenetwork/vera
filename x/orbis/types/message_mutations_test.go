@@ -122,6 +122,11 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 			RingId:      "ring-1",
 			PssInterval: MinPSSIntervalSeconds,
 		},
+		&MsgSetRingPreShareEndpointsByAcp{
+			Creator:           validMutationCreator,
+			RingId:            "ring-1",
+			PreShareEndpoints: []string{"https://defra.example"},
+		},
 		&MsgScheduleRingUpgradeByAcp{
 			Creator:        validMutationCreator,
 			RingId:         "ring-1",
@@ -168,6 +173,11 @@ func TestRingMutationMessagesValidateBasic(t *testing.T) {
 		Creator:     validMutationCreator,
 		RingId:      "ring-1",
 		PssInterval: MinPSSIntervalSeconds - 1,
+	}).ValidateBasic())
+	require.Error(t, (&MsgSetRingPreShareEndpointsByAcp{
+		Creator:           validMutationCreator,
+		RingId:            "ring-1",
+		PreShareEndpoints: []string{"ftp://defra.example"},
 	}).ValidateBasic())
 	require.Error(t, (&MsgScheduleRingUpgradeByAcp{
 		Creator:        validMutationCreator,

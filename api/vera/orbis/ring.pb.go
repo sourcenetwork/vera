@@ -241,14 +241,18 @@ type Ring struct {
 	AllowTrustedAuthRelays bool `protobuf:"varint,15,opt,name=allow_trusted_auth_relays,json=allowTrustedAuthRelays,proto3" json:"allow_trusted_auth_relays,omitempty"`
 	// Set at creation; true means this ring requires a PET check before PRE
 	// release, applying to every document in the ring. Immutable for the
-	// ring's lifetime. Not yet reachable: MsgCreateRing currently rejects true.
+	// ring's lifetime.
 	RequiresPet bool `protobuf:"varint,16,opt,name=requires_pet,json=requiresPet,proto3" json:"requires_pet,omitempty"`
 	// The ring's independently-generated PET public key. Absent until its own
 	// fresh-DKG ceremony finalizes (mirrors ring_pk, but is a distinct key —
-	// never used for signing). Not yet reachable: requires_pet is always false.
-	PetPk         *string `protobuf:"bytes,17,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// never used for signing).
+	PetPk *string `protobuf:"bytes,17,opt,name=pet_pk,json=petPk,proto3,oneof" json:"pet_pk,omitempty"`
+	// DefraDB HTTP base URLs. When non-empty, PRE responders store their
+	// signed reencryption share in Defra instead of returning it directly to
+	// the relayer. Empty keeps the direct-response PRE path unchanged.
+	PreShareEndpoints []string `protobuf:"bytes,18,rep,name=pre_share_endpoints,json=preShareEndpoints,proto3" json:"pre_share_endpoints,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Ring) Reset() {
@@ -400,6 +404,13 @@ func (x *Ring) GetPetPk() string {
 	return ""
 }
 
+func (x *Ring) GetPreShareEndpoints() []string {
+	if x != nil {
+		return x.PreShareEndpoints
+	}
+	return nil
+}
+
 // RingConfirmation records a single peer's agreement on the ring public key
 // (and, on a requires_pet ring, the PET public key too — submitted together
 // in one finalize message, not as an independent confirmation round).
@@ -484,7 +495,7 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\x0fReportingConfig\x12F\n" +
 	"\x0edemerit_config\x18\x01 \x01(\v2\x19.vera.orbis.DemeritConfigB\x04\xc8\xde\x1f\x00R\rdemeritConfig\x12(\n" +
 	"\x10backup_node_keys\x18\x02 \x03(\tR\x0ebackupNodeKeys\x12%\n" +
-	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\xee\x05\n" +
+	"\x0ekick_threshold\x18\x03 \x01(\x04R\rkickThreshold:\x04\xe8\xa0\x1f\x01\"\x9e\x06\n" +
 	"\x04Ring\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vcreator_did\x18\x02 \x01(\tR\n" +
@@ -504,7 +515,8 @@ const file_vera_orbis_ring_proto_rawDesc = "" +
 	"\x17trusted_auth_relay_dids\x18\x0e \x03(\tR\x14trustedAuthRelayDids\x129\n" +
 	"\x19allow_trusted_auth_relays\x18\x0f \x01(\bR\x16allowTrustedAuthRelays\x12!\n" +
 	"\frequires_pet\x18\x10 \x01(\bR\vrequiresPet\x12\x1a\n" +
-	"\x06pet_pk\x18\x11 \x01(\tH\x01R\x05petPk\x88\x01\x01B\x10\n" +
+	"\x06pet_pk\x18\x11 \x01(\tH\x01R\x05petPk\x88\x01\x01\x12.\n" +
+	"\x13pre_share_endpoints\x18\x12 \x03(\tR\x11preShareEndpointsB\x10\n" +
 	"\x0e_new_thresholdB\t\n" +
 	"\a_pet_pk\"m\n" +
 	"\x10RingConfirmation\x12\x19\n" +
