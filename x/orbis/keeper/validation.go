@@ -86,6 +86,10 @@ func validateRingPSSInterval(ring *types.Ring) error {
 	return types.ValidatePSSInterval(ring.GetPssInterval())
 }
 
+func validateRingPreShareEndpoints(ring *types.Ring) error {
+	return types.ValidatePreShareEndpoints(ring.PreShareEndpoints)
+}
+
 func validateStartRingReshare(
 	newPeerNodeKeys []string,
 	newThreshold immutable.Option[uint32],

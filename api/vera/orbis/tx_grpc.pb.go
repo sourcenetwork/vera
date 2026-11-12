@@ -25,6 +25,7 @@ const (
 	Msg_CancelPendingRing_FullMethodName                       = "/vera.orbis.Msg/CancelPendingRing"
 	Msg_StartRingReshareByAcp_FullMethodName                   = "/vera.orbis.Msg/StartRingReshareByAcp"
 	Msg_SetRingPssIntervalByAcp_FullMethodName                 = "/vera.orbis.Msg/SetRingPssIntervalByAcp"
+	Msg_SetRingPreShareEndpointsByAcp_FullMethodName           = "/vera.orbis.Msg/SetRingPreShareEndpointsByAcp"
 	Msg_ScheduleRingUpgradeByAcp_FullMethodName                = "/vera.orbis.Msg/ScheduleRingUpgradeByAcp"
 	Msg_CancelRingUpgradeByAcp_FullMethodName                  = "/vera.orbis.Msg/CancelRingUpgradeByAcp"
 	Msg_CancelRingReshareByAcp_FullMethodName                  = "/vera.orbis.Msg/CancelRingReshareByAcp"
@@ -56,6 +57,7 @@ type MsgClient interface {
 	CancelPendingRing(ctx context.Context, in *MsgCancelPendingRing, opts ...grpc.CallOption) (*MsgCancelPendingRingResponse, error)
 	StartRingReshareByAcp(ctx context.Context, in *MsgStartRingReshareByAcp, opts ...grpc.CallOption) (*MsgStartRingReshareByAcpResponse, error)
 	SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingPssIntervalByAcp, opts ...grpc.CallOption) (*MsgSetRingPssIntervalByAcpResponse, error)
+	SetRingPreShareEndpointsByAcp(ctx context.Context, in *MsgSetRingPreShareEndpointsByAcp, opts ...grpc.CallOption) (*MsgSetRingPreShareEndpointsByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(ctx context.Context, in *MsgScheduleRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(ctx context.Context, in *MsgCancelRingUpgradeByAcp, opts ...grpc.CallOption) (*MsgCancelRingUpgradeByAcpResponse, error)
 	CancelRingReshareByAcp(ctx context.Context, in *MsgCancelRingReshareByAcp, opts ...grpc.CallOption) (*MsgCancelRingReshareByAcpResponse, error)
@@ -138,6 +140,16 @@ func (c *msgClient) SetRingPssIntervalByAcp(ctx context.Context, in *MsgSetRingP
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MsgSetRingPssIntervalByAcpResponse)
 	err := c.cc.Invoke(ctx, Msg_SetRingPssIntervalByAcp_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) SetRingPreShareEndpointsByAcp(ctx context.Context, in *MsgSetRingPreShareEndpointsByAcp, opts ...grpc.CallOption) (*MsgSetRingPreShareEndpointsByAcpResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(MsgSetRingPreShareEndpointsByAcpResponse)
+	err := c.cc.Invoke(ctx, Msg_SetRingPreShareEndpointsByAcp_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -317,6 +329,7 @@ type MsgServer interface {
 	CancelPendingRing(context.Context, *MsgCancelPendingRing) (*MsgCancelPendingRingResponse, error)
 	StartRingReshareByAcp(context.Context, *MsgStartRingReshareByAcp) (*MsgStartRingReshareByAcpResponse, error)
 	SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error)
+	SetRingPreShareEndpointsByAcp(context.Context, *MsgSetRingPreShareEndpointsByAcp) (*MsgSetRingPreShareEndpointsByAcpResponse, error)
 	ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error)
 	CancelRingUpgradeByAcp(context.Context, *MsgCancelRingUpgradeByAcp) (*MsgCancelRingUpgradeByAcpResponse, error)
 	CancelRingReshareByAcp(context.Context, *MsgCancelRingReshareByAcp) (*MsgCancelRingReshareByAcpResponse, error)
@@ -362,6 +375,9 @@ func (UnimplementedMsgServer) StartRingReshareByAcp(context.Context, *MsgStartRi
 }
 func (UnimplementedMsgServer) SetRingPssIntervalByAcp(context.Context, *MsgSetRingPssIntervalByAcp) (*MsgSetRingPssIntervalByAcpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetRingPssIntervalByAcp not implemented")
+}
+func (UnimplementedMsgServer) SetRingPreShareEndpointsByAcp(context.Context, *MsgSetRingPreShareEndpointsByAcp) (*MsgSetRingPreShareEndpointsByAcpResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetRingPreShareEndpointsByAcp not implemented")
 }
 func (UnimplementedMsgServer) ScheduleRingUpgradeByAcp(context.Context, *MsgScheduleRingUpgradeByAcp) (*MsgScheduleRingUpgradeByAcpResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ScheduleRingUpgradeByAcp not implemented")
@@ -536,6 +552,24 @@ func _Msg_SetRingPssIntervalByAcp_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MsgServer).SetRingPssIntervalByAcp(ctx, req.(*MsgSetRingPssIntervalByAcp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_SetRingPreShareEndpointsByAcp_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgSetRingPreShareEndpointsByAcp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).SetRingPreShareEndpointsByAcp(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_SetRingPreShareEndpointsByAcp_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).SetRingPreShareEndpointsByAcp(ctx, req.(*MsgSetRingPreShareEndpointsByAcp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -858,6 +892,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetRingPssIntervalByAcp",
 			Handler:    _Msg_SetRingPssIntervalByAcp_Handler,
+		},
+		{
+			MethodName: "SetRingPreShareEndpointsByAcp",
+			Handler:    _Msg_SetRingPreShareEndpointsByAcp_Handler,
 		},
 		{
 			MethodName: "ScheduleRingUpgradeByAcp",

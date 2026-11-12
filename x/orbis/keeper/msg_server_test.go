@@ -1198,6 +1198,67 @@ func TestMsgServer_SetRingPssIntervalByAcpAllowsRingOwner(t *testing.T) {
 	require.ErrorContains(t, err, "pss_interval must be at least 86400 seconds")
 }
 
+func TestMsgServer_SetRingPreShareEndpointsByAcpAllowsRingOwner(t *testing.T) {
+	k, authKeeper, ctx := setupOrbisKeeper(t)
+	ctx = ctxWithDID(ctx, testDID)
+
+	creatorAddr, _ := testAccountWithPubKey(t, ctx, authKeeper)
+
+	peer1Addr, peer1Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer1")
+	peer2Addr, peer2Key := setupPeerWithNodeInfo(t, k, authKeeper, ctx, "12D3KooWPeer2")
+	policyID := createOrbisRingPolicy(t, k, ctx, creatorAddr)
+
+	createRingResp, err := k.CreateRing(ctx, &types.MsgCreateRing{
+		Creator:      creatorAddr,
+		PeerNodeKeys: []string{peer1Key, peer2Key},
+		Threshold:    1,
+		PssInterval:  types.MinPSSIntervalSeconds,
+		PolicyId:     policyID,
+	})
+	require.NoError(t, err)
+
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer1Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+	_, err = k.FinalizeRing(ctx, &types.MsgFinalizeRing{Creator: peer2Addr, RingId: createRingResp.RingId, RingPk: "ring-pk"})
+	require.NoError(t, err)
+
+	endpoints := []string{"https://defra.example"}
+	_, err = k.SetRingPreShareEndpointsByAcp(ctx, &types.MsgSetRingPreShareEndpointsByAcp{
+		Creator:           creatorAddr,
+		RingId:            createRingResp.RingId,
+		PreShareEndpoints: endpoints,
+	})
+	require.NoError(t, err)
+
+	ring := k.GetRing(ctx, createRingResp.RingId)
+	require.NotNil(t, ring)
+	require.Equal(t, policyID, ring.PolicyId)
+	require.Equal(t, endpoints, ring.PreShareEndpoints)
+
+	_, err = k.SetRingPreShareEndpointsByAcp(ctx, &types.MsgSetRingPreShareEndpointsByAcp{
+		Creator:           creatorAddr,
+		RingId:            createRingResp.RingId,
+		PreShareEndpoints: endpoints,
+	})
+	require.ErrorIs(t, err, types.ErrRingPreShareEndpointsUnchanged)
+
+	moreEndpoints := []string{"https://defra-a.example", "https://defra-b.example"}
+	_, err = k.SetRingPreShareEndpointsByAcp(ctx, &types.MsgSetRingPreShareEndpointsByAcp{
+		Creator:           creatorAddr,
+		RingId:            createRingResp.RingId,
+		PreShareEndpoints: moreEndpoints,
+	})
+	require.NoError(t, err)
+	require.Equal(t, moreEndpoints, k.GetRing(ctx, createRingResp.RingId).PreShareEndpoints)
+
+	_, err = k.SetRingPreShareEndpointsByAcp(ctx, &types.MsgSetRingPreShareEndpointsByAcp{
+		Creator:           creatorAddr,
+		RingId:            createRingResp.RingId,
+		PreShareEndpoints: []string{"not-a-url"},
+	})
+	require.ErrorContains(t, err, "must use http or https")
+}
+
 func TestMsgServer_SetRingReportingByAcpAllowsRingOwner(t *testing.T) {
 	k, authKeeper, ctx := setupOrbisKeeper(t)
 	ctx = ctxWithDID(ctx, testDID)
@@ -1792,6 +1853,13 @@ func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	})
 	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
 
+	_, err = k.SetRingPreShareEndpointsByAcp(outsiderCtx, &types.MsgSetRingPreShareEndpointsByAcp{
+		Creator:           outsiderAddr,
+		RingId:            createRingResp.RingId,
+		PreShareEndpoints: []string{"https://defra.example"},
+	})
+	require.ErrorIs(t, err, types.ErrUnauthorizedRingUpdate)
+
 	ring := k.GetRing(creatorCtx, createRingResp.RingId)
 	require.NotNil(t, ring)
 	require.Equal(t, types.MinPSSIntervalSeconds, ring.GetPssInterval())
@@ -1800,6 +1868,7 @@ func TestMsgServer_RingMutationsRejectUnauthorizedActor(t *testing.T) {
 	require.Nil(t, ring.UpgradeInfo.XActivationTime)
 	require.Empty(t, ring.NewPeerNodeKeys)
 	require.Nil(t, ring.XNewThreshold)
+	require.Empty(t, ring.PreShareEndpoints)
 }
 
 func TestMsgServer_RingMutationUsesRingPolicy(t *testing.T) {
